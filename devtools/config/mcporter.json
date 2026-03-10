@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/steipete/mcporter/main/mcporter.schema.json",
+  "mcpServers": {
+    "ascii-motion": {
+      "command": "bunx",
+      "args": [
+        "ascii-motion-mcp",
+        "--live",
+        "--project-dir",
+        "/Users/dstephen/git/sandpiper-ai"
+      ],
+      "lifecycle": "keep-alive",
+      "logging": { "daemon": { "enabled": true } }
+    }
+  },
+  "imports": []
+}

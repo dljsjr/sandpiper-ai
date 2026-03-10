@@ -1,0 +1,53 @@
+id: inject_null_default_twoarg
+language: typescript
+rule:
+  kind: arguments
+  inside:
+    pattern:
+      context: '$_OBJ.requiredOption($$$ARGS)'
+      selector: call_expression
+  not:
+    has:
+      nthChild: 3
+  has:
+    nthChild: 2
+transform:
+  NEWARGS:
+    replace:
+      source: $$$ARGS
+      replace: '(?m)(?<_ARGS>(?:.*\n?)*)'
+      by: $_ARGS, null
+  NEWARGS_CLEANED:
+    replace:
+      source: $NEWARGS
+      replace: ",,"
+      by: ', '
+fix: '($NEWARGS_CLEANED)'
+
+---
+
+id: inject_null_default_threearg
+language: typescript
+rule:
+  kind: arguments
+  inside:
+    pattern:
+      context: '$_OBJ.requiredOption($$$ARGS)'
+      selector: call_expression
+  not:
+    has:
+      nthChild: 4
+  has:
+    nthChild: 3
+transform:
+  NEWARGS:
+    replace:
+      source: $$$ARGS
+      replace: '(?m)(?<_ARGS>(?:.*\n?)*)'
+      by: $_ARGS, null
+  NEWARGS_CLEANED:
+    replace:
+      source: $NEWARGS
+      replace: ',, '
+      by: ', '
+fix: '($NEWARGS_CLEANED)'

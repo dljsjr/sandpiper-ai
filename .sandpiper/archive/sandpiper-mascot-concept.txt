@@ -1,0 +1,41 @@
+# Sandpiper Mascot Design Concept
+
+Based on the non-breeding adult sandpiper reference image, here's a concept for a highly detailed sandpiper mascot with depth and shading, similar to the Pi mascot or Copilot logo examples.
+
+## Design Approach
+
+The mascot should use:
+- Extensive block characters (█, ▓, ▒, ▀, ▄, ▌, ▐, etc.) for depth and texture
+- Multiple theme colors for shading and detail
+- Careful arrangement to create 3D appearance
+- Profile view with characteristic sandpiper posture
+
+## Conceptual Structure (6-8 lines):
+
+Line 1: Head and eye detail with proper shading
+Line 2: Beak and neck transition
+Line 3: Body with wing detail
+Line 4: Lower body and leg attachment
+Line 5: Legs with proper proportion
+Line 6: Feet and ground interaction
+Line 7: Ground texture/base (optional)
+Line 8: Additional detail/shadow (optional)
+
+## Color Strategy
+
+Similar to the Pi mascot example:
+- Primary color for main body
+- Secondary color for shadows/highlights
+- Accent color for eye/detail
+- Dim color for contrast/depth
+
+## Reference Inspiration
+
+The design should capture:
+- The sandpiper's distinctive long beak
+- The bent-over feeding posture
+- The slender legs and small feet
+- The compact body shape
+- The overall "busy" texture of feathers
+
+The mascot should be recognizable as a sandpiper while using the sophisticated coloring and block character techniques seen in professional mascot designs.
