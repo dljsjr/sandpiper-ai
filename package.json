@@ -1,0 +1,64 @@
+{
+  "name": "sandpiper-ai",
+  "version": "0.0.1",
+  "author": "Doug Stephen <dljs.jr@dougstephenjr.com>",
+  "private": true,
+  "scripts": {
+    "check": "bun run --workspaces --if-present check",
+    "clean": "rm -rf {.,**}/{node_modules,dist,.*cache,*.d.ts,*.tsbuildinfo}",
+    "sandpiper-cli": "sandpiper"
+  },
+  "keywords": [
+    "pi-package"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions"
+    ],
+    "skills": [
+      "./skills"
+    ],
+    "prompts": [
+      "./prompts"
+    ],
+    "themes": [
+      "./themes"
+    ]
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "devtools/"
+    ],
+    "catalogs": {
+      "bun": {
+        "bun": "1.3.10",
+        "@types/bun": "1.3.10"
+      },
+      "cli": {
+        "commander": "14.0.3",
+        "@commander-js/extra-typings": "14.0.0"
+      },
+      "pi": {
+        "@mariozechner/pi-coding-agent": "0.57.1",
+        "@silvia-odwyer/photon-node": "0.3.4"
+      },
+      "ts": {
+        "typescript": "5.9.3"
+      },
+      "tooling": {
+        "@biomejs/biome": "2.4.6"
+      }
+    }
+  },
+  "dependencies": {
+    "chalk": "4",
+    "sandpiper-ai-cli": "workspace:*",
+    "supports-color": "^10.2.2"
+  },
+  "description": "To install dependencies:",
+  "main": "sandpiper-design-iterative.js",
+  "devDependencies": {},
+  "license": "ISC",
+  "type": "commonjs"
+}

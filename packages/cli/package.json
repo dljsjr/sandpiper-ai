@@ -1,0 +1,34 @@
+{
+  "name": "sandpiper-ai-cli",
+  "version": "0.0.1",
+  "author": {
+    "name": "Doug Stephen",
+    "email": "dljs.jr@dougstephenjr.com"
+  },
+  "dependencies": {
+    "bun": "catalog:bun",
+    "@mariozechner/pi-coding-agent": "catalog:pi"
+  },
+  "peerDependencies": {
+    "@silvia-odwyer/photon-node": "catalog:pi"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:bun"
+  },
+  "scripts": {
+    "build:bun-compile": "mkdir -p ./dist && bun build --target bun --compile --compile-autoload-package-json ./index.ts --outfile ./dist/sandpiper",
+    "copy-assets": "bun run --target bun ./copy_pi_assets.ts",
+    "preinstall": "bun build:bun-compile && bun copy-assets"
+  },
+  "bin": {
+    "sandpiper": "./dist/sandpiper"
+  },
+  "piConfig": {
+    "name": "sandpiper",
+    "configDir": ".sandpiper",
+    "bin": "sandpiper"
+  },
+  "files": [
+    "dist"
+  ]
+}

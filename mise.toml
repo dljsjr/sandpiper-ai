@@ -1,0 +1,7 @@
+[tools]
+bun = "latest"
+
+[settings]
+
+[settings.npm]
+package_manager = "bun"
