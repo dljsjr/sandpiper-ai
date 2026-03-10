@@ -1,0 +1,3176 @@
+[mcporter] Restarting 'ascii-motion' before retrying listTools: Not connected
+ascii-motion
+
+  /**
+   * Get the character and colors at a specific canvas position
+   *
+   * @param x X coordinate (0-based, left to right)
+   * @param y Y coordinate (0-based, top to bottom)
+   * @param frameIndex? Frame index (defaults to current frame)
+   */
+  function get_cell(x: number, y: number, frameIndex?: number);
+      {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "description": "X coordinate (0-based, left to right)"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Y coordinate (0-based, top to bottom)"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame index (defaults to current frame)"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the character and/or colors at a specific canvas position
+   *
+   * @param x X coordinate (0-based)
+   * @param y Y coordinate (0-based)
+   * @param char? Single character to set
+   * @param color? Foreground color (hex, e.g., #FFFFFF)
+   * @param bgColor? Background color (hex or "transparent")
+   */
+  function set_cell(x: number, y: number, char?: string, color?: string, bgColor?: string);
+      {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "description": "X coordinate (0-based)"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Y coordinate (0-based)"
+          },
+          "char": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "description": "Single character to set"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "description": "Foreground color (hex, e.g., #FFFFFF)"
+          },
+          "bgColor": {
+            "type": "string",
+            "description": "Background color (hex or \"transparent\")"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Clear a cell, resetting it to empty (space with transparent background)
+   *
+   * @param x X coordinate
+   * @param y Y coordinate
+   */
+  function clear_cell(x: number, y: number);
+      {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "description": "X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Y coordinate"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set multiple cells in a single operation. More efficient than calling set_cell repeatedly.
+   *
+   * @param cells Array of cells to set (max 10,000). Each cell can specify any combination of char,
+   *              color, bgColor.
+   */
+  function set_cells_batch(cells: string[]);
+      {
+        "type": "object",
+        "properties": {
+          "cells": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "integer"
+                },
+                "y": {
+                  "type": "integer"
+                },
+                "char": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1
+                },
+                "color": {
+                  "type": "string",
+                  "pattern": "^#[0-9A-Fa-f]{6}$"
+                },
+                "bgColor": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "description": "Array of cells to set (max 10,000). Each cell can specify any combination of char, color, bgColor."
+          }
+        },
+        "required": [
+          "cells"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Paste a multi-line ASCII art block onto the canvas at a specified position. Great for pasting found
+   * ASCII art.
+   *
+   * @param text Multi-line ASCII text to paste
+   * @param x? X position for top-left corner
+   * @param y? Y position for top-left corner
+   * @param color? Text color for all pasted characters
+   * @param bgColor? Background color for all pasted characters
+   * @param preserveSpaces? If true, spaces will overwrite existing cells. If false, spaces are
+   *                        transparent.
+   */
+  function paste_ascii_block(text: string, x?: number, y?: number, color?: string, bgColor?: string, preserveSpaces?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Multi-line ASCII text to paste"
+          },
+          "x": {
+            "type": "integer",
+            "default": 0,
+            "description": "X position for top-left corner"
+          },
+          "y": {
+            "type": "integer",
+            "default": 0,
+            "description": "Y position for top-left corner"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "default": "#FFFFFF",
+            "description": "Text color for all pasted characters"
+          },
+          "bgColor": {
+            "type": "string",
+            "default": "transparent",
+            "description": "Background color for all pasted characters"
+          },
+          "preserveSpaces": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, spaces will overwrite existing cells. If false, spaces are transparent."
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Fill a region with a character and colors. Can be contiguous (flood fill) or global (all matching
+   * cells).
+   *
+   * @param x Starting X coordinate
+   * @param y Starting Y coordinate
+   * @param char Character to fill with
+   * @param color? Fill color
+   * @param bgColor? Fill background color
+   * @param contiguous? If true, only fills connected cells. If false, fills all matching cells.
+   * @param matchChar? Only fill cells that match the starting cell character
+   * @param matchColor? Only fill cells that match the starting cell color
+   * @param matchBgColor? Only fill cells that match the starting cell background
+   */
+  function fill_region(x: number, y: number, char: string, color?: string, bgColor?: string, contiguous?: boolean, matchChar?: boolean, matchColor?: boolean, matchBgColor?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "description": "Starting X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Starting Y coordinate"
+          },
+          "char": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "description": "Character to fill with"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "default": "#FFFFFF",
+            "description": "Fill color"
+          },
+          "bgColor": {
+            "type": "string",
+            "default": "transparent",
+            "description": "Fill background color"
+          },
+          "contiguous": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, only fills connected cells. If false, fills all matching cells."
+          },
+          "matchChar": {
+            "type": "boolean",
+            "default": false,
+            "description": "Only fill cells that match the starting cell character"
+          },
+          "matchColor": {
+            "type": "boolean",
+            "default": false,
+            "description": "Only fill cells that match the starting cell color"
+          },
+          "matchBgColor": {
+            "type": "boolean",
+            "default": false,
+            "description": "Only fill cells that match the starting cell background"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "char"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Resize the canvas. Content outside the new bounds will be clipped.
+   *
+   * @param width New width (4-200)
+   * @param height New height (4-100)
+   */
+  function resize_canvas(width: number, height: number);
+      {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "minimum": 4,
+            "maximum": 200,
+            "description": "New width (4-200)"
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 4,
+            "maximum": 100,
+            "description": "New height (4-100)"
+          }
+        },
+        "required": [
+          "width",
+          "height"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Clear all cells on the current frame, leaving it empty
+   */
+  function clear_canvas();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * List all frames in the animation with their metadata
+   */
+  function list_frames();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Add a new frame to the animation
+   *
+   * @param atIndex? Index to insert at (defaults to end)
+   * @param duration? Frame duration in ms (default: 100)
+   * @param copyFromIndex? Copy content from this frame index
+   * @param name? Frame name
+   */
+  function add_frame(atIndex?: number, duration?: number, copyFromIndex?: number, name?: string);
+      {
+        "type": "object",
+        "properties": {
+          "atIndex": {
+            "type": "integer",
+            "description": "Index to insert at (defaults to end)"
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 60000,
+            "description": "Frame duration in ms (default: 100)"
+          },
+          "copyFromIndex": {
+            "type": "integer",
+            "description": "Copy content from this frame index"
+          },
+          "name": {
+            "type": "string",
+            "description": "Frame name"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Delete a frame from the animation. Cannot delete the last remaining frame.
+   *
+   * @param index Index of frame to delete
+   */
+  function delete_frame(index: number);
+      {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Index of frame to delete"
+          }
+        },
+        "required": [
+          "index"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Duplicate a frame, inserting the copy immediately after the original
+   *
+   * @param index Index of frame to duplicate
+   */
+  function duplicate_frame(index: number);
+      {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Index of frame to duplicate"
+          }
+        },
+        "required": [
+          "index"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Navigate to a specific frame, making it the current/active frame
+   *
+   * @param index Frame index to navigate to
+   */
+  function go_to_frame(index: number);
+      {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Frame index to navigate to"
+          }
+        },
+        "required": [
+          "index"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the duration of a frame in milliseconds
+   *
+   * @param index Frame index
+   * @param duration Duration in milliseconds (10-60000)
+   */
+  function set_frame_duration(index: number, duration: number);
+      {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Frame index"
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 60000,
+            "description": "Duration in milliseconds (10-60000)"
+          }
+        },
+        "required": [
+          "index",
+          "duration"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set or change the name of a frame
+   *
+   * @param index Frame index
+   * @param name New frame name
+   */
+  function set_frame_name(index: number, name: string);
+      {
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "integer",
+            "description": "Frame index"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "New frame name"
+          }
+        },
+        "required": [
+          "index",
+          "name"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Create a new empty project, discarding any unsaved changes
+   *
+   * @param width? Canvas width
+   * @param height? Canvas height
+   * @param name? Project name
+   * @param template? Use a preset template
+   */
+  function new_project(width?: number, height?: number, name?: string, template?: "terminal-80x24" | "wide-120x30" | "square-40x40" | "small-32x16" | "large-160x50");
+      {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "minimum": 4,
+            "maximum": 200,
+            "default": 80,
+            "description": "Canvas width"
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 4,
+            "maximum": 100,
+            "default": 24,
+            "description": "Canvas height"
+          },
+          "name": {
+            "type": "string",
+            "description": "Project name"
+          },
+          "template": {
+            "type": "string",
+            "enum": [
+              "terminal-80x24",
+              "wide-120x30",
+              "square-40x40",
+              "small-32x16",
+              "large-160x50"
+            ],
+            "description": "Use a preset template"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Save the current project to a .asciimtn file
+   *
+   * @param filePath File path relative to project directory (e.g., "my-art.asciimtn")
+   */
+  function save_project(filePath: string);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path relative to project directory (e.g., \"my-art.asciimtn\")"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Load a project from a .asciimtn file
+   *
+   * @param filePath File path relative to project directory
+   */
+  function load_project(filePath: string);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path relative to project directory"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get information about the current project
+   */
+  function get_project_info();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the project name
+   *
+   * @param name New project name
+   */
+  function set_project_name(name: string);
+      {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "description": "New project name"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * List all .asciimtn project files in the project directory
+   *
+   * @param recursive? Search subdirectories
+   */
+  function list_project_files(recursive?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "recursive": {
+            "type": "boolean",
+            "default": false,
+            "description": "Search subdirectories"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get a compact summary of the canvas (dimensions, fill count, bounding box). Use this first to
+   * understand the canvas before requesting more detail.
+   *
+   * @param frameIndex? Frame index (defaults to current)
+   */
+  function get_canvas_summary(frameIndex?: number);
+      {
+        "type": "object",
+        "properties": {
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame index (defaults to current)"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get non-empty cells in a region. Use for inspecting specific areas.
+   *
+   * @param frameIndex? Frame index (defaults to current)
+   * @param region? Region to preview (defaults to entire canvas)
+   * @param maxCells? Maximum cells to return
+   */
+  function get_canvas_preview(frameIndex?: number, region?: unknown, maxCells?: number);
+      {
+        "type": "object",
+        "properties": {
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame index (defaults to current)"
+          },
+          "region": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "default": 0
+              },
+              "y": {
+                "type": "integer",
+                "default": 0
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "description": "Region to preview (defaults to entire canvas)"
+          },
+          "maxCells": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum cells to return"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get the canvas as raw ASCII text (characters only, no color info). Good for verifying visual
+   * appearance.
+   *
+   * @param frameIndex? Frame index (defaults to current)
+   * @param region? Region to render (defaults to bounding box of content)
+   * @param trimEmpty? Trim empty rows/columns around content
+   * @param overlayPreviousFrame? Show previous frame content as dim (for motion context)
+   */
+  function get_canvas_ascii(frameIndex?: number, region?: unknown, trimEmpty?: boolean, overlayPreviousFrame?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame index (defaults to current)"
+          },
+          "region": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer",
+                "default": 0
+              },
+              "y": {
+                "type": "integer",
+                "default": 0
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": false,
+            "description": "Region to render (defaults to bounding box of content)"
+          },
+          "trimEmpty": {
+            "type": "boolean",
+            "default": true,
+            "description": "Trim empty rows/columns around content"
+          },
+          "overlayPreviousFrame": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show previous frame content as dim (for motion context)"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get the cells that differ between two frames. Useful for understanding animation changes.
+   *
+   * @param frameA First frame index
+   * @param frameB Second frame index
+   * @param maxCells? Maximum cells to return
+   */
+  function get_frame_diff(frameA: number, frameB: number, maxCells?: number);
+      {
+        "type": "object",
+        "properties": {
+          "frameA": {
+            "type": "integer",
+            "description": "First frame index"
+          },
+          "frameB": {
+            "type": "integer",
+            "description": "Second frame index"
+          },
+          "maxCells": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 100,
+            "description": "Maximum cells to return"
+          }
+        },
+        "required": [
+          "frameA",
+          "frameB"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get a high-level description of the animation: frame count, timing, and motion patterns.
+   */
+  function describe_animation();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Undo the last action
+   */
+  function undo();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Redo the last undone action
+   */
+  function redo();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Check if undo/redo is available and what actions can be undone/redone
+   */
+  function get_history_status();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Duplicate a frame and apply modifications in a single operation. Efficient for creating animation
+   * sequences.
+   *
+   * @param sourceIndex Index of frame to copy
+   * @param modifications Cell modifications to apply to the new frame
+   * @param insertAtIndex? Where to insert the new frame (defaults to after source)
+   * @param name? Name for the new frame
+   * @param duration? Duration for the new frame
+   */
+  function copy_frame_and_modify(sourceIndex: number, modifications: string[], insertAtIndex?: number, name?: string, duration?: number);
+      {
+        "type": "object",
+        "properties": {
+          "sourceIndex": {
+            "type": "integer",
+            "description": "Index of frame to copy"
+          },
+          "modifications": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "integer"
+                },
+                "y": {
+                  "type": "integer"
+                },
+                "char": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1
+                },
+                "color": {
+                  "type": "string",
+                  "pattern": "^#[0-9A-Fa-f]{6}$"
+                },
+                "bgColor": {
+                  "type": "string"
+                },
+                "clear": {
+                  "type": "boolean",
+                  "description": "If true, clear this cell"
+                }
+              },
+              "required": [
+                "x",
+                "y"
+              ],
+              "additionalProperties": false
+            },
+            "description": "Cell modifications to apply to the new frame"
+          },
+          "insertAtIndex": {
+            "type": "integer",
+            "description": "Where to insert the new frame (defaults to after source)"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name for the new frame"
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 60000,
+            "description": "Duration for the new frame"
+          }
+        },
+        "required": [
+          "sourceIndex",
+          "modifications"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Shift all content on the current frame by an x/y offset. Useful for creating scrolling or movement
+   * animations.
+   *
+   * @param dx Horizontal shift (positive = right, negative = left)
+   * @param dy Vertical shift (positive = down, negative = up)
+   * @param wrap? If true, content wraps around edges
+   * @param frameIndex? Frame to shift (defaults to current)
+   */
+  function shift_frame_content(dx: number, dy: number, wrap?: boolean, frameIndex?: number);
+      {
+        "type": "object",
+        "properties": {
+          "dx": {
+            "type": "integer",
+            "description": "Horizontal shift (positive = right, negative = left)"
+          },
+          "dy": {
+            "type": "integer",
+            "description": "Vertical shift (positive = down, negative = up)"
+          },
+          "wrap": {
+            "type": "boolean",
+            "default": false,
+            "description": "If true, content wraps around edges"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to shift (defaults to current)"
+          }
+        },
+        "required": [
+          "dx",
+          "dy"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Flip/mirror content horizontally or vertically
+   *
+   * @param direction Flip direction
+   * @param region? Region to flip (defaults to entire canvas)
+   * @param frameIndex? Frame to flip (defaults to current)
+   */
+  function flip_region(direction: "horizontal" | "vertical", region?: unknown, frameIndex?: number);
+      {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "enum": [
+              "horizontal",
+              "vertical"
+            ],
+            "description": "Flip direction"
+          },
+          "region": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer"
+              },
+              "y": {
+                "type": "integer"
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "width",
+              "height"
+            ],
+            "additionalProperties": false,
+            "description": "Region to flip (defaults to entire canvas)"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to flip (defaults to current)"
+          }
+        },
+        "required": [
+          "direction"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Copy a region of cells from one frame to another
+   *
+   * @param sourceFrame Source frame index
+   * @param targetFrame Target frame index
+   * @param sourceRegion Region to copy from source
+   * @param targetPosition? Position to paste at in target (defaults to same position)
+   * @param overwrite? If true, overwrite existing cells in target
+   */
+  function copy_region_to_frame(sourceFrame: number, targetFrame: number, sourceRegion: unknown, targetPosition?: unknown, overwrite?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "sourceFrame": {
+            "type": "integer",
+            "description": "Source frame index"
+          },
+          "targetFrame": {
+            "type": "integer",
+            "description": "Target frame index"
+          },
+          "sourceRegion": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer"
+              },
+              "y": {
+                "type": "integer"
+              },
+              "width": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "height": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "required": [
+              "x",
+              "y",
+              "width",
+              "height"
+            ],
+            "additionalProperties": false,
+            "description": "Region to copy from source"
+          },
+          "targetPosition": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "integer"
+              },
+              "y": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "x",
+              "y"
+            ],
+            "additionalProperties": false,
+            "description": "Position to paste at in target (defaults to same position)"
+          },
+          "overwrite": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, overwrite existing cells in target"
+          }
+        },
+        "required": [
+          "sourceFrame",
+          "targetFrame",
+          "sourceRegion"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Generate intermediate frames between two keyframes. Creates smooth transitions.
+   *
+   * @param startFrame Starting keyframe index
+   * @param endFrame Ending keyframe index
+   * @param steps Number of intermediate frames to generate
+   * @param method? Interpolation method
+   */
+  function interpolate_frames(startFrame: number, endFrame: number, steps: number, method?: "linear" | "fade");
+      {
+        "type": "object",
+        "properties": {
+          "startFrame": {
+            "type": "integer",
+            "description": "Starting keyframe index"
+          },
+          "endFrame": {
+            "type": "integer",
+            "description": "Ending keyframe index"
+          },
+          "steps": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "description": "Number of intermediate frames to generate"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "linear",
+              "fade"
+            ],
+            "default": "linear",
+            "description": "Interpolation method"
+          }
+        },
+        "required": [
+          "startFrame",
+          "endFrame",
+          "steps"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Select a rectangular region of the canvas
+   *
+   * @param x Top-left X coordinate
+   * @param y Top-left Y coordinate
+   * @param width Width of selection
+   * @param height Height of selection
+   */
+  function select_rectangle(x: number, y: number, width: number, height: number);
+      {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "description": "Top-left X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Top-left Y coordinate"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Width of selection"
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Height of selection"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Select cells that match specific criteria (magic wand style)
+   *
+   * @param x Starting X coordinate
+   * @param y Starting Y coordinate
+   * @param matchChar? Match character
+   * @param matchColor? Match foreground color
+   * @param matchBgColor? Match background color
+   * @param contiguous? Only select connected cells
+   */
+  function select_by_color(x: number, y: number, matchChar?: boolean, matchColor?: boolean, matchBgColor?: boolean, contiguous?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "description": "Starting X coordinate"
+          },
+          "y": {
+            "type": "integer",
+            "description": "Starting Y coordinate"
+          },
+          "matchChar": {
+            "type": "boolean",
+            "default": false,
+            "description": "Match character"
+          },
+          "matchColor": {
+            "type": "boolean",
+            "default": true,
+            "description": "Match foreground color"
+          },
+          "matchBgColor": {
+            "type": "boolean",
+            "default": false,
+            "description": "Match background color"
+          },
+          "contiguous": {
+            "type": "boolean",
+            "default": true,
+            "description": "Only select connected cells"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get the current selection bounds and contents
+   *
+   * @param includeCells? Include the actual cell data in the response
+   * @param maxCells? Maximum cells to include
+   */
+  function get_selection(includeCells?: boolean, maxCells?: number);
+      {
+        "type": "object",
+        "properties": {
+          "includeCells": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include the actual cell data in the response"
+          },
+          "maxCells": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 100,
+            "description": "Maximum cells to include"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Clear the current selection (deselect)
+   */
+  function clear_selection();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Apply an operation to all cells in the current selection
+   *
+   * @param operation Operation to apply
+   * @param char? Character for fill operation
+   * @param color? Color for fill/recolor
+   * @param bgColor? Background color for fill/recolor
+   */
+  function apply_to_selection(operation: "clear" | "fill" | "recolor", char?: string, color?: string, bgColor?: string);
+      {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "clear",
+              "fill",
+              "recolor"
+            ],
+            "description": "Operation to apply"
+          },
+          "char": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "description": "Character for fill operation"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "description": "Color for fill/recolor"
+          },
+          "bgColor": {
+            "type": "string",
+            "description": "Background color for fill/recolor"
+          }
+        },
+        "required": [
+          "operation"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Delete all cell content within the current selection
+   */
+  function delete_selection_content();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the current frame or all frames as plain text (.txt). Returns ASCII art as text.
+   *
+   * @param filePath? File path to save to (relative to project dir). If omitted, returns content only.
+   * @param frameIndex? Frame to export (defaults to current). Use "all" param for all frames.
+   * @param allFrames? Export all frames with separators
+   * @param trimEmpty? Remove leading/trailing empty rows and columns
+   * @param includeMetadata? Include frame names and timing as comments
+   */
+  function export_text(filePath?: string, frameIndex?: number, allFrames?: boolean, trimEmpty?: boolean, includeMetadata?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save to (relative to project dir). If omitted, returns content only."
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to export (defaults to current). Use \"all\" param for all frames."
+          },
+          "allFrames": {
+            "type": "boolean",
+            "default": false,
+            "description": "Export all frames with separators"
+          },
+          "trimEmpty": {
+            "type": "boolean",
+            "default": true,
+            "description": "Remove leading/trailing empty rows and columns"
+          },
+          "includeMetadata": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include frame names and timing as comments"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the project as structured JSON data. Good for programmatic processing.
+   *
+   * @param filePath? File path to save to (relative to project dir). If omitted, returns content only.
+   * @param includeMetadata? Include project metadata
+   * @param humanReadable? Pretty-print JSON
+   * @param includeEmptyCells? Include cells with default values
+   */
+  function export_json(filePath?: string, includeMetadata?: boolean, humanReadable?: boolean, includeEmptyCells?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save to (relative to project dir). If omitted, returns content only."
+          },
+          "includeMetadata": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include project metadata"
+          },
+          "humanReadable": {
+            "type": "boolean",
+            "default": true,
+            "description": "Pretty-print JSON"
+          },
+          "includeEmptyCells": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include cells with default values"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the project as an .asciimtn session file (can be loaded by Ascii-Motion app).
+   *
+   * @param filePath File path for the .asciimtn file (relative to project dir)
+   */
+  function export_session(filePath: string);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path for the .asciimtn file (relative to project dir)"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the animation as a self-contained HTML file with embedded animation player.
+   *
+   * @param filePath? File path to save to. If omitted, returns HTML content.
+   * @param backgroundColor? Background color
+   * @param fontFamily? Font family
+   * @param fontSize? Font size in pixels
+   * @param animationSpeed? Animation speed multiplier
+   * @param loops? Number of loops
+   * @param includeControls? Include play/pause controls
+   */
+  function export_html(filePath?: string, backgroundColor?: string, fontFamily?: "monospace" | "courier" | "consolas", fontSize?: number, animationSpeed?: number, loops?: unknown, includeControls?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save to. If omitted, returns HTML content."
+          },
+          "backgroundColor": {
+            "type": "string",
+            "default": "#000000",
+            "description": "Background color"
+          },
+          "fontFamily": {
+            "type": "string",
+            "enum": [
+              "monospace",
+              "courier",
+              "consolas"
+            ],
+            "default": "monospace",
+            "description": "Font family"
+          },
+          "fontSize": {
+            "type": "integer",
+            "minimum": 8,
+            "maximum": 24,
+            "default": 14,
+            "description": "Font size in pixels"
+          },
+          "animationSpeed": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 5,
+            "default": 1,
+            "description": "Animation speed multiplier"
+          },
+          "loops": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "infinite"
+              },
+              {
+                "type": "integer",
+                "minimum": 1
+              }
+            ],
+            "default": "infinite",
+            "description": "Number of loops"
+          },
+          "includeControls": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include play/pause controls"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the animation as a React component (JSX or TSX).
+   *
+   * @param filePath? File path to save to
+   * @param typescript? Use TypeScript (TSX)
+   * @param includeControls? Include play/pause controls
+   * @param componentName? React component name
+   */
+  function export_react(filePath?: string, typescript?: boolean, includeControls?: boolean, componentName?: string);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save to"
+          },
+          "typescript": {
+            "type": "boolean",
+            "default": true,
+            "description": "Use TypeScript (TSX)"
+          },
+          "includeControls": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include play/pause controls"
+          },
+          "componentName": {
+            "type": "string",
+            "default": "AsciiAnimation",
+            "description": "React component name"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the current frame with ANSI escape codes for terminal display.
+   *
+   * @param frameIndex? Frame to export (defaults to current)
+   * @param colorMode? ANSI color mode
+   */
+  function export_ansi(frameIndex?: number, colorMode?: "16" | "256" | "truecolor");
+      {
+        "type": "object",
+        "properties": {
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to export (defaults to current)"
+          },
+          "colorMode": {
+            "type": "string",
+            "enum": [
+              "16",
+              "256",
+              "truecolor"
+            ],
+            "default": "truecolor",
+            "description": "ANSI color mode"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Apply a visual effect to the current frame or selection. Effects modify colors and/or characters.
+   *
+   * @param effect Type of effect to apply
+   * @param brightness? Brightness adjustment (-100 to 100)
+   * @param contrast? Contrast adjustment (-100 to 100)
+   * @param hue? Hue shift in degrees (-180 to 180)
+   * @param saturation? Saturation adjustment (-100 to 100)
+   * @param lightness? Lightness adjustment (-100 to 100)
+   * @param colorMap? Map of old colors to new colors (e.g., {"#FF0000": "#00FF00"})
+   * @param characterMap? Map of old characters to new (e.g., {"@": "#", "*": "+"})
+   * @param targetPalette? Target color palette for automatic remapping
+   * @param scatterAmount? Maximum pixel displacement for scatter effect
+   * @param frameIndex? Frame to apply effect to (defaults to current)
+   * @param applyToSelection? Only apply effect within current selection
+   * @param affectForeground? Apply color effects to foreground colors
+   * @param affectBackground? Apply color effects to background colors
+   */
+  function apply_effect(effect: "levels" | "hue-saturation" | "remap-colors" | "remap-characters" | "scatter" | "invert" | "grayscale", brightness?: number, contrast?: number, hue?: number, saturation?: number, lightness?: number, colorMap?: unknown, characterMap?: unknown, targetPalette?: string[], scatterAmount?: number, frameIndex?: number, applyToSelection?: boolean, affectForeground?: boolean, affectBackground?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "effect": {
+            "type": "string",
+            "enum": [
+              "levels",
+              "hue-saturation",
+              "remap-colors",
+              "remap-characters",
+              "scatter",
+              "invert",
+              "grayscale"
+            ],
+            "description": "Type of effect to apply"
+          },
+          "brightness": {
+            "type": "number",
+            "minimum": -100,
+            "maximum": 100,
+            "description": "Brightness adjustment (-100 to 100)"
+          },
+          "contrast": {
+            "type": "number",
+            "minimum": -100,
+            "maximum": 100,
+            "description": "Contrast adjustment (-100 to 100)"
+          },
+          "hue": {
+            "type": "number",
+            "minimum": -180,
+            "maximum": 180,
+            "description": "Hue shift in degrees (-180 to 180)"
+          },
+          "saturation": {
+            "type": "number",
+            "minimum": -100,
+            "maximum": 100,
+            "description": "Saturation adjustment (-100 to 100)"
+          },
+          "lightness": {
+            "type": "number",
+            "minimum": -100,
+            "maximum": 100,
+            "description": "Lightness adjustment (-100 to 100)"
+          },
+          "colorMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Map of old colors to new colors (e.g., {\"#FF0000\": \"#00FF00\"})"
+          },
+          "characterMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Map of old characters to new (e.g., {\"@\": \"#\", \"*\": \"+\"})"
+          },
+          "targetPalette": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Target color palette for automatic remapping"
+          },
+          "scatterAmount": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 20,
+            "description": "Maximum pixel displacement for scatter effect"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to apply effect to (defaults to current)"
+          },
+          "applyToSelection": {
+            "type": "boolean",
+            "default": false,
+            "description": "Only apply effect within current selection"
+          },
+          "affectForeground": {
+            "type": "boolean",
+            "default": true,
+            "description": "Apply color effects to foreground colors"
+          },
+          "affectBackground": {
+            "type": "boolean",
+            "default": true,
+            "description": "Apply color effects to background colors"
+          }
+        },
+        "required": [
+          "effect"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get statistics about colors used in the current frame. Useful before applying color effects.
+   *
+   * @param frameIndex? Frame to analyze (defaults to current)
+   * @param includeBackground? Include background colors in analysis
+   */
+  function get_color_stats(frameIndex?: number, includeBackground?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to analyze (defaults to current)"
+          },
+          "includeBackground": {
+            "type": "boolean",
+            "default": true,
+            "description": "Include background colors in analysis"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Replace one color with another across the entire frame or selection.
+   *
+   * @param oldColor Color to replace (hex format like #FF0000)
+   * @param newColor New color (hex format)
+   * @param target? Which colors to replace
+   * @param frameIndex? Frame to modify (defaults to current)
+   */
+  function batch_recolor(oldColor: string, newColor: string, target?: "foreground" | "background" | "both", frameIndex?: number);
+      {
+        "type": "object",
+        "properties": {
+          "oldColor": {
+            "type": "string",
+            "description": "Color to replace (hex format like #FF0000)"
+          },
+          "newColor": {
+            "type": "string",
+            "description": "New color (hex format)"
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "foreground",
+              "background",
+              "both"
+            ],
+            "default": "both",
+            "description": "Which colors to replace"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to modify (defaults to current)"
+          }
+        },
+        "required": [
+          "oldColor",
+          "newColor"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Replace one character with another across the entire frame or selection.
+   *
+   * @param oldChar Character to replace
+   * @param newChar New character
+   * @param frameIndex? Frame to modify (defaults to current)
+   */
+  function batch_replace_char(oldChar: string, newChar: string, frameIndex?: number);
+      {
+        "type": "object",
+        "properties": {
+          "oldChar": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "description": "Character to replace"
+          },
+          "newChar": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "description": "New character"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to modify (defaults to current)"
+          }
+        },
+        "required": [
+          "oldChar",
+          "newChar"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Generate procedural animation frames. Creates new frames with animated patterns.
+   *
+   * @param generator Generator type
+   * @param frameCount? Number of frames to generate
+   * @param frameDuration? Duration of each frame in ms
+   * @param color? Primary color (hex)
+   * @param secondaryColor? Secondary color for gradients
+   * @param backgroundColor? Background color
+   * @param characterSet? Custom characters to use (overrides default)
+   * @param density? Density of elements (0-1)
+   * @param speed? Animation speed multiplier
+   * @param trailLength? Length of trails
+   * @param waveSpeed? Wave expansion speed
+   * @param waveCount? Number of simultaneous waves
+   * @param centerX? Wave center X (defaults to canvas center)
+   * @param centerY? Wave center Y (defaults to canvas center)
+   * @param noiseScale? Noise scale (smaller = more detailed)
+   * @param noiseSpeed? How fast noise evolves
+   * @param particleCount? Number of particles
+   * @param gravity? Gravity effect (-1 to 1)
+   * @param replaceFrames? Replace existing frames (otherwise append)
+   * @param seed? Random seed for reproducibility
+   */
+  function run_generator(generator: "digital-rain" | "radio-waves" | "turbulent-noise" | "particle-physics" | "rain-drops" | "static-noise" | "gradient", frameCount?: number, frameDuration?: number, color?: string, secondaryColor?: string, backgroundColor?: string, characterSet?: string, density?: number, speed?: number, trailLength?: number, waveSpeed?: number, waveCount?: number, centerX?: number, centerY?: number, noiseScale?: number, noiseSpeed?: number, particleCount?: number, gravity?: number, replaceFrames?: boolean, seed?: number);
+      {
+        "type": "object",
+        "properties": {
+          "generator": {
+            "type": "string",
+            "enum": [
+              "digital-rain",
+              "radio-waves",
+              "turbulent-noise",
+              "particle-physics",
+              "rain-drops",
+              "static-noise",
+              "gradient"
+            ],
+            "description": "Generator type"
+          },
+          "frameCount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10,
+            "description": "Number of frames to generate"
+          },
+          "frameDuration": {
+            "type": "integer",
+            "minimum": 10,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Duration of each frame in ms"
+          },
+          "color": {
+            "type": "string",
+            "default": "#00FF00",
+            "description": "Primary color (hex)"
+          },
+          "secondaryColor": {
+            "type": "string",
+            "description": "Secondary color for gradients"
+          },
+          "backgroundColor": {
+            "type": "string",
+            "default": "transparent",
+            "description": "Background color"
+          },
+          "characterSet": {
+            "type": "string",
+            "description": "Custom characters to use (overrides default)"
+          },
+          "density": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1,
+            "default": 0.1,
+            "description": "Density of elements (0-1)"
+          },
+          "speed": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 5,
+            "default": 1,
+            "description": "Animation speed multiplier"
+          },
+          "trailLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20,
+            "default": 8,
+            "description": "Length of trails"
+          },
+          "waveSpeed": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 5,
+            "default": 1,
+            "description": "Wave expansion speed"
+          },
+          "waveCount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "default": 3,
+            "description": "Number of simultaneous waves"
+          },
+          "centerX": {
+            "type": "integer",
+            "description": "Wave center X (defaults to canvas center)"
+          },
+          "centerY": {
+            "type": "integer",
+            "description": "Wave center Y (defaults to canvas center)"
+          },
+          "noiseScale": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1,
+            "default": 0.1,
+            "description": "Noise scale (smaller = more detailed)"
+          },
+          "noiseSpeed": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1,
+            "default": 0.05,
+            "description": "How fast noise evolves"
+          },
+          "particleCount": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200,
+            "default": 20,
+            "description": "Number of particles"
+          },
+          "gravity": {
+            "type": "number",
+            "minimum": -1,
+            "maximum": 1,
+            "default": 0.1,
+            "description": "Gravity effect (-1 to 1)"
+          },
+          "replaceFrames": {
+            "type": "boolean",
+            "default": false,
+            "description": "Replace existing frames (otherwise append)"
+          },
+          "seed": {
+            "type": "integer",
+            "description": "Random seed for reproducibility"
+          }
+        },
+        "required": [
+          "generator"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Preview a single frame from a generator without applying to the project.
+   *
+   * @param generator Generator type
+   * @param color? Primary color
+   * @param density? Element density
+   * @param seed? Random seed
+   */
+  function preview_generator(generator: "digital-rain" | "radio-waves" | "turbulent-noise" | "particle-physics" | "rain-drops" | "static-noise" | "gradient", color?: string, density?: number, seed?: number);
+      {
+        "type": "object",
+        "properties": {
+          "generator": {
+            "type": "string",
+            "enum": [
+              "digital-rain",
+              "radio-waves",
+              "turbulent-noise",
+              "particle-physics",
+              "rain-drops",
+              "static-noise",
+              "gradient"
+            ],
+            "description": "Generator type"
+          },
+          "color": {
+            "type": "string",
+            "default": "#00FF00",
+            "description": "Primary color"
+          },
+          "density": {
+            "type": "number",
+            "minimum": 0.01,
+            "maximum": 1,
+            "default": 0.1,
+            "description": "Element density"
+          },
+          "seed": {
+            "type": "integer",
+            "description": "Random seed"
+          }
+        },
+        "required": [
+          "generator"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the current frame as an Ink (React CLI) component for Node.js terminal apps.
+   *
+   * @param filePath? File path to save (.tsx file). If omitted, returns content only.
+   * @param frameIndex? Frame to export (defaults to current)
+   * @param componentName? Name for the component
+   * @param includeAnimation? Export all frames with animation support
+   */
+  function export_ink(filePath?: string, frameIndex?: number, componentName?: string, includeAnimation?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save (.tsx file). If omitted, returns content only."
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to export (defaults to current)"
+          },
+          "componentName": {
+            "type": "string",
+            "default": "AsciiArt",
+            "description": "Name for the component"
+          },
+          "includeAnimation": {
+            "type": "boolean",
+            "default": false,
+            "description": "Export all frames with animation support"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the current frame as a Bubbletea (Go TUI) component.
+   *
+   * @param filePath? File path to save (.go file). If omitted, returns content only.
+   * @param frameIndex? Frame to export (defaults to current)
+   * @param packageName? Go package name
+   * @param modelName? Name for the Bubbletea model
+   * @param includeAnimation? Export all frames with animation support
+   */
+  function export_bubbletea(filePath?: string, frameIndex?: number, packageName?: string, modelName?: string, includeAnimation?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save (.go file). If omitted, returns content only."
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to export (defaults to current)"
+          },
+          "packageName": {
+            "type": "string",
+            "default": "ascii",
+            "description": "Go package name"
+          },
+          "modelName": {
+            "type": "string",
+            "default": "AsciiModel",
+            "description": "Name for the Bubbletea model"
+          },
+          "includeAnimation": {
+            "type": "boolean",
+            "default": false,
+            "description": "Export all frames with animation support"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the current frame as an OpenTUI (Python TUI) component.
+   *
+   * @param filePath? File path to save (.py file). If omitted, returns content only.
+   * @param frameIndex? Frame to export (defaults to current)
+   * @param className? Name for the Python class
+   * @param includeAnimation? Export all frames with animation support
+   */
+  function export_opentui(filePath?: string, frameIndex?: number, className?: string, includeAnimation?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save (.py file). If omitted, returns content only."
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to export (defaults to current)"
+          },
+          "className": {
+            "type": "string",
+            "default": "AsciiDisplay",
+            "description": "Name for the Python class"
+          },
+          "includeAnimation": {
+            "type": "boolean",
+            "default": false,
+            "description": "Export all frames with animation support"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the current frame as a PNG, JPG, or SVG image. Note: PNG/JPG require the canvas library; SVG
+   * works without dependencies.
+   *
+   * @param filePath File path to save (extension determines format: .png, .jpg, .svg)
+   * @param frameIndex? Frame to export (defaults to current)
+   * @param scale? Scale factor (1 = 10px per cell)
+   * @param fontFamily? Font family for rendering
+   * @param fontSize? Font size in pixels
+   * @param cellWidth? Width of each cell in pixels
+   * @param cellHeight? Height of each cell in pixels
+   */
+  function export_image(filePath: string, frameIndex?: number, scale?: number, fontFamily?: string, fontSize?: number, cellWidth?: number, cellHeight?: number);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save (extension determines format: .png, .jpg, .svg)"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to export (defaults to current)"
+          },
+          "scale": {
+            "type": "number",
+            "default": 1,
+            "description": "Scale factor (1 = 10px per cell)"
+          },
+          "fontFamily": {
+            "type": "string",
+            "default": "monospace",
+            "description": "Font family for rendering"
+          },
+          "fontSize": {
+            "type": "number",
+            "default": 12,
+            "description": "Font size in pixels"
+          },
+          "cellWidth": {
+            "type": "number",
+            "default": 10,
+            "description": "Width of each cell in pixels"
+          },
+          "cellHeight": {
+            "type": "number",
+            "default": 16,
+            "description": "Height of each cell in pixels"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Export the animation as an MP4, WebM, or GIF video. Requires ffmpeg for MP4/WebM, gif-encoder for
+   * GIF.
+   *
+   * @param filePath File path to save (extension determines format: .mp4, .webm, .gif)
+   * @param scale? Scale factor (1 = 10px per cell)
+   * @param fontFamily? Font family for rendering
+   * @param fontSize? Font size in pixels
+   * @param cellWidth? Width of each cell in pixels
+   * @param cellHeight? Height of each cell in pixels
+   * @param loop? Whether animation should loop (for GIF)
+   */
+  function export_video(filePath: string, scale?: number, fontFamily?: string, fontSize?: number, cellWidth?: number, cellHeight?: number, loop?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "File path to save (extension determines format: .mp4, .webm, .gif)"
+          },
+          "scale": {
+            "type": "number",
+            "default": 1,
+            "description": "Scale factor (1 = 10px per cell)"
+          },
+          "fontFamily": {
+            "type": "string",
+            "default": "monospace",
+            "description": "Font family for rendering"
+          },
+          "fontSize": {
+            "type": "number",
+            "default": 12,
+            "description": "Font size in pixels"
+          },
+          "cellWidth": {
+            "type": "number",
+            "default": 10,
+            "description": "Width of each cell in pixels"
+          },
+          "cellHeight": {
+            "type": "number",
+            "default": 16,
+            "description": "Height of each cell in pixels"
+          },
+          "loop": {
+            "type": "boolean",
+            "default": true,
+            "description": "Whether animation should loop (for GIF)"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Import an image file and convert it to ASCII art on the canvas. Requires optional "sharp" or "jimp"
+   * package for image processing.
+   *
+   * @param filePath Path to the image file (.png, .jpg, .gif, .bmp)
+   * @param targetWidth? Target width in characters. If omitted, uses canvas width.
+   * @param targetHeight? Target height in characters. If omitted, maintains aspect ratio.
+   * @param charset? Characters to use for brightness mapping (dark to bright)
+   * @param colorMode? How to apply colors
+   * @param dithering? Dithering algorithm to use
+   * @param frameIndex? Frame to import to (defaults to current)
+   * @param offsetX? X offset on canvas
+   * @param offsetY? Y offset on canvas
+   */
+  function import_image(filePath: string, targetWidth?: number, targetHeight?: number, charset?: string, colorMode?: "none" | "foreground" | "background" | "both", dithering?: "none" | "floyd-steinberg" | "ordered", frameIndex?: number, offsetX?: number, offsetY?: number);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "Path to the image file (.png, .jpg, .gif, .bmp)"
+          },
+          "targetWidth": {
+            "type": "integer",
+            "description": "Target width in characters. If omitted, uses canvas width."
+          },
+          "targetHeight": {
+            "type": "integer",
+            "description": "Target height in characters. If omitted, maintains aspect ratio."
+          },
+          "charset": {
+            "type": "string",
+            "default": " .:-=+*#%@",
+            "description": "Characters to use for brightness mapping (dark to bright)"
+          },
+          "colorMode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "foreground",
+              "background",
+              "both"
+            ],
+            "default": "foreground",
+            "description": "How to apply colors"
+          },
+          "dithering": {
+            "type": "string",
+            "enum": [
+              "none",
+              "floyd-steinberg",
+              "ordered"
+            ],
+            "default": "none",
+            "description": "Dithering algorithm to use"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to import to (defaults to current)"
+          },
+          "offsetX": {
+            "type": "integer",
+            "default": 0,
+            "description": "X offset on canvas"
+          },
+          "offsetY": {
+            "type": "integer",
+            "default": 0,
+            "description": "Y offset on canvas"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Import a video file and convert each frame to ASCII art animation. Requires ffmpeg and optional
+   * image processing package.
+   *
+   * @param filePath Path to the video file (.mp4, .webm, .mov, .gif)
+   * @param targetWidth? Target width in characters. If omitted, uses canvas width.
+   * @param targetHeight? Target height in characters. If omitted, maintains aspect ratio.
+   * @param charset? Characters to use for brightness mapping (dark to bright)
+   * @param colorMode? How to apply colors
+   * @param fps? Frames per second to extract
+   * @param maxFrames? Maximum number of frames to import
+   * @param startTime? Start time in seconds
+   * @param duration? Duration in seconds (omit for entire video)
+   */
+  function import_video(filePath: string, targetWidth?: number, targetHeight?: number, charset?: string, colorMode?: "none" | "foreground" | "background" | "both", fps?: number, maxFrames?: number, startTime?: number, duration?: number);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "Path to the video file (.mp4, .webm, .mov, .gif)"
+          },
+          "targetWidth": {
+            "type": "integer",
+            "description": "Target width in characters. If omitted, uses canvas width."
+          },
+          "targetHeight": {
+            "type": "integer",
+            "description": "Target height in characters. If omitted, maintains aspect ratio."
+          },
+          "charset": {
+            "type": "string",
+            "default": " .:-=+*#%@",
+            "description": "Characters to use for brightness mapping (dark to bright)"
+          },
+          "colorMode": {
+            "type": "string",
+            "enum": [
+              "none",
+              "foreground",
+              "background",
+              "both"
+            ],
+            "default": "foreground",
+            "description": "How to apply colors"
+          },
+          "fps": {
+            "type": "number",
+            "default": 10,
+            "description": "Frames per second to extract"
+          },
+          "maxFrames": {
+            "type": "integer",
+            "default": 100,
+            "description": "Maximum number of frames to import"
+          },
+          "startTime": {
+            "type": "number",
+            "default": 0,
+            "description": "Start time in seconds"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Duration in seconds (omit for entire video)"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Import ASCII art from a plain text file onto the canvas.
+   *
+   * @param filePath Path to the text file
+   * @param frameIndex? Frame to import to (defaults to current)
+   * @param offsetX? X offset on canvas
+   * @param offsetY? Y offset on canvas
+   * @param color? Foreground color for imported text
+   * @param bgColor? Background color for imported text
+   * @param replaceSpaces? Whether to set cells for space characters
+   */
+  function import_ascii_text(filePath: string, frameIndex?: number, offsetX?: number, offsetY?: number, color?: string, bgColor?: string, replaceSpaces?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "filePath": {
+            "type": "string",
+            "description": "Path to the text file"
+          },
+          "frameIndex": {
+            "type": "integer",
+            "description": "Frame to import to (defaults to current)"
+          },
+          "offsetX": {
+            "type": "integer",
+            "default": 0,
+            "description": "X offset on canvas"
+          },
+          "offsetY": {
+            "type": "integer",
+            "default": 0,
+            "description": "Y offset on canvas"
+          },
+          "color": {
+            "type": "string",
+            "default": "#ffffff",
+            "description": "Foreground color for imported text"
+          },
+          "bgColor": {
+            "type": "string",
+            "default": "transparent",
+            "description": "Background color for imported text"
+          },
+          "replaceSpaces": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to set cells for space characters"
+          }
+        },
+        "required": [
+          "filePath"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * List all available character palettes for ASCII art.
+   */
+  function list_character_palettes();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get all characters from a specific palette.
+   *
+   * @param paletteId Palette ID
+   */
+  function get_character_palette(paletteId: string);
+      {
+        "type": "object",
+        "properties": {
+          "paletteId": {
+            "type": "string",
+            "description": "Palette ID"
+          }
+        },
+        "required": [
+          "paletteId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * List all available color palettes.
+   */
+  function list_color_palettes();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get all colors from a specific palette.
+   *
+   * @param paletteId Palette ID
+   */
+  function get_color_palette(paletteId: string);
+      {
+        "type": "object",
+        "properties": {
+          "paletteId": {
+            "type": "string",
+            "description": "Palette ID"
+          }
+        },
+        "required": [
+          "paletteId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get the currently active foreground and background colors.
+   */
+  function get_active_colors();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the active foreground (text) color.
+   *
+   * @param color Hex color (e.g., #FF0000)
+   */
+  function set_foreground_color(color: string);
+      {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "description": "Hex color (e.g., #FF0000)"
+          }
+        },
+        "required": [
+          "color"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the active background color.
+   *
+   * @param color Hex color or "transparent"
+   */
+  function set_background_color(color: string);
+      {
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string",
+            "description": "Hex color or \"transparent\""
+          }
+        },
+        "required": [
+          "color"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the active character used for drawing.
+   *
+   * @param character Single character
+   */
+  function set_selected_character(character: string);
+      {
+        "type": "object",
+        "properties": {
+          "character": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1,
+            "description": "Single character"
+          }
+        },
+        "required": [
+          "character"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get palette recommendations for a specific style.
+   *
+   * @param style Style theme
+   */
+  function suggest_palette_for_style(style: "terminal" | "retro" | "matrix" | "minimalist" | "detailed" | "colorful");
+      {
+        "type": "object",
+        "properties": {
+          "style": {
+            "type": "string",
+            "enum": [
+              "terminal",
+              "retro",
+              "matrix",
+              "minimalist",
+              "detailed",
+              "colorful"
+            ],
+            "description": "Style theme"
+          }
+        },
+        "required": [
+          "style"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Request the browser to send its current state. Use this before reading canvas data to ensure you
+   * have the latest state. Returns success if browser is connected and responded.
+   */
+  function refresh_state_from_browser();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Compare two frames and show what cells changed between them. Useful for understanding motion and
+   * edits in an animation.
+   *
+   * @param frameA Index of first frame
+   * @param frameB Index of second frame
+   * @param showUnchanged? Include unchanged cells in output
+   */
+  function compare_frames(frameA: number, frameB: number, showUnchanged?: boolean);
+      {
+        "type": "object",
+        "properties": {
+          "frameA": {
+            "type": "integer",
+            "description": "Index of first frame"
+          },
+          "frameB": {
+            "type": "integer",
+            "description": "Index of second frame"
+          },
+          "showUnchanged": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include unchanged cells in output"
+          }
+        },
+        "required": [
+          "frameA",
+          "frameB"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get all layers in the project with their metadata, content frame count, and property track info.
+   */
+  function get_layers();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Add a new layer to the project. If project is in legacy frame mode, this switches it to layer mode.
+   *
+   * @param name? Layer name (auto-generated if omitted)
+   */
+  function add_layer(name?: string);
+      {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Layer name (auto-generated if omitted)"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Remove a layer by ID. Cannot remove the last remaining layer.
+   *
+   * @param layerId ID of the layer to remove
+   */
+  function remove_layer(layerId: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "ID of the layer to remove"
+          }
+        },
+        "required": [
+          "layerId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Duplicate a layer with all its content frames and property tracks.
+   *
+   * @param layerId ID of the layer to duplicate
+   */
+  function duplicate_layer(layerId: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "ID of the layer to duplicate"
+          }
+        },
+        "required": [
+          "layerId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set which layer is active for drawing and editing operations.
+   *
+   * @param layerId ID of the layer to make active
+   */
+  function set_active_layer(layerId: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "ID of the layer to make active"
+          }
+        },
+        "required": [
+          "layerId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Rename a layer.
+   *
+   * @param layerId ID of the layer to rename
+   * @param name New layer name
+   */
+  function rename_layer(layerId: string, name: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "ID of the layer to rename"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "New layer name"
+          }
+        },
+        "required": [
+          "layerId",
+          "name"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Move a layer from one z-order position to another. Index 0 = bottom layer.
+   *
+   * @param fromIndex Current index of the layer
+   * @param toIndex Target index to move to
+   */
+  function reorder_layers(fromIndex: number, toIndex: number);
+      {
+        "type": "object",
+        "properties": {
+          "fromIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Current index of the layer"
+          },
+          "toIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Target index to move to"
+          }
+        },
+        "required": [
+          "fromIndex",
+          "toIndex"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set visibility, solo, lock, or opacity on a layer.
+   *
+   * @param layerId Layer ID
+   * @param visible? Set visibility
+   * @param solo? Set solo mode
+   * @param locked? Set locked state
+   * @param opacity? Set opacity (0-100)
+   */
+  function set_layer_visibility(layerId: string, visible?: boolean, solo?: boolean, locked?: boolean, opacity?: number);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "Layer ID"
+          },
+          "visible": {
+            "type": "boolean",
+            "description": "Set visibility"
+          },
+          "solo": {
+            "type": "boolean",
+            "description": "Set solo mode"
+          },
+          "locked": {
+            "type": "boolean",
+            "description": "Set locked state"
+          },
+          "opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Set opacity (0-100)"
+          }
+        },
+        "required": [
+          "layerId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Add a new content frame (canvas data segment) to a layer at a specific timeline position.
+   *
+   * @param layerId Layer ID
+   * @param startFrame Starting frame number
+   * @param durationFrames Duration in frames
+   * @param data? Initial cell data for the content frame
+   */
+  function add_content_frame(layerId: string, startFrame: number, durationFrames: number, data?: unknown);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "Layer ID"
+          },
+          "startFrame": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Starting frame number"
+          },
+          "durationFrames": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Duration in frames"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "char": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1,
+                  "description": "Single ASCII character"
+                },
+                "color": {
+                  "type": "string",
+                  "pattern": "^#[0-9A-Fa-f]{6}$",
+                  "description": "Foreground hex color (e.g., #FFFFFF)"
+                },
+                "bgColor": {
+                  "type": "string",
+                  "description": "Background hex color or \"transparent\""
+                }
+              },
+              "required": [
+                "char",
+                "color",
+                "bgColor"
+              ],
+              "additionalProperties": false
+            },
+            "propertyNames": {
+              "pattern": "^\\d+,\\d+$"
+            },
+            "description": "Initial cell data for the content frame"
+          }
+        },
+        "required": [
+          "layerId",
+          "startFrame",
+          "durationFrames"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Remove a content frame from a layer.
+   *
+   * @param layerId Layer ID
+   * @param contentFrameId Content frame ID to remove
+   */
+  function remove_content_frame(layerId: string, contentFrameId: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "Layer ID"
+          },
+          "contentFrameId": {
+            "type": "string",
+            "description": "Content frame ID to remove"
+          }
+        },
+        "required": [
+          "layerId",
+          "contentFrameId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Add a keyframe to a layer property track. Creates the property track if it doesn't exist.
+   *
+   * @param layerId Layer ID
+   * @param propertyPath Property to keyframe (e.g., transform.position.x)
+   * @param frame Frame number
+   * @param value Keyframe value
+   * @param easing? Easing curve (defaults to linear)
+   */
+  function add_keyframe(layerId: string, propertyPath: "transform.position.x" | "transform.position.y" | "transform.scale.x" | "transform.scale.y" | "transform.rotation" | "transform.anchorPoint.x" | "transform.anchorPoint.y", frame: number, value: number, easing?: unknown);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "Layer ID"
+          },
+          "propertyPath": {
+            "type": "string",
+            "enum": [
+              "transform.position.x",
+              "transform.position.y",
+              "transform.scale.x",
+              "transform.scale.y",
+              "transform.rotation",
+              "transform.anchorPoint.x",
+              "transform.anchorPoint.y"
+            ],
+            "description": "Property to keyframe (e.g., transform.position.x)"
+          },
+          "frame": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Frame number"
+          },
+          "value": {
+            "type": "number",
+            "description": "Keyframe value"
+          },
+          "easing": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "linear",
+                      "hold",
+                      "ease-in",
+                      "ease-out",
+                      "ease-in-out",
+                      "ease-out-back",
+                      "ease-in-back",
+                      "bounce"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "const": "custom"
+                  }
+                ]
+              },
+              "x1": {
+                "type": "number"
+              },
+              "y1": {
+                "type": "number"
+              },
+              "x2": {
+                "type": "number"
+              },
+              "y2": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false,
+            "description": "Easing curve (defaults to linear)"
+          }
+        },
+        "required": [
+          "layerId",
+          "propertyPath",
+          "frame",
+          "value"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Remove a keyframe from a property track.
+   *
+   * @param layerId Layer ID
+   * @param trackId Property track ID
+   * @param keyframeId Keyframe ID to remove
+   */
+  function remove_keyframe(layerId: string, trackId: string, keyframeId: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "Layer ID"
+          },
+          "trackId": {
+            "type": "string",
+            "description": "Property track ID"
+          },
+          "keyframeId": {
+            "type": "string",
+            "description": "Keyframe ID to remove"
+          }
+        },
+        "required": [
+          "layerId",
+          "trackId",
+          "keyframeId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get all transform property values for a layer at the current frame, including keyframe status.
+   *
+   * @param layerId Layer ID
+   */
+  function get_layer_properties(layerId: string);
+      {
+        "type": "object",
+        "properties": {
+          "layerId": {
+            "type": "string",
+            "description": "Layer ID"
+          }
+        },
+        "required": [
+          "layerId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Create a layer group to organize layers together.
+   *
+   * @param name? Group name
+   * @param layerIds? Layer IDs to include in the group
+   */
+  function create_group(name?: string, layerIds?: string[]);
+      {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Group name"
+          },
+          "layerIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Layer IDs to include in the group"
+          }
+        },
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Dissolve a layer group, keeping the layers.
+   *
+   * @param groupId Group ID to dissolve
+   */
+  function ungroup_layers(groupId: string);
+      {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "string",
+            "description": "Group ID to dissolve"
+          }
+        },
+        "required": [
+          "groupId"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the timeline frame rate (FPS). Preserves frame count — only changes playback speed.
+   *
+   * @param fps Frames per second
+   */
+  function set_frame_rate(fps: number);
+      {
+        "type": "object",
+        "properties": {
+          "fps": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 120,
+            "description": "Frames per second"
+          }
+        },
+        "required": [
+          "fps"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Set the total timeline duration in frames.
+   *
+   * @param durationFrames Total frames in timeline
+   */
+  function set_timeline_duration(durationFrames: number);
+      {
+        "type": "object",
+        "properties": {
+          "durationFrames": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Total frames in timeline"
+          }
+        },
+        "required": [
+          "durationFrames"
+        ],
+        "additionalProperties": false,
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Check browser connection status. Returns whether browser is connected and client count
+   */
+  function get_connection_status();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  /**
+   * Get the authentication token for browser connection.
+   */
+  function get_auth_token();
+      {
+        "type": "object",
+        "properties": {},
+        "$schema": "http://json-schema.org/draft-07/schema#"
+      }
+
+  Examples:
+    mcporter call ascii-motion.get_cell(x: 1, y: 1, frameIndex: 1)
+
+  90 tools · 123ms · STDIO bunx ascii-motion-mcp --live --project-dir /Users/doug.stephen/git/sandpiper-ai
+

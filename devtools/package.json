@@ -6,6 +6,7 @@
   },
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "check:biome-fmt": "bunx --bun @biomejs/biome format",
     "check:biome-lint": "bunx --bun @biomejs/biome lint",
@@ -14,13 +15,16 @@
     "check": "bun run check:tsc check:biome-check"
   },
   "dependencies": {
+    "@commander-js/extra-typings": "catalog:cli",
+    "ascii-motion-mcp": "catalog:tooling",
     "bun": "catalog:bun",
-    "@commander-js/extra-typings": "catalog:cli"
+    "mcporter": "catalog:tooling"
   },
   "devDependencies": {
     "@types/bun": "catalog:bun"
   },
   "peerDependencies": {
-    "commander": "catalog:cli"
+    "commander": "catalog:cli",
+    "canvas": "catalog:tooling"
   }
 }
