@@ -1,0 +1,26 @@
+{
+  "name": "sandpiper-ai-devtools",
+  "author": {
+    "name": "Doug Stephen",
+    "email": "dljs.jr@dougstephenjr.com"
+  },
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "check:biome-fmt": "bunx --bun @biomejs/biome format",
+    "check:biome-lint": "bunx --bun @biomejs/biome lint",
+    "check:biome-check": "bunx --bun @biomejs/biome lint",
+    "check:tsc": "tsc --noEmit {.,**}/*.ts",
+    "check": "bun run check:tsc check:biome-check"
+  },
+  "dependencies": {
+    "bun": "catalog:bun",
+    "@commander-js/extra-typings": "catalog:cli"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:bun"
+  },
+  "peerDependencies": {
+    "commander": "catalog:cli"
+  }
+}
