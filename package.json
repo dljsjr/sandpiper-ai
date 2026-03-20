@@ -28,6 +28,7 @@
   "workspaces": {
     "packages": [
       "packages/*",
+      "extensions/*",
       "devtools/"
     ],
     "catalogs": {
@@ -46,6 +47,9 @@
       "ts": {
         "typescript": "5.9.3"
       },
+      "testing": {
+        "vitest": "4.1.0"
+      },
       "tooling": {
         "@biomejs/biome": "2.4.6",
         "ascii-motion-mcp": "file:../ascii-motion-mcp",
@@ -61,7 +65,9 @@
   },
   "description": "To install dependencies:",
   "main": "sandpiper-design-iterative.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "vitest": "catalog:testing"
+  },
   "license": "ISC",
   "type": "commonjs"
 }
