@@ -1,0 +1,22 @@
+{
+  "name": "shell-relay",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Pi extension: shared terminal session between user and agent via Zellij",
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "catalog:pi",
+    "@sinclair/typebox": "*"
+  },
+  "devDependencies": {
+    "vitest": "catalog:testing",
+    "typescript": "catalog:ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}

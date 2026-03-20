@@ -1,0 +1,67 @@
+        const baseRuntime = await createRuntime(runtimeOptions);
+        const keepAliveServers = new Set(
+                baseRuntime
+                        .getDefinitions()
+                        .filter(isKeepAliveServer)
+                        .map((entry) => entry.name),
+        );
+        const daemonClient =
+                keepAliveServers.size > 0
+                        ? new DaemonClient({
+                                        configPath: runtimeOptions.configPath,
+                                        configExplicit: false,
+                                        rootDir: runtimeOptions.rootDir,
+                                })
+                        : null;
+        const runtime = createKeepAliveRuntime(baseRuntime, {
+                daemonClient,
+                keepAliveServers,
+        });
+        runtime.close = (_server_name) => {
+                return Promise.resolve();
+        };
+        return runtime;
+}
+
+async function invokeWithTimeout<T>(
+        call: Promise<T>,
+        timeout: number,
+): Promise<T> {
+        if (!Number.isFinite(timeout) || timeout <= 0) {
+                return await call;
+        }
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try {
+                return await Promise.race([
+                        call,
+                        new Promise<never>((_, reject) => {
+                                timer = setTimeout(() => {
+                                        reject(new Error("Call timed out after " + timeout + "ms."));
+                                }, timeout);
+                        }),
+                ]);
+        } finally {
+                if (timer) {
+                        clearTimeout(timer);
+                }
+        }
+}
+
+async function runCli(): Promise<void> {
+        const args = process.argv.slice(2);
+        if (args.length === 0) {
+                program.outputHelp();
+                return;
+        }
+        await program.parseAsync(process.argv);
+}
+
+if (process.env.MCPORTER_DISABLE_AUTORUN !== "1") {
+        runCli().catch((error) => {
+                const message = error instanceof Error ? error.message : String(error);
+                console.error(message);
+                process.exit(1);
+        });
+}
+╰─  24.14.0    tmuq (no descr…  · 662a5064  ❯ zellij action dump-screen test_screen_dump.txt
+
