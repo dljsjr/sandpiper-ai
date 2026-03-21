@@ -63,6 +63,19 @@
       "name": "sandpiper-ai-core",
       "version": "0.0.1",
     },
+    "packages/sandpiper-tasks-cli": {
+      "name": "sandpiper-tasks-cli",
+      "version": "0.0.1",
+      "dependencies": {
+        "@commander-js/extra-typings": "catalog:cli",
+        "commander": "catalog:cli",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:bun",
+        "typescript": "catalog:ts",
+        "vitest": "catalog:testing",
+      },
+    },
   },
   "catalogs": {
     "bun": {
@@ -1054,6 +1067,8 @@
     "sandpiper-ai-core": ["sandpiper-ai-core@workspace:packages/core"],
 
     "sandpiper-ai-devtools": ["sandpiper-ai-devtools@workspace:devtools"],
+
+    "sandpiper-tasks-cli": ["sandpiper-tasks-cli@workspace:packages/sandpiper-tasks-cli"],
 
     "semver": ["semver@7.7.4", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA=="],
 

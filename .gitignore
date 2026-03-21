@@ -41,5 +41,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 sandpiper-session*.html
 pi-session*.html
 
-# allowlist AGENTS.md
+# allowlist agent stuff
 !AGENTS.md
+!.sandpiper
