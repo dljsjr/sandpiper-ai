@@ -1,21 +1,26 @@
 {
-  "name": "sandpiper-tasks-cli",
-  "version": "0.0.1",
-  "private": true,
-  "description": "CLI for markdown-based task management with YAML frontmatter",
-  "type": "module",
-  "dependencies": {
-    "commander": "catalog:cli",
-    "@commander-js/extra-typings": "catalog:cli"
-  },
-  "devDependencies": {
-    "typescript": "catalog:ts",
-    "vitest": "catalog:testing",
-    "@types/bun": "catalog:bun"
-  },
-  "scripts": {
-    "check": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  }
+	"name": "sandpiper-tasks-cli",
+	"version": "0.0.1",
+	"private": true,
+	"description": "CLI for markdown-based task management with YAML frontmatter",
+	"type": "module",
+	"dependencies": {
+		"@commander-js/extra-typings": "catalog:cli",
+		"@toon-format/toon": "2.1.0",
+		"commander": "catalog:cli"
+	},
+	"devDependencies": {
+		"@toon-format/cli": "2.1.0",
+		"@types/bun": "catalog:bun",
+		"typescript": "catalog:ts",
+		"vitest": "catalog:testing"
+	},
+	"scripts": {
+		"check:tsc": "tsc --noEmit",
+		"check:biome-check": "bunx --bun @biomejs/biome check .",
+		"check": "bun run check:tsc && bun run check:biome-check",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"build": "bun build --compile --target bun src/index.ts --outfile ../../skills/tasks/sandpiper-tasks"
+	}
 }

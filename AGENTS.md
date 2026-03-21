@@ -97,6 +97,8 @@ bun run check              # Run checks across all workspaces
 bun run --filter shell-relay check  # Run checks for a specific package
 ```
 
+**Lint as frequently as you test.** Run `bun run check` alongside `bunx vitest run` after every meaningful code change. Do not defer linting to a separate pass — catching lint issues early avoids accumulating noise.
+
 ### Dependencies
 
 - Prefer Node.js built-in modules over third-party packages
@@ -123,6 +125,31 @@ my-extension/
 ├── external-api.ts   # External service wrapper (no pi imports)
 └── ...
 ```
+
+## Task Management
+
+All coding work MUST be tracked against a task. Do not begin implementation without a task to reference. This applies to features, bugs, refactors, and any other code changes.
+
+### When to Create Tasks
+
+- Before starting any implementation work, ensure a task exists for it
+- If a task doesn't exist, create one using the tasks skill helper scripts
+- Bugs discovered during implementation get their own top-level `BUG` task (not a subtask)
+- Reference task keys in commit messages (e.g., `Refs: TCL-1, TCL-3`)
+
+### Project Key Guidelines
+
+Each project key is 3 uppercase letters scoped to a logical product or component. Use these guidelines to decide whether work belongs in an existing project or a new one:
+
+- **Same project** if the work directly implements, extends, tests, or fixes something within that component's codebase and responsibility boundary
+- **New project** if the work introduces a new tool, library, extension, or distinct deliverable — even if it's related to existing work
+- **When in doubt**, prefer a new project. It's easy to reference across projects via `related` or `depends_on`, but splitting a project retroactively is tedious
+
+Examples:
+- Shell relay extension code, tests, and shell scripts → `SHR`
+- A CLI tool for managing tasks (separate binary/package) → `TCL` (not `SHR`, even though SHR uses it)
+- A shared library consumed by multiple extensions → its own project key
+- A bug in the FIFO manager discovered while working on relay orchestration → `SHR` (same component), kind `BUG`
 
 ## CLI Development
 
