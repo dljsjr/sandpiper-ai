@@ -1,0 +1,21 @@
+{
+  "name": "sandpiper-tasks-cli",
+  "version": "0.0.1",
+  "private": true,
+  "description": "CLI for markdown-based task management with YAML frontmatter",
+  "type": "module",
+  "dependencies": {
+    "commander": "catalog:cli",
+    "@commander-js/extra-typings": "catalog:cli"
+  },
+  "devDependencies": {
+    "typescript": "catalog:ts",
+    "vitest": "catalog:testing",
+    "@types/bun": "catalog:bun"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}
