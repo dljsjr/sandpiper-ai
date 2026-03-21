@@ -2,7 +2,7 @@
 name: tasks
 description: Create, update, query, and organize project work items (tasks, bugs, subtasks) as markdown files with YAML frontmatter. Use when the user asks to create a ticket, track work, check task status, assign work, or manage a backlog. Tasks are stored in the local project's .sandpiper/tasks directory.
 allowed-tools: read write bash
-compatibility: Requires a local .sandpiper/tasks directory in the project. Uses standard POSIX tools (grep, ls) for querying.
+compatibility: Requires a local .sandpiper/tasks directory in the project. Uses ripgrep (rg) for full-text search.
 ---
 
 # Task Management Skill
@@ -11,226 +11,190 @@ Manage project work items as markdown files with YAML frontmatter, stored in the
 
 For the full normative specification (RFC 2119), see [SPEC.md](SPEC.md). This skill document provides operational guidance and quick reference.
 
-## Directory Structure
+## CLI Tool
 
-```
-.sandpiper/tasks/
-├── <PROJECT_KEY>/                      # One directory per project (e.g., SHR/)
-│   ├── .meta.yml                       # Project metadata (task counter)
-│   ├── <PROJECT_KEY>-<N>.md            # Top-level TASK or BUG
-│   ├── <PROJECT_KEY>-<N>/              # Subtask directory (only if task has subtasks)
-│   │   ├── <PROJECT_KEY>-<M>.md        # SUBTASK of the parent task
-│   │   └── ...
-│   └── ...
-└── ...
+The `sandpiper-tasks` CLI is the primary interface for task operations. It is bundled as a compiled binary at `skills/tasks/sandpiper-tasks` relative to the Pi Package root.
+
+```bash
+# From the project root:
+./skills/tasks/sandpiper-tasks <command>
+
+# Or with explicit directory:
+./skills/tasks/sandpiper-tasks --dir /path/to/project <command>
 ```
 
-### Example
+### Global Options
 
-```
-.sandpiper/tasks/
-└── SHR/
-    ├── .meta.yml
-    ├── SHR-1.md                        # TASK: Implement FIFO manager
-    ├── SHR-1/                          # Subtasks of SHR-1
-    │   ├── SHR-2.md                    # SUBTASK: Write O_RDWR sentinel logic
-    │   └── SHR-3.md                    # SUBTASK: Implement stale FIFO cleanup
-    ├── SHR-4.md                        # BUG: Signal channel drops messages
-    └── SHR-5.md                        # TASK: Implement Zellij integration
-```
+| Flag | Description |
+|------|-------------|
+| `-d, --dir <path>` | Path to directory containing `.sandpiper/tasks` (defaults to cwd) |
+| `-f, --format <fmt>` | Output format: `raw`, `json`, `toon` |
+| `--no-save` | Skip disk writes and index update; output only (implies `--format raw`) |
 
-## Project Metadata (`.meta.yml`)
+## Common Operations
 
-Each project directory MUST contain a `.meta.yml` file tracking the next task number:
+### Create a task
 
-```yaml
-project_key: SHR
-next_task_number: 6
+```bash
+sandpiper-tasks task create -p SHR -t "Implement feature X" --priority HIGH --reporter USER
+sandpiper-tasks task create -p SHR -t "Fix the bug" -k BUG --priority HIGH --reporter AGENT
+sandpiper-tasks task create -p SHR -t "Write tests" -k SUBTASK --parent SHR-1 --reporter AGENT
 ```
 
-When creating a new task, read `next_task_number`, use it for the new task key, then increment and write it back.
+### Pick up a task (assign to AGENT, set IN PROGRESS)
 
-## Project Keys
-
-- MUST be exactly 3 uppercase ASCII letters: `[A-Z]{3}`
-- Examples: `SHR` (Shell Relay), `CLI` (CLI tooling), `COR` (Core library)
-
-## Task File Format
-
-Every task is a markdown file with YAML frontmatter:
-
-```markdown
----
-title: Implement persistent FIFO manager
-status: IN PROGRESS
-kind: TASK
-priority: HIGH
-assignee: AGENT
-reporter: USER
-created_at: 2026-03-20T15:00:00Z
-updated_at: 2026-03-20T16:30:00Z
-depends_on:
-  - SHR-1
-related:
-  - SHR-5
-blocked_by:
-  - SHR-4
----
-
-# Implement persistent FIFO manager
-
-Detailed description of the work to be performed...
+```bash
+sandpiper-tasks task pickup SHR-1
+sandpiper-tasks task pickup -p SHR --filter-status NOT_STARTED    # bulk
 ```
 
-### Required Frontmatter Fields
+### Complete a task
 
-| Field | Type | Values |
-|-------|------|--------|
-| `title` | string | Short summary of the task |
-| `status` | enum | `NOT STARTED`, `IN PROGRESS`, `NEEDS REVIEW`, `COMPLETE` |
-| `kind` | enum | `BUG`, `TASK`, `SUBTASK` |
-| `priority` | enum | `LOW`, `MEDIUM`, `HIGH` |
-| `assignee` | string | `UNASSIGNED`, `USER`, or `AGENT` |
-| `reporter` | string | `USER` or `AGENT` |
-| `created_at` | ISO 8601 | Timestamp when the task was created |
-| `updated_at` | ISO 8601 | Timestamp when the task was last modified |
+```bash
+sandpiper-tasks task complete SHR-1                              # → NEEDS REVIEW
+sandpiper-tasks task complete SHR-1 --final --resolution DONE    # → COMPLETE
+sandpiper-tasks task complete SHR-1 --final --resolution WONTFIX # → COMPLETE (won't fix)
+```
 
-### Optional Frontmatter Fields
+### Update task fields
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `related` | array of task keys | Work that relates to this task but doesn't form a dependency |
-| `depends_on` | array of task keys | Tasks that must be completed before this one (planned dependencies) |
-| `blocked_by` | array of task keys | Tasks blocking this one from completion (unplanned dependencies, bugs, interrupt work) |
+```bash
+sandpiper-tasks task update SHR-1 --status IN_PROGRESS --assignee AGENT
+sandpiper-tasks task update SHR-1 --priority LOW
+sandpiper-tasks task update SHR-1 -t "New title"                 # rename
+sandpiper-tasks task update SHR-1 --desc "New description text"  # set description
+sandpiper-tasks task update SHR-1 --depends-on SHR-2,SHR-3       # set dependencies
+sandpiper-tasks task update SHR-1 --related ""                   # clear relationships
+sandpiper-tasks task update SHR-1 -i                             # open in $EDITOR
+sandpiper-tasks task update SHR-1 -i --status IN_PROGRESS        # pre-apply fields, then edit
+sandpiper-tasks task update -p SHR --filter-status IN_PROGRESS --assignee USER  # bulk
+```
 
-### Body
+### Move tasks
 
-The markdown body MUST start with a level-1 heading (`#`) that matches the `title` frontmatter field, followed by a detailed description of the work.
+```bash
+sandpiper-tasks task move SHR-1 -k BUG                           # convert TASK → BUG
+sandpiper-tasks task move SHR-3 -k TASK                           # promote SUBTASK → TASK
+sandpiper-tasks task move SHR-5 -k SUBTASK --parent SHR-1         # demote to subtask
+sandpiper-tasks task move SHR-1 -p CLI                            # move to CLI project (re-keys)
+sandpiper-tasks task move SHR-1 -p CLI -k BUG                    # move + convert in one step
+```
+
+Moving across projects re-keys the task and all its subtasks, creates `.moved` tombstone files, and updates all inbound references in other task files.
+
+### Query tasks
+
+```bash
+sandpiper-tasks task list                                        # all tasks
+sandpiper-tasks task list -p SHR --top-level                     # top-level SHR tasks
+sandpiper-tasks task list -s NOT_STARTED --priority HIGH         # high priority not started
+sandpiper-tasks task list -q "FIFO"                              # full-text search
+sandpiper-tasks task show SHR-1                                  # full detail + subtasks
+sandpiper-tasks task summary                                     # status/priority breakdown
+sandpiper-tasks task summary -p SHR                              # project-scoped summary
+```
+
+### Projects
+
+```bash
+sandpiper-tasks project list                                     # list all projects
+sandpiper-tasks project create SHR                               # create new project
+```
+
+### Index management
+
+```bash
+sandpiper-tasks index update                                     # rebuild index
+```
+
+### Structured output
+
+```bash
+sandpiper-tasks -f json task list -p SHR --top-level             # JSON array
+sandpiper-tasks -f toon task show SHR-1                          # TOON format
+sandpiper-tasks -f raw task show SHR-1                           # raw markdown
+sandpiper-tasks --no-save task create -p SHR -t "Preview"        # dry run
+```
+
+## CLI-First Operations
+
+Task operations SHOULD almost always go through the `sandpiper-tasks` CLI. The CLI maintains the index, enforces validation (e.g., resolution required for COMPLETE), and ensures formatting consistency.
+
+Direct file editing is allowed (the index detects out-of-band changes) but is strongly discouraged for routine operations. Use direct editing only for exceptional cases like bulk body text edits or recovery from corruption.
 
 ## Task Hierarchy Rules
 
 - `TASK` and `BUG` are ALWAYS top-level (directly under the project directory)
 - `SUBTASK` MUST be a child of a `TASK` or `BUG` (inside the parent's subtask directory)
 - `SUBTASK` CANNOT have its own subtasks (max depth is one level)
-- A bug discovered while working on a task is a separate top-level `BUG`, NOT a `SUBTASK` — use `related` or `blocked_by` to link them
+- A bug discovered while working on a task is a separate top-level `BUG`, NOT a `SUBTASK` — use `--related` or `--blocked-by` to link them
 
-## Task Numbering Rules
+## Resolution and Completion
 
-- Task numbers are **monotonically increasing integers**, starting at 1
-- Task numbers are **scoped to the project key** — each project has its own counter
-- The counter is shared across all task kinds (`TASK`, `BUG`, `SUBTASK`) within a project
-- The counter is tracked in the project's `.meta.yml` file
+- Tasks MUST NOT be deleted. Use `--final --resolution WONTFIX` for tasks that are no longer valid.
+- `DONE` — work completed successfully
+- `WONTFIX` — task is no longer valid or will not be addressed
+- Resolution is required when completing a task (`--final` flag)
 
 ## Assignee Conventions
 
 - `UNASSIGNED` — no one is working on this
 - `USER` — the user is working on this
 - `AGENT` — the agent is working on this
-- When the user asks you to create a task, set `reporter: USER`
-- When you surface a work item yourself, set `reporter: AGENT`
-- When you pick up a task to work on, set `assignee: AGENT` and `status: IN PROGRESS`
-- When you finish a task, set `status: NEEDS REVIEW` (let the user confirm completion)
+- When the user asks you to create a task, set `--reporter USER`
+- When you surface a work item yourself, set `--reporter AGENT`
+- When you pick up a task: `task pickup <key>`
+- When you finish a task: `task complete <key>` (for review) or `task complete <key> --final --resolution DONE`
 
-## Lifecycle
+## Activity Log
 
-- Completed tasks (`status: COMPLETE`) remain in place — they are NOT deleted or moved
-- Archiving completed tasks is done explicitly and periodically by the user
+Every modification to a task (excluding creation) automatically appends an entry to the task's activity log — a structured footer at the end of the task file. Each entry records the timestamp and what changed:
 
-## Helper Scripts
+```markdown
+---
 
-The `scripts/` directory contains helper scripts for common task operations. These are the preferred way to perform task operations — they handle timestamps, validation, and meta file updates correctly.
+# Activity Log
 
-### Create a task
-```bash
-./scripts/task-create.sh .sandpiper/tasks SHR TASK HIGH "Implement feature X"
-./scripts/task-create.sh .sandpiper/tasks SHR SUBTASK MEDIUM "Write unit tests" SHR-1
-./scripts/task-create.sh .sandpiper/tasks SHR BUG HIGH "Fix signal channel race condition"
+## 2026-03-21T09:00:00.000Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-21T10:00:00.000Z
+
+- **description**: added (3 lines)
 ```
 
-### Pick up a task (assign to AGENT, set IN PROGRESS)
-```bash
-./scripts/task-pick-up.sh .sandpiper/tasks/SHR/SHR-9.md
-./scripts/task-pick-up.sh .sandpiper/tasks/SHR/SHR-9.md .sandpiper/tasks/SHR/SHR-9/SHR-10.md
+The activity log is maintained automatically by the CLI. No manual action is required.
+
+## History Diffs
+
+Full content diffs for every task modification are stored in:
+
+```
+.sandpiper/tasks/history/<KEY>/<TIMESTAMP>.diff
 ```
 
-### Complete a task (set NEEDS REVIEW or COMPLETE)
-```bash
-./scripts/task-complete.sh .sandpiper/tasks/SHR/SHR-9.md
-./scripts/task-complete.sh --complete .sandpiper/tasks/SHR/SHR-9.md
-```
-
-### View status summary
-```bash
-./scripts/task-summary.sh .sandpiper/tasks SHR       # One project
-./scripts/task-summary.sh .sandpiper/tasks            # All projects
-```
-
-> **Note:** Script paths above are relative to the skill directory. Use the full path or resolve from the skill directory when invoking.
-
-## Manual Operations
-
-For operations not covered by scripts, use standard CLI tools:
-
-### List tasks for a project
-```bash
-ls .sandpiper/tasks/<PROJECT_KEY>/*.md
-```
-
-### List subtasks of a task
-```bash
-ls .sandpiper/tasks/<PROJECT_KEY>/<TASK_KEY>/*.md
-```
-
-### Find all tasks assigned to you
-```bash
-grep -rl "assignee: AGENT" .sandpiper/tasks/
-```
-
-### Find all blocked tasks
-```bash
-grep -rl "blocked_by:" .sandpiper/tasks/
-```
-
-### Query tasks by status
-```bash
-grep -rl "status: IN PROGRESS" .sandpiper/tasks/
-```
-
-### Get a full status summary
+These are standard unified diffs — readable by any diff tool and useful for auditing the full evolution of a task's content, including description changes that the activity log only summarizes.
 
 ```bash
-for status in "NOT STARTED" "IN PROGRESS" "NEEDS REVIEW" "COMPLETE"; do
-  count=$(grep -rl "status: $status" .sandpiper/tasks/ 2>/dev/null | wc -l | tr -d ' ')
-  echo "$status: $count"
-done
-```
+# View a task's history
+ls .sandpiper/tasks/history/SHR-1/
 
-### Bulk update task statuses
-
-```bash
-TS=$(date -Iseconds)
-sed -i '' "s/status: IN PROGRESS/status: NEEDS REVIEW/" .sandpiper/tasks/PROJECT/TASK.md
-sed -i '' "s/updated_at: .*/updated_at: $TS/" .sandpiper/tasks/PROJECT/TASK.md
+# Read a specific diff
+cat .sandpiper/tasks/history/SHR-1/2026-03-21T09-00-00.000Z.diff
 ```
 
 ## Workflow Tips
 
-### Pick up related test tickets alongside implementation tickets
-When doing TDD, pick up the relevant test subtask (e.g., "FIFO manager unit tests") at the same time as the implementation task. This keeps the test-first discipline honest and ensures tests are written before or alongside the code.
+### Use `date -Iseconds` for manual timestamp edits
+If editing task files directly, use `date -Iseconds` for `updated_at`.
 
-### Use `date -Iseconds` for timestamps
-Always use `date -Iseconds` when generating `created_at` and `updated_at` timestamps. This produces ISO 8601 format with timezone offset.
+### Commit ticket references in version control
+Reference task keys in commit messages: `Refs: SHR-1, SHR-2`
 
-### Batch ticket operations with shell loops
-When picking up or completing multiple related tasks, use shell loops to avoid repetitive manual edits:
+### Use structured output for scripting
+Pipe `--format json` to `jq` for scripting:
 ```bash
-TS=$(date -Iseconds)
-for f in .sandpiper/tasks/SHR/SHR-1/SHR-*.md; do
-  sed -i '' "s/status: NOT STARTED/status: IN PROGRESS/" "$f"
-  sed -i '' "s/assignee: UNASSIGNED/assignee: AGENT/" "$f"
-  sed -i '' "s/updated_at: .*/updated_at: $TS/" "$f"
-done
+sandpiper-tasks -f json task list -s IN_PROGRESS | jq '.[].key'
 ```
-
-### Commit ticket status updates alongside code changes
-When committing code that implements a task, include the ticket status update in the same commit or a follow-up commit. Reference task keys in commit messages with `Refs: SHR-1, SHR-2`.

@@ -1,0 +1,1439 @@
+version: 1
+lastUpdatedAt: 1774186166069
+tasks:
+  "TCL-39":
+    key: TCL-39
+    project: TCL
+    title: Rewrite tasks skill to use CLI
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T16:05:56-05:00"
+    updatedAt: "2026-03-21T21:15:16.492Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716497
+  "TCL-48":
+    key: TCL-48
+    project: TCL
+    title: Activity log demo
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-22T03:25:51.129Z"
+    updatedAt: "2026-03-22T03:26:06.203Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774149966208
+  "TCL-49":
+    key: TCL-49
+    project: TCL
+    title: Store description diffs in history directory
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-22T03:32:01.159Z"
+    updatedAt: "2026-03-22T03:35:20.715Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774150520720
+  "TCL-18":
+    key: TCL-18
+    project: TCL
+    title: Full-text search filter via ripgrep
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:06:45-05:00"
+    updatedAt: "2026-03-21T18:17:11.983Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774117040070
+  "TCL-38":
+    key: TCL-38
+    project: TCL
+    title: Build single-file executable for tasks skill
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T16:05:56-05:00"
+    updatedAt: "2026-03-21T21:15:16.462Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716470
+  "TCL-1":
+    key: TCL-1
+    project: TCL
+    title: Implement index update command
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-21T12:30:00-05:00"
+    updatedAt: "2026-03-21T18:17:11.983Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774117040070
+  "TCL-46":
+    key: TCL-46
+    project: TCL
+    title: Implement task move command
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-22T02:54:05.639Z"
+    updatedAt: "2026-03-22T02:59:13.385Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774148353390
+  "TCL-33":
+    key: TCL-33
+    project: TCL
+    title: Add --format and --no-save flags to root command
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T14:12:22-05:00"
+    updatedAt: "2026-03-21T14:20:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716470
+  "TCL-42":
+    key: TCL-42
+    project: TCL
+    title: Counter rebuild should only trigger on missing index/counter
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T21:18:51.461Z"
+    updatedAt: "2026-03-21T21:20:07.548Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774128007555
+  "TCL-13":
+    key: TCL-13
+    project: TCL
+    title: Implement read-only CLI subcommands
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:54:54-05:00"
+    updatedAt: "2026-03-21T18:17:11.983Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774117040070
+  "TCL-37":
+    key: TCL-37
+    project: TCL
+    title: Rebuild counter state from highest task number in index
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T16:05:56-05:00"
+    updatedAt: "2026-03-21T16:12:32-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716470
+  "TCL-43":
+    key: TCL-43
+    project: TCL
+    title: Codify CLI-first rule in spec and skill
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-22T02:15:07.020Z"
+    updatedAt: "2026-03-22T02:18:24.775Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774145904780
+  "TCL-36":
+    key: TCL-36
+    project: TCL
+    title: "Move counters into index, remove meta files"
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T16:05:56-05:00"
+    updatedAt: "2026-03-21T16:12:32-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716470
+  "TCL-47":
+    key: TCL-47
+    project: TCL
+    title: Implement activity log for task files
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-22T03:21:51.090Z"
+    updatedAt: "2026-03-22T03:26:06.176Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774149966181
+  "TCL-22":
+    key: TCL-22
+    project: TCL
+    title: Implement mutating CLI subcommands
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774120609578
+  "TCL-32":
+    key: TCL-32
+    project: TCL
+    title: Add schema version to index format with migration support
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:34:26-05:00"
+    updatedAt: "2026-03-21T13:36:25-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774120609578
+  "TCL-40":
+    key: TCL-40
+    project: TCL
+    title: Add resolution field (DONE/WONTFIX) required for COMPLETE
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T16:05:56-05:00"
+    updatedAt: "2026-03-21T16:10:56-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716471
+  "TCL-50":
+    key: TCL-50
+    project: TCL
+    title: "Update spec with activity log, history diffs, and move"
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-22T13:07:27.286Z"
+    updatedAt: "2026-03-22T13:09:39.954Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774184979962
+  "TCL-35":
+    key: TCL-35
+    project: TCL
+    title: Should not persist
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-21T19:17:01.272Z"
+    updatedAt: "2026-03-21T21:15:41.374Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127741380
+  "TCL-44":
+    key: TCL-44
+    project: TCL
+    title: Add missing update fields to CLI
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-22T02:15:07.050Z"
+    updatedAt: "2026-03-22T02:18:24.802Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: TCL-43
+    lastIndexedAt: 1774145904806
+  "TCL-31":
+    key: TCL-31
+    project: TCL
+    title: Index-file consistency tests
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:18:32-05:00"
+    updatedAt: "2026-03-21T13:19:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774120609578
+  "TCL-45":
+    key: TCL-45
+    project: TCL
+    title: Add --description flag and --interactive editor mode
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-22T02:26:00.704Z"
+    updatedAt: "2026-03-22T02:29:12.314Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774146552321
+  "TCL-41":
+    key: TCL-41
+    project: TCL
+    title: "Update spec: tasks should never be deleted, use WONTFIX"
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T16:05:56-05:00"
+    updatedAt: "2026-03-21T21:15:16.518Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774127716522
+  "TCL-51":
+    key: TCL-51
+    project: TCL
+    title: "Refactor pass: simplify, deduplicate, hygienic"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-22T13:17:12.401Z"
+    updatedAt: "2026-03-22T13:29:26.063Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774186166068
+  "TCL-8":
+    key: TCL-8
+    project: TCL
+    title: Design and implement Task Query API
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:39:19-05:00"
+    updatedAt: "2026-03-21T18:17:11.984Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774117040070
+  "TCL-12":
+    key: TCL-12
+    project: TCL
+    title: Review and refactor index data structure against Query API
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:39:19-05:00"
+    updatedAt: "2026-03-21T18:17:11.984Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-8
+    lastIndexedAt: 1774117040070
+  "TCL-11":
+    key: TCL-11
+    project: TCL
+    title: Implement Query API
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:39:19-05:00"
+    updatedAt: "2026-03-21T18:17:11.984Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-8
+    lastIndexedAt: 1774117040071
+  "TCL-10":
+    key: TCL-10
+    project: TCL
+    title: BDD test suite for Query API
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:39:19-05:00"
+    updatedAt: "2026-03-21T18:17:11.984Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-8
+    lastIndexedAt: 1774117040071
+  "TCL-9":
+    key: TCL-9
+    project: TCL
+    title: Design Query API types and function signatures
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:39:19-05:00"
+    updatedAt: "2026-03-21T18:17:11.984Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-8
+    lastIndexedAt: 1774117040071
+  "TCL-5":
+    key: TCL-5
+    project: TCL
+    title: Commander CLI wiring for index update subcommand
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:32:03-05:00"
+    updatedAt: "2026-03-21T18:17:11.985Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-1
+    lastIndexedAt: 1774117040071
+  "TCL-4":
+    key: TCL-4
+    project: TCL
+    title: Index update unit tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:32:03-05:00"
+    updatedAt: "2026-03-21T18:17:11.985Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-1
+    lastIndexedAt: 1774117040071
+  "TCL-7":
+    key: TCL-7
+    project: TCL
+    title: Fix subtask directory scanning bug
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: LOW
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:32:03-05:00"
+    updatedAt: "2026-03-21T18:17:11.985Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-1
+    lastIndexedAt: 1774117040071
+  "TCL-3":
+    key: TCL-3
+    project: TCL
+    title: "Index update logic (scan, parse, mtime skip, save)"
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:32:03-05:00"
+    updatedAt: "2026-03-21T18:17:11.985Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-1
+    lastIndexedAt: 1774117040071
+  "TCL-2":
+    key: TCL-2
+    project: TCL
+    title: Core types and frontmatter parser
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:32:03-05:00"
+    updatedAt: "2026-03-21T18:17:11.985Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-1
+    lastIndexedAt: 1774117040071
+  "TCL-6":
+    key: TCL-6
+    project: TCL
+    title: CLI end-to-end tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:32:03-05:00"
+    updatedAt: "2026-03-21T18:17:11.985Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-1
+    lastIndexedAt: 1774117040071
+  "TCL-29":
+    key: TCL-29
+    project: TCL
+    title: Tests for mutating commands
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609578
+  "TCL-28":
+    key: TCL-28
+    project: TCL
+    title: Bulk operations support (filter-based mutations)
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609578
+  "TCL-23":
+    key: TCL-23
+    project: TCL
+    title: task create — create a new task/bug/subtask
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609579
+  "TCL-27":
+    key: TCL-27
+    project: TCL
+    title: project create — create a new project
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609579
+  "TCL-26":
+    key: TCL-26
+    project: TCL
+    title: task complete — mark as NEEDS REVIEW or COMPLETE
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609579
+  "TCL-25":
+    key: TCL-25
+    project: TCL
+    title: task pickup — assign to AGENT and set IN PROGRESS
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609579
+  "TCL-24":
+    key: TCL-24
+    project: TCL
+    title: "task update — modify task fields (status, assignee, priority)"
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:14:09-05:00"
+    updatedAt: "2026-03-21T13:17:35-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-22
+    lastIndexedAt: 1774120609579
+  "TCL-17":
+    key: TCL-17
+    project: TCL
+    title: task summary — status/priority breakdown
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:54:54-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-13
+    lastIndexedAt: 1774117040071
+  "TCL-16":
+    key: TCL-16
+    project: TCL
+    title: project list — list all projects with task counts
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:54:54-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-13
+    lastIndexedAt: 1774117040071
+  "TCL-15":
+    key: TCL-15
+    project: TCL
+    title: task show — show a single task's details
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:54:54-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-13
+    lastIndexedAt: 1774117040071
+  "TCL-14":
+    key: TCL-14
+    project: TCL
+    title: task list — list/filter tasks
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T12:54:54-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-13
+    lastIndexedAt: 1774117040071
+  "TCL-19":
+    key: TCL-19
+    project: TCL
+    title: Core search function using rg
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:06:45-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-18
+    lastIndexedAt: 1774117040071
+  "TCL-21":
+    key: TCL-21
+    project: TCL
+    title: Tests for search
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:06:45-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-18
+    lastIndexedAt: 1774117040071
+  "TCL-20":
+    key: TCL-20
+    project: TCL
+    title: Integrate search into query API and CLI commands
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-21T13:06:45-05:00"
+    updatedAt: "2026-03-21T18:17:11.986Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-18
+    lastIndexedAt: 1774117040071
+  "SHR-28":
+    key: SHR-28
+    project: SHR
+    title: Session and pane lifecycle management
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:47:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678032
+  "SHR-19":
+    key: SHR-19
+    project: SHR
+    title: Relay orchestration
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:40:34-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678033
+  "SHR-29":
+    key: SHR-29
+    project: SHR
+    title: Shell integration installer
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:47:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678033
+  "SHR-39":
+    key: SHR-39
+    project: SHR
+    title: Configuration UX
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-20T23:00:00Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678033
+  "SHR-42":
+    key: SHR-42
+    project: SHR
+    title: Graceful degradation
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-20T23:00:00Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678033
+  "SHR-1":
+    key: SHR-1
+    project: SHR
+    title: Fish shell integration
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678034
+  "SHR-24":
+    key: SHR-24
+    project: SHR
+    title: Pi extension scaffolding and tool registration
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:47:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678034
+  "SHR-41":
+    key: SHR-41
+    project: SHR
+    title: Documentation
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-20T23:00:00Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678034
+  "SHR-6":
+    key: SHR-6
+    project: SHR
+    title: Bash shell integration
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678034
+  "SHR-14":
+    key: SHR-14
+    project: SHR
+    title: Zellij CLI integration
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:27:43-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678034
+  "SHR-30":
+    key: SHR-30
+    project: SHR
+    title: Startup validation
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:48:53-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678034
+  "SHR-31":
+    key: SHR-31
+    project: SHR
+    title: Test suite
+    status: IN PROGRESS
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:54:16-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678035
+  "SHR-40":
+    key: SHR-40
+    project: SHR
+    title: Session start hook
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-20T23:00:00Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678035
+  "SHR-7":
+    key: SHR-7
+    project: SHR
+    title: Zsh shell integration
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678035
+  "SHR-8":
+    key: SHR-8
+    project: SHR
+    title: PTY color preservation via unbuffer-relay
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-22T02:59:00.534Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774148340539
+  "SHR-9":
+    key: SHR-9
+    project: SHR
+    title: Persistent FIFO manager
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:21:12-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774115678035
+  "SHR-38":
+    key: SHR-38
+    project: SHR
+    title: Edge case tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:54:16-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678035
+  "SHR-32":
+    key: SHR-32
+    project: SHR
+    title: FIFO manager unit tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:26:06-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678035
+  "SHR-36":
+    key: SHR-36
+    project: SHR
+    title: Shell integration guard behavior tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:50:57-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678035
+  "SHR-37":
+    key: SHR-37
+    project: SHR
+    title: Integration tests
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-20T23:00:00Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678035
+  "SHR-33":
+    key: SHR-33
+    project: SHR
+    title: Signal channel parser unit tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:26:06-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678036
+  "SHR-34":
+    key: SHR-34
+    project: SHR
+    title: Command escaping round-trip tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:30:24-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678036
+  "SHR-35":
+    key: SHR-35
+    project: SHR
+    title: Zellij integration mock tests
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:27:43-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-31
+    lastIndexedAt: 1774115678036
+  "SHR-18":
+    key: SHR-18
+    project: SHR
+    title: Implement pane process state queries
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:27:43-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-14
+    lastIndexedAt: 1774115678036
+  "SHR-16":
+    key: SHR-16
+    project: SHR
+    title: Implement pane content capture via dump-screen
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:27:43-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-14
+    lastIndexedAt: 1774115678037
+  "SHR-17":
+    key: SHR-17
+    project: SHR
+    title: Implement session and pane creation
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:27:43-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-14
+    lastIndexedAt: 1774115678037
+  "SHR-15":
+    key: SHR-15
+    project: SHR
+    title: Implement command injection via write-chars
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:27:43-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-14
+    lastIndexedAt: 1774115678037
+  "SHR-26":
+    key: SHR-26
+    project: SHR
+    title: Register shell_relay tool
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:47:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-24
+    lastIndexedAt: 1774115678037
+  "SHR-27":
+    key: SHR-27
+    project: SHR
+    title: Register shell_relay_inspect tool
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:47:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-24
+    lastIndexedAt: 1774115678037
+  "SHR-25":
+    key: SHR-25
+    project: SHR
+    title: Create extension scaffolding
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:47:52-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-24
+    lastIndexedAt: 1774115678038
+  "SHR-4":
+    key: SHR-4
+    project: SHR
+    title: Implement fish Enter key binding override
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-1
+    lastIndexedAt: 1774115678038
+  "SHR-5":
+    key: SHR-5
+    project: SHR
+    title: Implement fish_title override
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: LOW
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-1
+    lastIndexedAt: 1774115678038
+  "SHR-2":
+    key: SHR-2
+    project: SHR
+    title: Implement fish prompt hook
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-1
+    lastIndexedAt: 1774115678038
+  "SHR-3":
+    key: SHR-3
+    project: SHR
+    title: Implement fish __relay_run wrapper function
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:42:02-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-1
+    lastIndexedAt: 1774115678038
+  "SHR-22":
+    key: SHR-22
+    project: SHR
+    title: Implement command escaping
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:30:24-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-19
+    lastIndexedAt: 1774115678038
+  "SHR-23":
+    key: SHR-23
+    project: SHR
+    title: Implement timeout support with Ctrl+C injection
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:40:34-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-19
+    lastIndexedAt: 1774115678039
+  "SHR-20":
+    key: SHR-20
+    project: SHR
+    title: Implement core execution flow
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:40:34-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-19
+    lastIndexedAt: 1774115678039
+  "SHR-21":
+    key: SHR-21
+    project: SHR
+    title: Implement command serialization and locking
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:40:34-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-19
+    lastIndexedAt: 1774115678039
+  "SHR-12":
+    key: SHR-12
+    project: SHR
+    title: Implement signal channel line parser and event emitter
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:26:06-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-9
+    lastIndexedAt: 1774115678039
+  "SHR-13":
+    key: SHR-13
+    project: SHR
+    title: Implement FIFO cleanup and stale detection
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:30:24-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-9
+    lastIndexedAt: 1774115678039
+  "SHR-10":
+    key: SHR-10
+    project: SHR
+    title: Implement FIFO creation with deterministic paths
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:26:06-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-9
+    lastIndexedAt: 1774115678039
+  "SHR-11":
+    key: SHR-11
+    project: SHR
+    title: Implement O_RDWR sentinel pattern
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-21T01:26:06-05:00"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-9
+    lastIndexedAt: 1774115678039
+counters:
+  TCL:
+    projectKey: TCL
+    nextTaskNumber: 52
+  SHR:
+    projectKey: SHR
+    nextTaskNumber: 43

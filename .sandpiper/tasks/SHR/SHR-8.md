@@ -6,7 +6,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-21T01:46:00-05:00
+updated_at: 2026-03-22T02:59:00.534Z
 ---
 
 # PTY color preservation via unbuffer-relay
