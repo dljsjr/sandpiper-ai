@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import {
   mkdtempSync,
+  mkdirSync,
   existsSync,
   statSync,
   rmSync,
@@ -232,6 +233,52 @@ describe("FifoManager", () => {
 
       FifoManager.cleanupStale(tempDir, "stale-to-clean");
       expect(existsSync(join(tempDir, "stale-to-clean"))).toBe(false);
+    });
+
+    it("should return empty array when base directory does not exist", () => {
+      const stale = FifoManager.detectStale(join(tempDir, "nonexistent"));
+      expect(stale).toEqual([]);
+    });
+
+    it("should not flag non-FIFO directories as stale", () => {
+      // Create a regular directory (not a relay session)
+      mkdirSync(join(tempDir, "not-a-session"), { recursive: true });
+
+      const stale = FifoManager.detectStale(tempDir);
+      expect(stale).not.toContain("not-a-session");
+    });
+  });
+
+  describe("reconnection after FIFO deletion", () => {
+    it("should be able to recreate FIFOs after shutdown", async () => {
+      manager = new FifoManager({ baseDir: tempDir, sessionId: "reconnect-test" });
+      manager.create();
+
+      const sessionDir = join(tempDir, "reconnect-test");
+      expect(existsSync(sessionDir)).toBe(true);
+
+      await manager.shutdown();
+      expect(existsSync(sessionDir)).toBe(false);
+
+      // Re-create should work
+      manager = new FifoManager({ baseDir: tempDir, sessionId: "reconnect-test" });
+      manager.create();
+      expect(existsSync(join(sessionDir, "stdout"))).toBe(true);
+      expect(existsSync(join(sessionDir, "stderr"))).toBe(true);
+      expect(existsSync(join(sessionDir, "signal"))).toBe(true);
+    });
+
+    it("should be able to cleanupStale then create with same session ID", () => {
+      const staleManager = new FifoManager({ baseDir: tempDir, sessionId: "stale-reconnect" });
+      staleManager.create();
+
+      // Simulate crash recovery: clean up stale, then create fresh
+      FifoManager.cleanupStale(tempDir, "stale-reconnect");
+
+      manager = new FifoManager({ baseDir: tempDir, sessionId: "stale-reconnect" });
+      manager.create();
+      expect(manager.isCreated).toBe(true);
+      expect(existsSync(manager.paths.stdout)).toBe(true);
     });
   });
 });
