@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
+const fs = require('node:fs');
 
 // Read the input file
 const inputFile = '/Users/doug.stephen/git/sandpiper-ai/references/blocks.txt';

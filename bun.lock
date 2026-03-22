@@ -10,6 +10,7 @@
         "supports-color": "^10.2.2",
       },
       "devDependencies": {
+        "typescript": "catalog:ts",
         "vitest": "catalog:testing",
       },
     },
@@ -24,6 +25,7 @@
       },
       "devDependencies": {
         "@types/bun": "catalog:bun",
+        "typescript": "catalog:ts",
       },
       "peerDependencies": {
         "canvas": "catalog:tooling",

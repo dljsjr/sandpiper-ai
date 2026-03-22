@@ -1,17 +1,13 @@
 #!/usr/bin/env bun
 
-import { $, fileURLToPath } from "bun";
-import { dirname, resolve } from "path";
+import { dirname, resolve } from 'node:path';
+import { $, fileURLToPath } from 'bun';
 
 await $`mkdir -p ./dist`;
 
-const targetDistDir = resolve("./dist");
-const piNodeModuleRoot = dirname(
-	dirname(fileURLToPath(import.meta.resolve("@mariozechner/pi-coding-agent"))),
-);
-const photonNodeModuleRoot = dirname(
-	fileURLToPath(import.meta.resolve("@silvia-odwyer/photon-node")),
-);
+const targetDistDir = resolve('./dist');
+const piNodeModuleRoot = dirname(dirname(fileURLToPath(import.meta.resolve('@mariozechner/pi-coding-agent'))));
+const photonNodeModuleRoot = dirname(fileURLToPath(import.meta.resolve('@silvia-odwyer/photon-node')));
 await $`
   cp package.json ${targetDistDir}/package.json
   echo -e "> See also: [./pi-README.md]\n " | cat - README.md > ${targetDistDir}/README.md

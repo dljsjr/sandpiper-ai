@@ -1,1 +1,0 @@
-/Users/dstephen/git/ascii-motion-mcp/dist/index.js
