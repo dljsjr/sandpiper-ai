@@ -88,16 +88,28 @@ Application code SHOULD be runtime-agnostic — it should run on Node.js, Bun, o
 
 ### Formatting & Linting
 
-This repo uses **Biome** for formatting and linting. Biome configuration lives in `biome.json` at the repo root.
+This repo uses **Biome** for formatting and linting, configured via `biome.json` at the repo root. **TypeScript** type checking uses `tsc --noEmit`, configured via the root `tsconfig.json`.
 
-Individual packages define a `check` script in their `package.json` that runs Biome (and any other checks). The root `package.json` runs `check` across all workspaces:
+All lint and check commands are run from the **repo root** — not from individual packages:
 
 ```sh
-bun run check              # Run checks across all workspaces
-bun run --filter shell-relay check  # Run checks for a specific package
+bun check              # Run tsc + biome check (format + lint + import organization)
+bun check:tsc          # TypeScript type checking only
+bun check:biome-check  # Biome format + lint + import organization
+bun check:biome-lint   # Biome lint rules only
+bun check:biome-fmt    # Biome formatting only
+bun check --write      # Apply biome auto-fixes in place
 ```
 
-**Lint as frequently as you test.** Run `bun run check` alongside `bunx vitest run` after every meaningful code change. Do not defer linting to a separate pass — catching lint issues early avoids accumulating noise.
+Do NOT run biome manually via `bunx` — always use the root `bun check` commands.
+
+**Lint as frequently as you test.** Run `bun check` alongside test runs after every meaningful code change. Do not defer linting to a separate pass.
+
+**Lint output MUST be totally clean.** Zero errors, zero warnings. If a warning appears, fix the underlying code — do not ignore it.
+
+**Only use safe auto-fixes.** When running `bun check --write`, do NOT use `--unsafe`. Unsafe fixes (e.g., replacing `!` with `?.`) can change runtime semantics and break type checking. Fix unsafe diagnostics manually.
+
+**Do NOT add lint suppression comments without consulting the user.** If you believe a lint warning is a false positive, explain the situation to the user and let them decide whether to suppress it. Never add `biome-ignore`, `// @ts-ignore`, `// @ts-expect-error`, or similar suppression comments on your own.
 
 ### Dependencies
 

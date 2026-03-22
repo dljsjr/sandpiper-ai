@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execSync } from 'node:child_process';
 
 /**
  * Escape a command string for safe passing to fish's `eval` via `__relay_run`.
@@ -20,7 +20,7 @@ export function escapeForFish(command: string): string {
   // any shell interpretation of the command string by the parent shell.
   const result = execSync("fish -c 'read -z cmd; string escape --style=script -- $cmd'", {
     input: command,
-    encoding: "utf-8",
+    encoding: 'utf-8',
     timeout: 5000,
   });
 
@@ -37,8 +37,8 @@ export function escapeForBash(command: string): string {
     return "''";
   }
 
-  const result = execSync("printf '%q' \"$CMD\"", {
-    encoding: "utf-8",
+  const result = execSync('printf \'%q\' "$CMD"', {
+    encoding: 'utf-8',
     timeout: 5000,
     env: { ...process.env, CMD: command },
   });

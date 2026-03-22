@@ -4,7 +4,11 @@
   "author": "Doug Stephen <dljs.jr@dougstephenjr.com>",
   "private": true,
   "scripts": {
-    "check": "bun run --workspaces --if-present check",
+    "check:biome-fmt": "bunx --bun @biomejs/biome format",
+    "check:biome-lint": "bunx --bun @biomejs/biome lint",
+    "check:biome-check": "bunx --bun @biomejs/biome check",
+    "check:tsc": "tsc --noEmit",
+    "check": "bun run check:tsc && bun run check:biome-check",
     "clean": "rm -rf {.,**}/{node_modules,dist,.*cache,*.d.ts,*.tsbuildinfo}",
     "sandpiper-cli": "sandpiper"
   },
@@ -66,6 +70,7 @@
   "description": "To install dependencies:",
   "main": "sandpiper-design-iterative.js",
   "devDependencies": {
+    "typescript": "catalog:ts",
     "vitest": "catalog:testing"
   },
   "license": "ISC",

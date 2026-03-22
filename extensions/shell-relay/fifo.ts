@@ -1,15 +1,6 @@
-import { execSync } from "node:child_process";
-import {
-  existsSync,
-  mkdirSync,
-  statSync,
-  rmSync,
-  readdirSync,
-  openSync,
-  closeSync,
-  constants,
-} from "node:fs";
-import { join } from "node:path";
+import { execSync } from 'node:child_process';
+import { closeSync, constants, existsSync, mkdirSync, openSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
 /** Paths to the three persistent FIFOs for a relay session. */
 export interface FifoPaths {
@@ -26,7 +17,7 @@ export interface FifoManagerOptions {
   readonly sessionId: string;
 }
 
-const FIFO_NAMES = ["stdout", "stderr", "signal"] as const;
+const FIFO_NAMES = ['stdout', 'stderr', 'signal'] as const;
 
 /**
  * Manages the lifecycle of persistent FIFOs for a shell relay session.
@@ -44,12 +35,12 @@ export class FifoManager {
   private _shutdown = false;
   private readonly openFds: number[] = [];
 
-  constructor(private readonly options: FifoManagerOptions) {
+  constructor(readonly options: FifoManagerOptions) {
     this.sessionDir = join(options.baseDir, options.sessionId);
     this._paths = {
-      stdout: join(this.sessionDir, "stdout"),
-      stderr: join(this.sessionDir, "stderr"),
-      signal: join(this.sessionDir, "signal"),
+      stdout: join(this.sessionDir, 'stdout'),
+      stderr: join(this.sessionDir, 'stderr'),
+      signal: join(this.sessionDir, 'signal'),
     };
   }
 
@@ -76,7 +67,7 @@ export class FifoManager {
     if (existsSync(this.sessionDir)) {
       throw new Error(
         `Session directory already exists: ${this.sessionDir}. ` +
-          `This may indicate a stale session. Use FifoManager.cleanupStale() to remove it.`
+          `This may indicate a stale session. Use FifoManager.cleanupStale() to remove it.`,
       );
     }
 
@@ -101,7 +92,7 @@ export class FifoManager {
    */
   open(): { stdout: number; stderr: number; signal: number } {
     if (!this._created) {
-      throw new Error("FIFOs must be created before opening. Call create() first.");
+      throw new Error('FIFOs must be created before opening. Call create() first.');
     }
 
     const stdoutFd = openSync(this._paths.stdout, constants.O_RDWR | constants.O_NONBLOCK);

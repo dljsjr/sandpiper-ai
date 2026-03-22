@@ -25,5 +25,14 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  }
+  },
+  "include": ["*.ts", "**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "**/node_modules",
+    "dist",
+    "**/dist",
+    "draw-sandpiper.ts",
+    "devtools/ascii-motion.ts"
+  ]
 }

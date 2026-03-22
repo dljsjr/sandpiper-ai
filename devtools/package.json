@@ -7,13 +7,6 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "scripts": {
-    "check:biome-fmt": "bunx --bun @biomejs/biome format",
-    "check:biome-lint": "bunx --bun @biomejs/biome lint",
-    "check:biome-check": "bunx --bun @biomejs/biome lint",
-    "check:tsc": "tsc --noEmit {.,**}/*.ts",
-    "check": "bun run check:tsc check:biome-check"
-  },
   "dependencies": {
     "@commander-js/extra-typings": "catalog:cli",
     "ascii-motion-mcp": "catalog:tooling",
@@ -21,7 +14,8 @@
     "mcporter": "catalog:tooling"
   },
   "devDependencies": {
-    "@types/bun": "catalog:bun"
+    "@types/bun": "catalog:bun",
+    "typescript": "catalog:ts"
   },
   "peerDependencies": {
     "commander": "catalog:cli",

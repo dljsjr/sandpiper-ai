@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execSync } from 'node:child_process';
 
 /** Configuration for the Zellij client. */
 export interface ZellijClientOptions {
@@ -56,7 +56,7 @@ export class ZellijClient {
    */
   createSession(name: string): void {
     execSync(`zellij attach --create-background ${this.shellQuote(name)}`, {
-      stdio: "pipe",
+      stdio: 'pipe',
     });
   }
 
@@ -64,7 +64,7 @@ export class ZellijClient {
    * Create a new pane in the target session.
    */
   newPane(): void {
-    this.execInSession("zellij action new-pane");
+    this.execInSession('zellij action new-pane');
   }
 
   /**
@@ -72,7 +72,7 @@ export class ZellijClient {
    */
   isAvailable(): boolean {
     try {
-      execSync("command -v zellij", { stdio: "pipe" });
+      execSync('command -v zellij', { stdio: 'pipe' });
       return true;
     } catch {
       return false;
@@ -85,10 +85,10 @@ export class ZellijClient {
    */
   listSessions(): string[] {
     try {
-      const output = execSync("zellij list-sessions", { stdio: "pipe", encoding: "utf-8" });
+      const output = execSync('zellij list-sessions', { stdio: 'pipe', encoding: 'utf-8' });
       return output
-        .split("\n")
-        .map((line) => line.split(" ")[0]?.trim())
+        .split('\n')
+        .map((line) => line.split(' ')[0]?.trim())
         .filter((name): name is string => !!name && name.length > 0);
     } catch {
       return [];
@@ -100,8 +100,8 @@ export class ZellijClient {
    */
   private execInSession(command: string): string {
     return execSync(command, {
-      stdio: "pipe",
-      encoding: "utf-8",
+      stdio: 'pipe',
+      encoding: 'utf-8',
       env: {
         ...process.env,
         ZELLIJ_SESSION_NAME: this.sessionName,

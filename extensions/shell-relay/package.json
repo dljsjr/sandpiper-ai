@@ -12,11 +12,12 @@
     "typescript": "catalog:ts"
   },
   "scripts": {
-    "check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
   }
 }
