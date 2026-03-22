@@ -31,6 +31,7 @@ These are declared in `package.json` under the `pi` key. See the [Pi Packages do
 | Path | Type | Description |
 |------|------|-------------|
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
+| `packages/sandpiper-tasks-cli/` | Distributable Binary | Task management CLI (compiled to `skills/tasks/sandpiper-tasks`) |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI tooling |
 | `packages/core/` | Shared Library | Shared core utilities |
 | `devtools/` | Dev-only | Development scripts and utilities |
@@ -61,12 +62,11 @@ This repo uses Bun workspaces. Dependencies are managed from the **repo root**:
 
 ### Task Conventions
 
-Common workflow tasks (check, build, test, etc.) SHOULD be defined as `scripts` in each package's `package.json`. This allows the root `package.json` to orchestrate them across all workspaces (e.g., `bun run --workspaces --if-present check`).
+Common workflow tasks (build, test, etc.) SHOULD be defined as `scripts` in each package's `package.json`. The root `package.json` handles cross-cutting concerns like linting and type checking (see [Formatting & Linting](#formatting--linting)).
 
-- **Simple tasks:** Define directly in `scripts` (e.g., `"check": "biome check ."`)
+- **Package-level scripts:** `test`, `build`, `test:watch` — things specific to a single package
+- **Root-level scripts:** `check`, `check:tsc`, `check:biome-*` — cross-cutting quality checks that run across all packages
 - **Complex tasks:** Implement as scripts in `devtools/` and reference them from `scripts` (e.g., `"release": "bun devtools/release.ts"`)
-
-This keeps `package.json` readable while allowing complex logic to live in proper script files.
 
 ### Code Portability
 
