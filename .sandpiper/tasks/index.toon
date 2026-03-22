@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774186166069
+lastUpdatedAt: 1774211146423
 tasks:
   "TCL-39":
     key: TCL-39
@@ -157,6 +157,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774117040070
+  "TCL-52":
+    key: TCL-52
+    project: TCL
+    title: Add batch/filter support to task move command
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-22T20:25:39.891Z"
+    updatedAt: "2026-03-22T20:25:46.417Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774211146422
   "TCL-37":
     key: TCL-37
     project: TCL
@@ -1433,7 +1448,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 52
+    nextTaskNumber: 53
   SHR:
     projectKey: SHR
     nextTaskNumber: 43
