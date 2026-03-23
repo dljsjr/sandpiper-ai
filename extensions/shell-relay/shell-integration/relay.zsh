@@ -45,16 +45,22 @@ __relay_run() {
     local cmd="$1"
     local __relay_exit
 
-    # Detect unbuffer-relay availability
+    # Detect unbuffer-relay availability:
+    # - SHELL_RELAY_UNBUFFER must point to the script (exported by the extension)
+    # - tclsh must be on PATH (provides the TCL runtime + expect package)
+    # - SHELL_RELAY_NO_UNBUFFER must not be set (opt-out for testing)
     local use_unbuffer=0
-    if [[ -z "${SHELL_RELAY_NO_UNBUFFER:-}" ]] && command -v unbuffer-relay >/dev/null 2>&1; then
+    if [[ -n "${SHELL_RELAY_UNBUFFER:-}" ]] && [[ -z "${SHELL_RELAY_NO_UNBUFFER:-}" ]] && command -v tclsh >/dev/null 2>&1; then
         use_unbuffer=1
     fi
 
     # Execute with capture pattern
+    # Enhanced mode: prefix with unbuffer-relay so the first command gets a PTY.
+    # eval runs in the current shell, preserving session state.
+    # Basic mode: eval directly (no PTY).
     if [[ $use_unbuffer -eq 1 ]]; then
         {
-            unbuffer-relay -p eval "$cmd" | tee "${SHELL_RELAY_STDOUT}" > /dev/tty
+            eval "${SHELL_RELAY_UNBUFFER}" "$cmd" | tee "${SHELL_RELAY_STDOUT}" > /dev/tty
             __relay_exit=${pipestatus[1]}
         } 2>&1 >/dev/null | tee "${SHELL_RELAY_STDERR}" > /dev/tty
     else

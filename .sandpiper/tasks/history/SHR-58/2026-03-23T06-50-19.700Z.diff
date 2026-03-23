@@ -1,0 +1,24 @@
+--- a/SHR-58.md
++++ b/SHR-58.md
+@@ -2,11 +2,10 @@
+ title: "expect is now a hard dependency for ghost client, not just color preservation"
+ status: NOT STARTED
+ kind: TASK
+-priority: MEDIUM
++priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-03-23T06:47:43.020Z
+-updated_at: 2026-03-23T06:50:15.771Z
++updated_at: 2026-03-23T06:50:19.700Z
+ ---
+ 
+ # expect is now a hard dependency for ghost client, not just color preservation
+@@ -25,3 +25,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-03-23T06:50:19.700Z
++
++- **priority**: MEDIUM → LOW
++

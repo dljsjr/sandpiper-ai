@@ -1,0 +1,27 @@
+--- a/SHR-40.md
++++ b/SHR-40.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Session start hook"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: LOW
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-03-20T23:00:00Z
+-updated_at: 2026-03-23T05:27:31.658Z
++updated_at: 2026-03-23T05:28:24.246Z
+ ---
+ 
+ # Session start hook
+@@ -30,3 +31,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-03-23T05:28:24.246Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

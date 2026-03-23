@@ -1,0 +1,30 @@
+#!/usr/bin/env expect
+#
+# ghost-attach — Headless Zellij client
+#
+# Attaches to (or creates) a Zellij session with a real PTY client,
+# keeping it alive indefinitely. This gives Zellij a focused pane so
+# that write-chars and dump-screen work reliably.
+#
+# Usage:
+#   ghost-attach <session-name>
+#
+# The process stays alive until killed. The parent should kill it on
+# shutdown (SIGTERM is fine — expect handles it gracefully).
+
+if {[llength $argv] == 0} {
+    puts stderr "Usage: ghost-attach <session-name>"
+    exit 1
+}
+
+set session [lindex $argv 0]
+
+log_user 0
+set timeout -1
+
+spawn zellij attach --create $session
+
+# Wait forever — the PTY client stays attached until we're killed
+catch {expect eof}
+
+exit 0

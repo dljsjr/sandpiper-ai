@@ -51,18 +51,28 @@ function __relay_run
     # and fish's parser undoes that escaping when it tokenizes the command line.
     set -l cmd $argv[1]
 
-    # Detect unbuffer-relay availability
+    # Detect unbuffer-relay availability:
+    # - SHELL_RELAY_UNBUFFER must point to the script (exported by the extension)
+    # - tclsh must be on PATH (provides the TCL runtime + expect package)
+    # - SHELL_RELAY_NO_UNBUFFER must not be set (opt-out for testing)
     set -l use_unbuffer 0
-    if not set -q SHELL_RELAY_NO_UNBUFFER
-        if command -v unbuffer-relay >/dev/null 2>&1
+    if set -q SHELL_RELAY_UNBUFFER; and not set -q SHELL_RELAY_NO_UNBUFFER
+        if command -v tclsh >/dev/null 2>&1
             set use_unbuffer 1
         end
     end
 
     # Execute with capture pattern
+    # Enhanced mode: prefix the command with unbuffer-relay so the first
+    # command (or only command) runs in a PTY for isatty(stdout) color
+    # preservation. eval runs in the current shell, so session state
+    # (functions, non-exported vars) is available for variable expansion
+    # and shell builtins. For pipelines, only the first command gets the
+    # PTY — subsequent pipeline stages run normally in-session.
+    # Basic mode: eval directly in the current shell (no PTY).
     if test $use_unbuffer -eq 1
         begin
-            unbuffer-relay -p eval $cmd | tee $SHELL_RELAY_STDOUT > /dev/tty
+            eval $SHELL_RELAY_UNBUFFER $cmd | tee $SHELL_RELAY_STDOUT > /dev/tty
             set -g __relay_exit $pipestatus[1]
         end 2>&1 >/dev/null | tee $SHELL_RELAY_STDERR > /dev/tty
     else
@@ -96,6 +106,13 @@ function __relay_execute
         return
     end
 
+    # If the command is already a __relay_run invocation (agent-injected),
+    # execute it directly — don't double-wrap.
+    if string match -qr '^\s*__relay_run ' -- $cmd
+        commandline -f execute
+        return
+    end
+
     # Check if the command is complete (handles multiline input)
     if not commandline --is-valid
         # Incomplete command — insert newline (default multiline behavior)
@@ -109,11 +126,12 @@ function __relay_execute
     commandline -f execute
 end
 
-# Bind Enter key — only when relay vars are available (optimization, not a guard)
-if set -q SHELL_RELAY_SIGNAL
-    bind \r __relay_execute
-    bind \n __relay_execute
-end
+# Bind Enter key unconditionally — __relay_execute has its own guards and
+# falls back to default `commandline -f execute` when the relay is inactive.
+# This must not be gated on SHELL_RELAY_SIGNAL because the env var is
+# exported into the pane after the shell (and this script) has already started.
+bind \r __relay_execute
+bind \n __relay_execute
 
 # --- Terminal Title Override ---
 # Displays the actual command being run, excluding wrapper boilerplate.

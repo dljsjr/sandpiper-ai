@@ -24,6 +24,13 @@ export interface RelayOptions {
   readonly shell: 'fish' | 'bash' | 'zsh';
   /** Function to inject a command string into the multiplexer pane. */
   readonly injectCommand: (command: string) => void | Promise<void>;
+  /**
+   * Timeout in milliseconds for waiting for `prompt_ready` after a command
+   * completes (after `last_status` is received). Non-fatal — if exceeded,
+   * the result is still returned.
+   * @default 5000
+   */
+  readonly promptReadyTimeoutMs?: number;
 }
 
 /**
@@ -37,6 +44,7 @@ export class Relay {
   private readonly fifoManager: FifoManager;
   private readonly shell: RelayOptions['shell'];
   private readonly injectCommand: RelayOptions['injectCommand'];
+  private readonly promptReadyTimeoutMs: number;
   private readonly signalParser = new SignalParser();
 
   private stdoutStream: ReadStream | null = null;
@@ -58,6 +66,7 @@ export class Relay {
     this.fifoManager = options.fifoManager;
     this.shell = options.shell;
     this.injectCommand = options.injectCommand;
+    this.promptReadyTimeoutMs = options.promptReadyTimeoutMs ?? 5000;
   }
 
   /**
@@ -104,6 +113,15 @@ export class Relay {
     this.stdoutStream = null;
     this.stderrStream = null;
     this.signalStream = null;
+  }
+
+  /**
+   * Wait for a prompt_ready signal on the signal channel.
+   * Used during setup to confirm the shell is initialized and the
+   * signal FIFO is wired up.
+   */
+  async waitForPromptReady(timeoutMs: number): Promise<void> {
+    await this.signalParser.waitFor('prompt_ready', timeoutMs);
   }
 
   /**
@@ -155,13 +173,17 @@ export class Relay {
 
     // Wait for prompt_ready signal (pane is ready for next command)
     try {
-      await this.signalParser.waitFor('prompt_ready', 5000);
+      await this.signalParser.waitFor('prompt_ready', this.promptReadyTimeoutMs);
     } catch {
       // prompt_ready timeout is non-fatal — we have the exit code already
     }
 
-    // Small delay to let any remaining FIFO data flush
-    await new Promise((r) => setTimeout(r, 20));
+    // Drain any remaining FIFO data that's already in the kernel buffer.
+    // After last_status arrives, stdout/stderr data may still be queued in
+    // Node's I/O layer. We yield twice: once to let pending I/O callbacks
+    // fire, and once more to process any data events they enqueue.
+    await new Promise((r) => setImmediate(r));
+    await new Promise((r) => setImmediate(r));
 
     return {
       stdout: this.stdoutBuffer,

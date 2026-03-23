@@ -1,0 +1,25 @@
+--- a/SHR-53.md
++++ b/SHR-53.md
+@@ -6,9 +6,18 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-23T05:42:59.163Z
+-updated_at: 2026-03-23T05:42:59.163Z
++updated_at: 2026-03-23T05:43:06.447Z
+ ---
+ 
+ # Agent commands double-wrapped by fish Enter keybind
+ 
+-
++When the agent injects a command via write-chars, the injection includes a trailing newline which triggers fish's Enter keybind override. The keybind wraps the already-wrapped `__relay_run` invocation in another `__relay_run`, causing double-wrapping. The inner wrapper captures output correctly so commands work, but it's redundant and means stdout/stderr flow through two layers of tee/FIFO piping.
++
++Fix: The fish Enter keybind should detect when the commandline already starts with `__relay_run` (or starts with a space prefix indicating an agent-injected command) and skip wrapping — just execute directly via `commandline -f execute`.
++
++---
++
++# Activity Log
++
++## 2026-03-23T05:43:06.447Z
++
++- **description**: added (3 lines)
++
