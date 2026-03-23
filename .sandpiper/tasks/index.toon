@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774235956530
+lastUpdatedAt: 1774240364083
 tasks:
   "TCL-39":
     key: TCL-39
@@ -411,6 +411,21 @@ tasks:
     blockedBy[0]:
     related[1]: TCL-43
     lastIndexedAt: 1774145904806
+  "TCL-60":
+    key: TCL-60
+    project: TCL
+    title: Biome --unsafe autofix broke signal parser while loop — investigate guardrails
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T03:58:37.935Z"
+    updatedAt: "2026-03-23T04:00:01.338Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: SHR-43
+    lastIndexedAt: 1774238401348
   "TCL-31":
     key: TCL-31
     project: TCL
@@ -933,47 +948,80 @@ tasks:
     key: SHR-28
     project: SHR
     title: Session and pane lifecycle management
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:47:52-05:00"
+    updatedAt: "2026-03-23T04:32:36.259Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678032
+    lastIndexedAt: 1774240356264
+  "SHR-49":
+    key: SHR-49
+    project: SHR
+    title: Add automated tests for unbuffer-relay expect script
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T04:32:18.537Z"
+    updatedAt: "2026-03-23T04:32:18.568Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774240338574
+  "SHR-48":
+    key: SHR-48
+    project: SHR
+    title: Use FIFO for dump-screen output in shell_relay_inspect tool
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T04:32:18.462Z"
+    updatedAt: "2026-03-23T04:32:18.501Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774240338509
   "SHR-19":
     key: SHR-19
     project: SHR
     title: Relay orchestration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:40:34-05:00"
+    updatedAt: "2026-03-23T04:32:36.286Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678033
+    lastIndexedAt: 1774240356292
   "SHR-29":
     key: SHR-29
     project: SHR
     title: Shell integration installer
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:47:52-05:00"
+    updatedAt: "2026-03-23T04:32:35.880Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678033
+    lastIndexedAt: 1774240355886
   "SHR-39":
     key: SHR-39
     project: SHR
@@ -989,6 +1037,37 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774115678033
+  "SHR-47":
+    key: SHR-47
+    project: SHR
+    title: Generate shell-appropriate env export commands based on detected shell
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T04:32:18.406Z"
+    updatedAt: "2026-03-23T04:32:18.431Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774240338437
+  "SHR-43":
+    key: SHR-43
+    project: SHR
+    title: "FIFO tests leak open streams, hanging vitest when running multiple test files"
+    status: COMPLETE
+    kind: BUG
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-23T03:31:17.041Z"
+    updatedAt: "2026-03-23T03:57:42.874Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: SHR-32
+    lastIndexedAt: 1774238262880
   "SHR-42":
     key: SHR-42
     project: SHR
@@ -1004,36 +1083,53 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774115678033
+  "SHR-46":
+    key: SHR-46
+    project: SHR
+    title: Replace 20ms FIFO flush delay with principled drain approach
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T04:32:18.347Z"
+    updatedAt: "2026-03-23T04:32:18.374Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774240338380
   "SHR-1":
     key: SHR-1
     project: SHR
     title: Fish shell integration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:36.313Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678034
+    lastIndexedAt: 1774240356320
   "SHR-24":
     key: SHR-24
     project: SHR
     title: Pi extension scaffolding and tool registration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:47:52-05:00"
+    updatedAt: "2026-03-23T04:32:36.341Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678034
+    lastIndexedAt: 1774240356347
   "SHR-41":
     key: SHR-41
     project: SHR
@@ -1053,62 +1149,97 @@ tasks:
     key: SHR-6
     project: SHR
     title: Bash shell integration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:35.907Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678034
+    lastIndexedAt: 1774240355913
+  "SHR-45":
+    key: SHR-45
+    project: SHR
+    title: Make prompt_ready timeout configurable in relay orchestration
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T04:32:18.287Z"
+    updatedAt: "2026-03-23T04:32:18.316Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774240338322
   "SHR-14":
     key: SHR-14
     project: SHR
     title: Zellij CLI integration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:27:43-05:00"
+    updatedAt: "2026-03-23T04:32:36.369Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678034
+    lastIndexedAt: 1774240356376
   "SHR-30":
     key: SHR-30
     project: SHR
     title: Startup validation
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:48:53-05:00"
+    updatedAt: "2026-03-23T04:32:35.934Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678034
+    lastIndexedAt: 1774240355940
+  "SHR-44":
+    key: SHR-44
+    project: SHR
+    title: Inline fish string escaping to eliminate subprocess latency
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-23T04:07:51.689Z"
+    updatedAt: "2026-03-23T04:14:33.332Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774239273338
   "SHR-31":
     key: SHR-31
     project: SHR
     title: Test suite
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:54:16-05:00"
+    updatedAt: "2026-03-23T04:32:44.076Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774240364083
   "SHR-40":
     key: SHR-40
     project: SHR
@@ -1128,95 +1259,101 @@ tasks:
     key: SHR-7
     project: SHR
     title: Zsh shell integration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:35.961Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774240355968
   "SHR-8":
     key: SHR-8
     project: SHR
     title: PTY color preservation via unbuffer-relay
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-22T02:59:00.534Z"
+    updatedAt: "2026-03-23T04:32:35.991Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774148340539
+    lastIndexedAt: 1774240355997
   "SHR-9":
     key: SHR-9
     project: SHR
     title: Persistent FIFO manager
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:21:12-05:00"
+    updatedAt: "2026-03-23T04:32:36.398Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774240356405
   "SHR-38":
     key: SHR-38
     project: SHR
     title: Edge case tests
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:54:16-05:00"
+    updatedAt: "2026-03-23T04:32:36.021Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774240356027
   "SHR-32":
     key: SHR-32
     project: SHR
     title: FIFO manager unit tests
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:26:06-05:00"
+    updatedAt: "2026-03-23T04:32:36.427Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774240356433
   "SHR-36":
     key: SHR-36
     project: SHR
     title: Shell integration guard behavior tests
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:50:57-05:00"
+    updatedAt: "2026-03-23T04:32:36.050Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774240356056
   "SHR-37":
     key: SHR-37
     project: SHR
@@ -1237,358 +1374,380 @@ tasks:
     key: SHR-33
     project: SHR
     title: Signal channel parser unit tests
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:26:06-05:00"
+    updatedAt: "2026-03-23T04:32:36.455Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678036
+    lastIndexedAt: 1774240356461
   "SHR-34":
     key: SHR-34
     project: SHR
     title: Command escaping round-trip tests
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:30:24-05:00"
+    updatedAt: "2026-03-23T04:32:36.483Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678036
+    lastIndexedAt: 1774240356489
   "SHR-35":
     key: SHR-35
     project: SHR
     title: Zellij integration mock tests
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:27:43-05:00"
+    updatedAt: "2026-03-23T04:32:36.078Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678036
+    lastIndexedAt: 1774240356084
   "SHR-18":
     key: SHR-18
     project: SHR
     title: Implement pane process state queries
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:27:43-05:00"
+    updatedAt: "2026-03-23T04:32:36.107Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-14
-    lastIndexedAt: 1774115678036
+    lastIndexedAt: 1774240356119
   "SHR-16":
     key: SHR-16
     project: SHR
     title: Implement pane content capture via dump-screen
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:27:43-05:00"
+    updatedAt: "2026-03-23T04:32:36.142Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-14
-    lastIndexedAt: 1774115678037
+    lastIndexedAt: 1774240356148
   "SHR-17":
     key: SHR-17
     project: SHR
     title: Implement session and pane creation
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:27:43-05:00"
+    updatedAt: "2026-03-23T04:32:36.513Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-14
-    lastIndexedAt: 1774115678037
+    lastIndexedAt: 1774240356519
   "SHR-15":
     key: SHR-15
     project: SHR
     title: Implement command injection via write-chars
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:27:43-05:00"
+    updatedAt: "2026-03-23T04:32:36.540Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-14
-    lastIndexedAt: 1774115678037
+    lastIndexedAt: 1774240356550
   "SHR-26":
     key: SHR-26
     project: SHR
     title: Register shell_relay tool
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:47:52-05:00"
+    updatedAt: "2026-03-23T04:32:36.575Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-24
-    lastIndexedAt: 1774115678037
+    lastIndexedAt: 1774240356582
   "SHR-27":
     key: SHR-27
     project: SHR
     title: Register shell_relay_inspect tool
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:47:52-05:00"
+    updatedAt: "2026-03-23T04:32:36.169Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-24
-    lastIndexedAt: 1774115678037
+    lastIndexedAt: 1774240356176
   "SHR-25":
     key: SHR-25
     project: SHR
     title: Create extension scaffolding
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:47:52-05:00"
+    updatedAt: "2026-03-23T04:32:36.604Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-24
-    lastIndexedAt: 1774115678038
+    lastIndexedAt: 1774240356610
   "SHR-4":
     key: SHR-4
     project: SHR
     title: Implement fish Enter key binding override
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:36.631Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-1
-    lastIndexedAt: 1774115678038
+    lastIndexedAt: 1774240356637
   "SHR-5":
     key: SHR-5
     project: SHR
     title: Implement fish_title override
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: LOW
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:35.853Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-1
-    lastIndexedAt: 1774115678038
+    lastIndexedAt: 1774240355860
   "SHR-2":
     key: SHR-2
     project: SHR
     title: Implement fish prompt hook
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:36.658Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-1
-    lastIndexedAt: 1774115678038
+    lastIndexedAt: 1774240356665
   "SHR-3":
     key: SHR-3
     project: SHR
     title: Implement fish __relay_run wrapper function
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:42:02-05:00"
+    updatedAt: "2026-03-23T04:32:36.688Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-1
-    lastIndexedAt: 1774115678038
+    lastIndexedAt: 1774240356696
   "SHR-22":
     key: SHR-22
     project: SHR
     title: Implement command escaping
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:30:24-05:00"
+    updatedAt: "2026-03-23T04:32:36.719Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-19
-    lastIndexedAt: 1774115678038
+    lastIndexedAt: 1774240356726
   "SHR-23":
     key: SHR-23
     project: SHR
     title: Implement timeout support with Ctrl+C injection
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:40:34-05:00"
+    updatedAt: "2026-03-23T04:32:36.201Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-19
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356207
   "SHR-20":
     key: SHR-20
     project: SHR
     title: Implement core execution flow
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:40:34-05:00"
+    updatedAt: "2026-03-23T04:32:36.748Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-19
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356754
   "SHR-21":
     key: SHR-21
     project: SHR
     title: Implement command serialization and locking
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:40:34-05:00"
+    updatedAt: "2026-03-23T04:32:36.775Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-19
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356781
   "SHR-12":
     key: SHR-12
     project: SHR
     title: Implement signal channel line parser and event emitter
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:26:06-05:00"
+    updatedAt: "2026-03-23T04:32:36.803Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-9
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356809
   "SHR-13":
     key: SHR-13
     project: SHR
     title: Implement FIFO cleanup and stale detection
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:30:24-05:00"
+    updatedAt: "2026-03-23T04:32:36.229Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-9
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356237
   "SHR-10":
     key: SHR-10
     project: SHR
     title: Implement FIFO creation with deterministic paths
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:26:06-05:00"
+    updatedAt: "2026-03-23T04:32:36.834Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-9
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356842
   "SHR-11":
     key: SHR-11
     project: SHR
     title: Implement O_RDWR sentinel pattern
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-21T01:26:06-05:00"
+    updatedAt: "2026-03-23T04:32:36.863Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-9
-    lastIndexedAt: 1774115678039
+    lastIndexedAt: 1774240356869
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 60
+    nextTaskNumber: 61
   SHR:
     projectKey: SHR
-    nextTaskNumber: 43
+    nextTaskNumber: 50

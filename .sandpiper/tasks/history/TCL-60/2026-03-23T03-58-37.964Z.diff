@@ -1,0 +1,33 @@
+--- a/TCL-60.md
++++ b/TCL-60.md
+@@ -6,9 +6,26 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-03-23T03:58:37.935Z
+-updated_at: 2026-03-23T03:58:37.935Z
++related:
++  - SHR-43
++updated_at: 2026-03-23T03:58:37.963Z
+ ---
+ 
+ # Biome safe autofix broke signal parser while loop — investigate guardrails
+ 
+-
++A biome safe autofix (--write, NOT --unsafe) restructured a `while ((x = expr) !== -1)` loop into separate init + while + reassign-at-bottom. A `continue` statement in the loop body bypassed the reassignment, causing an infinite loop on inputs with consecutive newlines.
++
++This suggests that even 'safe' biome autofixes can introduce runtime bugs when they restructure control flow containing `continue` or `break` statements.
++
++**Action items:**
++- Investigate whether biome has a rule or option to flag restructured loops with continue/break
++- Consider adding a post-fix test run to our workflow (run tests immediately after any `bun check --write`)
++- Document this pattern in the AGENTS.md as a known risk
++
++---
++
++# Activity Log
++
++## 2026-03-23T03:58:37.964Z
++
++- **description**: added (8 lines)
++- **related**: (none) → SHR-43
++

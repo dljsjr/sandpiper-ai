@@ -33,6 +33,7 @@ export class SignalParser extends EventEmitter {
       this.buffer = this.buffer.slice(newlineIndex + 1);
 
       if (line.length === 0) {
+        newlineIndex = this.buffer.indexOf('\n');
         continue;
       }
 

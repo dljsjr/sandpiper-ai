@@ -1,12 +1,13 @@
 ---
 title: "Bash shell integration"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-21T01:42:02-05:00
+updated_at: 2026-03-23T04:32:35.907Z
 ---
 
 # Bash shell integration
@@ -22,3 +23,12 @@ Implement the basic bash shell integration script (`relay.bash`) with prompt hoo
 - Validation deferred to full bash/zsh implementation phase
 
 **References:** FR-14, FR-3
+
+---
+
+# Activity Log
+
+## 2026-03-23T04:32:35.907Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

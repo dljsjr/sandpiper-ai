@@ -1,12 +1,13 @@
 ---
 title: "Fish shell integration"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-21T01:42:02-05:00
+updated_at: 2026-03-23T04:32:36.313Z
 ---
 
 # Fish shell integration
@@ -25,3 +26,12 @@ This is the MVP shell — fish gets full functionality including prompt hook, co
 - All guards are defensive: silent no-op on missing/broken FIFO
 
 **References:** FR-14, FR-3, FR-9
+
+---
+
+# Activity Log
+
+## 2026-03-23T04:32:36.313Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

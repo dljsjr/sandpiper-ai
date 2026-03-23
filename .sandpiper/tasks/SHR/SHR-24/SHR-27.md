@@ -1,12 +1,13 @@
 ---
 title: "Register shell_relay_inspect tool"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-21T01:47:52-05:00
+updated_at: 2026-03-23T04:32:36.169Z
 ---
 
 # Register shell_relay_inspect tool
@@ -18,3 +19,12 @@ Register the `shell_relay_inspect` tool for pane visual inspection:
 - Used by the agent to observe user-initiated activity or inspect pane state
 
 **Reference:** FR-6
+
+---
+
+# Activity Log
+
+## 2026-03-23T04:32:36.170Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

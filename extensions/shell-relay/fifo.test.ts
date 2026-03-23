@@ -6,6 +6,7 @@ import {
   mkdirSync,
   mkdtempSync,
   openSync,
+  type ReadStream,
   rmSync,
   statSync,
   writeSync,
@@ -18,12 +19,38 @@ import { FifoManager } from './fifo.js';
 describe('FifoManager', () => {
   let tempDir: string;
   let manager: FifoManager;
+  const openStreams: ReadStream[] = [];
+
+  /** Create a read stream and track it for cleanup. */
+  function trackedReadStream(path: string, opts: Record<string, unknown>): ReadStream {
+    const stream = createReadStream(path, opts);
+    openStreams.push(stream);
+    return stream;
+  }
 
   beforeEach(() => {
     tempDir = mkdtempSync(join(tmpdir(), 'shell-relay-test-'));
   });
 
   afterEach(async () => {
+    // Destroy all test-created streams and wait for them to fully close.
+    // Streams hold their own fds on the FIFO inodes — these MUST be closed
+    // before removing the FIFO files, otherwise the inode stays alive and
+    // keeps the vitest worker's event loop open indefinitely.
+    const closePromises = openStreams.map(
+      (stream) =>
+        new Promise<void>((resolve) => {
+          if (stream.destroyed) {
+            resolve();
+            return;
+          }
+          stream.on('close', resolve);
+          stream.destroy();
+        }),
+    );
+    await Promise.all(closePromises);
+    openStreams.length = 0;
+
     if (manager) {
       await manager.shutdown();
     }
@@ -122,7 +149,7 @@ describe('FifoManager', () => {
       manager.open();
 
       const collected: string[] = [];
-      const stream = createReadStream(manager.paths.signal, {
+      const stream = trackedReadStream(manager.paths.signal, {
         flags: 'r',
         encoding: 'utf-8',
       });
@@ -152,7 +179,7 @@ describe('FifoManager', () => {
       manager.open();
 
       const collected: string[] = [];
-      const stream = createReadStream(manager.paths.signal, {
+      const stream = trackedReadStream(manager.paths.signal, {
         flags: 'r',
         encoding: 'utf-8',
       });
@@ -189,7 +216,7 @@ describe('FifoManager', () => {
       manager.open();
 
       let gotEnd = false;
-      const stream = createReadStream(manager.paths.signal, {
+      const stream = trackedReadStream(manager.paths.signal, {
         flags: 'r',
         encoding: 'utf-8',
       });

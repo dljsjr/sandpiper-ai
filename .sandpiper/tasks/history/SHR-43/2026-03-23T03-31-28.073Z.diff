@@ -1,0 +1,35 @@
+--- a/SHR-43.md
++++ b/SHR-43.md
+@@ -6,9 +6,28 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-03-23T03:31:17.041Z
+-updated_at: 2026-03-23T03:31:17.041Z
++related:
++  - SHR-32
++updated_at: 2026-03-23T03:31:28.073Z
+ ---
+ 
+ # FIFO tests leak open streams, hanging vitest when running multiple test files
+ 
+-
++The O_RDWR sentinel pattern tests in fifo.test.ts create `createReadStream` instances directly in test bodies but don't always destroy them. When vitest runs multiple test files in the same process, these open streams keep the Node.js event loop alive, causing the test runner to hang indefinitely after fifo.test.ts completes.
++
++**Root cause:** Tests rely on process exit for implicit stream cleanup. This works when running fifo.test.ts in isolation but fails when running the full suite.
++
++**Affected tests:**
++- `should read data written by an external writer` — creates a stream, destroys it on data receipt, but if the test fails before data arrives, the stream leaks
++- `should survive multiple writer open/write/close cycles without EOF` — same pattern
++- `should not receive EOF when external writer closes` — intentionally keeps stream open for 100ms then destroys, but may not destroy on test failure
++
++**Fix:** Track all streams created in tests and destroy them in `afterEach`. Alternatively, use vitest's `onTestFinished` hook for guaranteed cleanup.
++
++---
++
++# Activity Log
++
++## 2026-03-23T03:31:28.073Z
++
++- **description**: added (10 lines)
++- **related**: (none) → SHR-32
++
