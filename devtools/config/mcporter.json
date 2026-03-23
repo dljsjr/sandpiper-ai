@@ -3,11 +3,20 @@
   "mcpServers": {
     "ascii-motion": {
       "command": "bunx",
+      "args": ["ascii-motion-mcp", "--live", "--project-dir", "/Users/dstephen/git/sandpiper-ai"],
+      "lifecycle": "keep-alive",
+      "logging": { "daemon": { "enabled": true } }
+    },
+    "dash": {
+      "command": "mise",
       "args": [
-        "ascii-motion-mcp",
-        "--live",
-        "--project-dir",
-        "/Users/dstephen/git/sandpiper-ai"
+        "x",
+        "uv@latest",
+        "--",
+        "uvx",
+        "--from",
+        "git+https://github.com/Kapeli/dash-mcp-server.git",
+        "dash-mcp-server"
       ],
       "lifecycle": "keep-alive",
       "logging": { "daemon": { "enabled": true } }

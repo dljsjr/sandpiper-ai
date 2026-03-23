@@ -10,6 +10,9 @@
     "check:tsc": "tsc --noEmit",
     "check:ast-grep": "ast-grep scan",
     "check": "bun run check:tsc && bun run check:biome-check",
+    "preinstall": "bash devtools/vendor.sh --if-missing",
+    "postinstall": "bash devtools/postinstall.sh",
+    "vendor": "bash devtools/vendor.sh",
     "clean": "rm -rf {.,**}/{node_modules,dist,.*cache,*.d.ts,*.tsbuildinfo}",
     "sandpiper-cli": "sandpiper"
   },
@@ -21,7 +24,8 @@
       "./extensions"
     ],
     "skills": [
-      "./skills"
+      "./skills/sandpiper",
+      "./skills/third-party"
     ],
     "prompts": [
       "./prompts"
@@ -66,7 +70,8 @@
   "dependencies": {
     "chalk": "^5.6.2",
     "sandpiper-ai-cli": "workspace:*",
-    "supports-color": "^10.2.2"
+    "supports-color": "^10.2.2",
+    "mcporter": "catalog:tooling"
   },
   "description": "To install dependencies:",
   "main": "sandpiper-design-iterative.js",

@@ -1,0 +1,5 @@
+# Vendored third-party skills
+# Format: <github-tree-url> <destination>
+
+https://github.com/anthropics/skills/tree/main/skills/skill-creator  ./skills/third-party/skill-creator
+https://github.com/anthropics/skills/tree/main/skills/pdf            ./skills/third-party/pdf

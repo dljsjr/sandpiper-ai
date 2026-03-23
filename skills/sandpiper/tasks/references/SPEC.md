@@ -10,9 +10,9 @@ Tasks are work items stored as markdown files with YAML frontmatter in a project
 
 ### 2.1 Project Key
 
-A project key MUST be composed of exactly 3 uppercase ASCII letters, matching the pattern `[A-Z]{3}`.
+A project key MUST be composed of 2 or more uppercase ASCII letters, matching the pattern `[A-Z]{2,}`. Short keys (2–4 letters) are encouraged for readability.
 
-Examples: `SHR`, `CLI`, `COR`
+Examples: `SHR`, `CLI`, `TOOLS`
 
 ### 2.2 Project Directory
 

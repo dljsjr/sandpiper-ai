@@ -6,16 +6,17 @@ This repository is a **Pi Package** — a bundle that can contain multiple exten
 
 ### Pi Package Layout
 
-The following top-level directories are Pi Package convention directories, auto-discovered by the pi framework:
+The following top-level directories are Pi Package convention directories, declared in `package.json` under the `pi` key:
 
 | Directory | Purpose |
 |-----------|---------|
 | `extensions/` | Pi extensions (`.ts`/`.js` files that register tools, hooks, etc.) |
-| `skills/` | Pi skills (`SKILL.md` folders and `.md` files) |
+| `skills/sandpiper/` | First-party skills (`SKILL.md` folders) |
+| `skills/third-party/` | Vendored third-party skills (managed via `vendor.txt` + `bun vendor`) |
 | `prompts/` | Prompt templates (`.md` files) |
 | `themes/` | UI themes (`.json` files) |
 
-These are declared in `package.json` under the `pi` key. See the [Pi Packages documentation](packages/cli/dist/docs/packages.md) for details.
+See the [Pi Packages documentation](packages/cli/dist/docs/packages.md) for details.
 
 ### Shared Code & Tooling
 
@@ -31,10 +32,11 @@ These are declared in `package.json` under the `pi` key. See the [Pi Packages do
 | Path | Type | Description |
 |------|------|-------------|
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
-| `packages/sandpiper-tasks-cli/` | Distributable Binary | Task management CLI (compiled to `skills/tasks/sandpiper-tasks`) |
+| `packages/sandpiper-tasks-cli/` | Distributable Binary | Task management CLI (compiled to `skills/sandpiper/tasks/scripts/sandpiper-tasks`) |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI tooling |
 | `packages/core/` | Shared Library | Shared core utilities |
-| `devtools/` | Dev-only | Development scripts and utilities |
+| `devtools/` | Dev-only | Development scripts, vendoring tools, and build utilities |
+| `devtools/dash.ts` | Dev-only | Dash documentation CLI source (compiled to `skills/sandpiper/dash/scripts/dash`) |
 
 ### Project-Specific Guidelines
 
@@ -191,7 +193,7 @@ All coding work MUST be tracked against a task. Do not begin implementation with
 
 ### Project Key Guidelines
 
-Each project key is 3 uppercase letters scoped to a logical product or component. Use these guidelines to decide whether work belongs in an existing project or a new one:
+Each project key is a short uppercase identifier (2+ letters, typically 3–4) scoped to a logical product or component. Use these guidelines to decide whether work belongs in an existing project or a new one:
 
 - **Same project** if the work directly implements, extends, tests, or fixes something within that component's codebase and responsibility boundary
 - **New project** if the work introduces a new tool, library, extension, or distinct deliverable — even if it's related to existing work

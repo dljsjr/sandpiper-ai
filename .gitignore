@@ -44,4 +44,4 @@ pi-session*.html
 # allowlist agent stuff
 !AGENTS.md
 !.sandpiper
-skills/tasks/scripts/sandpiper-tasks
+skills/sandpiper/tasks/scripts/sandpiper-tasks

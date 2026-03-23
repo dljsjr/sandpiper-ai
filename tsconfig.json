@@ -33,6 +33,7 @@
     "dist",
     "**/dist",
     "draw-sandpiper.ts",
-    "devtools/ascii-motion.ts"
+    "devtools/ascii-motion.ts",
+    "devtools/dash.ts"
   ]
 }

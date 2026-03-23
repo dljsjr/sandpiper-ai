@@ -44,7 +44,7 @@ export function renderTaskContent(opts: CreateTaskOptions): string {
 
 export function createProject(tasksDir: string, projectKey: string): void {
   if (!PROJECT_KEY_RE.test(projectKey)) {
-    throw new Error(`Invalid project key: "${projectKey}". Must be exactly 3 uppercase ASCII letters.`);
+    throw new Error(`Invalid project key: "${projectKey}". Must be 2 or more uppercase ASCII letters.`);
   }
 
   const projectDir = join(tasksDir, projectKey);
@@ -141,14 +141,14 @@ function getNextTaskNumber(tasksDir: string, projectKey: string): number {
 
 /**
  * Walk up from a task file path to find the tasks root directory.
- * The tasks root is the parent of the project directory (3-letter uppercase name).
+ * The tasks root is the parent of the project directory (uppercase name, 2+ letters).
  */
 function resolveTasksRoot(taskPath: string): string | null {
   let dir = dirname(taskPath);
   for (let i = 0; i < 3; i++) {
     const parent = dirname(dir);
     const dirName = basename(dir);
-    if (/^[A-Z]{3}$/.test(dirName)) {
+    if (/^[A-Z]{2,}$/.test(dirName)) {
       return parent;
     }
     dir = parent;

@@ -44,7 +44,7 @@ const listCommand = new Command('list').description('List all projects with task
 
 const createCommand = new Command('create')
   .description('Create a new project')
-  .argument('<key>', 'Project key (3 uppercase letters, e.g., SHR)')
+  .argument('<key>', 'Project key (uppercase letters, e.g., SHR, TOOLS)')
   .action((key, _opts, cmd) => {
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);

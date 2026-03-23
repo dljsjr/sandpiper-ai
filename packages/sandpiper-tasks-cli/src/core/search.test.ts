@@ -102,7 +102,7 @@ describe('searchTasks', () => {
     const keys = searchTasks(tasksDir, 'FIFO');
     // Should not include non-md files (no task key extractable)
     for (const key of keys) {
-      expect(key).toMatch(/^[A-Z]{3}-\d+$/);
+      expect(key).toMatch(/^[A-Z]{2,}-\d+$/);
     }
   });
 });
