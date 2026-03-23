@@ -1,6 +1,6 @@
 ---
 name: tasks
-description: Create, update, query, and organize project work items (tasks, bugs, subtasks) as markdown files with YAML frontmatter. Use when the user asks to create a ticket, track work, check task status, assign work, or manage a backlog. Tasks are stored in the local project's .sandpiper/tasks directory.
+description: Create, update, query, and organize project work items (tasks, bugs, subtasks) as markdown files with YAML frontmatter. Use when the user asks to create a ticket, track work, check task status, assign work, or manage a backlog. Also use when reviewing tickets, filtering tasks by status (e.g., NEEDS REVIEW, IN PROGRESS), doing code reviews against task acceptance criteria, or querying the task board for sprint status. Tasks are stored in the local project's .sandpiper/tasks directory.
 allowed-tools: read write bash
 compatibility: Requires a local .sandpiper/tasks directory in the project. Uses ripgrep (rg) for full-text search.
 ---
@@ -9,18 +9,18 @@ compatibility: Requires a local .sandpiper/tasks directory in the project. Uses 
 
 Manage project work items as markdown files with YAML frontmatter, stored in the local project's `.sandpiper/tasks` directory.
 
-For the full normative specification (RFC 2119), see [SPEC.md](SPEC.md). This skill document provides operational guidance and quick reference.
+For the full normative specification (RFC 2119), see [references/SPEC.md](references/SPEC.md). This skill document provides operational guidance and quick reference.
 
 ## CLI Tool
 
-The `sandpiper-tasks` CLI is the primary interface for task operations. It is bundled as a compiled binary at `skills/tasks/sandpiper-tasks` relative to the Pi Package root.
+The `sandpiper-tasks` CLI is the primary interface for task operations. It is bundled as a compiled binary at `skills/tasks/scripts/sandpiper-tasks` relative to the Pi Package root.
 
 ```bash
 # From the project root:
-./skills/tasks/sandpiper-tasks <command>
+./skills/tasks/scripts/sandpiper-tasks <command>
 
 # Or with explicit directory:
-./skills/tasks/sandpiper-tasks --dir /path/to/project <command>
+./skills/tasks/scripts/sandpiper-tasks --dir /path/to/project <command>
 ```
 
 ### Global Options
