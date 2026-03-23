@@ -14,6 +14,9 @@ import { ZellijClient } from './zellij.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+// Companion scripts (ghost-attach, unbuffer-relay) live at the extension
+// root, one level up from both src/ (dev) and dist/ (bundled).
+const extensionRoot = dirname(__dirname);
 
 /** Resolve the base directory for FIFOs. */
 function resolveBaseDir(): string {
@@ -75,7 +78,7 @@ export default function (pi: ExtensionAPI) {
     // Spawn a ghost client to attach to (or create) the session.
     // Zellij requires a real PTY client for write-chars and dump-screen
     // to work reliably. The ghost client provides this invisibly.
-    ghostClient = new GhostClient({ scriptDir: __dirname, sessionName: resolvedSession });
+    ghostClient = new GhostClient({ scriptDir: extensionRoot, sessionName: resolvedSession });
     ghostClient.start();
 
     // Wait for the ghost client to attach and the pane to be ready
@@ -122,10 +125,12 @@ export default function (pi: ExtensionAPI) {
       { name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal },
       { name: 'SHELL_RELAY_STDOUT', value: fifoManager.paths.stdout },
       { name: 'SHELL_RELAY_STDERR', value: fifoManager.paths.stderr },
-      { name: 'SHELL_RELAY_UNBUFFER', value: join(__dirname, 'unbuffer-relay') },
+      { name: 'SHELL_RELAY_UNBUFFER', value: join(extensionRoot, 'unbuffer-relay') },
     ]);
 
-    zellij.writeChars(`${envExports}\n`);
+    // Space prefix excludes from shell history; clear removes the
+    // visible export commands from the pane after they execute.
+    zellij.writeChars(` ${envExports}; clear\n`);
 
     // Wait for prompt_ready — this confirms:
     // 1. The shell has fully initialized (config.fish sourced)

@@ -1,23 +1,23 @@
 {
   "name": "sandpiper-tasks-cli",
   "version": "0.0.1",
-  "private": true,
-  "description": "CLI for markdown-based task management with YAML frontmatter",
   "type": "module",
+  "description": "CLI for markdown-based task management with YAML frontmatter",
+  "bin": {
+    "sandpiper-tasks": "./dist/sandpiper-tasks"
+  },
   "dependencies": {
     "@commander-js/extra-typings": "catalog:cli",
     "@toon-format/toon": "2.1.0",
     "commander": "catalog:cli"
   },
   "devDependencies": {
-    "@toon-format/cli": "2.1.0",
-    "@types/bun": "catalog:bun",
-    "typescript": "catalog:ts",
-    "vitest": "catalog:testing"
+    "@toon-format/cli": "2.1.0"
   },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "bun build --compile --target bun src/index.ts --outfile ../../skills/sandpiper/tasks/scripts/sandpiper-tasks"
+    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-tasks",
+    "preinstall": "mkdir -p dist && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-tasks"
   }
 }

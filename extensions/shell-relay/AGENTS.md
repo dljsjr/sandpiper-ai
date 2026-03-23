@@ -10,6 +10,7 @@ All core logic lives in framework-independent modules. Only `index.ts` imports p
 
 | Module | Purpose | Pi imports? |
 |--------|---------|-------------|
+| `ansi.ts` | Strip terminal query/response sequences from PTY output | No |
 | `env-export.ts` | Shell-appropriate env var export command generation | No |
 | `fifo.ts` | Persistent FIFO lifecycle (O_RDWR sentinel pattern) | No |
 | `ghost-client.ts` | Headless Zellij client management (expect-based PTY) | No |

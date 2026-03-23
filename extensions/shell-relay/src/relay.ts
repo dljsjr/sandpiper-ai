@@ -1,4 +1,5 @@
 import { createReadStream, type ReadStream } from 'node:fs';
+import { stripTerminalQueries } from './ansi.js';
 import { escapeForBash, escapeForFish } from './escape.js';
 import type { FifoManager } from './fifo.js';
 import { SignalParser } from './signal.js';
@@ -186,8 +187,8 @@ export class Relay {
     await new Promise((r) => setImmediate(r));
 
     return {
-      stdout: this.stdoutBuffer,
-      stderr: this.stderrBuffer,
+      stdout: stripTerminalQueries(this.stdoutBuffer),
+      stderr: stripTerminalQueries(this.stderrBuffer),
       exitCode,
       timedOut: false,
     };

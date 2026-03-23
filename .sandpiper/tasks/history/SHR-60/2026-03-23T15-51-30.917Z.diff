@@ -1,0 +1,31 @@
+--- a/SHR-60.md
++++ b/SHR-60.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Replace Enter keybind with fish_preexec dynamic wrapper approach"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-23T15:51:25.468Z
+ updated_at: 2026-03-23T15:51:25.468Z
+-updated_at: 2026-03-23T15:51:25.468Z
++updated_at: 2026-03-23T15:51:30.917Z
+ ---
+ 
+ # Replace Enter keybind with fish_preexec dynamic wrapper approach
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-03-23T15:51:30.917Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

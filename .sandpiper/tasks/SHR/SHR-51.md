@@ -1,12 +1,13 @@
 ---
 title: "Env var exports visible in pane stdout on initial connect"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-23T05:35:02.369Z
-updated_at: 2026-03-23T05:35:09.778Z
+updated_at: 2026-03-23T15:30:07.135Z
 ---
 
 # Env var exports visible in pane stdout on initial connect
@@ -20,3 +21,13 @@ When Shell Relay connects to a pane, the FIFO path env var exports (set -gx / ex
 ## 2026-03-23T05:35:09.778Z
 
 - **description**: added (1 line)
+
+## 2026-03-23T15:29:17.667Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-23T15:30:07.135Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

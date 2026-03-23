@@ -1,23 +1,26 @@
 {
   "name": "shell-relay",
   "version": "0.0.1",
-  "private": true,
+  "type": "module",
   "description": "Pi extension: shared terminal session between user and agent via Zellij",
+  "bin": {
+    "shell_relay": "./dist/shell-relay",
+    "unbuffer-relay": "./unbuffer-relay",
+    "ghost-attach": "./ghost-attach"
+  },
   "peerDependencies": {
     "@mariozechner/pi-coding-agent": "catalog:pi",
-    "@sinclair/typebox": "*"
-  },
-  "devDependencies": {
-    "vitest": "catalog:testing",
-    "typescript": "catalog:ts"
+    "@sinclair/typebox": "catalog:pi"
   },
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node ./src/index.ts --outfile ./dist/shell-relay",
+    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./src/index.ts --outfile ./dist/shell-relay"
   },
   "pi": {
     "extensions": [
-      "./index.ts"
+      "./dist/shell-relay"
     ]
   }
 }

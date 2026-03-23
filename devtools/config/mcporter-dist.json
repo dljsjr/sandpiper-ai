@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/steipete/mcporter/main/mcporter.schema.json",
+  "mcpServers": {
+    "dash": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/Kapeli/dash-mcp-server.git",
+        "dash-mcp-server"
+      ],
+      "lifecycle": "keep-alive",
+      "logging": { "daemon": { "enabled": true } }
+    }
+  },
+  "imports": []
+}
