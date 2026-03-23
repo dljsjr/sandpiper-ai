@@ -133,6 +133,32 @@ describe('Relay', () => {
       expect(r2.exitCode).toBe(2);
     });
 
+    it('should use configurable prompt_ready timeout', async () => {
+      const injectCommand = vi.fn(async () => {
+        setTimeout(() => {
+          writeToFifo(fifoManager.paths.signal, 'last_status:0\n');
+        }, 30);
+        // Never send prompt_ready — will use the configured timeout
+      });
+
+      relay = new Relay({
+        fifoManager,
+        shell: 'fish',
+        injectCommand,
+        promptReadyTimeoutMs: 100,
+      });
+      relay.startListening();
+
+      const start = Date.now();
+      const result = await relay.execute('cmd', { timeoutMs: 5000 });
+      const elapsed = Date.now() - start;
+
+      // Should still return successfully (prompt_ready timeout is non-fatal)
+      expect(result.exitCode).toBe(0);
+      // Should have waited roughly the configured timeout, not the default 5000ms
+      expect(elapsed).toBeLessThan(1000);
+    });
+
     it('should reject with timeout error if command takes too long', async () => {
       const injectCommand = vi.fn(async () => {
         // Don't send any signal — simulate a hung command

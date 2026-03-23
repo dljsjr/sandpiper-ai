@@ -96,6 +96,33 @@ export class ZellijClient {
   }
 
   /**
+   * Wait until the pane is reachable by polling with dump-screen.
+   * Requires a real client to be attached (e.g., via ghost-attach).
+   *
+   * @returns true if the pane became reachable, false if timed out
+   */
+  waitForPane(timeoutMs = 10_000, intervalMs = 500): Promise<boolean> {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const check = () => {
+        try {
+          // dump-screen to /dev/null — just testing if it succeeds
+          // With a real client attached, this reliably works
+          this.execInSession('zellij action dump-screen --full /dev/null');
+          resolve(true);
+        } catch {
+          if (Date.now() - start >= timeoutMs) {
+            resolve(false);
+          } else {
+            setTimeout(check, intervalMs);
+          }
+        }
+      };
+      check();
+    });
+  }
+
+  /**
    * Execute a command targeting the configured Zellij session.
    */
   private execInSession(command: string): string {

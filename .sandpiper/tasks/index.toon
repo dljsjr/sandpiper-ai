@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774240364083
+lastUpdatedAt: 1774248619707
 tasks:
   "TCL-39":
     key: TCL-39
@@ -964,32 +964,49 @@ tasks:
     key: SHR-49
     project: SHR
     title: Add automated tests for unbuffer-relay expect script
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-23T04:32:18.537Z"
-    updatedAt: "2026-03-23T04:32:18.568Z"
+    updatedAt: "2026-03-23T05:19:22.572Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774240338574
-  "SHR-48":
-    key: SHR-48
+    lastIndexedAt: 1774243162580
+  "SHR-59":
+    key: SHR-59
     project: SHR
-    title: Use FIFO for dump-screen output in shell_relay_inspect tool
+    title: Update README and /relay-connect for ghost client auto-create flow
     status: NOT STARTED
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
     reporter: AGENT
-    createdAt: "2026-03-23T04:32:18.462Z"
-    updatedAt: "2026-03-23T04:32:18.501Z"
+    createdAt: "2026-03-23T06:47:54.831Z"
+    updatedAt: "2026-03-23T06:48:02.637Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774240338509
+    lastIndexedAt: 1774248482643
+  "SHR-48":
+    key: SHR-48
+    project: SHR
+    title: Use FIFO for dump-screen output in shell_relay_inspect tool
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T04:32:18.462Z"
+    updatedAt: "2026-03-23T05:29:32.348Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774243772356
   "SHR-19":
     key: SHR-19
     project: SHR
@@ -1006,6 +1023,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774240356292
+  "SHR-58":
+    key: SHR-58
+    project: SHR
+    title: "expect is now a hard dependency for ghost client, not just color preservation"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T06:47:43.020Z"
+    updatedAt: "2026-03-23T06:50:19.700Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774248619706
   "SHR-29":
     key: SHR-29
     project: SHR
@@ -1026,32 +1058,50 @@ tasks:
     key: SHR-39
     project: SHR
     title: Configuration UX
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-23T05:27:23.499Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678033
+    lastIndexedAt: 1774243643508
   "SHR-47":
     key: SHR-47
     project: SHR
     title: Generate shell-appropriate env export commands based on detected shell
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
+    priority: HIGH
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-23T04:32:18.406Z"
-    updatedAt: "2026-03-23T04:32:18.431Z"
+    updatedAt: "2026-03-23T05:14:46.478Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774240338437
+    lastIndexedAt: 1774242886487
+  "SHR-57":
+    key: SHR-57
+    project: SHR
+    title: Spawn ghost Zellij client via expect for reliable write-chars and dump-screen
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-23T06:37:12.228Z"
+    updatedAt: "2026-03-23T06:45:18.134Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774248318143
   "SHR-43":
     key: SHR-43
     project: SHR
@@ -1068,36 +1118,69 @@ tasks:
     blockedBy[0]:
     related[1]: SHR-32
     lastIndexedAt: 1774238262880
+  "SHR-53":
+    key: SHR-53
+    project: SHR
+    title: Agent commands double-wrapped by fish Enter keybind
+    status: COMPLETE
+    kind: BUG
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-23T05:42:59.163Z"
+    updatedAt: "2026-03-23T05:44:26.854Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774244666863
   "SHR-42":
     key: SHR-42
     project: SHR
     title: Graceful degradation
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-23T05:16:42.679Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678033
+    lastIndexedAt: 1774243002691
+  "SHR-52":
+    key: SHR-52
+    project: SHR
+    title: Fish Enter keybind replaces visible commandline with wrapper before executing
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T05:35:13.798Z"
+    updatedAt: "2026-03-23T05:37:52.749Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774244272760
   "SHR-46":
     key: SHR-46
     project: SHR
     title: Replace 20ms FIFO flush delay with principled drain approach
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-23T04:32:18.347Z"
-    updatedAt: "2026-03-23T04:32:18.374Z"
+    updatedAt: "2026-03-23T05:29:17.065Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774240338380
+    lastIndexedAt: 1774243757075
   "SHR-1":
     key: SHR-1
     project: SHR
@@ -1114,6 +1197,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774240356320
+  "SHR-56":
+    key: SHR-56
+    project: SHR
+    title: Defer env var injection and validation until pane has an attached client
+    status: COMPLETE
+    kind: BUG
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-23T06:11:37.370Z"
+    updatedAt: "2026-03-23T06:12:47.355Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774246367361
   "SHR-24":
     key: SHR-24
     project: SHR
@@ -1134,17 +1233,18 @@ tasks:
     key: SHR-41
     project: SHR
     title: Documentation
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-23T05:20:23.291Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678034
+    lastIndexedAt: 1774243223299
   "SHR-6":
     key: SHR-6
     project: SHR
@@ -1161,21 +1261,37 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774240355913
+  "SHR-51":
+    key: SHR-51
+    project: SHR
+    title: Env var exports visible in pane stdout on initial connect
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T05:35:02.369Z"
+    updatedAt: "2026-03-23T05:35:09.778Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774244109785
   "SHR-45":
     key: SHR-45
     project: SHR
     title: Make prompt_ready timeout configurable in relay orchestration
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-23T04:32:18.287Z"
-    updatedAt: "2026-03-23T04:32:18.316Z"
+    updatedAt: "2026-03-23T05:27:23.529Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774240338322
+    lastIndexedAt: 1774243643535
   "SHR-14":
     key: SHR-14
     project: SHR
@@ -1208,6 +1324,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774240355940
+  "SHR-55":
+    key: SHR-55
+    project: SHR
+    title: OSC terminal query sequences leak as visible text in enhanced mode
+    status: NOT STARTED
+    kind: BUG
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T06:10:06.068Z"
+    updatedAt: "2026-03-23T06:10:12.747Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774246212754
   "SHR-44":
     key: SHR-44
     project: SHR
@@ -1240,21 +1371,38 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774240364083
+  "SHR-54":
+    key: SHR-54
+    project: SHR
+    title: unbuffer-relay not found in PATH — export script path as env var
+    status: COMPLETE
+    kind: BUG
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-23T05:47:15.501Z"
+    updatedAt: "2026-03-23T06:12:47.324Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774246367333
   "SHR-40":
     key: SHR-40
     project: SHR
     title: Session start hook
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-23T05:28:24.246Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774243704256
   "SHR-7":
     key: SHR-7
     project: SHR
@@ -1271,6 +1419,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774240355968
+  "SHR-50":
+    key: SHR-50
+    project: SHR
+    title: unbuffer-relay pipeline mode Ctrl+D does not reliably signal EOF
+    status: NOT STARTED
+    kind: BUG
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T05:18:28.806Z"
+    updatedAt: "2026-03-23T05:18:36.523Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774243116531
   "SHR-8":
     key: SHR-8
     project: SHR
@@ -1744,10 +1907,29 @@ tasks:
     related[0]:
     parent: SHR-9
     lastIndexedAt: 1774240356869
+  "SRL-1":
+    key: SRL-1
+    project: SRL
+    title: Create standalone self-reload extension
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T04:53:53.362Z"
+    updatedAt: "2026-03-23T05:13:11.691Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774242791699
 counters:
   TCL:
     projectKey: TCL
     nextTaskNumber: 61
   SHR:
     projectKey: SHR
-    nextTaskNumber: 50
+    nextTaskNumber: 60
+  SRL:
+    projectKey: SRL
+    nextTaskNumber: 2

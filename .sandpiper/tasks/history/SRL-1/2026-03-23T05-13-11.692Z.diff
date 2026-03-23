@@ -1,0 +1,28 @@
+--- a/SRL-1.md
++++ b/SRL-1.md
+@@ -1,13 +1,10 @@
+ ---
+ title: "Create standalone self-reload extension"
+-status: NOT STARTED
+-resolution: DONE
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-23T04:53:53.362Z
+-updated_at: 2026-03-23T05:13:07.212Z
++updated_at: 2026-03-23T05:13:11.691Z
+ ---
+ 
+ # Create standalone self-reload extension
+@@ -32,3 +32,8 @@
+ - **status**: COMPLETE → NOT STARTED
+ - **assignee**: AGENT → UNASSIGNED
+ 
++## 2026-03-23T05:13:11.692Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: DONE → WONTFIX
++

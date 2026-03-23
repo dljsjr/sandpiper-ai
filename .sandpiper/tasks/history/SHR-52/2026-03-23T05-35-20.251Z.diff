@@ -1,0 +1,23 @@
+--- a/SHR-52.md
++++ b/SHR-52.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-23T05:35:13.798Z
+-updated_at: 2026-03-23T05:35:13.798Z
++updated_at: 2026-03-23T05:35:20.251Z
+ ---
+ 
+ # Fish Enter keybind replaces visible commandline with wrapper before executing
+ 
+-
++When the user presses Enter in fish with the relay integration sourced, the Enter keybind replaces the visible commandline text with the __relay_run wrapper before executing. The command runs correctly, but the UX is jarring — the user sees their typed command replaced with the escaped/wrapped version. The PRD (FR-14) acknowledges this and suggests terminal title overrides as mitigation. Investigate whether we can preserve the visible commandline (e.g., by saving/restoring commandline content around the replacement, or using commandline -f execute after stashing the wrapper).
++
++---
++
++# Activity Log
++
++## 2026-03-23T05:35:20.251Z
++
++- **description**: added (1 line)
++

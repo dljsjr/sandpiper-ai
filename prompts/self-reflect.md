@@ -9,5 +9,6 @@ Do a self-reflection pass to persist anything learned during this session:
 - If any existing skills could benefit from companion scripts, author those in the skill's subdirectory
 - If there's anything else worth documenting that doesn't fit the above categories, create doc files where appropriate
 - Take a content pass on existing docs/skills to enforce hygiene: check for duplicated information, inconsistencies, and stale content
+- Review work done this session for any loose ends — file tasks, subtasks, or bugs for things that came up but weren't captured in the task tracker (edge cases noticed, TODO comments left in code, design questions deferred, follow-up work identified)
 
 You can do all of the above using your own judgement without confirmation.

@@ -10,7 +10,9 @@ All core logic lives in framework-independent modules. Only `index.ts` imports p
 
 | Module | Purpose | Pi imports? |
 |--------|---------|-------------|
+| `env-export.ts` | Shell-appropriate env var export command generation | No |
 | `fifo.ts` | Persistent FIFO lifecycle (O_RDWR sentinel pattern) | No |
+| `ghost-client.ts` | Headless Zellij client management (expect-based PTY) | No |
 | `signal.ts` | Signal channel parser (line-delimited protocol) | No |
 | `zellij.ts` | Zellij CLI wrapper | No |
 | `escape.ts` | Command escaping (`string escape` / `printf '%q'`) | No |
@@ -59,10 +61,27 @@ Line-delimited text on the signal FIFO:
 
 Separate `last_status` from `prompt_ready` — a command may complete before the prompt is drawn.
 
+### Ghost Client for Headless Zellij
+Zellij silently drops `write-chars` and breaks `dump-screen` on background sessions with no attached client. The ghost client (`ghost-attach` expect script) spawns a headless Zellij client with a real PTY, giving Zellij a focused pane. This makes `write-chars` and `dump-screen` work reliably. The user can optionally attach too (multi-client) for observation.
+
+**Setup sequence:** Ghost client spawns → shell starts → config sources relay integration → extension creates FIFOs + starts listening → injects env exports → waits for `prompt_ready` → setup complete. The `prompt_ready` signal replaces arbitrary timeouts — it confirms the shell is initialized, env vars are set, and the FIFO pipeline is wired up.
+
+### Enhanced Mode (PTY Color Preservation)
+The `eval` prefix approach puts `unbuffer-relay` before the command being eval'd:
+```fish
+eval $SHELL_RELAY_UNBUFFER $cmd | tee $SHELL_RELAY_STDOUT > /dev/tty
+```
+This preserves session state (`eval` runs in the current shell) while getting PTY colors (`unbuffer-relay` spawns the first binary in a PTY). For pipelines, only the first command gets the PTY. Shell builtins as the first token will fail in unbuffer-relay (they aren't binaries) — but builtins don't produce colored output, so this is harmless. Do NOT use the `-p` (pipeline) flag — it blocks reading stdin from the terminal.
+
 ### Command Escaping
 - **Fish:** `string escape --style=script` via stdin → round-trips through `eval (string unescape ...)`
 - **Bash/Zsh:** `printf '%q'` via env var → round-trips through `eval`
 - Space-prefix the injection (` __relay_run ESCAPED`) to exclude from shell history
+
+### Fish Enter Keybind
+- Binds unconditionally (not gated on `$SHELL_RELAY_SIGNAL`) because env vars are exported after shell startup
+- `__relay_execute` guards on every invocation — falls back to `commandline -f execute` when relay is inactive
+- Detects agent-injected commands (`__relay_run` prefix) and executes directly without re-wrapping
 
 ### Command Serialization
 Relay uses a promise chain to serialize concurrent `execute()` calls. Only one command runs in the pane at a time.
