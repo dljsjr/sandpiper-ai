@@ -23,8 +23,8 @@ Commands run in the user's existing shell session, inheriting all session state:
 ## Requirements
 
 - **[Zellij](https://zellij.dev)** terminal multiplexer
+- **`expect`/`tclsh`** — required for the ghost client and enhanced color mode (pre-installed on macOS; `apt install expect` on Linux)
 - **Shell integration** sourced in your shell RC file (see [Setup](#setup))
-- **Optional:** `tclsh` + `expect` package for ANSI color preservation (enhanced mode)
 
 ## Setup
 
@@ -51,23 +51,28 @@ source /path/to/extensions/shell-relay/shell-integration/relay.bash
 source /path/to/extensions/shell-relay/shell-integration/relay.zsh
 ```
 
-The integration scripts are safe to source in all shell instances — they silently no-op when not in a relay session.
+The integration scripts are safe to source in all shell instances — they silently no-op when not in a relay session. Enter key bindings (fish) are registered unconditionally but guard on every invocation.
 
-### 3. Start a Zellij Session
+### 3. Using the Relay
 
-Shell Relay can create a session for you, or you can connect to an existing one.
+Shell Relay sets up automatically on first tool use:
 
-**Automatic:** The extension creates a session on first tool use if no session is configured.
+1. **Auto-create:** If no session is configured, the extension creates a new Zellij session with a ghost client (headless PTY) and reports the session name.
+2. **Existing session:** Set `SHELL_RELAY_SESSION` or pass the `session` parameter on the tool call.
+3. **Interactive:** Use `/relay-connect` to pick from existing Zellij sessions or create a new one.
 
-**Manual:** Set the `SHELL_RELAY_SESSION` environment variable before starting pi:
+The user can optionally attach to the session to observe commands in real time:
 ```sh
-export SHELL_RELAY_SESSION=my-session
+zellij attach <session-name>
 ```
+This is **optional** — the relay works fully without user attachment thanks to the ghost client.
 
-Then attach to that session in another terminal:
-```sh
-zellij attach my-session
-```
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/relay-connect` | Interactive session picker — select existing or create new |
+| `/relay-status` | Show connection state, shell type, capture mode, FIFO paths |
 
 ## Configuration
 
@@ -81,34 +86,32 @@ zellij attach my-session
 
 ### Capture Modes
 
-| Mode | Colors | Requires |
-|------|--------|----------|
-| **Enhanced** | ✅ Full ANSI preserved | `tclsh` + `expect` |
-| **Basic** | ⚠️ Programs using `isatty()` lose color | Nothing extra |
+| Mode | Colors | How it works |
+|------|--------|--------------|
+| **Enhanced** | ✅ Full ANSI preserved | `unbuffer-relay` prefixed via `eval` — first command in pipeline gets a PTY, session state preserved |
+| **Basic** | ⚠️ Programs using `isatty()` lose color | Direct `eval` in current shell — no PTY |
 
-The extension auto-detects whether `tclsh`/`expect` is available and selects the appropriate mode. Set `SHELL_RELAY_NO_UNBUFFER=1` to force basic mode.
+The extension auto-detects whether `tclsh` is available and selects the appropriate mode. Set `SHELL_RELAY_NO_UNBUFFER=1` to force basic mode.
 
-## Shell Integration Details
+**Note:** In enhanced mode, if the first token of a command is a shell builtin (e.g., `set`, `cd`), `unbuffer-relay` will fail to spawn it (builtins aren't binaries). This is harmless — builtins don't produce colored output. The command still executes via `eval` in the current shell.
 
-### What Gets Installed
+## How It Works
 
-Each shell integration script provides:
+### Ghost Client
 
-1. **Prompt hook** — Writes `prompt_ready` to the signal FIFO when the shell prompt is drawn, telling the extension the pane is ready for commands.
+Zellij requires a real PTY client for `write-chars` and `dump-screen` to work reliably — background sessions silently drop input. Shell Relay spawns a **ghost client** using `expect` that attaches to the session with a real PTY, keeping it alive invisibly. The user can attach as a second client to observe.
 
-2. **Command wrapper** (`__relay_run`) — Wraps agent commands in a capture pattern that separates stdout/stderr via FIFOs while displaying output in the terminal via `/dev/tty`.
+### Startup Sequence
 
-3. **Enter key binding** (fish only) — Wraps user-typed commands in the same capture pattern, so the agent can see output from commands the user runs.
+1. Ghost client spawns → Zellij session created → shell starts → config sources integration script
+2. Extension creates persistent FIFOs and starts listening on the signal channel
+3. Extension injects FIFO path env vars via `write-chars`
+4. Shell processes exports → prompt draws → prompt hook writes `prompt_ready` to signal FIFO
+5. Extension receives `prompt_ready` → setup confirmed, ready for commands
 
-### Safety Guarantees
+The `prompt_ready` signal replaces arbitrary timeouts — it proves the shell initialized, env vars are set, and the FIFO pipeline is wired up.
 
-- Scripts are safe to source in **all** shell instances, not just relay sessions
-- Every hook invocation checks that `$SHELL_RELAY_SIGNAL` exists and is writable
-- If the signal FIFO is absent, broken, or the extension has crashed, hooks silently no-op
-- No error output is ever written to the terminal from the integration scripts
-- Compatible with other prompt customizations (starship, powerlevel10k, etc.)
-
-## Architecture
+### Architecture
 
 ```
 ┌──────────────────────┐                      ┌─────────────────────────────┐
@@ -116,7 +119,7 @@ Each shell integration script provides:
 │  (shell_relay tool)  │ ────────────────────► │  (user's shell session)     │
 │                      │                      │                             │
 │                      │   stdout FIFO        │  command wrapper:           │
-│                      │ ◄──── (persistent) ──│  { [unbuffer-relay -p]      │
+│                      │ ◄──── (persistent) ──│  { [unbuffer-relay]         │
 │  reads stdout        │                      │    CMD                      │
 │                      │   stderr FIFO        │    | tee $STDOUT > /dev/tty │
 │                      │ ◄──── (persistent) ──│  } 2>&1 >/dev/null         │
@@ -126,33 +129,44 @@ Each shell integration script provides:
 │                      │ ◄──── (persistent) ──│    last_status:EXIT_CODE    │
 │  reads signals       │                      │  prompt hook writes:        │
 │                      │                      │    prompt_ready              │
+│                      │                      │                             │
+│  ghost client ───────│── expect PTY ────────│── keeps pane focused        │
 └──────────────────────┘                      └─────────────────────────────┘
 ```
 
 ### Key Design Decisions
 
+- **Ghost client** — expect-based headless PTY so `write-chars` and `dump-screen` work without user attachment
 - **Persistent FIFOs** with `O_RDWR` sentinel handles — created once per session, no per-command lifecycle
 - **Signal channel** for event-driven completion detection — no polling
+- **`prompt_ready`** for setup confirmation — replaces arbitrary timeouts
 - **`tee` + `/dev/tty`** — output goes to both the agent (via FIFO) and the user (via terminal)
 - **Command serialization** — only one command runs in the pane at a time
-- **`unbuffer-relay`** — custom expect script for PTY color preservation with proper exit code propagation
+- **`eval` prefix for enhanced mode** — `eval unbuffer-relay CMD` preserves session state while getting PTY colors
+- **`unbuffer-relay`** — custom expect script for PTY wrapping with proper exit code propagation
 
 ## Troubleshooting
 
-### "Startup validation failed"
-The extension couldn't verify the full pipeline works. Check that:
-1. The shell integration script is sourced in the target pane
-2. The FIFO environment variables (`$SHELL_RELAY_SIGNAL`, etc.) are set in the pane
-3. Try running `echo prompt_ready > $SHELL_RELAY_SIGNAL` manually in the pane
+### "Timed out waiting for prompt_ready signal"
+The extension created the session but the shell integration didn't fire. Check that:
+1. The shell integration script is sourced in your shell's RC file (e.g., `config.fish`)
+2. `expect`/`tclsh` is installed (required for the ghost client)
+3. Check: `command -v tclsh && echo "available"`
+
+### "No Zellij session configured"
+No session was specified and auto-creation wasn't attempted. Either:
+- Set `SHELL_RELAY_SESSION` environment variable
+- Pass the `session` parameter on the tool call
+- Use `/relay-connect` to select a session interactively
 
 ### "Zellij is not installed or not available"
 Install Zellij from https://zellij.dev
 
 ### Commands lose color
-Install `expect` for enhanced mode:
-- macOS: `brew install expect` (usually pre-installed)
-- Ubuntu/Debian: `apt install expect`
-- Check: `command -v tclsh && echo "available"`
+Check enhanced mode is active:
+- `tclsh` must be on PATH
+- `SHELL_RELAY_NO_UNBUFFER` must not be set
+- `/relay-status` shows the current capture mode
 
 ### Agent errors suggest using `bash` instead
-The relay pane may be unavailable. Check that the Zellij session is running and the pane hasn't been closed.
+The relay pane may be unavailable. Check that the Zellij session is running and the ghost client process hasn't been killed.

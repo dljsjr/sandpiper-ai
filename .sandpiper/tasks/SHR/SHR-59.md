@@ -1,12 +1,13 @@
 ---
 title: "Update README and /relay-connect for ghost client auto-create flow"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-23T06:47:54.831Z
-updated_at: 2026-03-23T06:48:02.637Z
+updated_at: 2026-03-23T07:16:42.469Z
 ---
 
 # Update README and /relay-connect for ghost client auto-create flow
@@ -20,3 +21,13 @@ The README was written before the ghost client approach. It references manual se
 ## 2026-03-23T06:48:02.637Z
 
 - **description**: added (1 line)
+
+## 2026-03-23T07:14:45.859Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-23T07:16:42.469Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

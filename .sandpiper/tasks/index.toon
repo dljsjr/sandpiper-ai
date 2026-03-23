@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774248619707
+lastUpdatedAt: 1774250202475
 tasks:
   "TCL-39":
     key: TCL-39
@@ -980,17 +980,18 @@ tasks:
     key: SHR-59
     project: SHR
     title: Update README and /relay-connect for ghost client auto-create flow
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-23T06:47:54.831Z"
-    updatedAt: "2026-03-23T06:48:02.637Z"
+    updatedAt: "2026-03-23T07:16:42.469Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774248482643
+    lastIndexedAt: 1774250202475
   "SHR-48":
     key: SHR-48
     project: SHR
@@ -1027,17 +1028,18 @@ tasks:
     key: SHR-58
     project: SHR
     title: "expect is now a hard dependency for ghost client, not just color preservation"
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-23T06:47:43.020Z"
-    updatedAt: "2026-03-23T06:50:19.700Z"
+    updatedAt: "2026-03-23T07:16:42.436Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774248619706
+    lastIndexedAt: 1774250202446
   "SHR-29":
     key: SHR-29
     project: SHR
@@ -1423,17 +1425,18 @@ tasks:
     key: SHR-50
     project: SHR
     title: unbuffer-relay pipeline mode Ctrl+D does not reliably signal EOF
-    status: NOT STARTED
+    status: COMPLETE
     kind: BUG
     priority: LOW
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-23T05:18:28.806Z"
-    updatedAt: "2026-03-23T05:18:36.523Z"
+    updatedAt: "2026-03-23T07:13:20.824Z"
+    resolution: WONTFIX
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774243116531
+    lastIndexedAt: 1774250000830
   "SHR-8":
     key: SHR-8
     project: SHR
@@ -1521,18 +1524,19 @@ tasks:
     key: SHR-37
     project: SHR
     title: Integration tests
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-20T23:00:00Z"
-    updatedAt: "2026-03-20T23:00:00Z"
+    updatedAt: "2026-03-23T07:13:10.721Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-31
-    lastIndexedAt: 1774115678035
+    lastIndexedAt: 1774249990727
   "SHR-33":
     key: SHR-33
     project: SHR

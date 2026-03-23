@@ -1,12 +1,13 @@
 ---
 title: "expect is now a hard dependency for ghost client, not just color preservation"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-23T06:47:43.020Z
-updated_at: 2026-03-23T06:50:19.700Z
+updated_at: 2026-03-23T07:16:42.436Z
 ---
 
 # expect is now a hard dependency for ghost client, not just color preservation
@@ -28,3 +29,13 @@ The ghost-attach script uses expect to spawn a headless Zellij client, making ex
 ## 2026-03-23T06:50:19.700Z
 
 - **priority**: MEDIUM → LOW
+
+## 2026-03-23T07:14:45.826Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-23T07:16:42.436Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE
