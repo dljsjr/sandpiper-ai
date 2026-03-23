@@ -1,13 +1,23 @@
 ---
 title: "Design Query API types and function signatures"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-21T12:39:19-05:00
-updated_at: 2026-03-21T18:17:11.984Z
+updated_at: 2026-03-23T03:12:29.650Z
 ---
 
 # Design Query API types and function signatures
 
+
+---
+
+# Activity Log
+
+## 2026-03-23T03:12:29.650Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

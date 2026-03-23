@@ -1,12 +1,13 @@
 ---
 title: "Implement index update command"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-21T12:30:00-05:00
-updated_at: 2026-03-21T18:17:11.983Z
+updated_at: 2026-03-23T03:12:29.325Z
 ---
 
 # Implement index update command
@@ -25,3 +26,12 @@ Implement `<tasks-cli> index update` — scans a `.sandpiper/tasks` directory, p
 - Remove tasks from index that no longer exist on disk
 
 **Data format:** TOON (via `@toon-format/toon`)
+
+---
+
+# Activity Log
+
+## 2026-03-23T03:12:29.325Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
