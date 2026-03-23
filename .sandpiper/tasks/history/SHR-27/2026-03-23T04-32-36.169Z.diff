@@ -1,0 +1,31 @@
+--- a/SHR-27.md
++++ b/SHR-27.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Register shell_relay_inspect tool"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-03-20T23:00:00Z
+-updated_at: 2026-03-21T01:47:52-05:00
++updated_at: 2026-03-23T04:32:36.169Z
+ ---
+ 
+ # Register shell_relay_inspect tool
+@@ -19,3 +20,12 @@
+ 
+ **Reference:** FR-6
+ 
++---
++
++# Activity Log
++
++## 2026-03-23T04:32:36.170Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

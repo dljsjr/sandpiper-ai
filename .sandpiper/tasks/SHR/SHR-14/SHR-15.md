@@ -1,12 +1,13 @@
 ---
 title: "Implement command injection via write-chars"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-21T01:27:43-05:00
+updated_at: 2026-03-23T04:32:36.540Z
 ---
 
 # Implement command injection via write-chars
@@ -18,3 +19,12 @@ Wrap `zellij action write-chars` for injecting commands into a target pane.
 - Handle errors (Zellij not running, pane not found)
 
 **Reference:** FR-7
+
+---
+
+# Activity Log
+
+## 2026-03-23T04:32:36.540Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

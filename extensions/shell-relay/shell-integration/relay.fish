@@ -46,8 +46,10 @@ function __relay_run
         return 1
     end
 
-    # Unescape the command
-    set -l cmd (string unescape --style=script -- $argv[1])
+    # $argv[1] is the command string — already unescaped by fish's argument parser.
+    # The extension escapes the command via `string escape --style=script` before injection,
+    # and fish's parser undoes that escaping when it tokenizes the command line.
+    set -l cmd $argv[1]
 
     # Detect unbuffer-relay availability
     set -l use_unbuffer 0

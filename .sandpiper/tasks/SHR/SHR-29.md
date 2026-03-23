@@ -1,12 +1,13 @@
 ---
 title: "Shell integration installer"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-21T01:47:52-05:00
+updated_at: 2026-03-23T04:32:35.880Z
 ---
 
 # Shell integration installer
@@ -20,3 +21,12 @@ On extension installation or first use, guide the user through shell integration
 - Leverage pi's extension installation lifecycle hooks where available
 
 **References:** FR-14 (installation section)
+
+---
+
+# Activity Log
+
+## 2026-03-23T04:32:35.880Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

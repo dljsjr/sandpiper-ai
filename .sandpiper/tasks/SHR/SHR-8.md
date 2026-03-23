@@ -1,12 +1,13 @@
 ---
 title: "PTY color preservation via unbuffer-relay"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-20T23:00:00Z
-updated_at: 2026-03-22T02:59:00.534Z
+updated_at: 2026-03-23T04:32:35.991Z
 ---
 
 # PTY color preservation via unbuffer-relay
@@ -21,3 +22,12 @@ Formalize the `unbuffer-relay` expect/TCL script for PTY color preservation with
 - `SHELL_RELAY_NO_UNBUFFER=1` environment variable forces basic mode (skips PTY wrapping)
 
 **References:** FR-15
+
+---
+
+# Activity Log
+
+## 2026-03-23T04:32:35.991Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
