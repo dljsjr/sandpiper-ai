@@ -1,0 +1,8 @@
+id: no-ts-ignore
+language: TypeScript
+rule:
+  kind: comment
+  regex: "@ts-ignore|@ts-expect-error"
+severity: error
+message: "Do not use @ts-ignore or @ts-expect-error. Fix the type error or consult the user."
+note: "Per AGENTS.md: these suppression comments are prohibited without explicit user approval."

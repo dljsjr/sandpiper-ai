@@ -1,0 +1,11 @@
+# Find all exported functions — useful for understanding a module's public API
+# Usage: ast-grep scan --rule ast-grep/queries/find-exported-functions.yml [path]
+id: find-exported-functions
+language: TypeScript
+rule:
+  kind: export_statement
+  has:
+    kind: function_declaration
+    stopBy: end
+severity: hint
+message: "Exported function"

@@ -8,6 +8,7 @@
     "check:biome-lint": "bunx --bun @biomejs/biome lint",
     "check:biome-check": "bunx --bun @biomejs/biome check",
     "check:tsc": "tsc --noEmit",
+    "check:ast-grep": "ast-grep scan",
     "check": "bun run check:tsc && bun run check:biome-check",
     "clean": "rm -rf {.,**}/{node_modules,dist,.*cache,*.d.ts,*.tsbuildinfo}",
     "sandpiper-cli": "sandpiper"

@@ -1,0 +1,10 @@
+# Find all expect() assertions — useful for counting test coverage density
+# Usage: ast-grep scan --rule ast-grep/queries/find-test-assertions.yml [path]
+id: find-test-assertions
+language: TypeScript
+rule:
+  pattern: expect($$$ARGS)
+severity: hint
+message: "Test assertion"
+files:
+  - "**/*.test.ts"

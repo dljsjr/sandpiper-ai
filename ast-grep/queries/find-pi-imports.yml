@@ -1,0 +1,13 @@
+# Find all imports from pi framework packages — useful for verifying
+# that only the glue layer (index.ts) imports framework APIs
+# Usage: ast-grep scan --rule ast-grep/queries/find-pi-imports.yml [path]
+id: find-pi-imports
+language: TypeScript
+rule:
+  kind: import_statement
+  has:
+    kind: string
+    regex: "@mariozechner/pi-|@sinclair/typebox"
+    stopBy: end
+severity: hint
+message: "Pi framework import — should only appear in extension entry points (index.ts)"

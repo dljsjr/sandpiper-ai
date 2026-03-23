@@ -88,7 +88,7 @@ Application code SHOULD be runtime-agnostic — it should run on Node.js, Bun, o
 
 ### Formatting & Linting
 
-This repo uses **Biome** for formatting and linting, configured via `biome.json` at the repo root. **TypeScript** type checking uses `tsc --noEmit`, configured via the root `tsconfig.json`.
+This repo uses **Biome** for formatting and linting, configured via `biome.json` at the repo root. **TypeScript** type checking uses `tsc --noEmit`, configured via the root `tsconfig.json`. **ast-grep** provides structural code analysis rules, configured via `sgconfig.yml` with rules in `ast-grep/rules/`.
 
 All lint and check commands are run from the **repo root** — not from individual packages:
 
@@ -99,6 +99,7 @@ bun check:biome-check  # Biome format + lint + import organization
 bun check:biome-lint   # Biome lint rules only
 bun check:biome-fmt    # Biome formatting only
 bun check --write      # Apply biome auto-fixes in place
+bun check:ast-grep     # Structural code analysis (ast-grep rules)
 ```
 
 Do NOT run biome manually via `bunx` — always use the root `bun check` commands.
@@ -110,6 +111,45 @@ Do NOT run biome manually via `bunx` — always use the root `bun check` command
 **Only use safe auto-fixes.** When running `bun check --write`, do NOT use `--unsafe`. Unsafe fixes (e.g., replacing `!` with `?.`) can change runtime semantics and break type checking. Fix unsafe diagnostics manually.
 
 **Do NOT add lint suppression comments without consulting the user.** If you believe a lint warning is a false positive, explain the situation to the user and let them decide whether to suppress it. Never add `biome-ignore`, `// @ts-ignore`, `// @ts-expect-error`, or similar suppression comments on your own.
+
+### Code Exploration with ast-grep
+
+**Prefer ast-grep over grep/ripgrep** when the task involves understanding code *structure* rather than searching for plain text. ast-grep matches by AST, so it can answer questions like "find all exported functions," "which files import the pi framework," or "where are errors thrown" without false positives from comments, strings, or similarly-named variables.
+
+Pre-built queries are in `ast-grep/queries/`:
+
+```sh
+# Map a module's public API
+ast-grep scan --rule ast-grep/queries/find-exported-functions.yml extensions/shell-relay/
+
+# Verify architecture boundaries (pi imports only in index.ts)
+ast-grep scan --rule ast-grep/queries/find-pi-imports.yml extensions/
+
+# Count test assertions in a package
+ast-grep scan --rule ast-grep/queries/find-test-assertions.yml extensions/ 2>&1 | grep -c "┌─"
+
+# Map error handling paths
+ast-grep scan --rule ast-grep/queries/find-error-throws.yml packages/sandpiper-tasks-cli/
+```
+
+Pre-built transforms for refactoring are in `ast-grep/transforms/`. Always preview before applying (`-U` applies without confirmation):
+
+```sh
+# Preview: find interface props missing readonly
+ast-grep scan --rule ast-grep/transforms/readonly-interface-props.yml extensions/
+```
+
+For one-off structural searches, use inline patterns:
+
+```sh
+# Find all calls to a specific function
+ast-grep run -p 'updateTaskFields($$$ARGS)' -l ts packages/
+
+# Find all async arrow functions
+ast-grep run -p 'async ($$$PARAMS) => $$$BODY' -l ts extensions/
+```
+
+See `ast-grep/README.md` for the full catalog of queries, transforms, and rules.
 
 ### Dependencies
 

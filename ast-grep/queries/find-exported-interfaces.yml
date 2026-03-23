@@ -1,0 +1,13 @@
+# Find all exported interfaces — useful for understanding a module's type API
+# Usage: ast-grep scan --rule ast-grep/queries/find-exported-interfaces.yml [path]
+id: find-exported-interfaces
+language: TypeScript
+rule:
+  kind: export_statement
+  has:
+    any:
+      - kind: interface_declaration
+      - kind: type_alias_declaration
+    stopBy: end
+severity: hint
+message: "Exported type"

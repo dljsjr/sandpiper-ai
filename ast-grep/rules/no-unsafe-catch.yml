@@ -1,0 +1,15 @@
+id: no-unsafe-catch
+language: TypeScript
+rule:
+  kind: catch_clause
+  has:
+    kind: statement_block
+    all:
+      - has:
+          kind: comment
+      - not:
+          has:
+            kind: expression_statement
+severity: info
+message: "Catch block only contains a comment — consider logging or rethrowing the error."
+note: "Silent catch blocks can hide real errors. If intentional, ensure the comment explains why."

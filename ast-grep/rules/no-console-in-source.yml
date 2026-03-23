@@ -1,0 +1,18 @@
+id: no-console-in-source
+language: TypeScript
+rule:
+  pattern: console.$METHOD($$$ARGS)
+  not:
+    inside:
+      kind: call_expression
+      stopBy: end
+severity: warning
+message: "Avoid console.$METHOD in source files — use structured logging or tool results instead."
+note: "console.log/warn/error in extension source code won't reach the agent. Use ctx.ui.notify() or return content in tool results."
+files:
+  - "extensions/**/*.ts"
+  - "packages/**/*.ts"
+ignores:
+  - "**/*.test.ts"
+  - "**/commands/*.ts"
+  - "devtools/ascii-motion.ts"

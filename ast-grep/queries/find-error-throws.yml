@@ -1,0 +1,10 @@
+# Find all throw statements — useful for mapping error handling paths
+# Usage: ast-grep scan --rule ast-grep/queries/find-error-throws.yml [path]
+id: find-error-throws
+language: TypeScript
+rule:
+  kind: throw_statement
+severity: hint
+message: "Error thrown"
+ignores:
+  - "**/*.test.ts"
