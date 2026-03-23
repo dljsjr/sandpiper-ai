@@ -31,9 +31,14 @@ describe('createProject', () => {
   });
 
   it('should reject invalid project keys', () => {
-    expect(() => createProject(tasksDir, 'fo')).toThrow('3 uppercase');
-    expect(() => createProject(tasksDir, 'FOOO')).toThrow('3 uppercase');
-    expect(() => createProject(tasksDir, 'F1O')).toThrow('3 uppercase');
+    expect(() => createProject(tasksDir, 'fo')).toThrow('uppercase');
+    expect(() => createProject(tasksDir, 'F')).toThrow('uppercase');
+    expect(() => createProject(tasksDir, 'F1O')).toThrow('uppercase');
+  });
+
+  it('should accept project keys longer than 3 letters', () => {
+    createProject(tasksDir, 'TOOLS');
+    expect(existsSync(join(tasksDir, 'TOOLS'))).toBe(true);
   });
 });
 

@@ -1,19 +1,70 @@
 ---
 name: jj
-description: Use Jujutsu (jj) for version control instead of Git. Includes common commands, advanced features, and Git interoperability. Use for ALL version control operations in repositories that support jj, even when Git interoperability commands are available.
+description: >-
+  Use Jujutsu (jj) for version control instead of Git. Use for all version control
+  operations — committing changes, viewing diffs and history, creating and managing
+  branches (called bookmarks in jj), rebasing, squashing, pushing, pulling, undoing
+  operations, resolving conflicts, and interacting with Git remotes. Use whenever the
+  user wants to commit, view a diff or log, create or manage branches, push or pull,
+  rebase or squash commits, undo a mistake, resolve merge conflicts, or do any version
+  control work. Also use when the user mentions "jj", "jujutsu", or uses Git terminology
+  like "commit", "branch", "push", "pull", "stash", "rebase", "cherry-pick", "blame",
+  "log", or "diff" — jj has equivalents for all of these.
+compatibility: Requires jj CLI installed (brew install jj / cargo install jj-cli).
 ---
 
 # Jujutsu (jj) Version Control Skill
 
-**IMPORTANT**: Always prefer jj commands over git commands in jj repositories, even when Git interoperability is available.
+jj is a Git-compatible version control tool with a simpler, safer mental model. Always use `jj` commands rather than `git` — even though the underlying repo is Git-backed, jj's model avoids entire categories of mistakes (lost work, detached HEAD, botched rebases) because every operation is automatically recorded and undoable.
 
 ## Core Concepts
 
-- **No staging area** — changes are automatically tracked. The working copy IS a commit (`@`).
-- **Commits are mutable** — rewrite history freely with `describe`, `squash`, `absorb`, `split`.
-- **Change IDs are persistent** — a change keeps its identity as it evolves (rebased, amended, etc.).
-- **Bookmarks** (not branches) — named pointers to commits, similar to Git branches but more flexible.
-- **Operation log** — every repo mutation is recorded and undoable.
+These aren't just trivia — they change how you work:
+
+- **No staging area** — changes are automatically tracked. The working copy IS a commit (`@`). This means there's no "forgot to `git add`" class of mistake.
+- **Commits are mutable** — rewrite history freely with `describe`, `squash`, `absorb`, `split`. There's no penalty for committing early and refining later.
+- **Change IDs are persistent** — a change keeps its identity as it evolves (rebased, amended, etc.). You can always find a commit even after it's been rewritten.
+- **Bookmarks** (not branches) — named pointers to commits, similar to Git branches but decoupled from the commit graph.
+- **Operation log** — every repo mutation is recorded and undoable. Nothing is irreversible. This is the safety net that makes aggressive history rewriting safe.
+
+## How to Work with jj
+
+These patterns matter because jj's mental model rewards a different workflow than Git. In Git, you carefully stage and craft commits because rewriting history is painful. In jj, commits are cheap and mutable — commit early, refine later.
+
+### Commit frequently, refine later
+
+Since there's no staging area, `jj commit` captures all working copy changes. Commit after each logically complete unit of work. Don't worry about getting the message or scope perfect — you can always fix it with `jj describe` or `jj squash` later.
+
+- `jj describe -m "better message"` — update the current commit's message without creating a new commit
+- `jj commit -m "msg"` — equivalent to `jj describe -m "msg"` followed by `jj new`
+- When wrapping up a unit of work and moving on, prefer `jj commit` over `jj describe` — it leaves the working copy clean on a new empty commit, ready for the next task
+
+### Fix earlier commits with squash and absorb
+
+When you find an issue in an earlier commit (typo, review feedback, small fix), don't create a new "fix" commit. Instead, make the fix in `@` and move it into the right commit:
+
+- `jj squash --from @ --into <target> -m "msg"` — move changes from the current commit into a specific earlier commit
+- `jj absorb` — automatically distribute changes to the ancestor commits that last touched those lines (like an intelligent squash)
+- Check your work with `jj op show -p` after squash/absorb to verify the result
+
+### Curate history before pushing
+
+Multiple small commits from iterative development should be collapsed into logical units before pushing. Think "one commit per PR/feature." Use `jj squash` to combine related work.
+
+Be mindful of how `jj squash` handles commit messages to avoid opening an editor (which hangs in non-interactive contexts):
+- If the source has no description (common when squashing `@`), jj keeps the destination's message automatically — no flags needed
+- If you want to discard the source's description and keep the destination's, use `--use-destination-message` (`-u`)
+- If both have descriptions and you want to set a new one, provide `-m "message"`
+
+### The safety net
+
+Nothing in jj is irreversible. If something goes wrong:
+
+- `jj undo` — reverts the last operation (repeatable)
+- `jj op log` — shows full operation history
+- `jj op restore <id>` — jumps to any point in time
+
+This is why aggressive history rewriting is safe in jj — you can always go back.
 
 ## Status and Information
 
@@ -262,29 +313,17 @@ jj config edit --user              # Edit user config in editor
 jj config path --user              # Show config file path
 ```
 
-## Agent-Specific Workflow Guidance
+## Common Mistakes
 
-### Commit Hygiene
+**Unexpected editor on squash**: jj opens an editor when both source and destination have descriptions and you don't specify `-m` or `-u`. In non-interactive contexts this hangs. Use `-m "message"` to set a new description, or `-u` to keep the destination's.
 
-**Commit frequently.** No staging area means `jj commit` captures ALL working copy changes. Commit after each logically complete unit of work to keep changes separate.
+**Using `git` commands in a jj repo**: The Git CLI and jj can conflict because they both manage the same underlying Git repository. Stick to jj commands — they're safer and more capable.
 
-**Use `jj describe` to update messages** without creating new commits. `jj describe -m "msg"` is a no-op if working on the current commit's content.
+**Immutable commit errors**: If you get "immutable commit" errors when trying to squash into a commit that's already on main/trunk, add `--ignore-immutable` to the command.
 
-**Use fixups aggressively.** When you find an issue in an earlier commit, fix it in `@` then use `jj squash --from @ --into <target> -m "msg"` or `jj absorb` to move the fix into the right commit. This keeps history clean without the overhead of interactive rebasing.
+**Confusing `commit` and `describe`**: `jj commit` creates a *new* empty commit on top. If you just want to update the current commit's message without starting a new one, use `jj describe`.
 
-### History Curation
-
-**Squash related work together** at the end of a work session. Multiple small commits from iterative development should be collapsed into logical units before pushing. Think "one commit per PR/feature."
-
-**Always provide `-m` with squash** to avoid opening an editor (which hangs in non-interactive contexts).
-
-**Use `--ignore-immutable`** when squashing commits that are on main/trunk in a trunk-based workflow.
-
-### Safety Net
-
-**Nothing is irreversible.** `jj undo` reverts the last operation and can be repeated. `jj op log` shows full history. `jj op restore <id>` jumps to any point in time.
-
-**Check your work with `jj op show -p`** after squash/absorb operations to verify the result.
+**Not verifying after squash/absorb**: Always run `jj op show -p` after a squash or absorb to confirm the changes landed where you expected.
 
 ## Reference Documentation
 

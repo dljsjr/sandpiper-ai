@@ -82,7 +82,7 @@ export function updateIndex(tasksDir: string): TaskIndex {
       if (!pe.isDirectory()) {
         continue;
       }
-      if (!/^[A-Z]{3}-\d+$/.test(pe.name)) {
+      if (!/^[A-Z]{2,}-\d+$/.test(pe.name)) {
         continue;
       }
 
@@ -112,7 +112,7 @@ export function updateIndex(tasksDir: string): TaskIndex {
     if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) continue;
     const projectDir = join(tasksDir, entry.name);
     for (const file of readdirSync(projectDir)) {
-      const movedMatch = file.match(/^([A-Z]{3})-(\d+)\.moved$/);
+      const movedMatch = file.match(/^([A-Z]{2,})-(\d+)\.moved$/);
       if (movedMatch) {
         // biome-ignore lint/style/noNonNullAssertion: regex capture group guaranteed by match
         const project = movedMatch[1]!;

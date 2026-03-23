@@ -5,6 +5,7 @@ Do a thorough refactoring pass on ${1:-the current codebase}. Take your time and
 
 Your mantra is "simplify, deduplicate, hygienic, maintainable":
 
+- Use the **ast-grep** skill to explore code structure before refactoring — find duplicated patterns, map call sites, and verify changes haven't missed usages. Use ast-grep's rewrite capabilities for mechanical transformations across many files.
 - Emphasize DRY — extract shared patterns, constants, and utilities into dedicated modules
 - Emphasize YAGNI — remove unused code, unnecessary abstractions, and speculative generality
 - Prefer argument passing over global state

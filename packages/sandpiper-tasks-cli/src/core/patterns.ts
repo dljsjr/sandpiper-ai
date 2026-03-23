@@ -1,14 +1,14 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-/** Matches a 3-letter uppercase project key: SHR, CLI, etc. */
-export const PROJECT_KEY_RE = /^[A-Z]{3}$/;
+/** Matches an uppercase project key (2+ letters): SHR, CLI, TOOLS, etc. */
+export const PROJECT_KEY_RE = /^[A-Z]{2,}$/;
 
-/** Matches a task file name: SHR-1.md, CLI-42.md, etc. */
-export const TASK_FILE_RE = /^[A-Z]{3}-\d+\.md$/;
+/** Matches a task file name: SHR-1.md, TOOLS-42.md, etc. */
+export const TASK_FILE_RE = /^[A-Z]{2,}-\d+\.md$/;
 
-/** Matches a task key: SHR-1, CLI-42, etc. */
-export const TASK_KEY_RE = /^[A-Z]{3}-\d+$/;
+/** Matches a task key: SHR-1, TOOLS-42, etc. */
+export const TASK_KEY_RE = /^[A-Z]{2,}-\d+$/;
 
 /** Extract the project key from a task key. */
 export function projectFromKey(key: string): string {

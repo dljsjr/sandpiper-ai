@@ -1,6 +1,66 @@
 version: 1
-lastUpdatedAt: 1774250202475
+lastUpdatedAt: 1774279132201
 tasks:
+  "TOOLS-3":
+    key: TOOLS-3
+    project: TOOLS
+    title: Add .gitignore for compiled skill binaries that exceed jj snapshot size limit
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T15:18:52.169Z"
+    updatedAt: "2026-03-23T15:18:52.169Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774279132172
+  "TOOLS-2":
+    key: TOOLS-2
+    project: TOOLS
+    title: Support pinned refs/SHAs in vendor.txt for reproducible builds
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T14:54:12.030Z"
+    updatedAt: "2026-03-23T14:54:12.030Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774277876882
+  "TOOLS-1":
+    key: TOOLS-1
+    project: TOOLS
+    title: Group vendor.txt entries by repo to avoid redundant tarball downloads
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T14:54:12.001Z"
+    updatedAt: "2026-03-23T14:54:12.001Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774277876847
+  "TOOLS-4":
+    key: TOOLS-4
+    project: TOOLS
+    title: Consider caching dash docset identifiers to avoid repeated list-installed-docsets calls
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T15:18:52.197Z"
+    updatedAt: "2026-03-23T15:18:52.197Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774279132200
   "TCL-39":
     key: TCL-39
     project: TCL
@@ -1937,3 +1997,9 @@ counters:
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
+  VND:
+    projectKey: VND
+    nextTaskNumber: 3
+  TOOLS:
+    projectKey: TOOLS
+    nextTaskNumber: 5
