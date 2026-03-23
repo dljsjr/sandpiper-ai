@@ -1,5 +1,0 @@
-{
-  "extensions": ["../extensions"],
-  "skills": ["../skills/sandpiper", "../skills/third-party"],
-  "prompts": ["../prompts"]
-}

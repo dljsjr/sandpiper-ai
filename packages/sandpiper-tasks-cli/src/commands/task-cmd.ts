@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import { Command } from '@commander-js/extra-typings';
+import { archiveCompletedTasks, listArchivedTasks } from '../core/archive.js';
 import { replaceDescription } from '../core/description.js';
 import { editInEditor } from '../core/editor.js';
 import { formatSummary, formatTaskDetail, formatTaskLine } from '../core/format.js';
@@ -491,6 +492,65 @@ const moveCommand = new Command('move')
     });
   });
 
+const archiveCommand = new Command('archive')
+  .description('Move completed tasks to archive/ subdirectory within their project')
+  .option('-p, --project <key>', 'Archive only tasks in this project')
+  .option('--list', 'List archived tasks instead of archiving')
+  .action((opts, cmd) => {
+    withErrorHandling(() => {
+      const tasksDir = getTasksDir(cmd);
+
+      if (opts.list) {
+        const keys = listArchivedTasks(tasksDir, opts.project?.toUpperCase());
+        if (keys.length === 0) {
+          console.log('No archived tasks found.');
+        } else {
+          console.log(`Archived tasks (${keys.length}):`);
+          for (const key of keys) {
+            console.log(`  ${key}`);
+          }
+        }
+        return;
+      }
+
+      if (!shouldSave(cmd)) {
+        // Dry run: show what would be archived without moving files
+        const tasks = loadTasks(cmd);
+        const filter: TaskFilter = {
+          status: 'COMPLETE' as TaskStatus,
+          ...(opts.project ? { project: opts.project.toUpperCase() } : {}),
+        };
+        const completed = queryTasks(tasks, filter);
+        // Only top-level tasks (not subtasks) get archived directly
+        const topLevel = completed.filter((t) => !t.parent);
+        if (topLevel.length === 0) {
+          console.log('No completed tasks to archive.');
+        } else {
+          console.log(`Would archive ${topLevel.length} task${topLevel.length !== 1 ? 's' : ''}:`);
+          for (const t of topLevel) {
+            console.log(`  ${t.key}`);
+          }
+        }
+        return;
+      }
+
+      const result = archiveCompletedTasks(tasksDir, opts.project?.toUpperCase());
+
+      if (result.archived.length === 0) {
+        console.log('No completed tasks to archive.');
+        return;
+      }
+
+      // Rebuild the index after archiving to remove archived tasks
+      updateIndex(tasksDir);
+
+      console.log(`Archived ${result.archived.length} task${result.archived.length !== 1 ? 's' : ''}:`);
+      for (const key of result.archived) {
+        console.log(`  ${key}`);
+      }
+    });
+  });
+
 export const taskCommand = new Command('task')
   .description('Query and inspect tasks')
   .addCommand(listCommand)
@@ -500,4 +560,5 @@ export const taskCommand = new Command('task')
   .addCommand(updateCommand)
   .addCommand(pickupCommand)
   .addCommand(completeCommand)
-  .addCommand(moveCommand);
+  .addCommand(moveCommand)
+  .addCommand(archiveCommand);

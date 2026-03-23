@@ -1,67 +1,85 @@
-#!/usr/bin/env bun
+#!/usr/bin/env node
 
 process.title = 'sandpiper';
 
-import { glob, mkdir, mkdtemp, readFile, realpath, symlink, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { basename, dirname, join, resolve } from 'node:path';
-import { $ } from 'bun';
+import { execSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
+import { readFile, realpath } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const systemPiDistDir = await $`which pi`
-  .text()
-  .then((cmd) => {
-    return realpath(cmd).then((resolved) => resolved.toString());
-  })
-  .then(dirname);
-const systemPiPackageDir = dirname(systemPiDistDir);
+const scriptDir = dirname(fileURLToPath(import.meta.url));
 
-const overridesPackageDir = await mkdtemp(join(tmpdir(), 'sandpiper-'));
-process.env.PI_PACKAGE_DIR = overridesPackageDir;
+// Locate the system pi binary. Try (in order):
+// 1. .pi-binpath file next to this script (written at install time)
+// 2. .pi-binpath in dist/ subdirectory (dev mode: script is in packages/cli/)
+// 3. `which pi` fallback (dev mode without prior install)
+let systemPiDistDir: string;
 
-await symlink(join(dirname(process.execPath), 'CHANGELOG.md'), join(overridesPackageDir, 'CHANGELOG.md'));
+const binpathHere = join(scriptDir, '.pi-binpath');
+const binpathDist = join(scriptDir, 'dist', '.pi-binpath');
 
-await symlink(join(dirname(process.execPath), 'README.md'), join(overridesPackageDir, 'README.md'));
-
-const sandpiperPkgJson = JSON.parse(await readFile(join(dirname(process.execPath), 'package.json'), 'utf-8'));
-
-const piPkgJson = JSON.parse(await readFile(join(systemPiPackageDir, 'package.json'), 'utf-8'));
-
-piPkgJson.piConfig = sandpiperPkgJson.piConfig;
-
-await writeFile(join(overridesPackageDir, 'package.json'), JSON.stringify(piPkgJson));
-
-sandpiperPkgJson;
-
-await symlink(join(systemPiPackageDir, 'CHANGELOG.md'), join(overridesPackageDir, 'pi-CHANGELOG.md'));
-
-await symlink(join(systemPiPackageDir, 'README.md'), join(overridesPackageDir, 'pi-README.md'));
-
-await symlink(join(systemPiPackageDir, 'docs'), join(overridesPackageDir, 'docs'));
-
-await symlink(join(systemPiPackageDir, 'examples'), join(overridesPackageDir, 'examples'));
-
-const symlinkThemesDir = join(overridesPackageDir, 'dist/modes/interactive/theme');
-await mkdir(symlinkThemesDir, { recursive: true });
-
-for await (const entry of glob(`${systemPiPackageDir}/dist/modes/interactive/theme/*.json`)) {
-  const targetFile = basename(entry);
-  await symlink(resolve(entry), `${symlinkThemesDir}/${targetFile}`);
+if (existsSync(binpathHere)) {
+  systemPiDistDir = dirname(await realpath((await readFile(binpathHere, 'utf-8')).trim()));
+} else if (existsSync(binpathDist)) {
+  systemPiDistDir = dirname(await realpath((await readFile(binpathDist, 'utf-8')).trim()));
+} else {
+  // Fallback: find pi on PATH
+  try {
+    const piBin = execSync('which pi', { encoding: 'utf-8' }).trim();
+    systemPiDistDir = dirname(await realpath(piBin));
+  } catch {
+    console.error('Error: Could not find pi binary. Install pi globally or run the build first.');
+    process.exit(1);
+  }
 }
 
-const symlinkExportHtmlDir = join(overridesPackageDir, 'dist/core/export-html');
-const symlinkExportHtmlVendorDir = join(symlinkExportHtmlDir, 'vendor');
-await mkdir(symlinkExportHtmlVendorDir, { recursive: true });
+const systemPiPackageDir = dirname(systemPiDistDir);
+const piPkgJson = JSON.parse(await readFile(join(systemPiPackageDir, 'package.json'), 'utf-8'));
+const piVersion = piPkgJson.version;
 
-const sourceExportHtmlDir = join(systemPiDistDir, 'core', 'export-html');
-await symlink(join(sourceExportHtmlDir, 'template.html'), join(symlinkExportHtmlDir, 'template.html'));
+// Find the package directory that pi should use as its root.
+// Walk up from the script location until we find a package.json with the `pi`
+// key (which declares extensions/skills/prompts/themes resource paths).
+// - In dist: dist/sandpiper → dist/package.json (generated with pi + piConfig)
+// - In dev via .bin symlink: packages/cli/dist/sandpiper → walks up to repo root
+// - In dev direct: packages/cli/pi_wrapper.ts → walks up to repo root
+function findPackageDir(startDir: string): string {
+  let dir = startDir;
+  const root = resolve('/');
+  while (dir !== root) {
+    const pkgPath = join(dir, 'package.json');
+    if (existsSync(pkgPath)) {
+      try {
+        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+        if (pkg.pi) {
+          return dir;
+        }
+      } catch {
+        // Not valid JSON or not readable — keep walking
+      }
+    }
+    dir = dirname(dir);
+  }
+  // Fallback: two levels up (original behavior)
+  return resolve(join(startDir, '..', '..'));
+}
 
-await symlink(join(sourceExportHtmlDir, 'template.css'), join(symlinkExportHtmlDir, 'template.css'));
+const overridesPackageDir = findPackageDir(scriptDir);
 
-await symlink(join(sourceExportHtmlDir, 'template.js'), join(symlinkExportHtmlDir, 'template.js'));
+process.env.PI_PACKAGE_DIR = overridesPackageDir;
+process.env.PI_CODING_AGENT_PACKAGE = systemPiPackageDir;
+process.env.PI_CODING_AGENT_VERSION = piVersion;
+// Suppress pi's built-in version check — sandpiper handles its own
+// update notifications via the system extension.
+process.env.PI_SKIP_VERSION_CHECK = '1';
+console.log(`using pi-coding-agent version: ${piVersion}\n`);
 
-for await (const entry of glob(`${sourceExportHtmlDir}/vendor/*.js`)) {
-  const targetFile = basename(entry);
-  await symlink(resolve(entry), `${symlinkExportHtmlVendorDir}/${targetFile}`);
+for (const [key, val] of Object.entries(process.env).filter(([key, _]: [string, string?]) =>
+  key.startsWith('SANDPIPER_'),
+)) {
+  const varName = key.replace(/^SANDPIPER_/, '');
+  process.env[`PI_${varName}`] = val;
 }
 
 (await import(join(systemPiDistDir, 'main.js'))).main(process.argv.slice(2));

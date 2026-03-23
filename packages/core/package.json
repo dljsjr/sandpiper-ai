@@ -1,6 +1,7 @@
 {
   "name": "sandpiper-ai-core",
   "version": "0.0.1",
+  "type": "module",
   "author": {
     "name": "Doug Stephen",
     "email": "dljs.jr@dougstephenjr.com"

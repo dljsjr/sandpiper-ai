@@ -1,21 +1,19 @@
 {
   "name": "sandpiper-ai-devtools",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
   "author": {
     "name": "Doug Stephen",
     "email": "dljs.jr@dougstephenjr.com"
   },
-  "version": "0.0.1",
-  "private": true,
-  "type": "module",
   "dependencies": {
     "@commander-js/extra-typings": "catalog:cli",
     "ascii-motion-mcp": "catalog:tooling",
-    "bun": "catalog:bun",
     "mcporter": "catalog:tooling"
   },
   "devDependencies": {
-    "@types/bun": "catalog:bun",
-    "typescript": "catalog:ts"
+    "@types/bun": "catalog:ts"
   },
   "peerDependencies": {
     "commander": "catalog:cli",

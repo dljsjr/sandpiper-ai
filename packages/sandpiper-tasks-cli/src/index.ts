@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from '@commander-js/extra-typings';
 import { indexCommand } from './commands/index-cmd.js';
 import { projectCommand } from './commands/project-cmd.js';

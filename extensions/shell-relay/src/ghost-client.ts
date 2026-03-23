@@ -30,6 +30,8 @@ export class GhostClient {
   /**
    * Spawn the ghost client as a detached background process.
    * The process attaches to (or creates) the Zellij session with a real PTY.
+   *
+   * @throws If the ghost-attach script cannot be found or spawned.
    */
   start(): void {
     if (this.process) {
@@ -44,11 +46,25 @@ export class GhostClient {
     // Unref so the parent process can exit without waiting for the ghost
     this.process.unref();
 
+    // Handle spawn errors (e.g., script not found) — clean up and re-throw
+    // so the caller can report a useful error instead of crashing the agent.
+    this.process.on('error', (err) => {
+      this.process = null;
+      this.lastError = err;
+    });
+
     // Handle unexpected exit
     this.process.on('exit', () => {
       this.process = null;
     });
   }
+
+  /** Last error from the ghost client process, if any. */
+  get error(): Error | null {
+    return this.lastError;
+  }
+
+  private lastError: Error | null = null;
 
   /**
    * Kill the ghost client process.

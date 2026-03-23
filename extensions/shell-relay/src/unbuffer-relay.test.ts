@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const UNBUFFER_RELAY = join(import.meta.dirname, 'unbuffer-relay');
+const UNBUFFER_RELAY = join(import.meta.dirname, '..', 'unbuffer-relay');
 
 /** Run unbuffer-relay synchronously and return stdout, stderr, and exit code. */
 function run(

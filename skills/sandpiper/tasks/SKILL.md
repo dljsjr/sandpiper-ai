@@ -49,7 +49,7 @@ Bugs found while working on a task are their own top-level work items, not subta
 
 ## CLI Tool
 
-The `sandpiper-tasks` CLI is the primary interface for task operations. It is bundled as a compiled binary at `scripts/sandpiper-tasks` relative to this skill's directory.
+The `sandpiper-tasks` CLI is the primary interface for task operations. It is bundled as a standalone JS file at `scripts/sandpiper-tasks` relative to this skill's directory.
 
 ```bash
 sandpiper-tasks <command>
@@ -135,6 +135,17 @@ sandpiper-tasks task summary -p SHR                              # project-scope
 sandpiper-tasks project list                                     # list all projects
 sandpiper-tasks project create SHR                               # create new project
 ```
+
+### Archive completed tasks
+
+```bash
+sandpiper-tasks task archive                                     # archive all completed tasks
+sandpiper-tasks task archive -p SHR                              # archive only SHR completed tasks
+sandpiper-tasks task archive --list                              # list already-archived tasks
+sandpiper-tasks --no-save task archive                           # dry run (show what would be archived)
+```
+
+Archiving moves completed task files (and their subtask directories) to an `archive/` subdirectory within each project. Archived tasks are excluded from normal queries but preserved in full. Use `--list` to see what's been archived.
 
 ### Index management
 

@@ -1,12 +1,13 @@
 ---
 title: "Fish Enter keybind replaces visible commandline with wrapper before executing"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-23T05:35:13.798Z
-updated_at: 2026-03-23T05:37:52.749Z
+updated_at: 2026-03-23T15:34:06.705Z
 ---
 
 # Fish Enter keybind replaces visible commandline with wrapper before executing
@@ -28,3 +29,13 @@ Investigate whether we can avoid the visible replacement — e.g., by executing 
 ## 2026-03-23T05:37:52.749Z
 
 - **description**: 1 line → updated (5 lines)
+
+## 2026-03-23T15:30:22.825Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-23T15:34:06.706Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

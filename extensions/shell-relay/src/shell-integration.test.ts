@@ -8,8 +8,8 @@ import { FifoManager } from './fifo.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const FISH_SCRIPT = join(__dirname, 'shell-integration', 'relay.fish');
-const BASH_SCRIPT = join(__dirname, 'shell-integration', 'relay.bash');
+const FISH_SCRIPT = join(__dirname, '..', 'shell-integration', 'relay.fish');
+const BASH_SCRIPT = join(__dirname, '..', 'shell-integration', 'relay.bash');
 
 describe('Shell Integration Scripts', () => {
   let tempDir: string;

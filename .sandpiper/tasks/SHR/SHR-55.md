@@ -1,12 +1,13 @@
 ---
 title: "OSC terminal query sequences leak as visible text in enhanced mode"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: LOW
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-23T06:10:06.068Z
-updated_at: 2026-03-23T06:10:12.747Z
+updated_at: 2026-03-23T15:39:59.146Z
 ---
 
 # OSC terminal query sequences leak as visible text in enhanced mode
@@ -20,3 +21,13 @@ Programs like jj emit OSC escape sequences (^[]10;... ^[]11;... ^[[?62;4c) to qu
 ## 2026-03-23T06:10:12.747Z
 
 - **description**: added (1 line)
+
+## 2026-03-23T15:34:19.341Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-23T15:39:59.146Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE
