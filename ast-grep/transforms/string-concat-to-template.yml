@@ -1,0 +1,14 @@
+# Find string concatenation with + that could use template literals
+# Usage: ast-grep scan --rule ast-grep/transforms/string-concat-to-template.yml [path]
+id: string-concat-candidates
+language: TypeScript
+rule:
+  kind: binary_expression
+  has:
+    kind: string
+    stopBy: neighbor
+  regex: "\\+"
+severity: hint
+message: "String concatenation — consider template literals for readability."
+ignores:
+  - "**/*.test.ts"

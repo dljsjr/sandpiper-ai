@@ -1,0 +1,15 @@
+# Find execSync calls that could be converted to spawn for non-blocking execution
+# This is a QUERY, not an auto-fix — manual judgment needed for each case
+# Usage: ast-grep scan --rule ast-grep/transforms/execsync-to-spawn.yml [path]
+id: execsync-candidates
+language: TypeScript
+rule:
+  pattern: execSync($$$ARGS)
+  not:
+    inside:
+      kind: catch_clause
+      stopBy: end
+severity: hint
+message: "execSync call — consider spawn/execFile for non-blocking execution if not in a synchronous context."
+ignores:
+  - "**/*.test.ts"

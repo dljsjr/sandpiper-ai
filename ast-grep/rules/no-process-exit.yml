@@ -1,0 +1,10 @@
+id: no-process-exit
+language: TypeScript
+rule:
+  pattern: process.exit($$$ARGS)
+severity: warning
+message: "Avoid process.exit() — use process.exitCode and let the event loop drain."
+note: "process.exit() bypasses cleanup handlers and can leave resources open. Set process.exitCode instead."
+ignores:
+  - "**/*.test.ts"
+  - "devtools/ascii-motion.ts"

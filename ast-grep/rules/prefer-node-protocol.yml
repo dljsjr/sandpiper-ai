@@ -1,0 +1,20 @@
+id: prefer-node-protocol
+language: TypeScript
+rule:
+  kind: string
+  any:
+    - regex: "^['\"]fs['\"]$"
+    - regex: "^['\"]path['\"]$"
+    - regex: "^['\"]os['\"]$"
+    - regex: "^['\"]crypto['\"]$"
+    - regex: "^['\"]child_process['\"]$"
+    - regex: "^['\"]net['\"]$"
+    - regex: "^['\"]events['\"]$"
+    - regex: "^['\"]util['\"]$"
+    - regex: "^['\"]url['\"]$"
+  inside:
+    kind: import_statement
+    stopBy: end
+severity: warning
+message: "Use node: protocol for Node.js built-in imports (e.g., 'node:fs' instead of 'fs')."
+note: "Per AGENTS.md: use standard Node.js built-in modules with the node: protocol prefix."

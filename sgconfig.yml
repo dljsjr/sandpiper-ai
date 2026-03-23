@@ -1,0 +1,6 @@
+# ast-grep project configuration for sandpiper-ai
+# Run: ast-grep scan
+ruleDirs:
+  - ast-grep/rules
+utilDirs:
+  - ast-grep/utils

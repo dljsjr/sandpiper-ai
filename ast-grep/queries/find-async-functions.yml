@@ -1,0 +1,18 @@
+# Find all async functions — useful for identifying async boundaries
+# Usage: ast-grep scan --rule ast-grep/queries/find-async-functions.yml [path]
+id: find-async-functions
+language: TypeScript
+rule:
+  any:
+    - kind: function_declaration
+      has:
+        kind: async
+        stopBy: neighbor
+    - kind: arrow_function
+      has:
+        kind: async
+        stopBy: neighbor
+severity: hint
+message: "Async function"
+ignores:
+  - "**/*.test.ts"

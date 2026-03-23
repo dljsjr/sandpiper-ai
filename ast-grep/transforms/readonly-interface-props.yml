@@ -1,0 +1,18 @@
+# Add `readonly` to interface properties that don't have it
+# Usage: ast-grep run --rule ast-grep/transforms/readonly-interface-props.yml -U [path]
+# Preview: ast-grep run --rule ast-grep/transforms/readonly-interface-props.yml [path]
+id: readonly-interface-props
+language: TypeScript
+rule:
+  kind: property_signature
+  not:
+    has:
+      kind: readonly
+      stopBy: neighbor
+  inside:
+    kind: interface_body
+    stopBy: end
+fix: "readonly $$$MATCH"
+severity: hint
+message: "Interface property should be readonly"
+note: "Per AGENTS.md: use readonly where mutation is not needed."
