@@ -415,13 +415,27 @@ export default function (pi: ExtensionAPI) {
 
   pi.on('session_start', async (_event, ctx) => {
     const hasZellij = new ZellijClient({ sessionName: '' }).isAvailable();
-    const mode = isUnbufferAvailable() ? 'enhanced (PTY colors)' : 'basic';
+    const hasTclsh = (() => {
+      try {
+        execSync('command -v tclsh', { stdio: 'pipe' });
+        return true;
+      } catch {
+        return false;
+      }
+    })();
     const configuredSession = process.env.SHELL_RELAY_SESSION;
 
     if (!hasZellij) {
       ctx.ui.setStatus('shell-relay', 'Shell Relay: Zellij not found — install from https://zellij.dev');
       return;
     }
+
+    if (!hasTclsh) {
+      ctx.ui.setStatus('shell-relay', 'Shell Relay: expect/tclsh not found — required for ghost client');
+      return;
+    }
+
+    const mode = isUnbufferAvailable() ? 'enhanced (PTY colors)' : 'basic';
 
     if (configuredSession) {
       ctx.ui.setStatus('shell-relay', `Shell Relay: ${configuredSession} (${mode})`);
