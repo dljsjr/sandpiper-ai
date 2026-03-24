@@ -6,7 +6,7 @@ This document supplements the [repo-wide AGENTS.md](../../AGENTS.md) with shell-
 
 ### Framework-Independent Core
 
-All core logic lives in framework-independent modules. Only `index.ts` imports pi framework APIs.
+All core logic lives in framework-independent modules under `src/`. Only `index.ts` imports pi framework APIs. Companion scripts (`ghost-attach`, `unbuffer-relay`) and shell integration scripts live at the extension root. The bundle is built to `dist/shell-relay`.
 
 | Module | Purpose | Pi imports? |
 |--------|---------|-------------|
@@ -16,7 +16,7 @@ All core logic lives in framework-independent modules. Only `index.ts` imports p
 | `ghost-client.ts` | Headless Zellij client management (expect-based PTY) | No |
 | `signal.ts` | Signal channel parser (line-delimited protocol) | No |
 | `zellij.ts` | Zellij CLI wrapper | No |
-| `escape.ts` | Command escaping (`string escape` / `printf '%q'`) | No |
+| `escape.ts` | Command escaping (fish quote-break / bash `printf '%q'`) | No |
 | `relay.ts` | Orchestration (ties all modules together) | No |
 | `index.ts` | Pi extension glue (tool registration, lifecycle) | **Yes** — only file |
 
@@ -75,14 +75,16 @@ eval $SHELL_RELAY_UNBUFFER $cmd | tee $SHELL_RELAY_STDOUT > /dev/tty
 This preserves session state (`eval` runs in the current shell) while getting PTY colors (`unbuffer-relay` spawns the first binary in a PTY). For pipelines, only the first command gets the PTY. Shell builtins as the first token will fail in unbuffer-relay (they aren't binaries) — but builtins don't produce colored output, so this is harmless. Do NOT use the `-p` (pipeline) flag — it blocks reading stdin from the terminal.
 
 ### Command Escaping
-- **Fish:** `string escape --style=script` via stdin → round-trips through `eval (string unescape ...)`
+- **Fish:** Quote-break pattern (`'text'"'"'more'`) — fish single quotes have NO escape sequences, so single quotes are embedded by ending the quote, inserting `"'"`, and re-opening
 - **Bash/Zsh:** `printf '%q'` via env var → round-trips through `eval`
 - Space-prefix the injection (` __relay_run ESCAPED`) to exclude from shell history
 
-### Fish Enter Keybind
-- Binds unconditionally (not gated on `$SHELL_RELAY_SIGNAL`) because env vars are exported after shell startup
-- `__relay_execute` guards on every invocation — falls back to `commandline -f execute` when relay is inactive
-- Detects agent-injected commands (`__relay_run` prefix) and executes directly without re-wrapping
+### Fish User Command Capture (fish_preexec)
+- Uses `fish_preexec` event to dynamically create wrapper functions that shadow external commands
+- Fish resolves command names AFTER preexec handlers complete, so wrappers take effect for the current execution
+- Three cases: builtins (skipped), existing functions (copied via `functions -c`), external binaries (wrapped with `command` prefix)
+- `--wraps` preserves tab completion transitively
+- Pipeline optimization: `test -t 1` skips unbuffer-relay for non-head commands
 
 ### Command Serialization
 Relay uses a promise chain to serialize concurrent `execute()` calls. Only one command runs in the pane at a time.
