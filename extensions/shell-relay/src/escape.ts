@@ -3,8 +3,9 @@ import { execSync } from 'node:child_process';
 /**
  * Escape a command string for safe passing to fish's `eval` via `__relay_run`.
  *
- * Delegates to fish's built-in `string escape --style=script` via subprocess.
- * The command is passed via stdin to avoid shell interpretation.
+ * Uses fish-compatible quote-break pattern: single quotes with embedded
+ * quotes via '"'"' (end quote, double-quoted quote, re-open quote).
+ * Fish single quotes have NO escape sequences — not even \'.
  *
  * This module is framework-independent — no pi/sandpiper imports.
  */
@@ -13,13 +14,13 @@ export function escapeForFish(command: string): string {
     return "''";
   }
 
-  const result = execSync("fish -c 'read -z cmd; string escape --style=script -- $cmd'", {
-    input: command,
-    encoding: 'utf-8',
-    timeout: 5000,
-  });
-
-  return result.trimEnd();
+  // Fish single quotes don't support ANY escape sequences — not even \'.
+  // To include a literal single quote, we must:
+  //   1. End the single-quoted string
+  //   2. Append a single quote wrapped in double quotes: "'"
+  //   3. Re-open the single-quoted string
+  // e.g., "it's" becomes 'it'"'"'s'
+  return `'${command.replace(/'/g, "'\"'\"'")}'`;
 }
 
 /**

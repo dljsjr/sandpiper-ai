@@ -31,12 +31,12 @@ See the [Pi Packages documentation](packages/cli/dist/docs/packages.md) for deta
 
 | Path | Type | Description |
 |------|------|-------------|
+| `extensions/system.ts` | Pi Extension | Sandpiper identity injection and update notifications |
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
 | `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI (bundled to `skills/sandpiper/tasks/scripts/sandpiper-tasks`) |
-| `packages/cli/` | Distributable Binary | Sandpiper CLI tooling |
+| `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
 | `packages/core/` | Shared Library | Shared core utilities |
 | `devtools/` | Dev-only | Development scripts, vendoring tools, and build utilities |
-| `devtools/dash.ts` | Dev-only | Dash documentation CLI source (compiled to `skills/sandpiper/dash/scripts/dash`) |
 
 ### Project-Specific Guidelines
 
