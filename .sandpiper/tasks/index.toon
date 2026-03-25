@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774408531399
+lastUpdatedAt: 1774447716773
 tasks:
   "MEM-1":
     key: MEM-1
@@ -31,6 +31,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774408453432
+  "PKM-2":
+    key: PKM-2
+    project: PKM
+    title: Create project directory and skill for cross-project awareness
+    status: IN PROGRESS
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T14:08:29.327Z"
+    updatedAt: "2026-03-25T14:08:36.767Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774447716772
   "SHR-62":
     key: SHR-62
     project: SHR
@@ -274,7 +289,7 @@ counters:
     nextTaskNumber: 10
   PKM:
     projectKey: PKM
-    nextTaskNumber: 2
+    nextTaskNumber: 3
   MEM:
     projectKey: MEM
     nextTaskNumber: 2
