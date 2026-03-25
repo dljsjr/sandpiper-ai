@@ -11,14 +11,18 @@ Shell Relay registers two tools for the agent:
 
 Commands run in the user's existing shell session, inheriting all session state: environment variables, shell functions, authentication tokens, activated virtual environments, and more.
 
-### When to Use Shell Relay vs `bash`
+### Examples
 
-| Use Shell Relay when… | Use `bash` when… |
-|------------------------|-------------------|
-| Command needs session state (auth tokens, shell functions, non-exported vars) | General-purpose commands with no session state dependency |
-| You want the user to see command execution in real time | Speed matters — `bash` is faster (no Zellij overhead) |
-| You need 1Password or other per-process-tree auth to persist | The command is simple and ephemeral |
-| You want to inspect what the user has been doing in their terminal | |
+```
+# Execute a command in the shared terminal
+shell_relay: echo "hello from the agent"
+
+# Use session state (auth tokens, shell functions, etc.)
+shell_relay: op run -- kubectl get pods
+
+# Inspect what the user has been doing
+shell_relay_inspect
+```
 
 ## Requirements
 
@@ -134,10 +138,9 @@ The `prompt_ready` signal replaces arbitrary timeouts — it proves the shell in
 └──────────────────────┘                      └─────────────────────────────┘
 ```
 
-### Key Design Decisions
+### How It Captures Output
 
-- **Ghost client** — expect-based headless PTY so `write-chars` and `dump-screen` work without user attachment
-- **Persistent FIFOs** with `O_RDWR` sentinel handles — created once per session, no per-command lifecycle
+- **Persistent FIFOs** with `O_RDWR` sentinel handles — created once per session, no per-command overhead
 - **Signal channel** for event-driven completion detection — no polling
 - **`prompt_ready`** for setup confirmation — replaces arbitrary timeouts
 - **`tee` + `/dev/tty`** — output goes to both the agent (via FIFO) and the user (via terminal)

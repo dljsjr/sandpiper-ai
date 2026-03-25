@@ -107,6 +107,6 @@
     "typescript": "catalog:ts",
     "vitest": "catalog:testing"
   },
-  "license": "ISC",
+  "license": "MIT",
   "type": "module"
 }
