@@ -42,6 +42,8 @@ See the [Pi Packages documentation](packages/cli/dist/docs/packages.md) for deta
 
 Each extension or library MAY have its own `AGENTS.md` with project-specific guidelines. Project-level guidelines supplement these repo-wide guidelines; in case of conflict, the project-level `AGENTS.md` takes precedence.
 
+**Before working on files in a subdirectory for the first time in a session**, read that directory's `README.md` and `AGENTS.md` (if they exist) to understand the module's architecture, conventions, and testing patterns. Most directories have a `README.md` with descriptive context; some also have an `AGENTS.md` with prescriptive guidance specific to that module.
+
 ## Runtime & Toolchain
 
 ### Bun as CLI Tool
@@ -158,6 +160,7 @@ See `ast-grep/README.md` for the full catalog of queries, transforms, and rules.
 - Prefer Node.js built-in modules over third-party packages
 - External runtime dependencies MUST be justified — don't add a package for something achievable in a few lines of code
 - `devDependencies` (test frameworks, type definitions, linters) are more acceptable than runtime `dependencies`
+- Pi peer dependencies (`@mariozechner/pi-coding-agent`, `@sinclair/typebox`, etc.) go in `peerDependencies` — they are provided by pi's jiti runtime and MUST NOT be bundled into extensions
 - Pi peer dependencies (`@mariozechner/pi-coding-agent`, `@sinclair/typebox`, etc.) go in `peerDependencies` with `"*"` range — do not bundle them
 
 ## Architecture

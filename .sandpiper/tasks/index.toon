@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774447716773
+lastUpdatedAt: 1774455661522
 tasks:
   "MEM-1":
     key: MEM-1
@@ -35,17 +35,18 @@ tasks:
     key: PKM-2
     project: PKM
     title: Create project directory and skill for cross-project awareness
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T14:08:29.327Z"
-    updatedAt: "2026-03-25T14:08:36.767Z"
+    updatedAt: "2026-03-25T14:10:14.584Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774447716772
+    lastIndexedAt: 1774447814588
   "SHR-62":
     key: SHR-62
     project: SHR
@@ -76,6 +77,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774407769788
+  "SHR-64":
+    key: SHR-64
+    project: SHR
+    title: Install shell integration scripts to a well-known location
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T16:20:48.361Z"
+    updatedAt: "2026-03-25T16:21:01.517Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774455661521
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -277,7 +293,7 @@ counters:
     nextTaskNumber: 61
   SHR:
     projectKey: SHR
-    nextTaskNumber: 64
+    nextTaskNumber: 65
   SRL:
     projectKey: SRL
     nextTaskNumber: 2

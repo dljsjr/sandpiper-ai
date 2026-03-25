@@ -1,0 +1,28 @@
+---
+title: "Install shell integration scripts to a well-known location"
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-03-25T16:20:48.361Z
+updated_at: 2026-03-25T16:21:01.517Z
+---
+
+# Install shell integration scripts to a well-known location
+
+Currently users must source the relay shell integration from the npm/bun package install location, which is fragile and ugly. Install the scripts to a well-known location like ~/.sandpiper/shell-integrations/ so users can source from a stable path.
+
+Open questions:
+- What triggers the install? postinstall.sh? First tool call? A slash command?
+- Should we auto-detect the user's shell and offer to append the source line to their RC file?
+- Should other shell integrations (future) go in the same directory?
+- How to handle updates when the scripts change?
+
+---
+
+# Activity Log
+
+## 2026-03-25T16:21:01.517Z
+
+- **description**: added (7 lines)
