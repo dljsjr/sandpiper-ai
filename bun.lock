@@ -49,6 +49,9 @@
         "unbuffer-relay": "./unbuffer-relay",
         "ghost-attach": "./ghost-attach",
       },
+      "dependencies": {
+        "sandpiper-ai-core": "workspace:*",
+      },
       "peerDependencies": {
         "@mariozechner/pi-coding-agent": "catalog:pi",
         "@sinclair/typebox": "catalog:pi",

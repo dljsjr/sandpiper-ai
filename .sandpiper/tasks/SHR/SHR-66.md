@@ -1,12 +1,13 @@
 ---
 title: "Register shell relay preflight check for integration installation"
-status: NOT STARTED
+status: NEEDS REVIEW
+resolution: DONE
 kind: TASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T21:55:31.145Z
-updated_at: 2026-03-25T22:05:02.964Z
+updated_at: 2026-03-25T22:09:25.466Z
 depends_on:
   - SHR-65
 ---
@@ -58,3 +59,13 @@ Called in shell relay extension factory body:
 ## 2026-03-25T22:05:02.965Z
 
 - **description**: 29 lines → updated (33 lines)
+
+## 2026-03-25T22:08:14.684Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-25T22:09:25.467Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **resolution**: DONE

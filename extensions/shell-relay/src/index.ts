@@ -6,9 +6,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
+import { registerPreflightCheck } from 'sandpiper-ai-core';
 import { exportVars } from './env-export.js';
 import { FifoManager } from './fifo.js';
 import { GhostClient } from './ghost-client.js';
+import { checkShellIntegration } from './preflight.js';
 import { Relay } from './relay.js';
 import { ZellijClient } from './zellij.js';
 
@@ -47,6 +49,9 @@ function detectShell(): 'fish' | 'bash' | 'zsh' {
 }
 
 export default function (pi: ExtensionAPI) {
+  // Register preflight check — runs at session_start via system extension aggregation
+  registerPreflightCheck('shell-relay:integration', checkShellIntegration);
+
   let fifoManager: FifoManager | null = null;
   let ghostClient: GhostClient | null = null;
   let zellij: ZellijClient | null = null;

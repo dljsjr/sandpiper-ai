@@ -1,6 +1,8 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import {
   detectUnmigratedConfigs,
+  formatInstallInstructions,
+  installShellIntegrations,
   type MigrationMode,
   parseMigrationCommandArgs,
   parseMigrationScope,
@@ -115,6 +117,15 @@ async function handleMigrationFlag(pi: ExtensionAPI, mode: MigrationMode, cwd: s
 // ─── Extension ──────────────────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
+  // ── Shell integration install flag ──
+
+  pi.registerFlag('install-shell-integrations', {
+    description:
+      'Install shell integration scripts to ~/.sandpiper/shell-integrations/, print sourcing instructions, then exit',
+    type: 'boolean',
+    default: false,
+  });
+
   // ── Migration flags ──
 
   pi.registerFlag('migrate-pi-configs', {
@@ -144,8 +155,20 @@ export default function (pi: ExtensionAPI) {
     default: false,
   });
 
-  // Handle migration flags in session_directory (CLI-only, fires before session is created)
+  // Handle CLI-only flags in session_directory (fires before session is created)
   pi.on('session_directory', async (event) => {
+    // --install-shell-integrations
+    if (pi.getFlag('--install-shell-integrations')) {
+      const result = installShellIntegrations();
+      if (result.success) {
+        console.log(formatInstallInstructions(result.installedTo));
+        process.exit(0);
+      } else {
+        console.error(`✗ Install failed: ${result.error}`);
+        process.exit(1);
+      }
+    }
+
     const migrate = pi.getFlag('--migrate-pi-configs');
     const symlink = pi.getFlag('--symlink-config');
     const hasScope = pi.getFlag('--pi-configs-global') || pi.getFlag('--pi-configs-local');

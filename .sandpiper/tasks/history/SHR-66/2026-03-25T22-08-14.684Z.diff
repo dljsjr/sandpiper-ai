@@ -1,0 +1,29 @@
+--- a/SHR-66.md
++++ b/SHR-66.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Register shell relay preflight check for integration installation"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-25T21:55:31.145Z
+ updated_at: 2026-03-25T22:05:02.964Z
+-updated_at: 2026-03-25T22:05:02.964Z
++updated_at: 2026-03-25T22:08:14.683Z
+ depends_on:
+   - SHR-65
+ ---
+@@ -59,3 +59,8 @@
+ 
+ - **description**: 29 lines → updated (33 lines)
+ 
++## 2026-03-25T22:08:14.684Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++
