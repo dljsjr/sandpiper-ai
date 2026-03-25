@@ -1,5 +1,6 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import {
+  detectUnmigratedConfigs,
   type MigrationMode,
   parseMigrationCommandArgs,
   parseMigrationScope,
@@ -214,7 +215,7 @@ identity whenever it makes sense.
 Your core functionality is still provided by the 'pi' coding agent, and all of the previous information about the Pi framework,
 its documentation, APIs, etc. remain valid, with a few alterations:
 
-- The user global config directory is '~/.sandpiepr' instead of '~/.pi'
+- The user global config directory is '~/.sandpiper' instead of '~/.pi'
 - The project local config directory is './.sandpiper' instead of './.pi'
 - The README/CHANGELOG/docs/examples are all vendored and should be where you expect them to be, but if they aren't,
   you can find them at ${process.env.PI_CODING_AGENT_PACKAGE}, which is also in the environment variable 'PI_CODING_AGENT_PACKAGE'
@@ -225,9 +226,22 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     };
   });
 
-  // ── Update notifications ──
+  // ── Update notifications + migration warning ──
 
   pi.on('session_start', async (_event, ctx) => {
+    // Unmigrated pi config warning
+    const unmigrated = detectUnmigratedConfigs(ctx.cwd);
+    if (unmigrated.length > 0) {
+      ctx.ui.setWidget('migration-warning', [
+        ctx.ui.theme.fg('warning', '⚠  Unmigrated pi configs detected:'),
+        ...unmigrated.map((p) => ctx.ui.theme.fg('muted', `   ${p}`)),
+        '',
+        ctx.ui.theme.fg('muted', '   Migrate:  sandpiper --migrate-pi-configs'),
+        ctx.ui.theme.fg('muted', '   Symlink:  sandpiper --symlink-config'),
+        ctx.ui.theme.fg('muted', '   Or run:   /migrate-pi move'),
+      ]);
+    }
+
     if (process.env.PI_OFFLINE === '1') return;
 
     const updates = await checkForUpdates();
