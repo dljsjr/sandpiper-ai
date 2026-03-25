@@ -1,12 +1,13 @@
 ---
 title: "System extension: aggregate and display preflight diagnostics"
-status: NOT STARTED
+status: NEEDS REVIEW
+resolution: DONE
 kind: TASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T21:55:27.812Z
-updated_at: 2026-03-25T21:55:48.141Z
+updated_at: 2026-03-25T22:05:43.273Z
 depends_on:
   - AGENT-12
 ---
@@ -50,3 +51,13 @@ On session_start:
 ## 2026-03-25T21:55:48.141Z
 
 - **description**: added (29 lines)
+
+## 2026-03-25T22:05:08.067Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-25T22:05:43.274Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **resolution**: DONE

@@ -5,6 +5,7 @@ import {
   parseMigrationCommandArgs,
   parseMigrationScope,
   performMigration,
+  runPreflightChecks,
 } from 'sandpiper-ai-core';
 
 // ─── Version Check ──────────────────────────────────────────────
@@ -186,7 +187,7 @@ export default function (pi: ExtensionAPI) {
       const result = await performMigration(parsed.mode, { cwd: ctx.cwd, scope: parsed.scope });
 
       if (result.success) {
-        ctx.ui.setWidget('migration-warning', undefined); // Clear warning banner if present
+        ctx.ui.setWidget('sandpiper-diagnostics', undefined); // Will be re-evaluated on next session_start
         const verb = parsed.mode === 'move' ? 'Migration' : 'Symlink';
         if (result.migrated.length > 0) {
           ctx.ui.notify(`${verb} complete. Reloading...`, 'info');
@@ -226,22 +227,45 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     };
   });
 
-  // ── Update notifications + migration warning ──
+  // ── Diagnostics + update notifications ──
 
   pi.on('session_start', async (_event, ctx) => {
-    // Unmigrated pi config warning
+    // --- Preflight diagnostics ---
+    // Collect from registered checks (extensions) + built-in migration check.
+    const diagnostics = runPreflightChecks();
+
+    // Built-in: unmigrated pi configs (not a registered preflight check since it
+    // lives in system.ts itself and has no separate extension to register from).
     const unmigrated = detectUnmigratedConfigs(ctx.cwd);
     if (unmigrated.length > 0) {
-      ctx.ui.setWidget('migration-warning', [
-        ctx.ui.theme.fg('warning', '⚠  Unmigrated pi configs detected:'),
-        ...unmigrated.map((p) => ctx.ui.theme.fg('muted', `   ${p}`)),
-        '',
-        ctx.ui.theme.fg('muted', '   Migrate:  sandpiper --migrate-pi-configs'),
-        ctx.ui.theme.fg('muted', '   Symlink:  sandpiper --symlink-config'),
-        ctx.ui.theme.fg('muted', '   Or run:   /migrate-pi move'),
-      ]);
+      diagnostics.push({
+        key: 'system:unmigrated-pi-configs',
+        healthy: false,
+        message: `Unmigrated pi configs detected: ${unmigrated.join(', ')}`,
+        instructions: [
+          'Migrate:  sandpiper --migrate-pi-configs',
+          'Symlink:  sandpiper --symlink-config',
+          'Or run:   /migrate-pi move',
+        ],
+      });
     }
 
+    const unhealthy = diagnostics.filter((d) => !d.healthy);
+    if (unhealthy.length > 0) {
+      const lines: string[] = [ctx.ui.theme.fg('warning', '⚠  Sandpiper diagnostics:')];
+      for (const d of unhealthy) {
+        lines.push('');
+        lines.push(`  ${ctx.ui.theme.fg('warning', d.message)}`);
+        for (const instruction of d.instructions ?? []) {
+          lines.push(ctx.ui.theme.fg('muted', `    ${instruction}`));
+        }
+      }
+      ctx.ui.setWidget('sandpiper-diagnostics', lines);
+    } else {
+      ctx.ui.setWidget('sandpiper-diagnostics', undefined);
+    }
+
+    // --- Update notifications ---
     if (process.env.PI_OFFLINE === '1') return;
 
     const updates = await checkForUpdates();
