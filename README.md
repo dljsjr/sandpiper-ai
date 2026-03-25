@@ -12,7 +12,6 @@ On top of pi's core functionality, Sandpiper provides:
 - **Task Management** — A markdown-based task tracker with YAML frontmatter, designed for both humans and agents to read and update. Organize work by project, track status, archive completed items.
 - **Session Continuity** — Stand-up notes at the start of each session orient the agent on what was done last time, what's blocked, and what's next. A project directory tracks active projects across repositories.
 - **Skill Library** — Curated guidance documents for jj version control, ast-grep structural analysis, Dash documentation lookup, and more. Skills teach the agent domain-specific knowledge without bloating the system prompt.
-- **Custom Branding** — The `sandpiper` command and `~/.sandpiper` config directory keep your agent separate from a vanilla pi installation.
 
 ## Quick Start
 
@@ -88,7 +87,7 @@ bun --filter shell-relay test
 
 ## Configuration
 
-Sandpiper uses `~/.sandpiper/agent/` for global config and `.sandpiper/` for project-local config. These mirror pi's `~/.pi/agent/` and `.pi/` directories.
+Sandpiper uses `~/.sandpiper/agent/` for global config and `.sandpiper/` for project-local config — distinct from pi's `~/.pi/agent/` and `.pi/` directories. This allows sandpiper and pi to coexist on the same system with separate settings.
 
 Key files:
 - `~/.sandpiper/agent/settings.json` — global settings, installed packages

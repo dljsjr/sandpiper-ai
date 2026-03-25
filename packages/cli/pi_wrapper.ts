@@ -75,6 +75,18 @@ process.env.PI_CODING_AGENT_VERSION = piVersion;
 process.env.PI_SKIP_VERSION_CHECK = '1';
 console.log(`using pi-coding-agent version: ${piVersion}\n`);
 
+// Capture original PI_* env vars before we override them with SANDPIPER_* values.
+// Used by the migration extension to detect old pi config directories.
+// Double underscore prefix indicates "private" / internal use.
+const piEnvVarsToCapture = ['PI_CODING_AGENT_DIR'];
+for (const varName of piEnvVarsToCapture) {
+  const sandpiperVar = varName.replace(/^PI_/, 'SANDPIPER_');
+  if (process.env[varName] && !process.env[sandpiperVar]) {
+    process.env[`__${varName}_ORIGINAL`] = process.env[varName];
+  }
+}
+
+// Map SANDPIPER_* env vars to PI_* for pi's consumption.
 for (const [key, val] of Object.entries(process.env).filter(([key, _]: [string, string?]) =>
   key.startsWith('SANDPIPER_'),
 )) {

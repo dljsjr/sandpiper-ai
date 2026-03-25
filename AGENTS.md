@@ -275,3 +275,65 @@ bunx vitest path/to/file # Run specific test file
 - Test files live alongside the modules they test: `foo.ts` → `foo.test.ts`
 - Integration tests that require external resources go in `test/integration/`
 - Test fixtures and helpers go in `test/helpers/`
+
+## General Coding Guidelines
+
+### Don't Duplicate Code
+
+When the same logic appears in multiple places, extract it into a shared function. This applies to:
+- Repeated calculations or transformations
+- Duplicated path construction
+- Copy-pasted error handling
+- Similar validation logic
+
+If you find yourself copying code, stop and extract it instead.
+
+### Be Consistent
+
+Consistency reduces cognitive load and prevents bugs. Within a codebase:
+
+- **Use the same patterns everywhere** — if one function uses `join(homedir(), ...)` for paths, all functions should
+- **Match existing style** — look at nearby code and follow its conventions
+- **Don't mix approaches** — if a module uses runtime APIs for paths, don't add string literals elsewhere
+- **Prefer explicit over implicit** — `join(homedir(), '.config')` is better than `'~/.config'`
+
+When in doubt, look at similar code in the same module or project and match its approach.
+
+### Use Top-Level Imports
+
+Import all dependencies at the top of the file. Don't use inline imports inside functions unless there's a compelling reason (lazy loading, circular dependency avoidance, etc.).
+
+```typescript
+// Good
+import { existsSync, mkdirSync, renameSync } from 'node:fs';
+import { homedir } from 'node:os';
+
+function doSomething() {
+  mkdirSync(join(homedir(), '.config'), { recursive: true });
+}
+
+// Bad
+function doSomething() {
+  import('node:fs').then(({ mkdirSync }) => { ... }); // Unnecessary
+}
+```
+
+## Path Handling
+
+When working with filesystem paths, prefer runtime APIs over string manipulation:
+
+- **Use `join()` to construct paths from segments** — handles path separators portably
+- **Use `homedir()` from `node:os` for home directory** — don't use `~` in string literals
+- **Use `resolve()` for absolute paths** — let the runtime handle expansion
+- **Don't manually expand tildes** — `~` and `~user` are shell conventions, not filesystem paths. Pass paths through `resolve()` and let the OS handle them.
+- **Be consistent within a codebase** — if one part uses `join(homedir(), '.config')`, don't use `'~/.config'` strings elsewhere
+
+```typescript
+// Good: portable, explicit
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+const configDir = join(homedir(), '.sandpiper');
+
+// Bad: shell-specific, fragile
+const configDir = '~/.sandpiper';
+```
