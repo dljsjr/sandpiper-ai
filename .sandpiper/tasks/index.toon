@@ -1,6 +1,180 @@
 version: 1
-lastUpdatedAt: 1774455661522
+lastUpdatedAt: 1774462049803
 tasks:
+  "AGENT-1":
+    key: AGENT-1
+    project: AGENT
+    title: Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T16:59:08.170Z"
+    updatedAt: "2026-03-25T17:01:01.219Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774458061224
+  "AGENT-11":
+    key: AGENT-11
+    project: AGENT
+    title: Warning banner for unmigrated pi configs
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T18:01:30.626Z"
+    updatedAt: "2026-03-25T18:01:50.085Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774461710089
+  "AGENT-2":
+    key: AGENT-2
+    project: AGENT
+    title: Implement migration functions for pi config
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T17:56:54.966Z"
+    updatedAt: "2026-03-25T18:07:29.798Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774462049802
+  "AGENT-5":
+    key: AGENT-5
+    project: AGENT
+    title: CLI flags for pi config migration
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T17:58:15.773Z"
+    updatedAt: "2026-03-25T18:00:02.307Z"
+    dependsOn[1]: AGENT-2
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774461602312
+  "AGENT-8":
+    key: AGENT-8
+    project: AGENT
+    title: Slash command for pi config migration
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T18:00:23.127Z"
+    updatedAt: "2026-03-25T18:01:14.793Z"
+    dependsOn[1]: AGENT-2
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774461674797
+  "AGENT-3":
+    key: AGENT-3
+    project: AGENT
+    title: Move migration function
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T17:57:23.840Z"
+    updatedAt: "2026-03-25T18:06:43.933Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-2
+    lastIndexedAt: 1774462003937
+  "AGENT-4":
+    key: AGENT-4
+    project: AGENT
+    title: Symlink migration function
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T17:57:43.288Z"
+    updatedAt: "2026-03-25T18:06:58.743Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-2
+    lastIndexedAt: 1774462018748
+  "AGENT-6":
+    key: AGENT-6
+    project: AGENT
+    title: "--migrate-pi-configs flag"
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T17:58:29.647Z"
+    updatedAt: "2026-03-25T17:58:29.647Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-5
+    lastIndexedAt: 1774461509650
+  "AGENT-7":
+    key: AGENT-7
+    project: AGENT
+    title: "--symlink-config flag"
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T17:59:00.134Z"
+    updatedAt: "2026-03-25T17:59:00.134Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-5
+    lastIndexedAt: 1774461540137
+  "AGENT-10":
+    key: AGENT-10
+    project: AGENT
+    title: /migrate-pi symlink command
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T18:00:55.335Z"
+    updatedAt: "2026-03-25T18:00:55.335Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-8
+    lastIndexedAt: 1774461655337
+  "AGENT-9":
+    key: AGENT-9
+    project: AGENT
+    title: /migrate-pi move command
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T18:00:38.504Z"
+    updatedAt: "2026-03-25T18:00:38.504Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-8
+    lastIndexedAt: 1774461638507
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -312,3 +486,6 @@ counters:
   WEB:
     projectKey: WEB
     nextTaskNumber: 2
+  AGENT:
+    projectKey: AGENT
+    nextTaskNumber: 12

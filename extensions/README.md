@@ -13,7 +13,7 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 The central sandpiper extension. This is the main integration point between the pi framework and sandpiper's custom behavior. Currently it:
 
-- Injects the sandpiper identity into the system prompt (branding, config directory paths, version info)
+- Injects the sandpiper identity into the system prompt (config directory paths, version info)
 - Checks the npm registry for pi-coding-agent updates and notifies the user on session start
 
 As sandpiper grows, additional pi customizations should be added here rather than creating new single-purpose extensions.
