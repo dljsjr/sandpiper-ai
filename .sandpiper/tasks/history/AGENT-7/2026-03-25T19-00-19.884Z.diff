@@ -1,0 +1,29 @@
+--- a/AGENT-7.md
++++ b/AGENT-7.md
+@@ -1,14 +1,19 @@
+ ---
+ title: "--symlink-config flag"
+-status: NOT STARTED
++status: NEEDS REVIEW
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-25T17:59:00.134Z
+-updated_at: 2026-03-25T17:59:00.134Z
++updated_at: 2026-03-25T19:00:19.883Z
+ ---
+ 
+ # --symlink-config flag
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-03-25T19:00:19.884Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++- **resolution**: DONE
++

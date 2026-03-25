@@ -2,6 +2,9 @@
   "name": "sandpiper-ai-core",
   "version": "0.0.1",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "author": {
     "name": "Doug Stephen",
     "email": "dljs.jr@dougstephenjr.com"

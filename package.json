@@ -91,6 +91,7 @@
   "dependencies": {
     "chalk": "catalog:cli",
     "sandpiper-ai-cli": "workspace:*",
+    "sandpiper-ai-core": "workspace:*",
     "sandpiper-tasks-cli": "workspace:*",
     "shell-relay": "workspace:*",
     "supports-color": "catalog:cli"

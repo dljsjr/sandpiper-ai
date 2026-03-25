@@ -36,7 +36,8 @@
       "@mariozechner/pi-coding-agent": [
         "./node_modules/@mariozechner/pi-coding-agent"
       ],
-      "@sinclair/typebox": ["./node_modules/@sinclair/typebox"]
+      "@sinclair/typebox": ["./node_modules/@sinclair/typebox"],
+      "sandpiper-ai-core": ["./packages/core/src/index.ts"]
     }
   },
   "exclude": [
