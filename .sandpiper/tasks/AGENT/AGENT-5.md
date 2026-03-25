@@ -1,12 +1,13 @@
 ---
 title: "CLI flags for pi config migration"
-status: NOT STARTED
+status: NEEDS REVIEW
+resolution: DONE
 kind: TASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T17:58:15.773Z
-updated_at: 2026-03-25T18:00:02.307Z
+updated_at: 2026-03-25T19:45:39.585Z
 depends_on:
   - AGENT-2
 ---
@@ -67,3 +68,13 @@ In `session_directory` event:
 ## 2026-03-25T18:00:02.308Z
 
 - **description**: added (46 lines)
+
+## 2026-03-25T18:55:54.056Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-25T19:00:38.178Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **resolution**: DONE

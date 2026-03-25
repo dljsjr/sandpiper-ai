@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774462049803
+lastUpdatedAt: 1774467939592
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -15,7 +15,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774458061224
+    lastIndexedAt: 1774467939590
   "AGENT-11":
     key: AGENT-11
     project: AGENT
@@ -30,7 +30,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774461710089
+    lastIndexedAt: 1774467939590
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -46,22 +46,23 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774462049802
+    lastIndexedAt: 1774467939590
   "AGENT-5":
     key: AGENT-5
     project: AGENT
     title: CLI flags for pi config migration
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T17:58:15.773Z"
-    updatedAt: "2026-03-25T18:00:02.307Z"
+    updatedAt: "2026-03-25T19:45:39.585Z"
+    resolution: DONE
     dependsOn[1]: AGENT-2
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774461602312
+    lastIndexedAt: 1774467939590
   "AGENT-8":
     key: AGENT-8
     project: AGENT
@@ -76,7 +77,7 @@ tasks:
     dependsOn[1]: AGENT-2
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774461674797
+    lastIndexedAt: 1774467939590
   "AGENT-3":
     key: AGENT-3
     project: AGENT
@@ -93,7 +94,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-2
-    lastIndexedAt: 1774462003937
+    lastIndexedAt: 1774467939591
   "AGENT-4":
     key: AGENT-4
     project: AGENT
@@ -110,39 +111,41 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-2
-    lastIndexedAt: 1774462018748
+    lastIndexedAt: 1774467939591
   "AGENT-6":
     key: AGENT-6
     project: AGENT
     title: "--migrate-pi-configs flag"
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T17:58:29.647Z"
-    updatedAt: "2026-03-25T17:58:29.647Z"
+    updatedAt: "2026-03-25T18:59:54.637Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-5
-    lastIndexedAt: 1774461509650
+    lastIndexedAt: 1774467939591
   "AGENT-7":
     key: AGENT-7
     project: AGENT
     title: "--symlink-config flag"
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T17:59:00.134Z"
-    updatedAt: "2026-03-25T17:59:00.134Z"
+    updatedAt: "2026-03-25T19:00:19.883Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-5
-    lastIndexedAt: 1774461540137
+    lastIndexedAt: 1774467939591
   "AGENT-10":
     key: AGENT-10
     project: AGENT
@@ -158,7 +161,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-8
-    lastIndexedAt: 1774461655337
+    lastIndexedAt: 1774467939591
   "AGENT-9":
     key: AGENT-9
     project: AGENT
@@ -174,7 +177,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-8
-    lastIndexedAt: 1774461638507
+    lastIndexedAt: 1774467939591
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -220,7 +223,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774447814588
+    lastIndexedAt: 1774467939591
   "SHR-62":
     key: SHR-62
     project: SHR
@@ -265,7 +268,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774455661521
+    lastIndexedAt: 1774467939591
   "TCL-52":
     key: TCL-52
     project: TCL

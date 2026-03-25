@@ -1,4 +1,5 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import { type MigrationMode, parseMigrationScope, performMigration } from 'sandpiper-ai-core';
 
 // ─── Version Check ──────────────────────────────────────────────
 
@@ -76,10 +77,92 @@ async function checkForUpdates(): Promise<readonly UpdateInfo[]> {
   return updates;
 }
 
+// ─── Migration ──────────────────────────────────────────────────
+
+/**
+ * Handle migration flag — perform migration and exit.
+ */
+async function handleMigrationFlag(pi: ExtensionAPI, mode: MigrationMode, cwd: string): Promise<void> {
+  const scope = parseMigrationScope(
+    pi.getFlag('--pi-configs-global') === true,
+    pi.getFlag('--pi-configs-local') === true,
+  );
+  const result = await performMigration(mode, { cwd, scope });
+
+  if (result.success) {
+    if (result.migrated.length > 0) {
+      console.log('✓ Migration complete!');
+      for (const path of result.migrated) {
+        console.log(`  Migrated: ${path}`);
+      }
+    } else {
+      console.log('No configs to migrate.');
+    }
+    process.exit(0);
+  } else {
+    console.error(`✗ Migration failed: ${result.error}`);
+    process.exit(1);
+  }
+}
+
 // ─── Extension ──────────────────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
-  // System prompt augmentation
+  // ── Migration flags ──
+
+  pi.registerFlag('migrate-pi-configs', {
+    description: 'Migrate ~/.pi and ./.pi to ~/.sandpiper and ./.sandpiper, then exit',
+    type: 'boolean',
+    default: false,
+  });
+
+  pi.registerFlag('symlink-config', {
+    description: 'Symlink ~/.pi and ./.pi to ~/.sandpiper and ./.sandpiper, then exit',
+    type: 'boolean',
+    default: false,
+  });
+
+  // Note: pi's registerFlag API has no built-in concept of flag dependencies or
+  // required-if relationships. The CLI parser simply collects all registered flags
+  // and stores their values. Conditional validation is done manually at runtime.
+  pi.registerFlag('pi-configs-global', {
+    description: 'With --migrate-pi-configs or --symlink-config: only operate on global config (~/.pi)',
+    type: 'boolean',
+    default: false,
+  });
+
+  pi.registerFlag('pi-configs-local', {
+    description: 'With --migrate-pi-configs or --symlink-config: only operate on project-local config (./.pi)',
+    type: 'boolean',
+    default: false,
+  });
+
+  // Handle migration flags in session_directory (CLI-only, fires before session is created)
+  pi.on('session_directory', async (event) => {
+    const migrate = pi.getFlag('--migrate-pi-configs');
+    const symlink = pi.getFlag('--symlink-config');
+    const hasScope = pi.getFlag('--pi-configs-global') || pi.getFlag('--pi-configs-local');
+
+    // Scope flags require a migration flag
+    if (hasScope && !migrate && !symlink) {
+      console.error(
+        'Error: --pi-configs-global and --pi-configs-local require --migrate-pi-configs or --symlink-config.',
+      );
+      process.exit(1);
+    }
+
+    // Migration flags are mutually exclusive
+    if (migrate && symlink) {
+      console.error('Error: --migrate-pi-configs and --symlink-config are mutually exclusive.');
+      process.exit(1);
+    }
+
+    if (migrate) await handleMigrationFlag(pi, 'move', event.cwd);
+    if (symlink) await handleMigrationFlag(pi, 'symlink', event.cwd);
+  });
+
+  // ── System prompt ──
+
   pi.on('before_agent_start', async (event) => {
     return {
       systemPrompt:
@@ -103,9 +186,9 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     };
   });
 
-  // Update notifications
+  // ── Update notifications ──
+
   pi.on('session_start', async (_event, ctx) => {
-    // Don't check if offline mode is enabled
     if (process.env.PI_OFFLINE === '1') return;
 
     const updates = await checkForUpdates();
