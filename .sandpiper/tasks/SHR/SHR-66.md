@@ -1,0 +1,52 @@
+---
+title: "Register shell relay preflight check for integration installation"
+status: NOT STARTED
+kind: TASK
+priority: HIGH
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-03-25T21:55:31.145Z
+updated_at: 2026-03-25T21:56:06.096Z
+depends_on:
+  - SHR-65
+---
+
+# Register shell relay preflight check for integration installation
+
+Register a preflight check in the shell relay extension that verifies the integration scripts are installed at the well-known location.
+
+## Check Logic
+
+Healthy if ALL of:
+  - ~/.sandpiper/shell-integrations/relay.fish exists, OR
+  - ~/.sandpiper/shell-integrations/relay.bash exists, OR
+  - ~/.sandpiper/shell-integrations/relay.zsh exists
+(at least one is installed — we don't require all three)
+
+## Diagnostic when unhealthy
+
+message: 'Shell integration not installed'
+instructions:
+  - 'Run: sandpiper --install-shell-integrations'
+  - 'Then source the appropriate script for your shell (see output for details)'
+
+## Registration
+
+Called in shell relay extension factory body:
+
+  registerPreflightCheck('shell-relay:integration', pi, () => { ... })
+
+## Notes
+
+- Use existsSync from node:fs — synchronous, no await needed
+- Well-known path: join(homedir(), '.sandpiper', 'shell-integrations')
+- Check at least one script exists, not necessarily all three
+- SHR-64 parent ticket context: this check is what makes the well-known location useful
+
+---
+
+# Activity Log
+
+## 2026-03-25T21:56:06.097Z
+
+- **description**: added (29 lines)

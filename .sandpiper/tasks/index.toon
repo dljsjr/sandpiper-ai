@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774469425198
+lastUpdatedAt: 1774475805859
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -32,6 +32,37 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774469425197
+  "AGENT-12":
+    key: AGENT-12
+    project: AGENT
+    title: Core preflight check system
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T21:55:27.775Z"
+    updatedAt: "2026-03-25T21:56:45.854Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774475805858
+  "AGENT-13":
+    key: AGENT-13
+    project: AGENT
+    title: "System extension: aggregate and display preflight diagnostics"
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T21:55:27.812Z"
+    updatedAt: "2026-03-25T21:55:48.141Z"
+    dependsOn[1]: AGENT-12
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774475748146
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -268,11 +299,41 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T16:20:48.361Z"
-    updatedAt: "2026-03-25T16:21:01.517Z"
+    updatedAt: "2026-03-25T21:56:12.558Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774467939591
+    lastIndexedAt: 1774475772564
+  "SHR-65":
+    key: SHR-65
+    project: SHR
+    title: Add --install-shell-integrations flag to system extension
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T21:55:27.848Z"
+    updatedAt: "2026-03-25T21:55:57.924Z"
+    dependsOn[1]: AGENT-12
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774475757930
+  "SHR-66":
+    key: SHR-66
+    project: SHR
+    title: Register shell relay preflight check for integration installation
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T21:55:31.145Z"
+    updatedAt: "2026-03-25T21:56:06.096Z"
+    dependsOn[1]: SHR-65
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774475766101
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -474,7 +535,7 @@ counters:
     nextTaskNumber: 61
   SHR:
     projectKey: SHR
-    nextTaskNumber: 65
+    nextTaskNumber: 67
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
@@ -495,4 +556,4 @@ counters:
     nextTaskNumber: 2
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 12
+    nextTaskNumber: 14
