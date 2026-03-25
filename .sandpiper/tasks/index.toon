@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774467939592
+lastUpdatedAt: 1774469261254
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -67,17 +67,18 @@ tasks:
     key: AGENT-8
     project: AGENT
     title: Slash command for pi config migration
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T18:00:23.127Z"
-    updatedAt: "2026-03-25T18:01:14.793Z"
+    updatedAt: "2026-03-25T20:07:41.249Z"
+    resolution: DONE
     dependsOn[1]: AGENT-2
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774467939590
+    lastIndexedAt: 1774469261253
   "AGENT-3":
     key: AGENT-3
     project: AGENT
@@ -150,34 +151,36 @@ tasks:
     key: AGENT-10
     project: AGENT
     title: /migrate-pi symlink command
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T18:00:55.335Z"
-    updatedAt: "2026-03-25T18:00:55.335Z"
+    updatedAt: "2026-03-25T20:07:41.213Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-8
-    lastIndexedAt: 1774467939591
+    lastIndexedAt: 1774469261218
   "AGENT-9":
     key: AGENT-9
     project: AGENT
     title: /migrate-pi move command
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T18:00:38.504Z"
-    updatedAt: "2026-03-25T18:00:38.504Z"
+    updatedAt: "2026-03-25T20:07:41.176Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-8
-    lastIndexedAt: 1774467939591
+    lastIndexedAt: 1774469261180
   "MEM-1":
     key: MEM-1
     project: MEM

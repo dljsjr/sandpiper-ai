@@ -1,12 +1,13 @@
 ---
 title: "Slash command for pi config migration"
-status: NOT STARTED
+status: NEEDS REVIEW
+resolution: DONE
 kind: TASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T18:00:23.127Z
-updated_at: 2026-03-25T18:01:14.793Z
+updated_at: 2026-03-25T20:07:41.249Z
 depends_on:
   - AGENT-2
 ---
@@ -61,3 +62,13 @@ pi.registerCommand("migrate-pi", {
 ## 2026-03-25T18:01:14.793Z
 
 - **description**: added (40 lines)
+
+## 2026-03-25T20:06:46.733Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-25T20:07:41.249Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **resolution**: DONE

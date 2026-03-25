@@ -66,6 +66,47 @@ export function parseMigrationScope(global: boolean, local: boolean): MigrationS
   return 'both';
 }
 
+export interface ParsedMigrationArgs {
+  mode: MigrationMode;
+  scope: MigrationScope;
+}
+
+export interface ParsedMigrationArgsError {
+  error: string;
+}
+
+/**
+ * Parse slash command arguments for /migrate-pi.
+ *
+ * Valid forms:
+ *   move
+ *   symlink
+ *   move --pi-configs-global
+ *   move --pi-configs-local
+ *   symlink --pi-configs-global
+ *   symlink --pi-configs-local
+ */
+export function parseMigrationCommandArgs(args: string): ParsedMigrationArgs | ParsedMigrationArgsError {
+  const tokens = args.trim().split(/\s+/).filter(Boolean);
+
+  const [modeToken, ...rest] = tokens;
+
+  if (modeToken !== 'move' && modeToken !== 'symlink') {
+    return { error: 'Usage: /migrate-pi move|symlink [--pi-configs-global|--pi-configs-local]' };
+  }
+
+  const mode: MigrationMode = modeToken;
+  const hasGlobal = rest.includes('--pi-configs-global');
+  const hasLocal = rest.includes('--pi-configs-local');
+
+  const unknownFlags = rest.filter((t) => t !== '--pi-configs-global' && t !== '--pi-configs-local');
+  if (unknownFlags.length > 0) {
+    return { error: `Unknown argument(s): ${unknownFlags.join(', ')}` };
+  }
+
+  return { mode, scope: parseMigrationScope(hasGlobal, hasLocal) };
+}
+
 /**
  * Detect unmigrated configs.
  * Returns array of resolved paths describing what needs migration.
