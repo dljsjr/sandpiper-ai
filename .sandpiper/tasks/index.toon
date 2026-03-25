@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774476343279
+lastUpdatedAt: 1774476565511
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -294,47 +294,50 @@ tasks:
     key: SHR-64
     project: SHR
     title: Install shell integration scripts to a well-known location
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T16:20:48.361Z"
-    updatedAt: "2026-03-25T21:56:12.558Z"
+    updatedAt: "2026-03-25T22:09:25.506Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774475772564
+    lastIndexedAt: 1774476565511
   "SHR-65":
     key: SHR-65
     project: SHR
     title: Add --install-shell-integrations flag to system extension
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T21:55:27.848Z"
-    updatedAt: "2026-03-25T21:55:57.924Z"
+    updatedAt: "2026-03-25T22:08:14.647Z"
+    resolution: DONE
     dependsOn[1]: AGENT-12
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774475757930
+    lastIndexedAt: 1774476494652
   "SHR-66":
     key: SHR-66
     project: SHR
     title: Register shell relay preflight check for integration installation
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T21:55:31.145Z"
-    updatedAt: "2026-03-25T22:05:02.964Z"
+    updatedAt: "2026-03-25T22:09:25.466Z"
+    resolution: DONE
     dependsOn[1]: SHR-65
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774476302970
+    lastIndexedAt: 1774476565473
   "TCL-52":
     key: TCL-52
     project: TCL
