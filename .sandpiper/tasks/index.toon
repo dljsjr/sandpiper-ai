@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774469261254
+lastUpdatedAt: 1774469425198
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -20,17 +20,18 @@ tasks:
     key: AGENT-11
     project: AGENT
     title: Warning banner for unmigrated pi configs
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T18:01:30.626Z"
-    updatedAt: "2026-03-25T18:01:50.085Z"
+    updatedAt: "2026-03-25T20:10:25.192Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774467939590
+    lastIndexedAt: 1774469425197
   "AGENT-2":
     key: AGENT-2
     project: AGENT
