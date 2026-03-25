@@ -1,5 +1,10 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
-import { type MigrationMode, parseMigrationScope, performMigration } from 'sandpiper-ai-core';
+import {
+  type MigrationMode,
+  parseMigrationCommandArgs,
+  parseMigrationScope,
+  performMigration,
+} from 'sandpiper-ai-core';
 
 // ─── Version Check ──────────────────────────────────────────────
 
@@ -159,6 +164,40 @@ export default function (pi: ExtensionAPI) {
 
     if (migrate) await handleMigrationFlag(pi, 'move', event.cwd);
     if (symlink) await handleMigrationFlag(pi, 'symlink', event.cwd);
+  });
+
+  // ── Migration slash command ──
+
+  pi.registerCommand('migrate-pi', {
+    description: 'Migrate pi configs to sandpiper (move|symlink [--pi-configs-global|--pi-configs-local])',
+    getArgumentCompletions: (prefix: string) => {
+      const options = ['move', 'symlink', '--pi-configs-global', '--pi-configs-local'];
+      return options.filter((o) => o.startsWith(prefix)).map((o) => ({ value: o, label: o }));
+    },
+    handler: async (args, ctx) => {
+      const parsed = parseMigrationCommandArgs(args ?? '');
+
+      if ('error' in parsed) {
+        ctx.ui.notify(parsed.error, 'error');
+        return;
+      }
+
+      const result = await performMigration(parsed.mode, { cwd: ctx.cwd, scope: parsed.scope });
+
+      if (result.success) {
+        ctx.ui.setWidget('migration-warning', undefined); // Clear warning banner if present
+        const verb = parsed.mode === 'move' ? 'Migration' : 'Symlink';
+        if (result.migrated.length > 0) {
+          ctx.ui.notify(`${verb} complete. Reloading...`, 'info');
+          await ctx.reload();
+        } else {
+          ctx.ui.notify('No configs to migrate.', 'info');
+        }
+      } else {
+        const verb = parsed.mode === 'move' ? 'Migration' : 'Symlink';
+        ctx.ui.notify(`${verb} failed: ${result.error}`, 'error');
+      }
+    },
   });
 
   // ── System prompt ──
