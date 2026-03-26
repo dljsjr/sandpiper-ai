@@ -152,7 +152,9 @@ jj absorb                          # Auto-route @ changes to correct ancestor co
 ### Bookmarks (branches) and pushing
 ```bash
 jj bookmark create feat -r @       # Create bookmark at @
-jj bookmark set feat               # Move bookmark to @
+jj bookmark set feat               # Move bookmark to @ (any direction)
+jj bookmark advance feat           # Advance bookmark to @ (forward/descendant only — safer)
+jj bookmark advance feat --to @-   # Advance to a specific descendant revision
 jj bookmark delete feat            # Delete bookmark
 jj bookmark list                   # List bookmarks
 

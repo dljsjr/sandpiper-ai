@@ -225,8 +225,14 @@ primarily for Git interop and pushing to remotes.
 Create bookmark(s) at a revision.
 - `-r, --revision <REV>` — Target (default: `@`)
 
+### `jj bookmark advance [NAMES]...`
+Advance bookmark(s) forward to a descendant revision. Unlike `bookmark set`, only moves in
+the descendant direction — safe for advancing `main` after squashing a stack.
+- `--to <revset>` — Target revision (defaults to `@`)
+- Named args target specific bookmarks; without them uses `heads(::to & bookmarks())`
+
 ### `jj bookmark set <NAMES>...` (alias: `jj b s`)
-Create or update bookmark.
+Create or update bookmark (any direction).
 - `-r, --revision <REV>` — Target (default: `@`)
 - `-B, --allow-backwards` — Allow moving backwards/sideways
 
