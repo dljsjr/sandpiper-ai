@@ -1,49 +1,45 @@
-# Session Stand-Up: 2026-03-25
+# Session Stand-Up: 2026-03-26
 
 ## Accomplished
 
-### Documentation Overhaul (PKM-2)
-- Comprehensive READMEs for all directories (root, extensions, packages, devtools, skills)
-- Correct descriptive/prescriptive split: READMEs for humans, AGENTS.md for agents
-- Project directory skill + `~/.sandpiper/agent/projects.toon` registry
-- Session continuity + subdirectory discovery directives in root AGENTS.md
-- Coding guidelines added to AGENTS.md: path handling, no duplication, consistency, top-level imports
+### Project Metadata — TCL-53 (COMPLETE)
+- `packages/sandpiper-tasks-cli/src/core/project-metadata.ts` — render, parse, read, write, update
+- `ProjectMetadata`, `ProjectStatus`, `ProjectListItem` types added to `types.ts`
+- `PROJECT_METADATA_FILENAME` constant in `patterns.ts`
+- `project create` now requires `--name`, `--description`, `--when-to-file` (enforced)
+- New commands: `project show`, `project update` (with `-i` editor support)
+- `project list` — enriched human output + structured toon/json with metadata + `whenToFile`
+- `task show --metadata-only` — frontmatter-only output, no body or subtasks
+- `extractFrontmatter()`, `formatProjectsOutput()` in `output.ts`
+- Backfilled `PROJECT.md` for all 9 existing projects (AGENT, MEM, PKM, SHR, SRL, TCL, TOOLS, VND, WEB)
+- `SPEC.md` §2.3: full `PROJECT.md` specification
+- `SKILL.md`: session-start `project list --format toon` instruction + new command docs
+- 235 tests passing, lint clean
+- Squashed into single commit, pushed to main
 
-### Pi Config Migration (AGENT-2, 5, 8, 11)
-- `packages/core/src/migrate-pi-configs.ts`: performMigration(), detectUnmigratedConfigs()
-- `pi_wrapper.ts`: captures `__PI_CODING_AGENT_DIR_ORIGINAL` before remapping
-- CLI flags: `--migrate-pi-configs`, `--symlink-config`, `--pi-configs-global`, `--pi-configs-local`
-- `/migrate-pi` slash command with tab completion + `ctx.reload()`
-- Aggregated diagnostic banner via `setWidget('sandpiper-diagnostics')`
+### Housekeeping
+- SHR-68, SHR-69 (bash/zsh command capture), SHR-70 (PTY spike, completed), SHR-71 (PTY MVP), SHR-72 (moved to AGENT-15 — background process framework)
+- OpenClaw process/supervisor investigation at `.sandpiper/docs/openclaw-process-supervisor-investigation.md`
+- All migration subtasks (AGENT-3/4/6/7/9/10) closed as DONE
 
-### Preflight Check System (AGENT-12, 13)
-- `packages/core/src/preflight.ts`: registerPreflightCheck(), collectPreflightDiagnostics()
-- Uses `pi.events` bus (shared across jiti instances) — module-level registry didn't work
-- System extension aggregates all checks + built-in migration check into single banner
+### jj Workflow Guidance
+- `AGENTS.md`: added `jj commit` preference over `describe + new` with heuristic
+- `skills/sandpiper/jj/SKILL.md`: tailored externally-authored skill — added `jj commit` to edit workflow, `Making commits` section, failure mode explanation, Common Pitfalls entry
+- `skills/sandpiper/jj/SKILL.md` + `references/commands.md`: added `jj bookmark advance` (new command, not previously documented)
+- Session continuity confirmed working — used it at session start today
 
-### Shell Integration Installer (SHR-64, 65, 66)
-- `--install-shell-integrations` flag: copies scripts to `~/.sandpiper/shell-integrations/`
-- Shell relay preflight check: probes `__relay_prompt_hook` via `fish -c 'functions -q ...'`
-- `displayPath()` utility: `~` prefix for user-facing output
-- TypeScript project references: `packages/core` → `composite: true`, shell-relay references it
-
-### Bug Fixes
-- `getFlag()` requires bare name (no `--` prefix) — pi docs are misleading, plan-mode example is correct
-- `--if-present` for `bun --workspaces preinstall` (core has no preinstall)
-- Source path fix: `extensions/shell-relay/shell-integration/` (was missing `extensions/` segment)
-- Typo fix in system prompt: `~/.sandpiepr` → `~/.sandpiper`
-
-### New Tickets Filed
-- SHR-67: Error on relay tool use if integration not sourced (LOW, backlog)
-- TCL-61: Wax single-file hybrid search engine spike (LOW, with mcporter integration note)
+### Commit Methodology Lesson
+- `jj commit` preferred over `jj describe + jj new` — added to AGENTS.md and jj skill
+- `jj bookmark advance` — forward-only safe bookmark movement, useful after squashing
 
 ## In Progress
-- Nothing — all work committed
+- Nothing — all work committed and pushed to main
 
 ## Next Session
-1. **TCL-53** (MEDIUM) — Project-level metadata (markdown/toon config file per project)
-2. **TCL-56** (MEDIUM) — Atomicity improvements (agent notes written — start with atomic writes, then index self-healing)
-3. **WEB-1** (MEDIUM) — Headless web tool (evaluate lightpanda, Puppeteer, simple fetch)
+1. **TCL-56** (MEDIUM) — Atomicity improvements for task operations (atomic writes first, index self-healing second)
+2. **WEB-1** (MEDIUM) — Headless web browsing tool evaluation (lightpanda, Puppeteer, simple fetch)
+3. **SHR-62** (MEDIUM) — Long write-chars injections may wrap and confuse fish parser
+4. **SHR-63** (MEDIUM) — First command after setup often times out (prompt_ready race condition)
 
 ## Blockers
 - `pi.sendUserMessage()` doesn't route through slash command pipeline (upstream pi bug)
@@ -51,10 +47,10 @@
 - Sandpiper not published to npm — blocks self-update notification
 
 ## Context
-- **`pi.getFlag()` takes bare names** — no `--` prefix. The docs show `getFlag("--my-flag")` but that's wrong. Plan-mode example uses `getFlag("plan")`. All our flags are fixed.
-- **`pi.events` for cross-extension communication** — module-level registries don't work across jiti instances. `pi.events` is the shared runtime event bus.
-- **`packages/core` has real code now** — migrate-pi-configs, preflight, install-shell-integrations, paths. Uses `composite: true` tsconfig with project references from shell-relay.
-- **Shell integration well-known path** — `~/.sandpiper/shell-integrations/relay.{fish,bash,zsh}`
-- **Preflight probe** — fish doesn't need `-i` for `functions -q` (sources config.fish for all sessions including `-c`). Bash/zsh need `-i`.
-- **TCL-56 approach written up** — recommends: atomic writes first (write-to-temp-rename), index self-healing second, skip file locking. Defer move journaling unless moves prove unreliable. Consider index spike results (TCL-55/61) before investing in index consistency.
-- **Working tree is clean** — all changes committed via jj
+- **`project list --format toon` at session start** — the tasks skill now instructs agents to run this to load all `whenToFile` routing triggers. This session was the first to use the new session continuity flow end-to-end — it worked well.
+- **Skills edit source, not dist** — always edit under `skills/sandpiper/` (or `skills/third-party/`), then run `bash devtools/postinstall.sh` to sync to `dist/`. Never edit `dist/` directly.
+- **`sandpiper-tasks` binary must be rebuilt** — after CLI changes, run `bun run --filter sandpiper-tasks-cli build` AND `bash devtools/postinstall.sh` to get the installed binary updated.
+- **TCL-56 approach** — recommendations in previous standup still apply: atomic writes first (write-to-temp-rename), index self-healing second, skip file locking.
+- **AGENT-15** — background process framework (moved from SHR-72). Not a priority. Approach documented in `.sandpiper/docs/openclaw-process-supervisor-investigation.md`.
+- **jj bookmark advance** — newly discovered command, added to skill. Use instead of `bookmark set` when advancing main forward after squashing.
+- **Working tree is clean** — all changes committed and pushed to main
