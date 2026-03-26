@@ -1,0 +1,26 @@
+--- a/TCL-56.md
++++ b/TCL-56.md
+@@ -1,13 +1,9 @@
+ ---
+ title: "Improve atomicity and data integrity for task operations"
+-status: IN PROGRESS
++status: COMPLETE
+ resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-23T03:18:38.835Z
+-updated_at: 2026-03-26T21:34:24.063Z
++updated_at: 2026-03-26T21:36:56.113Z
+ ---
+ 
+ # Improve atomicity and data integrity for task operations
+@@ -103,3 +103,7 @@
+ 
+ - **status**: COMPLETE → IN PROGRESS
+ 
++## 2026-03-26T21:36:56.114Z
++
++- **status**: IN PROGRESS → COMPLETE
++

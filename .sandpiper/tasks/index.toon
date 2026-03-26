@@ -1,115 +1,199 @@
 version: 1
-lastUpdatedAt: 1774560864070
+lastUpdatedAt: 1774561016119
 tasks:
-  "AGENT-1":
-    key: AGENT-1
-    project: AGENT
-    title: Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags
+  "TOOLS-7":
+    key: TOOLS-7
+    project: TOOLS
+    title: Convert remaining shell scripts to portable TypeScript
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-24T21:02:38.813Z"
+    updatedAt: "2026-03-24T21:02:53.136Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774386173144
+  "TOOLS-2":
+    key: TOOLS-2
+    project: TOOLS
+    title: Support pinned refs/SHAs in vendor.txt for reproducible builds
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T14:54:12.030Z"
+    updatedAt: "2026-03-23T14:54:12.030Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774277876882
+  "TOOLS-9":
+    key: TOOLS-9
+    project: TOOLS
+    title: Investigate upstream pi support for piConfig env var overrides
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-25T03:03:06.093Z"
+    updatedAt: "2026-03-25T03:03:15.915Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774407795919
+  "TOOLS-1":
+    key: TOOLS-1
+    project: TOOLS
+    title: Group vendor.txt entries by repo to avoid redundant tarball downloads
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T14:54:12.001Z"
+    updatedAt: "2026-03-23T14:54:12.001Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774277876847
+  "TOOLS-4":
+    key: TOOLS-4
+    project: TOOLS
+    title: Consider caching dash docset identifiers to avoid repeated list-installed-docsets calls
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T15:18:52.197Z"
+    updatedAt: "2026-03-23T15:18:52.197Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774279132200
+  "WEB-1":
+    key: WEB-1
+    project: WEB
+    title: "Web fetch tool: fetch URL, extract content, return markdown"
     status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T16:59:08.170Z"
-    updatedAt: "2026-03-26T04:27:53.816Z"
+    createdAt: "2026-03-25T03:15:05.788Z"
+    updatedAt: "2026-03-26T20:58:12.383Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774499273820
-  "AGENT-11":
-    key: AGENT-11
-    project: AGENT
-    title: Warning banner for unmigrated pi configs
+    lastIndexedAt: 1774558692389
+  "WEB-5":
+    key: WEB-5
+    project: WEB
+    title: Implement HTML-to-markdown conversion (turndown)
     status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T18:01:30.626Z"
-    updatedAt: "2026-03-26T04:27:06.144Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226149
-  "AGENT-12":
-    key: AGENT-12
-    project: AGENT
-    title: Core preflight check system
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:27.775Z"
-    updatedAt: "2026-03-26T04:27:06.182Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226191
-  "AGENT-13":
-    key: AGENT-13
-    project: AGENT
-    title: "System extension: aggregate and display preflight diagnostics"
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:27.812Z"
-    updatedAt: "2026-03-26T04:27:06.223Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-12
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226228
-  "AGENT-14":
-    key: AGENT-14
-    project: AGENT
-    title: Migration move fails across filesystem boundaries (renameSync)
-    status: NOT STARTED
-    kind: BUG
-    priority: LOW
+    kind: SUBTASK
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
-    createdAt: "2026-03-26T04:45:09.533Z"
-    updatedAt: "2026-03-26T04:45:17.384Z"
+    createdAt: "2026-03-26T20:50:01.590Z"
+    updatedAt: "2026-03-26T20:55:36.544Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774500317389
-  "AGENT-15":
-    key: AGENT-15
-    project: AGENT
-    title: General-purpose background process/task framework for the agent
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
+    parent: WEB-1
+    lastIndexedAt: 1774558536551
+  "WEB-4":
+    key: WEB-4
+    project: WEB
+    title: Implement content extraction (readability + jsdom)
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
     assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T15:44:16.494Z"
-    updatedAt: "2026-03-26T15:44:16.494Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[1]: SHR-71
-    lastIndexedAt: 1774558194857
-  "AGENT-16":
-    key: AGENT-16
-    project: AGENT
-    title: TUI rebranding — custom assets and theming for the sandpiper identity
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T21:22:51.257Z"
-    updatedAt: "2026-03-26T21:22:51.257Z"
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.552Z"
+    updatedAt: "2026-03-26T20:55:36.506Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774560171260
+    parent: WEB-1
+    lastIndexedAt: 1774558536512
+  "WEB-3":
+    key: WEB-3
+    project: WEB
+    title: Implement fetch adapter with HTTP fetching
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.514Z"
+    updatedAt: "2026-03-26T20:55:36.469Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536475
+  "WEB-7":
+    key: WEB-7
+    project: WEB
+    title: "Tests for fetch, extract, convert, and end-to-end"
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.671Z"
+    updatedAt: "2026-03-26T20:58:12.343Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558692349
+  "WEB-6":
+    key: WEB-6
+    project: WEB
+    title: Implement web_fetch Pi tool and wire pipeline
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.631Z"
+    updatedAt: "2026-03-26T20:55:36.584Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536591
+  "WEB-2":
+    key: WEB-2
+    project: WEB
+    title: Scaffold extension + install dependencies
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.474Z"
+    updatedAt: "2026-03-26T20:55:36.428Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536434
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -126,22 +210,6 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774499226037
-  "AGENT-5":
-    key: AGENT-5
-    project: AGENT
-    title: CLI flags for pi config migration
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T17:58:15.773Z"
-    updatedAt: "2026-03-26T04:27:06.071Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-2
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226075
   "AGENT-8":
     key: AGENT-8
     project: AGENT
@@ -158,40 +226,131 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774499226112
-  "AGENT-3":
-    key: AGENT-3
+  "AGENT-13":
+    key: AGENT-13
     project: AGENT
-    title: Move migration function
+    title: "System extension: aggregate and display preflight diagnostics"
     status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
     reporter: USER
-    createdAt: "2026-03-25T17:57:23.840Z"
-    updatedAt: "2026-03-26T15:48:11.336Z"
+    createdAt: "2026-03-25T21:55:27.812Z"
+    updatedAt: "2026-03-26T04:27:06.223Z"
+    resolution: DONE
+    dependsOn[1]: AGENT-12
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774499226228
+  "AGENT-12":
+    key: AGENT-12
+    project: AGENT
+    title: Core preflight check system
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T21:55:27.775Z"
+    updatedAt: "2026-03-26T04:27:06.182Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: AGENT-2
-    lastIndexedAt: 1774558194858
-  "AGENT-4":
-    key: AGENT-4
+    lastIndexedAt: 1774499226191
+  "AGENT-16":
+    key: AGENT-16
     project: AGENT
-    title: Symlink migration function
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
+    title: TUI rebranding — custom assets and theming for the sandpiper identity
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T17:57:43.288Z"
-    updatedAt: "2026-03-26T15:48:11.379Z"
+    createdAt: "2026-03-26T21:22:51.257Z"
+    updatedAt: "2026-03-26T21:22:51.257Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774560171260
+  "AGENT-11":
+    key: AGENT-11
+    project: AGENT
+    title: Warning banner for unmigrated pi configs
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T18:01:30.626Z"
+    updatedAt: "2026-03-26T04:27:06.144Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: AGENT-2
-    lastIndexedAt: 1774558194858
+    lastIndexedAt: 1774499226149
+  "AGENT-15":
+    key: AGENT-15
+    project: AGENT
+    title: General-purpose background process/task framework for the agent
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T15:44:16.494Z"
+    updatedAt: "2026-03-26T15:44:16.494Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: SHR-71
+    lastIndexedAt: 1774558194857
+  "AGENT-14":
+    key: AGENT-14
+    project: AGENT
+    title: Migration move fails across filesystem boundaries (renameSync)
+    status: NOT STARTED
+    kind: BUG
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T04:45:09.533Z"
+    updatedAt: "2026-03-26T04:45:17.384Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774500317389
+  "AGENT-5":
+    key: AGENT-5
+    project: AGENT
+    title: CLI flags for pi config migration
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T17:58:15.773Z"
+    updatedAt: "2026-03-26T04:27:06.071Z"
+    resolution: DONE
+    dependsOn[1]: AGENT-2
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774499226075
+  "AGENT-1":
+    key: AGENT-1
+    project: AGENT
+    title: Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T16:59:08.170Z"
+    updatedAt: "2026-03-26T04:27:53.816Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774499273820
   "AGENT-6":
     key: AGENT-6
     project: AGENT
@@ -226,23 +385,40 @@ tasks:
     related[0]:
     parent: AGENT-5
     lastIndexedAt: 1774558194859
-  "AGENT-10":
-    key: AGENT-10
+  "AGENT-3":
+    key: AGENT-3
     project: AGENT
-    title: /migrate-pi symlink command
+    title: Move migration function
     status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T18:00:55.335Z"
-    updatedAt: "2026-03-26T15:48:11.536Z"
+    createdAt: "2026-03-25T17:57:23.840Z"
+    updatedAt: "2026-03-26T15:48:11.336Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: AGENT-8
-    lastIndexedAt: 1774558194859
+    parent: AGENT-2
+    lastIndexedAt: 1774558194858
+  "AGENT-4":
+    key: AGENT-4
+    project: AGENT
+    title: Symlink migration function
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T17:57:43.288Z"
+    updatedAt: "2026-03-26T15:48:11.379Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-2
+    lastIndexedAt: 1774558194858
   "AGENT-9":
     key: AGENT-9
     project: AGENT
@@ -260,36 +436,23 @@ tasks:
     related[0]:
     parent: AGENT-8
     lastIndexedAt: 1774558194859
-  "MEM-1":
-    key: MEM-1
-    project: MEM
-    title: Design memory/brain system for cross-session knowledge retrieval
-    status: NOT STARTED
-    kind: TASK
+  "AGENT-10":
+    key: AGENT-10
+    project: AGENT
+    title: /migrate-pi symlink command
+    status: COMPLETE
+    kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T03:14:28.312Z"
-    updatedAt: "2026-03-25T03:14:41.162Z"
+    createdAt: "2026-03-25T18:00:55.335Z"
+    updatedAt: "2026-03-26T15:48:11.536Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774408481166
-  "PKM-1":
-    key: PKM-1
-    project: PKM
-    title: Design PKM system with Zettelkasten semantics
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T03:13:59.736Z"
-    updatedAt: "2026-03-25T03:14:13.427Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774408453432
+    parent: AGENT-8
+    lastIndexedAt: 1774558194859
   "PKM-2":
     key: PKM-2
     project: PKM
@@ -306,251 +469,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774467939591
-  "SHR-62":
-    key: SHR-62
-    project: SHR
-    title: Long write-chars injections may wrap and confuse fish parser
-    status: NOT STARTED
-    kind: BUG
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-24T22:53:20.587Z"
-    updatedAt: "2026-03-24T22:53:33.606Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774392813613
-  "SHR-63":
-    key: SHR-63
-    project: SHR
-    title: First command after setup often times out (prompt_ready race condition)
-    status: NOT STARTED
-    kind: BUG
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-25T03:02:39.233Z"
-    updatedAt: "2026-03-25T03:02:49.784Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774407769788
-  "SHR-64":
-    key: SHR-64
-    project: SHR
-    title: Install shell integration scripts to a well-known location
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T16:20:48.361Z"
-    updatedAt: "2026-03-26T04:27:06.261Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226266
-  "SHR-65":
-    key: SHR-65
-    project: SHR
-    title: Add --install-shell-integrations flag to system extension
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:27.848Z"
-    updatedAt: "2026-03-26T04:27:06.301Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-12
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226307
-  "SHR-66":
-    key: SHR-66
-    project: SHR
-    title: Register shell relay preflight check for integration installation
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:31.145Z"
-    updatedAt: "2026-03-26T04:27:06.341Z"
-    resolution: DONE
-    dependsOn[1]: SHR-65
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226345
-  "SHR-67":
-    key: SHR-67
-    project: SHR
-    title: Error on relay tool/command use if shell integration not sourced
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T04:25:52.770Z"
-    updatedAt: "2026-03-26T04:25:59.595Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499159600
-  "SHR-68":
-    key: SHR-68
-    project: SHR
-    title: Implement bash user command capture via DEBUG trap
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T14:54:22.600Z"
-    updatedAt: "2026-03-26T14:54:22.600Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774558194859
-  "SHR-69":
-    key: SHR-69
-    project: SHR
-    title: Implement zsh user command capture via zle widget override
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T14:54:25.683Z"
-    updatedAt: "2026-03-26T14:54:25.683Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774558194860
-  "SHR-70":
-    key: SHR-70
-    project: SHR
-    title: "Spike: replace unbuffer-relay with proper PTY allocation approach (incl. OpenClaw process/supervisor evaluation)"
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T14:54:28.373Z"
-    updatedAt: "2026-03-26T15:44:07.179Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774558194860
-  "SHR-71":
-    key: SHR-71
-    project: SHR
-    title: Replace unbuffer-relay with @lydell/node-pty PTY adapter
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T15:44:11.246Z"
-    updatedAt: "2026-03-26T15:44:11.246Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[2]: SHR-68,SHR-69
-    lastIndexedAt: 1774558194860
-  "SHR-73":
-    key: SHR-73
-    project: SHR
-    title: Rebrand the Shell Relay with a more memorable name
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T21:22:51.359Z"
-    updatedAt: "2026-03-26T21:22:51.359Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774560171363
-  "TCL-52":
-    key: TCL-52
-    project: TCL
-    title: Add batch/filter support to task move command
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-22T20:25:39.891Z"
-    updatedAt: "2026-03-22T20:25:46.417Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774211146422
-  "TCL-53":
-    key: TCL-53
-    project: TCL
-    title: Investigate project-level metadata and configuration
+  "PKM-1":
+    key: PKM-1
+    project: PKM
+    title: Design PKM system with Zettelkasten semantics
     status: NOT STARTED
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-23T03:18:38.748Z"
-    updatedAt: "2026-03-26T16:25:07.981Z"
+    createdAt: "2026-03-25T03:13:59.736Z"
+    updatedAt: "2026-03-25T03:14:13.427Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774558194860
-  "TCL-55":
-    key: TCL-55
-    project: TCL
-    title: "Spike: SQLite index — trade-offs vs human-readable TOON index"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.806Z"
-    updatedAt: "2026-03-23T03:19:16.411Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774235956416
-  "TCL-56":
-    key: TCL-56
-    project: TCL
-    title: Improve atomicity and data integrity for task operations
-    status: IN PROGRESS
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.835Z"
-    updatedAt: "2026-03-26T21:34:24.063Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774560864069
-  "TCL-57":
-    key: TCL-57
-    project: TCL
-    title: Design board data model with swimlanes
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.864Z"
-    updatedAt: "2026-03-23T03:19:16.465Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774235956470
+    lastIndexedAt: 1774408453432
   "TCL-58":
     key: TCL-58
     project: TCL
@@ -581,21 +514,6 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774235956529
-  "TCL-61":
-    key: TCL-61
-    project: TCL
-    title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T04:30:07.828Z"
-    updatedAt: "2026-03-26T04:31:38.888Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[1]: TCL-55
-    lastIndexedAt: 1774499498893
   "TCL-69":
     key: TCL-69
     project: TCL
@@ -611,6 +529,113 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774560171312
+  "TCL-56":
+    key: TCL-56
+    project: TCL
+    title: Improve atomicity and data integrity for task operations
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.835Z"
+    updatedAt: "2026-03-26T21:36:56.113Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774561016119
+  "TCL-52":
+    key: TCL-52
+    project: TCL
+    title: Add batch/filter support to task move command
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-22T20:25:39.891Z"
+    updatedAt: "2026-03-22T20:25:46.417Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774211146422
+  "TCL-53":
+    key: TCL-53
+    project: TCL
+    title: Investigate project-level metadata and configuration
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.748Z"
+    updatedAt: "2026-03-26T16:25:07.981Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774558194860
+  "TCL-57":
+    key: TCL-57
+    project: TCL
+    title: Design board data model with swimlanes
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.864Z"
+    updatedAt: "2026-03-23T03:19:16.465Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774235956470
+  "TCL-61":
+    key: TCL-61
+    project: TCL
+    title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T04:30:07.828Z"
+    updatedAt: "2026-03-26T04:31:38.888Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: TCL-55
+    lastIndexedAt: 1774499498893
+  "TCL-55":
+    key: TCL-55
+    project: TCL
+    title: "Spike: SQLite index — trade-offs vs human-readable TOON index"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.806Z"
+    updatedAt: "2026-03-23T03:19:16.411Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774235956416
+  "TCL-68":
+    key: TCL-68
+    project: TCL
+    title: Update tasks SKILL.md with project metadata guidance
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T16:25:14.966Z"
+    updatedAt: "2026-03-26T16:25:14.966Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-53
+    lastIndexedAt: 1774558194861
   "TCL-62":
     key: TCL-62
     project: TCL
@@ -622,6 +647,38 @@ tasks:
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.725Z"
     updatedAt: "2026-03-26T16:30:49.453Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-53
+    lastIndexedAt: 1774558194861
+  "TCL-66":
+    key: TCL-66
+    project: TCL
+    title: Backfill PROJECT.md for all existing projects
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T16:25:14.882Z"
+    updatedAt: "2026-03-26T16:25:14.882Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-53
+    lastIndexedAt: 1774558194861
+  "TCL-67":
+    key: TCL-67
+    project: TCL
+    title: Update SPEC.md with project metadata specification
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T16:25:14.923Z"
+    updatedAt: "2026-03-26T16:25:14.923Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
@@ -675,247 +732,190 @@ tasks:
     related[0]:
     parent: TCL-53
     lastIndexedAt: 1774558194861
-  "TCL-66":
-    key: TCL-66
-    project: TCL
-    title: Backfill PROJECT.md for all existing projects
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.882Z"
-    updatedAt: "2026-03-26T16:25:14.882Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774558194861
-  "TCL-67":
-    key: TCL-67
-    project: TCL
-    title: Update SPEC.md with project metadata specification
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.923Z"
-    updatedAt: "2026-03-26T16:25:14.923Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774558194861
-  "TCL-68":
-    key: TCL-68
-    project: TCL
-    title: Update tasks SKILL.md with project metadata guidance
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.966Z"
-    updatedAt: "2026-03-26T16:25:14.966Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774558194861
-  "TOOLS-1":
-    key: TOOLS-1
-    project: TOOLS
-    title: Group vendor.txt entries by repo to avoid redundant tarball downloads
+  "SHR-69":
+    key: SHR-69
+    project: SHR
+    title: Implement zsh user command capture via zle widget override
     status: NOT STARTED
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-23T14:54:12.001Z"
-    updatedAt: "2026-03-23T14:54:12.001Z"
+    reporter: USER
+    createdAt: "2026-03-26T14:54:25.683Z"
+    updatedAt: "2026-03-26T14:54:25.683Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774277876847
-  "TOOLS-2":
-    key: TOOLS-2
-    project: TOOLS
-    title: Support pinned refs/SHAs in vendor.txt for reproducible builds
+    lastIndexedAt: 1774558194860
+  "SHR-68":
+    key: SHR-68
+    project: SHR
+    title: Implement bash user command capture via DEBUG trap
     status: NOT STARTED
     kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T14:54:22.600Z"
+    updatedAt: "2026-03-26T14:54:22.600Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774558194859
+  "SHR-73":
+    key: SHR-73
+    project: SHR
+    title: Rebrand the Shell Relay with a more memorable name
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.359Z"
+    updatedAt: "2026-03-26T21:22:51.359Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774560171363
+  "SHR-63":
+    key: SHR-63
+    project: SHR
+    title: First command after setup often times out (prompt_ready race condition)
+    status: NOT STARTED
+    kind: BUG
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
-    createdAt: "2026-03-23T14:54:12.030Z"
-    updatedAt: "2026-03-23T14:54:12.030Z"
+    createdAt: "2026-03-25T03:02:39.233Z"
+    updatedAt: "2026-03-25T03:02:49.784Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774277876882
-  "TOOLS-4":
-    key: TOOLS-4
-    project: TOOLS
-    title: Consider caching dash docset identifiers to avoid repeated list-installed-docsets calls
+    lastIndexedAt: 1774407769788
+  "SHR-67":
+    key: SHR-67
+    project: SHR
+    title: Error on relay tool/command use if shell integration not sourced
     status: NOT STARTED
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-23T15:18:52.197Z"
-    updatedAt: "2026-03-23T15:18:52.197Z"
+    reporter: USER
+    createdAt: "2026-03-26T04:25:52.770Z"
+    updatedAt: "2026-03-26T04:25:59.595Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774279132200
-  "TOOLS-7":
-    key: TOOLS-7
-    project: TOOLS
-    title: Convert remaining shell scripts to portable TypeScript
+    lastIndexedAt: 1774499159600
+  "SHR-66":
+    key: SHR-66
+    project: SHR
+    title: Register shell relay preflight check for integration installation
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T21:55:31.145Z"
+    updatedAt: "2026-03-26T04:27:06.341Z"
+    resolution: DONE
+    dependsOn[1]: SHR-65
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774499226345
+  "SHR-62":
+    key: SHR-62
+    project: SHR
+    title: Long write-chars injections may wrap and confuse fish parser
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-24T22:53:20.587Z"
+    updatedAt: "2026-03-24T22:53:33.606Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774392813613
+  "SHR-65":
+    key: SHR-65
+    project: SHR
+    title: Add --install-shell-integrations flag to system extension
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-25T21:55:27.848Z"
+    updatedAt: "2026-03-26T04:27:06.301Z"
+    resolution: DONE
+    dependsOn[1]: AGENT-12
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774499226307
+  "SHR-71":
+    key: SHR-71
+    project: SHR
+    title: Replace unbuffer-relay with @lydell/node-pty PTY adapter
     status: NOT STARTED
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-24T21:02:38.813Z"
-    updatedAt: "2026-03-24T21:02:53.136Z"
+    reporter: USER
+    createdAt: "2026-03-26T15:44:11.246Z"
+    updatedAt: "2026-03-26T15:44:11.246Z"
     dependsOn[0]:
     blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774386173144
-  "TOOLS-9":
-    key: TOOLS-9
-    project: TOOLS
-    title: Investigate upstream pi support for piConfig env var overrides
-    status: NOT STARTED
+    related[2]: SHR-68,SHR-69
+    lastIndexedAt: 1774558194860
+  "SHR-70":
+    key: SHR-70
+    project: SHR
+    title: "Spike: replace unbuffer-relay with proper PTY allocation approach (incl. OpenClaw process/supervisor evaluation)"
+    status: COMPLETE
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-25T03:03:06.093Z"
-    updatedAt: "2026-03-25T03:03:15.915Z"
+    reporter: USER
+    createdAt: "2026-03-26T14:54:28.373Z"
+    updatedAt: "2026-03-26T15:44:07.179Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774407795919
-  "WEB-1":
-    key: WEB-1
-    project: WEB
-    title: "Web fetch tool: fetch URL, extract content, return markdown"
+    lastIndexedAt: 1774558194860
+  "SHR-64":
+    key: SHR-64
+    project: SHR
+    title: Install shell integration scripts to a well-known location
     status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T03:15:05.788Z"
-    updatedAt: "2026-03-26T20:58:12.383Z"
+    createdAt: "2026-03-25T16:20:48.361Z"
+    updatedAt: "2026-03-26T04:27:06.261Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774558692389
-  "WEB-2":
-    key: WEB-2
-    project: WEB
-    title: Scaffold extension + install dependencies
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.474Z"
-    updatedAt: "2026-03-26T20:55:36.428Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536434
-  "WEB-3":
-    key: WEB-3
-    project: WEB
-    title: Implement fetch adapter with HTTP fetching
-    status: COMPLETE
-    kind: SUBTASK
+    lastIndexedAt: 1774499226266
+  "MEM-1":
+    key: MEM-1
+    project: MEM
+    title: Design memory/brain system for cross-session knowledge retrieval
+    status: NOT STARTED
+    kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.514Z"
-    updatedAt: "2026-03-26T20:55:36.469Z"
-    resolution: DONE
+    reporter: USER
+    createdAt: "2026-03-25T03:14:28.312Z"
+    updatedAt: "2026-03-25T03:14:41.162Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536475
-  "WEB-4":
-    key: WEB-4
-    project: WEB
-    title: Implement content extraction (readability + jsdom)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.552Z"
-    updatedAt: "2026-03-26T20:55:36.506Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536512
-  "WEB-5":
-    key: WEB-5
-    project: WEB
-    title: Implement HTML-to-markdown conversion (turndown)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.590Z"
-    updatedAt: "2026-03-26T20:55:36.544Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536551
-  "WEB-6":
-    key: WEB-6
-    project: WEB
-    title: Implement web_fetch Pi tool and wire pipeline
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.631Z"
-    updatedAt: "2026-03-26T20:55:36.584Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536591
-  "WEB-7":
-    key: WEB-7
-    project: WEB
-    title: "Tests for fetch, extract, convert, and end-to-end"
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.671Z"
-    updatedAt: "2026-03-26T20:58:12.343Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558692349
+    lastIndexedAt: 1774408481166
 counters:
   TCL:
     projectKey: TCL
