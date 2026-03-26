@@ -1,7 +1,8 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { decode as decodeToon, encode as encodeToon } from '@toon-format/toon';
 import { parseFrontmatter } from './frontmatter.js';
+import { writeFileAtomic } from './fs.js';
 import { applyFieldUpdates } from './mutate.js';
 import { projectFromKey, resolveTaskFile, scanHighestNumber, TASK_FILE_RE, TASK_KEY_RE } from './patterns.js';
 import type { TaskKind } from './types.js';
@@ -91,7 +92,7 @@ export function moveTask(tasksDir: string, key: string, opts: MoveOptions): Move
 
   // Write to new location
   mkdirSync(join(newPath, '..'), { recursive: true });
-  writeFileSync(newPath, newContent);
+  writeFileAtomic(newPath, newContent);
 
   // Move subtasks
   if (targetKind === 'SUBTASK' && targetParent) {
@@ -121,7 +122,7 @@ export function moveTask(tasksDir: string, key: string, opts: MoveOptions): Move
     for (const [oldK, newK] of reKeyMap) {
       const oldProject = projectFromKey(oldK);
       const tombstone = join(tasksDir, oldProject, `${oldK}.moved`);
-      writeFileSync(tombstone, `${newK}\n`);
+      writeFileAtomic(tombstone, `${newK}\n`);
     }
   }
 
@@ -210,7 +211,7 @@ function persistCounter(tasksDir: string, project: string, nextNum: number): voi
     const counters = (raw.counters ?? {}) as Record<string, { projectKey: string; nextTaskNumber: number }>;
     counters[project] = { projectKey: project, nextTaskNumber: nextNum };
     raw.counters = counters;
-    writeFileSync(indexPath, encodeToon(raw));
+    writeFileAtomic(indexPath, encodeToon(raw));
   } catch {
     // Non-fatal
   }
@@ -256,7 +257,7 @@ function moveSubtasks(
     }
 
     const newSubPath = join(targetDir, `${newSubKey}.md`);
-    writeFileSync(newSubPath, content);
+    writeFileAtomic(newSubPath, content);
     rmSync(oldSubPath, { force: true });
   }
 }
@@ -296,7 +297,7 @@ function updateReferencesInDir(dir: string, reKeyMap: ReadonlyMap<string, string
     }
 
     if (changed) {
-      writeFileSync(filePath, content);
+      writeFileAtomic(filePath, content);
     }
   }
 }

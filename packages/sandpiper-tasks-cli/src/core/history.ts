@@ -1,5 +1,6 @@
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { writeFileAtomic } from './fs.js';
 
 /**
  * Write a unified diff of a task file change to the history directory.
@@ -37,7 +38,7 @@ export function writeDiff(
     counter++;
   }
 
-  writeFileSync(join(histDir, filename), diff);
+  writeFileAtomic(join(histDir, filename), diff);
 }
 
 /**

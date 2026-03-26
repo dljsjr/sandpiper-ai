@@ -61,6 +61,20 @@ export interface ProjectMetadata {
   readonly createdAt: string;
 }
 
+/**
+ * A project entry as returned by `project list` — combines task counts
+ * with PROJECT.md metadata (when available).
+ */
+export interface ProjectListItem {
+  readonly key: string;
+  readonly name: string;
+  readonly description: string;
+  readonly whenToFile: string;
+  readonly status: ProjectStatus | null;
+  readonly taskCount: number;
+  readonly byStatus: Record<string, number>;
+}
+
 // ─── Index Types ─────────────────────────────────────────────────
 // These extend the domain model with index-specific metadata.
 
