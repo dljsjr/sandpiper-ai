@@ -15,7 +15,7 @@
     "build": "bun --filter sandpiper-ai-cli build",
     "vendor": "bash devtools/vendor.sh",
     "clean": "bun devtools/clean.ts",
-    "sandpiper-cli": "bun run --bun ./dist/sandpiper"
+    "sandpiper-dev": "bun run --bun ./packages/cli/pi_wrapper.ts"
   },
   "bin": {
     "sandpiper": "./dist/sandpiper",

@@ -92,9 +92,11 @@ Relay uses a promise chain to serialize concurrent `execute()` calls. Only one c
 
 ### Shell Integration Installation & Preflight
 Shell integration scripts are installed to `~/.sandpiper/shell-integrations/` via `sandpiper --install-shell-integrations`. At session start, the preflight system probes whether the integration is actually sourced by checking for `__relay_prompt_hook` in the user's shell:
-- **Fish:** `fish -c 'functions -q __relay_prompt_hook'` — no `-i` needed (fish sources `config.fish` for all sessions)
-- **Bash:** `bash -i -c 'type __relay_prompt_hook > /dev/null 2>&1'` — needs `-i` to source `.bashrc`
-- **Zsh:** `zsh -i -c 'whence __relay_prompt_hook > /dev/null 2>&1'` — needs `-i` to source `.zshrc`
+- **Fish:** `fish -i -c 'functions -q __relay_prompt_hook'`
+- **Bash:** `bash -i -c 'type __relay_prompt_hook > /dev/null 2>&1'`
+- **Zsh:** `zsh -i -c 'whence __relay_prompt_hook > /dev/null 2>&1'`
+
+All probes use `-i` (interactive mode) because integration scripts are typically guarded behind `status is-interactive` or equivalent checks. Without `-i`, the source line is skipped and the function appears undefined.
 
 Falls back to file existence check at the well-known location for unrecognized shells.
 
