@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774558692389
+lastUpdatedAt: 1774560171364
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -95,6 +95,21 @@ tasks:
     blockedBy[0]:
     related[1]: SHR-71
     lastIndexedAt: 1774558194857
+  "AGENT-16":
+    key: AGENT-16
+    project: AGENT
+    title: TUI rebranding — custom assets and theming for the sandpiper identity
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.257Z"
+    updatedAt: "2026-03-26T21:22:51.257Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774560171260
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -445,6 +460,21 @@ tasks:
     blockedBy[0]:
     related[2]: SHR-68,SHR-69
     lastIndexedAt: 1774558194860
+  "SHR-73":
+    key: SHR-73
+    project: SHR
+    title: Rebrand the Shell Relay with a more memorable name
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.359Z"
+    updatedAt: "2026-03-26T21:22:51.359Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774560171363
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -565,6 +595,21 @@ tasks:
     blockedBy[0]:
     related[1]: TCL-55
     lastIndexedAt: 1774499498893
+  "TCL-69":
+    key: TCL-69
+    project: TCL
+    title: Rebrand the Tasks CLI with a more memorable name
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.308Z"
+    updatedAt: "2026-03-26T21:22:51.308Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774560171312
   "TCL-62":
     key: TCL-62
     project: TCL
@@ -873,10 +918,10 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 69
+    nextTaskNumber: 70
   SHR:
     projectKey: SHR
-    nextTaskNumber: 73
+    nextTaskNumber: 74
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
@@ -897,4 +942,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 16
+    nextTaskNumber: 17
