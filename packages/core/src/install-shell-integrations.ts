@@ -30,7 +30,7 @@ export function getShellIntegrationsDir(): string {
 function getSourceDir(): string | undefined {
   const packageDir = process.env.PI_PACKAGE_DIR;
   if (!packageDir) return undefined;
-  return join(packageDir, 'shell-relay', 'shell-integration');
+  return join(packageDir, 'extensions', 'shell-relay', 'shell-integration');
 }
 
 const SCRIPTS: ReadonlyArray<{ file: string; shell: string; rcFile: string }> = [

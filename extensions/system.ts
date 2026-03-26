@@ -92,10 +92,7 @@ async function checkForUpdates(): Promise<readonly UpdateInfo[]> {
  * Handle migration flag — perform migration and exit.
  */
 async function handleMigrationFlag(pi: ExtensionAPI, mode: MigrationMode, cwd: string): Promise<void> {
-  const scope = parseMigrationScope(
-    pi.getFlag('--pi-configs-global') === true,
-    pi.getFlag('--pi-configs-local') === true,
-  );
+  const scope = parseMigrationScope(pi.getFlag('pi-configs-global') === true, pi.getFlag('pi-configs-local') === true);
   const result = await performMigration(mode, { cwd, scope });
 
   if (result.success) {
@@ -158,7 +155,7 @@ export default function (pi: ExtensionAPI) {
   // Handle CLI-only flags in session_directory (fires before session is created)
   pi.on('session_directory', async (event) => {
     // --install-shell-integrations
-    if (pi.getFlag('--install-shell-integrations')) {
+    if (pi.getFlag('install-shell-integrations')) {
       const result = installShellIntegrations();
       if (result.success) {
         console.log(formatInstallInstructions(result.installedTo));
@@ -169,9 +166,9 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    const migrate = pi.getFlag('--migrate-pi-configs');
-    const symlink = pi.getFlag('--symlink-config');
-    const hasScope = pi.getFlag('--pi-configs-global') || pi.getFlag('--pi-configs-local');
+    const migrate = pi.getFlag('migrate-pi-configs');
+    const symlink = pi.getFlag('symlink-config');
+    const hasScope = pi.getFlag('pi-configs-global') || pi.getFlag('pi-configs-local');
 
     // Scope flags require a migration flag
     if (hasScope && !migrate && !symlink) {
