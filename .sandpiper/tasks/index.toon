@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774558540176
+lastUpdatedAt: 1774558692389
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -756,17 +756,18 @@ tasks:
     key: WEB-1
     project: WEB
     title: "Web fetch tool: fetch URL, extract content, return markdown"
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T03:15:05.788Z"
-    updatedAt: "2026-03-26T20:49:54.851Z"
+    updatedAt: "2026-03-26T20:58:12.383Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774558194861
+    lastIndexedAt: 1774558692389
   "WEB-2":
     key: WEB-2
     project: WEB
@@ -856,18 +857,19 @@ tasks:
     key: WEB-7
     project: WEB
     title: "Tests for fetch, extract, convert, and end-to-end"
-    status: IN PROGRESS
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-26T20:50:01.671Z"
-    updatedAt: "2026-03-26T20:55:40.169Z"
+    updatedAt: "2026-03-26T20:58:12.343Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: WEB-1
-    lastIndexedAt: 1774558540176
+    lastIndexedAt: 1774558692349
 counters:
   TCL:
     projectKey: TCL

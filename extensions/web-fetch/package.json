@@ -19,12 +19,12 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node --external @mozilla/readability --external jsdom --external turndown ./src/index.ts --outfile ./dist/web-fetch",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node --external @mozilla/readability --external jsdom --external turndown ./src/index.ts --outfile ./dist/web-fetch"
+    "build": "tsc",
+    "preinstall": "tsc"
   },
   "pi": {
     "extensions": [
-      "./dist/web-fetch"
+      "./dist/index.js"
     ]
   }
 }
