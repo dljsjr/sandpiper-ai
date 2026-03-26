@@ -1,0 +1,30 @@
+{
+  "name": "web-fetch",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Pi extension: fetch web pages and return clean markdown content",
+  "dependencies": {
+    "@mozilla/readability": "catalog:web",
+    "jsdom": "catalog:web",
+    "turndown": "catalog:web"
+  },
+  "devDependencies": {
+    "@types/jsdom": "catalog:web",
+    "@types/turndown": "catalog:web"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "catalog:pi",
+    "@sinclair/typebox": "catalog:pi"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node --external @mozilla/readability --external jsdom --external turndown ./src/index.ts --outfile ./dist/web-fetch",
+    "preinstall": "mkdir -p dist && bun build --production --minify --target=node --external @mozilla/readability --external jsdom --external turndown ./src/index.ts --outfile ./dist/web-fetch"
+  },
+  "pi": {
+    "extensions": [
+      "./dist/web-fetch"
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774542919829
+lastUpdatedAt: 1774558540176
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -94,7 +94,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[1]: SHR-71
-    lastIndexedAt: 1774539948533
+    lastIndexedAt: 1774558194857
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -159,7 +159,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-2
-    lastIndexedAt: 1774540091343
+    lastIndexedAt: 1774558194858
   "AGENT-4":
     key: AGENT-4
     project: AGENT
@@ -176,7 +176,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-2
-    lastIndexedAt: 1774540091385
+    lastIndexedAt: 1774558194858
   "AGENT-6":
     key: AGENT-6
     project: AGENT
@@ -193,7 +193,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-5
-    lastIndexedAt: 1774540091423
+    lastIndexedAt: 1774558194858
   "AGENT-7":
     key: AGENT-7
     project: AGENT
@@ -210,7 +210,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-5
-    lastIndexedAt: 1774540091462
+    lastIndexedAt: 1774558194859
   "AGENT-10":
     key: AGENT-10
     project: AGENT
@@ -227,7 +227,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-8
-    lastIndexedAt: 1774540091542
+    lastIndexedAt: 1774558194859
   "AGENT-9":
     key: AGENT-9
     project: AGENT
@@ -244,7 +244,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: AGENT-8
-    lastIndexedAt: 1774540091502
+    lastIndexedAt: 1774558194859
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -398,7 +398,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774539847186
+    lastIndexedAt: 1774558194859
   "SHR-69":
     key: SHR-69
     project: SHR
@@ -413,7 +413,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774539847186
+    lastIndexedAt: 1774558194860
   "SHR-70":
     key: SHR-70
     project: SHR
@@ -429,7 +429,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774539847186
+    lastIndexedAt: 1774558194860
   "SHR-71":
     key: SHR-71
     project: SHR
@@ -444,7 +444,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[2]: SHR-68,SHR-69
-    lastIndexedAt: 1774539948533
+    lastIndexedAt: 1774558194860
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -474,7 +474,7 @@ tasks:
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774542307987
+    lastIndexedAt: 1774558194860
   "TCL-55":
     key: TCL-55
     project: TCL
@@ -580,7 +580,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542649460
+    lastIndexedAt: 1774558194861
   "TCL-63":
     key: TCL-63
     project: TCL
@@ -596,7 +596,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542919829
+    lastIndexedAt: 1774558194861
   "TCL-64":
     key: TCL-64
     project: TCL
@@ -612,7 +612,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542314805
+    lastIndexedAt: 1774558194861
   "TCL-65":
     key: TCL-65
     project: TCL
@@ -628,7 +628,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542314844
+    lastIndexedAt: 1774558194861
   "TCL-66":
     key: TCL-66
     project: TCL
@@ -644,7 +644,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542314885
+    lastIndexedAt: 1774558194861
   "TCL-67":
     key: TCL-67
     project: TCL
@@ -660,7 +660,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542314928
+    lastIndexedAt: 1774558194861
   "TCL-68":
     key: TCL-68
     project: TCL
@@ -676,7 +676,7 @@ tasks:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774542314969
+    lastIndexedAt: 1774558194861
   "TOOLS-1":
     key: TOOLS-1
     project: TOOLS
@@ -755,18 +755,119 @@ tasks:
   "WEB-1":
     key: WEB-1
     project: WEB
-    title: "Headless web browsing, fetching, and browser automation tool"
+    title: "Web fetch tool: fetch URL, extract content, return markdown"
     status: NOT STARTED
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T03:15:05.788Z"
-    updatedAt: "2026-03-26T04:38:18.366Z"
+    updatedAt: "2026-03-26T20:49:54.851Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774499898372
+    lastIndexedAt: 1774558194861
+  "WEB-2":
+    key: WEB-2
+    project: WEB
+    title: Scaffold extension + install dependencies
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.474Z"
+    updatedAt: "2026-03-26T20:55:36.428Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536434
+  "WEB-3":
+    key: WEB-3
+    project: WEB
+    title: Implement fetch adapter with HTTP fetching
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.514Z"
+    updatedAt: "2026-03-26T20:55:36.469Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536475
+  "WEB-4":
+    key: WEB-4
+    project: WEB
+    title: Implement content extraction (readability + jsdom)
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.552Z"
+    updatedAt: "2026-03-26T20:55:36.506Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536512
+  "WEB-5":
+    key: WEB-5
+    project: WEB
+    title: Implement HTML-to-markdown conversion (turndown)
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.590Z"
+    updatedAt: "2026-03-26T20:55:36.544Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536551
+  "WEB-6":
+    key: WEB-6
+    project: WEB
+    title: Implement web_fetch Pi tool and wire pipeline
+    status: COMPLETE
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.631Z"
+    updatedAt: "2026-03-26T20:55:36.584Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558536591
+  "WEB-7":
+    key: WEB-7
+    project: WEB
+    title: "Tests for fetch, extract, convert, and end-to-end"
+    status: IN PROGRESS
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-26T20:50:01.671Z"
+    updatedAt: "2026-03-26T20:55:40.169Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: WEB-1
+    lastIndexedAt: 1774558540176
 counters:
   TCL:
     projectKey: TCL
@@ -791,7 +892,7 @@ counters:
     nextTaskNumber: 2
   WEB:
     projectKey: WEB
-    nextTaskNumber: 2
+    nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
     nextTaskNumber: 16
