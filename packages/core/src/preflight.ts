@@ -2,14 +2,26 @@
  * Preflight check registration system.
  *
  * Extensions call registerPreflightCheck() during their factory body to register
- * synchronous health checks. The system extension reads the registry at session_start,
- * runs all checks, and displays a single aggregated diagnostic banner.
+ * synchronous health checks. The system extension collects results at session_start
+ * by emitting the preflight event on the shared pi.events bus.
  *
- * Callbacks MUST be synchronous — they are called during the extension factory body
- * which cannot await. Use existsSync, env var reads, and other sync operations only.
+ * Uses pi.events (the inter-extension event bus) as the communication channel.
+ * This works across jiti module instances because pi.events lives on the shared
+ * runtime, not in any module.
+ *
+ * Callbacks MUST be synchronous — pi.events.emit() is synchronous, so async
+ * checks would not be awaited.
  */
 
-// No pi imports — this module is framework-independent.
+// Structural types for the pi event bus — keeps core free of pi framework imports.
+interface EventBus {
+  on(event: string, handler: (data: unknown) => void): void;
+  emit(event: string, data: unknown): void;
+}
+
+interface HasEvents {
+  events: EventBus;
+}
 
 export interface PreflightDiagnostic {
   /** Unique key identifying the check (e.g. 'shell-relay:integration'). */
@@ -23,50 +35,46 @@ export interface PreflightDiagnostic {
 }
 
 export type PreflightCheck = () => PreflightDiagnostic;
+export type PreflightCollector = (diagnostic: PreflightDiagnostic) => void;
 
-interface RegisteredCheck {
-  readonly key: string;
-  readonly check: PreflightCheck;
-}
-
-/** Module-level registry — populated at extension factory time, read at session_start. */
-const registry: RegisteredCheck[] = [];
+/** Event name used on pi.events bus for preflight diagnostic collection. */
+export const PREFLIGHT_EVENT = 'sandpiper:collect-diagnostics';
 
 /**
  * Register a preflight check.
  *
  * Call this during your extension's factory body (not inside an event handler).
- * The check callback will be invoked by the system extension at session_start.
+ * When system.ts emits PREFLIGHT_EVENT at session_start, this listener runs the
+ * check and passes the result to the collector.
  *
- * @param key    Unique identifier for this check (e.g. 'shell-relay:integration').
- *               Used to deduplicate checks across reloads.
- * @param check  Synchronous function returning a PreflightDiagnostic.
+ * @param pi    The pi ExtensionAPI (or any object with a compatible .events bus).
+ * @param key   Unique identifier for this check (e.g. 'shell-relay:integration').
+ * @param check Synchronous function returning a PreflightDiagnostic.
  */
-export function registerPreflightCheck(key: string, check: PreflightCheck): void {
-  // Deduplicate by key — on reload, the factory runs again and would double-register.
-  const existing = registry.findIndex((r) => r.key === key);
-  if (existing !== -1) {
-    registry[existing] = { key, check };
-  } else {
-    registry.push({ key, check });
-  }
+export function registerPreflightCheck(pi: HasEvents, key: string, check: PreflightCheck): void {
+  pi.events.on(PREFLIGHT_EVENT, (collect) => {
+    const collector = collect as PreflightCollector;
+    try {
+      collector(check());
+    } catch (err) {
+      collector({
+        key,
+        healthy: false,
+        message: `Preflight check threw: ${err instanceof Error ? err.message : String(err)}`,
+      });
+    }
+  });
 }
 
 /**
- * Run all registered preflight checks and return the results.
- * Called by the system extension at session_start.
+ * Collect diagnostics from all registered preflight checks.
+ * Call this in system.ts session_start — emits synchronously, all results
+ * are populated by the time the function returns.
+ *
+ * @param pi The pi ExtensionAPI (or any object with a compatible .events bus).
  */
-export function runPreflightChecks(): PreflightDiagnostic[] {
-  return registry.map(({ check }) => {
-    try {
-      return check();
-    } catch (err) {
-      // A throwing check is itself a diagnostic failure.
-      return {
-        key: 'preflight:error',
-        healthy: false,
-        message: `Preflight check threw: ${err instanceof Error ? err.message : String(err)}`,
-      };
-    }
-  });
+export function collectPreflightDiagnostics(pi: HasEvents): PreflightDiagnostic[] {
+  const diagnostics: PreflightDiagnostic[] = [];
+  pi.events.emit(PREFLIGHT_EVENT, (d: PreflightDiagnostic) => diagnostics.push(d));
+  return diagnostics;
 }
