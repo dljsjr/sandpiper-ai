@@ -16,7 +16,7 @@ import {
   renderTaskContent,
   updateTaskFields,
 } from '../core/mutate.js';
-import { extractFrontmatter, formatRawOutput, formatTasksOutput } from '../core/output.js';
+import { formatRawOutput, formatTasksOutput } from '../core/output.js';
 import type { TaskFilter } from '../core/query.js';
 import { getSubtasks, getTask, queryTasks } from '../core/query.js';
 import type { TaskAssignee, TaskKind, TaskPriority, TaskReporter, TaskResolution, TaskStatus } from '../core/types.js';
@@ -119,8 +119,7 @@ const listCommand = new Command('list')
 const showCommand = new Command('show')
   .description('Show details for a specific task')
   .argument('<key>', 'Task key (e.g., SHR-1)')
-  .option('--metadata-only', 'Return only frontmatter fields; omit body and subtasks')
-  .action((key, opts, cmd) => {
+  .action((key, _opts, cmd) => {
     withErrorHandling(() => {
       const tasks = loadTasks(cmd);
       const task = getTask(tasks, key.toUpperCase());
@@ -133,22 +132,18 @@ const showCommand = new Command('show')
 
       const fmt = getOutputFormat(cmd);
       if (fmt && fmt !== 'raw') {
-        // toon/json: task object is already metadata-only; respect --metadata-only by omitting subtasks
-        const output = opts.metadataOnly ? [task] : [task, ...getSubtasks(tasks, task.key)];
-        console.log(formatTasksOutput(output, fmt));
+        const subtasks = getSubtasks(tasks, task.key);
+        console.log(formatTasksOutput([task, ...subtasks], fmt));
       } else if (fmt === 'raw') {
         const p = resolveTaskPath(getTasksDir(cmd), task.key);
-        const content = readFileSync(p, 'utf-8');
-        console.log(opts.metadataOnly ? extractFrontmatter(content) : content);
+        console.log(readFileSync(p, 'utf-8'));
       } else {
         console.log(formatTaskDetail(task));
-        if (!opts.metadataOnly) {
-          const subtasks = getSubtasks(tasks, task.key);
-          if (subtasks.length > 0) {
-            console.log(`\nSubtasks (${subtasks.length}):`);
-            for (const sub of subtasks) {
-              console.log(formatTaskLine(sub));
-            }
+        const subtasks = getSubtasks(tasks, task.key);
+        if (subtasks.length > 0) {
+          console.log(`\nSubtasks (${subtasks.length}):`);
+          for (const sub of subtasks) {
+            console.log(formatTaskLine(sub));
           }
         }
       }

@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774543581210
+lastUpdatedAt: 1774542919829
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -585,98 +585,98 @@ tasks:
     key: TCL-63
     project: TCL
     title: Update project create to enforce PROJECT.md scaffolding
-    status: NEEDS REVIEW
+    status: IN PROGRESS
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.763Z"
-    updatedAt: "2026-03-26T16:39:08.794Z"
+    updatedAt: "2026-03-26T16:35:19.822Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774543148800
+    lastIndexedAt: 1774542919829
   "TCL-64":
     key: TCL-64
     project: TCL
     title: Add project update and project show commands
-    status: NEEDS REVIEW
+    status: NOT STARTED
     kind: SUBTASK
     priority: MEDIUM
-    assignee: AGENT
+    assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.802Z"
-    updatedAt: "2026-03-26T16:40:58.575Z"
+    updatedAt: "2026-03-26T16:25:14.802Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774543258581
+    lastIndexedAt: 1774542314805
   "TCL-65":
     key: TCL-65
     project: TCL
     title: Enhance project list and add task show --metadata-only
-    status: NEEDS REVIEW
+    status: NOT STARTED
     kind: SUBTASK
     priority: MEDIUM
-    assignee: AGENT
+    assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.840Z"
-    updatedAt: "2026-03-26T16:44:03.651Z"
+    updatedAt: "2026-03-26T16:25:14.840Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774543443663
+    lastIndexedAt: 1774542314844
   "TCL-66":
     key: TCL-66
     project: TCL
     title: Backfill PROJECT.md for all existing projects
-    status: NEEDS REVIEW
+    status: NOT STARTED
     kind: SUBTASK
     priority: MEDIUM
-    assignee: AGENT
+    assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.882Z"
-    updatedAt: "2026-03-26T16:45:13.721Z"
+    updatedAt: "2026-03-26T16:25:14.882Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774543513727
+    lastIndexedAt: 1774542314885
   "TCL-67":
     key: TCL-67
     project: TCL
     title: Update SPEC.md with project metadata specification
-    status: NEEDS REVIEW
+    status: NOT STARTED
     kind: SUBTASK
     priority: MEDIUM
-    assignee: AGENT
+    assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.923Z"
-    updatedAt: "2026-03-26T16:45:45.092Z"
+    updatedAt: "2026-03-26T16:25:14.923Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774543545098
+    lastIndexedAt: 1774542314928
   "TCL-68":
     key: TCL-68
     project: TCL
     title: Update tasks SKILL.md with project metadata guidance
-    status: NEEDS REVIEW
+    status: NOT STARTED
     kind: SUBTASK
     priority: MEDIUM
-    assignee: AGENT
+    assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.966Z"
-    updatedAt: "2026-03-26T16:46:21.203Z"
+    updatedAt: "2026-03-26T16:25:14.966Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774543581210
+    lastIndexedAt: 1774542314969
   "TOOLS-1":
     key: TOOLS-1
     project: TOOLS
