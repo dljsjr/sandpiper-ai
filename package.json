@@ -4,7 +4,7 @@
   "author": "Doug Stephen <dljs.jr@dougstephenjr.com>",
   "private": true,
   "scripts": {
-    "preinstall": "bash devtools/vendor.sh --if-missing && bash devtools/preinstall.sh && bun --workspaces preinstall",
+    "preinstall": "bash devtools/vendor.sh --if-missing && bash devtools/preinstall.sh && bun --workspaces --if-present preinstall",
     "postinstall": "bash devtools/postinstall.sh",
     "check:biome-fmt": "bunx --bun @biomejs/biome format",
     "check:biome-lint": "bunx --bun @biomejs/biome lint",
