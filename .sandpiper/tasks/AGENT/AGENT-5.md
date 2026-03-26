@@ -1,13 +1,13 @@
 ---
 title: "CLI flags for pi config migration"
-status: NEEDS REVIEW
+status: COMPLETE
 resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T17:58:15.773Z
-updated_at: 2026-03-25T19:45:39.585Z
+updated_at: 2026-03-26T04:27:06.071Z
 depends_on:
   - AGENT-2
 ---
@@ -78,3 +78,7 @@ In `session_directory` event:
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **resolution**: DONE
+
+## 2026-03-26T04:27:06.071Z
+
+- **status**: NEEDS REVIEW → COMPLETE

@@ -1,13 +1,13 @@
 ---
 title: "Warning banner for unmigrated pi configs"
-status: NEEDS REVIEW
+status: COMPLETE
 resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T18:01:30.626Z
-updated_at: 2026-03-25T20:10:25.192Z
+updated_at: 2026-03-26T04:27:06.144Z
 ---
 
 # Warning banner for unmigrated pi configs
@@ -66,3 +66,7 @@ This is a single implementation task.
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **resolution**: DONE
+
+## 2026-03-26T04:27:06.145Z
+
+- **status**: NEEDS REVIEW → COMPLETE

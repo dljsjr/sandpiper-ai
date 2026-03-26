@@ -1,12 +1,13 @@
 ---
 title: "Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-25T16:59:08.170Z
-updated_at: 2026-03-25T17:01:01.219Z
+updated_at: 2026-03-26T04:27:53.816Z
 ---
 
 # Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags
@@ -56,3 +57,8 @@ From the pi extension API and main.js:
 ## 2026-03-25T17:01:01.220Z
 
 - **description**: added (37 lines)
+
+## 2026-03-26T04:27:53.816Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: DONE

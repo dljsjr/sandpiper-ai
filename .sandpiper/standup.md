@@ -3,60 +3,58 @@
 ## Accomplished
 
 ### Documentation Overhaul (PKM-2)
-- Comprehensive READMEs for all significant directories (root, extensions, packages, devtools, skills, ast-grep)
+- Comprehensive READMEs for all directories (root, extensions, packages, devtools, skills)
 - Correct descriptive/prescriptive split: READMEs for humans, AGENTS.md for agents
-- Added project directory skill (`skills/sandpiper/projects/`) + `~/.sandpiper/agent/projects.toon` registry
-- Root AGENTS.md: directive to read subdirectory README/AGENTS before working in new subdirectory
-- AGENTS.md: added Session Continuity section (read standup + project directory at session start)
-- SHR-64 filed: install shell integration scripts to well-known location
+- Project directory skill + `~/.sandpiper/agent/projects.toon` registry
+- Session continuity + subdirectory discovery directives in root AGENTS.md
+- Coding guidelines added to AGENTS.md: path handling, no duplication, consistency, top-level imports
 
-### Pi Config Migration Feature (AGENT-2, AGENT-5, AGENT-8, AGENT-11)
+### Pi Config Migration (AGENT-2, 5, 8, 11)
+- `packages/core/src/migrate-pi-configs.ts`: performMigration(), detectUnmigratedConfigs()
+- `pi_wrapper.ts`: captures `__PI_CODING_AGENT_DIR_ORIGINAL` before remapping
+- CLI flags: `--migrate-pi-configs`, `--symlink-config`, `--pi-configs-global`, `--pi-configs-local`
+- `/migrate-pi` slash command with tab completion + `ctx.reload()`
+- Aggregated diagnostic banner via `setWidget('sandpiper-diagnostics')`
 
-**Research completed:**
-- Confirmed `session_directory` fires after flag values are populated — correct hook for early-exit CLI flags
-- Confirmed `ctx.reload()` re-discovers files that didn't exist at startup (FileSettingsStorage re-runs existsSync on each reload)
-- Confirmed pi's `registerFlag` API has no built-in flag dependency/requires support
-- Confirmed `SANDPIPER_CODING_AGENT_DIR` is the correct env var (APP_NAME="sandpiper" → ENV_AGENT_DIR="SANDPIPER_CODING_AGENT_DIR")
+### Preflight Check System (AGENT-12, 13)
+- `packages/core/src/preflight.ts`: registerPreflightCheck(), collectPreflightDiagnostics()
+- Uses `pi.events` bus (shared across jiti instances) — module-level registry didn't work
+- System extension aggregates all checks + built-in migration check into single banner
 
-**Implemented:**
-- `packages/core/src/migrate-pi-configs.ts` — core migration logic (no pi imports):
-  - `getOldPiAgentDir()` — respects `__PI_CODING_AGENT_DIR_ORIGINAL` captured by pi_wrapper
-  - `getNewSandpiperAgentDir()` — reads `SANDPIPER_CODING_AGENT_DIR` directly
-  - `detectUnmigratedConfigs(cwd)` — returns resolved paths needing migration
-  - `parseMigrationScope(global, local)` — maps booleans to MigrationScope
-  - `parseMigrationCommandArgs(args)` — parses `/migrate-pi` slash command args
-  - `performMigration(mode, options)` — move or symlink with full error handling
-- `packages/cli/pi_wrapper.ts` — captures `__PI_CODING_AGENT_DIR_ORIGINAL` before SANDPIPER_* remapping
-- `extensions/system.ts` — registers flags, session_directory handler, slash command, warning banner:
-  - `--migrate-pi-configs` / `--symlink-config` — move or symlink pi configs, then exit
-  - `--pi-configs-global` / `--pi-configs-local` — scope modifiers (apply to both operations)
-  - `session_directory` handler — early exit with success/error code
-  - `/migrate-pi move|symlink [--pi-configs-global|--pi-configs-local]` — interactive migration with `ctx.reload()`
-  - `session_start` warning banner via `setWidget('migration-warning', ...)` when unmigrated configs detected
+### Shell Integration Installer (SHR-64, 65, 66)
+- `--install-shell-integrations` flag: copies scripts to `~/.sandpiper/shell-integrations/`
+- Shell relay preflight check: probes `__relay_prompt_hook` via `fish -c 'functions -q ...'`
+- `displayPath()` utility: `~` prefix for user-facing output
+- TypeScript project references: `packages/core` → `composite: true`, shell-relay references it
 
-**AGENTS.md additions:**
-- General coding guidelines: don't duplicate code, be consistent, use top-level imports
-- Path handling: prefer `join()`/`homedir()`/`resolve()` over string literals and manual tilde expansion
+### Bug Fixes
+- `getFlag()` requires bare name (no `--` prefix) — pi docs are misleading, plan-mode example is correct
+- `--if-present` for `bun --workspaces preinstall` (core has no preinstall)
+- Source path fix: `extensions/shell-relay/shell-integration/` (was missing `extensions/` segment)
+- Typo fix in system prompt: `~/.sandpiepr` → `~/.sandpiper`
+
+### New Tickets Filed
+- SHR-67: Error on relay tool use if integration not sourced (LOW, backlog)
+- TCL-61: Wax single-file hybrid search engine spike (LOW, with mcporter integration note)
 
 ## In Progress
-- Nothing — all work committed and history curated
+- Nothing — all work committed
 
 ## Next Session
-1. **SHR-64** (MEDIUM) — Install shell integration scripts to well-known location (`~/.sandpiper/shell-integrations/`)
-2. **SHR-63** (MEDIUM) — Fix first-command race condition after setup
-3. **SHR-62** (MEDIUM) — Investigate write-chars line wrapping for long commands
-4. **AGENT-1** — Broader pi config migration design (the current work was phase 1)
-5. **PKM-1** — Start designing the note-taking system
+1. **TCL-53** (MEDIUM) — Project-level metadata (markdown/toon config file per project)
+2. **TCL-56** (MEDIUM) — Atomicity improvements (agent notes written — start with atomic writes, then index self-healing)
+3. **WEB-1** (MEDIUM) — Headless web tool (evaluate lightpanda, Puppeteer, simple fetch)
 
 ## Blockers
 - `pi.sendUserMessage()` doesn't route through slash command pipeline (upstream pi bug)
 - `bun install` requires two passes for bin linking on clean install (bun issue #19782)
-- Sandpiper not published to npm yet — blocks self-update notification
+- Sandpiper not published to npm — blocks self-update notification
 
 ## Context
-- **`packages/core`** now has real code — `src/migrate-pi-configs.ts` + barrel `src/index.ts`
-- **`sandpiper-ai-core`** added to root `package.json` dependencies and `tsconfig.json` paths
-- **`--pi-configs-global`/`--pi-configs-local`** naming rationale: applies to both `--migrate-pi-configs` AND `--symlink-config`, so "migrate" prefix would be misleading
-- **`session_directory`** is the correct hook for CLI-only early-exit operations (fires after flag values populated, before session manager created)
-- **jj history is curated** — four clean migration commits
-- **Working tree is clean**
+- **`pi.getFlag()` takes bare names** — no `--` prefix. The docs show `getFlag("--my-flag")` but that's wrong. Plan-mode example uses `getFlag("plan")`. All our flags are fixed.
+- **`pi.events` for cross-extension communication** — module-level registries don't work across jiti instances. `pi.events` is the shared runtime event bus.
+- **`packages/core` has real code now** — migrate-pi-configs, preflight, install-shell-integrations, paths. Uses `composite: true` tsconfig with project references from shell-relay.
+- **Shell integration well-known path** — `~/.sandpiper/shell-integrations/relay.{fish,bash,zsh}`
+- **Preflight probe** — fish doesn't need `-i` for `functions -q` (sources config.fish for all sessions including `-c`). Bash/zsh need `-i`.
+- **TCL-56 approach written up** — recommends: atomic writes first (write-to-temp-rename), index self-healing second, skip file locking. Defer move journaling unless moves prove unreliable. Consider index spike results (TCL-55/61) before investing in index consistency.
+- **Working tree is clean** — all changes committed via jj

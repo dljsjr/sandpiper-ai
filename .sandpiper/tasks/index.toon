@@ -1,117 +1,118 @@
 version: 1
-lastUpdatedAt: 1774476565511
+lastUpdatedAt: 1774499927837
 tasks:
   "AGENT-1":
     key: AGENT-1
     project: AGENT
     title: Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T16:59:08.170Z"
-    updatedAt: "2026-03-25T17:01:01.219Z"
+    updatedAt: "2026-03-26T04:27:53.816Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774467939590
+    lastIndexedAt: 1774499273820
   "AGENT-11":
     key: AGENT-11
     project: AGENT
     title: Warning banner for unmigrated pi configs
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T18:01:30.626Z"
-    updatedAt: "2026-03-25T20:10:25.192Z"
+    updatedAt: "2026-03-26T04:27:06.144Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774469425197
+    lastIndexedAt: 1774499226149
   "AGENT-12":
     key: AGENT-12
     project: AGENT
     title: Core preflight check system
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T21:55:27.775Z"
-    updatedAt: "2026-03-25T21:56:45.854Z"
+    updatedAt: "2026-03-26T04:27:06.182Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774475805858
+    lastIndexedAt: 1774499226191
   "AGENT-13":
     key: AGENT-13
     project: AGENT
     title: "System extension: aggregate and display preflight diagnostics"
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T21:55:27.812Z"
-    updatedAt: "2026-03-25T22:05:43.273Z"
+    updatedAt: "2026-03-26T04:27:06.223Z"
     resolution: DONE
     dependsOn[1]: AGENT-12
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774476343278
+    lastIndexedAt: 1774499226228
   "AGENT-2":
     key: AGENT-2
     project: AGENT
     title: Implement migration functions for pi config
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T17:56:54.966Z"
-    updatedAt: "2026-03-25T18:07:29.798Z"
+    updatedAt: "2026-03-26T04:27:06.032Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774467939590
+    lastIndexedAt: 1774499226037
   "AGENT-5":
     key: AGENT-5
     project: AGENT
     title: CLI flags for pi config migration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T17:58:15.773Z"
-    updatedAt: "2026-03-25T19:45:39.585Z"
+    updatedAt: "2026-03-26T04:27:06.071Z"
     resolution: DONE
     dependsOn[1]: AGENT-2
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774467939590
+    lastIndexedAt: 1774499226075
   "AGENT-8":
     key: AGENT-8
     project: AGENT
     title: Slash command for pi config migration
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T18:00:23.127Z"
-    updatedAt: "2026-03-25T20:07:41.249Z"
+    updatedAt: "2026-03-26T04:27:06.107Z"
     resolution: DONE
     dependsOn[1]: AGENT-2
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774469261253
+    lastIndexedAt: 1774499226112
   "AGENT-3":
     key: AGENT-3
     project: AGENT
@@ -294,50 +295,65 @@ tasks:
     key: SHR-64
     project: SHR
     title: Install shell integration scripts to a well-known location
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T16:20:48.361Z"
-    updatedAt: "2026-03-25T22:09:25.506Z"
+    updatedAt: "2026-03-26T04:27:06.261Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774476565511
+    lastIndexedAt: 1774499226266
   "SHR-65":
     key: SHR-65
     project: SHR
     title: Add --install-shell-integrations flag to system extension
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T21:55:27.848Z"
-    updatedAt: "2026-03-25T22:08:14.647Z"
+    updatedAt: "2026-03-26T04:27:06.301Z"
     resolution: DONE
     dependsOn[1]: AGENT-12
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774476494652
+    lastIndexedAt: 1774499226307
   "SHR-66":
     key: SHR-66
     project: SHR
     title: Register shell relay preflight check for integration installation
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-25T21:55:31.145Z"
-    updatedAt: "2026-03-25T22:09:25.466Z"
+    updatedAt: "2026-03-26T04:27:06.341Z"
     resolution: DONE
     dependsOn[1]: SHR-65
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774476565473
+    lastIndexedAt: 1774499226345
+  "SHR-67":
+    key: SHR-67
+    project: SHR
+    title: Error on relay tool/command use if shell integration not sourced
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T04:25:52.770Z"
+    updatedAt: "2026-03-26T04:25:59.595Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774499159600
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -393,11 +409,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.835Z"
-    updatedAt: "2026-03-23T03:19:16.438Z"
+    updatedAt: "2026-03-26T04:38:47.830Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774235956443
+    lastIndexedAt: 1774499927836
   "TCL-57":
     key: TCL-57
     project: TCL
@@ -443,6 +459,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774235956529
+  "TCL-61":
+    key: TCL-61
+    project: TCL
+    title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T04:30:07.828Z"
+    updatedAt: "2026-03-26T04:31:38.888Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: TCL-55
+    lastIndexedAt: 1774499498893
   "TOOLS-1":
     key: TOOLS-1
     project: TOOLS
@@ -528,18 +559,18 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T03:15:05.788Z"
-    updatedAt: "2026-03-25T03:15:31.395Z"
+    updatedAt: "2026-03-26T04:38:18.366Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774408531399
+    lastIndexedAt: 1774499898372
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 61
+    nextTaskNumber: 62
   SHR:
     projectKey: SHR
-    nextTaskNumber: 67
+    nextTaskNumber: 68
   SRL:
     projectKey: SRL
     nextTaskNumber: 2

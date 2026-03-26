@@ -1,13 +1,13 @@
 ---
 title: "Install shell integration scripts to a well-known location"
-status: NEEDS REVIEW
+status: COMPLETE
 resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-25T16:20:48.361Z
-updated_at: 2026-03-25T22:09:25.506Z
+updated_at: 2026-03-26T04:27:06.261Z
 ---
 
 # Install shell integration scripts to a well-known location
@@ -45,3 +45,7 @@ Decomposed into four tasks:
 
 - **status**: NOT STARTED → NEEDS REVIEW
 - **resolution**: DONE
+
+## 2026-03-26T04:27:06.262Z
+
+- **status**: NEEDS REVIEW → COMPLETE
