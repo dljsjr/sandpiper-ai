@@ -22,13 +22,70 @@ A project that has tasks MUST have its own directory under `.sandpiper/tasks/` u
 .sandpiper/tasks/<PROJECT_KEY>/
 ```
 
-### 2.3 Project Counter State
+### 2.3 Project Metadata File
+
+Every project directory SHOULD have a `PROJECT.md` file at its root. This file makes the project self-describing so that an agent can understand the project's purpose and make confident ticket-filing decisions without relying on ambient context.
+
+#### 2.3.1 Location
+
+```
+.sandpiper/tasks/<PROJECT_KEY>/PROJECT.md
+```
+
+#### 2.3.2 Format
+
+`PROJECT.md` uses the same markdown + YAML frontmatter format as task files, but with a different set of fields.
+
+```markdown
+---
+key: SHR
+name: "Shell Relay"
+description: "Zellij-based shared terminal session between user and agent"
+when_to_file: "Use for work on the Zellij integration. Does NOT include general agent capabilities — those go in AGENT."
+status: active
+created_at: 2026-03-26T00:00:00Z
+---
+
+# Shell Relay
+
+## Purpose
+...
+
+## Scope
+...
+
+## Related Projects
+...
+```
+
+#### 2.3.3 Frontmatter Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `key` | REQUIRED | The project key. MUST match the owning project's key. |
+| `name` | REQUIRED | Human-readable project name. |
+| `description` | REQUIRED | One-line summary of what the project is. |
+| `when_to_file` | REQUIRED | One-line description of when to file a ticket in this project. Primary routing signal for agents. |
+| `status` | REQUIRED | Project lifecycle status: `active`, `archived`, `paused`. |
+| `created_at` | REQUIRED | ISO 8601 timestamp of when the PROJECT.md was created. |
+
+#### 2.3.4 Markdown Body
+
+The body SHOULD contain: **Purpose**, **Scope** (including what does NOT belong), and **Related Projects**.
+
+#### 2.3.5 Enforcement
+
+`project create` MUST require all required fields and write PROJECT.md as part of project creation.
+
+### 2.4 Project Counter State
 
 Task numbering counters are maintained in the task index file (`index.toon`), not in per-project metadata files. Each project's `nextTaskNumber` is stored in the index's `counters` section.
 
 If the index is unavailable (e.g., first use, corrupted, or deleted), the counter MUST be rebuilt by scanning existing task files and using the highest task number found + 1.
 
 Legacy `.meta.yml` files MAY be present from older versions and are supported as a fallback counter source, but MUST NOT be created by new implementations.
+
+The `PROJECT.md` file is distinct from counter state and is NOT used for counter recovery. See §2.3 for details.
 
 ## 3. Task Keys
 

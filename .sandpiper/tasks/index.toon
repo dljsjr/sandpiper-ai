@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774561016119
+lastUpdatedAt: 1774562600383
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -16,6 +16,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774386173144
+  "TOOLS-10":
+    key: TOOLS-10
+    project: TOOLS
+    title: Per-extension postinstall strategy for extensions with npm dependencies
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T22:03:20.380Z"
+    updatedAt: "2026-03-26T22:03:20.380Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774562600382
   "TOOLS-2":
     key: TOOLS-2
     project: TOOLS
@@ -931,7 +946,7 @@ counters:
     nextTaskNumber: 3
   TOOLS:
     projectKey: TOOLS
-    nextTaskNumber: 10
+    nextTaskNumber: 11
   PKM:
     projectKey: PKM
     nextTaskNumber: 3
