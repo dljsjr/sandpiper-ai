@@ -1,7 +1,8 @@
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { decode, encode } from '@toon-format/toon';
 import { parseFrontmatter } from './frontmatter.js';
+import { writeFileAtomic } from './fs.js';
 import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
 import { CURRENT_SCHEMA_VERSION, migrateIndex, validateSchemaVersion } from './schema.js';
 import type {
@@ -39,7 +40,7 @@ export function loadIndex(tasksDir: string): TaskIndex | null {
  */
 export function saveIndex(tasksDir: string, index: TaskIndex): void {
   const indexPath = join(tasksDir, INDEX_FILENAME);
-  writeFileSync(indexPath, encode(index), 'utf-8');
+  writeFileAtomic(indexPath, encode(index));
 }
 
 /**

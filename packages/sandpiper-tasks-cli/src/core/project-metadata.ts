@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseFrontmatter } from './frontmatter.js';
+import { writeFileAtomic } from './fs.js';
 import { PROJECT_METADATA_FILENAME } from './patterns.js';
 import type { ProjectMetadata, ProjectStatus } from './types.js';
 
@@ -100,7 +101,7 @@ export function readProjectMetadata(tasksDir: string, projectKey: string): Proje
  */
 export function writeProjectMetadata(tasksDir: string, opts: CreateProjectMetadataOptions): void {
   const metaPath = join(tasksDir, opts.key, PROJECT_METADATA_FILENAME);
-  writeFileSync(metaPath, renderProjectMetadataContent(opts));
+  writeFileAtomic(metaPath, renderProjectMetadataContent(opts));
 }
 
 // ─── Updates ──────────────────────────────────────────────────────
@@ -141,5 +142,5 @@ export function updateProjectMetadata(tasksDir: string, projectKey: string, fiel
     );
   }
   const content = readFileSync(metaPath, 'utf-8');
-  writeFileSync(metaPath, applyProjectMetadataUpdates(content, fields));
+  writeFileAtomic(metaPath, applyProjectMetadataUpdates(content, fields));
 }

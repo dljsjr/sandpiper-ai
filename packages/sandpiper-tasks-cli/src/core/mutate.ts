@@ -1,9 +1,10 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { decode as decodeToon } from '@toon-format/toon';
 import { appendActivityEntry, type FieldChange } from './activity-log.js';
 import { extractDescription, replaceDescription } from './description.js';
 import { parseFrontmatter } from './frontmatter.js';
+import { writeFileAtomic } from './fs.js';
 import { writeDiff } from './history.js';
 import { PROJECT_KEY_RE, scanHighestNumber } from './patterns.js';
 import type { TaskAssignee, TaskKind, TaskPriority, TaskReporter, TaskResolution, TaskStatus } from './types.js';
@@ -100,7 +101,7 @@ export function createTask(tasksDir: string, opts: CreateTaskOptions): CreateTas
   }
 
   const content = renderTaskContent(opts);
-  writeFileSync(taskPath, content);
+  writeFileAtomic(taskPath, content);
 
   return { key, path: taskPath };
 }
@@ -272,7 +273,7 @@ export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
     content = appendActivityEntry(content, changes);
   }
 
-  writeFileSync(taskPath, content);
+  writeFileAtomic(taskPath, content);
 
   // Write diff to history
   if (originalContent !== content) {

@@ -1,12 +1,12 @@
 ---
 title: "Improve atomicity and data integrity for task operations"
-status: NOT STARTED
+status: IN PROGRESS
 kind: TASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-23T03:18:38.835Z
-updated_at: 2026-03-26T04:38:47.830Z
+updated_at: 2026-03-26T21:23:43.428Z
 ---
 
 # Improve atomicity and data integrity for task operations
@@ -87,3 +87,8 @@ If we move to SQLite (TCL-55) or Wax (TCL-61) as the index backend, the index st
 ## 2026-03-26T04:38:47.831Z
 
 - **description**: 14 lines → updated (64 lines)
+
+## 2026-03-26T21:23:43.429Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
