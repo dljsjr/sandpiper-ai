@@ -1,13 +1,13 @@
 ---
 title: "Add --install-shell-integrations flag to system extension"
-status: NEEDS REVIEW
+status: COMPLETE
 resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-25T21:55:27.848Z
-updated_at: 2026-03-25T22:08:14.647Z
+updated_at: 2026-03-26T04:27:06.301Z
 depends_on:
   - AGENT-12
 ---
@@ -68,3 +68,7 @@ Add the appropriate line to your shell config:
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **resolution**: DONE
+
+## 2026-03-26T04:27:06.302Z
+
+- **status**: NEEDS REVIEW → COMPLETE

@@ -1,0 +1,31 @@
+--- a/TCL-61.md
++++ b/TCL-61.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-26T04:30:07.828Z
+-updated_at: 2026-03-26T04:30:22.803Z
++updated_at: 2026-03-26T04:31:38.888Z
+ related:
+   - TCL-55
+ ---
+@@ -39,6 +39,11 @@
+ - Single-file portability aligns with our ~/.sandpiper convention
+ - MCP server could integrate directly with pi's tool system
+ 
++### MCP Integration Path
++- Wax ships an MCP server (waxmcp): npx -y waxmcp@latest
++- We can use mcporter generate-cli to create a standalone CLI wrapper for the Wax MCP server, same pattern we use for the Dash MCP integration (see devtools/config/mcporter-dist.json)
++- This avoids writing custom MCP client code — mcporter handles the protocol and we get a CLI that can be invoked from skills or extensions
++
+ ### Concerns
+ - Swift-only: no native Node.js binding — would need MCP server as intermediary
+ - Apple Silicon only for Metal acceleration (degrades on Intel?)
+@@ -58,3 +63,7 @@
+ 
+ - **description**: added (36 lines)
+ 
++## 2026-03-26T04:31:38.888Z
++
++- **description**: 36 lines → updated (41 lines)
++

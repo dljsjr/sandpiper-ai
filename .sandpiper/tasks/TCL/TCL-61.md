@@ -1,0 +1,68 @@
+---
+title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
+status: NOT STARTED
+kind: TASK
+priority: LOW
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-03-26T04:30:07.828Z
+updated_at: 2026-03-26T04:31:38.888Z
+related:
+  - TCL-55
+---
+
+# Spike: Wax — single-file hybrid search index for Apple Silicon
+
+Evaluate Wax (github.com/christopherkarani/Wax) as a potential index/search backend for sandpiper.
+
+## What is Wax?
+
+Swift-native single-file persistence engine for AI agents on Apple platforms:
+- Hybrid search: BM25 text (SQLite FTS5) + vector (Metal HNSW) in one query
+- Single .wax file: documents, metadata, embeddings, and indexes bundled together
+- Sub-millisecond recall: ~6ms p95 hybrid search on M-series hardware
+- EAV structured memory: entity-attribute-value store for durable facts
+- WAL + dual headers: crash-resilient atomic writes
+- MCP server available: npx -y waxmcp@latest
+- Apache 2.0 license
+
+## Evaluation Questions
+
+### As task index replacement
+- Can Wax replace the TOON index for task queries? (filtering, sorting, full-text search)
+- How does it compare to SQLite FTS5 alone (TCL-55)?
+- Trade-off: Swift dependency vs Node.js native — would require MCP bridge or native addon
+
+### As PKM/MEM backend
+- Hybrid search is a natural fit for PKM-1 and MEM-1
+- EAV structured memory maps well to cross-session knowledge (entities, facts, relationships)
+- Single-file portability aligns with our ~/.sandpiper convention
+- MCP server could integrate directly with pi's tool system
+
+### MCP Integration Path
+- Wax ships an MCP server (waxmcp): npx -y waxmcp@latest
+- We can use mcporter generate-cli to create a standalone CLI wrapper for the Wax MCP server, same pattern we use for the Dash MCP integration (see devtools/config/mcporter-dist.json)
+- This avoids writing custom MCP client code — mcporter handles the protocol and we get a CLI that can be invoked from skills or extensions
+
+### Concerns
+- Swift-only: no native Node.js binding — would need MCP server as intermediary
+- Apple Silicon only for Metal acceleration (degrades on Intel?)
+- Young project (v0.1.8) — API stability, bug surface
+- Adds a process dependency (MCP server) vs in-process SQLite
+
+## Related
+- TCL-55: SQLite FTS5 spike (text-only, in-process, cross-platform)
+- PKM-1: PKM system design
+- MEM-1: Cross-session memory system
+
+---
+
+# Activity Log
+
+## 2026-03-26T04:30:22.804Z
+
+- **description**: added (36 lines)
+
+## 2026-03-26T04:31:38.888Z
+
+- **description**: 36 lines → updated (41 lines)

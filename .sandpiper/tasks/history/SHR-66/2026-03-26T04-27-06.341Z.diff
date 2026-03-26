@@ -1,0 +1,26 @@
+--- a/SHR-66.md
++++ b/SHR-66.md
+@@ -1,13 +1,9 @@
+ ---
+ title: "Register shell relay preflight check for integration installation"
+-status: NEEDS REVIEW
++status: COMPLETE
+ resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-25T21:55:31.145Z
+-updated_at: 2026-03-25T22:09:25.466Z
++updated_at: 2026-03-26T04:27:06.341Z
+ depends_on:
+   - SHR-65
+ ---
+@@ -70,3 +70,7 @@
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **resolution**: DONE
+ 
++## 2026-03-26T04:27:06.341Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++
