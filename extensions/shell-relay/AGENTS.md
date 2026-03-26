@@ -17,8 +17,9 @@ All core logic lives in framework-independent modules under `src/`. Only `index.
 | `signal.ts` | Signal channel parser (line-delimited protocol) | No |
 | `zellij.ts` | Zellij CLI wrapper | No |
 | `escape.ts` | Command escaping (fish quote-break / bash `printf '%q'`) | No |
+| `preflight.ts` | Shell integration preflight check (probes shell for `__relay_prompt_hook`) | No (imports from `sandpiper-ai-core`) |
 | `relay.ts` | Orchestration (ties all modules together) | No |
-| `index.ts` | Pi extension glue (tool registration, lifecycle) | **Yes** — only file |
+| `index.ts` | Pi extension glue (tool registration, lifecycle, preflight registration) | **Yes** — only file |
 
 ### Shell Integration Scripts
 
@@ -88,6 +89,14 @@ This preserves session state (`eval` runs in the current shell) while getting PT
 
 ### Command Serialization
 Relay uses a promise chain to serialize concurrent `execute()` calls. Only one command runs in the pane at a time.
+
+### Shell Integration Installation & Preflight
+Shell integration scripts are installed to `~/.sandpiper/shell-integrations/` via `sandpiper --install-shell-integrations`. At session start, the preflight system probes whether the integration is actually sourced by checking for `__relay_prompt_hook` in the user's shell:
+- **Fish:** `fish -c 'functions -q __relay_prompt_hook'` — no `-i` needed (fish sources `config.fish` for all sessions)
+- **Bash:** `bash -i -c 'type __relay_prompt_hook > /dev/null 2>&1'` — needs `-i` to source `.bashrc`
+- **Zsh:** `zsh -i -c 'whence __relay_prompt_hook > /dev/null 2>&1'` — needs `-i` to source `.zshrc`
+
+Falls back to file existence check at the well-known location for unrecognized shells.
 
 ## Reference Documentation
 

@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774499927837
+lastUpdatedAt: 1774500317389
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -65,6 +65,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774499226228
+  "AGENT-14":
+    key: AGENT-14
+    project: AGENT
+    title: Migration move fails across filesystem boundaries (renameSync)
+    status: NOT STARTED
+    kind: BUG
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-26T04:45:09.533Z"
+    updatedAt: "2026-03-26T04:45:17.384Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774500317389
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -591,4 +606,4 @@ counters:
     nextTaskNumber: 2
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 14
+    nextTaskNumber: 15

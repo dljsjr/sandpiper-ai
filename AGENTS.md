@@ -31,11 +31,11 @@ See the [Pi Packages documentation](packages/cli/dist/docs/packages.md) for deta
 
 | Path | Type | Description |
 |------|------|-------------|
-| `extensions/system.ts` | Pi Extension | Sandpiper identity injection and update notifications |
+| `extensions/system.ts` | Pi Extension | Sandpiper identity, update notifications, migration flags, preflight diagnostics |
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
 | `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI (bundled to `skills/sandpiper/tasks/scripts/sandpiper-tasks`) |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
-| `packages/core/` | Shared Library | Shared core utilities |
+| `packages/core/` | Shared Library | Migration, preflight checks, shell integration installer, path utilities |
 | `devtools/` | Dev-only | Development scripts, vendoring tools, and build utilities |
 
 ### Project-Specific Guidelines
@@ -160,8 +160,7 @@ See `ast-grep/README.md` for the full catalog of queries, transforms, and rules.
 - Prefer Node.js built-in modules over third-party packages
 - External runtime dependencies MUST be justified — don't add a package for something achievable in a few lines of code
 - `devDependencies` (test frameworks, type definitions, linters) are more acceptable than runtime `dependencies`
-- Pi peer dependencies (`@mariozechner/pi-coding-agent`, `@sinclair/typebox`, etc.) go in `peerDependencies` — they are provided by pi's jiti runtime and MUST NOT be bundled into extensions
-- Pi peer dependencies (`@mariozechner/pi-coding-agent`, `@sinclair/typebox`, etc.) go in `peerDependencies` with `"*"` range — do not bundle them
+- Pi peer dependencies (`@mariozechner/pi-coding-agent`, `@sinclair/typebox`, etc.) go in `peerDependencies` with `"*"` range — they are provided by pi's jiti runtime and MUST NOT be bundled into extensions
 
 ## Architecture
 
@@ -181,6 +180,57 @@ my-extension/
 ├── core.ts           # Core logic (no pi imports)
 ├── external-api.ts   # External service wrapper (no pi imports)
 └── ...
+```
+
+## Pi Extension API Pitfalls
+
+Known issues and non-obvious behaviors in pi's extension API:
+
+### `pi.getFlag()` uses bare names
+
+Register and read flags **without** the `--` prefix:
+
+```typescript
+pi.registerFlag("my-flag", { type: "boolean" });
+pi.getFlag("my-flag");     // ✅ returns the value
+pi.getFlag("--my-flag");   // ❌ always returns undefined
+```
+
+The pi docs show `getFlag("--my-flag")` but this is incorrect. The plan-mode example and the implementation both use bare names. Flags are stored in `extension.flags` by the name passed to `registerFlag`.
+
+### `session_directory` for CLI-only early-exit flags
+
+Use `session_directory` (not `session_start`) for flags that perform an action and exit:
+
+- Fires **after** flag values are populated (second arg parse pass)
+- Fires **before** session manager is created — no session to clean up
+- Can call `process.exit()` safely
+- Receives only `event.cwd` — no `ctx` (no UI access)
+
+### Module-level state is NOT shared across jiti instances
+
+Each extension loaded by jiti gets its own module scope. A module-level array in `packages/core` will be a different instance in each extension. Use `pi.events` (the shared runtime event bus) for cross-extension communication instead.
+
+### `pi.events` IS shared across extensions
+
+`pi.events.on()` and `pi.events.emit()` are synchronous and work across all jiti-loaded extensions. Use this for patterns like preflight check collection where one extension emits and others respond.
+
+### Cross-package TypeScript: use project references
+
+When an extension imports from a workspace package (e.g., `sandpiper-ai-core`), use TypeScript project references instead of widening `rootDir`:
+
+```json
+// packages/core/tsconfig.json
+{ "compilerOptions": { "composite": true, "declaration": true } }
+
+// extensions/shell-relay/tsconfig.json
+{ "references": [{ "path": "../../packages/core" }] }
+```
+
+The referenced package must be built first (`tsc --build`). Use conditional exports in `package.json` to serve types from `dist/` and source from `src/`:
+
+```json
+{ "exports": { ".": { "types": "./dist/index.d.ts", "default": "./src/index.ts" } } }
 ```
 
 ## Task Management
