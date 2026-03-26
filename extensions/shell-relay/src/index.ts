@@ -50,7 +50,7 @@ function detectShell(): 'fish' | 'bash' | 'zsh' {
 
 export default function (pi: ExtensionAPI) {
   // Register preflight check — runs at session_start via system extension aggregation
-  registerPreflightCheck('shell-relay:integration', checkShellIntegration);
+  registerPreflightCheck(pi, 'shell-relay:integration', checkShellIntegration);
 
   let fifoManager: FifoManager | null = null;
   let ghostClient: GhostClient | null = null;

@@ -1,5 +1,6 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import {
+  collectPreflightDiagnostics,
   detectUnmigratedConfigs,
   formatInstallInstructions,
   installShellIntegrations,
@@ -7,7 +8,6 @@ import {
   parseMigrationCommandArgs,
   parseMigrationScope,
   performMigration,
-  runPreflightChecks,
 } from 'sandpiper-ai-core';
 
 // ─── Version Check ──────────────────────────────────────────────
@@ -255,7 +255,8 @@ its documentation, APIs, etc. remain valid, with a few alterations:
   pi.on('session_start', async (_event, ctx) => {
     // --- Preflight diagnostics ---
     // Collect from registered checks (extensions) + built-in migration check.
-    const diagnostics = runPreflightChecks();
+    // pi.events.emit is synchronous — all listeners run before this returns.
+    const diagnostics = collectPreflightDiagnostics(pi);
 
     // Built-in: unmigrated pi configs (not a registered preflight check since it
     // lives in system.ts itself and has no separate extension to register from).
