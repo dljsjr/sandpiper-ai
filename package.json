@@ -70,6 +70,7 @@
       },
       "pi": {
         "@mariozechner/pi-coding-agent": "0.62.0",
+        "@mariozechner/pi-tui": "0.62.0",
         "@silvia-odwyer/photon-node": "0.3.4",
         "@sinclair/typebox": "0.34.48"
       },
@@ -107,6 +108,7 @@
   },
   "peerDependencies": {
     "@mariozechner/pi-coding-agent": "catalog:pi",
+    "@mariozechner/pi-tui": "catalog:pi",
     "@sinclair/typebox": "catalog:pi"
   },
   "devDependencies": {
