@@ -56,7 +56,7 @@ describe('installShellIntegrations', () => {
   beforeEach(() => {
     // Create a fake package dir with the expected source scripts
     tmpPackageDir = join(tmpdir(), `sandpiper-test-${Date.now()}`);
-    const srcDir = join(tmpPackageDir, 'shell-relay', 'shell-integration');
+    const srcDir = join(tmpPackageDir, 'extensions', 'shell-relay', 'shell-integration');
     mkdirSync(srcDir, { recursive: true });
     writeFileSync(join(srcDir, 'relay.fish'), '# fake fish integration');
     writeFileSync(join(srcDir, 'relay.bash'), '# fake bash integration');

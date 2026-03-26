@@ -10,7 +10,7 @@ import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, join } from 'node:path';
-import type { PreflightDiagnostic } from 'sandpiper-ai-core';
+import { displayPath, type PreflightDiagnostic } from 'sandpiper-ai-core';
 
 const WELL_KNOWN_DIR = join(homedir(), '.sandpiper', 'shell-integrations');
 
@@ -90,7 +90,7 @@ export function checkShellIntegration(): PreflightDiagnostic {
         message: 'Shell relay integration is not sourced',
         instructions: [
           `Add to ${rcFile}:`,
-          `  source ${join(WELL_KNOWN_DIR, scriptFile)}`,
+          `  source ${displayPath(join(WELL_KNOWN_DIR, scriptFile))}`,
           '',
           'If not yet installed, run first:',
           '  sandpiper --install-shell-integrations',

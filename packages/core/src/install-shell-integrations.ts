@@ -11,6 +11,7 @@
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { displayPath } from './paths.js';
 
 export interface InstallResult {
   success: boolean;
@@ -85,8 +86,9 @@ export function installShellIntegrations(): InstallResult {
  * Format the post-install instructions printed to stdout.
  */
 export function formatInstallInstructions(installedTo: string): string {
+  const display = displayPath(installedTo);
   const lines: string[] = [
-    `Shell integration scripts installed to ${installedTo}`,
+    `Shell integration scripts installed to ${display}`,
     '',
     'Add the appropriate line to your shell config:',
   ];
@@ -94,7 +96,7 @@ export function formatInstallInstructions(installedTo: string): string {
   for (const { file, shell, rcFile } of SCRIPTS) {
     lines.push('');
     lines.push(`  ${shell} (${rcFile}):`);
-    lines.push(`    source ${join(installedTo, file)}`);
+    lines.push(`    source ${displayPath(join(installedTo, file))}`);
   }
 
   return lines.join('\n');
