@@ -26,7 +26,7 @@ npm install -g @mariozechner/pi-coding-agent
 Then clone and set up sandpiper:
 
 ```bash
-git clone https://github.com/your-org/sandpiper-ai.git
+git clone https://github.com/dljsjr/sandpiper-ai.git
 cd sandpiper-ai
 bun install          # Install deps + build workspace packages
 bun sandpiper        # Launch sandpiper (interactive mode)
