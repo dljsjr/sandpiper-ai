@@ -38,24 +38,30 @@ This extension is part of the `sandpiper-ai` pi package. If you have the package
 
 ### 2. Source the Shell Integration
 
-Add the appropriate source line to your shell's RC file:
+First, install the integration scripts to the well-known location:
+
+```bash
+sandpiper --install-shell-integrations
+```
+
+Then add the appropriate source line to your shell's RC file:
 
 **Fish** (`~/.config/fish/config.fish`):
 ```fish
-source /path/to/extensions/shell-relay/shell-integration/relay.fish
+source ~/.sandpiper/shell-integrations/relay.fish
 ```
 
 **Bash** (`~/.bashrc`):
 ```bash
-source /path/to/extensions/shell-relay/shell-integration/relay.bash
+source ~/.sandpiper/shell-integrations/relay.bash
 ```
 
 **Zsh** (`~/.zshrc`):
 ```zsh
-source /path/to/extensions/shell-relay/shell-integration/relay.zsh
+source ~/.sandpiper/shell-integrations/relay.zsh
 ```
 
-The integration scripts are safe to source in all shell instances — they silently no-op when not in a relay session. Enter key bindings (fish) are registered unconditionally but guard on every invocation.
+The integration scripts are safe to source in all shell instances — they silently no-op when not in a relay session. Sandpiper will show a diagnostic warning on startup if the integration is not sourced.
 
 ### 3. Using the Relay
 
