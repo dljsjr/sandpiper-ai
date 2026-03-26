@@ -1,12 +1,13 @@
 ---
 title: "Web fetch tool: fetch URL, extract content, return markdown"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-25T03:15:05.788Z
-updated_at: 2026-03-26T20:49:54.851Z
+updated_at: 2026-03-26T20:58:12.383Z
 ---
 
 # Web fetch tool: fetch URL, extract content, return markdown
@@ -33,3 +34,8 @@ Full design: .sandpiper/docs/web-fetch-prd.md
 
 - **title**: Headless web browsing, fetching, and browser automation tool → Web fetch tool: fetch URL, extract content, return markdown
 - **description**: 45 lines → updated (5 lines)
+
+## 2026-03-26T20:58:12.383Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: DONE
