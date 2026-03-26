@@ -14,9 +14,11 @@ import { displayPath, type PreflightDiagnostic } from 'sandpiper-ai-core';
 
 const WELL_KNOWN_DIR = join(homedir(), '.sandpiper', 'shell-integrations');
 
-/** Shell probe commands — exit 0 if __relay_prompt_hook is defined, non-zero otherwise. */
+/** Shell probe commands — exit 0 if __relay_prompt_hook is defined, non-zero otherwise.
+ * All shells use -i (interactive) because integration scripts are typically
+ * guarded behind `status is-interactive` or equivalent checks. */
 const SHELL_PROBES: Readonly<Record<string, string>> = {
-  fish: `fish -c 'functions -q __relay_prompt_hook'`,
+  fish: `fish -i -c 'functions -q __relay_prompt_hook'`,
   bash: `bash -i -c 'type __relay_prompt_hook > /dev/null 2>&1'`,
   zsh: `zsh -i -c 'whence __relay_prompt_hook > /dev/null 2>&1'`,
 };
