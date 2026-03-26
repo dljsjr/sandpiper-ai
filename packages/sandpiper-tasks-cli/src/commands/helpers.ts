@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import type { Command } from '@commander-js/extra-typings';
+import { isIndexConsistent } from '../core/consistency.js';
 import { parseFrontmatter, taskFromFrontmatter } from '../core/frontmatter.js';
 import { loadIndex, tasksFromIndex, updateIndex } from '../core/index-update.js';
 import type { OutputFormat } from '../core/output.js';
@@ -100,6 +101,9 @@ export function loadTasks(cmd: Command<any, any, any>): readonly Task[] {
   const tasksDir = getTasksDir(cmd);
   let index = loadIndex(tasksDir);
   if (!index) {
+    index = updateIndex(tasksDir);
+  } else if (!isIndexConsistent(tasksDir, index)) {
+    // Index is stale — task file count doesn't match. Auto-rebuild.
     index = updateIndex(tasksDir);
   }
   return tasksFromIndex(index);

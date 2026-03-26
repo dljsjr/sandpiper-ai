@@ -2,6 +2,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { countTaskFilesOnDisk, isIndexConsistent } from './consistency.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { updateIndex } from './index-update.js';
 import { completeTask, createProject, createTask, pickupTask, updateTaskFields } from './mutate.js';
@@ -314,5 +315,106 @@ describe('Index-file consistency', () => {
       expect(index.tasks['FOO-3']?.title).toBe('Brand new');
       expectIndexMatchesDisk(index.tasks['FOO-3']!, join(tasksDir, 'FOO', 'FOO-3.md'));
     });
+  });
+});
+
+describe('countTaskFilesOnDisk', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'count-test-'));
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  it('should return 0 for an empty tasks directory', () => {
+    expect(countTaskFilesOnDisk(tasksDir)).toBe(0);
+  });
+
+  it('should count top-level task files', () => {
+    createProject(tasksDir, 'FOO');
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'A', reporter: 'USER' });
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'B', reporter: 'USER' });
+    expect(countTaskFilesOnDisk(tasksDir)).toBe(2);
+  });
+
+  it('should count subtasks', () => {
+    createProject(tasksDir, 'FOO');
+    const parent = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'HIGH',
+      title: 'Parent',
+      reporter: 'USER',
+    });
+    createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'SUBTASK',
+      priority: 'MEDIUM',
+      title: 'Child',
+      reporter: 'USER',
+      parent: parent.key,
+    });
+    expect(countTaskFilesOnDisk(tasksDir)).toBe(2); // parent + child
+  });
+
+  it('should count across multiple projects', () => {
+    createProject(tasksDir, 'AAA');
+    createProject(tasksDir, 'BBB');
+    createTask(tasksDir, { project: 'AAA', kind: 'TASK', priority: 'HIGH', title: 'A1', reporter: 'USER' });
+    createTask(tasksDir, { project: 'BBB', kind: 'TASK', priority: 'HIGH', title: 'B1', reporter: 'USER' });
+    createTask(tasksDir, { project: 'BBB', kind: 'TASK', priority: 'HIGH', title: 'B2', reporter: 'USER' });
+    expect(countTaskFilesOnDisk(tasksDir)).toBe(3);
+  });
+});
+
+describe('isIndexConsistent', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'heal-test-'));
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  it('should return true when index matches disk', () => {
+    createProject(tasksDir, 'FOO');
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T1', reporter: 'USER' });
+    const index = updateIndex(tasksDir);
+    expect(isIndexConsistent(tasksDir, index)).toBe(true);
+  });
+
+  it('should return false when a file is added out-of-band', () => {
+    createProject(tasksDir, 'FOO');
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T1', reporter: 'USER' });
+    const index = updateIndex(tasksDir);
+
+    // Add a file out-of-band
+    writeFileSync(
+      join(tasksDir, 'FOO', 'FOO-2.md'),
+      '---\ntitle: "OOB"\nstatus: NOT STARTED\nkind: TASK\npriority: LOW\nassignee: UNASSIGNED\nreporter: USER\ncreated_at: 2026-01-01T00:00:00Z\nupdated_at: 2026-01-01T00:00:00Z\n---\n\n# OOB\n',
+    );
+
+    expect(isIndexConsistent(tasksDir, index)).toBe(false);
+  });
+
+  it('should return false when a file is deleted out-of-band', () => {
+    createProject(tasksDir, 'FOO');
+    const { path } = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'HIGH',
+      title: 'T1',
+      reporter: 'USER',
+    });
+    const index = updateIndex(tasksDir);
+
+    rmSync(path);
+
+    expect(isIndexConsistent(tasksDir, index)).toBe(false);
   });
 });
