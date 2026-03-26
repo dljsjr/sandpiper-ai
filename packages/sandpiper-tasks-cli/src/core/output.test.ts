@@ -1,6 +1,6 @@
 import { decode } from '@toon-format/toon';
 import { describe, expect, it } from 'vitest';
-import { extractFrontmatter, formatRawOutput, formatTasksOutput } from './output.js';
+import { formatRawOutput, formatTasksOutput } from './output.js';
 import type { Task } from './types.js';
 
 function makeTask(overrides: Partial<Task> & { key: string }): Task {
@@ -99,55 +99,5 @@ describe('formatRawOutput', () => {
     const output = formatRawOutput(files);
     expect(output).toContain('title: Only');
     expect(output).not.toContain('───');
-  });
-});
-
-describe('extractFrontmatter', () => {
-  const FULL_TASK = `---
-title: "My Task"
-status: IN PROGRESS
-kind: TASK
-priority: HIGH
----
-
-# My Task
-
-This is the body content.
-
----
-
-# Activity Log
-
-## 2026-03-20T10:00:00Z
-
-- **status**: NOT STARTED → IN PROGRESS
-`;
-
-  it('should return only the frontmatter block', () => {
-    const result = extractFrontmatter(FULL_TASK);
-    expect(result).toContain('title: "My Task"');
-    expect(result).toContain('status: IN PROGRESS');
-    expect(result).not.toContain('# My Task');
-    expect(result).not.toContain('This is the body content');
-    expect(result).not.toContain('Activity Log');
-  });
-
-  it('should include both opening and closing --- delimiters', () => {
-    const result = extractFrontmatter(FULL_TASK);
-    const lines = result.split('\n');
-    expect(lines[0]).toBe('---');
-    expect(lines.at(-2)).toBe('---');
-  });
-
-  it('should return content unchanged when no frontmatter is present', () => {
-    const content = '# Just a heading\n\nSome content.\n';
-    expect(extractFrontmatter(content)).toBe(content);
-  });
-
-  it('should handle a file with only frontmatter and no body', () => {
-    const content = '---\ntitle: "Minimal"\nstatus: NOT STARTED\n---\n';
-    const result = extractFrontmatter(content);
-    expect(result).toContain('title: "Minimal"');
-    expect(result).not.toContain('# Minimal');
   });
 });

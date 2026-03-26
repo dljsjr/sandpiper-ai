@@ -22,84 +22,13 @@ A project that has tasks MUST have its own directory under `.sandpiper/tasks/` u
 .sandpiper/tasks/<PROJECT_KEY>/
 ```
 
-### 2.3 Project Metadata File
-
-Every project directory SHOULD have a `PROJECT.md` file at its root. This file makes the project self-describing so that an agent can understand the project's purpose and make confident ticket-filing decisions without relying on ambient context.
-
-#### 2.3.1 Location
-
-```
-.sandpiper/tasks/<PROJECT_KEY>/PROJECT.md
-```
-
-#### 2.3.2 Format
-
-`PROJECT.md` uses the same markdown + YAML frontmatter format as task files, but with a different set of fields. The frontmatter MUST open with `---` on the first line and close with `---`.
-
-```markdown
----
-key: SHR
-name: "Shell Relay"
-description: "Zellij-based shared terminal session between user and agent"
-when_to_file: "Use for work on the Zellij integration: relay extension, FIFO management, ghost-attach. Does NOT include general agent capabilities — those go in AGENT."
-status: active
-created_at: 2026-03-26T00:00:00Z
----
-
-# Shell Relay
-
-## Purpose
-
-...
-
-## Scope
-
-...
-
-## Related Projects
-
-...
-```
-
-#### 2.3.3 Frontmatter Fields
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `key` | REQUIRED | The project key. MUST match the owning project's key. |
-| `name` | REQUIRED | Human-readable project name (e.g., "Shell Relay"). |
-| `description` | REQUIRED | One-line summary of what the project is. |
-| `when_to_file` | REQUIRED | One-line description of when to file a ticket in this project. This is the primary routing signal used by agents. Mirrors the `description` trigger convention used by skills. |
-| `status` | REQUIRED | Project lifecycle status. One of: `active`, `archived`, `paused`. |
-| `created_at` | REQUIRED | ISO 8601 timestamp of when the PROJECT.md was created. |
-
-#### 2.3.4 Markdown Body
-
-The markdown body SHOULD contain three sections to provide additional context for agents and human readers:
-
-- **`## Purpose`** — What this project exists to do, in plain language.
-- **`## Scope`** — What belongs in this project and, critically, what does NOT (boundaries help agents route tickets correctly).
-- **`## Related Projects`** — Adjacent projects and how they relate.
-
-#### 2.3.5 `when_to_file` Convention
-
-The `when_to_file` field is the most important field for agent routing. It SHOULD:
-- Be a single sentence or short paragraph (one line in the YAML frontmatter).
-- Describe both positive scope ("use for X, Y, Z") and negative scope ("does NOT include A — that goes in PROJECT_B") where ambiguity exists.
-- Use the same phrasing convention as skill `description` trigger fields, since both are used by the agent to make routing decisions.
-
-#### 2.3.6 Enforcement
-
-The `project create` command MUST require all required frontmatter fields (`--name`, `--description`, `--when-to-file`) and write the PROJECT.md as part of project creation. Projects created before this requirement was introduced SHOULD have their PROJECT.md backfilled.
-
-### 2.4 Project Counter State
+### 2.3 Project Counter State
 
 Task numbering counters are maintained in the task index file (`index.toon`), not in per-project metadata files. Each project's `nextTaskNumber` is stored in the index's `counters` section.
 
 If the index is unavailable (e.g., first use, corrupted, or deleted), the counter MUST be rebuilt by scanning existing task files and using the highest task number found + 1.
 
 Legacy `.meta.yml` files MAY be present from older versions and are supported as a fallback counter source, but MUST NOT be created by new implementations.
-
-The `PROJECT.md` file is distinct from counter state and is NOT used for counter recovery. See §2.3 for PROJECT.md details.
 
 ## 3. Task Keys
 
