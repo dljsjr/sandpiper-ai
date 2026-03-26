@@ -38,7 +38,8 @@
   "pi": {
     "extensions": [
       "./extensions/system.ts",
-      "./extensions/shell-relay"
+      "./extensions/shell-relay",
+      "./extensions/web-fetch"
     ],
     "skills": [
       "./skills/sandpiper",
@@ -77,6 +78,13 @@
         "@types/node": "*",
         "@types/bun": "1.3.11"
       },
+      "web": {
+        "@mozilla/readability": "0.6.0",
+        "jsdom": "29.0.1",
+        "turndown": "7.2.2",
+        "@types/jsdom": "28.0.1",
+        "@types/turndown": "5.0.6"
+      },
       "testing": {
         "vitest": "4.1.1"
       },
@@ -94,7 +102,8 @@
     "sandpiper-ai-core": "workspace:*",
     "sandpiper-tasks-cli": "workspace:*",
     "shell-relay": "workspace:*",
-    "supports-color": "catalog:cli"
+    "supports-color": "catalog:cli",
+    "web-fetch": "workspace:*"
   },
   "peerDependencies": {
     "@mariozechner/pi-coding-agent": "catalog:pi",
