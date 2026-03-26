@@ -39,6 +39,46 @@ export interface Task {
   readonly related: readonly string[];
 }
 
+// ─── Project Metadata ─────────────────────────────────────────────
+
+export type ProjectStatus = 'active' | 'archived' | 'paused';
+
+/**
+ * Metadata about a project, parsed from PROJECT.md.
+ * Every project directory SHOULD have a PROJECT.md.
+ */
+export interface ProjectMetadata {
+  readonly key: string;
+  readonly name: string;
+  readonly description: string;
+  /**
+   * One-line description of when to file a ticket in this project.
+   * Mirrors the skill `description` trigger convention — loaded at session
+   * start so the agent can make confident filing decisions.
+   */
+  readonly whenToFile: string;
+  readonly status: ProjectStatus;
+  readonly createdAt: string;
+}
+
+/**
+ * A project entry as returned by `project list` — combines task counts
+ * with PROJECT.md metadata (when available).
+ */
+export interface ProjectListItem {
+  readonly key: string;
+  /** From PROJECT.md; empty string when no PROJECT.md exists. */
+  readonly name: string;
+  /** From PROJECT.md; empty string when no PROJECT.md exists. */
+  readonly description: string;
+  /** From PROJECT.md; empty string when no PROJECT.md exists. */
+  readonly whenToFile: string;
+  /** From PROJECT.md; null when no PROJECT.md exists. */
+  readonly status: ProjectStatus | null;
+  readonly taskCount: number;
+  readonly byStatus: Record<string, number>;
+}
+
 // ─── Index Types ─────────────────────────────────────────────────
 // These extend the domain model with index-specific metadata.
 

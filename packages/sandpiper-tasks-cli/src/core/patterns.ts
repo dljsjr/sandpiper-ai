@@ -4,6 +4,9 @@ import { join } from 'node:path';
 /** Matches an uppercase project key (2+ letters): SHR, CLI, TOOLS, etc. */
 export const PROJECT_KEY_RE = /^[A-Z]{2,}$/;
 
+/** Filename for per-project metadata files. */
+export const PROJECT_METADATA_FILENAME = 'PROJECT.md';
+
 /** Matches a task file name: SHR-1.md, TOOLS-42.md, etc. */
 export const TASK_FILE_RE = /^[A-Z]{2,}-\d+\.md$/;
 
