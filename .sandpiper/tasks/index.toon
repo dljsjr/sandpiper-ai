@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774623637545
+lastUpdatedAt: 1774623840821
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -114,17 +114,18 @@ tasks:
     key: AGENT-17
     project: AGENT
     title: Add borders and improved text styling to system banners
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-27T15:00:33.708Z"
-    updatedAt: "2026-03-27T15:00:37.537Z"
+    updatedAt: "2026-03-27T15:04:00.814Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774623637543
+    lastIndexedAt: 1774623840820
   "AGENT-2":
     key: AGENT-2
     project: AGENT

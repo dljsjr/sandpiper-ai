@@ -252,6 +252,13 @@ its documentation, APIs, etc. remain valid, with a few alterations:
   // ── Diagnostics + update notifications ──
 
   pi.on('session_start', async (_event, ctx) => {
+    // --- Session identity ---
+    process.env.SANDPIPER_SESSION_ID = ctx.sessionManager.getSessionId();
+    const sessionFile = ctx.sessionManager.getSessionFile();
+    if (sessionFile) {
+      process.env.SANDPIPER_SESSION_FILE = sessionFile;
+    }
+
     // --- Preflight diagnostics ---
     // Collect from registered checks (extensions) + built-in migration check.
     // pi.events.emit is synchronous — all listeners run before this returns.
