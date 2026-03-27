@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { DynamicBorder } from '@mariozechner/pi-coding-agent';
-import { Container, Text } from '@mariozechner/pi-tui';
+import { Spacer, Text } from '@mariozechner/pi-tui';
 import {
   collectPreflightDiagnostics,
   detectUnmigratedConfigs,
@@ -171,6 +171,32 @@ function formatProjectTriggersForPrompt(triggers: readonly ProjectTrigger[]): st
   }
   lines.push('</available_projects>');
   return lines.join('\n');
+}
+
+// ─── Chat Container Access ──────────────────────────────────────
+
+/**
+ * Get the chat container from the TUI component tree.
+ *
+ * The chat container is the second child (index 1) of the TUI root,
+ * per interactive-mode.ts init() layout order:
+ *   [0] headerContainer, [1] chatContainer, [2] pendingMessages,
+ *   [3] status, [4] widgetAbove, [5] editor, [6] widgetBelow, [7] footer
+ *
+ * Components added here flow with the chat — they scroll up naturally
+ * and are NOT persisted to the session JSONL.
+ */
+function getChatContainer(tui: { children: unknown[] }): { addChild: (c: unknown) => void } | undefined {
+  const candidate = tui.children[1];
+  if (
+    candidate &&
+    typeof candidate === 'object' &&
+    'addChild' in candidate &&
+    typeof (candidate as Record<string, unknown>).addChild === 'function'
+  ) {
+    return candidate as { addChild: (c: unknown) => void };
+  }
+  return undefined;
 }
 
 // ─── Migration ──────────────────────────────────────────────────
@@ -369,52 +395,54 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     }
 
     const unhealthy = diagnostics.filter((d) => !d.healthy);
-    if (unhealthy.length > 0) {
-      ctx.ui.setWidget('sandpiper-diagnostics', (_tui, theme) => {
-        const container = new Container();
-        container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-        container.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
-        for (const d of unhealthy) {
-          container.addChild(new Text(`  ${theme.fg('warning', d.message)}`, 1, 0));
-          for (const instruction of d.instructions ?? []) {
-            container.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
-          }
-        }
-        container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-        return {
-          render: (w: number) => container.render(w),
-          invalidate: () => container.invalidate(),
-        };
-      });
-    } else {
-      ctx.ui.setWidget('sandpiper-diagnostics', undefined);
-    }
 
-    // --- Update notifications ---
-    if (resolveEnvVar('OFFLINE') !== '1') {
-      const updates = await checkForUpdates();
-      for (const update of updates) {
-        ctx.ui.setWidget(`sandpiper-update:${update.name}`, (_tui, theme) => {
-          const container = new Container();
-          container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-          const heading = theme.bold(theme.fg('warning', 'Update Available'));
-          const versionLine =
-            theme.fg(
-              'muted',
-              `New version of ${update.name}: ${update.currentVersion} → ${update.latestVersion}. Run `,
-            ) + theme.fg('accent', update.installCommand);
-          let content = `${heading}\n${versionLine}`;
-          if (update.changelogUrl) {
-            content += `\n${theme.fg('muted', 'Changelog: ')}${theme.fg('accent', update.changelogUrl)}`;
+    // Use a transient widget to capture the TUI reference, then inject
+    // banners directly into the chat container so they flow with chat
+    // (not sticky) and aren't persisted to the session JSONL.
+    ctx.ui.setWidget('sandpiper-banners', (tui, theme) => {
+      const chatContainer = getChatContainer(tui);
+      if (chatContainer) {
+        // Diagnostics banner
+        if (unhealthy.length > 0) {
+          chatContainer.addChild(new Spacer(1));
+          chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+          chatContainer.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
+          for (const d of unhealthy) {
+            chatContainer.addChild(new Text(`  ${theme.fg('warning', d.message)}`, 1, 0));
+            for (const instruction of d.instructions ?? []) {
+              chatContainer.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
+            }
           }
-          container.addChild(new Text(content, 1, 0));
-          container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-          return {
-            render: (w: number) => container.render(w),
-            invalidate: () => container.invalidate(),
-          };
-        });
+          chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+        }
+
+        // Update notifications (fire-and-forget for post-startup placement)
+        if (resolveEnvVar('OFFLINE') !== '1') {
+          checkForUpdates().then((updates) => {
+            for (const update of updates) {
+              chatContainer.addChild(new Spacer(1));
+              chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+              const heading = theme.bold(theme.fg('warning', 'Update Available'));
+              const versionLine =
+                theme.fg(
+                  'muted',
+                  `New version of ${update.name}: ${update.currentVersion} → ${update.latestVersion}. Run `,
+                ) + theme.fg('accent', update.installCommand);
+              let content = `${heading}\n${versionLine}`;
+              if (update.changelogUrl) {
+                content += `\n${theme.fg('muted', 'Changelog: ')}${theme.fg('accent', update.changelogUrl)}`;
+              }
+              chatContainer.addChild(new Text(content, 1, 0));
+              chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+            }
+          });
+        }
       }
-    }
+
+      // Return a no-op component — the real work is the side-effect above
+      return { render: () => [], invalidate: () => {} };
+    });
+    // Clear the dummy widget immediately so it doesn't take up space
+    ctx.ui.setWidget('sandpiper-banners', undefined);
   });
 }
