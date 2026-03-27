@@ -180,6 +180,51 @@ Agent: "The tests failed. Let me check the output."
 ← { status: "exited", exit_code: 1, stderr: "..." }
 ```
 
+## Pi Framework State-Sharing Mechanisms
+
+Full inventory of how extensions can share state, communicate with the LLM,
+and persist data. Assessed for relevance to the background process framework.
+
+| Mechanism | LLM context? | Persisted? | Triggers turn? | Direction |
+|-----------|-------------|------------|----------------|-----------|
+| `pi.events` (event bus) | No | No | No | Extension ↔ Extension |
+| `context` event handler | Yes (injects messages) | No | No (piggybacks) | Extension → LLM |
+| `before_agent_start` return | Yes (system prompt) | No | No | Extension → LLM |
+| `sendMessage` | Yes (if display:true) | Yes | Optional | Extension → Chat + LLM |
+| `sendUserMessage` | Yes | Yes | Always | Extension → LLM |
+| `appendEntry` | **No** | Yes | No | Extension → Session |
+| `ctx.ui.notify` | No | No | No | Extension → User |
+| `ctx.ui.setWidget` | No | No | No | Extension → User |
+| `ctx.ui.setStatus` | No | No | No | Extension → User (footer) |
+| `process.env` | No | No | No | Global |
+| Tool `onUpdate` callback | Yes (partial) | No | No (mid-execution) | Tool → LLM |
+| Tool return value | Yes | Yes | No | Tool → LLM |
+
+### Mechanisms chosen for the framework
+
+- **`pi.events`** — internal extension-to-extension signaling. "Process X finished,
+  relay should react." Synchronous, in-memory, no persistence overhead.
+
+- **`context` event** — passive LLM notifications. Inject "background process X
+  exited with code 0" into the next LLM call without triggering a new turn.
+  Non-persistent (injected per-call), zero context cost when nothing to report.
+
+- **`appendEntry`** — sparingly, for cross-session state recovery if we ever need
+  to resume knowledge of processes that were running when the session was interrupted.
+  Does NOT enter LLM context, but does grow the JSONL file — use judiciously for
+  high-volume data.
+
+### Mechanisms explicitly not used
+
+- **`sendMessage`** — persists to JSONL, causes duplication on --resume. Wrong for
+  transient notifications.
+- **`sendUserMessage`** — too aggressive. Always triggers a turn, would interrupt
+  the agent's current work.
+- **`before_agent_start`** — fires once at the start, not suitable for ongoing
+  process status updates.
+- **Tool `onUpdate`** — only works during tool execution. Background processes
+  outlive their tool call by definition.
+
 ## Open Questions
 
 1. **Buffer size limits** — stdout can accumulate fast. Ring buffer? Max size with oldest-dropped?
