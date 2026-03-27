@@ -414,7 +414,7 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     // Fire-and-forget: don't await so the notification appears after
     // startup info (Context, Skills, etc.) has rendered, matching Pi's
     // own update banner placement.
-    if (process.env.PI_OFFLINE !== '1') {
+    if (process.env.SANDPIPER_OFFLINE !== '1') {
       checkForUpdates().then((updates) => {
         for (const update of updates) {
           pi.sendMessage({

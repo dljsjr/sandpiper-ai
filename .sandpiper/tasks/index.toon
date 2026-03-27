@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774626103743
+lastUpdatedAt: 1774628897100
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -142,6 +142,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774626103742
+  "AGENT-19":
+    key: AGENT-19
+    project: AGENT
+    title: Normalize PI_*/SANDPIPER_* env var mirroring in pi_wrapper.ts
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-27T16:27:22.601Z"
+    updatedAt: "2026-03-27T16:28:17.093Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774628897099
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -1006,4 +1022,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 19
+    nextTaskNumber: 20
