@@ -314,6 +314,46 @@ after `/reload` following a new module addition.
 
 **Fix:** Quit and relaunch sandpiper.
 
+## Pattern: Direct Chat Container Injection
+
+The most powerful technique for chat-flowing, bordered, non-persistent content.
+Extensions don't have direct access to the chat container, but it's reachable
+via the TUI component tree passed to widget factories.
+
+```typescript
+// Use a transient setWidget to capture the TUI reference
+ctx.ui.setWidget('my-banner', (tui, theme) => {
+  // Chat container is tui.children[1] (stable layout order from interactive-mode init)
+  const chatContainer = tui.children[1];
+  if (chatContainer && 'addChild' in chatContainer) {
+    chatContainer.addChild(new Spacer(1));
+    chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+    chatContainer.addChild(new Text(theme.bold(theme.fg('warning', 'My Banner')), 1, 0));
+    chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+  }
+  // Return a no-op — the real work is the side-effect above
+  return { render: () => [], invalidate: () => {} };
+});
+// Clear the dummy widget immediately
+ctx.ui.setWidget('my-banner', undefined);
+```
+
+**Why this works:** Pi's interactive mode builds the TUI tree as:
+`[0] header, [1] chatContainer, [2] pendingMessages, [3] status, [4] widgetAbove, [5] editor, [6] widgetBelow, [7] footer`.
+The `tui` parameter in widget factories IS the TUI root, and `Container.children`
+is public. Components added to `tui.children[1]` behave identically to Pi's own
+`this.chatContainer.addChild()` calls — they flow with chat and aren't persisted.
+
+**Duck-type the container** — don't use `instanceof Container` (fails across jiti
+module boundaries). Check for `'addChild' in candidate` instead.
+
+**Fire-and-forget for placement** — async work (like `checkForUpdates().then(...)`)
+resolved inside the factory will add components after startup info has rendered,
+placing them at the bottom of the chat near the editor.
+
+**Use `Spacer(1)` before borders** — matches Pi's own spacing pattern for visual
+separation from preceding content.
+
 ## Decision Guide
 
 | Need | Use | Why |

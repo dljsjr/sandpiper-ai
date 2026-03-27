@@ -23,9 +23,10 @@ provides orientation and the key decision guide.
 |-----|-----------|-------------------|----------|
 | `ctx.ui.notify(msg, type)` | Chat (flows up) | None — plain text, single color | Simple one-off notifications |
 | `ctx.ui.setWidget(key, factory)` | Above/below editor (sticky) | Full — DynamicBorder, Container, etc. | Persistent status/diagnostics that should stay visible |
-| `pi.registerMessageRenderer` + `pi.sendMessage` | Chat (flows up) | Full — DynamicBorder, Container, etc. | Rich notifications that need borders/styling AND should scroll with chat |
+| `pi.registerMessageRenderer` + `pi.sendMessage` | Chat (flows up) | Full — DynamicBorder, Container, etc. | Rich notifications — but persisted to JSONL (duplicates on resume) |
+| Direct chat container injection | Chat (flows up) | Full — DynamicBorder, Container, etc. | **Preferred** — rich, non-sticky, non-persistent. See patterns doc. |
 
-**The key tradeoff:** `setWidget` = sticky but full components. `notify` = chat-flowing but plain text only. `registerMessageRenderer` + `sendMessage` = chat-flowing AND full components — the right choice for styled banners.
+**The key tradeoff:** `setWidget` = sticky but full components. `notify` = chat-flowing but plain text only. **Direct chat container injection** = chat-flowing AND full components AND non-persistent — the right choice for styled banners.
 
 ## notify() internals
 
@@ -37,6 +38,32 @@ ctx.ui.notify('msg', 'error')    // → showError()    → red, prepends "Error:
 
 All three wrap the entire message in a single color — embedded ANSI styling partially works
 but is unreliable. Never use `notify` when you need `DynamicBorder`.
+
+## Direct Chat Container Injection (Preferred for Banners)
+
+The chat container is reachable at `tui.children[1]` from any widget factory.
+Use a transient `setWidget` to capture the TUI reference, inject components as
+a side-effect, then immediately clear the widget:
+
+```typescript
+ctx.ui.setWidget('my-banner', (tui, theme) => {
+  const chatContainer = tui.children[1];
+  if (chatContainer && 'addChild' in chatContainer) {
+    chatContainer.addChild(new Spacer(1));
+    chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+    chatContainer.addChild(new Text(theme.bold(theme.fg('warning', 'Heading')), 1, 0));
+    chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+  }
+  return { render: () => [], invalidate: () => {} };
+});
+ctx.ui.setWidget('my-banner', undefined); // clear the no-op widget
+```
+
+- Duck-type with `'addChild' in candidate` — don't use `instanceof` (jiti boundary issue)
+- Fire-and-forget async work inside the factory for post-startup placement
+- Components are transient — not persisted to JSONL, no duplication on `--resume`
+
+See `.sandpiper/docs/tui-extension-patterns.md` for full details and layout map.
 
 ## Custom Message Renderer Pattern
 
