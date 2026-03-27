@@ -1,3 +1,5 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { DynamicBorder } from '@mariozechner/pi-coding-agent';
 import { Container, Text } from '@mariozechner/pi-tui';
@@ -86,6 +88,88 @@ async function checkForUpdates(): Promise<readonly UpdateInfo[]> {
   // }
 
   return updates;
+}
+
+// ─── Project Metadata ───────────────────────────────────────────
+
+interface ProjectTrigger {
+  readonly key: string;
+  readonly whenToRead: string;
+  readonly location: string;
+}
+
+/**
+ * Extract a YAML frontmatter field from a markdown file's content.
+ * Handles both quoted and unquoted values.
+ */
+function extractFrontmatterField(content: string, field: string): string {
+  const match = content.match(new RegExp(`^${field}:\\s*"?([^"\\n]*)"?`, 'm'));
+  return match?.[1]?.trim() ?? '';
+}
+
+/**
+ * Scan .sandpiper/tasks/{project}/PROJECT.md for project metadata triggers.
+ * Returns only projects that have a non-empty when_to_read field.
+ */
+function collectProjectTriggers(cwd: string): readonly ProjectTrigger[] {
+  const tasksDir = join(cwd, '.sandpiper', 'tasks');
+  if (!existsSync(tasksDir)) return [];
+
+  const triggers: ProjectTrigger[] = [];
+  for (const entry of readdirSync(tasksDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const projectMdPath = join(tasksDir, entry.name, 'PROJECT.md');
+    if (!existsSync(projectMdPath)) continue;
+
+    try {
+      const content = readFileSync(projectMdPath, 'utf-8');
+      const key = extractFrontmatterField(content, 'key');
+      const whenToRead = extractFrontmatterField(content, 'when_to_read');
+      if (key && whenToRead) {
+        triggers.push({
+          key,
+          whenToRead,
+          location: `.sandpiper/tasks/${entry.name}/PROJECT.md`,
+        });
+      }
+    } catch {
+      // Skip unreadable files
+    }
+  }
+  return triggers;
+}
+
+/**
+ * Format project triggers as XML for inclusion in the system prompt,
+ * mirroring pi's skill injection format.
+ */
+function formatProjectTriggersForPrompt(triggers: readonly ProjectTrigger[]): string {
+  if (triggers.length === 0) return '';
+
+  const escapeXml = (s: string) =>
+    s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+
+  const lines = [
+    '',
+    'The following projects are registered in the local task tracker.',
+    'Use the read tool to load a project file when the task matches its description.',
+    '',
+    '<available_projects>',
+  ];
+  for (const trigger of triggers) {
+    lines.push('  <project>');
+    lines.push(`    <key>${escapeXml(trigger.key)}</key>`);
+    lines.push(`    <description>${escapeXml(trigger.whenToRead)}</description>`);
+    lines.push(`    <location>${escapeXml(trigger.location)}</location>`);
+    lines.push('  </project>');
+  }
+  lines.push('</available_projects>');
+  return lines.join('\n');
 }
 
 // ─── Migration ──────────────────────────────────────────────────
@@ -226,7 +310,9 @@ export default function (pi: ExtensionAPI) {
 
   // ── System prompt ──
 
-  pi.on('before_agent_start', async (event) => {
+  pi.on('before_agent_start', async (event, ctx) => {
+    const projectTriggers = formatProjectTriggersForPrompt(collectProjectTriggers(ctx.cwd));
+
     return {
       systemPrompt:
         event.systemPrompt +
@@ -245,7 +331,8 @@ its documentation, APIs, etc. remain valid, with a few alterations:
 - The version string for 'sandpiper' is separate from the version string for 'pi'; you are wrapped around Pi version ${process.env.PI_CODING_AGENT_VERSION},
   which is also in the environment variable 'PI_CODING_AGENT_VERSION'
 - You are distributed with a good bit of functionality that the core 'pi' framework doesn't include, via bundled extensions, skills, and prompts.
-`,
+` +
+        projectTriggers,
     };
   });
 

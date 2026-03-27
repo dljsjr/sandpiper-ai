@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774625950810
+lastUpdatedAt: 1774626103743
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -130,17 +130,18 @@ tasks:
     key: AGENT-18
     project: AGENT
     title: Inject project metadata triggers into system prompt
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-27T15:34:32.864Z"
-    updatedAt: "2026-03-27T15:34:46.455Z"
+    updatedAt: "2026-03-27T15:41:43.736Z"
+    resolution: DONE
     dependsOn[1]: TCL-70
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774625686460
+    lastIndexedAt: 1774626103742
   "AGENT-2":
     key: AGENT-2
     project: AGENT
