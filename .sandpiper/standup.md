@@ -1,60 +1,64 @@
 # Session Stand-Up
 
-Updated: 2026-03-27T18:30:00Z
+Updated: 2026-03-27T20:15:00Z
 Session: 0e5cb1a4-4133-404a-9c36-6e94354d38c4
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-03-27T14-50-08-059Z_0e5cb1a4-4133-404a-9c36-6e94354d38c4.jsonl
 
 ## Accomplished
 
 ### Banner Styling — AGENT-17 (COMPLETE)
-- Both banners (update notification + diagnostics) now use `pi.registerMessageRenderer` + `pi.sendMessage` — full DynamicBorder styling, flow with chat, not sticky
-- Fire-and-forget pattern for update notification ensures it appears after startup info
-- Diagnostics deduplication via Map (key-based) fixes listener accumulation on /reload
-- Reinstalled real relay.fish (was a stub from an early install run)
+- Final approach: inject DynamicBorder + Text directly into chat container (`tui.children[1]`) via transient setWidget side-effect
+- Bordered, flows with chat, non-persistent, no duplication on resume
+- Explored and rejected: sendMessage (persisted, duplicates on resume), setWidget (sticky)
+- Documented in tui skill, patterns doc, and AGENTS.md
 
-### Standup Skill Overhaul — AGENT-17 (COMPLETE)
-- "session" = agent context window; session UUID via SANDPIPER_SESSION_ID env var
+### Standup Skill + Session Identity — AGENT-17 (COMPLETE)
+- "session" = agent context window; SANDPIPER_SESSION_ID/FILE env vars
 
-### Project Metadata Rename — TCL-70 (COMPLETE)
-- when_to_file → when_to_read; 229 tests passing
-
-### System Prompt Project Injection — AGENT-18 (COMPLETE)
-- `<available_projects>` XML block auto-injected at agent start; ~850 tokens for 9 projects
+### Project Metadata — TCL-70 (COMPLETE), AGENT-18 (COMPLETE)
+- when_to_file → when_to_read rename; `<available_projects>` system prompt injection
 
 ### Env Var Normalization — AGENT-19 (COMPLETE)
-- Two-phase PI_* ↔ SANDPIPER_* mirror; resolveEnvVar() in sandpiper-ai-core
-- README.md user-facing docs; AGENTS.md developer convention
+- Two-phase PI_*/SANDPIPER_* mirror; resolveEnvVar() in core; README + AGENTS docs
 
-### TUI Knowledge — AGENT-17
-- New skill: `skills/sandpiper/tui/SKILL.md` — surfaces TUI patterns automatically
-- `.sandpiper/docs/tui-extension-patterns.md` — full reference doc
-- AGENTS.md TUI Development section with resource lookup table
-- Added: event listener accumulation pitfall, new-core-export restart requirement
+### Zellij 0.44 Compat — SHR-74
+- dump-screen requires --path flag (broke ghost client attachment)
+- listSessions needs --short --no-formatting (ANSI in session names)
+
+### Pi Binary Resolution
+- Removed static .pi-binpath caching; wrapper now resolves pi via `which pi` at runtime
+- Pi updates immediately reflected without sandpiper reinstall
+
+### Data Recovery
+- Restored 12 history diffs, 5 subtask statuses, ~224 lines of tests lost in earlier squash
+- Closed stale TCL-53, TCL-63
 
 ### Self-Reflection
-- tasks SKILL.md: removed stale session-start `project list` instruction (auto-injected now)
-- jj SKILL.md: added `jj restore --from` recovery pattern to common pitfalls
-- Closed stale TCL-53 (COMPLETE) and TCL-63 (COMPLETE)
-- Filed SHR-74 (stub relay.fish mystery), AGENT-20 (filter inactive projects from prompt)
+- New tui skill; updated tasks + jj skills; filed SHR-74, AGENT-20, AGENT-21
+
+### Zellij 0.44 Feature Investigation
+- Explored `zellij subscribe` live — viewport stream, fires per re-render, noisy for interactive typing but bulk for injected commands
+- Filed SHR-75 through SHR-79 with detailed findings
+- Likely hybrid approach: send-keys + list-panes + --pane-id (clear wins), keep FIFOs for exit codes/prompt_ready, evaluate subscribe for output capture
 
 ## In Progress
-- Nothing — all work committed and pushed to main
+- Nothing committed but unpushed — ready to push
 
 ## Next Session
-1. **SHR-62** (MEDIUM) — Long write-chars injections may wrap and confuse fish parser
-2. **SHR-63** (MEDIUM) — First command after setup often times out (prompt_ready race condition)
-3. **MEM-1** or **PKM-1** (MEDIUM) — Memory/PKM design work
-4. **AGENT-16** (LOW) — TUI rebranding — custom assets and theming
+1. **SHR-75** (HIGH) — Prototype subscribe-based output capture
+2. **SHR-79** (HIGH) — Architectural decision on Zellij 0.44 adoption strategy
+3. **SHR-76/77/78** (MEDIUM) — send-keys, list-panes, --pane-id investigations
+4. **AGENT-21** (MEDIUM) — Banner redesign (now COMPLETE via chat container injection, can close)
+5. **SHR-62/63** — Fish parser wrapping, prompt_ready race condition
 
 ## Blockers
-- `pi.sendUserMessage()` doesn't route through slash command pipeline (upstream pi bug)
 - Sandpiper not published to npm — blocks self-update notification
 
 ## Context
-- **Edit source skills, not dist** — edit `skills/sandpiper/`, run `bash devtools/postinstall.sh`
-- **sandpiper-tasks binary** — after CLI changes: `bun run --filter sandpiper-tasks-cli build` AND `bash devtools/postinstall.sh`
-- **New core exports require full restart** — `/reload` doesn't re-resolve jiti module graph
-- **Session identity** — SANDPIPER_SESSION_ID and SANDPIPER_SESSION_FILE injected at session_start
-- **Project triggers in system prompt** — auto-injected as `<available_projects>`; no manual project list needed
-- **Env vars** — use resolveEnvVar('NAME') from sandpiper-ai-core; 4 exempt vars accessed via process.env.PI_* directly
-- **TUI patterns** — read `.sandpiper/docs/tui-extension-patterns.md`; new `tui` skill auto-surfaces it
+- **Pi 0.63.1 active** — wrapper now resolves dynamically via PATH
+- **Zellij 0.44.0** — breaking change: dump-screen requires --path, list-sessions outputs ANSI by default
+- **Chat container injection** — `tui.children[1]` is the chat container; duck-type with `'addChild' in candidate`; use transient setWidget as entry point
+- **New core exports need full restart** — /reload doesn't re-resolve jiti module graph
+- **pi.events listeners accumulate on /reload** — deduplicate by key in collectors
+- **Edit source skills, not dist** — run `bash devtools/postinstall.sh` after changes
+- **sandpiper-tasks binary** — `bun run --filter sandpiper-tasks-cli build` AND postinstall
