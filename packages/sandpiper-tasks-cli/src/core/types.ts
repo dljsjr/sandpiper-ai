@@ -67,9 +67,13 @@ export interface ProjectMetadata {
  */
 export interface ProjectListItem {
   readonly key: string;
+  /** From PROJECT.md; empty string when no PROJECT.md exists. */
   readonly name: string;
+  /** From PROJECT.md; empty string when no PROJECT.md exists. */
   readonly description: string;
+  /** From PROJECT.md; empty string when no PROJECT.md exists. */
   readonly whenToRead: string;
+  /** From PROJECT.md; null when no PROJECT.md exists. */
   readonly status: ProjectStatus | null;
   readonly taskCount: number;
   readonly byStatus: Record<string, number>;
