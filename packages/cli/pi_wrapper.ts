@@ -4,38 +4,26 @@ process.title = 'sandpiper';
 
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
-import { readFile, realpath } from 'node:fs/promises';
+import { realpath } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 
-// Locate the system pi binary. Try (in order):
-// 1. .pi-binpath file next to this script (written at install time)
-// 2. .pi-binpath in dist/ subdirectory (dev mode: script is in packages/cli/)
-// 3. `which pi` fallback (dev mode without prior install)
+// Locate the system pi binary dynamically via PATH.
+// Always resolves the user's globally installed pi — not the workspace dependency.
 let systemPiDistDir: string;
 
-const binpathHere = join(scriptDir, '.pi-binpath');
-const binpathDist = join(scriptDir, 'dist', '.pi-binpath');
-
-if (existsSync(binpathHere)) {
-  systemPiDistDir = dirname(await realpath((await readFile(binpathHere, 'utf-8')).trim()));
-} else if (existsSync(binpathDist)) {
-  systemPiDistDir = dirname(await realpath((await readFile(binpathDist, 'utf-8')).trim()));
-} else {
-  // Fallback: find pi on PATH
-  try {
-    const piBin = execSync('which pi', { encoding: 'utf-8' }).trim();
-    systemPiDistDir = dirname(await realpath(piBin));
-  } catch {
-    console.error('Error: Could not find pi binary. Install pi globally or run the build first.');
-    process.exit(1);
-  }
+try {
+  const piBin = execSync('which pi', { encoding: 'utf-8' }).trim();
+  systemPiDistDir = dirname(await realpath(piBin));
+} catch {
+  console.error('Error: Could not find pi binary. Install pi globally first.');
+  process.exit(1);
 }
 
 const systemPiPackageDir = dirname(systemPiDistDir);
-const piPkgJson = JSON.parse(await readFile(join(systemPiPackageDir, 'package.json'), 'utf-8'));
+const piPkgJson = JSON.parse(readFileSync(join(systemPiPackageDir, 'package.json'), 'utf-8'));
 const piVersion = piPkgJson.version;
 
 // Find the package directory that pi should use as its root.

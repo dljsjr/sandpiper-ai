@@ -18,6 +18,6 @@
   "scripts": {
     "build": "mkdir -p dist && tsc && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper",
     "copy-assets": "bun run --target bun ./copy_pi_assets.ts",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun copy-assets && ./locatePi.sh"
+    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun copy-assets"
   }
 }
