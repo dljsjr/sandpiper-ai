@@ -378,6 +378,15 @@ bunx vitest path/to/file # Run specific test file
 - **Test real behavior over mocks where practical.** Only mock at boundaries where real resources are unavailable or impractical in a test environment (e.g., external service APIs, framework internals).
 - **Edge cases are first-class test cases.** Shell quoting, special characters, empty inputs, large outputs, error conditions, and boundary values should all have dedicated tests.
 
+### Dogfood-Driven Development for Tool Calls
+
+When building agent tools (pi extension tools), prioritize getting to a **dogfoodable state** as early as possible — a minimal version the agent can actually call and observe. The agent's own experience using the tool is a uniquely valuable feedback signal that unit tests can't replicate.
+
+- **Ship a callable tool early**, even if incomplete. A tool that spawns a process and returns its PID is more informative to work with than a fully-designed API that only exists in tests.
+- **Use the tool in-session** to validate ergonomics: Is the output useful? Is the context cost reasonable? Does the parameterization make sense from the agent's perspective?
+- **Iterate based on real usage**, not hypothetical scenarios. Buffer sizes, default parameters, output formatting — these are best tuned by the agent actually calling the tool during development.
+- **TDD still applies** — write tests for the core logic. Dogfooding validates the tool *interface* and *integration*; tests validate the *implementation*.
+
 ### Conventions
 
 - Test files live alongside the modules they test: `foo.ts` → `foo.test.ts`
