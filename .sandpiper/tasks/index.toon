@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774648654043
+lastUpdatedAt: 1774649094113
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -204,6 +204,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774641217050
+  "AGENT-27":
+    key: AGENT-27
+    project: AGENT
+    title: Refactor system.ts into a package (too large for a single file)
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T22:04:54.108Z"
+    updatedAt: "2026-03-27T22:04:54.108Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774649094112
   "AGENT-5":
     key: AGENT-5
     project: AGENT
@@ -240,34 +255,34 @@ tasks:
     key: AGENT-22
     project: AGENT
     title: Implement ProcessManager core in sandpiper-ai-core
-    status: NOT STARTED
+    status: IN PROGRESS
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-27T21:57:33.862Z"
-    updatedAt: "2026-03-27T21:57:33.862Z"
+    updatedAt: "2026-03-27T22:03:04.051Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648653869
+    lastIndexedAt: 1774648984057
   "AGENT-23":
     key: AGENT-23
     project: AGENT
     title: Implement start_background_process tool in system.ts
-    status: NOT STARTED
+    status: IN PROGRESS
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-27T21:57:33.910Z"
-    updatedAt: "2026-03-27T21:57:33.910Z"
+    updatedAt: "2026-03-27T22:03:04.093Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648653913
+    lastIndexedAt: 1774648984099
   "AGENT-24":
     key: AGENT-24
     project: AGENT
@@ -1224,4 +1239,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 27
+    nextTaskNumber: 28
