@@ -233,6 +233,33 @@ The referenced package must be built first (`tsc --build`). Use conditional expo
 { "exports": { ".": { "types": "./dist/index.d.ts", "default": "./src/index.ts" } } }
 ```
 
+## TUI Development
+
+When building or modifying TUI components for extensions, consult these resources **in this order**:
+
+### Sandpiper Reference
+
+| Resource | Path | Contents |
+|----------|------|----------|
+| TUI patterns doc | `.sandpiper/docs/tui-extension-patterns.md` | Practical patterns, decision guide, Pi internals analysis. **Read this first.** |
+| System extension | `extensions/system.ts` | Working examples: `DynamicBorder` widgets, custom message renderers, theme usage |
+
+### Pi Framework Reference
+
+The Pi package is resolved via the `PI_CODING_AGENT_PACKAGE` env var. All paths below are relative to that root.
+
+| Resource | Path | Contents |
+|----------|------|----------|
+| TUI docs | `docs/tui.md` | Component API, theming, custom components, overlays, keyboard input |
+| Extension docs | `docs/extensions.md` | `sendMessage`, `registerMessageRenderer`, `setWidget`, lifecycle hooks |
+| Extension examples | `examples/extensions/` | Working examples — especially `message-renderer.ts`, `preset.ts`, `tools.ts` |
+| TUI component source | `../pi-tui/dist/` (sibling package) | `Text`, `Container`, `Spacer`, `Box`, etc. — read the `.js` when docs are ambiguous |
+| Interactive mode source | `dist/modes/interactive/interactive-mode.js` | How Pi renders notifications, widgets, custom messages internally |
+
+### Key Principle
+
+**Trust working examples and source over docs when they conflict.** Pi's docs occasionally show incorrect API usage (e.g., `getFlag("--name")` vs the correct `getFlag("name")`). When in doubt, read the implementation.
+
 ## Task Management
 
 All coding work MUST be tracked against a task. Do not begin implementation without a task to reference. This applies to features, bugs, refactors, and any other code changes.
