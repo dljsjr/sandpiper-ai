@@ -46,7 +46,7 @@ export class ZellijClient {
    * @param outputPath - Path to write the screen dump to (can be a FIFO)
    */
   dumpScreen(outputPath: string): void {
-    this.execInSession(`zellij action dump-screen --full -- ${this.shellQuote(outputPath)}`);
+    this.execInSession(`zellij action dump-screen --full --path ${this.shellQuote(outputPath)}`);
   }
 
   /**
@@ -108,7 +108,7 @@ export class ZellijClient {
         try {
           // dump-screen to /dev/null — just testing if it succeeds
           // With a real client attached, this reliably works
-          this.execInSession('zellij action dump-screen --full /dev/null');
+          this.execInSession('zellij action dump-screen --full --path /dev/null');
           resolve(true);
         } catch {
           if (Date.now() - start >= timeoutMs) {
