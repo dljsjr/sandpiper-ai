@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774649094113
+lastUpdatedAt: 1774651330164
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -84,17 +84,18 @@ tasks:
     key: AGENT-15
     project: AGENT
     title: General-purpose background process/task framework for the agent
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T15:44:16.494Z"
-    updatedAt: "2026-03-27T21:31:06.691Z"
+    updatedAt: "2026-03-27T22:42:10.157Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[1]: SHR-71
-    lastIndexedAt: 1774647066700
+    lastIndexedAt: 1774651330163
   "AGENT-16":
     key: AGENT-16
     project: AGENT
@@ -255,82 +256,87 @@ tasks:
     key: AGENT-22
     project: AGENT
     title: Implement ProcessManager core in sandpiper-ai-core
-    status: IN PROGRESS
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-27T21:57:33.862Z"
-    updatedAt: "2026-03-27T22:03:04.051Z"
+    updatedAt: "2026-03-27T22:37:41.414Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648984057
+    lastIndexedAt: 1774651061427
   "AGENT-23":
     key: AGENT-23
     project: AGENT
     title: Implement start_background_process tool in system.ts
-    status: IN PROGRESS
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-27T21:57:33.910Z"
-    updatedAt: "2026-03-27T22:03:04.093Z"
+    updatedAt: "2026-03-27T22:37:41.468Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648984099
+    lastIndexedAt: 1774651061475
   "AGENT-24":
     key: AGENT-24
     project: AGENT
     title: Implement check_background_process tool in system.ts
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T21:57:33.951Z"
-    updatedAt: "2026-03-27T21:57:33.951Z"
+    updatedAt: "2026-03-27T22:37:41.509Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648653955
+    lastIndexedAt: 1774651061515
   "AGENT-25":
     key: AGENT-25
     project: AGENT
     title: Implement passive completion notifications via context event
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-27T21:57:33.994Z"
-    updatedAt: "2026-03-27T21:57:33.994Z"
+    updatedAt: "2026-03-27T22:42:10.115Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648653998
+    lastIndexedAt: 1774651330122
   "AGENT-26":
     key: AGENT-26
     project: AGENT
     title: Session lifecycle integration (teardown on session_shutdown)
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T21:57:34.038Z"
-    updatedAt: "2026-03-27T21:57:34.038Z"
+    updatedAt: "2026-03-27T22:37:41.551Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: AGENT-15
-    lastIndexedAt: 1774648654042
+    lastIndexedAt: 1774651061561
   "AGENT-3":
     key: AGENT-3
     project: AGENT

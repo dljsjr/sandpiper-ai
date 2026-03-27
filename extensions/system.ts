@@ -542,6 +542,28 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     ctx.ui.setWidget('sandpiper-banners', undefined);
   });
 
+  // ── Background process completion notifications ──
+  // Inject a message into the LLM context when background processes finish.
+  // This fires before every LLM call — zero cost when nothing to report.
+
+  pi.on('context', async (event, _ctx) => {
+    const completed = processManager.getCompletedUnacknowledged();
+    if (completed.length === 0) return;
+
+    const lines = completed.map((p) => `Background process "${p.id}" exited with code ${p.exitCode}.`);
+    for (const p of completed) processManager.acknowledge(p.id);
+
+    return {
+      messages: [
+        ...event.messages,
+        {
+          role: 'user',
+          content: [{ type: 'text', text: lines.join('\n') }],
+        } as (typeof event.messages)[number],
+      ],
+    };
+  });
+
   // ── Background process cleanup ──
 
   pi.on('session_shutdown', async () => {
