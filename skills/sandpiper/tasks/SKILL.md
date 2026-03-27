@@ -19,15 +19,15 @@ Manage project work items as markdown files with YAML frontmatter, stored in the
 
 For the full normative specification, see [references/SPEC.md](references/SPEC.md). This skill document provides operational guidance and quick reference.
 
-## Session Start: Load Project Metadata
+## Session Start: Project Routing
 
-At the **start of every session** in a project that has a `.sandpiper/tasks` directory, run:
+Project routing triggers (`whenToRead` fields) are **automatically injected into the system prompt** by the sandpiper system extension at session start. You do not need to run `project list` to get routing context — it is already in your context as an `<available_projects>` block.
+
+If you need the full project list with task counts (e.g., to assess project health or find the right key), run:
 
 ```bash
-sandpiper-tasks project list --format toon
+sandpiper-tasks project list
 ```
-
-This loads all project metadata — including the `whenToRead` routing field for each project — into context. Use these `whenToRead` values to decide where to file new tickets throughout the session, just as skill `description` fields are used to decide when to load a skill.
 
 Projects with no `PROJECT.md` will appear with empty `whenToRead`. If you create a new project, you MUST provide `--name`, `--description`, and `--when-to-read`.
 
@@ -147,7 +147,7 @@ sandpiper-tasks task summary -p SHR                              # project-scope
 
 ```bash
 sandpiper-tasks project list                                     # list all projects with task counts + metadata
-sandpiper-tasks --format toon project list                       # structured output with whenToRead (use at session start)
+sandpiper-tasks --format toon project list                       # structured output with whenToRead + task counts
 sandpiper-tasks project create SHR \
   --name "Shell Relay" \
   --description "Zellij-based shared terminal" \

@@ -277,6 +277,43 @@ pi.on('session_start', async (_event, ctx) => {
 Pi uses this same pattern internally — `this.checkForNewVersion().then(...)` in `run()`.
 The network latency naturally pushes the notification below the startup content.
 
+## Pitfall: Event Listener Accumulation on /reload
+
+`pi.events.on()` listeners accumulate across `/reload` cycles. The event bus persists
+for the lifetime of the process, but extension factories re-register listeners each time
+`/reload` runs. If your system collects results by emitting an event and gathering responses,
+you'll get duplicate results after each reload.
+
+**Fix:** Deduplicate by a stable key rather than relying on listener count:
+
+```typescript
+// ❌ Accumulates duplicates across reloads
+export function collectChecks(pi: HasEvents): Result[] {
+  const results: Result[] = [];
+  pi.events.emit(EVENT, (r: Result) => results.push(r));
+  return results;
+}
+
+// ✅ Deduplicates by key — reload-safe
+export function collectChecks(pi: HasEvents): Result[] {
+  const seen = new Map<string, Result>();
+  pi.events.emit(EVENT, (r: Result) => seen.set(r.key, r));
+  return [...seen.values()];
+}
+```
+
+## Pitfall: New Core Exports Require Full Restart
+
+Adding a new module to a workspace package (e.g., `sandpiper-ai-core`) and re-exporting it
+requires a **full agent restart** to take effect — `/reload` does not re-resolve the module
+dependency graph. jiti caches the module graph in memory for the session lifetime, so even
+with `moduleCache: false`, already-resolved packages aren't re-imported.
+
+**Symptom:** `Export named 'myNewFunction' not found in module '...core/src/index.ts'`
+after `/reload` following a new module addition.
+
+**Fix:** Quit and relaunch sandpiper.
+
 ## Decision Guide
 
 | Need | Use | Why |

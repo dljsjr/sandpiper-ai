@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774628897100
+lastUpdatedAt: 1774633484308
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -174,6 +174,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774499226037
+  "AGENT-20":
+    key: AGENT-20
+    project: AGENT
+    title: "Consider filtering inactive projects (VND, SRL) from system prompt injection to save ~170 tokens"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T17:44:44.304Z"
+    updatedAt: "2026-03-27T17:44:44.304Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774633484307
   "AGENT-5":
     key: AGENT-5
     project: AGENT
@@ -523,6 +538,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774560171363
+  "SHR-74":
+    key: SHR-74
+    project: SHR
+    title: Investigate how relay.fish stub ended up installed (was replaced by real file but shouldn't have reverted)
+    status: NOT STARTED
+    kind: BUG
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T17:44:44.263Z"
+    updatedAt: "2026-03-27T17:44:44.263Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774633484267
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -542,17 +572,18 @@ tasks:
     key: TCL-53
     project: TCL
     title: Investigate project-level metadata and configuration
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.748Z"
-    updatedAt: "2026-03-26T16:25:07.981Z"
+    updatedAt: "2026-03-27T17:44:37.583Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774558194860
+    lastIndexedAt: 1774633477593
   "TCL-55":
     key: TCL-55
     project: TCL
@@ -695,18 +726,19 @@ tasks:
     key: TCL-63
     project: TCL
     title: Update project create to enforce PROJECT.md scaffolding
-    status: IN PROGRESS
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-26T16:25:14.763Z"
-    updatedAt: "2026-03-26T16:35:19.822Z"
+    updatedAt: "2026-03-27T17:44:37.628Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-53
-    lastIndexedAt: 1774558194861
+    lastIndexedAt: 1774633477634
   "TCL-64":
     key: TCL-64
     project: TCL
@@ -1001,7 +1033,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 74
+    nextTaskNumber: 75
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
@@ -1022,4 +1054,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 20
+    nextTaskNumber: 21
