@@ -96,6 +96,35 @@ Key files:
 - `.sandpiper/standup.md` — session stand-up note
 - `.sandpiper/tasks/` — task tracker
 
+## Environment Variables
+
+Sandpiper is fully backwards-compatible with pi's `PI_*` environment variables. Any `PI_*` variable that pi supports will also work with sandpiper — for example, `PI_OFFLINE=1` will disable network requests.
+
+Every `PI_*` variable also has a corresponding `SANDPIPER_*` variant. You can use either:
+
+```bash
+PI_OFFLINE=1 sandpiper          # works
+SANDPIPER_OFFLINE=1 sandpiper   # also works
+```
+
+When both are set, `SANDPIPER_*` takes precedence:
+
+```bash
+# SANDPIPER_OFFLINE wins — offline mode is enabled
+PI_OFFLINE=0 SANDPIPER_OFFLINE=1 sandpiper
+```
+
+A small number of `PI_*` variables are used internally by sandpiper to configure the underlying pi runtime and are not mirrored to the `SANDPIPER_*` namespace:
+
+| Variable | Purpose |
+|----------|---------|
+| `PI_CODING_AGENT_PACKAGE` | Path to the pi-coding-agent package |
+| `PI_CODING_AGENT_VERSION` | Version of the underlying pi-coding-agent |
+| `PI_PACKAGE_DIR` | Package directory for loading extensions and skills |
+| `PI_SKIP_VERSION_CHECK` | Suppresses pi's built-in update check |
+
+These are set automatically at startup. You generally don't need to interact with them.
+
 ## License
 
 MIT

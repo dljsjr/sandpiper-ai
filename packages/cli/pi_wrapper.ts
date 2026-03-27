@@ -68,27 +68,32 @@ function findPackageDir(startDir: string): string {
 const overridesPackageDir = findPackageDir(scriptDir);
 
 // ── Explicit PI_* variables ──
-// These are pi-framework-specific and must not be mirrored to/from SANDPIPER_*.
-process.env.PI_PACKAGE_DIR = overridesPackageDir;
+// These are exempt from SANDPIPER_* ↔ PI_* mirroring.
+//
+// Sandpiper internals — capture pi package info for self-improvement
+// prompting (extension authoring, doc exploration, etc.):
 process.env.PI_CODING_AGENT_PACKAGE = systemPiPackageDir;
 process.env.PI_CODING_AGENT_VERSION = piVersion;
-// Suppress pi's built-in version check — sandpiper handles its own
-// update notifications via the system extension.
-process.env.PI_SKIP_VERSION_CHECK = '1';
+//
+// Pi behavior controls — set by sandpiper to configure the pi runtime.
+// Users may also set these, but sandpiper needs to set them to meet its
+// own requirements, so they must not be overwritten by mirroring:
+process.env.PI_PACKAGE_DIR = overridesPackageDir;
+process.env.PI_SKIP_VERSION_CHECK = '1'; // sandpiper has its own update check
 console.log(`using pi-coding-agent version: ${piVersion}\n`);
 
 // ── Env var mirroring ──
 // Mirror PI_* ↔ SANDPIPER_* so that:
 //   - Users can set either SANDPIPER_* or PI_* and both namespaces stay in sync
 //   - SANDPIPER_* takes precedence over PI_* when both are set
-//   - Our own code always reads SANDPIPER_* (except the 4 explicit vars above)
+//   - Our own code always reads SANDPIPER_* (via resolveEnvVar from core)
 //
-// The 4 explicit vars above are exempt — they are pi-framework internals that
-// we set directly and should not leak into the SANDPIPER_* namespace.
+// The 4 explicit vars above are exempt — they must not leak into the
+// SANDPIPER_* namespace or be overwritten by mirroring.
 const EXEMPT_PI_VARS = new Set([
-  'PI_PACKAGE_DIR',
   'PI_CODING_AGENT_PACKAGE',
   'PI_CODING_AGENT_VERSION',
+  'PI_PACKAGE_DIR',
   'PI_SKIP_VERSION_CHECK',
 ]);
 
