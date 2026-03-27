@@ -1,14 +1,15 @@
 ---
 title: "Inject project metadata triggers into system prompt"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-27T15:34:32.864Z
 depends_on:
   - TCL-70
-updated_at: 2026-03-27T15:34:46.455Z
+updated_at: 2026-03-27T15:41:43.736Z
 ---
 
 # Inject project metadata triggers into system prompt
@@ -41,3 +42,13 @@ Depends on TCL-70 (when_to_file → when_to_read rename).
 ## 2026-03-27T15:34:46.455Z
 
 - **description**: added (16 lines)
+
+## 2026-03-27T15:39:23.139Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-27T15:41:43.736Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE
