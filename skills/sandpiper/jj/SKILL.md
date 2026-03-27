@@ -347,6 +347,11 @@ place, and `jj new` to branch off an ancestor commit.
 
 **"How do I undo everything?"** — `jj op log` to find good state, `jj op restore <op-id>`.
 
+**"I need to recover specific files from an old commit."** — Use `jj restore --from <rev> path/to/files`. Supports glob patterns (quote them to prevent shell expansion). The files are restored into `@` — no need to create a new commit first:
+```
+jj restore --from abc123 '.sandpiper/tasks/*/PROJECT.md'
+```
+
 ---
 
 ## Reference files
