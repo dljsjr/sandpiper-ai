@@ -74,7 +74,12 @@ export function registerPreflightCheck(pi: HasEvents, key: string, check: Prefli
  * @param pi The pi ExtensionAPI (or any object with a compatible .events bus).
  */
 export function collectPreflightDiagnostics(pi: HasEvents): PreflightDiagnostic[] {
-  const diagnostics: PreflightDiagnostic[] = [];
-  pi.events.emit(PREFLIGHT_EVENT, (d: PreflightDiagnostic) => diagnostics.push(d));
-  return diagnostics;
+  const seen = new Map<string, PreflightDiagnostic>();
+  pi.events.emit(PREFLIGHT_EVENT, (d: PreflightDiagnostic) => {
+    // Deduplicate by key — last write wins. This handles listener
+    // accumulation on pi.events across /reload cycles (the event bus
+    // persists but extension factories re-register listeners).
+    seen.set(d.key, d);
+  });
+  return [...seen.values()];
 }

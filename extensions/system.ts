@@ -9,6 +9,7 @@ import {
   formatInstallInstructions,
   installShellIntegrations,
   type MigrationMode,
+  type PreflightDiagnostic,
   parseMigrationCommandArgs,
   parseMigrationScope,
   performMigration,
@@ -222,6 +223,23 @@ export default function (pi: ExtensionAPI) {
     return container;
   });
 
+  pi.registerMessageRenderer<PreflightDiagnostic[]>('sandpiper-diagnostics', (message, _options, theme) => {
+    const unhealthy = message.details;
+    if (!unhealthy || unhealthy.length === 0) return undefined;
+
+    const container = new Container();
+    container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+    container.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
+    for (const d of unhealthy) {
+      container.addChild(new Text(`  ${theme.fg('warning', d.message)}`, 1, 0));
+      for (const instruction of d.instructions ?? []) {
+        container.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
+      }
+    }
+    container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+    return container;
+  });
+
   // ── Shell integration install flag ──
 
   pi.registerFlag('install-shell-integrations', {
@@ -391,24 +409,12 @@ its documentation, APIs, etc. remain valid, with a few alterations:
 
     const unhealthy = diagnostics.filter((d) => !d.healthy);
     if (unhealthy.length > 0) {
-      ctx.ui.setWidget('sandpiper-diagnostics', (_tui, theme) => {
-        const container = new Container();
-        container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-        container.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
-        for (const d of unhealthy) {
-          container.addChild(new Text(`  ${theme.fg('warning', d.message)}`, 1, 0));
-          for (const instruction of d.instructions ?? []) {
-            container.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
-          }
-        }
-        container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-        return {
-          render: (w: number) => container.render(w),
-          invalidate: () => container.invalidate(),
-        };
+      pi.sendMessage({
+        customType: 'sandpiper-diagnostics',
+        content: '',
+        display: true,
+        details: unhealthy,
       });
-    } else {
-      ctx.ui.setWidget('sandpiper-diagnostics', undefined);
     }
 
     // --- Update notifications ---
