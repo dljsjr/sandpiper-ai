@@ -65,33 +65,27 @@ ctx.ui.setWidget('my-banner', undefined); // clear the no-op widget
 
 See `.sandpiper/docs/tui-extension-patterns.md` for full details and layout map.
 
-## Custom Message Renderer Pattern
+## Custom Message Renderer Pattern (Caution: Persistent)
+
+**Warning:** `sendMessage` persists to the session JSONL. On `--resume`, persisted
+messages are replayed, causing duplicates. Prefer direct chat container injection
+for transient notifications. Use `sendMessage` only when persistence is desired
+(e.g., messages the LLM should see in resumed sessions).
 
 ```typescript
-// In the extension factory (runs once at load):
-pi.registerMessageRenderer<MyDetails>('sandpiper-my-type', (message, _options, theme) => {
+pi.registerMessageRenderer<MyDetails>('my-type', (message, _options, theme) => {
   const container = new Container();
-  container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-  container.addChild(new Text(theme.bold(theme.fg('warning', 'Heading')), 1, 0));
-  container.addChild(new Text(
-    theme.fg('muted', 'Body text ') + theme.fg('accent', 'accent part'),
-    1, 0
-  ));
-  container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+  // ... build component ...
   return container;
 });
 
-// In a session_start or event handler:
 pi.sendMessage({
-  customType: 'sandpiper-my-type',
-  content: '',      // can be empty — renderer handles display
-  display: true,    // must be true
-  details: myData,  // typed payload available as message.details in renderer
+  customType: 'my-type',
+  content: '',
+  display: true,
+  details: myData,
 });
 ```
-
-`CustomMessageComponent` automatically adds `Spacer(1)` before the component.
-If the renderer returns `undefined`, falls back to default purple-box rendering.
 
 ## Chat Placement Timing
 

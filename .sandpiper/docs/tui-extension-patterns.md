@@ -360,6 +360,7 @@ separation from preceding content.
 |------|-----|-----|
 | Simple one-off notification | `ctx.ui.notify()` | Minimal code, flows with chat |
 | Persistent status/diagnostics | `ctx.ui.setWidget()` with factory | Stays visible, full component control |
-| Rich notification that scrolls | `registerMessageRenderer` + `sendMessage` | Components in chat flow |
+| Rich notification that scrolls (non-persistent) | Direct chat container injection | **Preferred** — full components, flows with chat, no JSONL persistence |
+| Rich notification that scrolls (persistent) | `registerMessageRenderer` + `sendMessage` | Components in chat flow, but duplicates on `--resume` |
 | Interactive UI (selection, input) | `ctx.ui.custom()` | Takes over editor, handles keyboard |
 | Footer info | `ctx.ui.setStatus()` or `ctx.ui.setFooter()` | Persistent, minimal |
