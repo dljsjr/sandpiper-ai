@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774641217052
+lastUpdatedAt: 1774646558587
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -568,6 +568,81 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774633484267
+  "SHR-75":
+    key: SHR-75
+    project: SHR
+    title: Investigate zellij subscribe for output capture (replace FIFO pipeline)
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T20:45:55.385Z"
+    updatedAt: "2026-03-27T21:22:38.363Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774646558378
+  "SHR-76":
+    key: SHR-76
+    project: SHR
+    title: Investigate zellij action send-keys as replacement for write-chars
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T20:45:55.442Z"
+    updatedAt: "2026-03-27T21:22:38.416Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774646558427
+  "SHR-77":
+    key: SHR-77
+    project: SHR
+    title: Investigate zellij action list-panes for pane discovery and health checks
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T20:45:55.495Z"
+    updatedAt: "2026-03-27T21:22:38.479Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774646558486
+  "SHR-78":
+    key: SHR-78
+    project: SHR
+    title: Investigate zellij action dump-screen --pane-id for targeted cross-session queries
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T20:45:55.549Z"
+    updatedAt: "2026-03-27T21:22:38.529Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774646558536
+  "SHR-79":
+    key: SHR-79
+    project: SHR
+    title: Evaluate whether Zellij 0.44 features warrant a ground-up shell relay redesign
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T20:45:55.601Z"
+    updatedAt: "2026-03-27T21:22:38.579Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774646558586
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -1048,7 +1123,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 75
+    nextTaskNumber: 80
   SRL:
     projectKey: SRL
     nextTaskNumber: 2

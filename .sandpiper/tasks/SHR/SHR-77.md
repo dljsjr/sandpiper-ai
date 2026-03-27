@@ -1,0 +1,26 @@
+---
+title: "Investigate zellij action list-panes for pane discovery and health checks"
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-03-27T20:45:55.495Z
+updated_at: 2026-03-27T21:22:38.479Z
+---
+
+# Investigate zellij action list-panes for pane discovery and health checks
+
+Zellij 0.44 adds `zellij action list-panes` with --json output. Lists all panes with metadata: running commands, titles, coordinates, pane IDs.
+
+Could replace our waitForPane polling (dump-screen to /dev/null) with a direct pane existence/readiness check. Also useful for pane discovery when reconnecting.
+
+Investigation: what metadata does list-panes provide? Is it sufficient to detect a healthy shell pane ready for command injection?
+
+---
+
+# Activity Log
+
+## 2026-03-27T21:22:38.479Z
+
+- **description**: added (5 lines)
