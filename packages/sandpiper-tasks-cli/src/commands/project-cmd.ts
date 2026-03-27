@@ -38,7 +38,7 @@ function buildProjectListItems(tasksDir: string, projects: Map<string, ProjectSt
         key,
         name: meta?.name ?? '',
         description: meta?.description ?? '',
-        whenToFile: meta?.whenToFile ?? '',
+        whenToRead: meta?.whenToRead ?? '',
         status: meta?.status ?? null,
         taskCount: data.total,
         byStatus: data.byStatus,
@@ -88,8 +88,8 @@ const createCommand = new Command('create')
   .requiredOption('--name <name>', 'Human-readable project name (e.g., "Shell Relay")')
   .requiredOption('--description <description>', 'One-line description of the project')
   .requiredOption(
-    '--when-to-file <text>',
-    'One-line description of when to file a ticket here (used by the agent for routing)',
+    '--when-to-read <text>',
+    'One-line description of when to read this project (used by the agent for routing)',
   )
   .action((key, opts, cmd) => {
     withErrorHandling(() => {
@@ -101,13 +101,13 @@ const createCommand = new Command('create')
         key: projectKey,
         name: opts.name,
         description: opts.description,
-        whenToFile: opts.whenToFile,
+        whenToRead: opts.whenToRead,
       });
 
       console.log(`Created project: ${projectKey}`);
       console.log(`  Name:         ${opts.name}`);
       console.log(`  Description:  ${opts.description}`);
-      console.log(`  When to file: ${opts.whenToFile}`);
+      console.log(`  When to read: ${opts.whenToRead}`);
       console.log(`  Metadata:     ${tasksDir}/${projectKey}/PROJECT.md`);
     });
   });
@@ -136,7 +136,7 @@ const updateCommand = new Command('update')
   .argument('<key>', 'Project key (e.g., SHR)')
   .option('--name <name>', 'Set human-readable project name')
   .option('--description <description>', 'Set one-line project description')
-  .option('--when-to-file <text>', 'Set when-to-file routing hint')
+  .option('--when-to-read <text>', 'Set when-to-read routing hint')
   .option('--status <status>', 'Set project status: active, archived, paused')
   .option('-i, --interactive', 'Open PROJECT.md in $EDITOR for editing')
   .action((key, opts, cmd) => {
@@ -171,7 +171,7 @@ const updateCommand = new Command('update')
       const fields = buildUpdateFields(opts);
       if (Object.keys(fields).length === 0) {
         throw new Error(
-          'No fields to update. Use --name, --description, --when-to-file, --status, or -i to edit in $EDITOR.',
+          'No fields to update. Use --name, --description, --when-to-read, --status, or -i to edit in $EDITOR.',
         );
       }
 
@@ -184,13 +184,13 @@ const updateCommand = new Command('update')
 function buildUpdateFields(opts: {
   name?: string;
   description?: string;
-  whenToFile?: string;
+  whenToRead?: string;
   status?: string;
 }): Parameters<typeof applyProjectMetadataUpdates>[1] {
   const fields: Record<string, string> = {};
   if (opts.name !== undefined) fields.name = opts.name;
   if (opts.description !== undefined) fields.description = opts.description;
-  if (opts.whenToFile !== undefined) fields.whenToFile = opts.whenToFile;
+  if (opts.whenToRead !== undefined) fields.whenToRead = opts.whenToRead;
   if (opts.status !== undefined) {
     const valid = ['active', 'archived', 'paused'];
     if (!valid.includes(opts.status)) {

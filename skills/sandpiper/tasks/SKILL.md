@@ -27,9 +27,9 @@ At the **start of every session** in a project that has a `.sandpiper/tasks` dir
 sandpiper-tasks project list --format toon
 ```
 
-This loads all project metadata — including the `whenToFile` routing field for each project — into context. Use these `whenToFile` values to decide where to file new tickets throughout the session, just as skill `description` fields are used to decide when to load a skill.
+This loads all project metadata — including the `whenToRead` routing field for each project — into context. Use these `whenToRead` values to decide where to file new tickets throughout the session, just as skill `description` fields are used to decide when to load a skill.
 
-Projects with no `PROJECT.md` will appear with empty `whenToFile`. If you create a new project, you MUST provide `--name`, `--description`, and `--when-to-file`.
+Projects with no `PROJECT.md` will appear with empty `whenToRead`. If you create a new project, you MUST provide `--name`, `--description`, and `--when-to-read`.
 
 ## Typical Workflows
 
@@ -147,13 +147,13 @@ sandpiper-tasks task summary -p SHR                              # project-scope
 
 ```bash
 sandpiper-tasks project list                                     # list all projects with task counts + metadata
-sandpiper-tasks --format toon project list                       # structured output with whenToFile (use at session start)
+sandpiper-tasks --format toon project list                       # structured output with whenToRead (use at session start)
 sandpiper-tasks project create SHR \
   --name "Shell Relay" \
   --description "Zellij-based shared terminal" \
-  --when-to-file "Use for relay extension work"                  # create project (all three flags required)
+  --when-to-read "Use for relay extension work"                  # create project (all three flags required)
 sandpiper-tasks project show SHR                                 # show PROJECT.md for a project
-sandpiper-tasks project update SHR --when-to-file "New trigger"  # update metadata field(s)
+sandpiper-tasks project update SHR --when-to-read "New trigger"  # update metadata field(s)
 sandpiper-tasks project update SHR -i                            # open PROJECT.md in $EDITOR
 ```
 

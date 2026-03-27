@@ -41,7 +41,7 @@ Every project directory SHOULD have a `PROJECT.md` file at its root. This file m
 key: SHR
 name: "Shell Relay"
 description: "Zellij-based shared terminal session between user and agent"
-when_to_file: "Use for work on the Zellij integration. Does NOT include general agent capabilities — those go in AGENT."
+when_to_read: "Use for work on the Zellij integration. Does NOT include general agent capabilities — those go in AGENT."
 status: active
 created_at: 2026-03-26T00:00:00Z
 ---
@@ -65,7 +65,7 @@ created_at: 2026-03-26T00:00:00Z
 | `key` | REQUIRED | The project key. MUST match the owning project's key. |
 | `name` | REQUIRED | Human-readable project name. |
 | `description` | REQUIRED | One-line summary of what the project is. |
-| `when_to_file` | REQUIRED | One-line description of when to file a ticket in this project. Primary routing signal for agents. |
+| `when_to_read` | REQUIRED | One-line description of when to read this project's details. Primary routing signal for agents. |
 | `status` | REQUIRED | Project lifecycle status: `active`, `archived`, `paused`. |
 | `created_at` | REQUIRED | ISO 8601 timestamp of when the PROJECT.md was created. |
 

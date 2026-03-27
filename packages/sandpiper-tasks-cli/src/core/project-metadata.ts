@@ -11,13 +11,13 @@ export interface CreateProjectMetadataOptions {
   readonly key: string;
   readonly name: string;
   readonly description: string;
-  readonly whenToFile: string;
+  readonly whenToRead: string;
 }
 
 export interface UpdateProjectMetadataFields {
   readonly name?: string;
   readonly description?: string;
-  readonly whenToFile?: string;
+  readonly whenToRead?: string;
   readonly status?: ProjectStatus;
 }
 
@@ -34,7 +34,7 @@ export function renderProjectMetadataContent(opts: CreateProjectMetadataOptions)
     `key: ${opts.key}`,
     `name: "${opts.name}"`,
     `description: "${opts.description}"`,
-    `when_to_file: "${opts.whenToFile}"`,
+    `when_to_read: "${opts.whenToRead}"`,
     'status: active',
     `created_at: ${ts}`,
     '---',
@@ -73,7 +73,7 @@ export function parseProjectMetadata(content: string): ProjectMetadata | null {
     key,
     name: str(fm.name, key),
     description: str(fm.description, ''),
-    whenToFile: str(fm.when_to_file, ''),
+    whenToRead: str(fm.when_to_read, ''),
     status: str(fm.status, 'active') as ProjectStatus,
     createdAt: str(fm.created_at, ''),
   };
@@ -120,8 +120,8 @@ export function applyProjectMetadataUpdates(content: string, fields: UpdateProje
   if (fields.description !== undefined) {
     result = result.replace(/^description: .+$/m, `description: "${fields.description}"`);
   }
-  if (fields.whenToFile !== undefined) {
-    result = result.replace(/^when_to_file: .+$/m, `when_to_file: "${fields.whenToFile}"`);
+  if (fields.whenToRead !== undefined) {
+    result = result.replace(/^when_to_read: .+$/m, `when_to_read: "${fields.whenToRead}"`);
   }
   if (fields.status !== undefined) {
     result = result.replace(/^status: .+$/m, `status: ${fields.status}`);

@@ -36,7 +36,7 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 - **`bunfig.toml` linker=hoisted** — deps hoisted to root `node_modules/`. Required for web-fetch extension.
 - **Extensions with npm deps use tsc output** — `pi.extensions: ["./dist/index.js"]`, not bun bundles.
 - **Edit source skills, not dist** — edit `skills/sandpiper/`, run `bash devtools/postinstall.sh`.
-- **`project list --format toon` at session start** — loads `whenToFile` routing triggers.
+- **`project list --format toon` at session start** — loads `whenToRead` routing triggers.
 - **`sandpiper-tasks` binary** — after CLI changes: `bun run --filter sandpiper-tasks-cli build` AND `bash devtools/postinstall.sh`.
 - **Widget MAX_WIDGET_LINES limit** — applies only to string arrays, NOT factory functions.
 - **Session identity** — `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` injected at `session_start` by system.ts.

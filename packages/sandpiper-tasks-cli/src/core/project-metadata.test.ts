@@ -15,7 +15,7 @@ const BASE_OPTS = {
   key: 'FOO',
   name: 'Foo Project',
   description: 'A test project',
-  whenToFile: 'Use for all Foo-related work',
+  whenToRead: 'Use for all Foo-related work',
 };
 
 // ─── renderProjectMetadataContent ─────────────────────────────────
@@ -26,7 +26,7 @@ describe('renderProjectMetadataContent', () => {
     expect(content).toContain('key: FOO');
     expect(content).toContain('name: "Foo Project"');
     expect(content).toContain('description: "A test project"');
-    expect(content).toContain('when_to_file: "Use for all Foo-related work"');
+    expect(content).toContain('when_to_read: "Use for all Foo-related work"');
     expect(content).toContain('status: active');
     expect(content).toMatch(/created_at: \d{4}-\d{2}-\d{2}T/);
   });
@@ -59,7 +59,7 @@ describe('parseProjectMetadata', () => {
     expect(meta?.key).toBe('FOO');
     expect(meta?.name).toBe('Foo Project');
     expect(meta?.description).toBe('A test project');
-    expect(meta?.whenToFile).toBe('Use for all Foo-related work');
+    expect(meta?.whenToRead).toBe('Use for all Foo-related work');
     expect(meta?.status).toBe('active');
     expect(meta?.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
@@ -80,7 +80,7 @@ describe('parseProjectMetadata', () => {
     expect(meta?.key).toBe('BAR');
     expect(meta?.name).toBe('BAR'); // falls back to key
     expect(meta?.description).toBe('');
-    expect(meta?.whenToFile).toBe('');
+    expect(meta?.whenToRead).toBe('');
     expect(meta?.status).toBe('active');
   });
 
@@ -147,7 +147,7 @@ describe('writeProjectMetadata', () => {
     const raw = readFileSync(join(tasksDir, 'FOO', 'PROJECT.md'), 'utf-8');
     const meta = parseProjectMetadata(raw);
     expect(meta?.key).toBe('FOO');
-    expect(meta?.whenToFile).toBe('Use for all Foo-related work');
+    expect(meta?.whenToRead).toBe('Use for all Foo-related work');
   });
 });
 
@@ -170,11 +170,11 @@ describe('applyProjectMetadataUpdates', () => {
     expect(updated).not.toContain('description: "A test project"');
   });
 
-  it('should update when_to_file', () => {
+  it('should update when_to_read', () => {
     const content = renderProjectMetadataContent(BASE_OPTS);
-    const updated = applyProjectMetadataUpdates(content, { whenToFile: 'Use for bar work only' });
-    expect(updated).toContain('when_to_file: "Use for bar work only"');
-    expect(updated).not.toContain('when_to_file: "Use for all Foo-related work"');
+    const updated = applyProjectMetadataUpdates(content, { whenToRead: 'Use for bar work only' });
+    expect(updated).toContain('when_to_read: "Use for bar work only"');
+    expect(updated).not.toContain('when_to_read: "Use for all Foo-related work"');
   });
 
   it('should update status', () => {
@@ -189,12 +189,12 @@ describe('applyProjectMetadataUpdates', () => {
     const updated = applyProjectMetadataUpdates(content, {
       name: 'Renamed',
       status: 'paused',
-      whenToFile: 'Updated trigger',
+      whenToRead: 'Updated trigger',
     });
     expect(updated).toContain('name: "Renamed"');
     expect(updated).toContain('# Renamed');
     expect(updated).toContain('status: paused');
-    expect(updated).toContain('when_to_file: "Updated trigger"');
+    expect(updated).toContain('when_to_read: "Updated trigger"');
   });
 
   it('should leave content unchanged when no fields provided', () => {
@@ -233,7 +233,7 @@ describe('updateProjectMetadata', () => {
     updateProjectMetadata(tasksDir, 'FOO', { status: 'archived' });
     const meta = readProjectMetadata(tasksDir, 'FOO');
     expect(meta?.name).toBe('Foo Project');
-    expect(meta?.whenToFile).toBe('Use for all Foo-related work');
+    expect(meta?.whenToRead).toBe('Use for all Foo-related work');
     expect(meta?.status).toBe('archived');
   });
 });
