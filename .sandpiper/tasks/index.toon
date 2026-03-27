@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774647066784
+lastUpdatedAt: 1774648654043
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -236,6 +236,86 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774499226112
+  "AGENT-22":
+    key: AGENT-22
+    project: AGENT
+    title: Implement ProcessManager core in sandpiper-ai-core
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T21:57:33.862Z"
+    updatedAt: "2026-03-27T21:57:33.862Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-15
+    lastIndexedAt: 1774648653869
+  "AGENT-23":
+    key: AGENT-23
+    project: AGENT
+    title: Implement start_background_process tool in system.ts
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T21:57:33.910Z"
+    updatedAt: "2026-03-27T21:57:33.910Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-15
+    lastIndexedAt: 1774648653913
+  "AGENT-24":
+    key: AGENT-24
+    project: AGENT
+    title: Implement check_background_process tool in system.ts
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T21:57:33.951Z"
+    updatedAt: "2026-03-27T21:57:33.951Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-15
+    lastIndexedAt: 1774648653955
+  "AGENT-25":
+    key: AGENT-25
+    project: AGENT
+    title: Implement passive completion notifications via context event
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T21:57:33.994Z"
+    updatedAt: "2026-03-27T21:57:33.994Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-15
+    lastIndexedAt: 1774648653998
+  "AGENT-26":
+    key: AGENT-26
+    project: AGENT
+    title: Session lifecycle integration (teardown on session_shutdown)
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T21:57:34.038Z"
+    updatedAt: "2026-03-27T21:57:34.038Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: AGENT-15
+    lastIndexedAt: 1774648654042
   "AGENT-3":
     key: AGENT-3
     project: AGENT
@@ -1144,4 +1224,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 22
+    nextTaskNumber: 27
