@@ -1,12 +1,13 @@
 ---
 title: "General-purpose background process/task framework for the agent"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T15:44:16.494Z
-updated_at: 2026-03-27T21:31:06.691Z
+updated_at: 2026-03-27T22:42:10.157Z
 related:
   - SHR-71
 ---
@@ -65,3 +66,8 @@ Informed by the OpenClaw investigation (`.sandpiper/docs/openclaw-process-superv
 ## 2026-03-27T21:31:06.695Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-03-27T22:42:10.157Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: DONE
