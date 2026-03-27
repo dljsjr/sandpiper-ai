@@ -2,11 +2,11 @@
 title: "General-purpose background process/task framework for the agent"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T15:44:16.494Z
-updated_at: 2026-03-26T15:44:16.494Z
+updated_at: 2026-03-27T21:31:06.691Z
 related:
   - SHR-71
 ---
@@ -57,3 +57,11 @@ Informed by the OpenClaw investigation (`.sandpiper/docs/openclaw-process-superv
 - `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — full analysis
 - OpenClaw `src/process/supervisor/` — reference implementation (adapt concepts, don't vendor)
 
+
+---
+
+# Activity Log
+
+## 2026-03-27T21:31:06.695Z
+
+- **priority**: LOW → MEDIUM

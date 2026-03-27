@@ -6,7 +6,15 @@ priority: HIGH
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-27T20:45:55.601Z
-updated_at: 2026-03-27T21:22:38.579Z
+depends_on:
+  - AGENT-15
+blocked_by:
+  - SHR-75
+  - SHR-76
+  - SHR-77
+  - SHR-78
+  - AGENT-15
+updated_at: 2026-03-27T21:31:06.778Z
 ---
 
 # Evaluate whether Zellij 0.44 features warrant a ground-up shell relay redesign
@@ -31,3 +39,11 @@ The shell integration scripts (relay.fish/bash/zsh) are likely still needed for 
 ## 2026-03-27T21:22:38.580Z
 
 - **description**: added (12 lines)
+
+## 2026-03-27T21:31:06.738Z
+
+- **depends_on**: (none) → AGENT-15
+
+## 2026-03-27T21:31:06.778Z
+
+- **blocked_by**: (none) → SHR-75, SHR-76, SHR-77, SHR-78, AGENT-15
