@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774623840821
+lastUpdatedAt: 1774625950810
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -126,6 +126,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774623840820
+  "AGENT-18":
+    key: AGENT-18
+    project: AGENT
+    title: Inject project metadata triggers into system prompt
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-27T15:34:32.864Z"
+    updatedAt: "2026-03-27T15:34:46.455Z"
+    dependsOn[1]: TCL-70
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774625686460
   "AGENT-2":
     key: AGENT-2
     project: AGENT
@@ -627,6 +642,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774560171312
+  "TCL-70":
+    key: TCL-70
+    project: TCL
+    title: Rename when_to_file → when_to_read in project metadata
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-27T15:34:32.819Z"
+    updatedAt: "2026-03-27T15:39:10.802Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774625950809
   "TCL-62":
     key: TCL-62
     project: TCL
@@ -950,7 +981,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 70
+    nextTaskNumber: 71
   SHR:
     projectKey: SHR
     nextTaskNumber: 74
@@ -974,4 +1005,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 18
+    nextTaskNumber: 19

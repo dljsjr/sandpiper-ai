@@ -51,7 +51,7 @@ describe('CLI: project create', () => {
       'Foo Project',
       '--description',
       'A test project',
-      '--when-to-file',
+      '--when-to-read',
       'Use for all Foo work',
     ]);
     expect(result.exitCode).toBe(0);
@@ -70,14 +70,14 @@ describe('CLI: project create', () => {
       'Bar Project',
       '--description',
       'Bar description',
-      '--when-to-file',
+      '--when-to-read',
       'Use for bar tasks',
     ]);
     const meta = readProjectMetadata(tasksDir, 'BAR');
     expect(meta?.key).toBe('BAR');
     expect(meta?.name).toBe('Bar Project');
     expect(meta?.description).toBe('Bar description');
-    expect(meta?.whenToFile).toBe('Use for bar tasks');
+    expect(meta?.whenToRead).toBe('Use for bar tasks');
     expect(meta?.status).toBe('active');
   });
 
@@ -92,7 +92,7 @@ describe('CLI: project create', () => {
       'Foo',
       '--description',
       'desc',
-      '--when-to-file',
+      '--when-to-read',
       'when',
     ]);
     expect(result.exitCode).toBe(0);
@@ -110,7 +110,7 @@ describe('CLI: project create', () => {
       'My Project',
       '--description',
       'desc',
-      '--when-to-file',
+      '--when-to-read',
       'Use for this',
     ]);
     expect(result.stdout).toContain('Created project: FOO');
@@ -127,7 +127,7 @@ describe('CLI: project create', () => {
       'FOO',
       '--description',
       'desc',
-      '--when-to-file',
+      '--when-to-read',
       'when',
     ]);
     expect(result.exitCode).not.toBe(0);
@@ -135,15 +135,15 @@ describe('CLI: project create', () => {
   });
 
   it('should fail if --description is missing', () => {
-    const result = runCli(['--dir', tempDir, 'project', 'create', 'FOO', '--name', 'Name', '--when-to-file', 'when']);
+    const result = runCli(['--dir', tempDir, 'project', 'create', 'FOO', '--name', 'Name', '--when-to-read', 'when']);
     expect(result.exitCode).not.toBe(0);
     expect(result.stderr).toContain('--description');
   });
 
-  it('should fail if --when-to-file is missing', () => {
+  it('should fail if --when-to-read is missing', () => {
     const result = runCli(['--dir', tempDir, 'project', 'create', 'FOO', '--name', 'Name', '--description', 'desc']);
     expect(result.exitCode).not.toBe(0);
-    expect(result.stderr).toContain('--when-to-file');
+    expect(result.stderr).toContain('--when-to-read');
   });
 
   it('should fail if the project already exists', () => {
@@ -157,7 +157,7 @@ describe('CLI: project create', () => {
       'Foo',
       '--description',
       'desc',
-      '--when-to-file',
+      '--when-to-read',
       'when',
     ];
     runCli(baseArgs);

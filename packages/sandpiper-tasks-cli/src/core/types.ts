@@ -52,11 +52,11 @@ export interface ProjectMetadata {
   readonly name: string;
   readonly description: string;
   /**
-   * One-line description of when to file a ticket in this project.
-   * Mirrors the skill `description` trigger convention — loaded at session
-   * start so the agent can make confident filing decisions.
+   * One-line description of when to read this project's details.
+   * Mirrors the skill `description` trigger convention — injected into
+   * the system prompt so the agent can make confident routing decisions.
    */
-  readonly whenToFile: string;
+  readonly whenToRead: string;
   readonly status: ProjectStatus;
   readonly createdAt: string;
 }
@@ -69,7 +69,7 @@ export interface ProjectListItem {
   readonly key: string;
   readonly name: string;
   readonly description: string;
-  readonly whenToFile: string;
+  readonly whenToRead: string;
   readonly status: ProjectStatus | null;
   readonly taskCount: number;
   readonly byStatus: Record<string, number>;
