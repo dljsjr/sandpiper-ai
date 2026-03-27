@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774646558587
+lastUpdatedAt: 1774647066784
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -86,15 +86,15 @@ tasks:
     title: General-purpose background process/task framework for the agent
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T15:44:16.494Z"
-    updatedAt: "2026-03-26T15:44:16.494Z"
+    updatedAt: "2026-03-27T21:31:06.691Z"
     dependsOn[0]:
     blockedBy[0]:
     related[1]: SHR-71
-    lastIndexedAt: 1774558194857
+    lastIndexedAt: 1774647066700
   "AGENT-16":
     key: AGENT-16
     project: AGENT
@@ -638,11 +638,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T20:45:55.601Z"
-    updatedAt: "2026-03-27T21:22:38.579Z"
-    dependsOn[0]:
-    blockedBy[0]:
+    updatedAt: "2026-03-27T21:31:06.778Z"
+    dependsOn[1]: AGENT-15
+    blockedBy[5]: SHR-75,SHR-76,SHR-77,SHR-78,AGENT-15
     related[0]:
-    lastIndexedAt: 1774646558586
+    lastIndexedAt: 1774647066784
   "TCL-52":
     key: TCL-52
     project: TCL
