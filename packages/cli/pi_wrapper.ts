@@ -67,6 +67,8 @@ function findPackageDir(startDir: string): string {
 
 const overridesPackageDir = findPackageDir(scriptDir);
 
+// ── Explicit PI_* variables ──
+// These are pi-framework-specific and must not be mirrored to/from SANDPIPER_*.
 process.env.PI_PACKAGE_DIR = overridesPackageDir;
 process.env.PI_CODING_AGENT_PACKAGE = systemPiPackageDir;
 process.env.PI_CODING_AGENT_VERSION = piVersion;
@@ -75,23 +77,36 @@ process.env.PI_CODING_AGENT_VERSION = piVersion;
 process.env.PI_SKIP_VERSION_CHECK = '1';
 console.log(`using pi-coding-agent version: ${piVersion}\n`);
 
-// Capture original PI_* env vars before we override them with SANDPIPER_* values.
-// Used by the migration extension to detect old pi config directories.
-// Double underscore prefix indicates "private" / internal use.
-const piEnvVarsToCapture = ['PI_CODING_AGENT_DIR'];
-for (const varName of piEnvVarsToCapture) {
-  const sandpiperVar = varName.replace(/^PI_/, 'SANDPIPER_');
-  if (process.env[varName] && !process.env[sandpiperVar]) {
-    process.env[`__${varName}_ORIGINAL`] = process.env[varName];
+// ── Env var mirroring ──
+// Mirror PI_* ↔ SANDPIPER_* so that:
+//   - Users can set either SANDPIPER_* or PI_* and both namespaces stay in sync
+//   - SANDPIPER_* takes precedence over PI_* when both are set
+//   - Our own code always reads SANDPIPER_* (except the 4 explicit vars above)
+//
+// The 4 explicit vars above are exempt — they are pi-framework internals that
+// we set directly and should not leak into the SANDPIPER_* namespace.
+const EXEMPT_PI_VARS = new Set([
+  'PI_PACKAGE_DIR',
+  'PI_CODING_AGENT_PACKAGE',
+  'PI_CODING_AGENT_VERSION',
+  'PI_SKIP_VERSION_CHECK',
+]);
+
+// Phase 1: PI_* → SANDPIPER_* (only if SANDPIPER_* is not already set)
+for (const [key, val] of Object.entries(process.env)) {
+  if (!key.startsWith('PI_') || EXEMPT_PI_VARS.has(key) || val === undefined) continue;
+  const sandpiperKey = `SANDPIPER_${key.slice(3)}`; // PI_FOO → SANDPIPER_FOO
+  if (process.env[sandpiperKey] === undefined) {
+    process.env[sandpiperKey] = val;
   }
 }
 
-// Map SANDPIPER_* env vars to PI_* for pi's consumption.
-for (const [key, val] of Object.entries(process.env).filter(([key, _]: [string, string?]) =>
-  key.startsWith('SANDPIPER_'),
-)) {
-  const varName = key.replace(/^SANDPIPER_/, '');
-  process.env[`PI_${varName}`] = val;
+// Phase 2: SANDPIPER_* → PI_* (unconditional — SANDPIPER_* takes precedence)
+for (const [key, val] of Object.entries(process.env)) {
+  if (!key.startsWith('SANDPIPER_') || val === undefined) continue;
+  const piKey = `PI_${key.slice(10)}`; // SANDPIPER_FOO → PI_FOO
+  if (EXEMPT_PI_VARS.has(piKey)) continue;
+  process.env[piKey] = val;
 }
 
 (await import(join(systemPiDistDir, 'main.js'))).main(process.argv.slice(2));
