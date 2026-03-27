@@ -9,7 +9,6 @@ import {
   formatInstallInstructions,
   installShellIntegrations,
   type MigrationMode,
-  type PreflightDiagnostic,
   parseMigrationCommandArgs,
   parseMigrationScope,
   performMigration,
@@ -202,44 +201,6 @@ async function handleMigrationFlag(pi: ExtensionAPI, mode: MigrationMode, cwd: s
 // ─── Extension ──────────────────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
-  // ── Custom message renderers ──
-
-  pi.registerMessageRenderer<UpdateInfo>('sandpiper-update', (message, _options, theme) => {
-    const update = message.details;
-    if (!update) return undefined;
-
-    const container = new Container();
-    container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-    const heading = theme.bold(theme.fg('warning', 'Update Available'));
-    const versionLine =
-      theme.fg('muted', `New version of ${update.name}: ${update.currentVersion} → ${update.latestVersion}. Run `) +
-      theme.fg('accent', update.installCommand);
-    let content = `${heading}\n${versionLine}`;
-    if (update.changelogUrl) {
-      content += `\n${theme.fg('muted', 'Changelog: ')}${theme.fg('accent', update.changelogUrl)}`;
-    }
-    container.addChild(new Text(content, 1, 0));
-    container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-    return container;
-  });
-
-  pi.registerMessageRenderer<PreflightDiagnostic[]>('sandpiper-diagnostics', (message, _options, theme) => {
-    const unhealthy = message.details;
-    if (!unhealthy || unhealthy.length === 0) return undefined;
-
-    const container = new Container();
-    container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-    container.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
-    for (const d of unhealthy) {
-      container.addChild(new Text(`  ${theme.fg('warning', d.message)}`, 1, 0));
-      for (const instruction of d.instructions ?? []) {
-        container.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
-      }
-    }
-    container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-    return container;
-  });
-
   // ── Shell integration install flag ──
 
   pi.registerFlag('install-shell-integrations', {
@@ -409,29 +370,51 @@ its documentation, APIs, etc. remain valid, with a few alterations:
 
     const unhealthy = diagnostics.filter((d) => !d.healthy);
     if (unhealthy.length > 0) {
-      pi.sendMessage({
-        customType: 'sandpiper-diagnostics',
-        content: '',
-        display: true,
-        details: unhealthy,
+      ctx.ui.setWidget('sandpiper-diagnostics', (_tui, theme) => {
+        const container = new Container();
+        container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+        container.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
+        for (const d of unhealthy) {
+          container.addChild(new Text(`  ${theme.fg('warning', d.message)}`, 1, 0));
+          for (const instruction of d.instructions ?? []) {
+            container.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
+          }
+        }
+        container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+        return {
+          render: (w: number) => container.render(w),
+          invalidate: () => container.invalidate(),
+        };
       });
+    } else {
+      ctx.ui.setWidget('sandpiper-diagnostics', undefined);
     }
 
     // --- Update notifications ---
-    // Fire-and-forget: don't await so the notification appears after
-    // startup info (Context, Skills, etc.) has rendered, matching Pi's
-    // own update banner placement.
     if (resolveEnvVar('OFFLINE') !== '1') {
-      checkForUpdates().then((updates) => {
-        for (const update of updates) {
-          pi.sendMessage({
-            customType: 'sandpiper-update',
-            content: '',
-            display: true,
-            details: update,
-          });
-        }
-      });
+      const updates = await checkForUpdates();
+      for (const update of updates) {
+        ctx.ui.setWidget(`sandpiper-update:${update.name}`, (_tui, theme) => {
+          const container = new Container();
+          container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+          const heading = theme.bold(theme.fg('warning', 'Update Available'));
+          const versionLine =
+            theme.fg(
+              'muted',
+              `New version of ${update.name}: ${update.currentVersion} → ${update.latestVersion}. Run `,
+            ) + theme.fg('accent', update.installCommand);
+          let content = `${heading}\n${versionLine}`;
+          if (update.changelogUrl) {
+            content += `\n${theme.fg('muted', 'Changelog: ')}${theme.fg('accent', update.changelogUrl)}`;
+          }
+          container.addChild(new Text(content, 1, 0));
+          container.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+          return {
+            render: (w: number) => container.render(w),
+            invalidate: () => container.invalidate(),
+          };
+        });
+      }
     }
   });
 }

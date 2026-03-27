@@ -85,10 +85,13 @@ export class ZellijClient {
    */
   listSessions(): string[] {
     try {
-      const output = execSync('zellij list-sessions', { stdio: 'pipe', encoding: 'utf-8' });
+      const output = execSync('zellij list-sessions --short --no-formatting', {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      });
       return output
         .split('\n')
-        .map((line) => line.split(' ')[0]?.trim())
+        .map((line) => line.trim())
         .filter((name): name is string => !!name && name.length > 0);
     } catch {
       return [];
