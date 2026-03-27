@@ -273,7 +273,7 @@ When building or modifying TUI components for extensions, consult these resource
 | Resource | Path | Contents |
 |----------|------|----------|
 | TUI patterns doc | `.sandpiper/docs/tui-extension-patterns.md` | Practical patterns, decision guide, Pi internals analysis. **Read this first.** |
-| System extension | `extensions/system.ts` | Working examples: `DynamicBorder` widgets, custom message renderers, theme usage |
+| System extension | `extensions/system.ts` | Working examples: chat container injection, `DynamicBorder`, theme usage, background process tools |
 
 ### Pi Framework Reference
 

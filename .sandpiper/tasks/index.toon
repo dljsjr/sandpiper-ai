@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774651330164
+lastUpdatedAt: 1774651801102
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -194,17 +194,18 @@ tasks:
     key: AGENT-21
     project: AGENT
     title: "Redesign banner display: non-persistent chat-flowing bordered notifications"
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T19:53:37.043Z"
-    updatedAt: "2026-03-27T19:53:37.043Z"
+    updatedAt: "2026-03-27T22:49:52.792Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774641217050
+    lastIndexedAt: 1774651792798
   "AGENT-27":
     key: AGENT-27
     project: AGENT
@@ -220,6 +221,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774649094112
+  "AGENT-28":
+    key: AGENT-28
+    project: AGENT
+    title: "ProcessManager: add configurable buffer size limits to prevent unbounded memory growth"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T22:50:01.097Z"
+    updatedAt: "2026-03-27T22:50:01.097Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774651801101
   "AGENT-5":
     key: AGENT-5
     project: AGENT
@@ -1245,4 +1261,4 @@ counters:
     nextTaskNumber: 8
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 28
+    nextTaskNumber: 29
