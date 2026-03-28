@@ -6,20 +6,55 @@ This document supplements the [repo-wide AGENTS.md](../../AGENTS.md) with shell-
 
 ### Framework-Independent Core
 
-All core logic lives in framework-independent modules under `src/`. Only `index.ts` imports pi framework APIs. Companion scripts (`ghost-attach`, `unbuffer-relay`) and shell integration scripts live at the extension root. The bundle is built to `dist/shell-relay`.
+All core logic lives in framework-independent modules under `src/`. Only `index.ts` imports pi framework APIs. Shell integration scripts live in `shell-integration/`. The bundle is built to `dist/shell-relay`.
 
 | Module | Purpose | Pi imports? |
 |--------|---------|-------------|
-| `ansi.ts` | Strip terminal query/response sequences from PTY output | No |
 | `env-export.ts` | Shell-appropriate env var export command generation | No |
-| `fifo.ts` | Persistent FIFO lifecycle (O_RDWR sentinel pattern) | No |
-| `ghost-client.ts` | Headless Zellij client management (expect-based PTY) | No |
-| `signal.ts` | Signal channel parser (line-delimited protocol) | No |
-| `zellij.ts` | Zellij CLI wrapper | No |
 | `escape.ts` | Command escaping (fish quote-break / bash `printf '%q'`) | No |
-| `preflight.ts` | Shell integration preflight check (probes shell for `__relay_prompt_hook`) | No (imports from `sandpiper-ai-core`) |
-| `relay.ts` | Orchestration (ties all modules together) | No |
+| `fifo.ts` | Persistent FIFO lifecycle (O_RDWR sentinel pattern) — used for signal FIFO only | No |
+| `signal.ts` | Signal channel parser (line-delimited protocol) | No |
+| `snapshot-diff.ts` | Output capture via dump-screen before/after diffing | No |
+| `zellij.ts` | Zellij 0.44+ CLI wrapper (paste, send-keys, --session, --pane-id, list-panes) | No |
+| `ansi.ts` | Strip terminal query/response sequences from output | No |
+| `preflight.ts` | Shell integration preflight check (probes for `__relay_prompt_hook`) | No (imports from `sandpiper-ai-core`) |
 | `index.ts` | Pi extension glue (tool registration, lifecycle, preflight registration) | **Yes** — only file |
+
+### Legacy Modules (Pending Removal)
+
+These modules are still in the codebase but no longer used by the rewritten relay:
+
+| Module | Status |
+|--------|--------|
+| `ghost-client.ts` | Eliminated — Zellij 0.44 --pane-id targeting works without ghost client |
+| `relay.ts` | Replaced by executeCommand() in index.ts with snapshot-diff |
+
+### Zellij 0.44 API Usage
+
+The relay uses Zellij 0.44+ CLI features exclusively:
+
+- **Session creation:** `zellij attach --create` spawned via background process, then `zellij action detach` — inherits terminal dimensions for wide viewport
+- **Command injection:** `paste` (bracketed paste mode) + `send-keys "Enter"` — replaces `write-chars`
+- **Session targeting:** `--session <name>` flag — replaces `ZELLIJ_SESSION_NAME` env var
+- **Pane targeting:** `--pane-id terminal_N` flag — eliminates need for ghost client
+- **Pane discovery:** `list-panes --json` — replaces dump-screen-to-dev-null polling
+- **Output capture:** `dump-screen --full` before/after command, diffed in TypeScript
+
+### Signal Protocol
+
+Line-delimited text on the signal FIFO (the only FIFO used):
+- `last_status:N\n` — command completed with exit code N
+- `prompt_ready\n` — pane is at shell prompt
+
+### Output Capture: Snapshot-Diff
+
+Output is captured by taking `dump-screen --full` snapshots before and after command execution, then diffing in TypeScript. The injected command text (`__relay_run 'escaped cmd'`) serves as a unique marker — the diff splits on it and takes everything after, trimming the trailing prompt.
+
+Key considerations:
+- Join lines without separator to find the marker (handles viewport wrapping)
+- Map marker position back to original lines to preserve line structure
+- Prompt trimming uses Set-based matching against the before snapshot's prompt lines
+- Viewport sizing matters — use attach-then-detach (not --create-background) for wide viewports
 
 ### Shell Integration Scripts
 
@@ -29,79 +64,43 @@ Shell scripts in `shell-integration/` are sourced in users' shell RC files. They
 - Defensive on every hook invocation (not just at source time)
 - Compatible with other prompt customizations (starship, powerlevel10k, etc.)
 
+Currently the scripts still reference `SHELL_RELAY_STDOUT`, `SHELL_RELAY_STDERR`, and `SHELL_RELAY_UNBUFFER` — these are set to `/dev/null` as a compatibility shim. A future simplification pass should remove these requirements.
+
 ## Testing
 
-### FIFO Tests
-- Use **real FIFOs** (`mkfifo`), not mocks — the O_RDWR sentinel pattern must be validated against real kernel behavior
-- Must call `fifoManager.open()` BEFORE creating read streams (otherwise blocks on FIFO open)
-- Large FIFO writes in tests MUST use child processes (not `setTimeout`) to avoid event loop deadlock
-- Always clean up FIFOs in `afterEach` — leaked FIFOs cause subsequent tests to hang
+### Snapshot-Diff Tests
+- Test with various prompt styles (custom, multi-line, simple `$ `)
+- Test wrapped command echoes (narrow viewport simulation)
+- Test output with blank lines, error messages, special characters
+- Test the "extreme wrapping" case where output starts on the same line as the command echo (currently a known limitation)
 
 ### Zellij Tests
 - Mock `child_process.execSync` — tests should NOT depend on a running Zellij instance
-- When mocking `execSync` with `encoding: "utf-8"`, return `string` values cast as `never` (TypeScript strict mode requires this)
+- When mocking `execSync` with `encoding: "utf-8"`, return `string` values cast as `never`
+
+### FIFO Tests
+- Use **real FIFOs** (`mkfifo`), not mocks — the O_RDWR sentinel pattern must be validated against real kernel behavior
+- Always clean up FIFOs in `afterEach`
 
 ### Escape Tests
-- Round-trip tests invoke real `fish` shell — they verify our escaping matches fish's own `string unescape`
-- Pass commands via environment variables or stdin to avoid shell interpretation by the parent process
-- Each escape test spawns a fish process (~400ms per test) — these are inherently slow
-
-### Signal Channel Tests
-- Pure unit tests — no external dependencies, fast
-- Test chunked input (data split across multiple `feed()` calls)
-- Test `waitFor()` timeout behavior
+- Round-trip tests invoke real `fish` shell (~400ms per test)
+- Pass commands via environment variables or stdin
 
 ## Key Patterns
 
-### O_RDWR Sentinel for Persistent FIFOs
-Open FIFOs with `O_RDWR` so the fd acts as both reader and writer. This prevents EOF when external writers close. The fd must be opened BEFORE creating read streams.
-
-### Signal Protocol
-Line-delimited text on the signal FIFO:
-- `last_status:N\n` — command completed with exit code N (written by `__relay_run`)
-- `prompt_ready\n` — pane is at shell prompt (written by prompt hook)
-
-Separate `last_status` from `prompt_ready` — a command may complete before the prompt is drawn.
-
-### Ghost Client for Headless Zellij
-Zellij silently drops `write-chars` and breaks `dump-screen` on background sessions with no attached client. The ghost client (`ghost-attach` expect script) spawns a headless Zellij client with a real PTY, giving Zellij a focused pane. This makes `write-chars` and `dump-screen` work reliably. The user can optionally attach too (multi-client) for observation.
-
-**Setup sequence:** Ghost client spawns → shell starts → config sources relay integration → extension creates FIFOs + starts listening → injects env exports → waits for `prompt_ready` → setup complete. The `prompt_ready` signal replaces arbitrary timeouts — it confirms the shell is initialized, env vars are set, and the FIFO pipeline is wired up.
-
-### Enhanced Mode (PTY Color Preservation)
-The `eval` prefix approach puts `unbuffer-relay` before the command being eval'd:
-```fish
-eval $SHELL_RELAY_UNBUFFER $cmd | tee $SHELL_RELAY_STDOUT > /dev/tty
-```
-This preserves session state (`eval` runs in the current shell) while getting PTY colors (`unbuffer-relay` spawns the first binary in a PTY). For pipelines, only the first command gets the PTY. Shell builtins as the first token will fail in unbuffer-relay (they aren't binaries) — but builtins don't produce colored output, so this is harmless. Do NOT use the `-p` (pipeline) flag — it blocks reading stdin from the terminal.
+### Viewport Sizing
+`--create-background` produces a 50x49 viewport. Use `zellij attach --create` (spawned as a child process) which inherits terminal dimensions, then detach. The session retains the wide viewport.
 
 ### Command Escaping
-- **Fish:** Quote-break pattern (`'text'"'"'more'`) — fish single quotes have NO escape sequences, so single quotes are embedded by ending the quote, inserting `"'"`, and re-opening
+- **Fish:** Quote-break pattern (`'text'"'"'more'`)
 - **Bash/Zsh:** `printf '%q'` via env var → round-trips through `eval`
 - Space-prefix the injection (` __relay_run ESCAPED`) to exclude from shell history
 
-### Fish User Command Capture (fish_preexec)
-- Uses `fish_preexec` event to dynamically create wrapper functions that shadow external commands
-- Fish resolves command names AFTER preexec handlers complete, so wrappers take effect for the current execution
-- Three cases: builtins (skipped), existing functions (copied via `functions -c`), external binaries (wrapped with `command` prefix)
-- `--wraps` preserves tab completion transitively
-- Pipeline optimization: `test -t 1` skips unbuffer-relay for non-head commands
-
 ### Command Serialization
-Relay uses a promise chain to serialize concurrent `execute()` calls. Only one command runs in the pane at a time.
-
-### Shell Integration Installation & Preflight
-Shell integration scripts are installed to `~/.sandpiper/shell-integrations/` via `sandpiper --install-shell-integrations`. At session start, the preflight system probes whether the integration is actually sourced by checking for `__relay_prompt_hook` in the user's shell:
-- **Fish:** `fish -i -c 'functions -q __relay_prompt_hook'`
-- **Bash:** `bash -i -c 'type __relay_prompt_hook > /dev/null 2>&1'`
-- **Zsh:** `zsh -i -c 'whence __relay_prompt_hook > /dev/null 2>&1'`
-
-All probes use `-i` (interactive mode) because integration scripts are typically guarded behind `status is-interactive` or equivalent checks. Without `-i`, the source line is skipped and the function appears undefined.
-
-Falls back to file existence check at the well-known location for unrecognized shells.
+The relay uses a promise chain to serialize concurrent `execute()` calls. Only one command runs in the pane at a time.
 
 ## Reference Documentation
 
-- [PRD](../../.sandpiper/docs/shell-relay-prd.md) — requirements and design decisions
-- [Work Plan](../../.sandpiper/docs/shell-relay-workplan.md) — phased implementation plan
+- [Zellij 0.44 Design Notes](../../.sandpiper/docs/zellij-044-relay-design.md) — architecture decisions, API findings
+- [Background Process Framework](../../.sandpiper/docs/background-process-framework-design.md) — ProcessManager design
 - [Task Board](../../.sandpiper/tasks/SHR/) — individual work items

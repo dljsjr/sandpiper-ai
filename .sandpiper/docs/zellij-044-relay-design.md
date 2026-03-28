@@ -26,7 +26,32 @@ The entire ghost client mechanism (`ghost-attach` expect script) existed because
 3. All actions accept `--pane-id` for pane-level targeting
 4. No attached client is required for any of these to work
 
-**The ghost client can be eliminated entirely.**
+**The ghost client has been eliminated.** Confirmed in SHR-78 spike.
+
+## Key Discovery: Viewport Sizing via Attach-Then-Detach
+
+`--create-background` produces a 50x49 viewport (Zellij's default for headless
+sessions). This causes severe output wrapping in dump-screen.
+
+**Fix:** Use `zellij attach --create <session>` (spawned as a background process)
+which inherits terminal dimensions from the spawning process, then immediately
+`zellij action detach`. The session retains the wide viewport (e.g., 141x70).
+
+```typescript
+// Spawn attach --create (inherits terminal dimensions)
+const proc = spawn('zellij', ['attach', '--create', sessionName], { stdio: 'pipe' });
+
+// Wait for pane to be available
+await waitForPane();
+
+// Detach — session keeps the wide viewport
+execSync(`zellij --session ${session} action detach`);
+
+// Clean up the attach process (exits after detach)
+proc.kill('SIGTERM');
+```
+
+This solved SHR-85 — output is now properly formatted at full terminal width.
 
 ## Key Discovery: Pane IDs Are First-Class
 
