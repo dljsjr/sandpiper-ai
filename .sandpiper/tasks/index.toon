@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774664435934
+lastUpdatedAt: 1774664564495
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -689,47 +689,50 @@ tasks:
     key: SHR-75
     project: SHR
     title: Investigate zellij subscribe for output capture (replace FIFO pipeline)
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-27T20:45:55.385Z"
-    updatedAt: "2026-03-27T21:22:38.363Z"
+    updatedAt: "2026-03-28T02:22:32.185Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774646558378
+    lastIndexedAt: 1774664552191
   "SHR-76":
     key: SHR-76
     project: SHR
     title: Investigate zellij action send-keys as replacement for write-chars
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T20:45:55.442Z"
-    updatedAt: "2026-03-27T21:22:38.416Z"
+    updatedAt: "2026-03-28T02:21:17.614Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774646558427
+    lastIndexedAt: 1774664477620
   "SHR-77":
     key: SHR-77
     project: SHR
     title: Investigate zellij action list-panes for pane discovery and health checks
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T20:45:55.495Z"
-    updatedAt: "2026-03-27T21:22:38.479Z"
+    updatedAt: "2026-03-28T02:21:17.700Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774646558486
+    lastIndexedAt: 1774664477707
   "SHR-78":
     key: SHR-78
     project: SHR
@@ -756,11 +759,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T20:45:55.601Z"
-    updatedAt: "2026-03-27T21:31:06.778Z"
+    updatedAt: "2026-03-28T02:22:44.487Z"
     dependsOn[1]: AGENT-15
     blockedBy[5]: SHR-75,SHR-76,SHR-77,SHR-78,AGENT-15
     related[0]:
-    lastIndexedAt: 1774647066784
+    lastIndexedAt: 1774664564494
   "TCL-52":
     key: TCL-52
     project: TCL

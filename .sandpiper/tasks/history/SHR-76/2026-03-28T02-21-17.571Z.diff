@@ -1,0 +1,38 @@
+--- a/SHR-76.md
++++ b/SHR-76.md
+@@ -6,19 +6,9 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-27T20:45:55.442Z
+-updated_at: 2026-03-27T21:22:38.416Z
++updated_at: 2026-03-28T02:21:17.571Z
+ ---
+ 
+ # Investigate zellij action send-keys as replacement for write-chars
+ 
+-Zellij 0.44 adds `zellij action send-keys` with human-readable key names ("Enter", "Ctrl c", "F1", etc.). Currently we use `write-chars` which injects raw character sequences.
+-
+-send-keys advantages:
+-- Proper key injection (special keys, modifiers handled correctly)
+-- Supports --pane-id for targeted delivery
+-- No shell quoting issues with special characters
+-
+-Investigation: can send-keys fully replace write-chars for command injection? Test with multi-line commands, special characters, shell quoting edge cases.
++CONFIRMED in SHR-78 spike: paste + send-keys work perfectly for command injection.
++
++Pattern: paste the command text (bracketed paste mode — fast, robust, handles multi-line),
++then send-keys 'Enter' to execute. Both accept --pane-id for targeted delivery.
++
++Replaces write-chars entirely. No shell quoting issues with special characters since
++bracketed paste mode is handled by the terminal, not the shell.
+ 
+ ---
+ 
+@@ -28,3 +27,7 @@
+ 
+ - **description**: added (8 lines)
+ 
++## 2026-03-28T02:21:17.571Z
++
++- **description**: 8 lines → updated (7 lines)
++
