@@ -6,7 +6,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-03-24T22:53:20.587Z
-updated_at: 2026-03-24T22:53:33.606Z
+updated_at: 2026-03-29T00:37:46.892Z
 ---
 
 # Long write-chars injections may wrap and confuse fish parser

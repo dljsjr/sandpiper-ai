@@ -8,7 +8,7 @@ reporter: USER
 created_at: 2026-03-23T03:18:38.896Z
 depends_on:
   - TCL-57
-updated_at: 2026-03-23T03:19:16.492Z
+updated_at: 2026-03-29T00:37:46.886Z
 ---
 
 # Pi TUI integration for task board

@@ -1,70 +1,6 @@
 version: 1
-lastUpdatedAt: 1774674282264
+lastUpdatedAt: 1774838828082
 tasks:
-  "AGENT-1":
-    key: AGENT-1
-    project: AGENT
-    title: Migrate pi config from ~/.pi to ~/.sandpiper via extension CLI flags
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T16:59:08.170Z"
-    updatedAt: "2026-03-26T04:27:53.816Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499273820
-  "AGENT-11":
-    key: AGENT-11
-    project: AGENT
-    title: Warning banner for unmigrated pi configs
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T18:01:30.626Z"
-    updatedAt: "2026-03-26T04:27:06.144Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226149
-  "AGENT-12":
-    key: AGENT-12
-    project: AGENT
-    title: Core preflight check system
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:27.775Z"
-    updatedAt: "2026-03-26T04:27:06.182Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226191
-  "AGENT-13":
-    key: AGENT-13
-    project: AGENT
-    title: "System extension: aggregate and display preflight diagnostics"
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:27.812Z"
-    updatedAt: "2026-03-26T04:27:06.223Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-12
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226228
   "AGENT-14":
     key: AGENT-14
     project: AGENT
@@ -75,27 +11,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T04:45:09.533Z"
-    updatedAt: "2026-03-26T04:45:17.384Z"
+    updatedAt: "2026-03-29T00:37:46.884Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774500317389
-  "AGENT-15":
-    key: AGENT-15
-    project: AGENT
-    title: General-purpose background process/task framework for the agent
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T15:44:16.494Z"
-    updatedAt: "2026-03-27T22:42:10.157Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[1]: SHR-71
-    lastIndexedAt: 1774651330163
+    lastIndexedAt: 1774744666898
   "AGENT-16":
     key: AGENT-16
     project: AGENT
@@ -106,75 +26,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T21:22:51.257Z"
-    updatedAt: "2026-03-26T21:22:51.257Z"
+    updatedAt: "2026-03-29T00:37:46.883Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774560171260
-  "AGENT-17":
-    key: AGENT-17
-    project: AGENT
-    title: Add borders and improved text styling to system banners
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T15:00:33.708Z"
-    updatedAt: "2026-03-27T15:04:00.814Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774623840820
-  "AGENT-18":
-    key: AGENT-18
-    project: AGENT
-    title: Inject project metadata triggers into system prompt
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T15:34:32.864Z"
-    updatedAt: "2026-03-27T15:41:43.736Z"
-    resolution: DONE
-    dependsOn[1]: TCL-70
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774626103742
-  "AGENT-19":
-    key: AGENT-19
-    project: AGENT
-    title: Normalize PI_*/SANDPIPER_* env var mirroring in pi_wrapper.ts
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T16:27:22.601Z"
-    updatedAt: "2026-03-27T16:28:17.093Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774628897099
-  "AGENT-2":
-    key: AGENT-2
-    project: AGENT
-    title: Implement migration functions for pi config
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T17:56:54.966Z"
-    updatedAt: "2026-03-26T04:27:06.032Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226037
+    lastIndexedAt: 1774744666898
   "AGENT-20":
     key: AGENT-20
     project: AGENT
@@ -185,27 +41,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T17:44:44.304Z"
-    updatedAt: "2026-03-27T17:44:44.304Z"
+    updatedAt: "2026-03-29T00:37:46.885Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774633484307
-  "AGENT-21":
-    key: AGENT-21
-    project: AGENT
-    title: "Redesign banner display: non-persistent chat-flowing bordered notifications"
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-27T19:53:37.043Z"
-    updatedAt: "2026-03-27T22:49:52.792Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774651792798
+    lastIndexedAt: 1774744666898
   "AGENT-27":
     key: AGENT-27
     project: AGENT
@@ -216,11 +56,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T22:04:54.108Z"
-    updatedAt: "2026-03-27T22:04:54.108Z"
+    updatedAt: "2026-03-29T00:37:46.883Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774649094112
+    lastIndexedAt: 1774744666898
   "AGENT-28":
     key: AGENT-28
     project: AGENT
@@ -231,230 +71,26 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T22:50:01.097Z"
-    updatedAt: "2026-03-27T22:50:01.097Z"
+    updatedAt: "2026-03-29T00:37:46.882Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774651801101
-  "AGENT-5":
-    key: AGENT-5
+    lastIndexedAt: 1774744666898
+  "AGENT-29":
+    key: AGENT-29
     project: AGENT
-    title: CLI flags for pi config migration
-    status: COMPLETE
+    title: Inject standup content into system prompt for automatic session continuity
+    status: NOT STARTED
     kind: TASK
     priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T17:58:15.773Z"
-    updatedAt: "2026-03-26T04:27:06.071Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-2
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226075
-  "AGENT-8":
-    key: AGENT-8
-    project: AGENT
-    title: Slash command for pi config migration
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T18:00:23.127Z"
-    updatedAt: "2026-03-26T04:27:06.107Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-2
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226112
-  "AGENT-22":
-    key: AGENT-22
-    project: AGENT
-    title: Implement ProcessManager core in sandpiper-ai-core
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-27T21:57:33.862Z"
-    updatedAt: "2026-03-27T22:37:41.414Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-15
-    lastIndexedAt: 1774651061427
-  "AGENT-23":
-    key: AGENT-23
-    project: AGENT
-    title: Implement start_background_process tool in system.ts
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-27T21:57:33.910Z"
-    updatedAt: "2026-03-27T22:37:41.468Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-15
-    lastIndexedAt: 1774651061475
-  "AGENT-24":
-    key: AGENT-24
-    project: AGENT
-    title: Implement check_background_process tool in system.ts
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-27T21:57:33.951Z"
-    updatedAt: "2026-03-27T22:37:41.509Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-15
-    lastIndexedAt: 1774651061515
-  "AGENT-25":
-    key: AGENT-25
-    project: AGENT
-    title: Implement passive completion notifications via context event
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-27T21:57:33.994Z"
-    updatedAt: "2026-03-27T22:42:10.115Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-15
-    lastIndexedAt: 1774651330122
-  "AGENT-26":
-    key: AGENT-26
-    project: AGENT
-    title: Session lifecycle integration (teardown on session_shutdown)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-27T21:57:34.038Z"
-    updatedAt: "2026-03-27T22:37:41.551Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-15
-    lastIndexedAt: 1774651061561
-  "AGENT-3":
-    key: AGENT-3
-    project: AGENT
-    title: Move migration function
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T17:57:23.840Z"
-    updatedAt: "2026-03-26T15:48:11.336Z"
-    resolution: DONE
+    createdAt: "2026-03-30T02:45:14.275Z"
+    updatedAt: "2026-03-30T02:45:14.275Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: AGENT-2
-    lastIndexedAt: 1774558194858
-  "AGENT-4":
-    key: AGENT-4
-    project: AGENT
-    title: Symlink migration function
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T17:57:43.288Z"
-    updatedAt: "2026-03-26T15:48:11.379Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-2
-    lastIndexedAt: 1774558194858
-  "AGENT-6":
-    key: AGENT-6
-    project: AGENT
-    title: "--migrate-pi-configs flag"
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T17:58:29.647Z"
-    updatedAt: "2026-03-26T15:48:11.417Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-5
-    lastIndexedAt: 1774558194858
-  "AGENT-7":
-    key: AGENT-7
-    project: AGENT
-    title: "--symlink-config flag"
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T17:59:00.134Z"
-    updatedAt: "2026-03-26T15:48:11.457Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-5
-    lastIndexedAt: 1774558194859
-  "AGENT-10":
-    key: AGENT-10
-    project: AGENT
-    title: /migrate-pi symlink command
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T18:00:55.335Z"
-    updatedAt: "2026-03-26T15:48:11.536Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-8
-    lastIndexedAt: 1774558194859
-  "AGENT-9":
-    key: AGENT-9
-    project: AGENT
-    title: /migrate-pi move command
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T18:00:38.504Z"
-    updatedAt: "2026-03-26T15:48:11.496Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: AGENT-8
-    lastIndexedAt: 1774558194859
+    lastIndexedAt: 1774838714278
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -465,11 +101,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T03:14:28.312Z"
-    updatedAt: "2026-03-25T03:14:41.162Z"
+    updatedAt: "2026-03-29T00:37:46.896Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774408481166
+    lastIndexedAt: 1774744666899
   "PKM-1":
     key: PKM-1
     project: PKM
@@ -480,27 +116,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-25T03:13:59.736Z"
-    updatedAt: "2026-03-25T03:14:13.427Z"
+    updatedAt: "2026-03-29T00:37:46.885Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774408453432
-  "PKM-2":
-    key: PKM-2
-    project: PKM
-    title: Create project directory and skill for cross-project awareness
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T14:08:29.327Z"
-    updatedAt: "2026-03-25T14:10:14.584Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774467939591
+    lastIndexedAt: 1774744666899
   "SHR-62":
     key: SHR-62
     project: SHR
@@ -511,11 +131,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-24T22:53:20.587Z"
-    updatedAt: "2026-03-24T22:53:33.606Z"
+    updatedAt: "2026-03-29T00:37:46.892Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774392813613
+    lastIndexedAt: 1774744666899
   "SHR-63":
     key: SHR-63
     project: SHR
@@ -526,59 +146,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-25T03:02:39.233Z"
-    updatedAt: "2026-03-25T03:02:49.784Z"
+    updatedAt: "2026-03-29T00:37:46.891Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774407769788
-  "SHR-64":
-    key: SHR-64
-    project: SHR
-    title: Install shell integration scripts to a well-known location
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T16:20:48.361Z"
-    updatedAt: "2026-03-26T04:27:06.261Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226266
-  "SHR-65":
-    key: SHR-65
-    project: SHR
-    title: Add --install-shell-integrations flag to system extension
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:27.848Z"
-    updatedAt: "2026-03-26T04:27:06.301Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-12
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226307
-  "SHR-66":
-    key: SHR-66
-    project: SHR
-    title: Register shell relay preflight check for integration installation
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-25T21:55:31.145Z"
-    updatedAt: "2026-03-26T04:27:06.341Z"
-    resolution: DONE
-    dependsOn[1]: SHR-65
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774499226345
+    lastIndexedAt: 1774744666899
   "SHR-67":
     key: SHR-67
     project: SHR
@@ -589,11 +161,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T04:25:52.770Z"
-    updatedAt: "2026-03-26T04:25:59.595Z"
+    updatedAt: "2026-03-29T00:37:46.891Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774499159600
+    lastIndexedAt: 1774744666899
   "SHR-68":
     key: SHR-68
     project: SHR
@@ -604,11 +176,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T14:54:22.600Z"
-    updatedAt: "2026-03-26T14:54:22.600Z"
+    updatedAt: "2026-03-29T00:37:46.890Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774558194859
+    lastIndexedAt: 1774744666899
   "SHR-69":
     key: SHR-69
     project: SHR
@@ -619,27 +191,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T14:54:25.683Z"
-    updatedAt: "2026-03-26T14:54:25.683Z"
+    updatedAt: "2026-03-29T00:37:46.889Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774558194860
-  "SHR-70":
-    key: SHR-70
-    project: SHR
-    title: "Spike: replace unbuffer-relay with proper PTY allocation approach (incl. OpenClaw process/supervisor evaluation)"
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T14:54:28.373Z"
-    updatedAt: "2026-03-26T15:44:07.179Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774558194860
+    lastIndexedAt: 1774744666899
   "SHR-71":
     key: SHR-71
     project: SHR
@@ -650,11 +206,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T15:44:11.246Z"
-    updatedAt: "2026-03-26T15:44:11.246Z"
+    updatedAt: "2026-03-29T00:37:46.893Z"
     dependsOn[0]:
     blockedBy[0]:
     related[2]: SHR-68,SHR-69
-    lastIndexedAt: 1774558194860
+    lastIndexedAt: 1774744666899
   "SHR-73":
     key: SHR-73
     project: SHR
@@ -665,11 +221,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T21:22:51.359Z"
-    updatedAt: "2026-03-26T21:22:51.359Z"
+    updatedAt: "2026-03-29T00:37:46.890Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774560171363
+    lastIndexedAt: 1774744666899
   "SHR-74":
     key: SHR-74
     project: SHR
@@ -680,107 +236,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T17:44:44.263Z"
-    updatedAt: "2026-03-27T17:44:44.263Z"
+    updatedAt: "2026-03-29T00:37:46.894Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774633484267
-  "SHR-75":
-    key: SHR-75
-    project: SHR
-    title: Investigate zellij subscribe for output capture (replace FIFO pipeline)
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T20:45:55.385Z"
-    updatedAt: "2026-03-28T02:22:32.185Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774664552191
-  "SHR-76":
-    key: SHR-76
-    project: SHR
-    title: Investigate zellij action send-keys as replacement for write-chars
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-27T20:45:55.442Z"
-    updatedAt: "2026-03-28T02:21:17.614Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774664477620
-  "SHR-77":
-    key: SHR-77
-    project: SHR
-    title: Investigate zellij action list-panes for pane discovery and health checks
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-27T20:45:55.495Z"
-    updatedAt: "2026-03-28T02:21:17.700Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774664477707
-  "SHR-78":
-    key: SHR-78
-    project: SHR
-    title: Investigate zellij action dump-screen --pane-id for targeted cross-session queries
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T20:45:55.549Z"
-    updatedAt: "2026-03-28T02:20:35.927Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774664435934
-  "SHR-79":
-    key: SHR-79
-    project: SHR
-    title: Evaluate whether Zellij 0.44 features warrant a ground-up shell relay redesign
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-27T20:45:55.601Z"
-    updatedAt: "2026-03-28T03:52:01.497Z"
-    resolution: DONE
-    dependsOn[1]: AGENT-15
-    blockedBy[5]: SHR-75,SHR-76,SHR-77,SHR-78,AGENT-15
-    related[0]:
-    lastIndexedAt: 1774669921504
-  "SHR-85":
-    key: SHR-85
-    project: SHR
-    title: Background Zellij sessions default to 50x49 viewport — output wraps and merges
-    status: COMPLETE
-    kind: BUG
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-28T04:39:06.466Z"
-    updatedAt: "2026-03-28T04:59:22.501Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774673962508
+    lastIndexedAt: 1774744666899
   "SHR-86":
     key: SHR-86
     project: SHR
@@ -791,11 +251,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.584Z"
-    updatedAt: "2026-03-28T05:02:33.584Z"
+    updatedAt: "2026-03-29T00:37:46.893Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774674153588
+    lastIndexedAt: 1774744666899
   "SHR-87":
     key: SHR-87
     project: SHR
@@ -806,11 +266,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.626Z"
-    updatedAt: "2026-03-28T05:02:33.626Z"
+    updatedAt: "2026-03-29T00:37:46.894Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774674153630
+    lastIndexedAt: 1774744666899
   "SHR-88":
     key: SHR-88
     project: SHR
@@ -821,11 +281,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.669Z"
-    updatedAt: "2026-03-28T05:02:33.669Z"
+    updatedAt: "2026-03-29T00:37:46.895Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774674153674
+    lastIndexedAt: 1774744666899
   "SHR-89":
     key: SHR-89
     project: SHR
@@ -836,96 +296,26 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-28T05:04:42.259Z"
-    updatedAt: "2026-03-28T05:04:42.259Z"
+    updatedAt: "2026-03-29T00:37:46.895Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774674282264
-  "SHR-80":
-    key: SHR-80
+    lastIndexedAt: 1774744666899
+  "SHR-90":
+    key: SHR-90
     project: SHR
-    title: "Replace ZellijClient with Zellij 0.44 API (paste, send-keys, --session, --pane-id, list-panes)"
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
+    title: Wire ctx.signal into shell_relay for user-cancellable command execution
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
     reporter: AGENT
-    createdAt: "2026-03-28T03:34:06.390Z"
-    updatedAt: "2026-03-28T03:39:08.201Z"
-    resolution: DONE
+    createdAt: "2026-03-30T02:04:48.245Z"
+    updatedAt: "2026-03-30T02:04:56.767Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: SHR-79
-    lastIndexedAt: 1774669148208
-  "SHR-81":
-    key: SHR-81
-    project: SHR
-    title: Implement snapshot-diff output capture (dump-screen before/after)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-28T03:34:06.454Z"
-    updatedAt: "2026-03-28T03:39:08.243Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: SHR-79
-    lastIndexedAt: 1774669148249
-  "SHR-82":
-    key: SHR-82
-    project: SHR
-    title: Simplify shell integration scripts to signal-only (prompt_ready + exit code)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-28T03:34:06.513Z"
-    updatedAt: "2026-03-28T03:52:01.369Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: SHR-79
-    lastIndexedAt: 1774669921376
-  "SHR-83":
-    key: SHR-83
-    project: SHR
-    title: Eliminate ghost-attach and unbuffer-relay dependencies
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-28T03:34:06.569Z"
-    updatedAt: "2026-03-28T03:52:01.413Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: SHR-79
-    lastIndexedAt: 1774669921419
-  "SHR-84":
-    key: SHR-84
-    project: SHR
-    title: "Update relay setup flow (background session, pane ID capture, no ghost client)"
-    status: COMPLETE
-    kind: SUBTASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-28T03:34:06.629Z"
-    updatedAt: "2026-03-28T03:52:01.455Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: SHR-79
-    lastIndexedAt: 1774669921462
+    lastIndexedAt: 1774836296772
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -936,27 +326,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-22T20:25:39.891Z"
-    updatedAt: "2026-03-22T20:25:46.417Z"
+    updatedAt: "2026-03-29T00:37:46.887Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774211146422
-  "TCL-53":
-    key: TCL-53
-    project: TCL
-    title: Investigate project-level metadata and configuration
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.748Z"
-    updatedAt: "2026-03-27T17:44:37.583Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774633477593
+    lastIndexedAt: 1774744666899
   "TCL-55":
     key: TCL-55
     project: TCL
@@ -967,27 +341,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.806Z"
-    updatedAt: "2026-03-23T03:19:16.411Z"
+    updatedAt: "2026-03-29T00:37:46.889Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774235956416
-  "TCL-56":
-    key: TCL-56
-    project: TCL
-    title: Improve atomicity and data integrity for task operations
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.835Z"
-    updatedAt: "2026-03-26T21:36:56.113Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774561016119
+    lastIndexedAt: 1774744666899
   "TCL-57":
     key: TCL-57
     project: TCL
@@ -998,11 +356,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.864Z"
-    updatedAt: "2026-03-23T03:19:16.465Z"
+    updatedAt: "2026-03-29T00:37:46.888Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774235956470
+    lastIndexedAt: 1774744666899
   "TCL-58":
     key: TCL-58
     project: TCL
@@ -1013,11 +371,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.896Z"
-    updatedAt: "2026-03-23T03:19:16.492Z"
+    updatedAt: "2026-03-29T00:37:46.886Z"
     dependsOn[1]: TCL-57
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774235956500
+    lastIndexedAt: 1774744666899
   "TCL-59":
     key: TCL-59
     project: TCL
@@ -1028,11 +386,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.927Z"
-    updatedAt: "2026-03-23T03:19:16.523Z"
+    updatedAt: "2026-03-29T00:37:46.886Z"
     dependsOn[1]: TCL-57
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774235956529
+    lastIndexedAt: 1774744666899
   "TCL-61":
     key: TCL-61
     project: TCL
@@ -1043,11 +401,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T04:30:07.828Z"
-    updatedAt: "2026-03-26T04:31:38.888Z"
+    updatedAt: "2026-03-29T00:37:46.888Z"
     dependsOn[0]:
     blockedBy[0]:
     related[1]: TCL-55
-    lastIndexedAt: 1774499498893
+    lastIndexedAt: 1774744666899
   "TCL-69":
     key: TCL-69
     project: TCL
@@ -1058,140 +416,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T21:22:51.308Z"
-    updatedAt: "2026-03-26T21:22:51.308Z"
+    updatedAt: "2026-03-29T00:37:46.887Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774560171312
-  "TCL-70":
-    key: TCL-70
-    project: TCL
-    title: Rename when_to_file → when_to_read in project metadata
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T15:34:32.819Z"
-    updatedAt: "2026-03-27T15:39:10.802Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774625950809
-  "TCL-62":
-    key: TCL-62
-    project: TCL
-    title: Add ProjectMetadata type + core read/write functions
-    status: NEEDS REVIEW
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.725Z"
-    updatedAt: "2026-03-26T16:30:49.453Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774558194861
-  "TCL-63":
-    key: TCL-63
-    project: TCL
-    title: Update project create to enforce PROJECT.md scaffolding
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.763Z"
-    updatedAt: "2026-03-27T17:44:37.628Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774633477634
-  "TCL-64":
-    key: TCL-64
-    project: TCL
-    title: Add project update and project show commands
-    status: NEEDS REVIEW
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.802Z"
-    updatedAt: "2026-03-26T16:40:58.575Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774641217051
-  "TCL-65":
-    key: TCL-65
-    project: TCL
-    title: Enhance project list and add task show --metadata-only
-    status: NEEDS REVIEW
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.840Z"
-    updatedAt: "2026-03-26T16:44:03.651Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774641217051
-  "TCL-66":
-    key: TCL-66
-    project: TCL
-    title: Backfill PROJECT.md for all existing projects
-    status: NEEDS REVIEW
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.882Z"
-    updatedAt: "2026-03-26T16:45:13.721Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774641217051
-  "TCL-67":
-    key: TCL-67
-    project: TCL
-    title: Update SPEC.md with project metadata specification
-    status: NEEDS REVIEW
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.923Z"
-    updatedAt: "2026-03-26T16:45:45.092Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774641217051
-  "TCL-68":
-    key: TCL-68
-    project: TCL
-    title: Update tasks SKILL.md with project metadata guidance
-    status: NEEDS REVIEW
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T16:25:14.966Z"
-    updatedAt: "2026-03-26T16:46:21.203Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-53
-    lastIndexedAt: 1774641217051
+    lastIndexedAt: 1774744666899
   "TOOLS-1":
     key: TOOLS-1
     project: TOOLS
@@ -1202,11 +431,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-23T14:54:12.001Z"
-    updatedAt: "2026-03-23T14:54:12.001Z"
+    updatedAt: "2026-03-29T00:37:46.881Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774277876847
+    lastIndexedAt: 1774744666898
   "TOOLS-10":
     key: TOOLS-10
     project: TOOLS
@@ -1214,14 +443,14 @@ tasks:
     status: NOT STARTED
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-26T22:03:20.380Z"
-    updatedAt: "2026-03-26T22:03:20.380Z"
+    updatedAt: "2026-03-30T02:47:08.075Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774562600382
+    lastIndexedAt: 1774838828081
   "TOOLS-2":
     key: TOOLS-2
     project: TOOLS
@@ -1232,11 +461,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-23T14:54:12.030Z"
-    updatedAt: "2026-03-23T14:54:12.030Z"
+    updatedAt: "2026-03-29T00:37:46.879Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774277876882
+    lastIndexedAt: 1774744666898
   "TOOLS-4":
     key: TOOLS-4
     project: TOOLS
@@ -1247,11 +476,11 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-23T15:18:52.197Z"
-    updatedAt: "2026-03-23T15:18:52.197Z"
+    updatedAt: "2026-03-29T00:37:46.881Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774279132200
+    lastIndexedAt: 1774744666898
   "TOOLS-7":
     key: TOOLS-7
     project: TOOLS
@@ -1259,14 +488,14 @@ tasks:
     status: NOT STARTED
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-24T21:02:38.813Z"
-    updatedAt: "2026-03-24T21:02:53.136Z"
+    updatedAt: "2026-03-29T00:38:02.254Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774386173144
+    lastIndexedAt: 1774744682258
   "TOOLS-9":
     key: TOOLS-9
     project: TOOLS
@@ -1277,136 +506,33 @@ tasks:
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-25T03:03:06.093Z"
-    updatedAt: "2026-03-25T03:03:15.915Z"
+    updatedAt: "2026-03-29T00:37:46.880Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774407795919
-  "WEB-1":
-    key: WEB-1
+    lastIndexedAt: 1774744666898
+  "WEB-8":
+    key: WEB-8
     project: WEB
-    title: "Web fetch tool: fetch URL, extract content, return markdown"
-    status: COMPLETE
+    title: Wire ctx.signal into web_fetch for user-cancellable fetches
+    status: NOT STARTED
     kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-25T03:15:05.788Z"
-    updatedAt: "2026-03-26T20:58:12.383Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774558692389
-  "WEB-2":
-    key: WEB-2
-    project: WEB
-    title: Scaffold extension + install dependencies
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.474Z"
-    updatedAt: "2026-03-26T20:55:36.428Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536434
-  "WEB-3":
-    key: WEB-3
-    project: WEB
-    title: Implement fetch adapter with HTTP fetching
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
+    priority: LOW
     assignee: UNASSIGNED
     reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.514Z"
-    updatedAt: "2026-03-26T20:55:36.469Z"
-    resolution: DONE
+    createdAt: "2026-03-30T02:04:34.128Z"
+    updatedAt: "2026-03-30T02:04:45.101Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536475
-  "WEB-4":
-    key: WEB-4
-    project: WEB
-    title: Implement content extraction (readability + jsdom)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.552Z"
-    updatedAt: "2026-03-26T20:55:36.506Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536512
-  "WEB-5":
-    key: WEB-5
-    project: WEB
-    title: Implement HTML-to-markdown conversion (turndown)
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.590Z"
-    updatedAt: "2026-03-26T20:55:36.544Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536551
-  "WEB-6":
-    key: WEB-6
-    project: WEB
-    title: Implement web_fetch Pi tool and wire pipeline
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.631Z"
-    updatedAt: "2026-03-26T20:55:36.584Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558536591
-  "WEB-7":
-    key: WEB-7
-    project: WEB
-    title: "Tests for fetch, extract, convert, and end-to-end"
-    status: COMPLETE
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T20:50:01.671Z"
-    updatedAt: "2026-03-26T20:58:12.343Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: WEB-1
-    lastIndexedAt: 1774558692349
+    lastIndexedAt: 1774836285107
 counters:
   TCL:
     projectKey: TCL
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 90
+    nextTaskNumber: 91
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
@@ -1424,7 +550,7 @@ counters:
     nextTaskNumber: 2
   WEB:
     projectKey: WEB
-    nextTaskNumber: 8
+    nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 29
+    nextTaskNumber: 30

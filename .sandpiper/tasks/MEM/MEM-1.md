@@ -6,7 +6,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-25T03:14:28.312Z
-updated_at: 2026-03-25T03:14:41.162Z
+updated_at: 2026-03-29T00:37:46.896Z
 ---
 
 # Design memory/brain system for cross-session knowledge retrieval
