@@ -1,0 +1,31 @@
+--- a/SHR-80.md
++++ b/SHR-80.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Replace ZellijClient with Zellij 0.44 API (paste, send-keys, --session, --pane-id, list-panes)"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-03-28T03:34:06.390Z
+ updated_at: 2026-03-28T03:34:06.390Z
+-updated_at: 2026-03-28T03:34:06.390Z
++updated_at: 2026-03-28T03:35:19.075Z
+ ---
+ 
+ # Replace ZellijClient with Zellij 0.44 API (paste, send-keys, --session, --pane-id, list-panes)
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-03-28T03:35:19.076Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

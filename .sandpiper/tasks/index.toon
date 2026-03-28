@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774668846635
+lastUpdatedAt: 1774669148250
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -768,34 +768,36 @@ tasks:
     key: SHR-80
     project: SHR
     title: "Replace ZellijClient with Zellij 0.44 API (paste, send-keys, --session, --pane-id, list-panes)"
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T03:34:06.390Z"
-    updatedAt: "2026-03-28T03:34:06.390Z"
+    updatedAt: "2026-03-28T03:39:08.201Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-79
-    lastIndexedAt: 1774668846398
+    lastIndexedAt: 1774669148208
   "SHR-81":
     key: SHR-81
     project: SHR
     title: Implement snapshot-diff output capture (dump-screen before/after)
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T03:34:06.454Z"
-    updatedAt: "2026-03-28T03:34:06.454Z"
+    updatedAt: "2026-03-28T03:39:08.243Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-79
-    lastIndexedAt: 1774668846458
+    lastIndexedAt: 1774669148249
   "SHR-82":
     key: SHR-82
     project: SHR

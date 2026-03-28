@@ -1,70 +1,75 @@
 import { execSync } from 'node:child_process';
 
-/** Configuration for the Zellij client. */
-export interface ZellijClientOptions {
-  /** The Zellij session name to target. */
-  readonly sessionName: string;
-}
-
 /**
- * Wraps Zellij CLI commands for shell relay operations.
+ * Zellij CLI client for shell relay operations.
  *
- * All commands that target a session use the ZELLIJ_SESSION_NAME
- * environment variable for session targeting.
+ * Uses Zellij 0.44+ APIs: --session flag for session targeting,
+ * --pane-id for pane-level targeting, paste for bracketed paste
+ * mode injection, send-keys for human-readable key input, and
+ * list-panes --json for structured pane metadata.
+ *
+ * No ghost client required — all operations work against background
+ * sessions via CLI.
  *
  * This module is framework-independent — no pi/sandpiper imports.
  */
+
+// ─── Types ──────────────────────────────────────────────────────
+
+export interface ZellijClientOptions {
+  /** Session name to target. */
+  readonly sessionName: string;
+  /** Pane ID to target (e.g., "terminal_0"). Set after session creation. */
+  readonly paneId?: string;
+}
+
+export interface PaneInfo {
+  readonly id: number;
+  readonly isPlugin: boolean;
+  readonly isFocused: boolean;
+  readonly isFloating: boolean;
+  readonly title: string;
+  readonly exited: boolean;
+  readonly exitStatus: number | null;
+  readonly paneCommand: string | null;
+  readonly paneCwd: string | null;
+  readonly tabId: number;
+  readonly tabName: string;
+  readonly paneRows: number;
+  readonly paneColumns: number;
+}
+
+// ─── Client ─────────────────────────────────────────────────────
+
 export class ZellijClient {
   private readonly sessionName: string;
+  private paneId: string | undefined;
 
   constructor(options: ZellijClientOptions) {
     this.sessionName = options.sessionName;
+    this.paneId = options.paneId;
   }
 
-  /**
-   * Inject characters into the target pane via `zellij action write-chars`.
-   *
-   * @param chars - The characters to inject (include trailing \n to execute)
-   */
-  writeChars(chars: string): void {
-    this.execInSession(`zellij action write-chars -- ${this.shellQuote(chars)}`);
+  /** Update the target pane ID. */
+  setPaneId(paneId: string): void {
+    this.paneId = paneId;
   }
 
-  /**
-   * Send raw key sequences (e.g., Ctrl+C) to the target pane.
-   * Uses write-chars under the hood since Zellij doesn't have a separate send-keys.
-   *
-   * @param keys - Raw key sequence (e.g., "\x03" for Ctrl+C)
-   */
-  sendKeys(keys: string): void {
-    this.writeChars(keys);
+  /** Get the current target pane ID. */
+  getPaneId(): string | undefined {
+    return this.paneId;
   }
 
-  /**
-   * Dump the full pane scrollback to a file via `zellij action dump-screen --full`.
-   *
-   * @param outputPath - Path to write the screen dump to (can be a FIFO)
-   */
-  dumpScreen(outputPath: string): void {
-    this.execInSession(`zellij action dump-screen --full --path ${this.shellQuote(outputPath)}`);
-  }
+  // ── Session Management ──────────────────────────────────────
 
   /**
-   * Create a new detached Zellij session.
-   *
-   * @param name - Name for the new session
+   * Create a background session (no attached terminal required).
+   * Idempotent — attaches to existing session if it already exists.
    */
-  createSession(name: string): void {
-    execSync(`zellij attach --create-background ${this.shellQuote(name)}`, {
+  createBackgroundSession(): void {
+    execSync(`zellij attach --create-background ${this.shellQuote(this.sessionName)}`, {
       stdio: 'pipe',
     });
-  }
-
-  /**
-   * Create a new pane in the target session.
-   */
-  newPane(): void {
-    this.execInSession('zellij action new-pane');
   }
 
   /**
@@ -98,44 +103,147 @@ export class ZellijClient {
     }
   }
 
+  // ── Pane Discovery ──────────────────────────────────────────
+
   /**
-   * Wait until the pane is reachable by polling with dump-screen.
-   * Requires a real client to be attached (e.g., via ghost-attach).
-   *
-   * @returns true if the pane became reachable, false if timed out
+   * List all panes in the target session with full metadata.
    */
-  waitForPane(timeoutMs = 10_000, intervalMs = 500): Promise<boolean> {
+  listPanes(): PaneInfo[] {
+    try {
+      const output = this.execInSession('action list-panes --json');
+      const raw = JSON.parse(output) as Array<Record<string, unknown>>;
+      return raw.map((p) => ({
+        id: p.id as number,
+        isPlugin: p.is_plugin as boolean,
+        isFocused: p.is_focused as boolean,
+        isFloating: p.is_floating as boolean,
+        title: (p.title as string) ?? '',
+        exited: p.exited as boolean,
+        exitStatus: (p.exit_status as number) ?? null,
+        paneCommand: (p.pane_command as string) ?? null,
+        paneCwd: (p.pane_cwd as string) ?? null,
+        tabId: p.tab_id as number,
+        tabName: (p.tab_name as string) ?? '',
+        paneRows: p.pane_rows as number,
+        paneColumns: p.pane_columns as number,
+      }));
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Find the first terminal pane (non-plugin) in the session.
+   * Returns the pane ID string (e.g., "terminal_0") or undefined.
+   */
+  findTerminalPane(): string | undefined {
+    const panes = this.listPanes();
+    const terminal = panes.find((p) => !p.isPlugin && !p.exited);
+    return terminal ? `terminal_${terminal.id}` : undefined;
+  }
+
+  /**
+   * Wait until a terminal pane is available in the session.
+   * Uses list-panes instead of dump-screen polling.
+   */
+  waitForPane(timeoutMs = 10_000, intervalMs = 500): Promise<string | undefined> {
     return new Promise((resolve) => {
       const start = Date.now();
       const check = () => {
-        try {
-          // dump-screen to /dev/null — just testing if it succeeds
-          // With a real client attached, this reliably works
-          this.execInSession('zellij action dump-screen --full --path /dev/null');
-          resolve(true);
-        } catch {
-          if (Date.now() - start >= timeoutMs) {
-            resolve(false);
-          } else {
-            setTimeout(check, intervalMs);
-          }
+        const paneId = this.findTerminalPane();
+        if (paneId) {
+          resolve(paneId);
+        } else if (Date.now() - start >= timeoutMs) {
+          resolve(undefined);
+        } else {
+          setTimeout(check, intervalMs);
         }
       };
       check();
     });
   }
 
+  // ── Command Injection ───────────────────────────────────────
+
   /**
-   * Execute a command targeting the configured Zellij session.
+   * Inject text into the target pane using bracketed paste mode.
+   * Faster and more robust than write-chars.
+   */
+  paste(text: string): void {
+    this.execInSessionWithPane(`action paste ${this.shellQuote(text)}`);
+  }
+
+  /**
+   * Send human-readable key names to the target pane.
+   * Examples: "Enter", "Ctrl c", "F1", "Tab", "Escape"
+   */
+  sendKeys(...keys: string[]): void {
+    const keyArgs = keys.map((k) => this.shellQuote(k)).join(' ');
+    this.execInSessionWithPane(`action send-keys ${keyArgs}`);
+  }
+
+  /**
+   * Inject a command and execute it.
+   * Uses paste (bracketed paste mode) + send-keys Enter.
+   */
+  injectCommand(command: string): void {
+    this.paste(command);
+    this.sendKeys('Enter');
+  }
+
+  // ── Output Capture ──────────────────────────────────────────
+
+  /**
+   * Dump the full pane scrollback as a string.
+   * Returns the raw text content (no ANSI codes by default).
+   */
+  dumpScreen(options?: { ansi?: boolean }): string {
+    const ansiFlag = options?.ansi ? ' --ansi' : '';
+    return this.execInSessionWithPane(`action dump-screen --full${ansiFlag}`);
+  }
+
+  /**
+   * Dump the pane scrollback to a file.
+   */
+  dumpScreenToFile(path: string, options?: { ansi?: boolean }): void {
+    const ansiFlag = options?.ansi ? ' --ansi' : '';
+    this.execInSessionWithPane(`action dump-screen --full --path ${this.shellQuote(path)}${ansiFlag}`);
+  }
+
+  // ── Legacy Compatibility ────────────────────────────────────
+  // These methods maintain the old interface for incremental migration.
+  // They should be removed once the relay is fully migrated.
+
+  /**
+   * @deprecated Use paste() + sendKeys('Enter') instead.
+   */
+  writeChars(chars: string): void {
+    this.execInSessionWithPane(`action write-chars -- ${this.shellQuote(chars)}`);
+  }
+
+  // ── Internals ───────────────────────────────────────────────
+
+  /**
+   * Execute a zellij command targeting the session.
    */
   private execInSession(command: string): string {
-    return execSync(command, {
+    return execSync(`zellij --session ${this.shellQuote(this.sessionName)} ${command}`, {
       stdio: 'pipe',
       encoding: 'utf-8',
-      env: {
-        ...process.env,
-        ZELLIJ_SESSION_NAME: this.sessionName,
-      },
+    });
+  }
+
+  /**
+   * Execute a zellij command targeting the session and pane.
+   * Throws if no pane ID is set.
+   */
+  private execInSessionWithPane(command: string): string {
+    if (!this.paneId) {
+      throw new Error('No pane ID set. Call setPaneId() or waitForPane() first.');
+    }
+    return execSync(`zellij --session ${this.shellQuote(this.sessionName)} ${command} --pane-id ${this.paneId}`, {
+      stdio: 'pipe',
+      encoding: 'utf-8',
     });
   }
 
