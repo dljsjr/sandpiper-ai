@@ -63,11 +63,13 @@ export default function (pi: ExtensionAPI) {
       );
     }
 
-    // Create background session (no ghost client needed — Zellij 0.44+)
-    zellij.createBackgroundSession();
+    // Create session by attaching then detaching — this gives the session
+    // a wide viewport (inherited from the spawning process) instead of the
+    // default 50x49 that --create-background produces.
+    await zellij.createSessionWithDetach(10_000);
 
-    // Wait for a terminal pane to be available and capture its ID
-    const paneId = await zellij.waitForPane(10_000, 500);
+    // The pane ID was found by createSessionWithDetach via waitForPane
+    const paneId = zellij.getPaneId() ?? zellij.findTerminalPane();
     if (!paneId) {
       throw new Error(
         `Failed to find a terminal pane in session "${resolvedSession}". ` +

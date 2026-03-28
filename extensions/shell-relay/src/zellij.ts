@@ -65,11 +65,56 @@ export class ZellijClient {
   /**
    * Create a background session (no attached terminal required).
    * Idempotent — attaches to existing session if it already exists.
+   *
+   * Uses attach --create-background which creates a small default viewport (50x49).
+   * For a wider viewport, use createSessionWithDetach() instead.
    */
   createBackgroundSession(): void {
     execSync(`zellij attach --create-background ${this.shellQuote(this.sessionName)}`, {
       stdio: 'pipe',
     });
+  }
+
+  /**
+   * Create a session by briefly attaching then immediately detaching.
+   * This inherits the terminal dimensions from the spawning process,
+   * giving us a wider viewport than createBackgroundSession().
+   *
+   * The attach process is spawned with inherited stdio so Zellij can
+   * read the terminal size. After the pane is ready, we detach.
+   */
+  async createSessionWithDetach(timeoutMs = 10_000): Promise<void> {
+    const { spawn: nodeSpawn } = await import('node:child_process');
+
+    // Spawn zellij attach --create with inherited stdio for terminal dimensions
+    const proc = nodeSpawn('zellij', ['attach', '--create', this.sessionName], {
+      stdio: 'pipe', // pipe so it doesn't take over the terminal
+    });
+
+    // Wait for the pane to be available, then detach
+    const paneReady = await this.waitForPane(timeoutMs);
+    if (paneReady) {
+      try {
+        execSync(`zellij --session ${this.shellQuote(this.sessionName)} action detach`, {
+          stdio: 'pipe',
+        });
+      } catch {
+        // Detach may fail if the session already detached — that's fine
+      }
+    }
+
+    // Clean up the attach process
+    try {
+      proc.kill('SIGTERM');
+    } catch {
+      // May have already exited from the detach
+    }
+
+    if (!paneReady) {
+      throw new Error(
+        `Failed to create session "${this.sessionName}". ` + 'No terminal pane became available within the timeout.',
+      );
+    }
   }
 
   /**
