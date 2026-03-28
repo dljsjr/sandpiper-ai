@@ -1,43 +1,24 @@
-import { execSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { existsSync } from 'node:fs';
+import { createReadStream, existsSync, type ReadStream } from 'node:fs';
 import { tmpdir, userInfo } from 'node:os';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
 import { registerPreflightCheck } from 'sandpiper-ai-core';
 import { exportVars } from './env-export.js';
 import { FifoManager } from './fifo.js';
-import { GhostClient } from './ghost-client.js';
 import { checkShellIntegration } from './preflight.js';
-import { Relay } from './relay.js';
+import { SignalParser } from './signal.js';
+import { extractCommandOutput } from './snapshot-diff.js';
 import { ZellijClient } from './zellij.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-// Companion scripts (ghost-attach, unbuffer-relay) live at the extension
-// root, one level up from both src/ (dev) and dist/ (bundled).
-const extensionRoot = dirname(__dirname);
-
-/** Resolve the base directory for FIFOs. */
+/** Resolve the base directory for signal FIFOs. */
 function resolveBaseDir(): string {
   const xdgRuntime = process.env.XDG_RUNTIME_DIR;
   if (xdgRuntime && existsSync(xdgRuntime)) {
     return join(xdgRuntime, 'shell-relay');
   }
   return join(tmpdir(), `shell-relay-${userInfo().username}`);
-}
-
-/** Check if unbuffer-relay (expect/tclsh) is available for enhanced mode. */
-function isUnbufferAvailable(): boolean {
-  if (process.env.SHELL_RELAY_NO_UNBUFFER === '1') return false;
-  try {
-    execSync('command -v tclsh', { stdio: 'pipe' });
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 /** Detect the shell type from environment. */
@@ -53,14 +34,16 @@ export default function (pi: ExtensionAPI) {
   registerPreflightCheck(pi, 'shell-relay:integration', checkShellIntegration);
 
   let fifoManager: FifoManager | null = null;
-  let ghostClient: GhostClient | null = null;
   let zellij: ZellijClient | null = null;
-  let relay: Relay | null = null;
-  let zellijPaneId: string | null = null;
+  let signalParser: SignalParser | null = null;
+  let signalStream: ReadStream | null = null;
   let zellijSessionName: string | null = null;
   let isSetUp = false;
 
-  /** Set up the relay: create FIFOs, connect to Zellij, start listening. */
+  // Execution lock: only one command at a time
+  let executionQueue: Promise<unknown> = Promise.resolve();
+
+  /** Set up the relay: create background session, find pane, wire signal FIFO. */
   async function setupRelay(
     ctx: { ui: { notify: (msg: string, level?: 'info' | 'warning' | 'error') => void } },
     targetZellijSession?: string,
@@ -80,28 +63,21 @@ export default function (pi: ExtensionAPI) {
       );
     }
 
-    // Spawn a ghost client to attach to (or create) the session.
-    // Zellij requires a real PTY client for write-chars and dump-screen
-    // to work reliably. The ghost client provides this invisibly.
-    ghostClient = new GhostClient({ scriptDir: extensionRoot, sessionName: resolvedSession });
-    ghostClient.start();
+    // Create background session (no ghost client needed — Zellij 0.44+)
+    zellij.createBackgroundSession();
 
-    // Wait for the ghost client to attach and the pane to be ready
-    const paneReady = await zellij.waitForPane(10_000, 500);
-    if (!paneReady) {
-      ghostClient.stop();
-      ghostClient = null;
+    // Wait for a terminal pane to be available and capture its ID
+    const paneId = await zellij.waitForPane(10_000, 500);
+    if (!paneId) {
       throw new Error(
-        `Failed to start Zellij session "${resolvedSession}". ` +
-          'The ghost client could not attach. Check that Zellij is working correctly.',
+        `Failed to find a terminal pane in session "${resolvedSession}". ` +
+          'The session may not have started correctly.',
       );
     }
+    zellij.setPaneId(paneId);
 
-    // Set up FIFOs and start listening BEFORE injecting env vars.
-    // This way, when the shell processes the env exports and draws a new
-    // prompt, the prompt hook writes prompt_ready to the signal FIFO and
-    // we receive it — confirming the full pipeline is wired up.
-    zellijPaneId = process.env.SHELL_RELAY_PANE_ID ?? randomUUID().slice(0, 12);
+    // Set up signal FIFO only (no stdout/stderr FIFOs needed)
+    const sessionId = randomUUID().slice(0, 12);
     const baseDir = resolveBaseDir();
 
     // Clean up stale FIFOs from previous sessions
@@ -110,46 +86,40 @@ export default function (pi: ExtensionAPI) {
       FifoManager.cleanupStale(baseDir, staleId);
     }
 
-    fifoManager = new FifoManager({ baseDir, sessionId: zellijPaneId });
+    fifoManager = new FifoManager({ baseDir, sessionId });
     fifoManager.create();
     fifoManager.open();
 
+    // Start listening on the signal FIFO for prompt_ready + exit codes
+    signalParser = new SignalParser();
+    signalStream = createReadStream(fifoManager.paths.signal, { flags: 'r', encoding: 'utf-8' });
+    signalStream.on('data', (chunk: string) => {
+      signalParser?.feed(chunk);
+    });
+
     const shell = detectShell();
 
-    // Create relay and start listening on FIFOs (before injection)
-    relay = new Relay({
-      fifoManager,
-      shell,
-      // biome-ignore lint/style/noNonNullAssertion: zellij is assigned in setupRelay before tool execution
-      injectCommand: (cmd: string) => zellij!.writeChars(cmd),
-    });
-    relay.startListening();
-
-    // Export FIFO paths into the Zellij pane
-    const envExports = exportVars(shell, [
-      { name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal },
-      { name: 'SHELL_RELAY_STDOUT', value: fifoManager.paths.stdout },
-      { name: 'SHELL_RELAY_STDERR', value: fifoManager.paths.stderr },
-      { name: 'SHELL_RELAY_UNBUFFER', value: join(extensionRoot, 'unbuffer-relay') },
-    ]);
+    // Export only the signal FIFO path into the Zellij pane
+    // (stdout/stderr FIFOs are no longer needed — we use snapshot-diff)
+    const envExports = exportVars(shell, [{ name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal }]);
 
     // Space prefix excludes from shell history; clear removes the
     // visible export commands from the pane after they execute.
-    zellij.writeChars(` ${envExports}; clear\n`);
+    zellij.paste(` ${envExports}; clear`);
+    zellij.sendKeys('Enter');
 
-    // Wait for prompt_ready — this confirms:
-    // 1. The shell has fully initialized (config.fish sourced)
+    // Wait for prompt_ready — confirms:
+    // 1. The shell has fully initialized
     // 2. The env exports have been processed
     // 3. The prompt hook is active and writing to the signal FIFO
     try {
-      await relay.waitForPromptReady(15_000);
+      await signalParser.waitFor('prompt_ready', 15_000);
     } catch {
       // Clean up on failure
-      relay.stopListening();
-      ghostClient?.stop();
+      signalStream.destroy();
       await fifoManager.shutdown();
-      relay = null;
-      ghostClient = null;
+      signalParser = null;
+      signalStream = null;
       fifoManager = null;
       throw new Error(
         `Shell Relay: Timed out waiting for prompt_ready signal in session "${resolvedSession}". ` +
@@ -160,10 +130,68 @@ export default function (pi: ExtensionAPI) {
     isSetUp = true;
     zellijSessionName = resolvedSession;
     ctx.ui.notify(
-      `Shell Relay: Connected (session=${resolvedSession}, shell=${shell}). ` +
-        `View the shared terminal with: zellij attach ${resolvedSession}`,
+      `Shell Relay: ready (${shell}). ` + `View the shared terminal with: zellij attach ${resolvedSession}`,
       'info',
     );
+  }
+
+  /** Tear down the relay. */
+  async function teardownRelay(): Promise<void> {
+    signalStream?.destroy();
+    signalStream = null;
+    signalParser = null;
+    if (fifoManager) {
+      await fifoManager.shutdown();
+      fifoManager = null;
+    }
+    zellij = null;
+    isSetUp = false;
+    zellijSessionName = null;
+  }
+
+  /** Execute a command and return captured output via snapshot-diff. */
+  async function executeCommand(
+    command: string,
+    timeoutMs: number,
+  ): Promise<{ output: string; exitCode: number; timedOut: boolean }> {
+    if (!zellij || !signalParser) {
+      throw new Error('Relay not set up');
+    }
+
+    // Take "before" snapshot
+    const beforeSnapshot = zellij.dumpScreen();
+
+    // Inject the command via the shell's __relay_run wrapper
+    const shell = detectShell();
+    const escaped =
+      shell === 'fish'
+        ? (await import('./escape.js')).escapeForFish(command)
+        : (await import('./escape.js')).escapeForBash(command);
+    zellij.paste(` __relay_run ${escaped}`);
+    zellij.sendKeys('Enter');
+
+    // Wait for last_status signal (command completed)
+    const statusEvent = await signalParser.waitFor('last_status', timeoutMs);
+    if (statusEvent.type !== 'last_status') {
+      throw new Error('Unexpected signal event type');
+    }
+    const exitCode = statusEvent.exitCode;
+
+    // Wait for prompt_ready (pane is ready for next command)
+    try {
+      await signalParser.waitFor('prompt_ready', 5_000);
+    } catch {
+      // prompt_ready timeout is non-fatal — we have the exit code already
+    }
+
+    // Small delay to let the terminal finish rendering
+    await new Promise((r) => setTimeout(r, 100));
+
+    // Take "after" snapshot and diff
+    const afterSnapshot = zellij.dumpScreen();
+    const output = extractCommandOutput(beforeSnapshot, afterSnapshot, command);
+
+    return { output, exitCode, timedOut: false };
   }
 
   // --- Tool Registration ---
@@ -221,27 +249,33 @@ export default function (pi: ExtensionAPI) {
 
       const timeoutMs = (params.timeout ?? 30) * 1000;
 
-      try {
-        // biome-ignore lint/style/noNonNullAssertion: relay is assigned in setupRelay before tool execution
-        const result = await relay!.execute(params.command, { timeoutMs });
+      // Serialize command execution
+      const resultPromise = new Promise<{
+        output: string;
+        exitCode: number;
+        timedOut: boolean;
+      }>((resolve, reject) => {
+        executionQueue = executionQueue.then(
+          () => executeCommand(params.command, timeoutMs).then(resolve, reject),
+          () => executeCommand(params.command, timeoutMs).then(resolve, reject),
+        );
+      });
 
-        const outputParts: string[] = [];
-        if (result.stdout.length > 0) {
-          outputParts.push(`STDOUT:\n${result.stdout}`);
+      try {
+        const result = await resultPromise;
+
+        const parts: string[] = [];
+        if (result.output.length > 0) {
+          parts.push(result.output);
+        } else {
+          parts.push('(no output)');
         }
-        if (result.stderr.length > 0) {
-          outputParts.push(`STDERR:\n${result.stderr}`);
-        }
-        if (outputParts.length === 0) {
-          outputParts.push('(no output)');
-        }
-        outputParts.push(`Exit code: ${result.exitCode}`);
+        parts.push(`\nExit code: ${result.exitCode}`);
 
         return {
-          content: [{ type: 'text' as const, text: outputParts.join('\n\n') }],
+          content: [{ type: 'text' as const, text: parts.join('\n') }],
           details: {
-            stdout: result.stdout,
-            stderr: result.stderr,
+            output: result.output,
             exitCode: result.exitCode,
             timedOut: result.timedOut,
           },
@@ -328,46 +362,27 @@ export default function (pi: ExtensionAPI) {
   pi.registerCommand('relay-connect', {
     description: 'Connect Shell Relay to a Zellij session (or create a new one)',
     handler: async (_args, ctx) => {
-      // If already connected, confirm reconnect
       if (isSetUp) {
         const reconnect = await ctx.ui.confirm(
           'Shell Relay is already connected',
           'Disconnect and connect to a different session?',
         );
         if (!reconnect) return;
-
-        // Tear down existing relay
-        relay?.stopListening();
-        ghostClient?.stop();
-        if (fifoManager) {
-          await fifoManager.shutdown();
-        }
-        relay = null;
-        ghostClient = null;
-        fifoManager = null;
-        zellij = null;
-        isSetUp = false;
-        zellijSessionName = null;
+        await teardownRelay();
       }
 
-      // Check Zellij availability
       const probe = new ZellijClient({ sessionName: '' });
       if (!probe.isAvailable()) {
         ctx.ui.notify('Zellij is not installed or not available. Install it from https://zellij.dev', 'error');
         return;
       }
 
-      // List existing sessions
       const sessions = probe.listSessions();
-
       const CREATE_NEW_OPTION = '+ Create new session';
       const options = [...sessions, CREATE_NEW_OPTION];
       const selection = await ctx.ui.select('Select a Zellij session for Shell Relay:', options);
 
-      if (selection === undefined) {
-        // User cancelled
-        return;
-      }
+      if (selection === undefined) return;
 
       let zellijSession: string;
       if (selection === CREATE_NEW_OPTION) {
@@ -380,7 +395,6 @@ export default function (pi: ExtensionAPI) {
 
       try {
         await setupRelay(ctx, zellijSession);
-        ctx.ui.notify(`Shell Relay: Connected to session "${zellijSession}".`, 'info');
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         ctx.ui.notify(`Shell Relay: Failed to connect — ${msg}`, 'error');
@@ -397,10 +411,10 @@ export default function (pi: ExtensionAPI) {
       }
 
       const shell = detectShell();
-      const mode = isUnbufferAvailable() ? 'enhanced (PTY colors)' : 'basic';
+      const paneId = zellij?.getPaneId() ?? 'unknown';
 
       ctx.ui.notify(
-        `Shell Relay: Connected\n  Session: ${zellijSessionName ?? 'unknown'}\n  Shell: ${shell}\n  Mode: ${mode}\n  FIFOs: ${fifoManager?.paths.signal ?? 'n/a'}`,
+        `Shell Relay: Connected\n  Session: ${zellijSessionName ?? 'unknown'}\n  Shell: ${shell}\n  Pane: ${paneId}\n  Signal FIFO: ${fifoManager?.paths.signal ?? 'n/a'}`,
         'info',
       );
     },
@@ -410,14 +424,6 @@ export default function (pi: ExtensionAPI) {
 
   pi.on('session_start', async (_event, ctx) => {
     const hasZellij = new ZellijClient({ sessionName: '' }).isAvailable();
-    const hasTclsh = (() => {
-      try {
-        execSync('command -v tclsh', { stdio: 'pipe' });
-        return true;
-      } catch {
-        return false;
-      }
-    })();
     const configuredSession = process.env.SHELL_RELAY_SESSION;
 
     if (!hasZellij) {
@@ -425,28 +431,16 @@ export default function (pi: ExtensionAPI) {
       return;
     }
 
-    if (!hasTclsh) {
-      ctx.ui.setStatus('shell-relay', 'Shell Relay: expect/tclsh not found — required for ghost client');
-      return;
-    }
-
-    const mode = isUnbufferAvailable() ? 'enhanced (PTY colors)' : 'basic';
+    const shell = detectShell();
 
     if (configuredSession) {
-      ctx.ui.setStatus('shell-relay', `Shell Relay: ${configuredSession} (${mode})`);
+      ctx.ui.setStatus('shell-relay', `Shell Relay: ${configuredSession} (${shell})`);
     } else {
-      ctx.ui.setStatus('shell-relay', `Shell Relay: ready (${mode})`);
+      ctx.ui.setStatus('shell-relay', `Shell Relay: ready (${shell})`);
     }
   });
 
   pi.on('session_shutdown', async () => {
-    relay?.stopListening();
-    ghostClient?.stop();
-    if (fifoManager) {
-      await fifoManager.shutdown();
-    }
-    ghostClient = null;
-    isSetUp = false;
-    zellijSessionName = null;
+    await teardownRelay();
   });
 }
