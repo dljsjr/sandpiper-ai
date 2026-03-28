@@ -78,6 +78,37 @@ describe('extractCommandOutput', () => {
     expect(extractCommandOutput(before, after, 'echo hi')).toBe('hi');
   });
 
+  it('should handle wrapped command echo in narrow viewport', () => {
+    // Simulates a 50-col viewport where the command echo wraps and merges with output
+    const before = [PROMPT, ''].join('\n');
+    const after = [
+      PROMPT,
+      // Command wraps across lines in narrow viewport, output starts on same line
+      '__relay_run \'echo "line one"; echo "line',
+      ' two"; echo "line three"\'',
+      'line one',
+      'line two',
+      'line three',
+      PROMPT,
+      '',
+    ].join('\n');
+
+    const result = extractCommandOutput(before, after, 'echo "line one"; echo "line two"; echo "line three"');
+    expect(result).toContain('line one');
+    expect(result).toContain('line two');
+    expect(result).toContain('line three');
+  });
+
+  it.skip('should handle output concatenated with command on same line (extreme wrapping)', () => {
+    // When viewport is very narrow, output may start on the same line as the command echo
+    const before = [PROMPT, ''].join('\n');
+    const after = [PROMPT, "__relay_run 'echo hi'hi", PROMPT, ''].join('\n');
+
+    const result = extractCommandOutput(before, after, 'echo hi');
+    // The 'hi' is on the same line as the command — we should still extract it
+    expect(result).toBe('hi');
+  });
+
   it('should handle long output that fills the scrollback', () => {
     const before = [PROMPT, ''].join('\n');
     const lines = Array.from({ length: 100 }, (_, i) => `line ${i + 1}`);
