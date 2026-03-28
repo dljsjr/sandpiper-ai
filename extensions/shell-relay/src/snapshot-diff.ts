@@ -38,47 +38,67 @@ export function extractCommandOutput(before: string, after: string, command: str
   // concatenated, and we search for markers in the joined text.
   const newText = newLines.map((l) => l.trimEnd()).join('\n');
 
-  // Find the command echo. The command appears after being echoed by the shell.
-  // In narrow viewports, the command wraps across lines, so we normalize
-  // whitespace (collapse newlines and spaces) when searching.
+  // Find the command echo and skip past it.
+  // The command is wrapped by __relay_run, so look for that marker first.
+  // If not found (e.g., raw command injection), fall back to searching
+  // for the command text with whitespace normalization.
   const commandNormalized = command.trim();
   let outputStartPos = 0;
 
-  // Collapse whitespace in both the new text and command for matching
-  const newTextCollapsed = newText.replace(/\s+/g, ' ');
-  const cmdCollapsed = commandNormalized.replace(/\s+/g, ' ');
-
-  const cmdIndex = newTextCollapsed.indexOf(cmdCollapsed);
-  if (cmdIndex >= 0) {
-    // Map back from collapsed position to original position.
-    // Find the end of the command in the original text by counting
-    // through characters, skipping whitespace differences.
-    const endInCollapsed = cmdIndex + cmdCollapsed.length;
-
-    // Walk through original text to find the position that corresponds
-    // to endInCollapsed in the collapsed version
-    let collapsedPos = 0;
-    let originalPos = 0;
-    let inWhitespace = false;
-    for (originalPos = 0; originalPos < newText.length && collapsedPos < endInCollapsed; originalPos++) {
-      const ch = newText[originalPos];
-      if (ch === ' ' || ch === '\n' || ch === '\t') {
-        if (!inWhitespace) {
-          collapsedPos++; // One space in collapsed for each whitespace run
-          inWhitespace = true;
-        }
-      } else {
-        collapsedPos++;
-        inWhitespace = false;
+  // Strategy 1: Look for __relay_run marker in newLines
+  // The __relay_run echo may span multiple wrapped lines. Find the first
+  // line containing __relay_run, then skip forward until we find a line
+  // that doesn't look like part of the command echo (doesn't contain
+  // the command text or the closing quote).
+  const relayRunIndex = newLines.findIndex((l) => l.includes('__relay_run'));
+  if (relayRunIndex >= 0) {
+    // Skip all lines that are part of the command echo.
+    // The command echo ends when we hit a line that is NOT part of the
+    // __relay_run invocation. We use the closing quote as a signal —
+    // scan forward until we pass a line ending with ' (the closing quote
+    // of the shell-escaped command).
+    let echoEnd = relayRunIndex + 1;
+    for (let i = relayRunIndex; i < newLines.length && i < relayRunIndex + 10; i++) {
+      echoEnd = i + 1;
+      const line = newLines[i] ?? '';
+      // If this line ends with the closing quote of __relay_run 'cmd',
+      // the command echo is complete
+      if (line.trimEnd().endsWith("'")) {
+        break;
       }
     }
-
-    // Find the next newline after the command ends in the original text
-    const afterCmd = newText.indexOf('\n', originalPos);
-    if (afterCmd >= 0) {
-      outputStartPos = afterCmd + 1;
-    } else {
-      return '';
+    // Convert line index back to position in newText
+    outputStartPos = newLines.slice(0, echoEnd).join('\n').length + 1;
+    if (outputStartPos > newText.length) outputStartPos = newText.length;
+  } else {
+    // Strategy 2: No __relay_run marker — search for command text directly
+    const newTextCollapsed = newText.replace(/\s+/g, ' ');
+    const cmdCollapsed = commandNormalized.replace(/\s+/g, ' ');
+    const cmdIndex = newTextCollapsed.indexOf(cmdCollapsed);
+    if (cmdIndex >= 0) {
+      // Find the end of the line containing the last part of the command
+      const endInCollapsed = cmdIndex + cmdCollapsed.length;
+      let collapsedPos = 0;
+      let originalPos = 0;
+      let inWhitespace = false;
+      for (originalPos = 0; originalPos < newText.length && collapsedPos < endInCollapsed; originalPos++) {
+        const ch = newText[originalPos];
+        if (ch === ' ' || ch === '\n' || ch === '\t') {
+          if (!inWhitespace) {
+            collapsedPos++;
+            inWhitespace = true;
+          }
+        } else {
+          collapsedPos++;
+          inWhitespace = false;
+        }
+      }
+      const afterCmd = newText.indexOf('\n', originalPos);
+      if (afterCmd >= 0) {
+        outputStartPos = afterCmd + 1;
+      } else {
+        return '';
+      }
     }
   }
 
