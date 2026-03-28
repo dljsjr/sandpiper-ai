@@ -6,7 +6,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T14:54:22.600Z
-updated_at: 2026-03-26T14:54:22.600Z
+updated_at: 2026-03-29T00:37:46.890Z
 ---
 
 # Implement bash user command capture via DEBUG trap

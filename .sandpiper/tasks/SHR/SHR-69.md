@@ -6,7 +6,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T14:54:25.683Z
-updated_at: 2026-03-26T14:54:25.683Z
+updated_at: 2026-03-29T00:37:46.889Z
 ---
 
 # Implement zsh user command capture via zle widget override

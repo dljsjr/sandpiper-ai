@@ -436,6 +436,26 @@ export default function (pi: ExtensionAPI) {
   pi.on('before_agent_start', async (event, ctx) => {
     const projectTriggers = formatProjectTriggersForPrompt(collectProjectTriggers(ctx.cwd));
 
+    // Read the standup file for session continuity
+    const standupPath = join(ctx.cwd, '.sandpiper', 'standup.md');
+    let standupContent = '';
+    if (existsSync(standupPath)) {
+      try {
+        const raw = readFileSync(standupPath, 'utf-8');
+        standupContent = `
+
+# Previous Session Context
+
+The following is the stand-up note from the previous session. Use it to orient yourself
+on what was done, what's planned next, and any important context. Do NOT read the session
+file referenced in the header — it is a large JSONL file.
+
+${raw}`;
+      } catch {
+        // Standup file unreadable — skip silently
+      }
+    }
+
     return {
       systemPrompt:
         event.systemPrompt +
@@ -455,7 +475,8 @@ its documentation, APIs, etc. remain valid, with a few alterations:
   which is also in the environment variable 'PI_CODING_AGENT_VERSION'
 - You are distributed with a good bit of functionality that the core 'pi' framework doesn't include, via bundled extensions, skills, and prompts.
 ` +
-        projectTriggers,
+        projectTriggers +
+        standupContent,
     };
   });
 

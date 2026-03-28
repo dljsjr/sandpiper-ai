@@ -6,7 +6,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-03-22T20:25:39.891Z
-updated_at: 2026-03-22T20:25:46.417Z
+updated_at: 2026-03-29T00:37:46.887Z
 ---
 
 # Add batch/filter support to task move command

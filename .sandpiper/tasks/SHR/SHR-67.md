@@ -6,7 +6,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T04:25:52.770Z
-updated_at: 2026-03-26T04:25:59.595Z
+updated_at: 2026-03-29T00:37:46.891Z
 ---
 
 # Error on relay tool/command use if shell integration not sourced

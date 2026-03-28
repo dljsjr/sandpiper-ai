@@ -6,7 +6,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-23T03:18:38.864Z
-updated_at: 2026-03-23T03:19:16.465Z
+updated_at: 2026-03-29T00:37:46.888Z
 ---
 
 # Design board data model with swimlanes
