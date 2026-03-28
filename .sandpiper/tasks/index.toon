@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774664564495
+lastUpdatedAt: 1774668846635
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -764,6 +764,86 @@ tasks:
     blockedBy[5]: SHR-75,SHR-76,SHR-77,SHR-78,AGENT-15
     related[0]:
     lastIndexedAt: 1774664564494
+  "SHR-80":
+    key: SHR-80
+    project: SHR
+    title: "Replace ZellijClient with Zellij 0.44 API (paste, send-keys, --session, --pane-id, list-panes)"
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T03:34:06.390Z"
+    updatedAt: "2026-03-28T03:34:06.390Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-79
+    lastIndexedAt: 1774668846398
+  "SHR-81":
+    key: SHR-81
+    project: SHR
+    title: Implement snapshot-diff output capture (dump-screen before/after)
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T03:34:06.454Z"
+    updatedAt: "2026-03-28T03:34:06.454Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-79
+    lastIndexedAt: 1774668846458
+  "SHR-82":
+    key: SHR-82
+    project: SHR
+    title: Simplify shell integration scripts to signal-only (prompt_ready + exit code)
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T03:34:06.513Z"
+    updatedAt: "2026-03-28T03:34:06.513Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-79
+    lastIndexedAt: 1774668846517
+  "SHR-83":
+    key: SHR-83
+    project: SHR
+    title: Eliminate ghost-attach and unbuffer-relay dependencies
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T03:34:06.569Z"
+    updatedAt: "2026-03-28T03:34:06.569Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-79
+    lastIndexedAt: 1774668846578
+  "SHR-84":
+    key: SHR-84
+    project: SHR
+    title: "Update relay setup flow (background session, pane ID capture, no ghost client)"
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T03:34:06.629Z"
+    updatedAt: "2026-03-28T03:34:06.629Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: SHR-79
+    lastIndexedAt: 1774668846633
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -1244,7 +1324,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 80
+    nextTaskNumber: 85
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
