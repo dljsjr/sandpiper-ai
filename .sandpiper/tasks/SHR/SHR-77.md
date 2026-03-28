@@ -1,21 +1,24 @@
 ---
 title: "Investigate zellij action list-panes for pane discovery and health checks"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-27T20:45:55.495Z
-updated_at: 2026-03-27T21:22:38.479Z
+updated_at: 2026-03-28T02:21:17.700Z
 ---
 
 # Investigate zellij action list-panes for pane discovery and health checks
 
-Zellij 0.44 adds `zellij action list-panes` with --json output. Lists all panes with metadata: running commands, titles, coordinates, pane IDs.
+CONFIRMED in SHR-78 spike: list-panes --json provides rich pane metadata.
 
-Could replace our waitForPane polling (dump-screen to /dev/null) with a direct pane existence/readiness check. Also useful for pane discovery when reconnecting.
+Fields include: id, is_focused, title, exited, exit_status, is_held, pane_command,
+pane_cwd, cursor_coordinates_in_pane, tab_id, tab_name, pane_rows, pane_columns.
 
-Investigation: what metadata does list-panes provide? Is it sufficient to detect a healthy shell pane ready for command injection?
+Replaces dump-screen-to-dev-null polling for waitForPane. Can detect pane health,
+find panes by command/cwd, and check exit status — all via structured JSON.
 
 ---
 
@@ -24,3 +27,12 @@ Investigation: what metadata does list-panes provide? Is it sufficient to detect
 ## 2026-03-27T21:22:38.479Z
 
 - **description**: added (5 lines)
+
+## 2026-03-28T02:21:17.657Z
+
+- **description**: 5 lines → updated (7 lines)
+
+## 2026-03-28T02:21:17.701Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: DONE
