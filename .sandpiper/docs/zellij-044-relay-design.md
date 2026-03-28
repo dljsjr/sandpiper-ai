@@ -93,25 +93,37 @@ zellij --session $SESSION action paste --pane-id $PANE_ID "$COMMAND" &&
 zellij --session $SESSION action send-keys --pane-id $PANE_ID "Enter"
 ```
 
-### Output Capture
+### Output Capture: Snapshot-Diff Approach
 
-Two options, to be evaluated in SHR-75:
+**Decided:** Use `dump-screen --full` before and after command execution,
+diff the two snapshots in TypeScript to extract command output.
 
-**Option A: Keep FIFOs for structured output**
-- Shell integration writes stdout/stderr to FIFOs (current approach)
-- `subscribe` or `dump-screen` as supplementary/fallback
-- Exit codes via shell integration `prompt_ready` signal
+Flow:
+1. `dump-screen --pane-id $PANE --full` → save as "before" snapshot
+2. `paste` command + `send-keys Enter`
+3. Wait for `prompt_ready` on signal FIFO (+ exit code)
+4. `dump-screen --pane-id $PANE --full` → save as "after" snapshot
+5. Diff before/after in TypeScript → extract new content
+6. Return extracted output + exit code to the agent
 
-**Option B: Viewport-based capture via dump-screen**
-- After command injection, wait for `prompt_ready` signal (still via FIFO or subscribe)
-- `dump-screen --pane-id $PANE_ID --full` to capture everything
-- Parse output between command and next prompt
-- Lose stdout/stderr separation but eliminate FIFO complexity
+Why this works:
+- `dump-screen --full` includes complete scrollback — no missed output
+- The diff is computed in TypeScript — never enters the LLM context window
+- stdout/stderr interleaving is fine — we care about the text, not which stream
+- No viewport size concerns — scrollback is independent of viewport dimensions
+- Zellij default scrollback is 10,000 lines; can be tuned with `--scroll-buffer-size`
+  at session creation time
 
-**Option C: Hybrid — FIFOs for exit code, viewport for output**
-- Shell integration only signals prompt_ready + exit code (minimal)
-- `dump-screen` captures the visual output post-completion
-- Simplest shell integration, richest output (includes colors if --ansi)
+Why not subscribe for output capture:
+- Subscribe gives viewport-only snapshots (lossy for long output unless --scrollback)
+- With --scrollback, every event delivers the entire buffer (wasteful)
+- Parsing command boundaries from viewport text is fragile (prompt decorations vary)
+- Subscribe is useful for real-time monitoring but not for reliable output capture
+
+Subscribe remains useful as:
+- Liveness/heartbeat signal
+- Real-time viewport monitoring for the shell_relay_inspect tool
+- Future: detecting interactive prompts, progress indicators, etc.
 
 ### Pane Health Check (replaces waitForPane polling)
 
@@ -122,16 +134,15 @@ zellij --session $SESSION action list-panes --json \
 
 ### What Stays
 
-- **Shell integration scripts** — still needed for prompt_ready signaling and exit code
-  capture. Zellij's viewport stream doesn't provide process-level boundaries.
-  BUT the integration could be *much* simpler — just prompt_ready + exit code,
-  no stdout/stderr redirection.
-- **Signal FIFO** — still the cleanest IPC for prompt_ready events from the shell
+- **Shell integration scripts** — dramatically simplified: only prompt_ready + exit code
+  signaling. No stdout/stderr redirection, no unbuffer, no tee.
+- **Signal FIFO** — cleanest IPC for structured events from the shell
 
 ### What Goes
 
 - **Ghost client** (`ghost-attach` expect script) — eliminated by --pane-id targeting
-- **stdout/stderr FIFOs** — likely replaced by dump-screen capture (TBD in SHR-75)
+- **stdout/stderr FIFOs** — replaced by snapshot-diff output capture
+- **Unbuffer-relay** (tclsh/expect script) — eliminated entirely
 - **`write-chars`** — replaced by `paste` + `send-keys`
 - **`ZELLIJ_SESSION_NAME` env var** — replaced by `--session` flag
 - **`dump-screen /dev/null` polling** — replaced by `list-panes --json`
