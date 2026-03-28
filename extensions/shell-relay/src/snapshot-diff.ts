@@ -39,20 +39,45 @@ export function extractCommandOutput(before: string, after: string, command: str
   const newText = newLines.map((l) => l.trimEnd()).join('\n');
 
   // Find the command echo. The command appears after being echoed by the shell.
-  // With __relay_run, it looks like: __relay_run 'command text'
-  // Without, it's just the command text.
-  // We look for the command text in the joined new content.
+  // In narrow viewports, the command wraps across lines, so we normalize
+  // whitespace (collapse newlines and spaces) when searching.
   const commandNormalized = command.trim();
   let outputStartPos = 0;
 
-  const cmdIndex = newText.indexOf(commandNormalized);
+  // Collapse whitespace in both the new text and command for matching
+  const newTextCollapsed = newText.replace(/\s+/g, ' ');
+  const cmdCollapsed = commandNormalized.replace(/\s+/g, ' ');
+
+  const cmdIndex = newTextCollapsed.indexOf(cmdCollapsed);
   if (cmdIndex >= 0) {
-    // Find the end of the line containing the command
-    const afterCmd = newText.indexOf('\n', cmdIndex + commandNormalized.length);
+    // Map back from collapsed position to original position.
+    // Find the end of the command in the original text by counting
+    // through characters, skipping whitespace differences.
+    const endInCollapsed = cmdIndex + cmdCollapsed.length;
+
+    // Walk through original text to find the position that corresponds
+    // to endInCollapsed in the collapsed version
+    let collapsedPos = 0;
+    let originalPos = 0;
+    let inWhitespace = false;
+    for (originalPos = 0; originalPos < newText.length && collapsedPos < endInCollapsed; originalPos++) {
+      const ch = newText[originalPos];
+      if (ch === ' ' || ch === '\n' || ch === '\t') {
+        if (!inWhitespace) {
+          collapsedPos++; // One space in collapsed for each whitespace run
+          inWhitespace = true;
+        }
+      } else {
+        collapsedPos++;
+        inWhitespace = false;
+      }
+    }
+
+    // Find the next newline after the command ends in the original text
+    const afterCmd = newText.indexOf('\n', originalPos);
     if (afterCmd >= 0) {
       outputStartPos = afterCmd + 1;
     } else {
-      // Command is on the last line — no output
       return '';
     }
   }
