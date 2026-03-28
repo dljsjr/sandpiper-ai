@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774672746471
+lastUpdatedAt: 1774674282264
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -769,17 +769,78 @@ tasks:
     key: SHR-85
     project: SHR
     title: Background Zellij sessions default to 50x49 viewport — output wraps and merges
-    status: NOT STARTED
+    status: COMPLETE
     kind: BUG
     priority: HIGH
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-28T04:39:06.466Z"
-    updatedAt: "2026-03-28T04:39:06.466Z"
+    updatedAt: "2026-03-28T04:59:22.501Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774672746471
+    lastIndexedAt: 1774673962508
+  "SHR-86":
+    key: SHR-86
+    project: SHR
+    title: "Snapshot-diff: __relay_run echo leaks through on long escaped commands"
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T05:02:33.584Z"
+    updatedAt: "2026-03-28T05:02:33.584Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774674153588
+  "SHR-87":
+    key: SHR-87
+    project: SHR
+    title: "Simplify shell integration scripts: remove stdout/stderr/unbuffer FIFO requirements"
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T05:02:33.626Z"
+    updatedAt: "2026-03-28T05:02:33.626Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774674153630
+  "SHR-88":
+    key: SHR-88
+    project: SHR
+    title: "Remove legacy modules: ghost-client.ts, relay.ts, ghost-attach, unbuffer-relay"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T05:02:33.669Z"
+    updatedAt: "2026-03-28T05:02:33.669Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774674153674
+  "SHR-89":
+    key: SHR-89
+    project: SHR
+    title: Clean up stale Zellij sessions on startup and shutdown
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-28T05:04:42.259Z"
+    updatedAt: "2026-03-28T05:04:42.259Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774674282264
   "SHR-80":
     key: SHR-80
     project: SHR
@@ -1345,7 +1406,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 86
+    nextTaskNumber: 90
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
