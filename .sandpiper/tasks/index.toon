@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774669921505
+lastUpdatedAt: 1774672746471
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -765,6 +765,21 @@ tasks:
     blockedBy[5]: SHR-75,SHR-76,SHR-77,SHR-78,AGENT-15
     related[0]:
     lastIndexedAt: 1774669921504
+  "SHR-85":
+    key: SHR-85
+    project: SHR
+    title: Background Zellij sessions default to 50x49 viewport — output wraps and merges
+    status: NOT STARTED
+    kind: BUG
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-28T04:39:06.466Z"
+    updatedAt: "2026-03-28T04:39:06.466Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774672746471
   "SHR-80":
     key: SHR-80
     project: SHR
@@ -1330,7 +1345,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 85
+    nextTaskNumber: 86
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
