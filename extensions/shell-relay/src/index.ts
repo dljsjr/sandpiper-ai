@@ -167,13 +167,10 @@ export default function (pi: ExtensionAPI) {
     // Take "before" snapshot
     const beforeSnapshot = zellij.dumpScreen();
 
-    // Inject the command via the shell's __relay_run wrapper
-    const shell = detectShell();
-    const escaped =
-      shell === 'fish'
-        ? (await import('./escape.js')).escapeForFish(command)
-        : (await import('./escape.js')).escapeForBash(command);
-    zellij.paste(` __relay_run ${escaped}`);
+    // Inject the raw command — the shell integration's preexec hook
+    // dynamically wraps it to capture exit code via __relay_capture.
+    // Space prefix excludes from shell history.
+    zellij.paste(` ${command}`);
     zellij.sendKeys('Enter');
 
     // Wait for last_status signal (command completed)
