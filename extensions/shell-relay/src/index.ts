@@ -298,23 +298,8 @@ export default function (pi: ExtensionAPI) {
       }
 
       try {
-        // Use a temp file for dump-screen output
-        const dumpPath = join(resolveBaseDir(), `dump-${randomUUID().slice(0, 8)}`);
         // biome-ignore lint/style/noNonNullAssertion: zellij is assigned in setupRelay before tool execution
-        zellij!.dumpScreen(dumpPath);
-
-        // Read the dump file
-        const { readFileSync, unlinkSync } = await import('node:fs');
-        let content: string;
-        try {
-          content = readFileSync(dumpPath, 'utf-8');
-        } finally {
-          try {
-            unlinkSync(dumpPath);
-          } catch {
-            // ignore cleanup errors
-          }
-        }
+        const content = zellij!.dumpScreen();
 
         return {
           content: [{ type: 'text' as const, text: content || '(empty pane)' }],
