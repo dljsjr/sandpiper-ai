@@ -1,0 +1,27 @@
+--- a/SHR-84.md
++++ b/SHR-84.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Update relay setup flow (background session, pane ID capture, no ghost client)"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-03-28T03:34:06.629Z
+-updated_at: 2026-03-28T03:49:19.768Z
++updated_at: 2026-03-28T03:52:01.455Z
+ ---
+ 
+ # Update relay setup flow (background session, pane ID capture, no ghost client)
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-03-28T03:52:01.456Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

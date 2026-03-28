@@ -1,13 +1,28 @@
 ---
 title: "Simplify shell integration scripts to signal-only (prompt_ready + exit code)"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-28T03:34:06.513Z
-updated_at: 2026-03-28T03:34:06.513Z
+updated_at: 2026-03-28T03:52:01.369Z
 ---
 
 # Simplify shell integration scripts to signal-only (prompt_ready + exit code)
 
+
+---
+
+# Activity Log
+
+## 2026-03-28T03:49:19.684Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-03-28T03:52:01.369Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774669148250
+lastUpdatedAt: 1774669921505
 tasks:
   "AGENT-1":
     key: AGENT-1
@@ -753,17 +753,18 @@ tasks:
     key: SHR-79
     project: SHR
     title: Evaluate whether Zellij 0.44 features warrant a ground-up shell relay redesign
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-27T20:45:55.601Z"
-    updatedAt: "2026-03-28T02:22:44.487Z"
+    updatedAt: "2026-03-28T03:52:01.497Z"
+    resolution: DONE
     dependsOn[1]: AGENT-15
     blockedBy[5]: SHR-75,SHR-76,SHR-77,SHR-78,AGENT-15
     related[0]:
-    lastIndexedAt: 1774664564494
+    lastIndexedAt: 1774669921504
   "SHR-80":
     key: SHR-80
     project: SHR
@@ -802,50 +803,53 @@ tasks:
     key: SHR-82
     project: SHR
     title: Simplify shell integration scripts to signal-only (prompt_ready + exit code)
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T03:34:06.513Z"
-    updatedAt: "2026-03-28T03:34:06.513Z"
+    updatedAt: "2026-03-28T03:52:01.369Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-79
-    lastIndexedAt: 1774668846517
+    lastIndexedAt: 1774669921376
   "SHR-83":
     key: SHR-83
     project: SHR
     title: Eliminate ghost-attach and unbuffer-relay dependencies
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T03:34:06.569Z"
-    updatedAt: "2026-03-28T03:34:06.569Z"
+    updatedAt: "2026-03-28T03:52:01.413Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-79
-    lastIndexedAt: 1774668846578
+    lastIndexedAt: 1774669921419
   "SHR-84":
     key: SHR-84
     project: SHR
     title: "Update relay setup flow (background session, pane ID capture, no ghost client)"
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T03:34:06.629Z"
-    updatedAt: "2026-03-28T03:34:06.629Z"
+    updatedAt: "2026-03-28T03:52:01.455Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: SHR-79
-    lastIndexedAt: 1774668846633
+    lastIndexedAt: 1774669921462
   "TCL-52":
     key: TCL-52
     project: TCL
