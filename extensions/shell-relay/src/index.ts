@@ -99,9 +99,15 @@ export default function (pi: ExtensionAPI) {
 
     const shell = detectShell();
 
-    // Export only the signal FIFO path into the Zellij pane
-    // (stdout/stderr FIFOs are no longer needed — we use snapshot-diff)
-    const envExports = exportVars(shell, [{ name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal }]);
+    // Export env vars into the Zellij pane.
+    // Signal FIFO is the only one we actually use — stdout/stderr are set to
+    // /dev/null so the shell integration scripts don't bail out (they check
+    // that all three are defined). Output capture is handled by snapshot-diff.
+    const envExports = exportVars(shell, [
+      { name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal },
+      { name: 'SHELL_RELAY_STDOUT', value: '/dev/null' },
+      { name: 'SHELL_RELAY_STDERR', value: '/dev/null' },
+    ]);
 
     // Space prefix excludes from shell history; clear removes the
     // visible export commands from the pane after they execute.
