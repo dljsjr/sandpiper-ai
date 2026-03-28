@@ -175,7 +175,8 @@ export default function (pi: ExtensionAPI) {
       shell === 'fish'
         ? (await import('./escape.js')).escapeForFish(command)
         : (await import('./escape.js')).escapeForBash(command);
-    zellij.paste(` __relay_run ${escaped}`);
+    const injectedText = `__relay_run ${escaped}`;
+    zellij.paste(` ${injectedText}`);
     zellij.sendKeys('Enter');
 
     // Wait for last_status signal (command completed)
@@ -195,9 +196,10 @@ export default function (pi: ExtensionAPI) {
     // Small delay to let the terminal finish rendering
     await new Promise((r) => setTimeout(r, 100));
 
-    // Take "after" snapshot and diff
+    // Take "after" snapshot and diff — pass the full injected text
+    // so the diff can split on it reliably
     const afterSnapshot = zellij.dumpScreen();
-    const output = extractCommandOutput(beforeSnapshot, afterSnapshot, command);
+    const output = extractCommandOutput(beforeSnapshot, afterSnapshot, injectedText);
 
     return { output, exitCode, timedOut: false };
   }
