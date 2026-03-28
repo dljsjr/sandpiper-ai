@@ -2,8 +2,8 @@
  * Snapshot-diff output capture.
  *
  * Captures command output by diffing dump-screen snapshots taken before
- * and after command execution. The diff extracts only the new content
- * produced by the command, stripping the command echo and trailing prompt.
+ * and after command execution. Works with narrow viewports (e.g., 50-col
+ * Zellij background sessions) where lines may wrap.
  *
  * This module is framework-independent — no pi/sandpiper imports.
  */
@@ -11,11 +11,10 @@
 /**
  * Extract the output of a command from before/after scrollback snapshots.
  *
- * Strategy:
- * 1. Find the divergence point between before and after snapshots
- * 2. In the new content, find and skip the command echo
- * 3. Trim the trailing prompt (matches the prompt from the before snapshot)
- * 4. Return the content between command echo and trailing prompt
+ * Strategy: find the new content in "after" that wasn't in "before",
+ * then strip the command echo from the beginning and the prompt from
+ * the end. Uses line-by-line comparison for the diff, then marker-based
+ * extraction for the output boundaries.
  *
  * @param before - Scrollback snapshot taken before command injection
  * @param after - Scrollback snapshot taken after prompt_ready
@@ -33,16 +32,58 @@ export function extractCommandOutput(before: string, after: string, command: str
   const newLines = afterLines.slice(divergeIndex);
   if (newLines.length === 0) return '';
 
-  // Find where the command echo ends and output begins
-  const outputStart = findOutputStart(newLines, command);
+  // Find the output boundaries within the new content.
+  // Join all new lines into a single string for marker-based extraction.
+  // This handles viewport wrapping gracefully — wrapped lines are just
+  // concatenated, and we search for markers in the joined text.
+  const newText = newLines.map((l) => l.trimEnd()).join('\n');
 
-  // Find where output ends and the trailing prompt begins
-  const outputEnd = findOutputEnd(newLines, outputStart, beforeLines);
+  // Find the command echo. The command appears after being echoed by the shell.
+  // With __relay_run, it looks like: __relay_run 'command text'
+  // Without, it's just the command text.
+  // We look for the command text in the joined new content.
+  const commandNormalized = command.trim();
+  let outputStartPos = 0;
 
-  // Extract and clean the output
-  const outputLines = newLines.slice(outputStart, outputEnd);
+  const cmdIndex = newText.indexOf(commandNormalized);
+  if (cmdIndex >= 0) {
+    // Find the end of the line containing the command
+    const afterCmd = newText.indexOf('\n', cmdIndex + commandNormalized.length);
+    if (afterCmd >= 0) {
+      outputStartPos = afterCmd + 1;
+    } else {
+      // Command is on the last line — no output
+      return '';
+    }
+  }
+
+  // Extract from after the command echo to end of new content
+  const output = newText.slice(outputStartPos);
+
+  // Trim trailing prompt lines by matching against the before snapshot's
+  // last non-empty lines (the prompt pattern)
+  const promptLines = new Set<string>();
+  for (let i = beforeLines.length - 1; i >= 0 && promptLines.size < 5; i--) {
+    const line = beforeLines[i]?.trim() ?? '';
+    if (line.length > 0) {
+      promptLines.add(line);
+    }
+  }
+
+  // Strip trailing empty lines, then trailing prompt lines
+  const outputLines = output.split('\n');
+  let endIndex = outputLines.length;
+
+  while (endIndex > 0 && (outputLines[endIndex - 1]?.trim() ?? '') === '') {
+    endIndex--;
+  }
+  while (endIndex > 0 && promptLines.has(outputLines[endIndex - 1]?.trim() ?? '')) {
+    endIndex--;
+  }
+
   return outputLines
-    .map((line) => line.trimEnd())
+    .slice(0, endIndex)
+    .map((l) => l.trimEnd())
     .join('\n')
     .trim();
 }
@@ -60,79 +101,10 @@ function findDivergencePoint(beforeLines: string[], afterLines: string[]): numbe
 }
 
 /**
- * Find where the command output starts (after the command echo).
- *
- * The shell echoes the command before executing it. This may span multiple
- * lines if the terminal is narrow. We concatenate the first few new lines
- * and look for the command text as a substring of the concatenation.
- * Once we've accumulated enough text to contain the full command, the
- * next line is where output begins.
- */
-function findOutputStart(newLines: string[], command: string): number {
-  const commandNormalized = command.trim();
-  if (commandNormalized.length === 0) return 0;
-
-  // Concatenate lines progressively until we find the command text.
-  // The command echo may wrap across multiple narrow viewport lines,
-  // so we accumulate until the full command is found.
-  let accumulated = '';
-  for (let i = 0; i < Math.min(newLines.length, 10); i++) {
-    const line = newLines[i]?.trim() ?? '';
-    accumulated += line;
-
-    if (accumulated.includes(commandNormalized)) {
-      // Found the full command text — output starts after this line
-      return i + 1;
-    }
-  }
-
-  // Command text not found in first 10 lines — skip nothing
-  return 0;
-}
-
-/**
- * Find where the command output ends (before the trailing prompt).
- *
- * The trailing prompt is identified by matching against the last few
- * non-empty lines of the "before" snapshot, since the prompt repeats
- * after every command.
- */
-function findOutputEnd(newLines: string[], outputStart: number, beforeLines: string[]): number {
-  // Collect the prompt pattern from the end of the "before" snapshot.
-  // The last few non-empty lines before the command are the prompt.
-  const promptLines = new Set<string>();
-  for (let i = beforeLines.length - 1; i >= 0 && promptLines.size < 5; i--) {
-    const line = beforeLines[i]?.trim() ?? '';
-    if (line.length > 0) {
-      promptLines.add(line);
-    }
-  }
-
-  if (promptLines.size === 0) return newLines.length;
-
-  // Trim from the end: remove empty lines, then remove any lines that
-  // match prompt lines from the "before" snapshot.
-  let endIndex = newLines.length;
-
-  // Strip trailing empty lines
-  while (endIndex > outputStart && (newLines[endIndex - 1]?.trim() ?? '') === '') {
-    endIndex--;
-  }
-
-  // Strip trailing prompt lines
-  while (endIndex > outputStart && promptLines.has(newLines[endIndex - 1]?.trim() ?? '')) {
-    endIndex--;
-  }
-
-  return endIndex;
-}
-
-/**
  * Normalize a scrollback dump into clean lines.
  */
 function normalizeLines(dump: string): string[] {
   const lines = dump.split('\n').map((line) => line.trimEnd());
-  // Remove trailing empty lines
   while (lines.length > 0 && lines[lines.length - 1] === '') {
     lines.pop();
   }
