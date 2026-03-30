@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774898022880
+lastUpdatedAt: 1774898545824
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -139,6 +139,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774898022879
+  "AGENT-33":
+    key: AGENT-33
+    project: AGENT
+    title: Archive superseded shell-relay design docs under .sandpiper/archive
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:21:40.760Z"
+    updatedAt: "2026-03-30T19:22:25.817Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774898545823
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -648,4 +663,4 @@ counters:
     nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 33
+    nextTaskNumber: 34
