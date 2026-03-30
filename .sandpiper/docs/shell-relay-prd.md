@@ -1,5 +1,12 @@
 # Shell Relay — Product Requirements Document
 
+> **Historical design document — superseded in part.** This PRD reflects an earlier shell-relay architecture based on dedicated stdout/stderr FIFOs, `unbuffer-relay`, and other design choices that are no longer the live implementation. Keep it for historical context and requirement lineage, but do **not** treat it as the current source of truth for architecture or setup.
+>
+> Current references:
+> - `extensions/shell-relay/README.md` — current setup, usage, and architecture overview
+> - `extensions/shell-relay/AGENTS.md` — implementation-oriented development guidance
+> - `.sandpiper/docs/zellij-044-relay-design.md` — current Zellij-based design notes
+
 ## Overview
 
 **Shell Relay** is a pi extension that gives the coding agent access to a persistent, shared terminal session — a multiplexer pane that both the user and agent can observe and interact with in real time. Think of it as a Google Doc, but for a shell: both the user and the agent are equal participants with full control. Either party can run commands, inspect state, or interact with the session at any time. This transforms the agent's shell access from isolated, ephemeral command execution into a fully collaborative workspace.

@@ -40,7 +40,7 @@ bun sandpiper        # Launch sandpiper (interactive mode)
 sandpiper-ai/
 ├── extensions/          # Pi extensions (tools, hooks, lifecycle)
 │   ├── system.ts        # Sandpiper identity + update notifications
-│   └── shell-relay/     # Shared terminal via Zellij (ghost client, FIFOs)
+│   └── shell-relay/     # Shared terminal via Zellij
 ├── packages/            # Workspace packages (built + distributed)
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
 │   ├── sandpiper-tasks-cli/  # Task management CLI
@@ -57,16 +57,20 @@ sandpiper-ai/
 
 ## Building
 
-Workspace packages are built automatically during `bun install` via `preinstall` scripts. To rebuild manually:
+Workspace packages with real build outputs are built automatically during `bun install` via `preinstall` scripts. To rebuild manually:
 
 ```bash
 bun run build                              # Build the sandpiper CLI
 bun --filter sandpiper-tasks-cli run build # Rebuild tasks CLI
-bun --filter shell-relay run build          # Rebuild shell relay extension
+bun --filter sandpiper-ai-core run build   # Rebuild core package declarations/dist
+bash devtools/postinstall.sh               # Reassemble dist/ and reinstall package
 ```
+
+Pi extensions are not bundled. They load from source `.ts` files via jiti, and `postinstall.sh` copies their source trees into `dist/` so the same package-local entrypoints resolve there too.
 
 The `postinstall` script assembles the distribution in `dist/`:
 - Copies extensions, skills, prompts, themes, and packages
+- Preserves extension source trees and package metadata
 - Generates `dist/package.json` with pi package metadata
 - Symlinks pi's internal assets (themes, export templates)
 - Builds the dash CLI via mcporter

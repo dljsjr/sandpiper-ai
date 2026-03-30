@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774897614681
+lastUpdatedAt: 1774898022880
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -124,6 +124,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774896622054
+  "AGENT-32":
+    key: AGENT-32
+    project: AGENT
+    title: Do a repository doc hygiene sweep after recent architecture changes
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:10:37.303Z"
+    updatedAt: "2026-03-30T19:13:42.874Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774898022879
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -633,4 +648,4 @@ counters:
     nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 32
+    nextTaskNumber: 33

@@ -1,6 +1,6 @@
 # Session Stand-Up
 
-Updated: 2026-03-30T19:02:03Z
+Updated: 2026-03-30T19:13:11Z
 Session: 0e5cb1a4-4133-404a-9c36-6e94354d38c4
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-03-27T14-50-08-059Z_0e5cb1a4-4133-404a-9c36-6e94354d38c4.jsonl
 
@@ -44,6 +44,8 @@ This was an enormous session covering banner styling, framework infrastructure, 
 - Data recovery from bad squash (history diffs, task statuses, tests)
 - TUI skill + patterns doc; self-reflection passes
 - AGENT-21 banner redesign closed; AGENT-27 system.ts refactor filed
+- **TOOLS-10 cleanup validated:** shell-relay and web-fetch both load successfully from source via jiti after full reinstall/restart
+- **Doc hygiene sweep:** cleaned stale built-extension assumptions from repo docs; rewrote `extensions/shell-relay/README.md`; updated `README.md`, `extensions/README.md`, `.sandpiper/docs/build-system.md`, `.sandpiper/docs/extension-loading.md`, and `extensions/shell-relay/AGENTS.md`; marked old shell-relay PRD/workplan docs as historical/superseded
 
 ### Self-Reflection
 - Updated shell-relay AGENTS.md for new architecture (removed ghost client, unbuffer, old FIFO patterns)
@@ -74,5 +76,6 @@ This was an enormous session covering banner styling, framework infrastructure, 
 - **system.ts is large** — AGENT-27 tracks refactoring into a package
 - **Edit source skills, not dist** — run `bash devtools/postinstall.sh`
 - **Extensions now load from source via jiti** — extension changes need `bash devtools/postinstall.sh`, not per-extension build steps
+- **shell-relay docs were stale and are now aligned** — historical shell-relay PRD/workplan docs remain for lineage but are explicitly marked superseded; current sources of truth are `extensions/shell-relay/README.md`, `extensions/shell-relay/AGENTS.md`, and `.sandpiper/docs/zellij-044-relay-design.md`
 - **sandpiper-tasks binary** — `bun run --filter sandpiper-tasks-cli build` AND postinstall
 - **CLI/core package changes** — build the affected package if it emits binaries or declarations, then run postinstall
