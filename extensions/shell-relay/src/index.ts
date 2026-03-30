@@ -101,15 +101,10 @@ export default function (pi: ExtensionAPI) {
 
     const shell = detectShell();
 
-    // Export env vars into the Zellij pane.
-    // Signal FIFO is the only one we actually use — stdout/stderr are set to
-    // /dev/null so the shell integration scripts don't bail out (they check
-    // that all three are defined). Output capture is handled by snapshot-diff.
-    const envExports = exportVars(shell, [
-      { name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal },
-      { name: 'SHELL_RELAY_STDOUT', value: '/dev/null' },
-      { name: 'SHELL_RELAY_STDERR', value: '/dev/null' },
-    ]);
+    // Export the signal FIFO path into the Zellij pane.
+    // Output capture is handled by snapshot-diff; the shell integration only
+    // needs the signal channel for prompt_ready and last_status.
+    const envExports = exportVars(shell, [{ name: 'SHELL_RELAY_SIGNAL', value: fifoManager.paths.signal }]);
 
     // Space prefix excludes from shell history; clear removes the
     // visible export commands from the pane after they execute.
@@ -131,7 +126,7 @@ export default function (pi: ExtensionAPI) {
       fifoManager = null;
       throw new Error(
         `Shell Relay: Timed out waiting for prompt_ready signal in session "${resolvedSession}". ` +
-          'Ensure the shell integration script (relay.fish) is sourced in your shell config.',
+          'Ensure the relay shell integration script is sourced in your shell config.',
       );
     }
 

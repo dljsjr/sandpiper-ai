@@ -1,12 +1,13 @@
 ---
 title: "Archive superseded shell-relay design docs under .sandpiper/archive"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T19:21:40.760Z
-updated_at: 2026-03-30T19:22:25.817Z
+updated_at: 2026-03-30T19:23:24.794Z
 ---
 
 # Archive superseded shell-relay design docs under .sandpiper/archive
@@ -33,3 +34,8 @@ Validation should confirm that active docs still point to current references and
 ## 2026-03-30T19:22:25.818Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T19:23:24.794Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

@@ -20,14 +20,13 @@ All core logic lives in framework-independent modules under `src/`. Only `index.
 | `preflight.ts` | Shell integration preflight check (probes for `__relay_prompt_hook`) | No (imports from `sandpiper-ai-core`) |
 | `index.ts` | Pi extension glue (tool registration, lifecycle, preflight registration) | **Yes** — only file |
 
-### Legacy Modules (Pending Removal)
+### Current Shell Integration Scope
 
-These modules are still in the codebase but no longer used by the rewritten relay:
+The shell integration scripts are intentionally narrow now:
 
-| Module | Status |
-|--------|--------|
-| `ghost-client.ts` | Eliminated — Zellij 0.44 --pane-id targeting works without ghost client |
-| `relay.ts` | Replaced by executeCommand() in index.ts with snapshot-diff |
+- `prompt_ready` signals that the pane is back at a prompt
+- `__relay_run` executes an injected command and writes `last_status:N`
+- Output capture is handled by snapshot-diff in TypeScript, not by shell-side stdout/stderr FIFOs
 
 ### Zellij 0.44 API Usage
 
@@ -64,7 +63,7 @@ Shell scripts in `shell-integration/` are sourced in users' shell RC files. They
 - Defensive on every hook invocation (not just at source time)
 - Compatible with other prompt customizations (starship, powerlevel10k, etc.)
 
-Currently the scripts still reference `SHELL_RELAY_STDOUT`, `SHELL_RELAY_STDERR`, and `SHELL_RELAY_UNBUFFER` — these are set to `/dev/null` as a compatibility shim. A future simplification pass should remove these requirements.
+The scripts only require `SHELL_RELAY_SIGNAL`. They should not assume stdout/stderr FIFOs, PTY wrappers, or other legacy relay environment variables.
 
 ## Testing
 

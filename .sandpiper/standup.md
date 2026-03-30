@@ -1,6 +1,6 @@
 # Session Stand-Up
 
-Updated: 2026-03-30T19:13:11Z
+Updated: 2026-03-30T19:39:19Z
 Session: 0e5cb1a4-4133-404a-9c36-6e94354d38c4
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-03-27T14-50-08-059Z_0e5cb1a4-4133-404a-9c36-6e94354d38c4.jsonl
 
@@ -46,6 +46,9 @@ This was an enormous session covering banner styling, framework infrastructure, 
 - AGENT-21 banner redesign closed; AGENT-27 system.ts refactor filed
 - **TOOLS-10 cleanup validated:** shell-relay and web-fetch both load successfully from source via jiti after full reinstall/restart
 - **Doc hygiene sweep:** cleaned stale built-extension assumptions from repo docs; rewrote `extensions/shell-relay/README.md`; updated `README.md`, `extensions/README.md`, `.sandpiper/docs/build-system.md`, `.sandpiper/docs/extension-loading.md`, and `extensions/shell-relay/AGENTS.md`; marked old shell-relay PRD/workplan docs as historical/superseded
+- **SHR-87 / SHR-88:** simplified shell integration scripts to signal-only behavior, removed legacy shell-relay artifacts (`ghost-client.ts`, `relay.ts`, `ghost-attach`, `unbuffer-relay`, related tests), and validated relay still works
+- **TOOLS-12:** simplified root package metadata after extension unbundling (removed root dependency declarations for shell-relay/web-fetch and stale root relay bins)
+- **TOOLS-13 filed:** backlog follow-up to verify source-loaded extension dependency resolution in publish-style installs
 
 ### Self-Reflection
 - Updated shell-relay AGENTS.md for new architecture (removed ghost client, unbuffer, old FIFO patterns)
@@ -58,9 +61,9 @@ This was an enormous session covering banner styling, framework infrastructure, 
 
 ## Next Session
 1. **Snapshot-diff edge case:** long escaped commands leak __relay_run echo — needs refinement
-2. **Shell integration simplification:** remove stdout/stderr FIFO requirements from relay.fish/bash/zsh
-3. **SHR-62** — Long write-chars injections (now paste) wrapping
-4. **SHR-63** — prompt_ready race condition
+2. **SHR-62** — Long write-chars injections (now paste) wrapping
+3. **SHR-63** — prompt_ready race condition
+4. **TOOLS-13** — verify source-loaded extension dependency resolution in publish-style installs
 5. **MEM-1** or **PKM-1** — Memory/PKM design work
 
 ## Blockers
@@ -69,7 +72,7 @@ This was an enormous session covering banner styling, framework infrastructure, 
 ## Context
 - **Relay rewrite is live** — no ghost client, no expect/tclsh, no stdout/stderr FIFOs. Uses paste + send-keys, --session + --pane-id, snapshot-diff output capture
 - **Viewport sizing** — sessions created via attach-then-detach to inherit terminal dimensions; createBackgroundSession still available but produces 50x49
-- **Shell integration still needed** — relay.fish/bash/zsh provide prompt_ready + exit code signals via signal FIFO; stdout/stderr vars set to /dev/null as compat shim
+- **Shell integration is now signal-only** — relay.fish/bash/zsh provide prompt_ready + exit code signals via `SHELL_RELAY_SIGNAL`; no stdout/stderr/unbuffer compat shim remains
 - **Background processes** — start/check_background_process tools; context event notifications; processManager at module scope in system.ts
 - **Chat container injection** — `tui.children[1]`; duck-type with `'addChild' in candidate`
 - **New core exports need full restart** — /reload doesn't re-resolve jiti module graph

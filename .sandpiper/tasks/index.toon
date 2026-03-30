@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774898545824
+lastUpdatedAt: 1774899590209
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -143,17 +143,18 @@ tasks:
     key: AGENT-33
     project: AGENT
     title: Archive superseded shell-relay design docs under .sandpiper/archive
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T19:21:40.760Z"
-    updatedAt: "2026-03-30T19:22:25.817Z"
+    updatedAt: "2026-03-30T19:23:24.794Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774898545823
+    lastIndexedAt: 1774898604799
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -323,32 +324,32 @@ tasks:
     key: SHR-87
     project: SHR
     title: "Simplify shell integration scripts: remove stdout/stderr/unbuffer FIFO requirements"
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.626Z"
-    updatedAt: "2026-03-29T00:37:46.894Z"
+    updatedAt: "2026-03-30T19:39:50.159Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774899590164
   "SHR-88":
     key: SHR-88
     project: SHR
     title: "Remove legacy modules: ghost-client.ts, relay.ts, ghost-attach, unbuffer-relay"
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.669Z"
-    updatedAt: "2026-03-29T00:37:46.895Z"
+    updatedAt: "2026-03-30T19:39:50.201Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774899590208
   "SHR-89":
     key: SHR-89
     project: SHR
@@ -561,6 +562,36 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774897345250
+  "TOOLS-12":
+    key: TOOLS-12
+    project: TOOLS
+    title: Simplify root package metadata after extension unbundling
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:31:59.244Z"
+    updatedAt: "2026-03-30T19:39:50.115Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774899590122
+  "TOOLS-13":
+    key: TOOLS-13
+    project: TOOLS
+    title: Verify source-loaded extension dependency resolution in publish-style installs
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T19:31:59.329Z"
+    updatedAt: "2026-03-30T19:31:59.372Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774899119377
   "TOOLS-2":
     key: TOOLS-2
     project: TOOLS
@@ -651,7 +682,7 @@ counters:
     nextTaskNumber: 3
   TOOLS:
     projectKey: TOOLS
-    nextTaskNumber: 12
+    nextTaskNumber: 14
   PKM:
     projectKey: PKM
     nextTaskNumber: 3

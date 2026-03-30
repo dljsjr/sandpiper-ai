@@ -76,7 +76,7 @@ describe('Shell Integration Scripts', () => {
   });
 
   describe('Fish __relay_run', () => {
-    it('should error when FIFO env vars are not set', () => {
+    it('should error when SHELL_RELAY_SIGNAL is not set', () => {
       let output = '';
       try {
         output = execSync(`fish -c "source ${FISH_SCRIPT}; __relay_run 'echo hello'" 2>&1 || true`, {
@@ -89,28 +89,67 @@ describe('Shell Integration Scripts', () => {
         const execError = error as { stdout?: string; stderr?: string; message?: string };
         output = execError.stdout ?? execError.stderr ?? execError.message ?? '';
       }
-      expect(output).toContain('FIFO environment variables not set');
+      expect(output).toContain('signal environment variable not set');
     });
 
-    it('should detect unbuffer-relay when SHELL_RELAY_NO_UNBUFFER is set', () => {
-      // With NO_UNBUFFER set, the wrapper should skip unbuffer-relay even if available
-      // This is a behavioral test — we just verify it doesn't crash
+    it('should write last_status when SHELL_RELAY_SIGNAL is set', () => {
+      execSync(`fish -c "source ${FISH_SCRIPT}; __relay_run (string escape --style=script -- 'true')" 2>&1`, {
+        encoding: 'utf-8',
+        timeout: 5000,
+        env: {
+          PATH: process.env.PATH ?? '',
+          SHELL_RELAY_SIGNAL: fifoManager.paths.signal,
+        },
+      });
+
+      const { openSync: fsOpen, readSync, closeSync: fsClose } = require('node:fs');
+      const { constants } = require('node:fs');
+      const buf = Buffer.alloc(256);
+      const fd = fsOpen(fifoManager.paths.signal, constants.O_RDONLY | constants.O_NONBLOCK);
+      const bytesRead = readSync(fd, buf);
+      fsClose(fd);
+
+      const content = buf.toString('utf-8', 0, bytesRead);
+      expect(content).toContain('last_status:0');
+    });
+  });
+
+  describe('Bash __relay_run', () => {
+    it('should error when SHELL_RELAY_SIGNAL is not set', () => {
+      let output = '';
       try {
-        execSync(`fish -c "source ${FISH_SCRIPT}; __relay_run (string escape --style=script -- 'echo test')" 2>&1`, {
+        output = execSync(`bash -c "source ${BASH_SCRIPT}; __relay_run 'true'" 2>&1 || true`, {
           encoding: 'utf-8',
           timeout: 5000,
-          env: {
-            PATH: process.env.PATH ?? '',
-            SHELL_RELAY_SIGNAL: fifoManager.paths.signal,
-            SHELL_RELAY_STDOUT: fifoManager.paths.stdout,
-            SHELL_RELAY_STDERR: fifoManager.paths.stderr,
-            SHELL_RELAY_NO_UNBUFFER: '1',
-          },
+          env: { PATH: process.env.PATH ?? '' },
+          shell: '/bin/bash',
         });
-      } catch {
-        // May fail because /dev/tty isn't available in this context,
-        // but it shouldn't fail due to unbuffer-relay detection
+      } catch (error: unknown) {
+        const execError = error as { stdout?: string; stderr?: string; message?: string };
+        output = execError.stdout ?? execError.stderr ?? execError.message ?? '';
       }
+      expect(output).toContain('signal environment variable not set');
+    });
+
+    it('should write last_status when SHELL_RELAY_SIGNAL is set', () => {
+      execSync(`bash -c "source ${BASH_SCRIPT}; __relay_run 'true'" 2>&1`, {
+        encoding: 'utf-8',
+        timeout: 5000,
+        env: {
+          PATH: process.env.PATH ?? '',
+          SHELL_RELAY_SIGNAL: fifoManager.paths.signal,
+        },
+      });
+
+      const { openSync: fsOpen, readSync, closeSync: fsClose } = require('node:fs');
+      const { constants } = require('node:fs');
+      const buf = Buffer.alloc(256);
+      const fd = fsOpen(fifoManager.paths.signal, constants.O_RDONLY | constants.O_NONBLOCK);
+      const bytesRead = readSync(fd, buf);
+      fsClose(fd);
+
+      const content = buf.toString('utf-8', 0, bytesRead);
+      expect(content).toContain('last_status:0');
     });
   });
 
