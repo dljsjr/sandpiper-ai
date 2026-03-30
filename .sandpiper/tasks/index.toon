@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774899590209
+lastUpdatedAt: 1774900931534
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -155,6 +155,36 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774898604799
+  "AGENT-34":
+    key: AGENT-34
+    project: AGENT
+    title: Plan second-pass progressive disclosure revision for agent guidance
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T20:00:27.354Z"
+    updatedAt: "2026-03-30T20:02:11.527Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774900931533
+  "AGENT-35":
+    key: AGENT-35
+    project: AGENT
+    title: Design deferred deterministic guidance/enforcement hooks for tool use
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T20:00:27.396Z"
+    updatedAt: "2026-03-30T20:00:37.110Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774900837115
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -324,32 +354,34 @@ tasks:
     key: SHR-87
     project: SHR
     title: "Simplify shell integration scripts: remove stdout/stderr/unbuffer FIFO requirements"
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.626Z"
-    updatedAt: "2026-03-30T19:39:50.159Z"
+    updatedAt: "2026-03-30T19:41:37.061Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774899590164
+    lastIndexedAt: 1774899697066
   "SHR-88":
     key: SHR-88
     project: SHR
     title: "Remove legacy modules: ghost-client.ts, relay.ts, ghost-attach, unbuffer-relay"
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: LOW
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-28T05:02:33.669Z"
-    updatedAt: "2026-03-30T19:39:50.201Z"
+    updatedAt: "2026-03-30T19:41:37.104Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774899590208
+    lastIndexedAt: 1774899697109
   "SHR-89":
     key: SHR-89
     project: SHR
@@ -566,17 +598,18 @@ tasks:
     key: TOOLS-12
     project: TOOLS
     title: Simplify root package metadata after extension unbundling
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T19:31:59.244Z"
-    updatedAt: "2026-03-30T19:39:50.115Z"
+    updatedAt: "2026-03-30T19:41:37.016Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774899590122
+    lastIndexedAt: 1774899697022
   "TOOLS-13":
     key: TOOLS-13
     project: TOOLS
@@ -694,4 +727,4 @@ counters:
     nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 34
+    nextTaskNumber: 36

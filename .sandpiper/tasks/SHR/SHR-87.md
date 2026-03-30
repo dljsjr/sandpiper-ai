@@ -1,12 +1,13 @@
 ---
 title: "Simplify shell integration scripts: remove stdout/stderr/unbuffer FIFO requirements"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-28T05:02:33.626Z
-updated_at: 2026-03-30T19:39:50.159Z
+updated_at: 2026-03-30T19:41:37.061Z
 ---
 
 # Simplify shell integration scripts: remove stdout/stderr/unbuffer FIFO requirements
@@ -33,3 +34,8 @@ Validation should show that the relay still initializes, reports prompt readines
 ## 2026-03-30T19:39:50.159Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T19:41:37.061Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

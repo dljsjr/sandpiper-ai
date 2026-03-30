@@ -1,12 +1,13 @@
 ---
 title: "Simplify root package metadata after extension unbundling"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T19:31:59.244Z
-updated_at: 2026-03-30T19:39:50.115Z
+updated_at: 2026-03-30T19:41:37.016Z
 ---
 
 # Simplify root package metadata after extension unbundling
@@ -33,3 +34,8 @@ Validation should confirm that extension loading still works after the cleanup a
 ## 2026-03-30T19:39:50.116Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T19:41:37.016Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
