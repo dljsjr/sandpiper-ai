@@ -1,0 +1,27 @@
+--- a/AGENT-31.md
++++ b/AGENT-31.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Parameterize filesystem targets without nested overrides and audit tests for production-path access"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-30T18:34:48.194Z
+-updated_at: 2026-03-30T18:34:55.916Z
++updated_at: 2026-03-30T18:42:42.132Z
+ ---
+ 
+ # Parameterize filesystem targets without nested overrides and audit tests for production-path access
+@@ -26,3 +27,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-03-30T18:42:42.133Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

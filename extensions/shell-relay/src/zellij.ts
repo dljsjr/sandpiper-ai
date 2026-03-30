@@ -112,7 +112,7 @@ export class ZellijClient {
 
     if (!paneReady) {
       throw new Error(
-        `Failed to create session "${this.sessionName}". ` + 'No terminal pane became available within the timeout.',
+        `Failed to create session "${this.sessionName}". No terminal pane became available within the timeout.`,
       );
     }
   }

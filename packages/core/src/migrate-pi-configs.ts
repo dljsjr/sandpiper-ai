@@ -8,6 +8,7 @@
 import { existsSync, mkdirSync, renameSync, symlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { resolveEnvVar } from './env.js';
 
 export type MigrationMode = 'move' | 'symlink';
 export type MigrationScope = 'both' | 'global' | 'local';
@@ -30,6 +31,12 @@ interface MigrationTarget {
   label: string;
 }
 
+function resolveConfiguredPath(path: string): string {
+  if (path === '~') return homedir();
+  if (path.startsWith('~/')) return join(homedir(), path.slice(2));
+  return resolve(path);
+}
+
 /**
  * Get the old pi agent directory (before sandpiper override).
  * Respects user's PI_CODING_AGENT_DIR if they set it (captured as __PI_CODING_AGENT_DIR_ORIGINAL
@@ -38,20 +45,20 @@ interface MigrationTarget {
 export function getOldPiAgentDir(): string {
   const original = process.env.__PI_CODING_AGENT_DIR_ORIGINAL;
   if (original) {
-    return resolve(original);
+    return resolveConfiguredPath(original);
   }
   return join(homedir(), '.pi', 'agent');
 }
 
 /**
- * Get the new sandpiper agent directory.
- * Reads SANDPIPER_CODING_AGENT_DIR directly — the user-facing env var for overriding
- * the sandpiper config location (APP_NAME = "sandpiper", so ENV_AGENT_DIR = "SANDPIPER_CODING_AGENT_DIR").
+ * Get the current sandpiper agent directory.
+ * Uses the same SANDPIPER_* / PI_* mirrored override lookup route as the rest
+ * of sandpiper via resolveEnvVar('CODING_AGENT_DIR').
  */
 export function getNewSandpiperAgentDir(): string {
-  const sandpiperDir = process.env.SANDPIPER_CODING_AGENT_DIR;
-  if (sandpiperDir) {
-    return resolve(sandpiperDir);
+  const configuredDir = resolveEnvVar('CODING_AGENT_DIR');
+  if (configuredDir) {
+    return resolveConfiguredPath(configuredDir);
   }
   return join(homedir(), '.sandpiper', 'agent');
 }

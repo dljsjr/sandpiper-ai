@@ -5,92 +5,100 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { checkShellIntegration } from './preflight.js';
 
 describe('checkShellIntegration', () => {
-  describe('with fish shell (live probe)', () => {
-    let originalShell: string | undefined;
+  describe('with a recognized shell', () => {
+    it('returns healthy when the probe reports the integration is active', () => {
+      const result = checkShellIntegration({
+        shellPath: '/usr/bin/fish',
+        probeShellFunction: () => true,
+      });
 
-    beforeEach(() => {
-      originalShell = process.env.SHELL;
-      process.env.SHELL = '/usr/bin/fish';
+      expect(result).toEqual({
+        key: 'shell-relay:integration',
+        healthy: true,
+        message: 'Shell integration is active',
+      });
     });
 
-    afterEach(() => {
-      if (originalShell === undefined) {
-        delete process.env.SHELL;
-      } else {
-        process.env.SHELL = originalShell;
-      }
-    });
+    it('returns unhealthy with sourcing instructions when the probe reports the integration is not sourced', () => {
+      const result = checkShellIntegration({
+        shellPath: '/usr/bin/fish',
+        probeShellFunction: () => false,
+        wellKnownDir: '/tmp/shell-integrations',
+      });
 
-    it('returns healthy when __relay_prompt_hook is defined in fish', () => {
-      const result = checkShellIntegration();
-      expect(result).toHaveProperty('key', 'shell-relay:integration');
-      expect(result).toHaveProperty('healthy');
-      expect(result).toHaveProperty('message');
+      expect(result.key).toBe('shell-relay:integration');
+      expect(result.healthy).toBe(false);
+      expect(result.message).toContain('not sourced');
+      expect(result.instructions).toContain('Add to ~/.config/fish/config.fish:');
+      expect(result.instructions).toContain('  source /tmp/shell-integrations/relay.fish');
     });
   });
 
-  describe('with unrecognized shell (file existence fallback)', () => {
-    let originalShell: string | undefined;
+  describe('with file existence fallback', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      originalShell = process.env.SHELL;
-      process.env.SHELL = '/usr/bin/nushell';
       tempDir = mkdtempSync(join(tmpdir(), 'preflight-test-'));
     });
 
     afterEach(() => {
-      if (originalShell === undefined) {
-        delete process.env.SHELL;
-      } else {
-        process.env.SHELL = originalShell;
-      }
       rmSync(tempDir, { recursive: true, force: true });
     });
 
-    it('returns unhealthy when no scripts installed at well-known location', () => {
-      const result = checkShellIntegration(tempDir);
+    it('returns unhealthy when no scripts are installed at the target location', () => {
+      const result = checkShellIntegration({
+        shellPath: '/usr/bin/nushell',
+        wellKnownDir: tempDir,
+      });
+
       expect(result.key).toBe('shell-relay:integration');
       expect(result.healthy).toBe(false);
       expect(result.message).toContain('not installed');
-      expect(result.instructions?.some((i) => i.includes('--install-shell-integrations'))).toBe(true);
+      expect(result.instructions?.some((instruction) => instruction.includes('--install-shell-integrations'))).toBe(
+        true,
+      );
     });
 
-    it('returns healthy when at least one script exists at well-known location', () => {
+    it('returns healthy when at least one script exists at the target location', () => {
       writeFileSync(join(tempDir, 'relay.fish'), '# test stub');
 
-      const result = checkShellIntegration(tempDir);
+      const result = checkShellIntegration({
+        shellPath: '/usr/bin/nushell',
+        wellKnownDir: tempDir,
+      });
+
       expect(result.key).toBe('shell-relay:integration');
       expect(result.healthy).toBe(true);
     });
   });
 
-  describe('with no SHELL env var', () => {
-    let originalShell: string | undefined;
-    let tempDir: string;
+  it('uses process.env.SHELL by default', () => {
+    const originalShell = process.env.SHELL;
+    process.env.SHELL = '/usr/bin/zsh';
 
-    beforeEach(() => {
-      originalShell = process.env.SHELL;
-      delete process.env.SHELL;
-      tempDir = mkdtempSync(join(tmpdir(), 'preflight-test-'));
-    });
+    try {
+      const result = checkShellIntegration({
+        probeShellFunction: () => false,
+        wellKnownDir: '/tmp/shell-integrations',
+      });
 
-    afterEach(() => {
-      if (originalShell !== undefined) {
+      expect(result.instructions).toContain('Add to ~/.zshrc:');
+      expect(result.instructions).toContain('  source /tmp/shell-integrations/relay.zsh');
+    } finally {
+      if (originalShell === undefined) {
+        delete process.env.SHELL;
+      } else {
         process.env.SHELL = originalShell;
       }
-      rmSync(tempDir, { recursive: true, force: true });
-    });
-
-    it('falls back to file existence check', () => {
-      const result = checkShellIntegration(tempDir);
-      expect(result.key).toBe('shell-relay:integration');
-      expect(result.healthy).toBe(false);
-    });
+    }
   });
 
   it('always returns a valid PreflightDiagnostic shape', () => {
-    const result = checkShellIntegration();
+    const result = checkShellIntegration({
+      shellPath: '/usr/bin/nushell',
+      wellKnownDir: '/tmp/nowhere',
+    });
+
     expect(typeof result.key).toBe('string');
     expect(typeof result.healthy).toBe('boolean');
     expect(typeof result.message).toBe('string');
