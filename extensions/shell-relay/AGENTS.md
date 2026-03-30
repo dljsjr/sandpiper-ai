@@ -6,7 +6,7 @@ This document supplements the [repo-wide AGENTS.md](../../AGENTS.md) with shell-
 
 ### Framework-Independent Core
 
-All core logic lives in framework-independent modules under `src/`. Only `index.ts` imports pi framework APIs. Shell integration scripts live in `shell-integration/`. The bundle is built to `dist/shell-relay`.
+All core logic lives in framework-independent modules under `src/`. Only `index.ts` imports pi framework APIs. Shell integration scripts live in `shell-integration/`. The extension loads from `src/index.ts` via the package-local `pi.extensions` entry; `postinstall.sh` copies the source tree and assets into `dist/extensions/shell-relay/`.
 
 | Module | Purpose | Pi imports? |
 |--------|---------|-------------|

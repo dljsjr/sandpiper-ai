@@ -20,9 +20,7 @@
   "bin": {
     "sandpiper": "./dist/sandpiper",
     "sandpiper-tasks": "./packages/sandpiper-tasks-cli/dist/sandpiper-tasks",
-    "shell-relay": "./extensions/shell-relay/dist/shell-relay",
-    "unbuffer-relay": "./extensions/shell-relay/unbuffer-relay",
-    "ghost-attach": "./extensions/shell-relay/ghost-attach"
+    "unbuffer-relay": "./extensions/shell-relay/unbuffer-relay"
   },
   "files": [
     "./dist"

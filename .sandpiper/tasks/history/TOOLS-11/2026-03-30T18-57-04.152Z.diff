@@ -1,0 +1,29 @@
+--- a/TOOLS-11.md
++++ b/TOOLS-11.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Clean up stale built-extension assumptions after TOOLS-10"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-30T18:57:04.051Z
+ updated_at: 2026-03-30T18:57:04.101Z
+-updated_at: 2026-03-30T18:57:04.101Z
++updated_at: 2026-03-30T18:57:04.151Z
+ ---
+ 
+ # Clean up stale built-extension assumptions after TOOLS-10
+@@ -25,3 +25,8 @@
+ 
+ - **description**: added (5 lines)
+ 
++## 2026-03-30T18:57:04.152Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++
