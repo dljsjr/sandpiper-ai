@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774839013057
+lastUpdatedAt: 1774839831360
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -92,6 +92,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774838885022
+  "AGENT-30":
+    key: AGENT-30
+    project: AGENT
+    title: Restructure AGENTS.md with progressive disclosure — split into focused docs
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T02:56:05.619Z"
+    updatedAt: "2026-03-30T03:03:51.354Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774839831359
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -441,17 +457,17 @@ tasks:
     key: TOOLS-10
     project: TOOLS
     title: Per-extension postinstall strategy for extensions with npm dependencies
-    status: NOT STARTED
+    status: IN PROGRESS
     kind: TASK
-    priority: LOW
+    priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-26T22:03:20.380Z"
-    updatedAt: "2026-03-30T02:50:13.051Z"
+    updatedAt: "2026-03-30T02:56:20.887Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774839013057
+    lastIndexedAt: 1774839380892
   "TOOLS-2":
     key: TOOLS-2
     project: TOOLS
@@ -554,4 +570,4 @@ counters:
     nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 30
+    nextTaskNumber: 31
