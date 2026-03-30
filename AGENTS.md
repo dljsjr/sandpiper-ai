@@ -215,6 +215,27 @@ my-extension/
 └── ...
 ```
 
+### How Extensions Are Loaded
+
+Pi uses **jiti** (a TypeScript-aware module loader) to load extensions at runtime. Understanding this is critical:
+
+1. **jiti loads `.ts` files directly** — no build step required. This is Pi's happy path.
+2. **Module resolution** follows standard Node.js rules — imports resolve from `node_modules/` (hoisted by bun), plus jiti aliases for Pi framework packages.
+3. **`tsconfig.json` paths are for TypeScript type-checking only** — jiti does NOT use them. If an import works in `tsc` but fails at runtime, the module isn't resolvable via standard Node.js resolution.
+4. **Each jiti load creates a separate module scope** — module-level state is NOT shared between extensions. Use `pi.events` for cross-extension communication.
+
+**Our extensions have different loading strategies:**
+
+| Extension | Entry point | Build step | Why |
+|-----------|------------|------------|-----|
+| `system.ts` | Source `.ts` | None | Happy path — jiti loads directly |
+| `shell-relay` | Bundled `.js` | `bun build` | Historical — bundles all modules into single file |
+| `web-fetch` | Compiled `.js` | `tsc` | Has npm deps (jsdom, etc.) that need hoisted node_modules |
+
+The ideal state is for all extensions to load from source `.ts` files (like `system.ts`), with jiti resolving dependencies at runtime from the hoisted `node_modules/`. See TOOLS-10 for the investigation into unbundling.
+
+**Key implication:** The `dist/` directory assembled by `postinstall.sh` is a Pi Package — it contains resource declarations (`package.json` with the `pi` key), extension entry points, skills, prompts, and themes. It does NOT contain `node_modules/` or manage npm dependencies. Dependencies are resolved from the workspace's hoisted `node_modules/` at runtime.
+
 ## Pi Extension API Pitfalls
 
 Known issues and non-obvious behaviors in pi's extension API:
