@@ -12,8 +12,7 @@ import { homedir } from 'node:os';
 import { basename, join } from 'node:path';
 import { displayPath, type PreflightDiagnostic } from 'sandpiper-ai-core';
 
-/** Default well-known directory for shell integration scripts. */
-export const DEFAULT_WELL_KNOWN_DIR = join(homedir(), '.sandpiper', 'shell-integrations');
+const defaultWellKnownDir = join(homedir(), '.sandpiper', 'shell-integrations');
 
 /** Shell probe commands — exit 0 if __relay_prompt_hook is defined, non-zero otherwise.
  * All shells use -i (interactive) because integration scripts are typically
@@ -40,10 +39,9 @@ const SCRIPT_FILES: Readonly<Record<string, string>> = {
  * Detect the user's shell name from SHELL env var.
  * Returns 'fish', 'bash', 'zsh', or undefined if unrecognized.
  */
-function detectShell(): string | undefined {
-  const shell = process.env.SHELL;
-  if (!shell) return undefined;
-  const name = basename(shell);
+function detectShell(shellPath = process.env.SHELL): string | undefined {
+  if (!shellPath) return undefined;
+  const name = basename(shellPath);
   return name in SHELL_PROBES ? name : undefined;
 }
 
@@ -69,18 +67,19 @@ function isAnyScriptInstalled(wellKnownDir: string): boolean {
   return Object.values(SCRIPT_FILES).some((file) => existsSync(join(wellKnownDir, file)));
 }
 
-/**
- * Run the shell relay preflight check.
- */
-/**
- * @param wellKnownDirOverride - Override the well-known directory (for testing only).
- */
-export function checkShellIntegration(wellKnownDirOverride?: string): PreflightDiagnostic {
-  const WELL_KNOWN_DIR = wellKnownDirOverride ?? DEFAULT_WELL_KNOWN_DIR;
-  const shellName = detectShell();
+interface ShellIntegrationCheckOptions {
+  readonly probeShellFunction?: (shellName: string) => boolean | undefined;
+  readonly shellPath?: string;
+  readonly wellKnownDir?: string;
+}
+
+/** Run the shell relay preflight check. */
+export function checkShellIntegration(options: ShellIntegrationCheckOptions = {}): PreflightDiagnostic {
+  const wellKnownDir = options.wellKnownDir ?? defaultWellKnownDir;
+  const shellName = detectShell(options.shellPath);
 
   if (shellName) {
-    const sourced = probeShellFunction(shellName);
+    const sourced = (options.probeShellFunction ?? probeShellFunction)(shellName);
 
     if (sourced === true) {
       return { key: 'shell-relay:integration', healthy: true, message: 'Shell integration is active' };
@@ -97,7 +96,7 @@ export function checkShellIntegration(wellKnownDirOverride?: string): PreflightD
         message: 'Shell relay integration is not sourced',
         instructions: [
           `Add to ${rcFile}:`,
-          `  source ${displayPath(join(WELL_KNOWN_DIR, scriptFile))}`,
+          `  source ${displayPath(join(wellKnownDir, scriptFile))}`,
           '',
           'If not yet installed, run first:',
           '  sandpiper --install-shell-integrations',
@@ -107,7 +106,7 @@ export function checkShellIntegration(wellKnownDirOverride?: string): PreflightD
   }
 
   // Shell unrecognized or probe failed to spawn — fall back to file existence
-  const installed = isAnyScriptInstalled(WELL_KNOWN_DIR);
+  const installed = isAnyScriptInstalled(wellKnownDir);
   if (!installed) {
     return {
       key: 'shell-relay:integration',
