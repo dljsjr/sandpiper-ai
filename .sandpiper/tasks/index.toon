@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774841238832
+lastUpdatedAt: 1774891186001
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -333,6 +333,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774836296772
+  "SHR-91":
+    key: SHR-91
+    project: SHR
+    title: Shell integration files at ~/.sandpiper/shell-integrations/ disappear after clean install
+    status: COMPLETE
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T17:12:32.224Z"
+    updatedAt: "2026-03-30T17:19:45.986Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774891185999
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -550,7 +566,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 91
+    nextTaskNumber: 92
   SRL:
     projectKey: SRL
     nextTaskNumber: 2

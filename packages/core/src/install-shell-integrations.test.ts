@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -8,11 +8,7 @@ import {
   installShellIntegrations,
 } from './install-shell-integrations.js';
 
-// We test the install logic by:
-// 1. Pointing PI_PACKAGE_DIR at a temp dir with fake source scripts
-// 2. Checking that the scripts are copied to the well-known location
-// (We can't redirect the well-known location itself without more invasive mocking,
-//  so these are integration-style tests that write to a temp homedir via env var override.)
+// All tests use temp directories — NEVER the real ~/.sandpiper/ location.
 
 describe('getShellIntegrationsDir', () => {
   it('returns a path ending in .sandpiper/shell-integrations', () => {
@@ -51,16 +47,20 @@ describe('formatInstallInstructions', () => {
 
 describe('installShellIntegrations', () => {
   let tmpPackageDir: string;
+  let tmpTargetDir: string;
   let originalPackageDir: string | undefined;
 
   beforeEach(() => {
     // Create a fake package dir with the expected source scripts
-    tmpPackageDir = join(tmpdir(), `sandpiper-test-${Date.now()}`);
+    tmpPackageDir = mkdtempSync(join(tmpdir(), 'sandpiper-install-src-'));
     const srcDir = join(tmpPackageDir, 'extensions', 'shell-relay', 'shell-integration');
     mkdirSync(srcDir, { recursive: true });
-    writeFileSync(join(srcDir, 'relay.fish'), '# fake fish integration');
-    writeFileSync(join(srcDir, 'relay.bash'), '# fake bash integration');
-    writeFileSync(join(srcDir, 'relay.zsh'), '# fake zsh integration');
+    writeFileSync(join(srcDir, 'relay.fish'), '# test fish integration');
+    writeFileSync(join(srcDir, 'relay.bash'), '# test bash integration');
+    writeFileSync(join(srcDir, 'relay.zsh'), '# test zsh integration');
+
+    // Create a temp target dir (instead of writing to real ~/.sandpiper/)
+    tmpTargetDir = mkdtempSync(join(tmpdir(), 'sandpiper-install-dst-'));
 
     originalPackageDir = process.env.PI_PACKAGE_DIR;
     process.env.PI_PACKAGE_DIR = tmpPackageDir;
@@ -68,6 +68,7 @@ describe('installShellIntegrations', () => {
 
   afterEach(() => {
     rmSync(tmpPackageDir, { recursive: true, force: true });
+    rmSync(tmpTargetDir, { recursive: true, force: true });
     if (originalPackageDir === undefined) {
       delete process.env.PI_PACKAGE_DIR;
     } else {
@@ -75,31 +76,36 @@ describe('installShellIntegrations', () => {
     }
   });
 
-  it('returns success when source scripts exist', () => {
-    const result = installShellIntegrations();
-    // May fail if well-known dir isn't writable in CI, but source lookup should succeed
-    if (!result.success) {
-      // Only acceptable failure is write permission, not missing source
-      expect(result.error).not.toContain('Shell integration source not found');
-    }
+  it('copies scripts to the target directory', () => {
+    const result = installShellIntegrations(tmpTargetDir);
+    expect(result.success).toBe(true);
+    expect(result.installedTo).toBe(tmpTargetDir);
+    expect(existsSync(join(tmpTargetDir, 'relay.fish'))).toBe(true);
+    expect(existsSync(join(tmpTargetDir, 'relay.bash'))).toBe(true);
+    expect(existsSync(join(tmpTargetDir, 'relay.zsh'))).toBe(true);
+  });
+
+  it('copies the correct content', () => {
+    installShellIntegrations(tmpTargetDir);
+    expect(readFileSync(join(tmpTargetDir, 'relay.fish'), 'utf-8')).toBe('# test fish integration');
   });
 
   it('returns failure when PI_PACKAGE_DIR is unset', () => {
     delete process.env.PI_PACKAGE_DIR;
-    const result = installShellIntegrations();
+    const result = installShellIntegrations(tmpTargetDir);
     expect(result.success).toBe(false);
     expect(result.error).toContain('Shell integration source not found');
   });
 
   it('returns failure when PI_PACKAGE_DIR points to a dir without shell-relay scripts', () => {
-    process.env.PI_PACKAGE_DIR = tmpdir(); // exists but has no shell-relay subdir
-    const result = installShellIntegrations();
+    process.env.PI_PACKAGE_DIR = tmpdir();
+    const result = installShellIntegrations(tmpTargetDir);
     expect(result.success).toBe(false);
     expect(result.error).toContain('Shell integration source not found');
   });
 
   it('includes installedTo in result', () => {
-    const result = installShellIntegrations();
-    expect(result.installedTo).toMatch(/shell-integrations$/);
+    const result = installShellIntegrations(tmpTargetDir);
+    expect(result.installedTo).toBe(tmpTargetDir);
   });
 });

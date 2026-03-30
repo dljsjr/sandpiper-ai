@@ -43,18 +43,20 @@ const SCRIPTS: ReadonlyArray<{ file: string; shell: string; rcFile: string }> = 
 /**
  * Install shell integration scripts to ~/.sandpiper/shell-integrations/.
  * Overwrites existing files — users should not edit these scripts directly.
+ *
+ * @param targetDirOverride - Override the target directory (for testing only).
  */
-export function installShellIntegrations(): InstallResult {
+export function installShellIntegrations(targetDirOverride?: string): InstallResult {
   const sourceDir = getSourceDir();
   if (!sourceDir || !existsSync(sourceDir)) {
     return {
       success: false,
       error: `Shell integration source not found. Is PI_PACKAGE_DIR set correctly? (${sourceDir ?? 'unset'})`,
-      installedTo: getShellIntegrationsDir(),
+      installedTo: targetDirOverride ?? getShellIntegrationsDir(),
     };
   }
 
-  const targetDir = getShellIntegrationsDir();
+  const targetDir = targetDirOverride ?? getShellIntegrationsDir();
   try {
     mkdirSync(targetDir, { recursive: true });
   } catch (err) {
