@@ -1,12 +1,13 @@
 ---
 title: "Implement second-pass prompt progressive disclosure revision"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T20:04:39.335Z
-updated_at: 2026-03-30T20:10:35.685Z
+updated_at: 2026-03-30T20:19:20.787Z
 ---
 
 # Implement second-pass prompt progressive disclosure revision
@@ -29,3 +30,8 @@ Implement the next prompt-side guidance revision described in .sandpiper/docs/ag
 ## 2026-03-30T20:10:35.686Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T20:19:20.788Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

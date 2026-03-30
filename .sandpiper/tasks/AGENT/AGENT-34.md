@@ -1,12 +1,13 @@
 ---
 title: "Plan second-pass progressive disclosure revision for agent guidance"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T20:00:27.354Z
-updated_at: 2026-03-30T20:02:11.527Z
+updated_at: 2026-03-30T20:19:20.741Z
 ---
 
 # Plan second-pass progressive disclosure revision for agent guidance
@@ -29,3 +30,8 @@ We already completed an initial AGENTS.md progressive-disclosure pass, but we wa
 ## 2026-03-30T20:02:11.528Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T20:19:20.742Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

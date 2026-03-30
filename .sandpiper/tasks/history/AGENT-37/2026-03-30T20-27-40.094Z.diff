@@ -1,0 +1,23 @@
+--- a/AGENT-37.md
++++ b/AGENT-37.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-30T20:27:40.052Z
+-updated_at: 2026-03-30T20:27:40.052Z
++updated_at: 2026-03-30T20:27:40.094Z
+ ---
+ 
+ # Improve cold-start continuity with startup context and guidance
+ 
+-
++Implement a final set of continuity improvements before wrapping this session. Scope: (1) inject a compact active-task summary at startup, (2) filter inactive projects out of the injected <available_projects> prompt block, (3) inject a compact dirty-working-copy summary when the jj working copy is not clean, (4) add a cold-start continuity-check prompt template, and (5) investigate whether the Pi/Sandpiper extension lifecycle can reliably distinguish a true cold start from a resumed session; if so, append cold-start instructions only on true cold starts. Keep the startup additions compact so they improve continuity without creating too much prompt churn. If reliable cold-start detection is not possible from the available lifecycle data, capture that finding clearly and choose the safest fallback.
++
++---
++
++# Activity Log
++
++## 2026-03-30T20:27:40.094Z
++
++- **description**: added (1 line)
++

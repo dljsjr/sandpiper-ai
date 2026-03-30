@@ -14,12 +14,19 @@ This work has two related but distinct axes:
 
 The current decision is to **prioritize the prompt architecture first** and defer the hook design to a later phase. This document records both the near-term plan and the findings that should be preserved for that later design pass.
 
+Sandpiper now also injects a compact startup context that can include:
+- active task summary
+- meaningful dirty-working-copy summary
+- cold-start-specific guidance when the session appears to begin without restored conversation history
+
 ## Decisions Already Made
 
 - There are **two axes** to the problem: prompt-side progressive disclosure and harness-side deterministic enforcement.
 - The repository should pursue the **prompt-side revision first**.
 - Root `AGENTS.md` should be **small, routing-oriented, and invariant-focused**, but not aggressively minimized at the expense of clarity.
 - The optimization target is **clear routing + tiny high-signal leaf docs + minimal duplication**, not an arbitrary token ceiling.
+- Startup continuity should include **compact live context**, not just narrative context: active tasks and meaningful dirty-working-copy state are worth surfacing.
+- Inactive / archived projects should be filtered from startup project-routing injection to keep the prompt denser and more relevant.
 - Deterministic enforcement is promising, but the repo should **not** jump straight into hook implementation before the prompt-side taxonomy is crisp.
 
 ---
@@ -163,6 +170,16 @@ Use these as reality checks for the prompt-only revision before building hooks:
 5. **General source-of-truth questions**
    - Can it find the active doc instead of reading archived/historical material?
 
+### Implemented Prompt-Side Additions
+
+The prompt-side revision now also includes several low-cost continuity aids:
+
+- active / archived project filtering for `<available_projects>` injection
+- compact active-task context injection
+- compact dirty-working-copy context injection (with noisy task-history churn filtered out)
+- a `/cold-start-check` prompt template for manual re-orientation
+- cold-start guidance appended on the first agent turn when the session appears to start without restored conversation history
+
 ### Success Criteria
 
 The prompt-side revision is successful if, in cold-start situations:
@@ -232,6 +249,17 @@ Pi docs indicate that in default parallel tool execution mode:
 - `tool_call` is not guaranteed to see sibling tool results from that same assistant message
 
 That matters for any design that queues or deduplicates guidance.
+
+### Cold-Start Detection Finding
+
+Pi's extension lifecycle does **not** appear to expose an explicit "initial start reason = new vs resume" event for the first session load. `session_start` fires on the initial load, but its event payload carries no `reason` field.
+
+Current practical heuristic:
+
+- on `session_start`, treat the session as a cold start if `ctx.sessionManager.getSessionFile()` is still undefined **or** `ctx.sessionManager.getEntries()` contains no `message` entries
+- on later session transitions, use `session_switch.reason === 'new' | 'resume'`
+
+The missing session-file signal is especially useful because a brand-new session does not get a session file until after the first agent response, while a resumed session already has one. This is good enough for the current prompt-side guidance injection, but if Pi later exposes an explicit initial-load reason, that would still be preferable.
 
 ### Likely First Enforcement Candidates
 

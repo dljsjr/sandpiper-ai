@@ -1,13 +1,19 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { DynamicBorder } from '@mariozechner/pi-coding-agent';
 import { Spacer, Text } from '@mariozechner/pi-tui';
 import { Type } from '@sinclair/typebox';
 import {
+  collectActiveTaskContext,
   collectPreflightDiagnostics,
+  collectProjectTriggers,
+  collectWorkingCopySummary,
   detectUnmigratedConfigs,
+  formatActiveTaskContextForPrompt,
   formatInstallInstructions,
+  formatProjectTriggersForPrompt,
+  formatWorkingCopySummaryForPrompt,
   installShellIntegrations,
   type MigrationMode,
   ProcessManager,
@@ -93,88 +99,6 @@ async function checkForUpdates(): Promise<readonly UpdateInfo[]> {
   return updates;
 }
 
-// ─── Project Metadata ───────────────────────────────────────────
-
-interface ProjectTrigger {
-  readonly key: string;
-  readonly whenToRead: string;
-  readonly location: string;
-}
-
-/**
- * Extract a YAML frontmatter field from a markdown file's content.
- * Handles both quoted and unquoted values.
- */
-function extractFrontmatterField(content: string, field: string): string {
-  const match = content.match(new RegExp(`^${field}:\\s*"?([^"\\n]*)"?`, 'm'));
-  return match?.[1]?.trim() ?? '';
-}
-
-/**
- * Scan .sandpiper/tasks/{project}/PROJECT.md for project metadata triggers.
- * Returns only projects that have a non-empty when_to_read field.
- */
-function collectProjectTriggers(cwd: string): readonly ProjectTrigger[] {
-  const tasksDir = join(cwd, '.sandpiper', 'tasks');
-  if (!existsSync(tasksDir)) return [];
-
-  const triggers: ProjectTrigger[] = [];
-  for (const entry of readdirSync(tasksDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    const projectMdPath = join(tasksDir, entry.name, 'PROJECT.md');
-    if (!existsSync(projectMdPath)) continue;
-
-    try {
-      const content = readFileSync(projectMdPath, 'utf-8');
-      const key = extractFrontmatterField(content, 'key');
-      const whenToRead = extractFrontmatterField(content, 'when_to_read');
-      if (key && whenToRead) {
-        triggers.push({
-          key,
-          whenToRead,
-          location: `.sandpiper/tasks/${entry.name}/PROJECT.md`,
-        });
-      }
-    } catch {
-      // Skip unreadable files
-    }
-  }
-  return triggers;
-}
-
-/**
- * Format project triggers as XML for inclusion in the system prompt,
- * mirroring pi's skill injection format.
- */
-function formatProjectTriggersForPrompt(triggers: readonly ProjectTrigger[]): string {
-  if (triggers.length === 0) return '';
-
-  const escapeXml = (s: string) =>
-    s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&apos;');
-
-  const lines = [
-    '',
-    'The following projects are registered in the local task tracker.',
-    'Use the read tool to load a project file when the task matches its description.',
-    '',
-    '<available_projects>',
-  ];
-  for (const trigger of triggers) {
-    lines.push('  <project>');
-    lines.push(`    <key>${escapeXml(trigger.key)}</key>`);
-    lines.push(`    <description>${escapeXml(trigger.whenToRead)}</description>`);
-    lines.push(`    <location>${escapeXml(trigger.location)}</location>`);
-    lines.push('  </project>');
-  }
-  lines.push('</available_projects>');
-  return lines.join('\n');
-}
-
 // ─── Chat Container Access ──────────────────────────────────────
 
 /**
@@ -229,6 +153,8 @@ async function handleMigrationFlag(pi: ExtensionAPI, mode: MigrationMode, cwd: s
 // ─── Extension ──────────────────────────────────────────────────
 
 const processManager = new ProcessManager();
+let startupContextPending = true;
+let coldStartGuidancePending = false;
 
 export default function (pi: ExtensionAPI) {
   // ── Background process tools ──
@@ -435,6 +361,27 @@ export default function (pi: ExtensionAPI) {
 
   pi.on('before_agent_start', async (event, ctx) => {
     const projectTriggers = formatProjectTriggersForPrompt(collectProjectTriggers(ctx.cwd));
+    const activeTaskContext = startupContextPending
+      ? formatActiveTaskContextForPrompt(collectActiveTaskContext(ctx.cwd))
+      : '';
+    const workingCopyContext = startupContextPending
+      ? formatWorkingCopySummaryForPrompt(collectWorkingCopySummary(ctx.cwd))
+      : '';
+    const coldStartGuidance = coldStartGuidancePending
+      ? `
+
+# Cold-Start Guidance
+
+This session started without restored conversation history.
+Before making changes that depend on prior work:
+- orient from the stand-up below
+- review the active task context and working-copy context in this prompt
+- use the root AGENTS.md routing table to load focused docs and local module docs for the area you will touch
+- summarize current state before implementing if the user's request depends on prior session context`
+      : '';
+
+    startupContextPending = false;
+    coldStartGuidancePending = false;
 
     // Read the standup file for session continuity
     const standupPath = join(ctx.cwd, '.sandpiper', 'standup.md');
@@ -476,6 +423,9 @@ its documentation, APIs, etc. remain valid, with a few alterations:
 - You are distributed with a good bit of functionality that the core 'pi' framework doesn't include, via bundled extensions, skills, and prompts.
 ` +
         projectTriggers +
+        activeTaskContext +
+        workingCopyContext +
+        coldStartGuidance +
         standupContent,
     };
   });
@@ -483,9 +433,18 @@ its documentation, APIs, etc. remain valid, with a few alterations:
   // ── Diagnostics + update notifications ──
 
   pi.on('session_start', async (_event, ctx) => {
+    startupContextPending = true;
+
+    // Cold-start heuristic for initial load:
+    // - brand-new sessions have no session file yet until after the first agent response
+    // - resumed sessions already have a session file
+    // - as a fallback, resumed sessions also have prior message entries loaded
+    const sessionFile = ctx.sessionManager.getSessionFile();
+    coldStartGuidancePending =
+      sessionFile === undefined || !ctx.sessionManager.getEntries().some((entry) => entry.type === 'message');
+
     // --- Session identity ---
     process.env.SANDPIPER_SESSION_ID = ctx.sessionManager.getSessionId();
-    const sessionFile = ctx.sessionManager.getSessionFile();
     if (sessionFile) {
       process.env.SANDPIPER_SESSION_FILE = sessionFile;
     }
@@ -561,6 +520,11 @@ its documentation, APIs, etc. remain valid, with a few alterations:
     });
     // Clear the dummy widget immediately so it doesn't take up space
     ctx.ui.setWidget('sandpiper-banners', undefined);
+  });
+
+  pi.on('session_switch', async (event) => {
+    startupContextPending = true;
+    coldStartGuidancePending = event.reason === 'new';
   });
 
   // ── Background process completion notifications ──
