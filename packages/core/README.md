@@ -11,6 +11,8 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | `install-shell-integrations.ts` | Copy shell integration scripts to `~/.sandpiper/shell-integrations/` |
 | `paths.ts` | `displayPath()` — replace homedir prefix with `~` for user-facing output |
 | `startup-context.ts` | Collect compact startup prompt context (projects, active tasks, working-copy summary) |
+| `system-startup.ts` | Build Sandpiper startup prompt sections and cold-start heuristics |
+| `update-check.ts` | Check for pi update availability and install command suggestions |
 
 ## Build
 

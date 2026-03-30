@@ -11,12 +11,19 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ### system.ts
 
-The central sandpiper extension. This is the main integration point between the pi framework and sandpiper's custom behavior. Currently it:
+The central sandpiper extension. This is the main integration point between the pi framework and sandpiper's custom behavior.
 
-- Injects the sandpiper identity into the system prompt (config directory paths, version info)
-- Checks the npm registry for pi-coding-agent updates and notifies the user on session start
+The entrypoint is intentionally becoming a thinner glue layer. Framework-independent logic is extracted into `packages/core/`, while Pi-specific wiring helpers live under `extensions/system/`.
 
-As sandpiper grows, additional pi customizations should be added here rather than creating new single-purpose extensions.
+Current responsibilities include:
+
+- Sandpiper identity and startup prompt assembly
+- Compact startup continuity context (projects, active tasks, working-copy summary, cold-start guidance)
+- Background process tool registration and completion notifications
+- Migration / shell-integration install flags and commands
+- Diagnostics and update banners
+
+As sandpiper grows, prefer keeping the entrypoint thin and pushing reusable logic into `packages/core/` or focused extension-local modules rather than expanding a single large file.
 
 ### shell-relay
 
