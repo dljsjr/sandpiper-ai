@@ -134,9 +134,9 @@ This means:
 The shell integration provides the synchronization signals that make the relay reliable:
 
 - `prompt_ready` — the shell is at a prompt and ready
-- `last_status:N` — the last command exited with status `N`
+- `last_status:N` — the last injected relay command exited with status `N`
 
-The extension uses a signal FIFO for these events.
+The extension uses a signal FIFO for these events. Output itself is not piped through the shell integration.
 
 ## Current architecture
 

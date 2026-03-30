@@ -9,9 +9,7 @@
         "sandpiper-ai-cli": "workspace:*",
         "sandpiper-ai-core": "workspace:*",
         "sandpiper-tasks-cli": "workspace:*",
-        "shell-relay": "workspace:*",
         "supports-color": "catalog:cli",
-        "web-fetch": "workspace:*",
       },
       "devDependencies": {
         "@commander-js/extra-typings": "catalog:cli",
@@ -46,11 +44,6 @@
     "extensions/shell-relay": {
       "name": "shell-relay",
       "version": "0.0.1",
-      "bin": {
-        "shell_relay": "./dist/shell-relay",
-        "unbuffer-relay": "./unbuffer-relay",
-        "ghost-attach": "./ghost-attach",
-      },
       "dependencies": {
         "sandpiper-ai-core": "workspace:*",
       },
