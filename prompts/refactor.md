@@ -5,6 +5,7 @@ Do a thorough refactoring pass on ${1:-the current codebase}. Take your time and
 
 Your mantra is "simplify, deduplicate, hygienic, maintainable":
 
+- Start by using the root `AGENTS.md` routing table to identify the focused docs and local `README.md` / `AGENTS.md` files relevant to the area you're refactoring. Prefer active guidance in `.sandpiper/docs/` over historical material in `.sandpiper/archive/`.
 - Use the **ast-grep** skill to explore code structure before refactoring — find duplicated patterns, map call sites, and verify changes haven't missed usages. Use ast-grep's rewrite capabilities for mechanical transformations across many files.
 - Emphasize DRY — extract shared patterns, constants, and utilities into dedicated modules
 - Emphasize YAGNI — remove unused code, unnecessary abstractions, and speculative generality

@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774900931534
+lastUpdatedAt: 1774901435693
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -185,6 +185,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774900837115
+  "AGENT-36":
+    key: AGENT-36
+    project: AGENT
+    title: Implement second-pass prompt progressive disclosure revision
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T20:04:39.335Z"
+    updatedAt: "2026-03-30T20:10:35.685Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774901435692
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -727,4 +742,4 @@ counters:
     nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 36
+    nextTaskNumber: 37

@@ -9,3 +9,4 @@ Let's do a collaborative review of the PRD at `$1`. Go through it top to bottom,
 - Maintain a single source of truth — deduplicate information across sections
 - After significant edits, do a consistency sweep for stale references and terminology drift
 - When we resolve open questions, capture the decisions in the document
+- If the PRD changes imply updates to active repo guidance (`AGENTS.md`, focused docs in `.sandpiper/docs/`, or prompt templates), update those living artifacts in the same session instead of leaving them to drift
