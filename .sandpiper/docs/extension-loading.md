@@ -11,17 +11,21 @@ Pi uses **jiti** (a TypeScript-aware module loader) to load extensions at runtim
 
 ## Our Extensions
 
-| Extension | Entry point | Build step | Why |
-|-----------|------------|------------|-----|
-| `system.ts` | Source `.ts` | None | Happy path — jiti loads directly |
-| `shell-relay` | Bundled `.js` | `bun build` | Historical — bundles all modules into single file |
-| `web-fetch` | Compiled `.js` | `tsc` | Has npm deps (jsdom, etc.) that need hoisted node_modules |
+All current extensions now follow Pi's happy path and load from source `.ts` files:
 
-The ideal state is for all extensions to load from source `.ts` files (like `system.ts`), with jiti resolving dependencies at runtime from the hoisted `node_modules/`. See TOOLS-10 for the investigation into unbundling.
+| Extension | Entry point | Build step | Notes |
+|-----------|------------|------------|-------|
+| `system.ts` | Source `.ts` file | None | Single-file extension |
+| `shell-relay` | `./src/index.ts` via `package.json` | None | Multi-file extension; source tree copied into dist |
+| `web-fetch` | `./src/index.ts` via `package.json` | None | npm deps resolve from hoisted `node_modules/` |
+
+This was normalized in TOOLS-10. Only actual binaries from `packages/` are bundled; extension runtime entrypoints are source-loaded by jiti.
 
 ## Key Implication
 
-The `dist/` directory assembled by `postinstall.sh` is a Pi Package — it contains resource declarations (`package.json` with the `pi` key), extension entry points, skills, prompts, and themes. It does NOT contain `node_modules/` or manage npm dependencies. Dependencies are resolved from the workspace's hoisted `node_modules/` at runtime.
+The `dist/` directory assembled by `postinstall.sh` is a Pi Package — it contains resource declarations (`package.json` with the `pi` key), extension source trees, skills, prompts, and themes. It does NOT contain `node_modules/` or manage npm dependencies. Dependencies are resolved from the workspace's hoisted `node_modules/` at runtime.
+
+For directory-based extensions, `postinstall.sh` copies the extension's `src/` directory and `package.json` into `dist/extensions/<name>/`. Pi then reads that package-local `pi.extensions` entry and jiti loads `./src/index.ts` from the assembled dist tree.
 
 ## jiti Aliases
 

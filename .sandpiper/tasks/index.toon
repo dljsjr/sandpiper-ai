@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774896622055
+lastUpdatedAt: 1774897345251
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -501,6 +501,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774841238831
+  "TOOLS-11":
+    key: TOOLS-11
+    project: TOOLS
+    title: Clean up stale built-extension assumptions after TOOLS-10
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T18:57:04.051Z"
+    updatedAt: "2026-03-30T19:02:25.243Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774897345250
   "TOOLS-2":
     key: TOOLS-2
     project: TOOLS
@@ -591,7 +606,7 @@ counters:
     nextTaskNumber: 3
   TOOLS:
     projectKey: TOOLS
-    nextTaskNumber: 11
+    nextTaskNumber: 12
   PKM:
     projectKey: PKM
     nextTaskNumber: 3
