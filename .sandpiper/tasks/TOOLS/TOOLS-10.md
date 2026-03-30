@@ -1,12 +1,13 @@
 ---
 title: "Per-extension postinstall strategy for extensions with npm dependencies"
-status: IN PROGRESS
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-26T22:03:20.380Z
-updated_at: 2026-03-30T02:56:20.887Z
+updated_at: 2026-03-30T03:27:18.826Z
 ---
 
 # Per-extension postinstall strategy for extensions with npm dependencies
@@ -89,3 +90,8 @@ See AGENTS.md 'Build System & Distribution' section.
 ## 2026-03-30T02:56:20.888Z
 
 - **status**: NOT STARTED → IN PROGRESS
+
+## 2026-03-30T03:27:18.826Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

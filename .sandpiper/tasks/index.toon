@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774839831360
+lastUpdatedAt: 1774841238832
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -457,17 +457,18 @@ tasks:
     key: TOOLS-10
     project: TOOLS
     title: Per-extension postinstall strategy for extensions with npm dependencies
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-26T22:03:20.380Z"
-    updatedAt: "2026-03-30T02:56:20.887Z"
+    updatedAt: "2026-03-30T03:27:18.826Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774839380892
+    lastIndexedAt: 1774841238831
   "TOOLS-2":
     key: TOOLS-2
     project: TOOLS

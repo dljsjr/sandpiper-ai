@@ -3,11 +3,6 @@
   "version": "0.0.1",
   "type": "module",
   "description": "Pi extension: shared terminal session between user and agent via Zellij",
-  "bin": {
-    "shell_relay": "./dist/shell-relay",
-    "unbuffer-relay": "./unbuffer-relay",
-    "ghost-attach": "./ghost-attach"
-  },
   "dependencies": {
     "sandpiper-ai-core": "workspace:*"
   },
@@ -17,13 +12,11 @@
   },
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest",
-    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node ./src/index.ts --outfile ./dist/shell-relay",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./src/index.ts --outfile ./dist/shell-relay"
+    "test:watch": "vitest"
   },
   "pi": {
     "extensions": [
-      "./dist/shell-relay"
+      "./src/index.ts"
     ]
   }
 }

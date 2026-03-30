@@ -18,13 +18,11 @@
   },
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest",
-    "build": "tsc",
-    "preinstall": "tsc"
+    "test:watch": "vitest"
   },
   "pi": {
     "extensions": [
-      "./dist/index.js"
+      "./src/index.ts"
     ]
   }
 }
