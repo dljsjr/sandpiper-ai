@@ -72,39 +72,6 @@ Common workflow tasks (build, test, etc.) SHOULD be defined as `scripts` in each
 - **Root-level scripts:** `check`, `check:tsc`, `check:biome-*` — cross-cutting quality checks that run across all packages
 - **Complex tasks:** Implement as scripts in `devtools/` and reference them from `scripts` (e.g., `"release": "bun devtools/release.ts"`)
 
-### Build System & Distribution
-
-The build pipeline has three stages:
-
-**1. Package builds (per-package `preinstall`/`build` scripts):**
-- `packages/cli/` — `bun build` bundles `pi_wrapper.ts` → `dist/sandpiper`, runs `copy_pi_assets.ts` to symlink pi's themes/exports
-- `packages/sandpiper-tasks-cli/` — `bun build` bundles the CLI → `skills/sandpiper/tasks/scripts/sandpiper-tasks`
-- `extensions/shell-relay/` — `bun build` bundles the extension → `dist/shell-relay`
-- `extensions/web-fetch/` — `tsc` compiles TypeScript → `dist/` (uses hoisted node_modules for npm deps)
-- `packages/core/` — `tsc --build` compiles TypeScript → `dist/`
-
-**2. Dependency hoisting (`bunfig.toml`):**
-```toml
-[install]
-linker = "hoisted"
-```
-This hoists all dependencies to the root `node_modules/`, which is required for extensions that have npm dependencies (like `web-fetch` with `jsdom`, `readability`, `turndown`). Extensions loaded by pi's jiti runtime resolve imports from the hoisted `node_modules/`.
-
-**3. Distribution assembly (`devtools/postinstall.sh`):**
-This script assembles the final Pi Package in `dist/`:
-- Copies extensions, skills, prompts, themes from source to `dist/`
-- Generates `dist/package.json` with the `pi` key (declares resource paths)
-- Symlinks pi's internal assets (themes, export templates)
-- Builds the dash CLI via mcporter
-- Runs `pi package install dist/` to register with pi
-
-**After making changes, the typical workflow is:**
-- Source code changes in `packages/` or `extensions/` → run the package's `build` script
-- Skill/prompt/theme changes in `skills/` → run `bash devtools/postinstall.sh`
-- Both → build first, then postinstall
-
-**Single-file extensions** (like `extensions/system.ts`) are loaded directly by jiti at runtime — no build step needed. They resolve imports via the root `tsconfig.json` paths and hoisted `node_modules/`.
-
 ### Code Portability
 
 Application code SHOULD be runtime-agnostic — it should run on Node.js, Bun, or Deno without modification:
@@ -149,45 +116,6 @@ Do NOT run biome manually via `bunx` — always use the root `bun check` command
 
 **Do NOT add lint suppression comments without consulting the user.** If you believe a lint warning is a false positive, explain the situation to the user and let them decide whether to suppress it. Never add `biome-ignore`, `// @ts-ignore`, `// @ts-expect-error`, or similar suppression comments on your own.
 
-### Code Exploration with ast-grep
-
-**Prefer ast-grep over grep/ripgrep** when the task involves understanding code *structure* rather than searching for plain text. ast-grep matches by AST, so it can answer questions like "find all exported functions," "which files import the pi framework," or "where are errors thrown" without false positives from comments, strings, or similarly-named variables.
-
-Pre-built queries are in `ast-grep/queries/`:
-
-```sh
-# Map a module's public API
-ast-grep scan --rule ast-grep/queries/find-exported-functions.yml extensions/shell-relay/
-
-# Verify architecture boundaries (pi imports only in index.ts)
-ast-grep scan --rule ast-grep/queries/find-pi-imports.yml extensions/
-
-# Count test assertions in a package
-ast-grep scan --rule ast-grep/queries/find-test-assertions.yml extensions/ 2>&1 | grep -c "┌─"
-
-# Map error handling paths
-ast-grep scan --rule ast-grep/queries/find-error-throws.yml packages/sandpiper-tasks-cli/
-```
-
-Pre-built transforms for refactoring are in `ast-grep/transforms/`. Always preview before applying (`-U` applies without confirmation):
-
-```sh
-# Preview: find interface props missing readonly
-ast-grep scan --rule ast-grep/transforms/readonly-interface-props.yml extensions/
-```
-
-For one-off structural searches, use inline patterns:
-
-```sh
-# Find all calls to a specific function
-ast-grep run -p 'updateTaskFields($$$ARGS)' -l ts packages/
-
-# Find all async arrow functions
-ast-grep run -p 'async ($$$PARAMS) => $$$BODY' -l ts extensions/
-```
-
-See `ast-grep/README.md` for the full catalog of queries, transforms, and rules.
-
 ### Dependencies
 
 - Prefer Node.js built-in modules over third-party packages
@@ -215,135 +143,18 @@ my-extension/
 └── ...
 ```
 
-### How Extensions Are Loaded
+## Read-When-Needed Documentation
 
-Pi uses **jiti** (a TypeScript-aware module loader) to load extensions at runtime. Understanding this is critical:
+The following topics have detailed documentation in `docs/`. Read the relevant doc **before** working in that area:
 
-1. **jiti loads `.ts` files directly** — no build step required. This is Pi's happy path.
-2. **Module resolution** follows standard Node.js rules — imports resolve from `node_modules/` (hoisted by bun), plus jiti aliases for Pi framework packages.
-3. **`tsconfig.json` paths are for TypeScript type-checking only** — jiti does NOT use them. If an import works in `tsc` but fails at runtime, the module isn't resolvable via standard Node.js resolution.
-4. **Each jiti load creates a separate module scope** — module-level state is NOT shared between extensions. Use `pi.events` for cross-extension communication.
-
-**Our extensions have different loading strategies:**
-
-| Extension | Entry point | Build step | Why |
-|-----------|------------|------------|-----|
-| `system.ts` | Source `.ts` | None | Happy path — jiti loads directly |
-| `shell-relay` | Bundled `.js` | `bun build` | Historical — bundles all modules into single file |
-| `web-fetch` | Compiled `.js` | `tsc` | Has npm deps (jsdom, etc.) that need hoisted node_modules |
-
-The ideal state is for all extensions to load from source `.ts` files (like `system.ts`), with jiti resolving dependencies at runtime from the hoisted `node_modules/`. See TOOLS-10 for the investigation into unbundling.
-
-**Key implication:** The `dist/` directory assembled by `postinstall.sh` is a Pi Package — it contains resource declarations (`package.json` with the `pi` key), extension entry points, skills, prompts, and themes. It does NOT contain `node_modules/` or manage npm dependencies. Dependencies are resolved from the workspace's hoisted `node_modules/` at runtime.
-
-## Pi Extension API Pitfalls
-
-Known issues and non-obvious behaviors in pi's extension API:
-
-### `pi.getFlag()` uses bare names
-
-Register and read flags **without** the `--` prefix:
-
-```typescript
-pi.registerFlag("my-flag", { type: "boolean" });
-pi.getFlag("my-flag");     // ✅ returns the value
-pi.getFlag("--my-flag");   // ❌ always returns undefined
-```
-
-The pi docs show `getFlag("--my-flag")` but this is incorrect. The plan-mode example and the implementation both use bare names. Flags are stored in `extension.flags` by the name passed to `registerFlag`.
-
-### `session_directory` for CLI-only early-exit flags
-
-Use `session_directory` (not `session_start`) for flags that perform an action and exit:
-
-- Fires **after** flag values are populated (second arg parse pass)
-- Fires **before** session manager is created — no session to clean up
-- Can call `process.exit()` safely
-- Receives only `event.cwd` — no `ctx` (no UI access)
-
-### Module-level state is NOT shared across jiti instances
-
-Each extension loaded by jiti gets its own module scope. A module-level array in `packages/core` will be a different instance in each extension. Use `pi.events` (the shared runtime event bus) for cross-extension communication instead.
-
-### `pi.events` IS shared across extensions
-
-`pi.events.on()` and `pi.events.emit()` are synchronous and work across all jiti-loaded extensions. Use this for patterns like preflight check collection where one extension emits and others respond.
-
-### Cross-package TypeScript: use project references
-
-When an extension imports from a workspace package (e.g., `sandpiper-ai-core`), use TypeScript project references instead of widening `rootDir`:
-
-```json
-// packages/core/tsconfig.json
-{ "compilerOptions": { "composite": true, "declaration": true } }
-
-// extensions/shell-relay/tsconfig.json
-{ "references": [{ "path": "../../packages/core" }] }
-```
-
-The referenced package must be built first (`tsc --build`). Use conditional exports in `package.json` to serve types from `dist/` and source from `src/`:
-
-```json
-{ "exports": { ".": { "types": "./dist/index.d.ts", "default": "./src/index.ts" } } }
-```
-
-## Environment Variables
-
-Sandpiper mirrors `PI_*` env vars into the `SANDPIPER_*` namespace (and vice versa) at startup via `pi_wrapper.ts`. This means users can set either `SANDPIPER_OFFLINE=1` or `PI_OFFLINE=1` and it works.
-
-### Use `resolveEnvVar()` in our code
-
-Always use `resolveEnvVar(name)` from `sandpiper-ai-core` to read env vars that exist in both namespaces. It checks `SANDPIPER_*` first, then falls back to `PI_*`:
-
-```typescript
-import { resolveEnvVar } from 'sandpiper-ai-core';
-
-// ✅ Correct — checks SANDPIPER_OFFLINE, then PI_OFFLINE
-if (resolveEnvVar('OFFLINE') === '1') { ... }
-
-// ❌ Wrong — misses the SANDPIPER_* override
-if (process.env.PI_OFFLINE === '1') { ... }
-```
-
-### Exempt variables
-
-Four `PI_*` variables are exempt from mirroring and should be accessed directly via `process.env.PI_*`:
-
-| Variable | Category | Purpose |
-|----------|----------|---------|
-| `PI_CODING_AGENT_PACKAGE` | Sandpiper internal | Path to the pi-coding-agent package (for self-improvement prompting, doc exploration) |
-| `PI_CODING_AGENT_VERSION` | Sandpiper internal | Version of the underlying pi-coding-agent |
-| `PI_PACKAGE_DIR` | Pi behavior control | Package directory pi loads extensions/skills from |
-| `PI_SKIP_VERSION_CHECK` | Pi behavior control | Suppresses pi's built-in update check (sandpiper has its own) |
-
-`resolveEnvVar()` handles these gracefully (short-circuits to the `PI_*` value), but prefer `process.env.PI_*` directly for clarity.
-
-## TUI Development
-
-When building or modifying TUI components for extensions, consult these resources **in this order**:
-
-### Sandpiper Reference
-
-| Resource | Path | Contents |
-|----------|------|----------|
-| TUI patterns doc | `.sandpiper/docs/tui-extension-patterns.md` | Practical patterns, decision guide, Pi internals analysis. **Read this first.** |
-| System extension | `extensions/system.ts` | Working examples: chat container injection, `DynamicBorder`, theme usage, background process tools |
-
-### Pi Framework Reference
-
-The Pi package is resolved via the `PI_CODING_AGENT_PACKAGE` env var. All paths below are relative to that root.
-
-| Resource | Path | Contents |
-|----------|------|----------|
-| TUI docs | `docs/tui.md` | Component API, theming, custom components, overlays, keyboard input |
-| Extension docs | `docs/extensions.md` | `sendMessage`, `registerMessageRenderer`, `setWidget`, lifecycle hooks |
-| Extension examples | `examples/extensions/` | Working examples — especially `message-renderer.ts`, `preset.ts`, `tools.ts` |
-| TUI component source | `../pi-tui/dist/` (sibling package) | `Text`, `Container`, `Spacer`, `Box`, etc. — read the `.js` when docs are ambiguous |
-| Interactive mode source | `dist/modes/interactive/interactive-mode.js` | How Pi renders notifications, widgets, custom messages internally |
-
-### Key Principle
-
-**Trust working examples and source over docs when they conflict.** Pi's docs occasionally show incorrect API usage (e.g., `getFlag("--name")` vs the correct `getFlag("name")`). When in doubt, read the implementation.
+| Topic | Doc | Read when... |
+|-------|-----|-------------|
+| Build system & distribution | [.sandpiper/docs/build-system.md](.sandpiper/docs/build-system.md) | Modifying build scripts, postinstall, package.json, or the dist assembly |
+| Extension loading (jiti) | [.sandpiper/docs/extension-loading.md](.sandpiper/docs/extension-loading.md) | Creating extensions, debugging import failures, understanding jiti behavior |
+| Pi API pitfalls | [.sandpiper/docs/pi-api-pitfalls.md](.sandpiper/docs/pi-api-pitfalls.md) | Working with pi's extension API (`getFlag`, `events`, `session_directory`, etc.) |
+| Environment variables | [.sandpiper/docs/env-vars.md](.sandpiper/docs/env-vars.md) | Reading/writing env vars, understanding SANDPIPER_*/PI_* mirroring |
+| TUI development | [.sandpiper/docs/tui-extension-patterns.md](.sandpiper/docs/tui-extension-patterns.md) | Building UI components, banners, widgets, or custom renderers in extensions |
+| CLI development | [.sandpiper/docs/cli-development.md](.sandpiper/docs/cli-development.md) | Building command-line tools with Commander |
 
 ## Task Management
 
@@ -370,39 +181,6 @@ Examples:
 - A CLI tool for managing tasks (separate binary/package) → `TCL` (not `SHR`, even though SHR uses it)
 - A shared library consumed by multiple extensions → its own project key
 - A bug in the FIFO manager discovered while working on relay orchestration → `SHR` (same component), kind `BUG`
-
-## CLI Development
-
-When building command-line tools with Commander (or similar frameworks):
-
-### Separation of Concerns
-
-- **Implementation logic MUST be decoupled from CLI argument parsing.** The CLI layer (Commander command definitions, argument parsing, option handling) is a thin entry point that delegates to framework-independent functions. This mirrors the same pattern used for pi extensions (see [Architecture](#framework-independent-core)).
-- Implementation functions accept plain TypeScript arguments — not Commander objects, not `process.argv`, not parsed option bags from the framework.
-- This ensures core logic can be **unit tested directly** without invoking the CLI, mocking argument parsers, or spawning subprocesses.
-
-### Testing Strategy
-
-- **Unit tests** call the implementation functions directly with plain arguments. These are fast, reliable, and cover the core logic.
-- **End-to-end tests** exercise the full CLI pathway — invoking the Commander program (or spawning the CLI as a subprocess) to validate that argument parsing, option handling, and output formatting work correctly together.
-- Both layers are required. Unit tests alone miss argument parsing bugs; E2E tests alone are slow and make debugging failures harder.
-
-### Example Structure
-
-```
-my-cli/
-├── index.ts          # CLI entry point: Commander program definition (thin)
-├── commands/
-│   ├── create.ts     # Commander command wiring (thin)
-│   └── list.ts       # Commander command wiring (thin)
-├── core/
-│   ├── create.ts     # Implementation logic (no Commander imports)
-│   ├── create.test.ts
-│   ├── list.ts       # Implementation logic (no Commander imports)
-│   └── list.test.ts
-└── test/
-    └── cli.test.ts   # End-to-end CLI tests
-```
 
 ## Testing
 
