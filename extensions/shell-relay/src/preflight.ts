@@ -12,7 +12,8 @@ import { homedir } from 'node:os';
 import { basename, join } from 'node:path';
 import { displayPath, type PreflightDiagnostic } from 'sandpiper-ai-core';
 
-const WELL_KNOWN_DIR = join(homedir(), '.sandpiper', 'shell-integrations');
+/** Default well-known directory for shell integration scripts. */
+export const DEFAULT_WELL_KNOWN_DIR = join(homedir(), '.sandpiper', 'shell-integrations');
 
 /** Shell probe commands — exit 0 if __relay_prompt_hook is defined, non-zero otherwise.
  * All shells use -i (interactive) because integration scripts are typically
@@ -64,14 +65,18 @@ function probeShellFunction(shellName: string): boolean | undefined {
 /**
  * Fall back to checking if any integration script exists at the well-known location.
  */
-function isAnyScriptInstalled(): boolean {
-  return Object.values(SCRIPT_FILES).some((file) => existsSync(join(WELL_KNOWN_DIR, file)));
+function isAnyScriptInstalled(wellKnownDir: string): boolean {
+  return Object.values(SCRIPT_FILES).some((file) => existsSync(join(wellKnownDir, file)));
 }
 
 /**
  * Run the shell relay preflight check.
  */
-export function checkShellIntegration(): PreflightDiagnostic {
+/**
+ * @param wellKnownDirOverride - Override the well-known directory (for testing only).
+ */
+export function checkShellIntegration(wellKnownDirOverride?: string): PreflightDiagnostic {
+  const WELL_KNOWN_DIR = wellKnownDirOverride ?? DEFAULT_WELL_KNOWN_DIR;
   const shellName = detectShell();
 
   if (shellName) {
@@ -102,7 +107,7 @@ export function checkShellIntegration(): PreflightDiagnostic {
   }
 
   // Shell unrecognized or probe failed to spawn — fall back to file existence
-  const installed = isAnyScriptInstalled();
+  const installed = isAnyScriptInstalled(WELL_KNOWN_DIR);
   if (!installed) {
     return {
       key: 'shell-relay:integration',
