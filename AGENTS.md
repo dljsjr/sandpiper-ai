@@ -209,6 +209,9 @@ bunx vitest path/to/file # Run specific test file
 - **Test-first approach (TDD/BDD):** Write tests before or alongside implementation, not as an afterthought.
 - **Emphasize unit and integration tests over manual testing.** Manual testing is important for end-to-end validation, but the automated test suite should catch the vast majority of issues.
 - **Test real behavior over mocks where practical.** Only mock at boundaries where real resources are unavailable or impractical in a test environment (e.g., external service APIs, framework internals).
+- **Tests MUST NOT read, write, or delete real user or installed production state** (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config, etc.). Use temp directories, fixtures, or injected targets instead.
+- **Parameterize the concrete resource under test, not a generic ancestor.** If the real seam is a shell integrations directory, inject that directory; do not introduce a `homedir` override just to reach it. If a parent location is already parameterized, reuse that route instead of adding nested overrides.
+- **Prefer existing override mechanisms over new ad hoc test-only path knobs.** Reuse established env/config/Pi resolution paths (for example `resolveEnvVar('CODING_AGENT_DIR')` for the agent directory) before adding new parameters.
 - **Edge cases are first-class test cases.** Shell quoting, special characters, empty inputs, large outputs, error conditions, and boundary values should all have dedicated tests.
 
 ### Dogfood-Driven Development for Tool Calls
