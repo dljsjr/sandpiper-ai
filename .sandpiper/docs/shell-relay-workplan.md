@@ -1,5 +1,12 @@
 # Shell Relay — Work Plan
 
+> **Historical implementation plan — superseded in part.** This work plan tracks an earlier relay architecture and should be read as historical execution context, not the current implementation plan.
+>
+> Current references:
+> - `extensions/shell-relay/README.md`
+> - `extensions/shell-relay/AGENTS.md`
+> - `.sandpiper/docs/zellij-044-relay-design.md`
+>
 > **PRD:** [shell-relay-prd.md](./shell-relay-prd.md)
 > **Extension path:** `extensions/shell-relay/`
 

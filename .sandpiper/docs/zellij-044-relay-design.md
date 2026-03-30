@@ -98,16 +98,18 @@ From live testing:
 
 ## Proposed New Architecture
 
-### Session Setup (replaces ghost-attach + FIFO creation)
+### Session Setup (replaces ghost-attach + old background session flow)
 
 ```bash
-# Create background session (no ghost client needed)
-zellij attach --create-background $SESSION
+# Create session with a real terminal size, then detach immediately
+zellij attach --create $SESSION
+zellij --session $SESSION action detach
 
-# Pane ID is already available — the default pane in the session
-# Or create a new pane and capture its ID
-PANE_ID=$(zellij --session $SESSION action new-pane)
+# Discover the terminal pane from list-panes --json
+zellij --session $SESSION action list-panes --json
 ```
+
+`attach --create-background` is still available, but the relay does **not** use it because it produces a cramped 50x49 viewport. The live implementation uses attach-then-detach so `dump-screen` snapshots reflect the user's real terminal dimensions.
 
 ### Command Injection (replaces write-chars)
 
@@ -159,8 +161,8 @@ zellij --session $SESSION action list-panes --json \
 
 ### What Stays
 
-- **Shell integration scripts** — dramatically simplified: only prompt_ready + exit code
-  signaling. No stdout/stderr redirection, no unbuffer, no tee.
+- **Shell integration scripts** — still responsible for prompt_ready + exit code
+  signaling
 - **Signal FIFO** — cleanest IPC for structured events from the shell
 
 ### What Goes
