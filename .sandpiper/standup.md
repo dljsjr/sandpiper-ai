@@ -76,6 +76,6 @@ This was an enormous session covering banner styling, framework infrastructure, 
 - **system.ts is large** — AGENT-27 tracks refactoring into a package
 - **Edit source skills, not dist** — run `bash devtools/postinstall.sh`
 - **Extensions now load from source via jiti** — extension changes need `bash devtools/postinstall.sh`, not per-extension build steps
-- **shell-relay docs were stale and are now aligned** — historical shell-relay PRD/workplan docs remain for lineage but are explicitly marked superseded; current sources of truth are `extensions/shell-relay/README.md`, `extensions/shell-relay/AGENTS.md`, and `.sandpiper/docs/zellij-044-relay-design.md`
+- **shell-relay docs were stale and are now aligned** — historical shell-relay PRD/workplan/review artifacts were moved to `.sandpiper/archive/shell-relay/`; current sources of truth are `extensions/shell-relay/README.md`, `extensions/shell-relay/AGENTS.md`, and `.sandpiper/docs/zellij-044-relay-design.md`
 - **sandpiper-tasks binary** — `bun run --filter sandpiper-tasks-cli build` AND postinstall
 - **CLI/core package changes** — build the affected package if it emits binaries or declarations, then run postinstall
