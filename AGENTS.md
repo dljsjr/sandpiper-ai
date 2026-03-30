@@ -334,6 +334,7 @@ All coding work MUST be tracked against a task. Do not begin implementation with
 - If a task doesn't exist, create one using the tasks skill helper scripts
 - Bugs discovered during implementation get their own top-level `BUG` task (not a subtask)
 - Reference task keys in commit messages (e.g., `Refs: TCL-1, TCL-3`)
+- **Every task MUST have a description** unless the title is completely self-explanatory. Include enough context that a future agent session with no prior knowledge of the work can understand: what the problem is, what constraints exist, what approach was considered, and where to look for more context. A task with just a title is a continuity failure.
 
 ### Project Key Guidelines
 

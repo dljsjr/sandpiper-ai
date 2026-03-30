@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774838828082
+lastUpdatedAt: 1774838885023
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -80,17 +80,18 @@ tasks:
     key: AGENT-29
     project: AGENT
     title: Inject standup content into system prompt for automatic session continuity
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-30T02:45:14.275Z"
-    updatedAt: "2026-03-30T02:45:14.275Z"
+    updatedAt: "2026-03-30T02:48:05.017Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774838714278
+    lastIndexedAt: 1774838885022
   "MEM-1":
     key: MEM-1
     project: MEM
