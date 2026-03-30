@@ -1,7 +1,9 @@
 ---
-description: Persist learnings from the current session into skills, docs, and guidelines
+description: Persist learnings from the current session into skills, docs, guidelines, and prompt templates
 ---
 Do a structured self-reflection pass to persist anything learned during this session. Work through each phase in order — do not skip phases, and explicitly note "Nothing to do" for a phase if it genuinely doesn't apply.
+
+Treat the repo's guidance surface broadly: skills, `AGENTS.md`, focused docs in `.sandpiper/docs/`, local READMEs / `AGENTS.md`, and prompt templates can all need updates when conventions or routing guidance changed.
 
 ## Phase 1: Skills Audit
 
@@ -28,11 +30,13 @@ Think about the work done this session. Were there any:
 
 If any of these apply, create a new skill using the **skill-creator** skill for guidance on structure and description writing. If none apply, explicitly state: "No new skills identified this session" with a brief explanation of why.
 
-## Phase 2: Documentation and Guidelines
+## Phase 2: Documentation, Guidance Layers, and Prompt Templates
 
-- Update relevant **AGENTS.md** files if new conventions or guidelines were established (project-specific in the repo, general in `~/.sandpiper/agent/AGENTS.md`)
-- Create or update **doc files** (`.sandpiper/docs/`, READMEs) for design decisions, investigations, or architectural context that doesn't belong in skills or AGENTS.md
-- Take a **content hygiene pass** on docs/skills touched this session: check for duplicated information, stale references, and terminology drift
+- Update relevant **AGENTS.md** files if new conventions or routing guidance were established (project-specific in the repo, general in `~/.sandpiper/agent/AGENTS.md`)
+- Create or update focused **doc files** (`.sandpiper/docs/`, READMEs) for design decisions, investigations, or architectural context that does not belong in skills or AGENTS.md
+- Update **prompt templates** when the session changed expected workflows, guidance routing, self-review expectations, or the repository's progressive-disclosure structure
+- If the session changed how agent guidance is structured, update `.sandpiper/docs/agent-guidance-evolution.md`
+- Take a **content hygiene pass** on docs / skills / prompt templates touched this session: check for duplicated information, stale references, terminology drift, and whether guidance still lives in the right layer
 
 ## Phase 3: Loose Ends
 

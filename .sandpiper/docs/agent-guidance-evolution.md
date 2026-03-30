@@ -141,9 +141,11 @@ Module-local `AGENTS.md` and `README.md` files should also be normalized so they
    - add consistent trigger + compact top section + canonical examples
 3. **Sweep local docs in the most active modules**
    - especially `extensions/system.ts`-related guidance and `extensions/shell-relay/`
-4. **Do a duplication pass**
+4. **Align prompt templates with the layered guidance model**
+   - especially templates that steer implementation, refactoring, status review, and self-reflection
+5. **Do a duplication pass**
    - remove repeated explanations that now have a single source of truth
-5. **Cold-start evaluation pass**
+6. **Cold-start evaluation pass**
    - test whether a fresh agent can route itself correctly for known tricky scenarios
 
 ### Suggested Cold-Start Scenarios
@@ -169,6 +171,7 @@ The prompt-side revision is successful if, in cold-start situations:
 - repo-specific mistakes become less common even without harness enforcement
 - root `AGENTS.md` is easier to scan and less repetitive
 - focused docs become more obviously actionable
+- prompt templates reinforce the routing/source-of-truth model instead of bypassing it
 - historical/reference material is easier to distinguish from active guidance
 
 ### Non-Goals for This Pass
