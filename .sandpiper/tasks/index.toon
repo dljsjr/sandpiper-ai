@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774897345251
+lastUpdatedAt: 1774897614681
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -365,6 +365,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774891185999
+  "SHR-92":
+    key: SHR-92
+    project: SHR
+    title: Rewrite shell-relay README to match current architecture
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:04:41.170Z"
+    updatedAt: "2026-03-30T19:06:54.675Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774897614681
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -597,7 +612,7 @@ counters:
     nextTaskNumber: 71
   SHR:
     projectKey: SHR
-    nextTaskNumber: 92
+    nextTaskNumber: 93
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
