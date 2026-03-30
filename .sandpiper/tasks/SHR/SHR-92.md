@@ -1,12 +1,13 @@
 ---
 title: "Rewrite shell-relay README to match current architecture"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T19:04:41.170Z
-updated_at: 2026-03-30T19:06:54.675Z
+updated_at: 2026-03-30T20:19:20.653Z
 ---
 
 # Rewrite shell-relay README to match current architecture
@@ -33,3 +34,8 @@ Validation should include a consistency pass against the current code, shell-rel
 ## 2026-03-30T19:06:54.676Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T20:19:20.654Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

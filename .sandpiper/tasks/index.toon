@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774901435693
+lastUpdatedAt: 1774903404262
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -128,17 +128,18 @@ tasks:
     key: AGENT-32
     project: AGENT
     title: Do a repository doc hygiene sweep after recent architecture changes
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T19:10:37.303Z"
-    updatedAt: "2026-03-30T19:13:42.874Z"
+    updatedAt: "2026-03-30T20:19:20.608Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774898022879
+    lastIndexedAt: 1774901960614
   "AGENT-33":
     key: AGENT-33
     project: AGENT
@@ -159,17 +160,18 @@ tasks:
     key: AGENT-34
     project: AGENT
     title: Plan second-pass progressive disclosure revision for agent guidance
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T20:00:27.354Z"
-    updatedAt: "2026-03-30T20:02:11.527Z"
+    updatedAt: "2026-03-30T20:19:20.741Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774900931533
+    lastIndexedAt: 1774901960751
   "AGENT-35":
     key: AGENT-35
     project: AGENT
@@ -189,17 +191,34 @@ tasks:
     key: AGENT-36
     project: AGENT
     title: Implement second-pass prompt progressive disclosure revision
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T20:04:39.335Z"
-    updatedAt: "2026-03-30T20:10:35.685Z"
+    updatedAt: "2026-03-30T20:19:20.787Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774901435692
+    lastIndexedAt: 1774901960793
+  "AGENT-37":
+    key: AGENT-37
+    project: AGENT
+    title: Improve cold-start continuity with startup context and guidance
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T20:27:40.052Z"
+    updatedAt: "2026-03-30T20:43:24.255Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774903404261
   "MEM-1":
     key: MEM-1
     project: MEM
@@ -447,17 +466,18 @@ tasks:
     key: SHR-92
     project: SHR
     title: Rewrite shell-relay README to match current architecture
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T19:04:41.170Z"
-    updatedAt: "2026-03-30T19:06:54.675Z"
+    updatedAt: "2026-03-30T20:19:20.653Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774897614681
+    lastIndexedAt: 1774901960659
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -598,17 +618,18 @@ tasks:
     key: TOOLS-11
     project: TOOLS
     title: Clean up stale built-extension assumptions after TOOLS-10
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-30T18:57:04.051Z"
-    updatedAt: "2026-03-30T19:02:25.243Z"
+    updatedAt: "2026-03-30T20:19:20.696Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774897345250
+    lastIndexedAt: 1774901960703
   "TOOLS-12":
     key: TOOLS-12
     project: TOOLS
@@ -742,4 +763,4 @@ counters:
     nextTaskNumber: 9
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 37
+    nextTaskNumber: 38

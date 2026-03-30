@@ -10,6 +10,7 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | `preflight.ts` | Preflight check registration system (via `pi.events` bus) |
 | `install-shell-integrations.ts` | Copy shell integration scripts to `~/.sandpiper/shell-integrations/` |
 | `paths.ts` | `displayPath()` — replace homedir prefix with `~` for user-facing output |
+| `startup-context.ts` | Collect compact startup prompt context (projects, active tasks, working-copy summary) |
 
 ## Build
 

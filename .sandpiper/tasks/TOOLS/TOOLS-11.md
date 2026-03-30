@@ -1,12 +1,13 @@
 ---
 title: "Clean up stale built-extension assumptions after TOOLS-10"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T18:57:04.051Z
-updated_at: 2026-03-30T19:02:25.243Z
+updated_at: 2026-03-30T20:19:20.696Z
 ---
 
 # Clean up stale built-extension assumptions after TOOLS-10
@@ -33,3 +34,8 @@ Validation should confirm that the repo still assembles dist/ correctly, sandpip
 ## 2026-03-30T19:02:25.244Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T20:19:20.697Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
