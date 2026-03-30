@@ -1,12 +1,13 @@
 ---
 title: "Remove legacy modules: ghost-client.ts, relay.ts, ghost-attach, unbuffer-relay"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-28T05:02:33.669Z
-updated_at: 2026-03-30T19:39:50.201Z
+updated_at: 2026-03-30T19:41:37.104Z
 ---
 
 # Remove legacy modules: ghost-client.ts, relay.ts, ghost-attach, unbuffer-relay
@@ -33,3 +34,8 @@ Validation should confirm that no live code path still references these artifact
 ## 2026-03-30T19:39:50.201Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-03-30T19:41:37.104Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

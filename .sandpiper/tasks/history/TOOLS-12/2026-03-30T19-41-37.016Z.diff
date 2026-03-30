@@ -1,0 +1,27 @@
+--- a/TOOLS-12.md
++++ b/TOOLS-12.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Simplify root package metadata after extension unbundling"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-30T19:31:59.244Z
+-updated_at: 2026-03-30T19:39:50.115Z
++updated_at: 2026-03-30T19:41:37.016Z
+ ---
+ 
+ # Simplify root package metadata after extension unbundling
+@@ -34,3 +35,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-03-30T19:41:37.016Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,23 @@
+--- a/AGENT-35.md
++++ b/AGENT-35.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-30T20:00:27.396Z
+-updated_at: 2026-03-30T20:00:27.396Z
++updated_at: 2026-03-30T20:00:37.110Z
+ ---
+ 
+ # Design deferred deterministic guidance/enforcement hooks for tool use
+ 
+-
++We want to explore a later phase of agent-guidance improvements that uses deterministic harness behavior around tool use, inspired by the hook-based convention-enforcement article. This task is intentionally deferred until after the prompt-side progressive-disclosure revision is planned and/or completed. Capture the current findings from today's review so we do not have to rediscover them later: which Sandpiper/Pi extension hooks exist (tool_call, tool_result, context, before_agent_start, etc.), what they appear capable of, where they differ from Claude Code's PreToolUse additionalContext model, and which high-confidence repo-specific enforcement candidates seem most promising (e.g. git→jj, blocking direct task file edits, blocking dist edits, etc.). Future work under this task should produce a detailed design/work plan rather than jumping straight to implementation.
++
++---
++
++# Activity Log
++
++## 2026-03-30T20:00:37.110Z
++
++- **description**: added (1 line)
++
