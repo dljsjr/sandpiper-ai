@@ -1,0 +1,29 @@
+--- a/AGENT-27.md
++++ b/AGENT-27.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Refactor system.ts into a package (too large for a single file)"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: LOW
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-27T22:04:54.108Z
+ updated_at: 2026-03-30T20:48:48.998Z
+-updated_at: 2026-03-30T20:48:48.998Z
++updated_at: 2026-03-30T20:48:49.042Z
+ ---
+ 
+ # Refactor system.ts into a package (too large for a single file)
+@@ -21,3 +21,8 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-03-30T20:48:49.042Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

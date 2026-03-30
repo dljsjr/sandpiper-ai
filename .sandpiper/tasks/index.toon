@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774903404262
+lastUpdatedAt: 1774904419838
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -50,17 +50,17 @@ tasks:
     key: AGENT-27
     project: AGENT
     title: Refactor system.ts into a package (too large for a single file)
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: TASK
     priority: LOW
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-27T22:04:54.108Z"
-    updatedAt: "2026-03-29T00:37:46.883Z"
+    updatedAt: "2026-03-30T21:00:19.829Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666898
+    lastIndexedAt: 1774904419837
   "AGENT-28":
     key: AGENT-28
     project: AGENT
@@ -583,6 +583,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774744666899
+  "TCL-71":
+    key: TCL-71
+    project: TCL
+    title: Make mutating task/project update commands require a key or explicit filter
+    status: NOT STARTED
+    kind: BUG
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T20:47:48.695Z"
+    updatedAt: "2026-03-30T20:47:48.737Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774903668743
   "TOOLS-1":
     key: TOOLS-1
     project: TOOLS
@@ -739,7 +754,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 71
+    nextTaskNumber: 72
   SHR:
     projectKey: SHR
     nextTaskNumber: 93

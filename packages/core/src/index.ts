@@ -5,3 +5,5 @@ export * from './paths.js';
 export * from './preflight.js';
 export * from './process-manager.js';
 export * from './startup-context.js';
+export * from './system-startup.js';
+export * from './update-check.js';
