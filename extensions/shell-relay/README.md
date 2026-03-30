@@ -1,181 +1,241 @@
 # Shell Relay
 
-A pi extension that gives the coding agent access to a persistent, shared terminal session. Both the user and agent can observe and interact with the session in real time — like a Google Doc, but for a shell.
+A Sandpiper extension that lets the agent execute commands in a shared Zellij terminal session instead of a fresh forked shell.
 
-## What It Does
+Both the user and the agent can see and interact with the same terminal pane in real time. This is the right tool when a command depends on live shell session state such as:
 
-Shell Relay registers two tools for the agent:
+- authenticated CLI state
+- shell functions
+- non-exported environment variables
+- activated virtual environments
+- anything the built-in `bash` tool would lose by starting a new process tree
 
-- **`shell_relay`** — Execute commands in the user's shared terminal (Zellij pane)
-- **`shell_relay_inspect`** — View the current visual state of the shared terminal
+## Tools
 
-Commands run in the user's existing shell session, inheriting all session state: environment variables, shell functions, authentication tokens, activated virtual environments, and more.
+Shell Relay registers two tools:
 
-### Examples
+- **`shell_relay`** — run a command in the shared terminal session
+- **`shell_relay_inspect`** — inspect the current visual state of the pane
 
-```
-# Execute a command in the shared terminal
-shell_relay: echo "hello from the agent"
+Examples:
 
-# Use session state (auth tokens, shell functions, etc.)
+```text
 shell_relay: op run -- kubectl get pods
-
-# Inspect what the user has been doing
+shell_relay: source env.sh && make deploy
 shell_relay_inspect
 ```
 
 ## Requirements
 
-- **[Zellij](https://zellij.dev)** terminal multiplexer
-- **`expect`/`tclsh`** — required for the ghost client and enhanced color mode (pre-installed on macOS; `apt install expect` on Linux)
-- **Shell integration** sourced in your shell RC file (see [Setup](#setup))
+- **[Zellij](https://zellij.dev)**
+- **Zellij 0.44+** for `--session`, `--pane-id`, `list-panes --json`, `paste`, and current `dump-screen` behavior
+- **Shell integration** sourced in your shell config
+
+No `expect`, `tclsh`, ghost client, or extension bundle is required.
 
 ## Setup
 
-### 1. Install the Pi Package
+### 1. Install shell integrations
 
-This extension is part of the `sandpiper-ai` pi package. If you have the package installed, the extension is auto-discovered.
-
-### 2. Source the Shell Integration
-
-First, install the integration scripts to the well-known location:
+Install the relay shell integration files:
 
 ```bash
 sandpiper --install-shell-integrations
 ```
 
-Then add the appropriate source line to your shell's RC file:
+Then source the appropriate file from your shell config:
 
-**Fish** (`~/.config/fish/config.fish`):
+**Fish** (`~/.config/fish/config.fish`)
 ```fish
 source ~/.sandpiper/shell-integrations/relay.fish
 ```
 
-**Bash** (`~/.bashrc`):
+**Bash** (`~/.bashrc`)
 ```bash
 source ~/.sandpiper/shell-integrations/relay.bash
 ```
 
-**Zsh** (`~/.zshrc`):
+**Zsh** (`~/.zshrc`)
 ```zsh
 source ~/.sandpiper/shell-integrations/relay.zsh
 ```
 
-The integration scripts are safe to source in all shell instances — they silently no-op when not in a relay session. Sandpiper will show a diagnostic warning on startup if the integration is not sourced.
+The scripts are safe to source unconditionally. Outside a relay session they silently no-op.
 
-### 3. Using the Relay
+### 2. Start using the relay
 
-Shell Relay sets up automatically on first tool use:
+Shell Relay is lazy-initialized on first use.
 
-1. **Auto-create:** If no session is configured, the extension creates a new Zellij session with a ghost client (headless PTY) and reports the session name.
-2. **Existing session:** Set `SHELL_RELAY_SESSION` or pass the `session` parameter on the tool call.
-3. **Interactive:** Use `/relay-connect` to pick from existing Zellij sessions or create a new one.
+It chooses a Zellij session in this order:
 
-The user can optionally attach to the session to observe commands in real time:
-```sh
+1. the `session` parameter passed to the tool
+2. `SHELL_RELAY_SESSION`
+3. a new auto-generated session name like `relay-<id>`
+
+You can also connect interactively with:
+
+```text
+/relay-connect
+```
+
+And inspect the current connection with:
+
+```text
+/relay-status
+```
+
+To watch the shared terminal directly, attach to the session:
+
+```bash
 zellij attach <session-name>
 ```
-This is **optional** — the relay works fully without user attachment thanks to the ghost client.
+
+## How it works
+
+### Session model
+
+On first use, Shell Relay creates or connects to a Zellij session, finds a terminal pane, exports relay environment variables into that shell, and waits for a `prompt_ready` signal from the shell integration.
+
+The relay session is collaborative:
+
+- the agent can run commands there
+- the user can attach and watch
+- the user may also type in the pane between agent commands
+
+### Command injection
+
+Commands are injected with:
+
+- `zellij action paste ...`
+- `zellij action send-keys Enter`
+
+This replaced the older `write-chars` approach.
+
+### Output capture
+
+Shell Relay no longer captures stdout/stderr through dedicated FIFOs.
+
+Instead it:
+
+1. takes a **before** snapshot with `dump-screen --full`
+2. runs the command in the pane
+3. waits for shell integration signals (`last_status`, then usually `prompt_ready`)
+4. takes an **after** snapshot
+5. diffs the two snapshots in TypeScript to extract the new output
+
+This means:
+
+- output is captured from the pane's rendered text
+- stdout/stderr are **not** returned as separate structured streams
+- interactive TUIs are best examined with `shell_relay_inspect`
+
+### Shell integration
+
+The shell integration provides the synchronization signals that make the relay reliable:
+
+- `prompt_ready` — the shell is at a prompt and ready
+- `last_status:N` — the last command exited with status `N`
+
+The extension uses a signal FIFO for these events.
+
+## Current architecture
+
+```text
+┌──────────────────────┐                      ┌─────────────────────────────┐
+│ shell_relay tool     │                      │ Zellij terminal pane        │
+│                      │ paste + send-keys ─► │ user's shell session        │
+│                      │                      │                             │
+│ dump-screen before   │ ◄──────────────────► │ visible terminal content    │
+│ dump-screen after    │                      │                             │
+│ snapshot diff        │                      │ shell integration writes    │
+│                      │ signal FIFO ◄─────── │ prompt_ready / last_status  │
+└──────────────────────┘                      └─────────────────────────────┘
+```
+
+Implementation notes:
+
+- uses **Zellij 0.44+** session and pane targeting
+- uses **attach-then-detach** session creation so the pane inherits a wide viewport
+- serializes command execution so only one relay command runs at a time
+- loads as a normal Pi extension from `src/index.ts` via jiti
+
+## Commands and configuration
 
 ### Commands
 
 | Command | Description |
 |---------|-------------|
-| `/relay-connect` | Interactive session picker — select existing or create new |
-| `/relay-status` | Show connection state, shell type, capture mode, FIFO paths |
+| `/relay-connect` | Connect to an existing Zellij session or create a new one |
+| `/relay-status` | Show current relay session, shell, pane, and signal FIFO |
 
-## Configuration
+### Tool parameters
 
-### Environment Variables
+#### `shell_relay`
+
+- `command` — required shell command string
+- `timeout` — optional timeout in seconds, default `30`
+- `session` — optional Zellij session name
+
+#### `shell_relay_inspect`
+
+- `session` — optional Zellij session name
+
+### Environment variables
 
 | Variable | Description |
 |----------|-------------|
-| `SHELL_RELAY_SESSION` | Zellij session name to connect to |
-| `SHELL_RELAY_PANE_ID` | Specific pane ID within the session |
-| `SHELL_RELAY_NO_UNBUFFER` | Set to `1` to force basic mode (no PTY color preservation) |
+| `SHELL_RELAY_SESSION` | Default Zellij session name to connect to |
 
-### Capture Modes
+## When to use it
 
-| Mode | Colors | How it works |
-|------|--------|--------------|
-| **Enhanced** | ✅ Full ANSI preserved | `unbuffer-relay` prefixed via `eval` — first command in pipeline gets a PTY, session state preserved |
-| **Basic** | ⚠️ Programs using `isatty()` lose color | Direct `eval` in current shell — no PTY |
+Use **`shell_relay`** when a command needs the user's live shell state.
 
-The extension auto-detects whether `tclsh` is available and selects the appropriate mode. Set `SHELL_RELAY_NO_UNBUFFER=1` to force basic mode.
+Use **`bash`** when the command is ordinary, stateless, and does not need the user's interactive environment.
 
-**Note:** In enhanced mode, if the first token of a command is a shell builtin (e.g., `set`, `cd`), `unbuffer-relay` will fail to spawn it (builtins aren't binaries). This is harmless — builtins don't produce colored output. The command still executes via `eval` in the current shell.
+Good candidates for `shell_relay`:
 
-## How It Works
-
-### Ghost Client
-
-Zellij requires a real PTY client for `write-chars` and `dump-screen` to work reliably — background sessions silently drop input. Shell Relay spawns a **ghost client** using `expect` that attaches to the session with a real PTY, keeping it alive invisibly. The user can attach as a second client to observe.
-
-### Startup Sequence
-
-1. Ghost client spawns → Zellij session created → shell starts → config sources integration script
-2. Extension creates persistent FIFOs and starts listening on the signal channel
-3. Extension injects FIFO path env vars via `write-chars`
-4. Shell processes exports → prompt draws → prompt hook writes `prompt_ready` to signal FIFO
-5. Extension receives `prompt_ready` → setup confirmed, ready for commands
-
-The `prompt_ready` signal replaces arbitrary timeouts — it proves the shell initialized, env vars are set, and the FIFO pipeline is wired up.
-
-### Architecture
-
-```
-┌──────────────────────┐                      ┌─────────────────────────────┐
-│  pi extension        │   write-chars        │  zellij pane                │
-│  (shell_relay tool)  │ ────────────────────► │  (user's shell session)     │
-│                      │                      │                             │
-│                      │   stdout FIFO        │  command wrapper:           │
-│                      │ ◄──── (persistent) ──│  { [unbuffer-relay]         │
-│  reads stdout        │                      │    CMD                      │
-│                      │   stderr FIFO        │    | tee $STDOUT > /dev/tty │
-│                      │ ◄──── (persistent) ──│  } 2>&1 >/dev/null         │
-│  reads stderr        │                      │    | tee $STDERR > /dev/tty │
-│                      │                      │                             │
-│                      │   signal FIFO        │  wrapper writes:            │
-│                      │ ◄──── (persistent) ──│    last_status:EXIT_CODE    │
-│  reads signals       │                      │  prompt hook writes:        │
-│                      │                      │    prompt_ready              │
-│                      │                      │                             │
-│  ghost client ───────│── expect PTY ────────│── keeps pane focused        │
-└──────────────────────┘                      └─────────────────────────────┘
-```
-
-### How It Captures Output
-
-- **Persistent FIFOs** with `O_RDWR` sentinel handles — created once per session, no per-command overhead
-- **Signal channel** for event-driven completion detection — no polling
-- **`prompt_ready`** for setup confirmation — replaces arbitrary timeouts
-- **`tee` + `/dev/tty`** — output goes to both the agent (via FIFO) and the user (via terminal)
-- **Command serialization** — only one command runs in the pane at a time
-- **`eval` prefix for enhanced mode** — `eval unbuffer-relay CMD` preserves session state while getting PTY colors
-- **`unbuffer-relay`** — custom expect script for PTY wrapping with proper exit code propagation
+- `op run ...`
+- shell functions
+- commands that depend on sourced shell setup
+- workflows where the user should be able to watch or intervene live
 
 ## Troubleshooting
 
 ### "Timed out waiting for prompt_ready signal"
-The extension created the session but the shell integration didn't fire. Check that:
-1. The shell integration script is sourced in your shell's RC file (e.g., `config.fish`)
-2. `expect`/`tclsh` is installed (required for the ghost client)
-3. Check: `command -v tclsh && echo "available"`
 
-### "No Zellij session configured"
-No session was specified and auto-creation wasn't attempted. Either:
-- Set `SHELL_RELAY_SESSION` environment variable
-- Pass the `session` parameter on the tool call
-- Use `/relay-connect` to select a session interactively
+The relay session started, but the shell integration did not signal readiness.
+
+Check that:
+
+1. your shell config sources the correct `relay.fish`, `relay.bash`, or `relay.zsh`
+2. you restarted the shell after adding the source line
+3. the session is running the shell you expected
 
 ### "Zellij is not installed or not available"
-Install Zellij from https://zellij.dev
 
-### Commands lose color
-Check enhanced mode is active:
-- `tclsh` must be on PATH
-- `SHELL_RELAY_NO_UNBUFFER` must not be set
-- `/relay-status` shows the current capture mode
+Install Zellij and ensure `zellij` is on `PATH`.
 
-### Agent errors suggest using `bash` instead
-The relay pane may be unavailable. Check that the Zellij session is running and the ghost client process hasn't been killed.
+### Relay works, but output is missing or odd
+
+Remember that output is captured via snapshot diff of terminal content, not raw stdout/stderr pipes.
+
+If the command is highly interactive or paints the screen repeatedly:
+
+- inspect the pane with `shell_relay_inspect`
+- or attach directly with `zellij attach <session>`
+
+### I want a specific session
+
+Set:
+
+```bash
+export SHELL_RELAY_SESSION=my-session
+```
+
+or pass the `session` parameter explicitly on the tool call.
+
+## Related docs
+
+- [AGENTS.md](AGENTS.md) — shell-relay-specific development guidance
+- [`.sandpiper/docs/zellij-044-relay-design.md`](../../.sandpiper/docs/zellij-044-relay-design.md) — design notes and Zellij API findings
+- [`.sandpiper/docs/background-process-framework-design.md`](../../.sandpiper/docs/background-process-framework-design.md) — background process framework used elsewhere in Sandpiper
