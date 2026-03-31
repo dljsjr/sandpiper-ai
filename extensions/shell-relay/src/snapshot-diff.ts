@@ -35,7 +35,7 @@ export function extractCommandOutput(before: string, after: string, injectedText
   if (newLines.length === 0) return '';
 
   // Join without separator to find the marker regardless of wrapping
-  const joined = newLines.map((l) => l.trimEnd()).join('');
+  const joined = newLines.join('');
   const marker = injectedText.trim();
   const markerEnd = joined.indexOf(marker);
 
@@ -50,7 +50,7 @@ export function extractCommandOutput(before: string, after: string, injectedText
   let charCount = 0;
   let outputStartLine = 0;
   for (let i = 0; i < newLines.length; i++) {
-    charCount += (newLines[i]?.trimEnd() ?? '').length;
+    charCount += (newLines[i] ?? '').length;
     if (charCount >= endPos) {
       // Marker ends on this line. Check if there's leftover text on this
       // line after the marker (output starting on the same line).
@@ -58,7 +58,7 @@ export function extractCommandOutput(before: string, after: string, injectedText
       if (overshoot > 0) {
         // There's output text on the same line as the command echo end.
         // Extract just that trailing portion.
-        const fullLine = newLines[i]?.trimEnd() ?? '';
+        const fullLine = newLines[i] ?? '';
         const trailing = fullLine.slice(fullLine.length - overshoot);
         const remainingLines = [trailing, ...newLines.slice(i + 1)];
         return trimTrailingPrompt(remainingLines, beforeLines);
@@ -121,8 +121,8 @@ function findDivergencePoint(beforeLines: string[], afterLines: string[]): numbe
  * Normalize a scrollback dump into clean lines.
  */
 function normalizeLines(dump: string): string[] {
-  const lines = dump.split('\n').map((line) => line.trimEnd());
-  while (lines.length > 0 && lines[lines.length - 1] === '') {
+  const lines = dump.split('\n');
+  while (lines.length > 0 && (lines[lines.length - 1]?.trim() ?? '') === '') {
     lines.pop();
   }
   return lines;
