@@ -84,9 +84,28 @@ describe('extractCommandOutput', () => {
     // The injected text is the full unwrapped string
     const injected = '__relay_run \'echo "line one"; echo "line two"; echo "line three"\'';
     const result = extractCommandOutput(before, after, injected);
-    expect(result).toContain('line one');
-    expect(result).toContain('line two');
-    expect(result).toContain('line three');
+    expect(result).toBe('line one\nline two\nline three');
+  });
+
+  it('should not leak wrapped __relay_run echo when a significant space lands at line end', () => {
+    const before = [PROMPT, ''].join('\n');
+    const injected = "__relay_run 'echo '\"'\"'alpha'\"'\"'; echo '\"'\"'x y z'\"'\"''";
+    // Simulates a narrow viewport wrap where the line ends with a significant space
+    // after "echo ". trimEnd-based parsing drops that space and fails marker matching.
+    const after = [
+      PROMPT,
+      "__relay_run 'echo '\"",
+      "'\"'alpha'\"'\"'; echo ",
+      "'\"'\"'x y z'\"'\"''",
+      'OUT1',
+      'OUT2',
+      PROMPT,
+      '',
+    ].join('\n');
+
+    const result = extractCommandOutput(before, after, injected);
+    expect(result).toBe('OUT1\nOUT2');
+    expect(result).not.toContain('__relay_run');
   });
 
   it('should handle output merged with command on same line (extreme narrow viewport)', () => {
