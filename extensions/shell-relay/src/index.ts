@@ -449,6 +449,54 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
+  pi.registerCommand('relay-cleanup', {
+    description: 'Remove stale EXITED relay sessions from Zellij',
+    handler: async (_args, ctx) => {
+      const probe = new ZellijClient({ sessionName: '' });
+      if (!probe.isAvailable()) {
+        ctx.ui.notify('Zellij is not installed or not available.', 'error');
+        return;
+      }
+
+      const stale = probe
+        .listSessionsWithStatus()
+        .filter((s) => s.name.startsWith('relay-') && s.exited && s.name !== zellijSessionName);
+
+      if (stale.length === 0) {
+        ctx.ui.notify('No stale relay sessions found.', 'info');
+        return;
+      }
+
+      const sessionList = stale.map((s) => `  ${s.name}`).join('\n');
+      const confirmed = await ctx.ui.confirm(
+        `Delete ${stale.length} stale relay session${stale.length > 1 ? 's' : ''}?`,
+        `The following EXITED relay sessions will be permanently deleted:\n${sessionList}`,
+      );
+
+      if (!confirmed) return;
+
+      let deleted = 0;
+      let failed = 0;
+      for (const session of stale) {
+        try {
+          probe.deleteSession(session.name);
+          deleted++;
+        } catch {
+          failed++;
+        }
+      }
+
+      if (failed > 0) {
+        ctx.ui.notify(
+          `Deleted ${deleted} session${deleted !== 1 ? 's' : ''}. ${failed} could not be deleted.`,
+          'warning',
+        );
+      } else {
+        ctx.ui.notify(`Deleted ${deleted} stale relay session${deleted !== 1 ? 's' : ''}.`, 'info');
+      }
+    },
+  });
+
   // --- Lifecycle ---
 
   /** Restore stored session name and auto-reconnect if appropriate. */
@@ -469,7 +517,6 @@ export default function (pi: ExtensionAPI) {
     if (shouldAutoReconnect(storedRelaySessionName, available)) {
       try {
         await setupRelay(ctx, storedRelaySessionName);
-        // setStatus is updated inside setupRelay; no notify needed
         return;
       } catch {
         // Auto-reconnect failed — fall through to ready status

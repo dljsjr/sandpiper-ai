@@ -69,6 +69,41 @@ describe('ZellijClient', () => {
     });
   });
 
+  describe('listSessionsWithStatus', () => {
+    it('should identify EXITED sessions from plain --no-formatting output', () => {
+      const plainOutput = [
+        'relay-abc12345 [Created 1day ago] (EXITED - attach to resurrect)',
+        'relay-def67890 [Created 5m ago] (current)',
+        'sandpiper [Created 10m ago] (current)',
+      ].join('\n');
+      mockExecSync.mockReturnValue(plainOutput as never);
+
+      const sessions = client.listSessionsWithStatus();
+      expect(sessions).toHaveLength(3);
+      expect(sessions.find((s) => s.name === 'relay-abc12345')?.exited).toBe(true);
+      expect(sessions.find((s) => s.name === 'relay-def67890')?.exited).toBe(false);
+      expect(sessions.find((s) => s.name === 'sandpiper')?.exited).toBe(false);
+    });
+
+    it('should return empty array when zellij is unavailable', () => {
+      mockExecSync.mockImplementation(() => {
+        throw new Error('not found');
+      });
+      expect(client.listSessionsWithStatus()).toEqual([]);
+    });
+  });
+
+  describe('deleteSession', () => {
+    it('should call zellij delete-session with the session name', () => {
+      mockExecSync.mockReturnValue('' as never);
+      client.deleteSession('relay-abc12345');
+
+      const cmd = mockExecSync.mock.calls[0]![0] as string;
+      expect(cmd).toContain('zellij delete-session');
+      expect(cmd).toContain('relay-abc12345');
+    });
+  });
+
   // ── Pane Discovery ──────────────────────────────────────────
 
   describe('listPanes', () => {

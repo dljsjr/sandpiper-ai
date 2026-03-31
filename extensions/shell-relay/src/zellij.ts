@@ -131,7 +131,7 @@ export class ZellijClient {
 
   /**
    * List active Zellij sessions.
-   * Returns an array of session names.
+   * Returns an array of session names (running AND EXITED).
    */
   listSessions(): string[] {
     try {
@@ -146,6 +146,42 @@ export class ZellijClient {
     } catch {
       return [];
     }
+  }
+
+  /**
+   * List sessions with their running/exited status.
+   * Parses full `zellij list-sessions` output (with ANSI codes stripped).
+   */
+  listSessionsWithStatus(): Array<{ name: string; exited: boolean }> {
+    try {
+      const output = execSync('zellij list-sessions --no-formatting', {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      });
+      return output
+        .split('\n')
+        .map((line) => {
+          const trimmed = line.trim();
+          if (!trimmed) return null;
+          const nameMatch = trimmed.match(/^(\S+)/);
+          if (!nameMatch) return null;
+          return { name: nameMatch[1], exited: trimmed.includes('EXITED') };
+        })
+        .filter((s): s is { name: string; exited: boolean } => s !== null);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Delete a Zellij session by name.
+   * Only works on EXITED sessions; running sessions must be killed first.
+   */
+  deleteSession(sessionName: string): void {
+    execSync(`zellij delete-session ${sessionName}`, {
+      stdio: 'pipe',
+      encoding: 'utf-8' as never,
+    });
   }
 
   // ── Pane Discovery ──────────────────────────────────────────
