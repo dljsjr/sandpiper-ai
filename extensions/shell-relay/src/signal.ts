@@ -18,7 +18,10 @@ export type SignalEvent =
  * This module is framework-independent — no pi/sandpiper imports.
  */
 export class SignalParser extends EventEmitter {
+  private static readonly MAX_BUFFERED_EVENTS = 64;
+
   private buffer = '';
+  private recentEvents: SignalEvent[] = [];
 
   /**
    * Feed raw data from the signal FIFO into the parser.
@@ -39,6 +42,10 @@ export class SignalParser extends EventEmitter {
 
       const event = this.parseLine(line);
       if (event) {
+        this.recentEvents.push(event);
+        if (this.recentEvents.length > SignalParser.MAX_BUFFERED_EVENTS) {
+          this.recentEvents.shift();
+        }
         this.emit('signal', event);
       }
 
@@ -55,12 +62,17 @@ export class SignalParser extends EventEmitter {
    * @throws If the timeout is exceeded
    */
   waitFor(eventType: SignalEvent['type'], timeoutMs: number): Promise<SignalEvent> {
+    const buffered = this.takeBuffered(eventType);
+    if (buffered) {
+      return Promise.resolve(buffered);
+    }
+
     return new Promise<SignalEvent>((resolve, reject) => {
       const handler = (event: SignalEvent) => {
         if (event.type === eventType) {
           clearTimeout(timer);
           this.removeListener('signal', handler);
-          resolve(event);
+          resolve(this.takeBuffered(eventType) ?? event);
         }
       };
 
@@ -71,6 +83,16 @@ export class SignalParser extends EventEmitter {
 
       this.on('signal', handler);
     });
+  }
+
+  /** Consume and return the first buffered event matching the requested type. */
+  private takeBuffered(eventType: SignalEvent['type']): SignalEvent | undefined {
+    const index = this.recentEvents.findIndex((event) => event.type === eventType);
+    if (index < 0) {
+      return undefined;
+    }
+    const [event] = this.recentEvents.splice(index, 1);
+    return event;
   }
 
   private parseLine(line: string): SignalEvent | null {

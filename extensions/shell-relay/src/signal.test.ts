@@ -134,6 +134,12 @@ describe('SignalParser', () => {
       expect(event).toEqual({ type: 'last_status', exitCode: 0 });
     });
 
+    it('should resolve from buffered events that arrived before waitFor', async () => {
+      parser.feed('last_status:0\n');
+      const event = await parser.waitFor('last_status', 50);
+      expect(event).toEqual({ type: 'last_status', exitCode: 0 });
+    });
+
     it('should reject on timeout', async () => {
       const promise = parser.waitFor('prompt_ready', 50);
       await expect(promise).rejects.toThrow('timed out');
