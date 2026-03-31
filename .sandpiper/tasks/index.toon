@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774977326369
+lastUpdatedAt: 1774977435739
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -269,17 +269,17 @@ tasks:
     key: SHR-63
     project: SHR
     title: First command after setup often times out (prompt_ready race condition)
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: BUG
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-25T03:02:39.233Z"
-    updatedAt: "2026-03-29T00:37:46.891Z"
+    updatedAt: "2026-03-31T17:17:15.732Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774977435738
   "SHR-67":
     key: SHR-67
     project: SHR
