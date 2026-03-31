@@ -55,7 +55,12 @@ export default function (pi: ExtensionAPI) {
 
   /** Set up the relay: create background session, find pane, wire signal FIFO. */
   async function setupRelay(
-    ctx: { ui: { notify: (msg: string, level?: 'info' | 'warning' | 'error') => void } },
+    ctx: {
+      ui: {
+        notify: (msg: string, level?: 'info' | 'warning' | 'error') => void;
+        setStatus: (key: string, text: string) => void;
+      };
+    },
     targetZellijSession?: string,
   ): Promise<void> {
     if (isSetUp) return;
@@ -150,10 +155,7 @@ export default function (pi: ExtensionAPI) {
     // Persist the chosen session name so future resumes can reconnect
     pi.appendEntry<StoredRelaySession>(RELAY_SESSION_CUSTOM_TYPE, { sessionName: resolvedSession });
     storedRelaySessionName = resolvedSession;
-    ctx.ui.notify(
-      `Shell Relay: ready (${shell}). ` + `View the shared terminal with: zellij attach ${resolvedSession}`,
-      'info',
-    );
+    ctx.ui.setStatus('shell-relay', `Shell Relay: ${resolvedSession} (${shell})`);
   }
 
   /** Tear down the relay. */
@@ -467,7 +469,7 @@ export default function (pi: ExtensionAPI) {
     if (shouldAutoReconnect(storedRelaySessionName, available)) {
       try {
         await setupRelay(ctx, storedRelaySessionName);
-        ctx.ui.notify(`Shell Relay: reconnected to ${storedRelaySessionName}`, 'info');
+        // setStatus is updated inside setupRelay; no notify needed
         return;
       } catch {
         // Auto-reconnect failed — fall through to ready status
