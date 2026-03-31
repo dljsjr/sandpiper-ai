@@ -1,0 +1,24 @@
+--- a/SHR-89.md
++++ b/SHR-89.md
+@@ -6,11 +6,11 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-28T05:04:42.259Z
+-updated_at: 2026-03-31T16:12:51.868Z
++updated_at: 2026-03-31T16:12:51.909Z
+ ---
+ 
+ # Add /relay-cleanup command to remove stale EXITED relay sessions
+ 
++Automatic cleanup of stale Zellij relay sessions is unsafe because other Sandpiper sessions (eligible for --resume) may have claimed those sessions via appendEntry, and we cannot cheaply enumerate all session files to know which relay sessions are 'orphaned'. Instead, add a /relay-cleanup command that lists all EXITED relay-* sessions and asks the user to confirm deletion. This gives the user full visibility and control without risking data loss.
+ 
+ ---
+ 
+@@ -29,3 +30,7 @@
+ 
+ - **title**: Clean up stale Zellij sessions on startup and shutdown → Add /relay-cleanup command to remove stale EXITED relay sessions
+ 
++## 2026-03-31T16:12:51.910Z
++
++- **description**: added (1 line)
++

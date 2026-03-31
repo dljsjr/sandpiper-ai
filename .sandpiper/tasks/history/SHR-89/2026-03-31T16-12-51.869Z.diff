@@ -1,0 +1,30 @@
+--- a/SHR-89.md
++++ b/SHR-89.md
+@@ -1,15 +1,11 @@
+ ---
+-title: "Clean up stale Zellij sessions on startup and shutdown"
++title: "Add /relay-cleanup command to remove stale EXITED relay sessions"
+ status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-28T05:04:42.259Z
+-updated_at: 2026-03-31T16:05:49.711Z
++updated_at: 2026-03-31T16:12:51.868Z
+ ---
+ 
+ # Clean up stale Zellij sessions on startup and shutdown
+-# Clean up stale Zellij sessions on startup and shutdown
++# Add /relay-cleanup command to remove stale EXITED relay sessions
+ 
+ 
+ ---
+@@ -25,3 +25,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-03-31T16:12:51.869Z
++
++- **title**: Clean up stale Zellij sessions on startup and shutdown → Add /relay-cleanup command to remove stale EXITED relay sessions
++

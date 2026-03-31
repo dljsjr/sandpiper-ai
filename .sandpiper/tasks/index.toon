@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774972320816
+lastUpdatedAt: 1774974098314
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -422,18 +422,18 @@ tasks:
   "SHR-89":
     key: SHR-89
     project: SHR
-    title: Clean up stale Zellij sessions on startup and shutdown
-    status: NOT STARTED
+    title: Add /relay-cleanup command to remove stale EXITED relay sessions
+    status: NEEDS REVIEW
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-03-28T05:04:42.259Z"
-    updatedAt: "2026-03-31T15:39:16.677Z"
+    updatedAt: "2026-03-31T16:21:38.308Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774971556682
+    lastIndexedAt: 1774974098314
   "SHR-90":
     key: SHR-90
     project: SHR
