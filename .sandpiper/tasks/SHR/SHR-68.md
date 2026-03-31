@@ -2,11 +2,11 @@
 title: "Implement bash user command capture via DEBUG trap"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T14:54:22.600Z
-updated_at: 2026-03-29T00:37:46.890Z
+updated_at: 2026-03-31T15:39:16.719Z
 ---
 
 # Implement bash user command capture via DEBUG trap
@@ -31,3 +31,11 @@ updated_at: 2026-03-29T00:37:46.890Z
 - `extensions/shell-relay/shell-integration/relay.fish` — fish_preexec implementation to reference for pattern
 - `extensions/shell-relay/src/relay.ts` — `buildInjectionCommand`, `escapeForBash`
 
+
+---
+
+# Activity Log
+
+## 2026-03-31T15:39:16.720Z
+
+- **priority**: LOW → MEDIUM

@@ -1,12 +1,13 @@
 ---
 title: "Replace unbuffer-relay with @lydell/node-pty PTY adapter"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T15:44:11.246Z
-updated_at: 2026-03-29T00:37:46.893Z
+updated_at: 2026-03-31T15:26:50.366Z
 related:
   - SHR-68
   - SHR-69
@@ -43,3 +44,12 @@ This is the **PTY MVP only** — replace unbuffer-relay, nothing more. Backgroun
 - `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — PTY approach comparison and `@lydell/node-pty` evaluation
 - SHR-70 — completed investigation spike
 
+
+---
+
+# Activity Log
+
+## 2026-03-31T15:26:50.366Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

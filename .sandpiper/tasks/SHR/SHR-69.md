@@ -2,11 +2,11 @@
 title: "Implement zsh user command capture via zle widget override"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T14:54:25.683Z
-updated_at: 2026-03-29T00:37:46.889Z
+updated_at: 2026-03-31T15:39:16.767Z
 ---
 
 # Implement zsh user command capture via zle widget override
@@ -32,3 +32,11 @@ updated_at: 2026-03-29T00:37:46.889Z
 - `extensions/shell-relay/shell-integration/relay.fish` — fish_preexec implementation to reference for pattern
 - `extensions/shell-relay/src/relay.ts` — `buildInjectionCommand`, `escapeForBash` (shared with zsh)
 
+
+---
+
+# Activity Log
+
+## 2026-03-31T15:39:16.767Z
+
+- **priority**: LOW → MEDIUM
