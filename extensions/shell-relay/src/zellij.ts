@@ -296,10 +296,11 @@ export class ZellijClient {
   // They should be removed once the relay is fully migrated.
 
   /**
-   * @deprecated Use paste() + sendKeys('Enter') instead.
+   * @deprecated Legacy compatibility shim.
+   * Routes through paste() to avoid write-chars wrapping/parser issues.
    */
   writeChars(chars: string): void {
-    this.execInSessionWithPane(`action write-chars -- ${this.shellQuote(chars)}`);
+    this.paste(chars);
   }
 
   // ── Internals ───────────────────────────────────────────────
