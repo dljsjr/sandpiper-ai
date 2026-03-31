@@ -64,13 +64,17 @@ its documentation, APIs, etc. remain valid, with a few alterations:
 - You are distributed with a good bit of functionality that the core 'pi' framework doesn't include, via bundled extensions, skills, and prompts.
 `;
 
-  return (
-    basePrompt +
-    identityBlock +
-    (options.projectTriggers ?? '') +
-    (options.activeTaskContext ?? '') +
-    (options.workingCopyContext ?? '') +
-    (options.coldStartGuidance ?? '') +
-    (options.standupContent ?? '')
-  );
+  // Prefix-caching strategy:
+  // 1) Keep static sections first (base prompt + identity block).
+  // 2) Append dynamic sections afterwards.
+  // 3) Within dynamic sections, keep less-volatile blocks before more-volatile blocks.
+  const dynamicSections = [
+    options.projectTriggers ?? '',
+    options.standupContent ?? '',
+    options.coldStartGuidance ?? '',
+    options.activeTaskContext ?? '',
+    options.workingCopyContext ?? '',
+  ];
+
+  return basePrompt + identityBlock + dynamicSections.join('');
 }
