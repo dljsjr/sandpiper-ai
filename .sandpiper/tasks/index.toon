@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774977435739
+lastUpdatedAt: 1774986511446
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -515,18 +515,18 @@ tasks:
   "SHR-95":
     key: SHR-95
     project: SHR
-    title: Fish __relay_run cannot execute heredoc commands
+    title: Block fish heredoc shell_relay calls via generic enforcement API
     status: NOT STARTED
     kind: BUG
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-31T17:15:03.901Z"
-    updatedAt: "2026-03-31T17:15:14.947Z"
+    updatedAt: "2026-03-31T19:48:31.436Z"
     dependsOn[0]:
-    blockedBy[0]:
+    blockedBy[1]: AGENT-35
     related[0]:
-    lastIndexedAt: 1774977314954
+    lastIndexedAt: 1774986511445
   "TCL-52":
     key: TCL-52
     project: TCL
