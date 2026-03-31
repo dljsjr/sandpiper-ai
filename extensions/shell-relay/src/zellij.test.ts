@@ -295,14 +295,15 @@ describe('ZellijClient', () => {
   // ── Legacy ──────────────────────────────────────────────────
 
   describe('writeChars (deprecated)', () => {
-    it('should still work for backward compatibility', () => {
+    it('should route through paste for backward compatibility', () => {
       mockExecSync.mockReturnValue('' as never);
 
-      client.writeChars('echo hello\n');
+      client.writeChars("echo 'long quoted payload'\n");
 
       const cmd = mockExecSync.mock.calls[0]![0] as string;
-      expect(cmd).toContain('write-chars');
-      expect(cmd).toContain('echo hello');
+      expect(cmd).toContain('action paste');
+      expect(cmd).not.toContain('write-chars');
+      expect(cmd).toContain("echo '\\''long quoted payload'\\''");
     });
   });
 });

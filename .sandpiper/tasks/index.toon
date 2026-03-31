@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774975659638
+lastUpdatedAt: 1774977326369
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -254,17 +254,17 @@ tasks:
     key: SHR-62
     project: SHR
     title: Long write-chars injections may wrap and confuse fish parser
-    status: NOT STARTED
+    status: NEEDS REVIEW
     kind: BUG
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-24T22:53:20.587Z"
-    updatedAt: "2026-03-29T00:37:46.892Z"
+    updatedAt: "2026-03-31T17:15:26.362Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774977326368
   "SHR-63":
     key: SHR-63
     project: SHR
@@ -512,6 +512,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774972320816
+  "SHR-95":
+    key: SHR-95
+    project: SHR
+    title: Fish __relay_run cannot execute heredoc commands
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-31T17:15:03.901Z"
+    updatedAt: "2026-03-31T17:15:14.947Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774977314954
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -791,7 +806,7 @@ counters:
     nextTaskNumber: 72
   SHR:
     projectKey: SHR
-    nextTaskNumber: 95
+    nextTaskNumber: 96
   SRL:
     projectKey: SRL
     nextTaskNumber: 2
