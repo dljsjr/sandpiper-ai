@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1774904419838
+lastUpdatedAt: 1774972320816
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -35,17 +35,18 @@ tasks:
     key: AGENT-20
     project: AGENT
     title: "Consider filtering inactive projects (VND, SRL) from system prompt injection to save ~170 tokens"
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T17:44:44.304Z"
-    updatedAt: "2026-03-29T00:37:46.885Z"
+    updatedAt: "2026-03-31T15:26:50.316Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666898
+    lastIndexedAt: 1774970810325
   "AGENT-27":
     key: AGENT-27
     project: AGENT
@@ -178,15 +179,15 @@ tasks:
     title: Design deferred deterministic guidance/enforcement hooks for tool use
     status: NOT STARTED
     kind: TASK
-    priority: MEDIUM
+    priority: HIGH
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-30T20:00:27.396Z"
-    updatedAt: "2026-03-30T20:00:37.110Z"
+    updatedAt: "2026-03-31T15:39:16.633Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774900837115
+    lastIndexedAt: 1774971556639
   "AGENT-36":
     key: AGENT-36
     project: AGENT
@@ -300,75 +301,77 @@ tasks:
     title: Implement bash user command capture via DEBUG trap
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T14:54:22.600Z"
-    updatedAt: "2026-03-29T00:37:46.890Z"
+    updatedAt: "2026-03-31T15:39:16.719Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774971556725
   "SHR-69":
     key: SHR-69
     project: SHR
     title: Implement zsh user command capture via zle widget override
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T14:54:25.683Z"
-    updatedAt: "2026-03-29T00:37:46.889Z"
+    updatedAt: "2026-03-31T15:39:16.767Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774971556772
   "SHR-71":
     key: SHR-71
     project: SHR
     title: Replace unbuffer-relay with @lydell/node-pty PTY adapter
-    status: NOT STARTED
+    status: COMPLETE
     kind: TASK
     priority: LOW
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T15:44:11.246Z"
-    updatedAt: "2026-03-29T00:37:46.893Z"
+    updatedAt: "2026-03-31T15:26:50.366Z"
+    resolution: WONTFIX
     dependsOn[0]:
     blockedBy[0]:
     related[2]: SHR-68,SHR-69
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774970810371
   "SHR-73":
     key: SHR-73
     project: SHR
     title: Rebrand the Shell Relay with a more memorable name
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T21:22:51.359Z"
-    updatedAt: "2026-03-29T00:37:46.890Z"
+    updatedAt: "2026-03-31T15:39:16.812Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774971556818
   "SHR-74":
     key: SHR-74
     project: SHR
     title: Investigate how relay.fish stub ended up installed (was replaced by real file but shouldn't have reverted)
-    status: NOT STARTED
+    status: COMPLETE
     kind: BUG
     priority: LOW
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T17:44:44.263Z"
-    updatedAt: "2026-03-29T00:37:46.894Z"
+    updatedAt: "2026-03-31T15:39:10.939Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774971550950
   "SHR-86":
     key: SHR-86
     project: SHR
@@ -422,15 +425,15 @@ tasks:
     title: Clean up stale Zellij sessions on startup and shutdown
     status: NOT STARTED
     kind: TASK
-    priority: MEDIUM
+    priority: HIGH
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-28T05:04:42.259Z"
-    updatedAt: "2026-03-29T00:37:46.895Z"
+    updatedAt: "2026-03-31T15:39:16.677Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774971556682
   "SHR-90":
     key: SHR-90
     project: SHR
@@ -478,6 +481,37 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774901960659
+  "SHR-93":
+    key: SHR-93
+    project: SHR
+    title: Clean up EXITED relay sessions on startup
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-31T14:18:18.299Z"
+    updatedAt: "2026-03-31T14:19:23.449Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774966763460
+  "SHR-94":
+    key: SHR-94
+    project: SHR
+    title: Resurrection-aware shell relay session management
+    status: NEEDS REVIEW
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-31T14:53:00.592Z"
+    updatedAt: "2026-03-31T15:52:00.809Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774972320816
   "TCL-52":
     key: TCL-52
     project: TCL
@@ -574,15 +608,15 @@ tasks:
     title: Rebrand the Tasks CLI with a more memorable name
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T21:22:51.308Z"
-    updatedAt: "2026-03-29T00:37:46.887Z"
+    updatedAt: "2026-03-31T15:39:16.856Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1774971556862
   "TCL-71":
     key: TCL-71
     project: TCL
@@ -757,7 +791,7 @@ counters:
     nextTaskNumber: 72
   SHR:
     projectKey: SHR
-    nextTaskNumber: 93
+    nextTaskNumber: 95
   SRL:
     projectKey: SRL
     nextTaskNumber: 2

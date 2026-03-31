@@ -8,6 +8,13 @@ import { registerPreflightCheck } from 'sandpiper-ai-core';
 import { exportVars } from './env-export.js';
 import { FifoManager } from './fifo.js';
 import { checkShellIntegration } from './preflight.js';
+import {
+  deriveRelaySessionName,
+  RELAY_SESSION_CUSTOM_TYPE,
+  restoreSessionNameFromBranch,
+  type StoredRelaySession,
+  shouldAutoReconnect,
+} from './session-lifecycle.js';
 import { SignalParser } from './signal.js';
 import { extractCommandOutput } from './snapshot-diff.js';
 import { ZellijClient } from './zellij.js';
@@ -40,6 +47,9 @@ export default function (pi: ExtensionAPI) {
   let zellijSessionName: string | null = null;
   let isSetUp = false;
 
+  // The session name stored/restored via appendEntry — source of truth across restarts
+  let storedRelaySessionName: string | undefined;
+
   // Execution lock: only one command at a time
   let executionQueue: Promise<unknown> = Promise.resolve();
 
@@ -50,9 +60,13 @@ export default function (pi: ExtensionAPI) {
   ): Promise<void> {
     if (isSetUp) return;
 
-    // Resolve or create Zellij session
+    // Resolve or create Zellij session.
+    // Priority: explicit argument > env var > stored (appendEntry) > UUID-derived default
     const resolvedSession =
-      targetZellijSession ?? process.env.SHELL_RELAY_SESSION ?? `relay-${randomUUID().slice(0, 8)}`;
+      targetZellijSession ??
+      process.env.SHELL_RELAY_SESSION ??
+      storedRelaySessionName ??
+      deriveRelaySessionName(process.env.SANDPIPER_SESSION_ID ?? randomUUID());
 
     zellij = new ZellijClient({ sessionName: resolvedSession });
 
@@ -132,6 +146,10 @@ export default function (pi: ExtensionAPI) {
 
     isSetUp = true;
     zellijSessionName = resolvedSession;
+
+    // Persist the chosen session name so future resumes can reconnect
+    pi.appendEntry<StoredRelaySession>(RELAY_SESSION_CUSTOM_TYPE, { sessionName: resolvedSession });
+    storedRelaySessionName = resolvedSession;
     ctx.ui.notify(
       `Shell Relay: ready (${shell}). ` + `View the shared terminal with: zellij attach ${resolvedSession}`,
       'info',
@@ -393,7 +411,9 @@ export default function (pi: ExtensionAPI) {
 
       let zellijSession: string;
       if (selection === CREATE_NEW_OPTION) {
-        const name = await ctx.ui.input('Session name:', `relay-${randomUUID().slice(0, 8)}`);
+        const defaultName =
+          storedRelaySessionName ?? deriveRelaySessionName(process.env.SANDPIPER_SESSION_ID ?? randomUUID());
+        const name = await ctx.ui.input('Session name:', defaultName);
         if (!name) return;
         zellijSession = name;
       } else {
@@ -429,22 +449,55 @@ export default function (pi: ExtensionAPI) {
 
   // --- Lifecycle ---
 
-  pi.on('session_start', async (_event, ctx) => {
-    const hasZellij = new ZellijClient({ sessionName: '' }).isAvailable();
-    const configuredSession = process.env.SHELL_RELAY_SESSION;
+  /** Restore stored session name and auto-reconnect if appropriate. */
+  async function onSessionReady(ctx: Parameters<Parameters<typeof pi.on>[1]>[1]): Promise<void> {
+    // Restore the persisted relay session name from the current branch
+    storedRelaySessionName = restoreSessionNameFromBranch(ctx.sessionManager.getBranch());
 
-    if (!hasZellij) {
+    const probe = new ZellijClient({ sessionName: '' });
+    if (!probe.isAvailable()) {
       ctx.ui.setStatus('shell-relay', 'Shell Relay: Zellij not found — install from https://zellij.dev');
       return;
     }
 
     const shell = detectShell();
 
-    if (configuredSession) {
-      ctx.ui.setStatus('shell-relay', `Shell Relay: ${configuredSession} (${shell})`);
+    // Auto-reconnect if we have a stored session that still exists in Zellij
+    const available = probe.listSessions();
+    if (shouldAutoReconnect(storedRelaySessionName, available)) {
+      try {
+        await setupRelay(ctx, storedRelaySessionName);
+        ctx.ui.notify(`Shell Relay: reconnected to ${storedRelaySessionName}`, 'info');
+        return;
+      } catch {
+        // Auto-reconnect failed — fall through to ready status
+      }
+    }
+
+    const label = storedRelaySessionName ?? process.env.SHELL_RELAY_SESSION;
+    if (label) {
+      ctx.ui.setStatus('shell-relay', `Shell Relay: ${label} (${shell})`);
     } else {
       ctx.ui.setStatus('shell-relay', `Shell Relay: ready (${shell})`);
     }
+  }
+
+  pi.on('session_start', async (_event, ctx) => {
+    await onSessionReady(ctx);
+  });
+
+  pi.on('session_switch', async (_event, ctx) => {
+    isSetUp = false;
+    await teardownRelay();
+    await onSessionReady(ctx);
+  });
+
+  pi.on('session_fork', async (_event, ctx) => {
+    storedRelaySessionName = restoreSessionNameFromBranch(ctx.sessionManager.getBranch());
+  });
+
+  pi.on('session_tree', async (_event, ctx) => {
+    storedRelaySessionName = restoreSessionNameFromBranch(ctx.sessionManager.getBranch());
   });
 
   pi.on('session_shutdown', async () => {

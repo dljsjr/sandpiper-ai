@@ -2,11 +2,11 @@
 title: "Design deferred deterministic guidance/enforcement hooks for tool use"
 status: NOT STARTED
 kind: TASK
-priority: MEDIUM
+priority: HIGH
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-30T20:00:27.396Z
-updated_at: 2026-03-30T20:00:37.110Z
+updated_at: 2026-03-31T15:39:16.633Z
 ---
 
 # Design deferred deterministic guidance/enforcement hooks for tool use
@@ -20,3 +20,7 @@ We want to explore a later phase of agent-guidance improvements that uses determ
 ## 2026-03-30T20:00:37.110Z
 
 - **description**: added (1 line)
+
+## 2026-03-31T15:39:16.634Z
+
+- **priority**: MEDIUM → HIGH
