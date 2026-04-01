@@ -177,48 +177,96 @@ Both the `history/` directory (full unified diffs per modification) and the in-f
 
 History files move to the same storage location as tasks (orphan branch, external repo, or inline — whatever is configured). In the separate-branch model, the churn they create is isolated from code history, which is the primary goal.
 
-### Worktree / workspace mechanics
+### Backend selection and storage mechanics
 
-When `mode.branch` is not `"@"` and `mode.repo` is omitted (separate branch in the current repo):
+When `mode.branch` is not `"@"` and `mode.repo` is omitted (separate branch in the **current repo**), the backend depends on the repository type:
 
-#### Git worktree approach (colocated jj)
+- **Current repo has `.jj/`** → use **`jj workspace`**
+- **Current repo has `.git/` but not `.jj/`** → use **`git worktree`**
+- **Do not use `git worktree` inside a jj repo**
+
+When `mode.repo` is set (an **external repo**), do **not** use a workspace/worktree at all — just clone the repo into the canonical path. Use the same VCS semantics as the current repo:
+
+- **Current repo has `.jj/`** → use **`jj git clone --colocate`**
+- **Current repo has `.git/` but not `.jj/`** → use **`git clone`**
+
+This keeps the mental model simple:
+- workspaces/worktrees are only for a second checkout of the **current repo**
+- external repos are always plain clones
+
+#### Spike findings (TCL-83)
+
+The mechanics were validated in temporary colocated test repos.
+
+##### `jj workspace add` inside a jj repo: works
+
+A nested workspace created at `.sandpiper/tasks/` behaved correctly:
+
+- `jj workspace add .sandpiper/tasks --name tasks --revision @-` succeeded
+- the main workspace's `jj st` remained clean after creation
+- the parent repo's `git status` also remained clean
+- uncommitted changes inside `.sandpiper/tasks/` did **not** leak into the parent workspace
+- commits inside the nested workspace remained isolated from the parent workspace
+- `jj workspace add .sandpiper/tasks --revision 'root()'` also worked, giving the task workspace truly independent history (not sharing the code branch ancestor)
+
+##### `git worktree add` inside a jj repo: unsafe
+
+A nested git worktree also looked clean from Git's point of view:
+
+- parent `git status` remained clean
+- parent `jj st` initially remained clean
+
+But `jj` behavior inside the nested worktree was wrong:
+
+- `jj st` inside the nested git worktree did **not** create separate workspace semantics
+- `jj` commands there behaved as though they were still operating on the parent/default workspace
+- commits in the nested git worktree affected the main jj workspace state instead of staying isolated
+
+**Conclusion:** `git worktree` is not a safe backend when the current repo is jj-managed and the user is expected to keep using jj commands.
+
+#### jj workspace approach (current repo is jj)
+
+```bash
+# Create the task workspace with independent history rooted at root()
+jj workspace add .sandpiper/tasks --name tasks --revision 'root()'
+
+# Optional: create a bookmark for remote sync
+cd .sandpiper/tasks
+jj bookmark create sandpiper-tasks -r @-
+```
+
+This produces a fully independent nested workspace at `.sandpiper/tasks/` while keeping the parent workspace clean.
+
+#### Git worktree approach (current repo is plain git)
 
 ```bash
 # Bootstrap: create orphan branch if it doesn't exist
-git checkout --orphan sandpiper-tasks
-git rm -rf .
-git commit --allow-empty -m "Initialize task storage"
-git checkout -          # back to previous branch
+git worktree add --orphan -b sandpiper-tasks .sandpiper/tasks
 
-# Add worktree at the canonical path
-git worktree add .sandpiper/tasks sandpiper-tasks
-
-# Gitignore the path on main
+# Gitignore the path on the main branch
 echo ".sandpiper/tasks/" >> .gitignore
 ```
 
-In jj colocated mode, jj reads git's worktree configuration. The main workspace's `jj st` should not include files from the worktree path.
-
-#### jj workspace approach (if supported)
-
-```bash
-jj workspace add .sandpiper/tasks --revision sandpiper-tasks
-```
-
-This may or may not work for subdirectories of an existing workspace. Needs a spike to determine whether jj supports this and how it interacts with the main workspace's snapshot.
+In a plain git repo this gives the expected second checkout semantics.
 
 #### External repo approach
 
-When `mode.repo` is set:
+When `mode.repo` is set, clone the external repo directly into `.sandpiper/tasks/`:
+
+##### If the current repo is jj-managed
 
 ```bash
-# Clone the external repo into the canonical path
+jj git clone --colocate <repo-url> .sandpiper/tasks
+cd .sandpiper/tasks
+jj edit root()  # or switch/create the configured branch as needed
+```
+
+##### If the current repo is plain git
+
+```bash
 git clone <repo-url> .sandpiper/tasks
 cd .sandpiper/tasks
 git checkout <branch>    # or create if needed
-
-# Gitignore the path in the project repo
-echo ".sandpiper/tasks/" >> .gitignore
 ```
 
 The CLI manages clone, pull, commit, and push as part of task operations — or exposes a `sandpiper tasks sync` command for manual control.
@@ -232,8 +280,8 @@ On any task CLI invocation, the CLI resolves configuration and ensures storage i
 3. **Ensure storage matches config:**
    - `enabled: false` or no VCS → create the directory if missing.
    - `branch: "@"` → nothing to do, files are inline.
-   - `branch: "<name>"` → ensure the branch exists, ensure the worktree is checked out.
-   - `repo: "<url>"` → ensure the clone exists, ensure the right branch is checked out.
+   - `branch: "<name>"` with no `repo` → ensure the separate checkout exists using the repo-appropriate backend (`jj workspace` in jj repos, `git worktree` in plain git repos).
+   - `repo: "<url>"` → ensure the clone exists using the repo-appropriate clone semantics (`jj git clone --colocate` in jj repos, `git clone` in plain git repos), then ensure the configured branch is checked out.
 4. **No config and no existing tasks directory?** Use defaults (`enabled: true, branch: "@"`) and create the directory.
 
 The bootstrap is idempotent — running it multiple times is safe.
@@ -273,20 +321,26 @@ For the external repo case, the same options apply with the addition of pull-bef
 
 **Impact:** Eliminates the single noisiest file from VCS diffs. Every task operation touches one fewer file.
 
-### Phase 2 — Separate-branch support
+### Phase 2 — Separate-branch support (current repo)
 
-1. **Spike:** Validate jj workspace / git worktree behavior with a branch checked out into `.sandpiper/tasks/`.
-2. Add `tasks.version_control` config schema to `.sandpiper/settings.json`.
-3. Implement branch bootstrap (create orphan branch, set up worktree, gitignore path).
-4. Implement auto-commit for task operations in separate-branch mode.
-5. Implement `sandpiper tasks sync` for push/pull.
-6. Migration command: move existing inline tasks to the configured branch.
+1. Add `tasks.version_control` config schema to `.sandpiper/settings.json` and `.sandpiper-tasks.json`.
+2. Implement backend detection (`.jj/` → `jj workspace`, `.git/` without `.jj/` → `git worktree`).
+3. Implement branch bootstrap:
+   - jj repo → `jj workspace add .sandpiper/tasks --revision 'root()'`
+   - git repo → `git worktree add --orphan -b <branch> .sandpiper/tasks`
+4. Implement gitignore updates for the main checkout.
+5. Implement auto-commit / manual-commit behavior according to config.
+6. Implement `sandpiper tasks sync` for push/pull.
+7. Migration command: move existing inline tasks to the configured branch.
 
 ### Phase 3 — External repo support
 
-1. Implement clone-based bootstrap for `mode.repo`.
-2. Handle pull-before-operate for remote changes.
-3. Handle conflict detection and resolution guidance.
+1. Implement clone-based bootstrap for `mode.repo` using repo-appropriate clone semantics:
+   - jj repo → `jj git clone --colocate`
+   - git repo → `git clone`
+2. Handle branch selection / creation after clone.
+3. Handle pull-before-operate for remote changes.
+4. Handle conflict detection and resolution guidance.
 
 ### Phase 4 — Extend pattern
 
@@ -308,11 +362,13 @@ For the external repo case, the same options apply with the addition of pull-bef
 1. **Auto-commit** — opt-in via `auto_commit: true` in config. Default `false`. User controls commit granularity.
 2. **Auto-push** — opt-in via `auto_push: true` in config. Default `false`. Offline-first by default.
 3. **Settings file location** — two locations, standalone overrides sandpiper settings. The standalone file lives at the project root (not in `.sandpiper/` or the tasks directory) so it can be committed to `main` even when tasks are on a separate branch.
-4. **`@` sentinel in external repo context** — when `repo` is set and `branch` is `"@"`, the default branch is whatever HEAD points to on the cloned remote. This is standard `git clone` / `jj git clone` behavior and does not require special handling. Documented in the `mode.branch` section.
-5. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
+4. **Standalone config filename** — `.sandpiper-tasks.json`.
+5. **Standalone config format** — JSON only, matching the base sandpiper config to simplify migration strategies.
+6. **`@` sentinel in external repo context** — when `repo` is set and `branch` is `"@"`, the default branch is whatever HEAD points to on the cloned remote. This is standard `git clone` / `jj git clone` behavior and does not require special handling. Documented in the `mode.branch` section.
+7. **Backend selection rule** — current repo: jj → `jj workspace`, git → `git worktree`. External repo: always plain clone, using the same VCS semantics as the current repo (`jj git clone --colocate` in jj repos, `git clone` in git repos).
+8. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
 
 ## Open questions
 
-1. **jj workspace mechanics** — Does `jj workspace add` support targeting a subdirectory of an existing workspace? If not, does `git worktree add` in colocated mode work cleanly with jj's snapshot? Needs a spike (next step after this doc is finalized).
-2. **Standalone config filename** — The standalone config file at the project root needs a well-known name. Candidates: `.sandpiper-tasks.json`, `sandpiper-tasks.config.json`, `.tasks.json`. Leaning toward `.sandpiper-tasks.json` for namespace clarity.
-3. **Config file format** — JSON is the current choice for consistency with `.sandpiper/settings.json`. Should we also support TOML or YAML for the standalone file? Leaning toward JSON-only to keep parsing simple.
+1. **Bootstrap UX** — when separate-branch or external-repo mode is configured but storage is not yet initialized, should the CLI auto-bootstrap silently, prompt interactively, or fail with an actionable message plus an explicit init command? Leaning toward explicit bootstrap command plus actionable guidance for safety.
+2. **Root-based history and remotes** — for the jj workspace backend, should the implementation always root the task workspace at `root()` from day one, or make that configurable? Root-based independent history is desirable, but we should validate the remote push/pull ergonomics before hard-coding it into the implementation.

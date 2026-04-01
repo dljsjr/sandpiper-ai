@@ -1,6 +1,6 @@
 # Session Stand-Up
 
-Updated: 2026-04-01T16:35:00Z
+Updated: 2026-04-01T17:48:00Z
 Session: current
 
 ## Accomplished
@@ -20,6 +20,22 @@ Session: current
   - Bumped LOW → MEDIUM: AGENT-14, AGENT-16, AGENT-28, SHR-67, TCL-57/58/59, TCL-80, TOOLS-7, WEB-10, WEB-11
   - Bumped MEDIUM → HIGH: WEB-9
 
+### Task storage strategy design + jj spike
+- Created and completed **TCL-82** (design doc) and **TCL-83** (jj/git mechanics spike).
+- Added `.sandpiper/docs/task-storage-strategy.md` describing a configurable task storage model:
+  - inline mode (`branch: "@"`)
+  - separate-branch mode in the current repo
+  - external repo mode via plain clone
+  - opt-in `auto_commit` and `auto_push`
+  - standalone root config file (`.sandpiper-tasks.json`) overriding `.sandpiper/settings.json`
+  - `index.toon` treated as derived state
+- Spike findings:
+  - **jj repo → use `jj workspace`** at `.sandpiper/tasks/`
+  - **plain git repo → use `git worktree`**
+  - **do not use `git worktree` inside a jj repo**
+  - **external repos are plain clones**, not workspaces/worktrees; use `jj git clone --colocate` in jj projects and `git clone` in git projects
+- Remaining open questions in the design doc are narrowed to bootstrap UX and whether root-based independent history should be hard-coded for the jj workspace backend.
+
 ## Deferred decisions (need dedicated session)
 - **SHR-68/69** (bash/zsh user command capture) — need a discussion before final triage
 - **MEM-1** — user has a detailed design doc; triage after a dedicated MEM design review session
@@ -32,12 +48,14 @@ Session: current
 Good candidates to pick up next:
 - **TCL-71** (HIGH) — require key or explicit filter on mutating commands; safety improvement, ready to implement
 - **WEB-9** (HIGH) — CSS selector targeting; easy win, API already designed
+- **Task storage Phase 1** — gitignore `index.toon`, rebuild it as derived state, and make scan-from-disk the primary counter allocation path
 - **AGENT-35** (HIGH) — deterministic enforcement hooks; significant design effort, worth planning
 
 ## Blockers
 - None.
 
 ## Context
-- `main` is ahead of `main@origin` by several commits (triage pass + ticket creation). User is handling pushes manually.
+- `main` is ahead of `main@origin` by several commits (ticket creation, triage pass, task storage design/spike). User is handling pushes manually.
 - SHR-68/69 discussion deferred; they remain at MEDIUM pending that conversation.
 - TCL-55/61 remain LOW pending MEM design review.
+- The task storage design now explicitly distinguishes current-repo separate-branch storage from external-repo clone storage; do not reuse `git worktree` inside jj repos.
