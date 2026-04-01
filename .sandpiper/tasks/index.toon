@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775069408202
+lastUpdatedAt: 1775069483766
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1083,17 +1083,18 @@ tasks:
     key: TCL-87
     project: TCL
     title: "Phase 2: support separate-branch task storage in the current repo"
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:01:57.031Z"
-    updatedAt: "2026-04-01T18:35:35.179Z"
+    updatedAt: "2026-04-01T18:51:23.758Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775068535192
+    lastIndexedAt: 1775069483765
   "TCL-88":
     key: TCL-88
     project: TCL
@@ -1247,18 +1248,19 @@ tasks:
     key: TCL-97
     project: TCL
     title: Add integration tests and operator docs for current-repo storage modes
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.194Z"
-    updatedAt: "2026-04-01T18:04:23.072Z"
+    updatedAt: "2026-04-01T18:51:23.713Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-87
-    lastIndexedAt: 1775066663078
+    lastIndexedAt: 1775069483720
   "TCL-100":
     key: TCL-100
     project: TCL
