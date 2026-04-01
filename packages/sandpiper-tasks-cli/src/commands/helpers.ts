@@ -1,12 +1,14 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import type { Command } from '@commander-js/extra-typings';
+import { autoCommitIfEnabled } from '../core/auto-commit.js';
 import { isIndexConsistent } from '../core/consistency.js';
 import { parseFrontmatter, taskFromFrontmatter } from '../core/frontmatter.js';
 import { ensureIndexGitignore, loadIndex, tasksFromIndex, updateIndex } from '../core/index-update.js';
 import type { OutputFormat } from '../core/output.js';
 import { formatRawOutput, formatTasksOutput } from '../core/output.js';
 import { searchTasks } from '../core/search.js';
+import { resolveStorageConfig } from '../core/storage-config.js';
 import type { Task } from '../core/types.js';
 
 export interface RootOptions {
@@ -144,6 +146,9 @@ export function emitMutationResult(
 
   if (shouldSave(cmd)) {
     updateIndex(getTasksDir(cmd));
+    const rootDir = getRootDir(cmd) ?? process.cwd();
+    const config = resolveStorageConfig(rootDir);
+    autoCommitIfEnabled(rootDir, config, humanMessage.split('\n')[0] ?? humanMessage);
   }
 }
 
