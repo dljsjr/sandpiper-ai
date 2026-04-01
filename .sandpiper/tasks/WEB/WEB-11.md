@@ -2,11 +2,11 @@
 title: "Spike: single-query web search tool (fetch top N results from a search API)"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.175Z
-updated_at: 2026-04-01T15:30:30.404Z
+updated_at: 2026-04-01T16:30:37.348Z
 ---
 
 # Spike: single-query web search tool (fetch top N results from a search API)
@@ -42,3 +42,7 @@ This is a spike to evaluate:
 ## 2026-04-01T15:30:30.404Z
 
 - **description**: added (23 lines)
+
+## 2026-04-01T16:30:37.348Z
+
+- **priority**: LOW → MEDIUM

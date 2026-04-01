@@ -2,11 +2,11 @@
 title: "Migration move fails across filesystem boundaries (renameSync)"
 status: NOT STARTED
 kind: BUG
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-03-26T04:45:09.533Z
-updated_at: 2026-03-29T00:37:46.884Z
+updated_at: 2026-04-01T16:32:15.928Z
 ---
 
 # Migration move fails across filesystem boundaries (renameSync)
@@ -24,3 +24,7 @@ Low priority — this is an unusual configuration, and the user can use --symlin
 ## 2026-03-26T04:45:17.384Z
 
 - **description**: added (5 lines)
+
+## 2026-04-01T16:32:15.928Z
+
+- **priority**: LOW → MEDIUM

@@ -2,11 +2,11 @@
 title: "Convert remaining shell scripts to portable TypeScript"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-24T21:02:38.813Z
-updated_at: 2026-03-29T00:38:02.254Z
+updated_at: 2026-04-01T16:30:37.234Z
 ---
 
 # Convert remaining shell scripts to portable TypeScript
@@ -29,3 +29,7 @@ Replace remaining bash/POSIX shell scripts with portable TypeScript for cross-pl
 ## 2026-03-29T00:37:46.877Z
 
 - **status**: IN PROGRESS → NOT STARTED
+
+## 2026-04-01T16:30:37.234Z
+
+- **priority**: LOW → MEDIUM

@@ -2,13 +2,13 @@
 title: "Web app for task board"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-23T03:18:38.927Z
 depends_on:
   - TCL-57
-updated_at: 2026-03-29T00:37:46.886Z
+updated_at: 2026-04-01T16:30:37.157Z
 ---
 
 # Web app for task board
@@ -36,3 +36,7 @@ Depends on the board data model from TCL-57.
 
 - **description**: added (14 lines)
 - **depends_on**: (none) → TCL-57
+
+## 2026-04-01T16:30:37.157Z
+
+- **priority**: LOW → MEDIUM

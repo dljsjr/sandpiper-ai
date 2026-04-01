@@ -2,11 +2,11 @@
 title: "Design board data model with swimlanes"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-23T03:18:38.864Z
-updated_at: 2026-03-29T00:37:46.888Z
+updated_at: 2026-04-01T16:30:37.092Z
 ---
 
 # Design board data model with swimlanes
@@ -30,3 +30,7 @@ Output: a data model specification that can be consumed by both the Pi TUI integ
 ## 2026-03-23T03:19:16.465Z
 
 - **description**: added (11 lines)
+
+## 2026-04-01T16:30:37.092Z
+
+- **priority**: LOW → MEDIUM
