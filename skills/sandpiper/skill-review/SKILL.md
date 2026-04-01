@@ -128,7 +128,7 @@ In non-interactive contexts this hangs indefinitely. Always use
 
 **Check for a `compatibility` field** if the skill has external dependencies (CLI tools, runtime requirements, MCP servers).
 
-**Check that bundled scripts are referenced** from the SKILL.md body with guidance on when to use them.
+**Check that bundled scripts are referenced using relative paths** (e.g., `scripts/my-tool`) from the SKILL.md body, with guidance on when to use them. Code examples in fenced blocks must use `scripts/` paths, not bare command names — agents resolve these relative paths against the skill directory at runtime. A bare command name (e.g., `my-tool` instead of `scripts/my-tool`) will cause agents to try to find the command on `$PATH`, which fails.
 
 **Check for missing file-type conventions.** If the skill uses `references/` or `scripts/`, verify the directory names are correct and the linking is clear.
 
