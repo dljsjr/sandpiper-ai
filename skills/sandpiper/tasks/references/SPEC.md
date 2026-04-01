@@ -79,11 +79,16 @@ The body SHOULD contain: **Purpose**, **Scope** (including what does NOT belong)
 
 ### 2.4 Project Counter State
 
-Task numbering counters are maintained in the task index file (`index.toon`), not in per-project metadata files. Each project's `nextTaskNumber` is stored in the index's `counters` section.
+Task numbering counters are derived from the task files on disk. **Disk scan is the primary mechanism** — on every `task create`, the CLI scans all `.md` task files and `.moved` tombstones in the project directory to find the highest allocated number, then increments by one.
 
-If the index is unavailable (e.g., first use, corrupted, or deleted), the counter MUST be rebuilt by scanning existing task files and using the highest task number found + 1.
+The task index (`index.toon`) also stores per-project counters, but these act as a **floor** only: if the index counter is higher than the disk scan result (e.g. because a task file was deleted, which the spec prohibits), the index value is used to prevent counter regression.
 
-Legacy `.meta.yml` files MAY be present from older versions and are supported as a fallback counter source, but MUST NOT be created by new implementations.
+Key properties:
+- `index.toon` is **derived state** and is **gitignored** in all storage modes. It is never committed to VCS. The CLI creates/rebuilds it automatically and maintains a `.gitignore` entry for it.
+- The index is rebuilt automatically when it is absent or when the task file count has changed since the last index.
+- Counter allocation is monotonic and collision-resistant. `.moved` tombstone files are included in the scan so that moved task numbers are never reused.
+
+Legacy `.meta.yml` files MAY be present from older versions. They MUST NOT be created by new implementations and are not consulted by the current counter logic.
 
 The `PROJECT.md` file is distinct from counter state and is NOT used for counter recovery. See §2.3 for details.
 
@@ -456,3 +461,138 @@ The activity log (§7.7) and history diffs (§8) are complementary:
 | Description changes | Line count summary | Actual content diff |
 | Use case | Quick glance at what changed | Full audit / content recovery |
 | Format | Human-readable markdown | Standard unified diff |
+
+## 9. Storage Configuration
+
+### 9.1 Overview
+
+By default, task files are stored inline on the current VCS branch alongside code. This
+means every `task create`, `task update`, `task pickup`, etc. modifies files that appear
+in `git status` / `jj st` alongside code changes. For projects with active task usage
+this creates significant VCS churn.
+
+The `sandpiper-tasks` CLI supports three storage modes to address this:
+
+| Mode | Description |
+|------|-------------|
+| **inline** (default) | Tasks tracked on the current branch with code |
+| **separate-branch** | Tasks live on a dedicated branch; workspace/worktree at `.sandpiper/tasks/` |
+| **external-repo** | Tasks live in a separate git/jj repository cloned to `.sandpiper/tasks/` |
+
+In separate-branch and external-repo modes, `.sandpiper/tasks/` is gitignored on the
+main branch. Task operations still read and write files at the same path — the storage
+mode is transparent to normal `task` commands.
+
+### 9.2 Configuration File
+
+Storage is configured via a JSON file at the **project root** (not inside `.sandpiper/`).
+
+**Standalone config file (highest precedence):** `.sandpiper-tasks.json`
+
+```json
+{
+  "version_control": {
+    "enabled": true,
+    "mode": {
+      "branch": "tasks"
+    },
+    "auto_commit": false,
+    "auto_push": false
+  }
+}
+```
+
+**Alternative: `.sandpiper/settings.json` under the `tasks` key:**
+
+```json
+{
+  "tasks": {
+    "version_control": {
+      "enabled": true,
+      "mode": { "branch": "tasks" }
+    }
+  }
+}
+```
+
+When both files exist, `.sandpiper-tasks.json` wins entirely for the `tasks` namespace.
+
+### 9.3 Configuration Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `version_control.enabled` | boolean | `true` | Whether tasks are VCS-tracked. `false` → plain files, gitignored. |
+| `version_control.mode.branch` | string | `"@"` | `"@"` = inline (current branch). Any other value = separate branch name. |
+| `version_control.mode.repo` | string | omit | External repo URL. When set, the CLI clones that repo to `.sandpiper/tasks/`. |
+| `version_control.auto_commit` | boolean | `false` | Auto-commit to the task branch after every mutation. Not applicable in inline mode. |
+| `version_control.auto_push` | boolean | `false` | Auto-push after every auto-commit. Requires `auto_commit: true`. |
+
+**Storage mode matrix:**
+
+| `enabled` | `repo` | `branch` | Behaviour |
+|-----------|--------|----------|-----------|
+| `true` | omit | `"@"` | Inline (default) |
+| `true` | omit | `"tasks"` | Separate branch in current repo |
+| `true` | `"git@..."` | `"@"` | External repo, default branch |
+| `true` | `"git@..."` | `"tasks"` | External repo, named branch |
+| `false` | — | — | Plain files, gitignored |
+
+### 9.4 Backend Selection
+
+The CLI detects the VCS type and selects the appropriate backend:
+
+| Project repo | Separate-branch backend | External-repo clone |
+|---|---|---|
+| jj (`.jj/` present) | `jj workspace add` | `jj git clone --colocate` |
+| git only (`.git/`, no `.jj/`) | `git worktree add --orphan` | `git clone` |
+
+jj takes precedence when both `.jj/` and `.git/` exist (colocated repo).
+
+### 9.5 Bootstrap Commands
+
+Separate-branch and external-repo modes require explicit initialisation.
+Inline mode requires none.
+
+```bash
+# Initialise the task workspace/worktree (separate-branch or external-repo mode)
+scripts/sandpiper-tasks --dir /path/to/project storage init
+
+# Migrate existing inline tasks onto the configured separate branch
+scripts/sandpiper-tasks --dir /path/to/project storage migrate
+
+# Sync with remote (pull then push)
+scripts/sandpiper-tasks --dir /path/to/project storage sync
+scripts/sandpiper-tasks --dir /path/to/project storage push
+scripts/sandpiper-tasks --dir /path/to/project storage pull
+```
+
+`storage init` is idempotent. Running it on an already-initialised workspace is safe.
+
+### 9.6 Workflow: Setting Up Separate-Branch Storage
+
+1. **Create the config file** at the project root:
+   ```json
+   { "version_control": { "mode": { "branch": "tasks" } } }
+   ```
+
+2. **Initialise** (for a fresh project with no existing tasks):
+   ```bash
+   scripts/sandpiper-tasks --dir . storage init
+   ```
+
+3. **Or migrate** (for a project with existing inline tasks):
+   ```bash
+   scripts/sandpiper-tasks --dir . storage migrate
+   ```
+
+4. **Commit both sides:**
+   - Main branch: the file deletions + updated `.gitignore`
+   - Task branch/workspace: the task files
+
+5. **Verify:**
+   ```bash
+   scripts/sandpiper-tasks --dir . task list
+   ```
+
+See `references/storage.md` for the full operator reference including repair guidance,
+auto-commit configuration, and remote tracking setup.

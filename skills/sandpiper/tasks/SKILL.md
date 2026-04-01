@@ -277,3 +277,49 @@ scripts/sandpiper-tasks task list -s NEEDS_REVIEW
 # Bulk mutation
 scripts/sandpiper-tasks task complete --final --resolution DONE --filter-status NEEDS_REVIEW
 ```
+
+## Task Storage Modes
+
+By default, task files are tracked inline on the current VCS branch alongside code.
+Every task operation (create, update, pickup, complete) produces file changes that
+appear in `git status` / `jj st`. For active projects this creates significant churn.
+
+To keep task history separate from code history, configure a **separate branch** or
+**external repo** in a config file at the project root:
+
+```json
+// .sandpiper-tasks.json
+{ "version_control": { "mode": { "branch": "tasks" } } }
+```
+
+Key fields:
+
+| Field | Default | What it does |
+|---|---|---|
+| `mode.branch` | `"@"` | `"@"` = inline; any other value = branch name |
+| `mode.repo` | omit | External repo URL (cloned to `.sandpiper/tasks/`) |
+| `auto_commit` | `false` | Commit to task branch after every mutation |
+| `auto_push` | `false` | Push after every auto-commit |
+
+Once configured, bootstrap with:
+
+```bash
+# Fresh project — initialise the separate workspace/worktree
+scripts/sandpiper-tasks --dir /path/to/project storage init
+
+# Existing project — migrate inline tasks onto the separate branch
+scripts/sandpiper-tasks --dir /path/to/project storage migrate
+
+# Sync with remote
+scripts/sandpiper-tasks --dir /path/to/project storage sync   # pull then push
+scripts/sandpiper-tasks --dir /path/to/project storage push
+scripts/sandpiper-tasks --dir /path/to/project storage pull
+```
+
+After `storage init` or `storage migrate`, commit both sides:
+- **Main branch:** the file deletions + updated `.gitignore`
+- **Task workspace:** the task files
+
+For complete configuration options, backend selection rules (jj workspace vs git
+worktree), repair guidance, and auto-commit semantics, read
+`references/storage.md`.
