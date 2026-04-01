@@ -95,12 +95,23 @@ src/
     ├── mutate.ts         # Create, update, complete, pickup
     ├── move.ts           # Move tasks between projects/kinds
     ├── archive.ts        # Archive completed tasks
-    ├── index-update.ts   # TOON index management
+    ├── index-update.ts   # TOON index management (derived state — see below)
     ├── schema.ts         # Schema versioning + migrations
     ├── activity-log.ts   # Append-only activity log per task
     ├── history.ts        # Unified diffs for task modifications
     └── ...
 ```
+
+### `index.toon` is derived state
+
+`index.toon` is a cache over the task files on disk. It is **never committed to VCS**
+— a `.gitignore` entry is automatically maintained by the CLI.
+
+- **Auto-rebuilt** when missing or when the task file count has changed.
+- **Scan-from-disk is primary** for counter allocation: `task create` always scans
+  existing `.md` files and `.moved` tombstones to find the highest allocated number.
+  The index counter acts as a floor to guard against regression if files are deleted.
+- Running `sandpiper-tasks index update` explicitly rebuilds the index from scratch.
 
 Core logic is framework-independent (no CLI imports). The CLI layer is a thin Commander wrapper that delegates to core functions.
 

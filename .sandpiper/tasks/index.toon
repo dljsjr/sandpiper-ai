@@ -1,549 +1,6 @@
 version: 1
-lastUpdatedAt: 1775067040520
+lastUpdatedAt: 1775068190860
 tasks:
-  "TOOLS-7":
-    key: TOOLS-7
-    project: TOOLS
-    title: Convert remaining shell scripts to portable TypeScript
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-24T21:02:38.813Z"
-    updatedAt: "2026-04-01T16:30:37.234Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037243
-  "TOOLS-10":
-    key: TOOLS-10
-    project: TOOLS
-    title: Per-extension postinstall strategy for extensions with npm dependencies
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-26T22:03:20.380Z"
-    updatedAt: "2026-03-30T03:27:18.826Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774841238831
-  "TOOLS-11":
-    key: TOOLS-11
-    project: TOOLS
-    title: Clean up stale built-extension assumptions after TOOLS-10
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T18:57:04.051Z"
-    updatedAt: "2026-03-30T20:19:20.696Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774901960703
-  "TOOLS-2":
-    key: TOOLS-2
-    project: TOOLS
-    title: Support pinned refs/SHAs in vendor.txt for reproducible builds
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-23T14:54:12.030Z"
-    updatedAt: "2026-03-29T00:37:46.879Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774744666898
-  "TOOLS-9":
-    key: TOOLS-9
-    project: TOOLS
-    title: Investigate upstream pi support for piConfig env var overrides
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-25T03:03:06.093Z"
-    updatedAt: "2026-03-29T00:37:46.880Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774744666898
-  "TOOLS-12":
-    key: TOOLS-12
-    project: TOOLS
-    title: Simplify root package metadata after extension unbundling
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T19:31:59.244Z"
-    updatedAt: "2026-03-30T19:41:37.016Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774899697022
-  "TOOLS-1":
-    key: TOOLS-1
-    project: TOOLS
-    title: Group vendor.txt entries by repo to avoid redundant tarball downloads
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-23T14:54:12.001Z"
-    updatedAt: "2026-03-29T00:37:46.881Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774744666898
-  "TOOLS-4":
-    key: TOOLS-4
-    project: TOOLS
-    title: Consider caching dash docset identifiers to avoid repeated list-installed-docsets calls
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-23T15:18:52.197Z"
-    updatedAt: "2026-03-29T00:37:46.881Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774744666898
-  "TOOLS-13":
-    key: TOOLS-13
-    project: TOOLS
-    title: Verify source-loaded extension dependency resolution in publish-style installs
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-30T19:31:59.329Z"
-    updatedAt: "2026-03-30T19:31:59.372Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774899119377
-  "WEB-10":
-    key: WEB-10
-    project: WEB
-    title: Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:49.144Z"
-    updatedAt: "2026-04-01T16:30:37.312Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037321
-  "WEB-11":
-    key: WEB-11
-    project: WEB
-    title: "Spike: single-query web search tool (fetch top N results from a search API)"
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:49.175Z"
-    updatedAt: "2026-04-01T16:30:37.348Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037353
-  "WEB-9":
-    key: WEB-9
-    project: WEB
-    title: Implement CSS selector targeting in web_fetch
-    status: NOT STARTED
-    kind: TASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:49.112Z"
-    updatedAt: "2026-04-01T16:30:37.271Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037280
-  "WEB-12":
-    key: WEB-12
-    project: WEB
-    title: "Spike: site crawling with robots.txt respect and conservative rate limiting"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:49.206Z"
-    updatedAt: "2026-04-01T15:30:39.721Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775057439727
-  "WEB-8":
-    key: WEB-8
-    project: WEB
-    title: Wire ctx.signal into web_fetch for user-cancellable fetches
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-30T02:04:34.128Z"
-    updatedAt: "2026-03-30T02:04:45.101Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774836285107
-  "WEB-13":
-    key: WEB-13
-    project: WEB
-    title: "Spike: browser automation tool for interactive and JS-heavy pages"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:33:28.199Z"
-    updatedAt: "2026-04-01T15:33:42.994Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[1]: WEB-10
-    lastIndexedAt: 1775057623000
-  "AGENT-39":
-    key: AGENT-39
-    project: AGENT
-    title: "Audit follow-up: remove scratch/debug files and harden ignore patterns"
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:06.862Z"
-    updatedAt: "2026-04-01T15:14:55.343Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495348
-  "AGENT-29":
-    key: AGENT-29
-    project: AGENT
-    title: Inject standup content into system prompt for automatic session continuity
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-30T02:45:14.275Z"
-    updatedAt: "2026-03-30T02:48:05.017Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774838885022
-  "AGENT-48":
-    key: AGENT-48
-    project: AGENT
-    title: Persist self-reflection learnings in skills/docs after task-storage design session
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T18:09:03.845Z"
-    updatedAt: "2026-04-01T18:10:40.514Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775067040520
-  "AGENT-38":
-    key: AGENT-38
-    project: AGENT
-    title: Optimize startup system prompt ordering for prefix caching
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-31T19:55:05.909Z"
-    updatedAt: "2026-04-01T05:08:13.959Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775020093968
-  "AGENT-28":
-    key: AGENT-28
-    project: AGENT
-    title: "ProcessManager: add configurable buffer size limits to prevent unbounded memory growth"
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-27T22:50:01.097Z"
-    updatedAt: "2026-04-01T16:30:37.029Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037034
-  "AGENT-33":
-    key: AGENT-33
-    project: AGENT
-    title: Archive superseded shell-relay design docs under .sandpiper/archive
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T19:21:40.760Z"
-    updatedAt: "2026-03-30T19:23:24.794Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774898604799
-  "AGENT-46":
-    key: AGENT-46
-    project: AGENT
-    title: "ProcessManager: add process restart / auto-restart support"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:52.779Z"
-    updatedAt: "2026-04-01T15:30:48.405Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775057448411
-  "AGENT-37":
-    key: AGENT-37
-    project: AGENT
-    title: Improve cold-start continuity with startup context and guidance
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T20:27:40.052Z"
-    updatedAt: "2026-03-30T20:43:24.255Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774903404261
-  "AGENT-27":
-    key: AGENT-27
-    project: AGENT
-    title: Refactor system.ts into a package (too large for a single file)
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-27T22:04:54.108Z"
-    updatedAt: "2026-04-01T04:38:21.716Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775018301726
-  "AGENT-42":
-    key: AGENT-42
-    project: AGENT
-    title: Run clone cleanup sweep across remaining low-priority duplicates
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:07.054Z"
-    updatedAt: "2026-04-01T15:14:55.435Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495440
-  "AGENT-36":
-    key: AGENT-36
-    project: AGENT
-    title: Implement second-pass prompt progressive disclosure revision
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T20:04:39.335Z"
-    updatedAt: "2026-03-30T20:19:20.787Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774901960793
-  "AGENT-43":
-    key: AGENT-43
-    project: AGENT
-    title: Set up refactor audit tooling via mise (jscpd + lizard)
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:52.271Z"
-    updatedAt: "2026-04-01T15:14:55.466Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495471
-  "AGENT-32":
-    key: AGENT-32
-    project: AGENT
-    title: Do a repository doc hygiene sweep after recent architecture changes
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T19:10:37.303Z"
-    updatedAt: "2026-03-30T20:19:20.608Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774901960614
-  "AGENT-47":
-    key: AGENT-47
-    project: AGENT
-    title: "ProcessManager: design multi-consumer output broadcast pattern"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:52.812Z"
-    updatedAt: "2026-04-01T15:30:58.706Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775057458712
-  "AGENT-16":
-    key: AGENT-16
-    project: AGENT
-    title: TUI rebranding — custom assets and theming for the sandpiper identity
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T21:22:51.257Z"
-    updatedAt: "2026-04-01T16:30:36.995Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037001
-  "AGENT-35":
-    key: AGENT-35
-    project: AGENT
-    title: Design deferred deterministic guidance/enforcement hooks for tool use
-    status: NOT STARTED
-    kind: TASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-30T20:00:27.396Z"
-    updatedAt: "2026-03-31T15:39:16.633Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774971556639
-  "AGENT-40":
-    key: AGENT-40
-    project: AGENT
-    title: Deduplicate parseTaskIndex flush logic in startup-context
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:06.955Z"
-    updatedAt: "2026-04-01T15:14:55.374Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495379
-  "AGENT-31":
-    key: AGENT-31
-    project: AGENT
-    title: Parameterize filesystem targets without nested overrides and audit tests for production-path access
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T18:34:48.194Z"
-    updatedAt: "2026-03-30T18:50:22.049Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774896622054
-  "AGENT-44":
-    key: AGENT-44
-    project: AGENT
-    title: bun test baseline failures in shell-relay/core process tests under current Bun/Vitest setup
-    status: COMPLETE
-    kind: BUG
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-04-01T06:07:06.349Z"
-    updatedAt: "2026-04-01T15:14:55.500Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495511
-  "AGENT-30":
-    key: AGENT-30
-    project: AGENT
-    title: Restructure AGENTS.md with progressive disclosure — split into focused docs
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T02:56:05.619Z"
-    updatedAt: "2026-03-30T03:03:51.354Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774839831359
   "AGENT-14":
     key: AGENT-14
     project: AGENT
@@ -559,22 +16,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775061135934
-  "AGENT-45":
-    key: AGENT-45
+  "AGENT-16":
+    key: AGENT-16
     project: AGENT
-    title: Update biome.json schema URL to match installed Biome CLI
-    status: COMPLETE
-    kind: BUG
-    priority: LOW
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-04-01T06:34:19.203Z"
-    updatedAt: "2026-04-01T15:14:55.538Z"
-    resolution: DONE
+    title: TUI rebranding — custom assets and theming for the sandpiper identity
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.257Z"
+    updatedAt: "2026-04-01T16:30:36.995Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775056495543
+    lastIndexedAt: 1775061037001
   "AGENT-20":
     key: AGENT-20
     project: AGENT
@@ -591,6 +47,117 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774970810325
+  "AGENT-27":
+    key: AGENT-27
+    project: AGENT
+    title: Refactor system.ts into a package (too large for a single file)
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-27T22:04:54.108Z"
+    updatedAt: "2026-04-01T04:38:21.716Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775018301726
+  "AGENT-28":
+    key: AGENT-28
+    project: AGENT
+    title: "ProcessManager: add configurable buffer size limits to prevent unbounded memory growth"
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-27T22:50:01.097Z"
+    updatedAt: "2026-04-01T16:30:37.029Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037034
+  "AGENT-29":
+    key: AGENT-29
+    project: AGENT
+    title: Inject standup content into system prompt for automatic session continuity
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T02:45:14.275Z"
+    updatedAt: "2026-03-30T02:48:05.017Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774838885022
+  "AGENT-30":
+    key: AGENT-30
+    project: AGENT
+    title: Restructure AGENTS.md with progressive disclosure — split into focused docs
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T02:56:05.619Z"
+    updatedAt: "2026-03-30T03:03:51.354Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774839831359
+  "AGENT-31":
+    key: AGENT-31
+    project: AGENT
+    title: Parameterize filesystem targets without nested overrides and audit tests for production-path access
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T18:34:48.194Z"
+    updatedAt: "2026-03-30T18:50:22.049Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774896622054
+  "AGENT-32":
+    key: AGENT-32
+    project: AGENT
+    title: Do a repository doc hygiene sweep after recent architecture changes
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:10:37.303Z"
+    updatedAt: "2026-03-30T20:19:20.608Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774901960614
+  "AGENT-33":
+    key: AGENT-33
+    project: AGENT
+    title: Archive superseded shell-relay design docs under .sandpiper/archive
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:21:40.760Z"
+    updatedAt: "2026-03-30T19:23:24.794Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774898604799
   "AGENT-34":
     key: AGENT-34
     project: AGENT
@@ -607,6 +174,101 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774901960751
+  "AGENT-35":
+    key: AGENT-35
+    project: AGENT
+    title: Design deferred deterministic guidance/enforcement hooks for tool use
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T20:00:27.396Z"
+    updatedAt: "2026-03-31T15:39:16.633Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774971556639
+  "AGENT-36":
+    key: AGENT-36
+    project: AGENT
+    title: Implement second-pass prompt progressive disclosure revision
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T20:04:39.335Z"
+    updatedAt: "2026-03-30T20:19:20.787Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774901960793
+  "AGENT-37":
+    key: AGENT-37
+    project: AGENT
+    title: Improve cold-start continuity with startup context and guidance
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T20:27:40.052Z"
+    updatedAt: "2026-03-30T20:43:24.255Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774903404261
+  "AGENT-38":
+    key: AGENT-38
+    project: AGENT
+    title: Optimize startup system prompt ordering for prefix caching
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-31T19:55:05.909Z"
+    updatedAt: "2026-04-01T05:08:13.959Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775020093968
+  "AGENT-39":
+    key: AGENT-39
+    project: AGENT
+    title: "Audit follow-up: remove scratch/debug files and harden ignore patterns"
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:06.862Z"
+    updatedAt: "2026-04-01T15:14:55.343Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495348
+  "AGENT-40":
+    key: AGENT-40
+    project: AGENT
+    title: Deduplicate parseTaskIndex flush logic in startup-context
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:06.955Z"
+    updatedAt: "2026-04-01T15:14:55.374Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495379
   "AGENT-41":
     key: AGENT-41
     project: AGENT
@@ -623,6 +285,131 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775056495409
+  "AGENT-42":
+    key: AGENT-42
+    project: AGENT
+    title: Run clone cleanup sweep across remaining low-priority duplicates
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:07.054Z"
+    updatedAt: "2026-04-01T15:14:55.435Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495440
+  "AGENT-43":
+    key: AGENT-43
+    project: AGENT
+    title: Set up refactor audit tooling via mise (jscpd + lizard)
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:52.271Z"
+    updatedAt: "2026-04-01T15:14:55.466Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495471
+  "AGENT-44":
+    key: AGENT-44
+    project: AGENT
+    title: bun test baseline failures in shell-relay/core process tests under current Bun/Vitest setup
+    status: COMPLETE
+    kind: BUG
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-04-01T06:07:06.349Z"
+    updatedAt: "2026-04-01T15:14:55.500Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495511
+  "AGENT-45":
+    key: AGENT-45
+    project: AGENT
+    title: Update biome.json schema URL to match installed Biome CLI
+    status: COMPLETE
+    kind: BUG
+    priority: LOW
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-04-01T06:34:19.203Z"
+    updatedAt: "2026-04-01T15:14:55.538Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495543
+  "AGENT-46":
+    key: AGENT-46
+    project: AGENT
+    title: "ProcessManager: add process restart / auto-restart support"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:52.779Z"
+    updatedAt: "2026-04-01T15:30:48.405Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057448411
+  "AGENT-47":
+    key: AGENT-47
+    project: AGENT
+    title: "ProcessManager: design multi-consumer output broadcast pattern"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:52.812Z"
+    updatedAt: "2026-04-01T15:30:58.706Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057458712
+  "AGENT-48":
+    key: AGENT-48
+    project: AGENT
+    title: Persist self-reflection learnings in skills/docs after task-storage design session
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:09:03.845Z"
+    updatedAt: "2026-04-01T18:10:40.514Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775067040520
+  "MEM-1":
+    key: MEM-1
+    project: MEM
+    title: Design memory/brain system for cross-session knowledge retrieval
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-25T03:14:28.312Z"
+    updatedAt: "2026-03-29T00:37:46.896Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666899
   "PKM-1":
     key: PKM-1
     project: PKM
@@ -638,752 +425,6 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774744666899
-  "TCL-78":
-    key: TCL-78
-    project: TCL
-    title: Remove 'as Task' cast in taskFromFrontmatter and verify structural completeness
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:58.355Z"
-    updatedAt: "2026-04-01T15:31:06.703Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775057466709
-  "TCL-58":
-    key: TCL-58
-    project: TCL
-    title: Pi TUI integration for task board
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.896Z"
-    updatedAt: "2026-04-01T16:30:37.125Z"
-    dependsOn[1]: TCL-57
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037131
-  "TCL-59":
-    key: TCL-59
-    project: TCL
-    title: Web app for task board
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.927Z"
-    updatedAt: "2026-04-01T16:30:37.157Z"
-    dependsOn[1]: TCL-57
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037163
-  "TCL-79":
-    key: TCL-79
-    project: TCL
-    title: Narrow updateAllReferences to use index instead of full file scan
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:58.387Z"
-    updatedAt: "2026-04-01T15:31:15.480Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775057475486
-  "TCL-69":
-    key: TCL-69
-    project: TCL
-    title: Rebrand the Tasks CLI with a more memorable name
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T21:22:51.308Z"
-    updatedAt: "2026-03-31T15:39:16.856Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774971556862
-  "TCL-81":
-    key: TCL-81
-    project: TCL
-    title: Make 'kind' update in applyFieldUpdates an explicit internal API rather than a backdoor cast
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:58.451Z"
-    updatedAt: "2026-04-01T15:31:33.516Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775057493523
-  "TCL-72":
-    key: TCL-72
-    project: TCL
-    title: Refactor task-cmd into per-subcommand modules with shared helpers
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:06.925Z"
-    updatedAt: "2026-04-01T15:14:55.604Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495609
-  "TCL-85":
-    key: TCL-85
-    project: TCL
-    title: "Work plan: decompose task storage strategy implementation into phased tickets"
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T18:01:56.966Z"
-    updatedAt: "2026-04-01T18:04:44.898Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775066684903
-  "TCL-76":
-    key: TCL-76
-    project: TCL
-    title: sandpiper-tasks-cli baseline test regressions in search and index command suites
-    status: COMPLETE
-    kind: BUG
-    priority: HIGH
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-04-01T06:07:06.413Z"
-    updatedAt: "2026-04-01T12:29:17.663Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775046557668
-  "TCL-52":
-    key: TCL-52
-    project: TCL
-    title: Add batch/filter support to task move command
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-22T20:25:39.891Z"
-    updatedAt: "2026-03-29T00:37:46.887Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774744666899
-  "TCL-84":
-    key: TCL-84
-    project: TCL
-    title: "Spike: validate push/pull ergonomics for root()-based jj task workspace branch"
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T17:51:21.489Z"
-    updatedAt: "2026-04-01T17:54:51.566Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775066091572
-  "TCL-77":
-    key: TCL-77
-    project: TCL
-    title: Deduplicate remaining move/mutate reference-rewrite clone
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-04-01T06:30:48.955Z"
-    updatedAt: "2026-04-01T15:14:55.754Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495765
-  "TCL-80":
-    key: TCL-80
-    project: TCL
-    title: Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors
-    status: NOT STARTED
-    kind: BUG
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-04-01T15:29:58.419Z"
-    updatedAt: "2026-04-01T16:30:37.193Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037199
-  "TCL-73":
-    key: TCL-73
-    project: TCL
-    title: Add tests for extracted task subcommands and command helpers
-    status: COMPLETE
-    kind: TASK
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:07.016Z"
-    updatedAt: "2026-04-01T15:14:55.638Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495653
-  "TCL-57":
-    key: TCL-57
-    project: TCL
-    title: Design board data model with swimlanes
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.864Z"
-    updatedAt: "2026-04-01T16:30:37.092Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037098
-  "TCL-74":
-    key: TCL-74
-    project: TCL
-    title: Refactor history.findChanges into smaller helpers
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:07.087Z"
-    updatedAt: "2026-04-01T15:14:55.683Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495692
-  "TCL-87":
-    key: TCL-87
-    project: TCL
-    title: "Phase 2: support separate-branch task storage in the current repo"
-    status: NOT STARTED
-    kind: TASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:01:57.031Z"
-    updatedAt: "2026-04-01T18:04:22.717Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775066662722
-  "TCL-83":
-    key: TCL-83
-    project: TCL
-    title: "Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks"
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T17:38:25.745Z"
-    updatedAt: "2026-04-01T17:46:33.702Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775065593708
-  "TCL-71":
-    key: TCL-71
-    project: TCL
-    title: Make mutating task/project update commands require a key or explicit filter
-    status: NOT STARTED
-    kind: BUG
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-30T20:47:48.695Z"
-    updatedAt: "2026-03-30T20:47:48.737Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774903668743
-  "TCL-82":
-    key: TCL-82
-    project: TCL
-    title: "Design doc: task storage strategy for reducing VCS churn"
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T17:25:31.265Z"
-    updatedAt: "2026-04-01T17:46:41.122Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775065601128
-  "TCL-61":
-    key: TCL-61
-    project: TCL
-    title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T04:30:07.828Z"
-    updatedAt: "2026-03-29T00:37:46.888Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[1]: TCL-55
-    lastIndexedAt: 1774744666899
-  "TCL-55":
-    key: TCL-55
-    project: TCL
-    title: "Spike: SQLite index — trade-offs vs human-readable TOON index"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-23T03:18:38.806Z"
-    updatedAt: "2026-03-29T00:37:46.889Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774744666899
-  "TCL-75":
-    key: TCL-75
-    project: TCL
-    title: Refactor mutate.computeChanges into formatter helpers
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-04-01T06:05:07.118Z"
-    updatedAt: "2026-04-01T15:14:55.720Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775056495726
-  "TCL-86":
-    key: TCL-86
-    project: TCL
-    title: "Phase 1: treat index.toon as derived state and make disk scan primary for counter allocation"
-    status: NOT STARTED
-    kind: TASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:01:56.999Z"
-    updatedAt: "2026-04-01T18:04:22.685Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775066662690
-  "TCL-89":
-    key: TCL-89
-    project: TCL
-    title: "Phase 4: generalize storage bootstrap for future domains and unified init"
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:01:57.094Z"
-    updatedAt: "2026-04-01T18:04:22.782Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775066662788
-  "TCL-88":
-    key: TCL-88
-    project: TCL
-    title: "Phase 3: support external-repo task storage"
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:01:57.062Z"
-    updatedAt: "2026-04-01T18:04:22.748Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775066662754
-  "TCL-95":
-    key: TCL-95
-    project: TCL
-    title: Implement current-repo sync and auto-commit/auto-push behavior
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.125Z"
-    updatedAt: "2026-04-01T18:04:22.997Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-87
-    lastIndexedAt: 1775066663004
-  "TCL-94":
-    key: TCL-94
-    project: TCL
-    title: Implement sandpiper tasks init for current-repo jj/git backends
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.091Z"
-    updatedAt: "2026-04-01T18:04:22.963Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-87
-    lastIndexedAt: 1775066662969
-  "TCL-97":
-    key: TCL-97
-    project: TCL
-    title: Add integration tests and operator docs for current-repo storage modes
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.194Z"
-    updatedAt: "2026-04-01T18:04:23.072Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-87
-    lastIndexedAt: 1775066663078
-  "TCL-93":
-    key: TCL-93
-    project: TCL
-    title: Implement task storage config resolution and precedence
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.059Z"
-    updatedAt: "2026-04-01T18:04:22.924Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-87
-    lastIndexedAt: 1775066662933
-  "TCL-96":
-    key: TCL-96
-    project: TCL
-    title: Implement inline-to-separate-branch migration for current-repo mode
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.159Z"
-    updatedAt: "2026-04-01T18:04:23.035Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-87
-    lastIndexedAt: 1775066663042
-  "TCL-101":
-    key: TCL-101
-    project: TCL
-    title: Extract reusable storage bootstrap primitives for future domains
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.338Z"
-    updatedAt: "2026-04-01T18:04:23.211Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-89
-    lastIndexedAt: 1775066663218
-  "TCL-102":
-    key: TCL-102
-    project: TCL
-    title: Implement unified init/status surfaces for configured storage domains
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.374Z"
-    updatedAt: "2026-04-01T18:04:23.248Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-89
-    lastIndexedAt: 1775066663254
-  "TCL-103":
-    key: TCL-103
-    project: TCL
-    title: Document PKM/MEM adoption path for generalized storage bootstrap
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.408Z"
-    updatedAt: "2026-04-01T18:04:23.285Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-89
-    lastIndexedAt: 1775066663291
-  "TCL-100":
-    key: TCL-100
-    project: TCL
-    title: Add integration tests and conflict/repair guidance for external repo mode
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.300Z"
-    updatedAt: "2026-04-01T18:04:23.176Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-88
-    lastIndexedAt: 1775066663183
-  "TCL-99":
-    key: TCL-99
-    project: TCL
-    title: Implement branch selection/tracking and sync flows for external repo mode
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.266Z"
-    updatedAt: "2026-04-01T18:04:23.144Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-88
-    lastIndexedAt: 1775066663150
-  "TCL-98":
-    key: TCL-98
-    project: TCL
-    title: Implement external repo bootstrap with jj/git clone semantics
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.231Z"
-    updatedAt: "2026-04-01T18:04:23.106Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-88
-    lastIndexedAt: 1775066663116
-  "TCL-91":
-    key: TCL-91
-    project: TCL
-    title: Make scan-from-disk the primary counter allocation path
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:14.995Z"
-    updatedAt: "2026-04-01T18:04:22.851Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-86
-    lastIndexedAt: 1775066662858
-  "TCL-90":
-    key: TCL-90
-    project: TCL
-    title: Gitignore index.toon and rebuild it when missing or stale
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: HIGH
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:14.960Z"
-    updatedAt: "2026-04-01T18:04:22.815Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-86
-    lastIndexedAt: 1775066662822
-  "TCL-92":
-    key: TCL-92
-    project: TCL
-    title: Add coverage and docs for no-index startup/rebuild/counter flows
-    status: NOT STARTED
-    kind: SUBTASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-04-01T18:02:15.027Z"
-    updatedAt: "2026-04-01T18:04:22.891Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    parent: TCL-86
-    lastIndexedAt: 1775066662897
-  "SHR-69":
-    key: SHR-69
-    project: SHR
-    title: Implement zsh user command capture via zle widget override
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T14:54:25.683Z"
-    updatedAt: "2026-03-31T15:39:16.767Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774971556772
-  "SHR-68":
-    key: SHR-68
-    project: SHR
-    title: Implement bash user command capture via DEBUG trap
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T14:54:22.600Z"
-    updatedAt: "2026-03-31T15:39:16.719Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774971556725
-  "SHR-73":
-    key: SHR-73
-    project: SHR
-    title: Rebrand the Shell Relay with a more memorable name
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T21:22:51.359Z"
-    updatedAt: "2026-03-31T15:39:16.812Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774971556818
-  "SHR-63":
-    key: SHR-63
-    project: SHR
-    title: First command after setup often times out (prompt_ready race condition)
-    status: COMPLETE
-    kind: BUG
-    priority: MEDIUM
-    assignee: AGENT
-    reporter: AGENT
-    createdAt: "2026-03-25T03:02:39.233Z"
-    updatedAt: "2026-04-01T04:38:21.722Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775018301727
-  "SHR-90":
-    key: SHR-90
-    project: SHR
-    title: Wire ctx.signal into shell_relay for user-cancellable command execution
-    status: NOT STARTED
-    kind: TASK
-    priority: LOW
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-30T02:04:48.245Z"
-    updatedAt: "2026-03-30T02:04:56.767Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774836296772
-  "SHR-67":
-    key: SHR-67
-    project: SHR
-    title: Error on relay tool/command use if shell integration not sourced
-    status: NOT STARTED
-    kind: TASK
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-26T04:25:52.770Z"
-    updatedAt: "2026-04-01T16:30:37.060Z"
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775061037066
-  "SHR-94":
-    key: SHR-94
-    project: SHR
-    title: Resurrection-aware shell relay session management
-    status: COMPLETE
-    kind: TASK
-    priority: HIGH
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-31T14:53:00.592Z"
-    updatedAt: "2026-04-01T04:38:21.723Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1775018301727
-  "SHR-95":
-    key: SHR-95
-    project: SHR
-    title: Block fish heredoc shell_relay calls via generic enforcement API
-    status: NOT STARTED
-    kind: BUG
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-31T17:15:03.901Z"
-    updatedAt: "2026-03-31T19:48:31.436Z"
-    dependsOn[0]:
-    blockedBy[1]: AGENT-35
-    related[0]:
-    lastIndexedAt: 1774986511445
   "SHR-62":
     key: SHR-62
     project: SHR
@@ -1400,54 +441,67 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775018301727
-  "SHR-91":
-    key: SHR-91
+  "SHR-63":
+    key: SHR-63
     project: SHR
-    title: Shell integration files at ~/.sandpiper/shell-integrations/ disappear after clean install
-    status: COMPLETE
-    kind: BUG
-    priority: MEDIUM
-    assignee: UNASSIGNED
-    reporter: USER
-    createdAt: "2026-03-30T17:12:32.224Z"
-    updatedAt: "2026-03-30T17:19:45.986Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774891185999
-  "SHR-86":
-    key: SHR-86
-    project: SHR
-    title: "Snapshot-diff: __relay_run echo leaks through on long escaped commands"
+    title: First command after setup often times out (prompt_ready race condition)
     status: COMPLETE
     kind: BUG
     priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
-    createdAt: "2026-03-28T05:02:33.584Z"
+    createdAt: "2026-03-25T03:02:39.233Z"
     updatedAt: "2026-04-01T04:38:21.722Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775018301727
-  "SHR-96":
-    key: SHR-96
+  "SHR-67":
+    key: SHR-67
     project: SHR
-    title: Refactor shell-relay index into thin orchestrator + extracted tools/commands
-    status: COMPLETE
+    title: Error on relay tool/command use if shell integration not sourced
+    status: NOT STARTED
     kind: TASK
-    priority: HIGH
-    assignee: AGENT
+    priority: MEDIUM
+    assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-04-01T06:05:06.895Z"
-    updatedAt: "2026-04-01T15:14:55.571Z"
-    resolution: DONE
+    createdAt: "2026-03-26T04:25:52.770Z"
+    updatedAt: "2026-04-01T16:30:37.060Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775056495576
+    lastIndexedAt: 1775061037066
+  "SHR-68":
+    key: SHR-68
+    project: SHR
+    title: Implement bash user command capture via DEBUG trap
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T14:54:22.600Z"
+    updatedAt: "2026-03-31T15:39:16.719Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774971556725
+  "SHR-69":
+    key: SHR-69
+    project: SHR
+    title: Implement zsh user command capture via zle widget override
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T14:54:25.683Z"
+    updatedAt: "2026-03-31T15:39:16.767Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774971556772
   "SHR-71":
     key: SHR-71
     project: SHR
@@ -1464,38 +518,21 @@ tasks:
     blockedBy[0]:
     related[2]: SHR-68,SHR-69
     lastIndexedAt: 1774970810371
-  "SHR-92":
-    key: SHR-92
+  "SHR-73":
+    key: SHR-73
     project: SHR
-    title: Rewrite shell-relay README to match current architecture
-    status: COMPLETE
+    title: Rebrand the Shell Relay with a more memorable name
+    status: NOT STARTED
     kind: TASK
     priority: MEDIUM
-    assignee: AGENT
-    reporter: USER
-    createdAt: "2026-03-30T19:04:41.170Z"
-    updatedAt: "2026-03-30T20:19:20.653Z"
-    resolution: DONE
-    dependsOn[0]:
-    blockedBy[0]:
-    related[0]:
-    lastIndexedAt: 1774901960659
-  "SHR-93":
-    key: SHR-93
-    project: SHR
-    title: Clean up EXITED relay sessions on startup
-    status: COMPLETE
-    kind: TASK
-    priority: LOW
     assignee: UNASSIGNED
-    reporter: AGENT
-    createdAt: "2026-03-31T14:18:18.299Z"
-    updatedAt: "2026-03-31T14:19:23.449Z"
-    resolution: WONTFIX
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.359Z"
+    updatedAt: "2026-03-31T15:39:16.812Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774966763460
+    lastIndexedAt: 1774971556818
   "SHR-74":
     key: SHR-74
     project: SHR
@@ -1512,6 +549,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774971550950
+  "SHR-86":
+    key: SHR-86
+    project: SHR
+    title: "Snapshot-diff: __relay_run echo leaks through on long escaped commands"
+    status: COMPLETE
+    kind: BUG
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-28T05:02:33.584Z"
+    updatedAt: "2026-04-01T04:38:21.722Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775018301727
   "SHR-87":
     key: SHR-87
     project: SHR
@@ -1560,21 +613,968 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775018301727
-  "MEM-1":
-    key: MEM-1
-    project: MEM
-    title: Design memory/brain system for cross-session knowledge retrieval
+  "SHR-90":
+    key: SHR-90
+    project: SHR
+    title: Wire ctx.signal into shell_relay for user-cancellable command execution
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-30T02:04:48.245Z"
+    updatedAt: "2026-03-30T02:04:56.767Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774836296772
+  "SHR-91":
+    key: SHR-91
+    project: SHR
+    title: Shell integration files at ~/.sandpiper/shell-integrations/ disappear after clean install
+    status: COMPLETE
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T17:12:32.224Z"
+    updatedAt: "2026-03-30T17:19:45.986Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774891185999
+  "SHR-92":
+    key: SHR-92
+    project: SHR
+    title: Rewrite shell-relay README to match current architecture
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:04:41.170Z"
+    updatedAt: "2026-03-30T20:19:20.653Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774901960659
+  "SHR-93":
+    key: SHR-93
+    project: SHR
+    title: Clean up EXITED relay sessions on startup
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-31T14:18:18.299Z"
+    updatedAt: "2026-03-31T14:19:23.449Z"
+    resolution: WONTFIX
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774966763460
+  "SHR-94":
+    key: SHR-94
+    project: SHR
+    title: Resurrection-aware shell relay session management
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-31T14:53:00.592Z"
+    updatedAt: "2026-04-01T04:38:21.723Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775018301727
+  "SHR-95":
+    key: SHR-95
+    project: SHR
+    title: Block fish heredoc shell_relay calls via generic enforcement API
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-31T17:15:03.901Z"
+    updatedAt: "2026-03-31T19:48:31.436Z"
+    dependsOn[0]:
+    blockedBy[1]: AGENT-35
+    related[0]:
+    lastIndexedAt: 1774986511445
+  "SHR-96":
+    key: SHR-96
+    project: SHR
+    title: Refactor shell-relay index into thin orchestrator + extracted tools/commands
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:06.895Z"
+    updatedAt: "2026-04-01T15:14:55.571Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495576
+  "TCL-52":
+    key: TCL-52
+    project: TCL
+    title: Add batch/filter support to task move command
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-22T20:25:39.891Z"
+    updatedAt: "2026-03-29T00:37:46.887Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666899
+  "TCL-55":
+    key: TCL-55
+    project: TCL
+    title: "Spike: SQLite index — trade-offs vs human-readable TOON index"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.806Z"
+    updatedAt: "2026-03-29T00:37:46.889Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666899
+  "TCL-57":
+    key: TCL-57
+    project: TCL
+    title: Design board data model with swimlanes
     status: NOT STARTED
     kind: TASK
     priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
-    createdAt: "2026-03-25T03:14:28.312Z"
-    updatedAt: "2026-03-29T00:37:46.896Z"
+    createdAt: "2026-03-23T03:18:38.864Z"
+    updatedAt: "2026-04-01T16:30:37.092Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
+    lastIndexedAt: 1775061037098
+  "TCL-58":
+    key: TCL-58
+    project: TCL
+    title: Pi TUI integration for task board
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.896Z"
+    updatedAt: "2026-04-01T16:30:37.125Z"
+    dependsOn[1]: TCL-57
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037131
+  "TCL-59":
+    key: TCL-59
+    project: TCL
+    title: Web app for task board
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-23T03:18:38.927Z"
+    updatedAt: "2026-04-01T16:30:37.157Z"
+    dependsOn[1]: TCL-57
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037163
+  "TCL-61":
+    key: TCL-61
+    project: TCL
+    title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T04:30:07.828Z"
+    updatedAt: "2026-03-29T00:37:46.888Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: TCL-55
     lastIndexedAt: 1774744666899
+  "TCL-69":
+    key: TCL-69
+    project: TCL
+    title: Rebrand the Tasks CLI with a more memorable name
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-26T21:22:51.308Z"
+    updatedAt: "2026-03-31T15:39:16.856Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774971556862
+  "TCL-71":
+    key: TCL-71
+    project: TCL
+    title: Make mutating task/project update commands require a key or explicit filter
+    status: NOT STARTED
+    kind: BUG
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T20:47:48.695Z"
+    updatedAt: "2026-03-30T20:47:48.737Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774903668743
+  "TCL-72":
+    key: TCL-72
+    project: TCL
+    title: Refactor task-cmd into per-subcommand modules with shared helpers
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:06.925Z"
+    updatedAt: "2026-04-01T15:14:55.604Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495609
+  "TCL-73":
+    key: TCL-73
+    project: TCL
+    title: Add tests for extracted task subcommands and command helpers
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:07.016Z"
+    updatedAt: "2026-04-01T15:14:55.638Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495653
+  "TCL-74":
+    key: TCL-74
+    project: TCL
+    title: Refactor history.findChanges into smaller helpers
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:07.087Z"
+    updatedAt: "2026-04-01T15:14:55.683Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495692
+  "TCL-75":
+    key: TCL-75
+    project: TCL
+    title: Refactor mutate.computeChanges into formatter helpers
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T06:05:07.118Z"
+    updatedAt: "2026-04-01T15:14:55.720Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495726
+  "TCL-76":
+    key: TCL-76
+    project: TCL
+    title: sandpiper-tasks-cli baseline test regressions in search and index command suites
+    status: COMPLETE
+    kind: BUG
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-04-01T06:07:06.413Z"
+    updatedAt: "2026-04-01T12:29:17.663Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775046557668
+  "TCL-77":
+    key: TCL-77
+    project: TCL
+    title: Deduplicate remaining move/mutate reference-rewrite clone
+    status: COMPLETE
+    kind: TASK
+    priority: LOW
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-04-01T06:30:48.955Z"
+    updatedAt: "2026-04-01T15:14:55.754Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775056495765
+  "TCL-78":
+    key: TCL-78
+    project: TCL
+    title: Remove 'as Task' cast in taskFromFrontmatter and verify structural completeness
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.355Z"
+    updatedAt: "2026-04-01T15:31:06.703Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057466709
+  "TCL-79":
+    key: TCL-79
+    project: TCL
+    title: Narrow updateAllReferences to use index instead of full file scan
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.387Z"
+    updatedAt: "2026-04-01T15:31:15.480Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057475486
+  "TCL-80":
+    key: TCL-80
+    project: TCL
+    title: Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors
+    status: NOT STARTED
+    kind: BUG
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.419Z"
+    updatedAt: "2026-04-01T16:30:37.193Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037199
+  "TCL-81":
+    key: TCL-81
+    project: TCL
+    title: Make 'kind' update in applyFieldUpdates an explicit internal API rather than a backdoor cast
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.451Z"
+    updatedAt: "2026-04-01T15:31:33.516Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057493523
+  "TCL-82":
+    key: TCL-82
+    project: TCL
+    title: "Design doc: task storage strategy for reducing VCS churn"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T17:25:31.265Z"
+    updatedAt: "2026-04-01T17:46:41.122Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775065601128
+  "TCL-83":
+    key: TCL-83
+    project: TCL
+    title: "Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T17:38:25.745Z"
+    updatedAt: "2026-04-01T17:46:33.702Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775065593708
+  "TCL-84":
+    key: TCL-84
+    project: TCL
+    title: "Spike: validate push/pull ergonomics for root()-based jj task workspace branch"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T17:51:21.489Z"
+    updatedAt: "2026-04-01T17:54:51.566Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066091572
+  "TCL-85":
+    key: TCL-85
+    project: TCL
+    title: "Work plan: decompose task storage strategy implementation into phased tickets"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:01:56.966Z"
+    updatedAt: "2026-04-01T18:04:44.898Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066684903
+  "TCL-86":
+    key: TCL-86
+    project: TCL
+    title: "Phase 1: treat index.toon as derived state and make disk scan primary for counter allocation"
+    status: IN PROGRESS
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:01:56.999Z"
+    updatedAt: "2026-04-01T18:18:02.359Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775067482367
+  "TCL-87":
+    key: TCL-87
+    project: TCL
+    title: "Phase 2: support separate-branch task storage in the current repo"
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:57.031Z"
+    updatedAt: "2026-04-01T18:04:22.717Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662722
+  "TCL-88":
+    key: TCL-88
+    project: TCL
+    title: "Phase 3: support external-repo task storage"
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:57.062Z"
+    updatedAt: "2026-04-01T18:04:22.748Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662754
+  "TCL-89":
+    key: TCL-89
+    project: TCL
+    title: "Phase 4: generalize storage bootstrap for future domains and unified init"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:57.094Z"
+    updatedAt: "2026-04-01T18:04:22.782Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662788
+  "TCL-90":
+    key: TCL-90
+    project: TCL
+    title: Gitignore index.toon and rebuild it when missing or stale
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:02:14.960Z"
+    updatedAt: "2026-04-01T18:29:50.764Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-86
+    lastIndexedAt: 1775068190772
+  "TCL-91":
+    key: TCL-91
+    project: TCL
+    title: Make scan-from-disk the primary counter allocation path
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:02:14.995Z"
+    updatedAt: "2026-04-01T18:29:50.811Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-86
+    lastIndexedAt: 1775068190818
+  "TCL-92":
+    key: TCL-92
+    project: TCL
+    title: Add coverage and docs for no-index startup/rebuild/counter flows
+    status: NEEDS REVIEW
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.027Z"
+    updatedAt: "2026-04-01T18:29:50.852Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-86
+    lastIndexedAt: 1775068190859
+  "TCL-93":
+    key: TCL-93
+    project: TCL
+    title: Implement task storage config resolution and precedence
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.059Z"
+    updatedAt: "2026-04-01T18:04:22.924Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066662933
+  "TCL-94":
+    key: TCL-94
+    project: TCL
+    title: Implement sandpiper tasks init for current-repo jj/git backends
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.091Z"
+    updatedAt: "2026-04-01T18:04:22.963Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066662969
+  "TCL-95":
+    key: TCL-95
+    project: TCL
+    title: Implement current-repo sync and auto-commit/auto-push behavior
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.125Z"
+    updatedAt: "2026-04-01T18:04:22.997Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066663004
+  "TCL-96":
+    key: TCL-96
+    project: TCL
+    title: Implement inline-to-separate-branch migration for current-repo mode
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.159Z"
+    updatedAt: "2026-04-01T18:04:23.035Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066663042
+  "TCL-97":
+    key: TCL-97
+    project: TCL
+    title: Add integration tests and operator docs for current-repo storage modes
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.194Z"
+    updatedAt: "2026-04-01T18:04:23.072Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066663078
+  "TCL-100":
+    key: TCL-100
+    project: TCL
+    title: Add integration tests and conflict/repair guidance for external repo mode
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.300Z"
+    updatedAt: "2026-04-01T18:04:23.176Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-88
+    lastIndexedAt: 1775066663183
+  "TCL-98":
+    key: TCL-98
+    project: TCL
+    title: Implement external repo bootstrap with jj/git clone semantics
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.231Z"
+    updatedAt: "2026-04-01T18:04:23.106Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-88
+    lastIndexedAt: 1775066663116
+  "TCL-99":
+    key: TCL-99
+    project: TCL
+    title: Implement branch selection/tracking and sync flows for external repo mode
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.266Z"
+    updatedAt: "2026-04-01T18:04:23.144Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-88
+    lastIndexedAt: 1775066663150
+  "TCL-101":
+    key: TCL-101
+    project: TCL
+    title: Extract reusable storage bootstrap primitives for future domains
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.338Z"
+    updatedAt: "2026-04-01T18:04:23.211Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-89
+    lastIndexedAt: 1775066663218
+  "TCL-102":
+    key: TCL-102
+    project: TCL
+    title: Implement unified init/status surfaces for configured storage domains
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.374Z"
+    updatedAt: "2026-04-01T18:04:23.248Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-89
+    lastIndexedAt: 1775066663254
+  "TCL-103":
+    key: TCL-103
+    project: TCL
+    title: Document PKM/MEM adoption path for generalized storage bootstrap
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.408Z"
+    updatedAt: "2026-04-01T18:04:23.285Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-89
+    lastIndexedAt: 1775066663291
+  "TOOLS-1":
+    key: TOOLS-1
+    project: TOOLS
+    title: Group vendor.txt entries by repo to avoid redundant tarball downloads
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T14:54:12.001Z"
+    updatedAt: "2026-03-29T00:37:46.881Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666898
+  "TOOLS-10":
+    key: TOOLS-10
+    project: TOOLS
+    title: Per-extension postinstall strategy for extensions with npm dependencies
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-26T22:03:20.380Z"
+    updatedAt: "2026-03-30T03:27:18.826Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774841238831
+  "TOOLS-11":
+    key: TOOLS-11
+    project: TOOLS
+    title: Clean up stale built-extension assumptions after TOOLS-10
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T18:57:04.051Z"
+    updatedAt: "2026-03-30T20:19:20.696Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774901960703
+  "TOOLS-12":
+    key: TOOLS-12
+    project: TOOLS
+    title: Simplify root package metadata after extension unbundling
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-03-30T19:31:59.244Z"
+    updatedAt: "2026-03-30T19:41:37.016Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774899697022
+  "TOOLS-13":
+    key: TOOLS-13
+    project: TOOLS
+    title: Verify source-loaded extension dependency resolution in publish-style installs
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-03-30T19:31:59.329Z"
+    updatedAt: "2026-03-30T19:31:59.372Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774899119377
+  "TOOLS-2":
+    key: TOOLS-2
+    project: TOOLS
+    title: Support pinned refs/SHAs in vendor.txt for reproducible builds
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T14:54:12.030Z"
+    updatedAt: "2026-03-29T00:37:46.879Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666898
+  "TOOLS-4":
+    key: TOOLS-4
+    project: TOOLS
+    title: Consider caching dash docset identifiers to avoid repeated list-installed-docsets calls
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-23T15:18:52.197Z"
+    updatedAt: "2026-03-29T00:37:46.881Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666898
+  "TOOLS-7":
+    key: TOOLS-7
+    project: TOOLS
+    title: Convert remaining shell scripts to portable TypeScript
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: AGENT
+    createdAt: "2026-03-24T21:02:38.813Z"
+    updatedAt: "2026-04-01T16:30:37.234Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037243
+  "TOOLS-9":
+    key: TOOLS-9
+    project: TOOLS
+    title: Investigate upstream pi support for piConfig env var overrides
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-25T03:03:06.093Z"
+    updatedAt: "2026-03-29T00:37:46.880Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774744666898
+  "WEB-10":
+    key: WEB-10
+    project: WEB
+    title: Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.144Z"
+    updatedAt: "2026-04-01T16:30:37.312Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037321
+  "WEB-11":
+    key: WEB-11
+    project: WEB
+    title: "Spike: single-query web search tool (fetch top N results from a search API)"
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.175Z"
+    updatedAt: "2026-04-01T16:30:37.348Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037353
+  "WEB-12":
+    key: WEB-12
+    project: WEB
+    title: "Spike: site crawling with robots.txt respect and conservative rate limiting"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.206Z"
+    updatedAt: "2026-04-01T15:30:39.721Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057439727
+  "WEB-13":
+    key: WEB-13
+    project: WEB
+    title: "Spike: browser automation tool for interactive and JS-heavy pages"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:33:28.199Z"
+    updatedAt: "2026-04-01T15:33:42.994Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: WEB-10
+    lastIndexedAt: 1775057623000
+  "WEB-8":
+    key: WEB-8
+    project: WEB
+    title: Wire ctx.signal into web_fetch for user-cancellable fetches
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-03-30T02:04:34.128Z"
+    updatedAt: "2026-03-30T02:04:45.101Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1774836285107
+  "WEB-9":
+    key: WEB-9
+    project: WEB
+    title: Implement CSS selector targeting in web_fetch
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.112Z"
+    updatedAt: "2026-04-01T16:30:37.271Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775061037280
 counters:
   TCL:
     projectKey: TCL

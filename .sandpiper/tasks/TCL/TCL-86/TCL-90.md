@@ -1,12 +1,12 @@
 ---
 title: "Gitignore index.toon and rebuild it when missing or stale"
-status: NOT STARTED
+status: NEEDS REVIEW
 kind: SUBTASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:02:14.960Z
-updated_at: 2026-04-01T18:04:22.815Z
+updated_at: 2026-04-01T18:29:50.764Z
 ---
 
 # Gitignore index.toon and rebuild it when missing or stale
@@ -32,3 +32,12 @@ Add VCS ignore handling for `index.toon` and make commands rebuild the index aut
 ## 2026-04-01T18:04:22.816Z
 
 - **description**: added (13 lines)
+
+## 2026-04-01T18:18:02.405Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-04-01T18:29:50.765Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW

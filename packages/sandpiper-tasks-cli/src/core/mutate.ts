@@ -108,27 +108,18 @@ export function createTask(tasksDir: string, opts: CreateTaskOptions): CreateTas
 
 /**
  * Get the next task number for a project.
- * Checks index counter, legacy .meta.yml, and file scan.
+ *
+ * Disk scan is the primary mechanism — always finds the true highest allocated
+ * number from .md task files and .moved tombstones on disk.
+ *
+ * The index counter acts as a floor: if it is higher than the scan result
+ * (e.g. because a task file was deleted), the index value is used to prevent
+ * counter regression. The spec prohibits deletion, but this is defensive.
  */
 function getNextTaskNumber(tasksDir: string, projectKey: string): number {
+  const fromDisk = scanHighestNumber(tasksDir, projectKey) + 1;
   const fromIndex = readProjectCounter(tasksDir, projectKey);
-  if (fromIndex !== undefined) {
-    return fromIndex;
-  }
-
-  // Try reading from legacy .meta.yml
-  const metaPath = join(tasksDir, projectKey, '.meta.yml');
-  if (existsSync(metaPath)) {
-    const meta = readFileSync(metaPath, 'utf-8');
-    const numMatch = meta.match(/next_task_number:\s*(\d+)/);
-    if (numMatch) {
-      // biome-ignore lint/style/noNonNullAssertion: regex capture group guaranteed by match
-      return Number.parseInt(numMatch[1]!, 10);
-    }
-  }
-
-  // Last resort: scan files
-  return scanHighestNumber(tasksDir, projectKey) + 1;
+  return fromIndex !== undefined && fromIndex > fromDisk ? fromIndex : fromDisk;
 }
 
 /**

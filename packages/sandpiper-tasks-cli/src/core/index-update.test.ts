@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -357,5 +357,61 @@ describe('loadIndex', () => {
     expect(loaded?.tasks['SHR-1']?.title).toBe('Round trip test');
     expect(loaded?.tasks['SHR-1']?.assignee).toBe('AGENT');
     expect(loaded?.tasks['SHR-1']?.project).toBe('SHR');
+  });
+});
+
+describe('gitignore management', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'gitignore-test-'));
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  it('should create .gitignore containing index.toon when none exists', () => {
+    // Arrange: tasks dir with no .gitignore
+    mkdirSync(join(tasksDir, 'FOO'));
+
+    // Act
+    updateIndex(tasksDir);
+
+    // Assert
+    const gitignorePath = join(tasksDir, '.gitignore');
+    expect(existsSync(gitignorePath)).toBe(true);
+    const gitignoreContent = readFileSync(gitignorePath, 'utf-8');
+    const lines = gitignoreContent.split('\n').map((l) => l.trim());
+    expect(lines).toContain('index.toon');
+  });
+
+  it('should append index.toon to an existing .gitignore that does not contain it', () => {
+    // Arrange: tasks dir with an existing .gitignore missing the entry
+    mkdirSync(join(tasksDir, 'FOO'));
+    writeFileSync(join(tasksDir, '.gitignore'), '*.log\n');
+
+    // Act
+    updateIndex(tasksDir);
+
+    // Assert: original entry preserved, index.toon added
+    const gitignoreContent = readFileSync(join(tasksDir, '.gitignore'), 'utf-8');
+    expect(gitignoreContent).toContain('*.log');
+    const lines = gitignoreContent.split('\n').map((l) => l.trim());
+    expect(lines).toContain('index.toon');
+  });
+
+  it('should not duplicate the index.toon entry on repeated calls', () => {
+    // Arrange
+    mkdirSync(join(tasksDir, 'FOO'));
+
+    // Act: call updateIndex twice
+    updateIndex(tasksDir);
+    updateIndex(tasksDir);
+
+    // Assert: exactly one index.toon line
+    const content = readFileSync(join(tasksDir, '.gitignore'), 'utf-8');
+    const matches = content.split('\n').filter((l) => l.trim() === 'index.toon');
+    expect(matches).toHaveLength(1);
   });
 });
