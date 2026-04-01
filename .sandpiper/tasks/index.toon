@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775068602038
+lastUpdatedAt: 1775069067875
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1196,18 +1196,19 @@ tasks:
     key: TCL-94
     project: TCL
     title: Implement sandpiper tasks init for current-repo jj/git backends
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.091Z"
-    updatedAt: "2026-04-01T18:04:22.963Z"
+    updatedAt: "2026-04-01T18:44:27.865Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-87
-    lastIndexedAt: 1775066662969
+    lastIndexedAt: 1775069067875
   "TCL-95":
     key: TCL-95
     project: TCL

@@ -2,6 +2,7 @@
 import { Command } from '@commander-js/extra-typings';
 import { indexCommand } from './commands/index-cmd.js';
 import { projectCommand } from './commands/project-cmd.js';
+import { storageCommand } from './commands/storage-cmd.js';
 import { taskCommand } from './commands/task-cmd.js';
 
 const program = new Command()
@@ -15,5 +16,6 @@ const program = new Command()
 program.addCommand(indexCommand);
 program.addCommand(taskCommand);
 program.addCommand(projectCommand);
+program.addCommand(storageCommand);
 
 program.parse();
