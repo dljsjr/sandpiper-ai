@@ -299,6 +299,16 @@ describe('storage pull — external repo, git backend (integration)', () => {
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Pulled');
   });
+
+  it('storage init re-clones cleanly after broken clone is removed', () => {
+    // Simulate a broken clone by deleting it
+    rmSync(join(rootDir, '.sandpiper', 'tasks'), { recursive: true, force: true });
+
+    // Re-init should clone fresh
+    const result = runCli(`--dir ${rootDir} storage init`);
+    expect(result.exitCode).toBe(0);
+    expect(existsSync(join(rootDir, '.sandpiper', 'tasks', '.git'))).toBe(true);
+  });
 });
 
 // ─── storage sync/push/pull inline no-op ───────────────────────────

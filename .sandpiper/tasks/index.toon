@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775069706304
+lastUpdatedAt: 1775069748576
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1099,17 +1099,18 @@ tasks:
     key: TCL-88
     project: TCL
     title: "Phase 3: support external-repo task storage"
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:01:57.062Z"
-    updatedAt: "2026-04-01T18:35:35.277Z"
+    updatedAt: "2026-04-01T18:55:48.566Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775068535285
+    lastIndexedAt: 1775069748575
   "TCL-89":
     key: TCL-89
     project: TCL
@@ -1265,18 +1266,19 @@ tasks:
     key: TCL-100
     project: TCL
     title: Add integration tests and conflict/repair guidance for external repo mode
-    status: IN PROGRESS
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.300Z"
-    updatedAt: "2026-04-01T18:51:37.046Z"
+    updatedAt: "2026-04-01T18:55:48.522Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-88
-    lastIndexedAt: 1775069497056
+    lastIndexedAt: 1775069748529
   "TCL-98":
     key: TCL-98
     project: TCL
