@@ -115,8 +115,14 @@ export function initExternalRepo(opts: InitExternalRepoOptions): void {
 
 function checkoutOrCreateBranchJj(repoPath: string, branch: string): void {
   try {
-    run(`jj bookmark set "${branch}" -r @`, repoPath);
+    // Remote branch exists: point local bookmark at it, then create a mutable
+    // working-copy commit on top. jj disallows editing immutable commits
+    // (remote-tracking refs are immutable by default), so `jj new` is used
+    // instead of `jj edit` to give us a mutable @ we can commit task files to.
+    run(`jj bookmark set "${branch}" -r "${branch}@origin"`, repoPath);
+    run(`jj new "${branch}"`, repoPath);
   } catch {
+    // Remote branch absent: create a new local bookmark at the current working copy.
     run(`jj bookmark create "${branch}" -r @`, repoPath);
   }
 }
