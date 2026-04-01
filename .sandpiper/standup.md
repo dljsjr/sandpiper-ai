@@ -1,95 +1,91 @@
 # Session Stand-Up
 
-Updated: 2026-03-30T21:00:22Z
+Updated: 2026-04-01T05:08:28Z
 Session: 0e5cb1a4-4133-404a-9c36-6e94354d38c4
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-03-27T14-50-08-059Z_0e5cb1a4-4133-404a-9c36-6e94354d38c4.jsonl
 
 ## Accomplished
 
-This was an enormous session covering banner styling, framework infrastructure, and a complete shell relay rewrite.
+### Shell Relay Stabilization
+- **SHR-89:** Implemented `/relay-cleanup` slash command for explicit stale session cleanup.
+  - Lists EXITED `relay-*` sessions via `zellij list-sessions --no-formatting`
+  - Confirms before deletion
+  - Uses new `ZellijClient.deleteSession()`
+- Restored **auto-connect on startup** behavior (kept `setStatus`, no `notify` footer spam)
+- **SHR-86:** Fixed snapshot-diff `__relay_run` echo leak for long wrapped escaped commands.
+  - Root cause: trimming significant trailing spaces before marker matching
+  - Fix: preserve wrapped line endings during marker search/boundary mapping
+  - Added regression test for wrapped fish quote-break payload
+- **SHR-62:** Updated deprecated `writeChars()` shim to route through `paste()` instead of `action write-chars` to avoid wrapping/parser issues.
+- **SHR-63:** Eliminated first-command race by buffering signal events.
+  - `SignalParser.waitFor()` now consumes matching buffered events that arrived before listener registration
+  - Added regression test
 
-### Banner Styling — AGENT-17 (COMPLETE)
-- Final approach: inject DynamicBorder + Text into chat container (`tui.children[1]`)
-- Bordered, flows with chat, non-persistent, no duplication on resume
+### Fish Heredoc Investigation
+- Reproduced heredoc failure in fish (`Expected a string, but found a redirection`) and confirmed grammar mismatch behavior.
+- Reframed follow-up as **SHR-95**: block fish heredoc `shell_relay` calls via generic enforcement API.
+- Set **`SHR-95 blocked_by AGENT-35`** (deferred until deterministic enforcement framework exists).
 
-### Session Continuity — AGENT-17 (COMPLETE)
-- Standup skill rewrite: "session" = agent context window
-- SANDPIPER_SESSION_ID/FILE env vars injected at session_start
+### Startup Prompt / Prefix Caching Maintenance
+- **AGENT-38:** Reordered startup prompt assembly to keep static components first, then dynamic components ordered by volatility.
+- Initially added a dynamic `Current Date` line, then removed it after confirming the harness already provides date context.
+- Final dynamic order (prefix-cache optimized):
+  1. project triggers
+  2. standup context
+  3. active task context
+  4. working-copy context
+  5. cold-start guidance (one-shot, most volatile, intentionally last)
 
-### Project Metadata — TCL-70 (COMPLETE), AGENT-18 (COMPLETE)
-- when_to_file → when_to_read rename
-- `<available_projects>` XML auto-injected into system prompt
+### Task Hygiene
+- Bulk-closed all `NEEDS REVIEW` tasks as `COMPLETE (DONE)`:
+  - AGENT-27, AGENT-38
+  - SHR-62, SHR-63, SHR-86, SHR-89, SHR-94
 
-### Env Var Normalization — AGENT-19 (COMPLETE)
-- Two-phase PI_*/SANDPIPER_* mirror; resolveEnvVar() in core
-- Pi binary resolved dynamically via PATH (removed .pi-binpath caching)
+### Home-Agent Guidance Update (outside repo)
+- Confirmed expanded skill set visibility (19 skills including `gh`, `glab`, `code-review`, `mutation-testing`, etc.).
+- Ingested new testing/code-health guidance into `~/.sandpiper/agent/AGENTS.md` with progressive disclosure:
+  - concise hot-memory rules in AGENTS
+  - routing pointers to leaf docs
+  - created:
+    - `~/.sandpiper/agent/docs/testing.md`
+    - `~/.sandpiper/agent/docs/code-health.md`
 
-### Background Process Framework — AGENT-15 (COMPLETE)
-- ProcessManager: spawn, kill, output buffering, exit tracking, acknowledgment
-- start/check_background_process tools; context event completion notifications
-- 25 unit tests; dogfood-verified end-to-end
+### Self-Reflection Persistence
+- Updated `skills/sandpiper/tasks/SKILL.md` with a CLI flag gotcha note:
+  - `task list` uses `-s/--status`
+  - bulk mutating commands use `--filter-status`
+- Updated `.sandpiper/docs/agent-guidance-evolution.md` to capture prompt-ordering/cache decision:
+  - static-first prompt assembly
+  - dynamic ordering by volatility
+  - one-shot cold-start guidance appended last for better shared prefix caching
 
-### Shell Relay Rewrite — SHR-79 (COMPLETE)
-- **Eliminated:** ghost-attach (tclsh/expect), unbuffer-relay, stdout/stderr FIFOs, write-chars, ZELLIJ_SESSION_NAME env var
-- **New:** paste + send-keys, --session + --pane-id targeting, list-panes --json, snapshot-diff output capture
-- **Viewport fix (SHR-85):** attach-then-detach pattern for wide terminal dimensions (141x70 vs 50x49)
-- **Investigations:** SHR-75 through SHR-78 all completed — confirmed ghost client elimination, paste/send-keys, list-panes, subscribe capabilities
-- 12 snapshot-diff tests, 22 ZellijClient tests, 154 total shell-relay tests
-
-### Zellij 0.44 Compat — SHR-74
-- dump-screen --path flag; listSessions --short --no-formatting
-- Preflight dedup by key on /reload
-
-### Other
-- Data recovery from bad squash (history diffs, task statuses, tests)
-- TUI skill + patterns doc; self-reflection passes
-- AGENT-21 banner redesign closed; AGENT-27 system.ts refactor filed
-- **TOOLS-10 cleanup validated:** shell-relay and web-fetch both load successfully from source via jiti after full reinstall/restart
-- **Doc hygiene sweep:** cleaned stale built-extension assumptions from repo docs; rewrote `extensions/shell-relay/README.md`; updated `README.md`, `extensions/README.md`, `.sandpiper/docs/build-system.md`, `.sandpiper/docs/extension-loading.md`, and `extensions/shell-relay/AGENTS.md`; marked old shell-relay PRD/workplan docs as historical/superseded
-- **SHR-87 / SHR-88:** simplified shell integration scripts to signal-only behavior, removed legacy shell-relay artifacts (`ghost-client.ts`, `relay.ts`, `ghost-attach`, `unbuffer-relay`, related tests), and validated relay still works
-- **TOOLS-12:** simplified root package metadata after extension unbundling (removed root dependency declarations for shell-relay/web-fetch and stale root relay bins)
-- **TOOLS-13 filed:** backlog follow-up to verify source-loaded extension dependency resolution in publish-style installs
-- **AGENT-34 planned / AGENT-35 filed:** documented the next agent-guidance iteration in `.sandpiper/docs/agent-guidance-evolution.md`, with a prompt-first progressive-disclosure plan and a deferred memo of current hook/enforcement findings for later design work
-- **AGENT-36:** executed the prompt-side guidance revision — tightened root `AGENTS.md` around invariants/routing/source-of-truth, refactored the key focused docs (`build-system`, `extension-loading`, `pi-api-pitfalls`, `env-vars`, `cli-development`) into a compact leaf-doc shape, and updated prompt templates (`self-reflect`, `new-feature`, `refactor`, `review-prd`, `sprint-status`) to reinforce the layered guidance model
-- **AGENT-37:** added compact startup continuity context in `system.ts` via new `packages/core/src/startup-context.ts` helpers — active-task summary injection, inactive-project filtering, meaningful dirty-working-copy summary injection (task-history churn filtered out), a new `/cold-start-check` prompt template, and cold-start guidance that now uses the stronger heuristic `session file missing OR no message entries` on initial load plus `session_switch.reason` on later transitions; validated in both resumed and true-cold-start sessions
-- **AGENT-27:** refactored the system extension into a thin `extensions/system.ts` glue layer plus focused helper modules under `extensions/system/`, and moved more framework-independent logic into `packages/core` (`system-startup.ts`, `update-check.ts`) with new unit tests; validated with `bunx vitest run packages/core`, `bun check`, `bun run --filter sandpiper-ai-core build`, `bash devtools/postinstall.sh`, and a non-interactive `sandpiper --no-session` smoke test
-- **TCL-71 filed:** dangerous sandpiper-tasks behavior where unscoped mutating update commands can affect all tasks/projects; fix should require a key or explicit filter for mutating existing task/project data
-
-### Self-Reflection
-- Updated shell-relay AGENTS.md for new architecture (removed ghost client, unbuffer, old FIFO patterns)
-- Updated Zellij design doc with viewport sizing discovery
-- Filed SHR-86 (snapshot-diff echo leak), SHR-87 (shell integration simplification), SHR-88 (legacy code removal)
-- Skills reviewed: tui, jj, tasks, standup, fifo-patterns, and skill-review — all accurate, no changes needed
-- No new skills identified — this session's learnings were best captured in prompt templates, focused docs, and the guidance-evolution planning doc rather than a new procedural skill
+### Key commits from this session window
+- `7eef79ff` — Simplify `listSessionsWithStatus` using `--no-formatting`
+- `95e9add3` — Snapshot-diff wrapped-marker fix
+- `25e87367` — `writeChars` shim routed to paste
+- `e84dc58b` — SignalParser buffering race fix
+- `0675151a` — Reframe SHR-95 blocked by AGENT-35
+- `6afdbbb4` — Prompt ordering optimized without duplicate date line
+- `f4e16303` — Move cold-start guidance to end of dynamic startup section
+- `1124a6c9` — Bulk close NEEDS REVIEW tasks as COMPLETE
 
 ## In Progress
-- Nothing — AGENT-27 is implemented and marked NEEDS REVIEW; TCL-71 is filed as backlog bug work
+- None.
 
 ## Next Session
-1. **Snapshot-diff edge case:** long escaped commands leak __relay_run echo — needs refinement
-2. **SHR-62** — Long write-chars injections (now paste) wrapping
-3. **SHR-63** — prompt_ready race condition
-4. **AGENT-35** — review the deferred hook/enforcement memo when ready to design deterministic tool guidance
-5. **TOOLS-13** — verify source-loaded extension dependency resolution in publish-style installs
-6. **MEM-1** or **PKM-1** — Memory/PKM design work
-7. Review/close **AGENT-27** if the refactor looks good after user review
+1. **AGENT-35 (HIGH):** design generic deterministic tool-call enforcement API.
+2. Implement **SHR-95** via AGENT-35 API (fish heredoc detection + deterministic rewrite guidance).
+3. **TOOLS-13:** verify source-loaded extension dependency resolution in publish-style installs.
+4. **TCL-71:** fix dangerous unscoped mutating task/project updates.
+5. Optional strategic work: **MEM-1 / PKM-1**.
 
 ## Blockers
-- Sandpiper not published to npm — blocks self-update notification
+- Sandpiper not published to npm — still blocks self-update notification path.
+- SHR-95 intentionally blocked on AGENT-35.
 
 ## Context
-- **Relay rewrite is live** — no ghost client, no expect/tclsh, no stdout/stderr FIFOs. Uses paste + send-keys, --session + --pane-id, snapshot-diff output capture
-- **Viewport sizing** — sessions created via attach-then-detach to inherit terminal dimensions; createBackgroundSession still available but produces 50x49
-- **Shell integration is now signal-only** — relay.fish/bash/zsh provide prompt_ready + exit code signals via `SHELL_RELAY_SIGNAL`; no stdout/stderr/unbuffer compat shim remains
-- **Background processes** — start/check_background_process tools; context event notifications; processManager at module scope in system.ts
-- **Chat container injection** — `tui.children[1]`; duck-type with `'addChild' in candidate`
-- **New core exports need full restart** — /reload doesn't re-resolve jiti module graph
-- **system.ts entrypoint is now thin** — helper modules live under `extensions/system/`, and reusable startup/update logic moved into `packages/core`
-- **Agent-guidance planning doc:** `.sandpiper/docs/agent-guidance-evolution.md` captures the prompt-first revision plan plus deferred deterministic hook findings; use it as the entry point for future guidance work
-- **Prompt templates were aligned with the new structure** — `self-reflect`, `new-feature`, `refactor`, `review-prd`, and `sprint-status` now explicitly reinforce routing to focused docs and living-artifact hygiene
-- **Startup continuity is stronger now** — fresh sessions get compact active-task context, meaningful working-copy context, and cold-start-only guidance; archived projects are filtered out of startup project routing
-- **Edit source skills, not dist** — run `bash devtools/postinstall.sh`
-- **Extensions now load from source via jiti** — extension changes need `bash devtools/postinstall.sh`, not per-extension build steps
-- **shell-relay docs were stale and are now aligned** — historical shell-relay PRD/workplan/review artifacts were moved to `.sandpiper/archive/shell-relay/`; current sources of truth are `extensions/shell-relay/README.md`, `extensions/shell-relay/AGENTS.md`, and `.sandpiper/docs/zellij-044-relay-design.md`
-- **sandpiper-tasks binary** — `bun run --filter sandpiper-tasks-cli build` AND postinstall
-- **CLI/core package changes** — build the affected package if it emits binaries or declarations, then run postinstall
+- Shell relay is now stable with paste-based injection and buffered signal handling.
+- `/relay-cleanup` is available and working.
+- Startup prompt now follows static-first, volatility-ordered dynamic assembly (without duplicate date), with one-shot cold-start guidance intentionally appended last for prefix caching.
+- `/reload` usually refreshes prompt/extension behavior; full restart may still be needed for some module-graph changes.
+- Home-agent global guidance now routes testing/code-health details to dedicated leaf docs.
