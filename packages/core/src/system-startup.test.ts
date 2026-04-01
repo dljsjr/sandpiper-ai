@@ -73,9 +73,9 @@ describe('system-startup', () => {
       expect(prompt.indexOf('<available_projects>...</available_projects>')).toBeLessThan(
         prompt.indexOf('# Previous Session Context'),
       );
-      expect(prompt.indexOf('# Previous Session Context')).toBeLessThan(prompt.indexOf('# Cold-Start Guidance'));
-      expect(prompt.indexOf('# Cold-Start Guidance')).toBeLessThan(prompt.indexOf('# Active Task Context'));
+      expect(prompt.indexOf('# Previous Session Context')).toBeLessThan(prompt.indexOf('# Active Task Context'));
       expect(prompt.indexOf('# Active Task Context')).toBeLessThan(prompt.indexOf('# Working Copy Context'));
+      expect(prompt.indexOf('# Working Copy Context')).toBeLessThan(prompt.indexOf('# Cold-Start Guidance'));
     });
   });
 });

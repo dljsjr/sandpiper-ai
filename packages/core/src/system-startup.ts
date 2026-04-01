@@ -71,9 +71,11 @@ its documentation, APIs, etc. remain valid, with a few alterations:
   const dynamicSections = [
     options.projectTriggers ?? '',
     options.standupContent ?? '',
-    options.coldStartGuidance ?? '',
     options.activeTaskContext ?? '',
     options.workingCopyContext ?? '',
+    // Cold-start guidance is one-shot/volatile; keep it last to maximize
+    // shared prefix caching across cold-start vs resumed first turns.
+    options.coldStartGuidance ?? '',
   ];
 
   return basePrompt + identityBlock + dynamicSections.join('');
