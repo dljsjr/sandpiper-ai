@@ -1,0 +1,32 @@
+--- a/AGENT-39.md
++++ b/AGENT-39.md
+@@ -6,9 +6,25 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-01T06:05:06.862Z
+-updated_at: 2026-04-01T06:05:06.862Z
++updated_at: 2026-04-01T06:05:26.538Z
+ ---
+ 
+ # Audit follow-up: remove scratch/debug files and harden ignore patterns
+ 
+-
++Follow-up cleanup from external audit.
++
++Scope:
++- Remove committed scratch files (.tmp-fuzz.mts, .tmp-fuzz2.mts)
++- Remove committed debug log (devtools/mcporter.log)
++- Update .gitignore to prevent recurrence
++
++Verification:
++- bun check
++- bun test
++
++---
++
++# Activity Log
++
++## 2026-04-01T06:05:26.539Z
++
++- **description**: added (10 lines)
++

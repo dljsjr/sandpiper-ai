@@ -1,0 +1,25 @@
+--- a/AGENT-45.md
++++ b/AGENT-45.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Update biome.json schema URL to match installed Biome CLI"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: LOW
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T06:34:19.203Z
+-updated_at: 2026-04-01T12:24:54.413Z
++updated_at: 2026-04-01T12:25:07.531Z
+ ---
+ 
+ # Update biome.json schema URL to match installed Biome CLI
+@@ -26,3 +26,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T12:25:07.531Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

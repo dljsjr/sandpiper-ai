@@ -1,0 +1,25 @@
+--- a/AGENT-40.md
++++ b/AGENT-40.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Deduplicate parseTaskIndex flush logic in startup-context"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T06:05:06.955Z
+-updated_at: 2026-04-01T06:17:40.985Z
++updated_at: 2026-04-01T06:18:30.818Z
+ ---
+ 
+ # Deduplicate parseTaskIndex flush logic in startup-context
+@@ -30,3 +30,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T06:18:30.818Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

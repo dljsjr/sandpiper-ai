@@ -1,0 +1,27 @@
+--- a/AGENT-33.md
++++ b/AGENT-33.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Archive superseded shell-relay design docs under .sandpiper/archive"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-30T19:21:40.760Z
+-updated_at: 2026-03-30T19:22:25.817Z
++updated_at: 2026-03-30T19:23:24.794Z
+ ---
+ 
+ # Archive superseded shell-relay design docs under .sandpiper/archive
+@@ -34,3 +35,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-03-30T19:23:24.794Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

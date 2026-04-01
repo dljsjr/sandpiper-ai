@@ -1,0 +1,23 @@
+--- a/AGENT-27.md
++++ b/AGENT-27.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-27T22:04:54.108Z
+-updated_at: 2026-03-29T00:37:46.883Z
++updated_at: 2026-03-30T20:48:48.998Z
+ ---
+ 
+ # Refactor system.ts into a package (too large for a single file)
+ 
+-
++has grown into a large mixed-responsibility extension entrypoint that now bundles background-process tools, migration/install flag handling, startup prompt assembly, diagnostics/update banners, and background-process context notifications. We want to refactor it into a package-oriented structure that preserves the current behavior but makes the extension entrypoint a thinner glue layer. Prefer framework-independent logic in  where possible, keeping Pi-specific registration/lifecycle wiring in the extension file or in thin extension-facing modules. The refactor should avoid changing user-visible behavior, should keep startup continuity behavior intact, and should leave room for future deterministic guidance/tool-call work without making  grow further.
++
++---
++
++# Activity Log
++
++## 2026-03-30T20:48:48.999Z
++
++- **description**: added (1 line)
++

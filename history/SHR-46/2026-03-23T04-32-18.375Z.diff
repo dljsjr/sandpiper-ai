@@ -1,0 +1,30 @@
+--- a/SHR-46.md
++++ b/SHR-46.md
+@@ -6,9 +6,23 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-03-23T04:32:18.347Z
+-updated_at: 2026-03-23T04:32:18.347Z
++updated_at: 2026-03-23T04:32:18.374Z
+ ---
+ 
+ # Replace 20ms FIFO flush delay with principled drain approach
+ 
+-
++relay.ts uses a fixed 20ms setTimeout after receiving signals to let remaining FIFO data flush. This is a heuristic — too short for large outputs, wasted time for small outputs.
++
++Options:
++- Debounce on FIFO data arrival (wait until no data for N ms)
++- Use a small drain loop that checks for pending data
++- Accept the heuristic and document the trade-off
++
++Reference: code-review-shr-v1.md Finding 3
++
++---
++
++# Activity Log
++
++## 2026-03-23T04:32:18.375Z
++
++- **description**: added (8 lines)
++

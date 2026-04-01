@@ -1,0 +1,27 @@
+--- a/TCL-93.md
++++ b/TCL-93.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Implement task storage config resolution and precedence"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T18:02:15.059Z
+-updated_at: 2026-04-01T18:35:35.232Z
++updated_at: 2026-04-01T18:36:42.029Z
+ ---
+ 
+ # Implement task storage config resolution and precedence
+@@ -44,3 +45,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T18:36:42.030Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,25 @@
+--- a/TCL-73.md
++++ b/TCL-73.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add tests for extracted task subcommands and command helpers"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T06:05:07.016Z
+-updated_at: 2026-04-01T06:24:49.344Z
++updated_at: 2026-04-01T06:27:04.030Z
+ ---
+ 
+ # Add tests for extracted task subcommands and command helpers
+@@ -31,3 +31,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T06:27:04.030Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

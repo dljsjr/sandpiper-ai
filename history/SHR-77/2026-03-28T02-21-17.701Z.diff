@@ -1,0 +1,27 @@
+--- a/SHR-77.md
++++ b/SHR-77.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Investigate zellij action list-panes for pane discovery and health checks"
+-status: NOT STARTED
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-27T20:45:55.495Z
+-updated_at: 2026-03-28T02:21:17.656Z
++updated_at: 2026-03-28T02:21:17.700Z
+ ---
+ 
+ # Investigate zellij action list-panes for pane discovery and health checks
+@@ -31,3 +32,8 @@
+ 
+ - **description**: 5 lines → updated (7 lines)
+ 
++## 2026-03-28T02:21:17.701Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: DONE
++

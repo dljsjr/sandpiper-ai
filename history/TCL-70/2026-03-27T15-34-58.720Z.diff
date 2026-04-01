@@ -1,0 +1,29 @@
+--- a/TCL-70.md
++++ b/TCL-70.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Rename when_to_file → when_to_read in project metadata"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-27T15:34:32.819Z
+ updated_at: 2026-03-27T15:34:46.413Z
+-updated_at: 2026-03-27T15:34:46.413Z
++updated_at: 2026-03-27T15:34:58.720Z
+ ---
+ 
+ # Rename when_to_file → when_to_read in project metadata
+@@ -32,3 +32,8 @@
+ 
+ - **description**: added (12 lines)
+ 
++## 2026-03-27T15:34:58.720Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

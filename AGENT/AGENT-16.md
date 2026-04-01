@@ -1,0 +1,21 @@
+---
+title: "TUI rebranding — custom assets and theming for the sandpiper identity"
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-03-26T21:22:51.257Z
+updated_at: 2026-04-01T16:30:36.995Z
+---
+
+# TUI rebranding — custom assets and theming for the sandpiper identity
+
+
+---
+
+# Activity Log
+
+## 2026-04-01T16:30:36.995Z
+
+- **priority**: LOW → MEDIUM

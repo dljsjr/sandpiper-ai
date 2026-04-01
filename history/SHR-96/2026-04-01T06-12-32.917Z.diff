@@ -1,0 +1,25 @@
+--- a/SHR-96.md
++++ b/SHR-96.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Refactor shell-relay index into thin orchestrator + extracted tools/commands"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T06:05:06.895Z
+-updated_at: 2026-04-01T06:07:24.499Z
++updated_at: 2026-04-01T06:12:32.917Z
+ ---
+ 
+ # Refactor shell-relay index into thin orchestrator + extracted tools/commands
+@@ -35,3 +35,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T06:12:32.917Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++
