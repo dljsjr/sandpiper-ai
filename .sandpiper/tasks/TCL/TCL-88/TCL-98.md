@@ -1,12 +1,13 @@
 ---
 title: "Implement external repo bootstrap with jj/git clone semantics"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:02:15.231Z
-updated_at: 2026-04-01T18:04:23.106Z
+updated_at: 2026-04-01T18:54:08.200Z
 ---
 
 # Implement external repo bootstrap with jj/git clone semantics
@@ -32,3 +33,13 @@ Implement external-repo bootstrap using repo-appropriate clone semantics.
 ## 2026-04-01T18:04:23.106Z
 
 - **description**: added (13 lines)
+
+## 2026-04-01T18:51:36.955Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-04-01T18:54:08.200Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

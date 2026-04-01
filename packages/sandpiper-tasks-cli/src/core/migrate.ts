@@ -34,7 +34,7 @@ export function migrateInlineToSeparateBranch(opts: MigrateOptions): void {
   const { rootDir, config, backend } = opts;
   const vc = config.version_control;
 
-  if (!vc.enabled || vc.mode.branch === '@') {
+  if (!vc.enabled || (vc.mode.branch === '@' && !vc.mode.repo)) {
     throw new Error(
       'storage migrate requires a separate-branch or external-repo configuration. ' +
         'Update .sandpiper-tasks.json or .sandpiper/settings.json to set a branch name.',

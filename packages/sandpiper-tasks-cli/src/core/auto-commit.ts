@@ -12,7 +12,8 @@ import { detectVcsBackend } from './vcs.js';
  */
 export function autoCommitIfEnabled(rootDir: string, config: TaskStorageConfig, message: string): void {
   const vc = config.version_control;
-  if (!vc.enabled || !vc.auto_commit || vc.mode.branch === '@') return;
+  // Inline mode: enabled, branch="@", no external repo — auto-commit doesn't apply
+  if (!vc.enabled || !vc.auto_commit || (vc.mode.branch === '@' && !vc.mode.repo)) return;
 
   const workspacePath = join(rootDir, '.sandpiper', 'tasks');
   const backend = detectVcsBackend(rootDir);
