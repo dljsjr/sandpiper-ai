@@ -1,12 +1,12 @@
 ---
 title: "Phase 1: treat index.toon as derived state and make disk scan primary for counter allocation"
-status: NOT STARTED
+status: IN PROGRESS
 kind: TASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:01:56.999Z
-updated_at: 2026-04-01T18:04:22.685Z
+updated_at: 2026-04-01T18:18:02.359Z
 ---
 
 # Phase 1: treat index.toon as derived state and make disk scan primary for counter allocation
@@ -40,3 +40,8 @@ This phase should deliver immediate churn reduction without changing storage top
 ## 2026-04-01T18:04:22.685Z
 
 - **description**: added (21 lines)
+
+## 2026-04-01T18:18:02.360Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT

@@ -1,12 +1,12 @@
 ---
 title: "Make scan-from-disk the primary counter allocation path"
-status: NOT STARTED
+status: NEEDS REVIEW
 kind: SUBTASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:02:14.995Z
-updated_at: 2026-04-01T18:04:22.851Z
+updated_at: 2026-04-01T18:29:50.811Z
 ---
 
 # Make scan-from-disk the primary counter allocation path
@@ -32,3 +32,12 @@ Make scan-from-disk the primary task-number allocation path, with `.moved` tombs
 ## 2026-04-01T18:04:22.851Z
 
 - **description**: added (13 lines)
+
+## 2026-04-01T18:18:02.455Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-04-01T18:29:50.811Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW

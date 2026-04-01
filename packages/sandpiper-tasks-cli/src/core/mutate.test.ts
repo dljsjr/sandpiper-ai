@@ -1,8 +1,9 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parseFrontmatter } from './frontmatter.js';
+import { updateIndex } from './index-update.js';
 import { completeTask, createProject, createTask, pickupTask, updateTaskFields } from './mutate.js';
 
 function readTaskFrontmatter(path: string): Record<string, string | string[]> {
@@ -356,5 +357,82 @@ describe('completeTask', () => {
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.status).toBe('COMPLETE');
     expect(fm.resolution).toBe('DONE');
+  });
+});
+
+describe('counter allocation', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'counter-alloc-test-'));
+    createProject(tasksDir, 'FOO');
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  it('should allocate highest-on-disk+1 even when a stale index has a lower counter', () => {
+    // Arrange: create FOO-1, build index (counter = 2), then add FOO-5 out-of-band
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'First', reporter: 'USER' });
+    updateIndex(tasksDir); // counter locked at 2
+    writeFileSync(
+      join(tasksDir, 'FOO', 'FOO-5.md'),
+      '---\ntitle: "Out of band"\nstatus: NOT STARTED\nkind: TASK\npriority: LOW\nassignee: UNASSIGNED\nreporter: USER\ncreated_at: 2026-03-21T10:00:00Z\nupdated_at: 2026-03-21T10:00:00Z\n---\n\n# Out of band\n',
+    );
+
+    // Act: create next task — index says 2, disk says highest is 5
+    const result = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'After sync',
+      reporter: 'USER',
+    });
+
+    // Assert: disk scan wins → FOO-6
+    expect(result.key).toBe('FOO-6');
+  });
+
+  it('should not reuse a number that has a .moved tombstone', () => {
+    // Arrange: FOO-1 and FOO-2 exist, FOO-2 gets a .moved tombstone (simulates cross-project move)
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T1', reporter: 'USER' });
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T2', reporter: 'USER' });
+    rmSync(join(tasksDir, 'FOO', 'FOO-2.md'));
+    writeFileSync(join(tasksDir, 'FOO', 'FOO-2.moved'), '');
+
+    // Act: no index; disk scan must pick up the tombstone
+    const result = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'After move',
+      reporter: 'USER',
+    });
+
+    // Assert: FOO-2 is not reused; highest on disk (via tombstone) is 2 → allocate FOO-3
+    expect(result.key).toBe('FOO-3');
+  });
+
+  it('should use index counter as floor when disk scan finds a lower number', () => {
+    // Arrange: create FOO-1 through FOO-3, build index (counter = 4),
+    // then delete FOO-3 out-of-band (spec prohibits deletion, but be defensive)
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T1', reporter: 'USER' });
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T2', reporter: 'USER' });
+    createTask(tasksDir, { project: 'FOO', kind: 'TASK', priority: 'HIGH', title: 'T3', reporter: 'USER' });
+    updateIndex(tasksDir); // counter locked at 4
+    rmSync(join(tasksDir, 'FOO', 'FOO-3.md'));
+
+    // Act: disk scan finds highest = 2 → would return 3; index floor = 4
+    const result = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'After deletion',
+      reporter: 'USER',
+    });
+
+    // Assert: index floor wins → FOO-4 (no counter regression)
+    expect(result.key).toBe('FOO-4');
   });
 });

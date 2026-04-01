@@ -3,7 +3,7 @@ import { basename, join, resolve } from 'node:path';
 import type { Command } from '@commander-js/extra-typings';
 import { isIndexConsistent } from '../core/consistency.js';
 import { parseFrontmatter, taskFromFrontmatter } from '../core/frontmatter.js';
-import { loadIndex, tasksFromIndex, updateIndex } from '../core/index-update.js';
+import { ensureIndexGitignore, loadIndex, tasksFromIndex, updateIndex } from '../core/index-update.js';
 import type { OutputFormat } from '../core/output.js';
 import { formatRawOutput, formatTasksOutput } from '../core/output.js';
 import { searchTasks } from '../core/search.js';
@@ -99,6 +99,7 @@ export function getTasksDir(cmd: Command<any, any, any>): string {
 // biome-ignore lint/suspicious/noExplicitAny: Commander generic params vary per command
 export function loadTasks(cmd: Command<any, any, any>): readonly Task[] {
   const tasksDir = getTasksDir(cmd);
+  ensureIndexGitignore(tasksDir);
   let index = loadIndex(tasksDir);
   if (!index) {
     index = updateIndex(tasksDir);

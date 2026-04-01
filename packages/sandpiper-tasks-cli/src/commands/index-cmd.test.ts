@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -98,6 +98,22 @@ describe('CLI: index update', () => {
     expect(existsSync(join(tempDir, '.sandpiper', 'tasks', 'index.toon'))).toBe(true);
   });
 
+  it('should return task results when no index exists yet (auto-rebuild on startup)', () => {
+    // Arrange: tasks on disk, no index file
+    setupTasksDir(tempDir);
+    const indexPath = join(tempDir, '.sandpiper', 'tasks', 'index.toon');
+    expect(existsSync(indexPath)).toBe(false);
+
+    // Act: read-only command with no prior index
+    const result = runCli(`--dir ${tempDir} task list`);
+
+    // Assert: succeeds and returns the task
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('TST-1');
+    // Index is rebuilt as a side effect
+    expect(existsSync(indexPath)).toBe(true);
+  });
+
   it('should report error when tasks directory does not exist', () => {
     const result = runCli(`--dir ${tempDir} index update`);
     expect(result.exitCode).toBe(1);
@@ -113,6 +129,25 @@ describe('CLI: index update', () => {
   it('should print help for index update subcommand', () => {
     const result = runCli('index update --help');
     expect(result.stdout).toContain('Scan task files');
+  });
+
+  it('should create .gitignore with index.toon on a read-only command when index is already fresh', () => {
+    // Arrange: pre-built index exists, no .gitignore
+    setupTasksDir(tempDir);
+    runCli(`--dir ${tempDir} index update`); // builds index
+    const tasksDir = join(tempDir, '.sandpiper', 'tasks');
+    const gitignorePath = join(tasksDir, '.gitignore');
+    rmSync(gitignorePath, { force: true }); // remove gitignore to simulate missing state
+
+    // Act: run a read-only command (task list) — index is fresh, no rebuild triggered
+    const result = runCli(`--dir ${tempDir} task list`);
+    expect(result.exitCode).toBe(0);
+
+    // Assert: .gitignore was created even though updateIndex was not called
+    expect(existsSync(gitignorePath)).toBe(true);
+    const gitignoreContent = readFileSync(gitignorePath, 'utf-8');
+    const lines = gitignoreContent.split('\n').map((l) => l.trim());
+    expect(lines).toContain('index.toon');
   });
 
   it('should handle multiple projects', () => {
