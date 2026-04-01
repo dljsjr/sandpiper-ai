@@ -1,0 +1,205 @@
+--- a/TCL-83.md
++++ b/TCL-83.md
+@@ -6,162 +6,-96 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T17:38:25.745Z
+-updated_at: 2026-04-01T17:38:36.098Z
++updated_at: 2026-04-01T17:39:12.101Z
+ ---
+ 
+ # Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks
+ 
+-Validate the storage mechanics described in .
++Validate the storage mechanics described in `.sandpiper/docs/task-storage-strategy.md`.
+ 
+ ## Goal
+ 
+-Determine whether we can safely store  on a separate branch in the current repo using either:
+--  into a subdirectory of the existing workspace, or
+--  in a colocated jj repo
++Determine whether we can safely store `.sandpiper/tasks/` on a separate branch in the current repo using either:
++- `jj workspace add` into a subdirectory of the existing workspace, or
++- `git worktree add` in a colocated jj repo
+ 
+ ## Questions to answer
+ 
+-1. Can  target a subdirectory of an existing workspace?
+-2. If not, does  work cleanly in a colocated jj repo?
+-3. Does the main workspace's Working copy changes:
+-M .sandpiper/docs/task-storage-strategy.md
+-A .sandpiper/tasks/TCL/TCL-83.md
+-A .sandpiper/tasks/history/TCL-83/2026-04-01T17-38-25.773Z.diff
+-M .sandpiper/tasks/index.toon
+-Working copy  (@) : nmusytxl 5fd3d1a0 (no description set)
+-Parent commit (@-): kpmtoutl 1a8d600b main* | Update task storage design doc with resolved decisions / Modified regular file .sandpiper/docs/task-storage-strategy.md:
+-    ...
+- 308  308: 1. **Auto-commit** — opt-in via `auto_commit: true` in config. Default `false`. User controls commit granularity.
+- 309  309: 2. **Auto-push** — opt-in via `auto_push: true` in config. Default `false`. Offline-first by default.
+- 310  310: 3. **Settings file location** — two locations, standalone overrides sandpiper settings. The standalone file lives at the project root (not in `.sandpiper/` or the tasks directory) so it can be committed to `main` even when tasks are on a separate branch.
+- 311  311: 4. **Standalone config filename** — `.sandpiper-tasks.json`.
+-      312: 5. **Standalone config format** — JSON only, matching the base sandpiper config to simplify migration strategies.
+- 311  313: 6. **`@` sentinel in external repo context** — when `repo` is set and `branch` is `"@"`, the default branch is whatever HEAD points to on the cloned remote. This is standard `git clone` / `jj git clone` behavior and does not require special handling. Documented in the `mode.branch` section.
+- 312  314: 57. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
+- 313  315: 
+- 314  316: ## Open questions
+- 315  317: 
+- 316  318: 1. **jj workspace mechanics** — Does `jj workspace add` support targeting a subdirectory of an existing workspace? If not, does `git worktree add` in colocated mode work cleanly with jj's snapshot? Needs a spike (next step after this doc is finalized).
+- 317     : 2. **Standalone config filename** — The standalone config file at the project root needs a well-known name. Candidates: `.sandpiper-tasks.json`, `sandpiper-tasks.config.json`, `.tasks.json`. Leaning toward `.sandpiper-tasks.json` for namespace clarity.
+- 318     : 3. **Config file format** — JSON is the current choice for consistency with `.sandpiper/settings.json`. Should we also support TOML or YAML for the standalone file? Leaning toward JSON-only to keep parsing simple.
+-      319: 2. **Bootstrap UX** — when separate-branch or external-repo mode is configured but storage is not yet initialized, should the CLI auto-bootstrap silently, prompt interactively, or fail with an actionable message plus an explicit init command? Leaning toward explicit bootstrap command plus actionable guidance for safety.
+-Added regular file .sandpiper/tasks/TCL/TCL-83.md:
+-        1: ---
+-        2: title: "Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks"
+-        3: status: IN PROGRESS
+-        4: kind: TASK
+-        5: priority: HIGH
+-        6: assignee: AGENT
+-        7: reporter: USER
+-        8: created_at: 2026-04-01T17:38:25.745Z
+-        9: updated_at: 2026-04-01T17:38:25.773Z
+-       10: ---
+-       11: 
+-       12: # Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks
+-       13: 
+-       14: 
+-       15: ---
+-       16: 
+-       17: # Activity Log
+-       18: 
+-       19: ## 2026-04-01T17:38:25.773Z
+-       20: 
+-       21: - **status**: NOT STARTED → IN PROGRESS
+-       22: - **assignee**: UNASSIGNED → AGENT
+-Added regular file .sandpiper/tasks/history/TCL-83/2026-04-01T17-38-25.773Z.diff:
+-        1: --- a/TCL-83.md
+-        2: +++ b/TCL-83.md
+-        3: @@ -1,14 +1,21 @@
+-        4:  ---
+-        5:  title: "Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks"
+-        6: -status: NOT STARTED
+-        7: +status: IN PROGRESS
+-        8:  kind: TASK
+-        9:  priority: HIGH
+-       10:  assignee: UNASSIGNED
+-       11: -assignee: UNASSIGNED
+-       12: +assignee: AGENT
+-       13:  reporter: USER
+-       14:  created_at: 2026-04-01T17:38:25.745Z
+-       15:  updated_at: 2026-04-01T17:38:25.745Z
+-       16: -updated_at: 2026-04-01T17:38:25.745Z
+-       17: +updated_at: 2026-04-01T17:38:25.773Z
+-       18:  ---
+-       19:  
+-       20:  # Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks
+-       21:  
+-       22:  
+-       23: +---
+-       24: +
+-       25: +# Activity Log
+-       26: +
+-       27: +## 2026-04-01T17:38:25.773Z
+-       28: +
+-       29: +- **status**: NOT STARTED → IN PROGRESS
+-       30: +- **assignee**: UNASSIGNED → AGENT
+-       31: +
+-Modified regular file .sandpiper/tasks/index.toon:
+-   1    1: version: 1
+-   2    2: lastUpdatedAt: 17750644392051775065105779
+-   3    3: tasks:
+-   4    4:   "TOOLS-7":
+-   5    5:     key: TOOLS-7
+-    ...
+- 837  837:     blockedBy[0]:
+- 838  838:     related[0]:
+- 839  839:     lastIndexedAt: 1775056495692
+-      840:   "TCL-83":
+-      841:     key: TCL-83
+-      842:     project: TCL
+-      843:     title: "Spike: validate jj/git worktree mechanics for task storage at .sandpiper/tasks"
+-      844:     status: IN PROGRESS
+-      845:     kind: TASK
+-      846:     priority: HIGH
+-      847:     assignee: AGENT
+-      848:     reporter: USER
+-      849:     createdAt: "2026-04-01T17:38:25.745Z"
+-      850:     updatedAt: "2026-04-01T17:38:25.773Z"
+-      851:     dependsOn[0]:
+-      852:     blockedBy[0]:
+-      853:     related[0]:
+-      854:     lastIndexedAt: 1775065105779
+- 840  855:   "TCL-71":
+- 841  856:     key: TCL-71
+- 842  857:     project: TCL
+-    ...
+-1229 1244: counters:
+-1230 1245:   TCL:
+-1231 1246:     projectKey: TCL
+-1232 1247:     nextTaskNumber: 8384
+-1233 1248:   SHR:
+-1234 1249:     projectKey: SHR
+-1235 1250:     nextTaskNumber: 97
+-    ... ignore files in the worktree path?
+-4. Can the task worktree be committed independently without confusing the main workspace?
+-5. What bootstrap / teardown commands are required?
+-6. Are there path, nested-repo, or snapshot edge cases that make the approach unsafe?
+-
+-## Deliverable
+-
+-- A short findings doc or section appended to the design doc with a recommendation
+-- If viable: exact bootstrap commands for implementation
+-- If not viable: rejection rationale and fallback strategy
+-
+-## References
+-
+-- 
+--
+-
+----
+-
+-# Activity Log
+-
+-## 2026-04-01T17:38:25.773Z
+-
+-- **status**: NOT STARTED → IN PROGRESS
+-- **assignee**: UNASSIGNED → AGENT
+-
+-## 2026-04-01T17:38:36.098Z
+-
+-- **description**: added (140 lines)
+-
++1. Can `jj workspace add` target a subdirectory of an existing workspace?
++2. If not, does `git worktree add .sandpiper/tasks <branch>` work cleanly in a colocated jj repo?
++3. Does the main workspace `jj st` / `jj diff` ignore files in the worktree path?
++4. Can the task worktree be committed independently without confusing the main workspace?
++5. What bootstrap / teardown commands are required?
++6. Are there path, nested-repo, or snapshot edge cases that make the approach unsafe?
++
++## Deliverable
++
++- A short findings doc or section appended to the design doc with a recommendation
++- If viable: exact bootstrap commands for implementation
++- If not viable: rejection rationale and fallback strategy
++
++## References
++
++- `.sandpiper/docs/task-storage-strategy.md`
++- `dist/skills/sandpiper/jj/SKILL.md`
++
++---
++
++# Activity Log
++
++## 2026-04-01T17:38:25.773Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++
++## 2026-04-01T17:38:36.098Z
++
++- **description**: added (140 lines)
++
++## 2026-04-01T17:39:12.101Z
++
++- **description**: 140 lines → updated (27 lines)
++

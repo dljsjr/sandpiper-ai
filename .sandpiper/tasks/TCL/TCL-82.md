@@ -1,12 +1,13 @@
 ---
 title: "Design doc: task storage strategy for reducing VCS churn"
-status: IN PROGRESS
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T17:25:31.265Z
-updated_at: 2026-04-01T17:27:19.198Z
+updated_at: 2026-04-01T17:46:41.122Z
 ---
 
 # Design doc: task storage strategy for reducing VCS churn
@@ -42,3 +43,8 @@ Combined with treating `index.toon` as derived state (gitignored, auto-rebuilt).
 ## 2026-04-01T17:27:19.198Z
 
 - **description**: added (18 lines)
+
+## 2026-04-01T17:46:41.122Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE
