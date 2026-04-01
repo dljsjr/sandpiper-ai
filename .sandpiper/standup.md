@@ -21,7 +21,7 @@ Session: current
   - Bumped MEDIUM → HIGH: WEB-9
 
 ### Task storage strategy design + jj spike
-- Created and completed **TCL-82** (design doc) and **TCL-83** (jj/git mechanics spike).
+- Created and completed **TCL-82** (design doc), **TCL-83** (jj/git mechanics spike), and **TCL-84** (root-based jj remote sync spike).
 - Added `.sandpiper/docs/task-storage-strategy.md` describing a configurable task storage model:
   - inline mode (`branch: "@"`)
   - separate-branch mode in the current repo
@@ -34,7 +34,9 @@ Session: current
   - **plain git repo → use `git worktree`**
   - **do not use `git worktree` inside a jj repo**
   - **external repos are plain clones**, not workspaces/worktrees; use `jj git clone --colocate` in jj projects and `git clone` in git projects
-- Remaining open questions in the design doc are narrowed to bootstrap UX and whether root-based independent history should be hard-coded for the jj workspace backend.
+  - **root()-based jj task history pushes/pulls cleanly** via a bookmark-backed branch on the real project remote
+  - **remote recovery works**: after deleting the local workspace/bookmark, `jj git fetch` restores the remote-tracking bookmark and a fresh workspace can be recreated from `<bookmark>@origin`
+- Remaining open questions in the design doc are now narrowed to bootstrap UX and how much remote bookmark setup should be automatic on first bootstrap.
 
 ## Deferred decisions (need dedicated session)
 - **SHR-68/69** (bash/zsh user command capture) — need a discussion before final triage

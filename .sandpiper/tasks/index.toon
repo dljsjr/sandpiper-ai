@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775065601129
+lastUpdatedAt: 1775066091573
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -759,6 +759,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774744666899
+  "TCL-84":
+    key: TCL-84
+    project: TCL
+    title: "Spike: validate push/pull ergonomics for root()-based jj task workspace branch"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T17:51:21.489Z"
+    updatedAt: "2026-04-01T17:54:51.566Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066091572
   "TCL-77":
     key: TCL-77
     project: TCL
@@ -1246,7 +1262,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 84
+    nextTaskNumber: 85
   SHR:
     projectKey: SHR
     nextTaskNumber: 97
