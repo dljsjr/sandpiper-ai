@@ -209,6 +209,17 @@ A nested workspace created at `.sandpiper/tasks/` behaved correctly:
 - commits inside the nested workspace remained isolated from the parent workspace
 - `jj workspace add .sandpiper/tasks --revision 'root()'` also worked, giving the task workspace truly independent history (not sharing the code branch ancestor)
 
+##### `root()`-based jj history and remote sync: works
+
+This was validated against the real project remote using temporary bookmarks and temporary workspaces.
+
+- A root-based workspace commit could be bookmarked and pushed to GitHub as an unrelated branch with no errors.
+- After deleting the local workspace and local bookmark, `jj git fetch` restored the remote-tracking bookmark cleanly.
+- A fresh workspace could then be recreated from `<bookmark>@origin` and checked out with the expected task files present.
+- Remote branch cleanup also worked via jj's deleted-bookmark flow (`jj bookmark delete` followed by `jj git push --deleted`).
+
+**Conclusion:** root-based independent history is viable for the jj backend and does not require a separate compatibility mode.
+
 ##### `git worktree add` inside a jj repo: unsafe
 
 A nested git worktree also looked clean from Git's point of view:
@@ -230,12 +241,22 @@ But `jj` behavior inside the nested worktree was wrong:
 # Create the task workspace with independent history rooted at root()
 jj workspace add .sandpiper/tasks --name tasks --revision 'root()'
 
-# Optional: create a bookmark for remote sync
+# Create a bookmark for remote sync
 cd .sandpiper/tasks
 jj bookmark create sandpiper-tasks -r @-
 ```
 
 This produces a fully independent nested workspace at `.sandpiper/tasks/` while keeping the parent workspace clean.
+
+On another machine or after local workspace deletion:
+
+```bash
+# Fetch the remote bookmark in the main workspace
+jj git fetch --remote origin
+
+# Recreate the task workspace from the remote-tracking bookmark
+jj workspace add .sandpiper/tasks --name tasks --revision 'sandpiper-tasks@origin'
+```
 
 #### Git worktree approach (current repo is plain git)
 
@@ -366,9 +387,10 @@ For the external repo case, the same options apply with the addition of pull-bef
 5. **Standalone config format** — JSON only, matching the base sandpiper config to simplify migration strategies.
 6. **`@` sentinel in external repo context** — when `repo` is set and `branch` is `"@"`, the default branch is whatever HEAD points to on the cloned remote. This is standard `git clone` / `jj git clone` behavior and does not require special handling. Documented in the `mode.branch` section.
 7. **Backend selection rule** — current repo: jj → `jj workspace`, git → `git worktree`. External repo: always plain clone, using the same VCS semantics as the current repo (`jj git clone --colocate` in jj repos, `git clone` in git repos).
-8. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
+8. **jj backend history model** — hard-code `root()`-based independent history for the jj workspace backend. Real remote push/fetch/recreate testing showed this works cleanly enough to make it the default rather than a configurable mode.
+9. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
 
 ## Open questions
 
 1. **Bootstrap UX** — when separate-branch or external-repo mode is configured but storage is not yet initialized, should the CLI auto-bootstrap silently, prompt interactively, or fail with an actionable message plus an explicit init command? Leaning toward explicit bootstrap command plus actionable guidance for safety.
-2. **Root-based history and remotes** — for the jj workspace backend, should the implementation always root the task workspace at `root()` from day one, or make that configurable? Root-based independent history is desirable, but we should validate the remote push/pull ergonomics before hard-coding it into the implementation.
+2. **Remote setup UX for jj bookmarks** — should the implementation always create and track the task bookmark automatically on first bootstrap, or should remote sync remain a second explicit step until the user opts into `auto_push`? Leaning toward automatic local bookmark creation plus explicit first push, so the branch exists locally immediately without surprising network activity.
