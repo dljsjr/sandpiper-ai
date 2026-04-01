@@ -264,6 +264,32 @@ jj workspace forget test-workspace
 rm -rf ../test-workspace
 ```
 
+### Gotcha: `jj edit` fails on immutable commits
+
+Remote-tracking commits (those reachable from `name@origin`) are **immutable** by default.
+Calling `jj edit <some-commit>` on one will fail:
+
+```
+Error: Commit abc123 is immutable
+Hint: Could not modify commit: ...
+```
+
+This typically surfaces when trying to check out a cloned remote branch with `jj edit`. Use
+`jj new <branch>` instead — it creates a **new mutable working-copy commit** on top of the
+immutable one, which is the correct way to start working on a cloned branch:
+
+```bash
+# Wrong: trying to edit an immutable remote-tracking commit
+jj edit "tasks@origin"     # → Error: Commit is immutable
+
+# Right: create a mutable working copy on top of it
+jj new "tasks@origin"      # → @ is now a new empty commit, parent = tasks@origin
+jj bookmark set tasks -r "tasks@origin"  # track the remote branch locally
+```
+
+If you specifically need to modify an immutable commit (rare, e.g. rewriting history you own),
+configure the `immutable_heads` revset in your jj config to exclude it.
+
 ---
 
 ## Inserting Changes into History
