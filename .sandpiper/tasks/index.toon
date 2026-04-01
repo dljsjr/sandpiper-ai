@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775056495766
+lastUpdatedAt: 1775057493523
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -139,6 +139,66 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774899119377
+  "WEB-10":
+    key: WEB-10
+    project: WEB
+    title: Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.144Z"
+    updatedAt: "2026-04-01T15:30:20.094Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057420099
+  "WEB-11":
+    key: WEB-11
+    project: WEB
+    title: "Spike: single-query web search tool (fetch top N results from a search API)"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.175Z"
+    updatedAt: "2026-04-01T15:30:30.404Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057430410
+  "WEB-9":
+    key: WEB-9
+    project: WEB
+    title: Implement CSS selector targeting in web_fetch
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.112Z"
+    updatedAt: "2026-04-01T15:30:09.621Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057409628
+  "WEB-12":
+    key: WEB-12
+    project: WEB
+    title: "Spike: site crawling with robots.txt respect and conservative rate limiting"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:49.206Z"
+    updatedAt: "2026-04-01T15:30:39.721Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057439727
   "WEB-8":
     key: WEB-8
     project: WEB
@@ -233,6 +293,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774898604799
+  "AGENT-46":
+    key: AGENT-46
+    project: AGENT
+    title: "ProcessManager: add process restart / auto-restart support"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:52.779Z"
+    updatedAt: "2026-04-01T15:30:48.405Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057448411
   "AGENT-37":
     key: AGENT-37
     project: AGENT
@@ -329,6 +404,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774901960614
+  "AGENT-47":
+    key: AGENT-47
+    project: AGENT
+    title: "ProcessManager: design multi-consumer output broadcast pattern"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:52.812Z"
+    updatedAt: "2026-04-01T15:30:58.706Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057458712
   "AGENT-16":
     key: AGENT-16
     project: AGENT
@@ -517,6 +607,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774744666899
+  "TCL-78":
+    key: TCL-78
+    project: TCL
+    title: Remove 'as Task' cast in taskFromFrontmatter and verify structural completeness
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.355Z"
+    updatedAt: "2026-04-01T15:31:06.703Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057466709
   "TCL-58":
     key: TCL-58
     project: TCL
@@ -547,6 +652,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774744666899
+  "TCL-79":
+    key: TCL-79
+    project: TCL
+    title: Narrow updateAllReferences to use index instead of full file scan
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.387Z"
+    updatedAt: "2026-04-01T15:31:15.480Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057475486
   "TCL-69":
     key: TCL-69
     project: TCL
@@ -562,6 +682,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774971556862
+  "TCL-81":
+    key: TCL-81
+    project: TCL
+    title: Make 'kind' update in applyFieldUpdates an explicit internal API rather than a backdoor cast
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.451Z"
+    updatedAt: "2026-04-01T15:31:33.516Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057493523
   "TCL-72":
     key: TCL-72
     project: TCL
@@ -625,6 +760,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775056495765
+  "TCL-80":
+    key: TCL-80
+    project: TCL
+    title: Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors
+    status: NOT STARTED
+    kind: BUG
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:29:58.419Z"
+    updatedAt: "2026-04-01T15:31:23.312Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775057483321
   "TCL-73":
     key: TCL-73
     project: TCL
@@ -1049,7 +1199,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 78
+    nextTaskNumber: 82
   SHR:
     projectKey: SHR
     nextTaskNumber: 97
@@ -1070,7 +1220,7 @@ counters:
     nextTaskNumber: 2
   WEB:
     projectKey: WEB
-    nextTaskNumber: 9
+    nextTaskNumber: 13
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 46
+    nextTaskNumber: 48
