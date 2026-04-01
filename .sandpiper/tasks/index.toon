@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775066091573
+lastUpdatedAt: 1775066684904
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -728,6 +728,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775056495609
+  "TCL-85":
+    key: TCL-85
+    project: TCL
+    title: "Work plan: decompose task storage strategy implementation into phased tickets"
+    status: COMPLETE
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:01:56.966Z"
+    updatedAt: "2026-04-01T18:04:44.898Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066684903
   "TCL-76":
     key: TCL-76
     project: TCL
@@ -853,6 +869,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775056495692
+  "TCL-87":
+    key: TCL-87
+    project: TCL
+    title: "Phase 2: support separate-branch task storage in the current repo"
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:57.031Z"
+    updatedAt: "2026-04-01T18:04:22.717Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662722
   "TCL-83":
     key: TCL-83
     project: TCL
@@ -946,6 +977,275 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1775056495726
+  "TCL-86":
+    key: TCL-86
+    project: TCL
+    title: "Phase 1: treat index.toon as derived state and make disk scan primary for counter allocation"
+    status: NOT STARTED
+    kind: TASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:56.999Z"
+    updatedAt: "2026-04-01T18:04:22.685Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662690
+  "TCL-89":
+    key: TCL-89
+    project: TCL
+    title: "Phase 4: generalize storage bootstrap for future domains and unified init"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:57.094Z"
+    updatedAt: "2026-04-01T18:04:22.782Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662788
+  "TCL-88":
+    key: TCL-88
+    project: TCL
+    title: "Phase 3: support external-repo task storage"
+    status: NOT STARTED
+    kind: TASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:01:57.062Z"
+    updatedAt: "2026-04-01T18:04:22.748Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775066662754
+  "TCL-95":
+    key: TCL-95
+    project: TCL
+    title: Implement current-repo sync and auto-commit/auto-push behavior
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.125Z"
+    updatedAt: "2026-04-01T18:04:22.997Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066663004
+  "TCL-94":
+    key: TCL-94
+    project: TCL
+    title: Implement sandpiper tasks init for current-repo jj/git backends
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.091Z"
+    updatedAt: "2026-04-01T18:04:22.963Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066662969
+  "TCL-97":
+    key: TCL-97
+    project: TCL
+    title: Add integration tests and operator docs for current-repo storage modes
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.194Z"
+    updatedAt: "2026-04-01T18:04:23.072Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066663078
+  "TCL-93":
+    key: TCL-93
+    project: TCL
+    title: Implement task storage config resolution and precedence
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.059Z"
+    updatedAt: "2026-04-01T18:04:22.924Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066662933
+  "TCL-96":
+    key: TCL-96
+    project: TCL
+    title: Implement inline-to-separate-branch migration for current-repo mode
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.159Z"
+    updatedAt: "2026-04-01T18:04:23.035Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-87
+    lastIndexedAt: 1775066663042
+  "TCL-101":
+    key: TCL-101
+    project: TCL
+    title: Extract reusable storage bootstrap primitives for future domains
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.338Z"
+    updatedAt: "2026-04-01T18:04:23.211Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-89
+    lastIndexedAt: 1775066663218
+  "TCL-102":
+    key: TCL-102
+    project: TCL
+    title: Implement unified init/status surfaces for configured storage domains
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.374Z"
+    updatedAt: "2026-04-01T18:04:23.248Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-89
+    lastIndexedAt: 1775066663254
+  "TCL-103":
+    key: TCL-103
+    project: TCL
+    title: Document PKM/MEM adoption path for generalized storage bootstrap
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.408Z"
+    updatedAt: "2026-04-01T18:04:23.285Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-89
+    lastIndexedAt: 1775066663291
+  "TCL-100":
+    key: TCL-100
+    project: TCL
+    title: Add integration tests and conflict/repair guidance for external repo mode
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.300Z"
+    updatedAt: "2026-04-01T18:04:23.176Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-88
+    lastIndexedAt: 1775066663183
+  "TCL-99":
+    key: TCL-99
+    project: TCL
+    title: Implement branch selection/tracking and sync flows for external repo mode
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.266Z"
+    updatedAt: "2026-04-01T18:04:23.144Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-88
+    lastIndexedAt: 1775066663150
+  "TCL-98":
+    key: TCL-98
+    project: TCL
+    title: Implement external repo bootstrap with jj/git clone semantics
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.231Z"
+    updatedAt: "2026-04-01T18:04:23.106Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-88
+    lastIndexedAt: 1775066663116
+  "TCL-91":
+    key: TCL-91
+    project: TCL
+    title: Make scan-from-disk the primary counter allocation path
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:14.995Z"
+    updatedAt: "2026-04-01T18:04:22.851Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-86
+    lastIndexedAt: 1775066662858
+  "TCL-90":
+    key: TCL-90
+    project: TCL
+    title: Gitignore index.toon and rebuild it when missing or stale
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: HIGH
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:14.960Z"
+    updatedAt: "2026-04-01T18:04:22.815Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-86
+    lastIndexedAt: 1775066662822
+  "TCL-92":
+    key: TCL-92
+    project: TCL
+    title: Add coverage and docs for no-index startup/rebuild/counter flows
+    status: NOT STARTED
+    kind: SUBTASK
+    priority: MEDIUM
+    assignee: UNASSIGNED
+    reporter: USER
+    createdAt: "2026-04-01T18:02:15.027Z"
+    updatedAt: "2026-04-01T18:04:22.891Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    parent: TCL-86
+    lastIndexedAt: 1775066662897
   "SHR-69":
     key: SHR-69
     project: SHR
@@ -1262,7 +1562,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 85
+    nextTaskNumber: 104
   SHR:
     projectKey: SHR
     nextTaskNumber: 97
