@@ -292,21 +292,38 @@ git checkout <branch>    # or create if needed
 
 The CLI manages clone, pull, commit, and push as part of task operations — or exposes a `sandpiper tasks sync` command for manual control.
 
-### CLI bootstrap behavior
+### Initialization and bootstrap behavior
 
-On any task CLI invocation, the CLI resolves configuration and ensures storage is set up:
+Task storage bootstrap is **explicit**, not silent. The CLI should expose an init command such as:
+
+```bash
+sandpiper tasks init
+```
+
+On any normal task CLI invocation, the CLI resolves configuration first:
 
 1. **Resolve config.** Check for a standalone config file at the project root. If present, use it. Otherwise, read `.sandpiper/settings.json` → `tasks` key. If neither exists, use defaults.
-2. **Is `.sandpiper/tasks/` present and populated?** If yes, use it.
-3. **Ensure storage matches config:**
-   - `enabled: false` or no VCS → create the directory if missing.
-   - `branch: "@"` → nothing to do, files are inline.
-   - `branch: "<name>"` with no `repo` → ensure the separate checkout exists using the repo-appropriate backend (`jj workspace` in jj repos, `git worktree` in plain git repos).
-   - `repo: "<url>"` → ensure the clone exists using the repo-appropriate clone semantics (`jj git clone --colocate` in jj repos, `git clone` in plain git repos), then ensure the configured branch is checked out.
-4. **No config and no existing tasks directory?** Use defaults (`enabled: true, branch: "@"`) and create the directory.
+2. **If storage is already initialized**, use it.
+3. **If storage is not initialized:**
+   - `enabled: false` or no VCS → create `.sandpiper/tasks/` lazily and proceed (plain-file mode needs no special bootstrap)
+   - `branch: "@"` → create `.sandpiper/tasks/` lazily and proceed (inline mode needs no special bootstrap)
+   - separate-branch or external-repo mode → **fail with an actionable message** telling the user to run `sandpiper tasks init`
 
-The bootstrap is idempotent — running it multiple times is safe.
+The explicit init command then performs the repo-specific bootstrap:
 
+- **current repo, jj backend**
+  - create the root-based task workspace at `.sandpiper/tasks/`
+  - create the local task bookmark
+  - fetch the remote and either track an existing remote bookmark or create the remote bookmark if missing
+- **current repo, git backend**
+  - create the orphan branch worktree at `.sandpiper/tasks/`
+  - set up the branch's remote tracking relationship
+- **external repo mode**
+  - clone the repo into `.sandpiper/tasks/`
+  - check out or create the configured branch
+  - set up tracking against the remote branch
+
+Bootstrap is idempotent — running init multiple times is safe.
 ### Commit behavior in separate-branch mode
 
 When `auto_commit` is enabled and tasks are on a separate branch, the CLI automatically commits to the task branch after each mutating operation:
@@ -320,9 +337,16 @@ When `auto_commit` is disabled (the default), file changes accumulate in the tas
 
 ### Push/pull behavior
 
-When `auto_push` is enabled (and `auto_commit` is also enabled), the CLI pushes the task branch to its remote after each commit. This is opt-in because task operations should be fast and offline-capable by default — network I/O should be a conscious choice.
+Remote tracking should be established during explicit bootstrap, regardless of whether `auto_push` is enabled.
 
-When `auto_push` is disabled (the default), the user pushes manually:
+That means:
+- the local task bookmark/branch exists immediately after init
+- the corresponding remote bookmark/branch is created or tracked during init
+- subsequent task operations do **not** need to infer or lazily create the remote relationship
+
+When `auto_push` is enabled (and `auto_commit` is also enabled), the CLI pushes the task branch to its remote after each commit. This is opt-in because normal task operations should remain fast and offline-capable by default.
+
+When `auto_push` is disabled (the default), the user pushes manually after bootstrap has already established tracking:
 
 ```bash
 sandpiper tasks sync    # pull remote changes, then push local changes
@@ -331,7 +355,6 @@ sandpiper tasks pull    # pull only
 ```
 
 For the external repo case, the same options apply with the addition of pull-before-operate to pick up remote changes when syncing.
-
 ## Implementation plan
 
 ### Phase 1 — Reduce inline churn (no config changes)
@@ -346,22 +369,26 @@ For the external repo case, the same options apply with the addition of pull-bef
 
 1. Add `tasks.version_control` config schema to `.sandpiper/settings.json` and `.sandpiper-tasks.json`.
 2. Implement backend detection (`.jj/` → `jj workspace`, `.git/` without `.jj/` → `git worktree`).
-3. Implement branch bootstrap:
+3. Implement explicit `sandpiper tasks init` bootstrap flow.
+4. Implement branch bootstrap:
    - jj repo → `jj workspace add .sandpiper/tasks --revision 'root()'`
    - git repo → `git worktree add --orphan -b <branch> .sandpiper/tasks`
-4. Implement gitignore updates for the main checkout.
-5. Implement auto-commit / manual-commit behavior according to config.
-6. Implement `sandpiper tasks sync` for push/pull.
-7. Migration command: move existing inline tasks to the configured branch.
+5. Implement automatic local bookmark/branch creation and remote tracking setup during init.
+6. Implement gitignore updates for the main checkout.
+7. Implement auto-commit / manual-commit behavior according to config.
+8. Implement `sandpiper tasks sync` for push/pull.
+9. Migration command: move existing inline tasks to the configured branch.
 
 ### Phase 3 — External repo support
 
 1. Implement clone-based bootstrap for `mode.repo` using repo-appropriate clone semantics:
    - jj repo → `jj git clone --colocate`
    - git repo → `git clone`
-2. Handle branch selection / creation after clone.
-3. Handle pull-before-operate for remote changes.
-4. Handle conflict detection and resolution guidance.
+2. Implement explicit init flow for external repo mode.
+3. Handle branch selection / creation after clone.
+4. Implement remote tracking setup during init.
+5. Handle pull-before-operate for remote changes.
+6. Handle conflict detection and resolution guidance.
 
 ### Phase 4 — Extend pattern
 
@@ -388,9 +415,10 @@ For the external repo case, the same options apply with the addition of pull-bef
 6. **`@` sentinel in external repo context** — when `repo` is set and `branch` is `"@"`, the default branch is whatever HEAD points to on the cloned remote. This is standard `git clone` / `jj git clone` behavior and does not require special handling. Documented in the `mode.branch` section.
 7. **Backend selection rule** — current repo: jj → `jj workspace`, git → `git worktree`. External repo: always plain clone, using the same VCS semantics as the current repo (`jj git clone --colocate` in jj repos, `git clone` in git repos).
 8. **jj backend history model** — hard-code `root()`-based independent history for the jj workspace backend. Real remote push/fetch/recreate testing showed this works cleanly enough to make it the default rather than a configurable mode.
-9. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
+9. **Bootstrap UX** — explicit init command. Separate-branch and external-repo modes should not auto-bootstrap on a normal task command; they should fail with an actionable message directing the user to `sandpiper tasks init`.
+10. **Remote tracking setup** — init should always create the local bookmark/branch and establish remote tracking up front, even when `auto_push` is disabled. `auto_push` only controls subsequent mutation pushes, not bootstrap-time remote setup.
+11. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
 
 ## Open questions
 
-1. **Bootstrap UX** — when separate-branch or external-repo mode is configured but storage is not yet initialized, should the CLI auto-bootstrap silently, prompt interactively, or fail with an actionable message plus an explicit init command? Leaning toward explicit bootstrap command plus actionable guidance for safety.
-2. **Remote setup UX for jj bookmarks** — should the implementation always create and track the task bookmark automatically on first bootstrap, or should remote sync remain a second explicit step until the user opts into `auto_push`? Leaning toward automatic local bookmark creation plus explicit first push, so the branch exists locally immediately without surprising network activity.
+None currently. The design is ready to decompose into implementation tickets.
