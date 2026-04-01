@@ -1,5 +1,5 @@
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -139,6 +139,49 @@ describe('initExternalRepo — git backend (integration)', () => {
 
     const branch = execSync('git branch --show-current', { cwd: clonePath, encoding: 'utf-8' }).trim();
     expect(branch).toBe('sandpiper-tasks');
+  });
+});
+
+describe('initExternalRepo — jj backend (integration)', () => {
+  let rootDir: string;
+  let remoteDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'ext-repo-jj-test-'));
+    remoteDir = mkdtempSync(join(tmpdir(), 'ext-repo-jj-remote-'));
+    execSync('jj git init --colocate', { cwd: rootDir, stdio: 'pipe' });
+    execSync('jj git init --colocate', { cwd: remoteDir, stdio: 'pipe' });
+  });
+
+  afterEach(() => {
+    execSync(`rm -rf "${rootDir}"`);
+    execSync(`rm -rf "${remoteDir}"`);
+  });
+
+  it('checks out a named branch that already exists on the remote', () => {
+    // Create a named branch on the remote with distinct content
+    writeFileSync(join(remoteDir, 'sentinel.md'), 'tasks branch sentinel\n');
+    execSync('jj bookmark create sandpiper-tasks -r @', { cwd: remoteDir, stdio: 'pipe' });
+    const remoteCommit = execSync("jj log --no-graph -r sandpiper-tasks --template 'change_id.short()'", {
+      cwd: remoteDir,
+      encoding: 'utf-8',
+    });
+
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+    initExternalRepo({
+      rootDir,
+      backend: 'jj',
+      repoUrl: remoteDir,
+      clonePath,
+      branchName: 'sandpiper-tasks',
+    });
+
+    // Local bookmark should point at the same commit as the remote branch, not @
+    const localCommit = execSync("jj log --no-graph -r sandpiper-tasks --template 'change_id.short()'", {
+      cwd: clonePath,
+      encoding: 'utf-8',
+    });
+    expect(localCommit.trim()).toBe(remoteCommit.trim());
   });
 });
 
