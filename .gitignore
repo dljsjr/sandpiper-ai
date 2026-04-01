@@ -47,3 +47,4 @@ pi-session*.html
 !AGENTS.md
 !.sandpiper
 
+.sandpiper/tasks/
