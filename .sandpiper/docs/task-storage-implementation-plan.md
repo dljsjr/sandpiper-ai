@@ -1,9 +1,10 @@
 # Task Storage Strategy — Implementation Plan
 
-**Status:** Planned  
+**Status:** Phases 1–3 complete; Phase 4 not started  
 **Planning ticket:** TCL-85  
 **Design reference:** `.sandpiper/docs/task-storage-strategy.md`  
 **Date:** 2026-04-01  
+**Updated:** 2026-04-01 (post-session reflection)  
 
 ## Purpose
 
@@ -21,12 +22,12 @@ This document is execution-oriented. It does **not** restate the full rationale 
 
 Implementation is split into four top-level phases:
 
-| Phase | Ticket | Priority | Goal |
-|------|--------|----------|------|
-| 1 | TCL-86 | HIGH | Make the index derived state and remove the biggest churn source without changing storage topology |
-| 2 | TCL-87 | HIGH | Support separate-branch task storage in the current repo |
-| 3 | TCL-88 | MEDIUM | Support external-repo task storage |
-| 4 | TCL-89 | LOW | Generalize the storage bootstrap for future domains and unified init |
+| Phase | Ticket | Priority | Status | Goal |
+|------|--------|----------|--------|------|
+| 1 | TCL-86 | HIGH | ✅ DONE | Make the index derived state and remove the biggest churn source without changing storage topology |
+| 2 | TCL-87 | HIGH | ✅ DONE | Support separate-branch task storage in the current repo |
+| 3 | TCL-88 | MEDIUM | ✅ DONE | Support external-repo task storage |
+| 4 | TCL-89 | LOW | NOT STARTED | Generalize the storage bootstrap for future domains and unified init |
 
 Each phase has child subtasks that can be handed to a contributor independently.
 
