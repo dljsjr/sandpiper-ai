@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775057623000
+lastUpdatedAt: 1775061135934
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -7,15 +7,15 @@ tasks:
     title: Convert remaining shell scripts to portable TypeScript
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: AGENT
     reporter: AGENT
     createdAt: "2026-03-24T21:02:38.813Z"
-    updatedAt: "2026-03-29T00:38:02.254Z"
+    updatedAt: "2026-04-01T16:30:37.234Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744682258
+    lastIndexedAt: 1775061037243
   "TOOLS-10":
     key: TOOLS-10
     project: TOOLS
@@ -145,45 +145,45 @@ tasks:
     title: Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-04-01T15:29:49.144Z"
-    updatedAt: "2026-04-01T15:30:20.094Z"
+    updatedAt: "2026-04-01T16:30:37.312Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775057420099
+    lastIndexedAt: 1775061037321
   "WEB-11":
     key: WEB-11
     project: WEB
     title: "Spike: single-query web search tool (fetch top N results from a search API)"
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-04-01T15:29:49.175Z"
-    updatedAt: "2026-04-01T15:30:30.404Z"
+    updatedAt: "2026-04-01T16:30:37.348Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775057430410
+    lastIndexedAt: 1775061037353
   "WEB-9":
     key: WEB-9
     project: WEB
     title: Implement CSS selector targeting in web_fetch
     status: NOT STARTED
     kind: TASK
-    priority: MEDIUM
+    priority: HIGH
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-04-01T15:29:49.112Z"
-    updatedAt: "2026-04-01T15:30:09.621Z"
+    updatedAt: "2026-04-01T16:30:37.271Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775057409628
+    lastIndexedAt: 1775061037280
   "WEB-12":
     key: WEB-12
     project: WEB
@@ -283,15 +283,15 @@ tasks:
     title: "ProcessManager: add configurable buffer size limits to prevent unbounded memory growth"
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-27T22:50:01.097Z"
-    updatedAt: "2026-03-29T00:37:46.882Z"
+    updatedAt: "2026-04-01T16:30:37.029Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666898
+    lastIndexedAt: 1775061037034
   "AGENT-33":
     key: AGENT-33
     project: AGENT
@@ -440,15 +440,15 @@ tasks:
     title: TUI rebranding — custom assets and theming for the sandpiper identity
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T21:22:51.257Z"
-    updatedAt: "2026-03-29T00:37:46.883Z"
+    updatedAt: "2026-04-01T16:30:36.995Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666898
+    lastIndexedAt: 1775061037001
   "AGENT-35":
     key: AGENT-35
     project: AGENT
@@ -534,15 +534,15 @@ tasks:
     title: Migration move fails across filesystem boundaries (renameSync)
     status: NOT STARTED
     kind: BUG
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-03-26T04:45:09.533Z"
-    updatedAt: "2026-03-29T00:37:46.884Z"
+    updatedAt: "2026-04-01T16:32:15.928Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666898
+    lastIndexedAt: 1775061135934
   "AGENT-45":
     key: AGENT-45
     project: AGENT
@@ -643,30 +643,30 @@ tasks:
     title: Pi TUI integration for task board
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.896Z"
-    updatedAt: "2026-03-29T00:37:46.886Z"
+    updatedAt: "2026-04-01T16:30:37.125Z"
     dependsOn[1]: TCL-57
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1775061037131
   "TCL-59":
     key: TCL-59
     project: TCL
     title: Web app for task board
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.927Z"
-    updatedAt: "2026-03-29T00:37:46.886Z"
+    updatedAt: "2026-04-01T16:30:37.157Z"
     dependsOn[1]: TCL-57
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1775061037163
   "TCL-79":
     key: TCL-79
     project: TCL
@@ -781,15 +781,15 @@ tasks:
     title: Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors
     status: NOT STARTED
     kind: BUG
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: AGENT
     createdAt: "2026-04-01T15:29:58.419Z"
-    updatedAt: "2026-04-01T15:31:23.312Z"
+    updatedAt: "2026-04-01T16:30:37.193Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775057483321
+    lastIndexedAt: 1775061037199
   "TCL-73":
     key: TCL-73
     project: TCL
@@ -812,15 +812,15 @@ tasks:
     title: Design board data model with swimlanes
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-23T03:18:38.864Z"
-    updatedAt: "2026-03-29T00:37:46.888Z"
+    updatedAt: "2026-04-01T16:30:37.092Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1775061037098
   "TCL-74":
     key: TCL-74
     project: TCL
@@ -980,15 +980,15 @@ tasks:
     title: Error on relay tool/command use if shell integration not sourced
     status: NOT STARTED
     kind: TASK
-    priority: LOW
+    priority: MEDIUM
     assignee: UNASSIGNED
     reporter: USER
     createdAt: "2026-03-26T04:25:52.770Z"
-    updatedAt: "2026-03-29T00:37:46.891Z"
+    updatedAt: "2026-04-01T16:30:37.060Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1774744666899
+    lastIndexedAt: 1775061037066
   "SHR-94":
     key: SHR-94
     project: SHR

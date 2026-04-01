@@ -2,11 +2,11 @@
 title: "Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors"
 status: NOT STARTED
 kind: BUG
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:58.419Z
-updated_at: 2026-04-01T15:31:23.312Z
+updated_at: 2026-04-01T16:30:37.193Z
 ---
 
 # Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors
@@ -39,3 +39,7 @@ Add a test that verifies a real error (e.g., passing a bad flag) propagates inst
 ## 2026-04-01T15:31:23.313Z
 
 - **description**: added (20 lines)
+
+## 2026-04-01T16:30:37.193Z
+
+- **priority**: LOW → MEDIUM

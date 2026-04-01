@@ -2,11 +2,11 @@
 title: "Implement CSS selector targeting in web_fetch"
 status: NOT STARTED
 kind: TASK
-priority: MEDIUM
+priority: HIGH
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.112Z
-updated_at: 2026-04-01T15:30:09.621Z
+updated_at: 2026-04-01T16:30:37.271Z
 ---
 
 # Implement CSS selector targeting in web_fetch
@@ -36,3 +36,7 @@ After Readability extraction, apply the CSS selector to the extracted DOM (via j
 ## 2026-04-01T15:30:09.621Z
 
 - **description**: added (17 lines)
+
+## 2026-04-01T16:30:37.271Z
+
+- **priority**: MEDIUM → HIGH

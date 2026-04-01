@@ -2,11 +2,11 @@
 title: "Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.144Z
-updated_at: 2026-04-01T15:30:20.094Z
+updated_at: 2026-04-01T16:30:37.312Z
 ---
 
 # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
@@ -36,3 +36,7 @@ Most sites an agent reads are SSR (docs, GitHub, npm, MDN). But some pages — S
 ## 2026-04-01T15:30:20.094Z
 
 - **description**: added (17 lines)
+
+## 2026-04-01T16:30:37.312Z
+
+- **priority**: LOW → MEDIUM

@@ -1,0 +1,26 @@
+--- a/AGENT-28.md
++++ b/AGENT-28.md
+@@ -2,13 +2,18 @@
+ title: "ProcessManager: add configurable buffer size limits to prevent unbounded memory growth"
+ status: NOT STARTED
+ kind: TASK
+-priority: LOW
++priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-03-27T22:50:01.097Z
+-updated_at: 2026-03-29T00:37:46.882Z
++updated_at: 2026-04-01T16:30:37.029Z
+ ---
+ 
+ # ProcessManager: add configurable buffer size limits to prevent unbounded memory growth
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-04-01T16:30:37.029Z
++
++- **priority**: LOW → MEDIUM
++

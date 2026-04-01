@@ -2,11 +2,11 @@
 title: "Error on relay tool/command use if shell integration not sourced"
 status: NOT STARTED
 kind: TASK
-priority: LOW
+priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T04:25:52.770Z
-updated_at: 2026-03-29T00:37:46.891Z
+updated_at: 2026-04-01T16:30:37.060Z
 ---
 
 # Error on relay tool/command use if shell integration not sourced
@@ -24,3 +24,7 @@ Deferred from the SHR-64 shell integration installer work.
 ## 2026-03-26T04:25:59.595Z
 
 - **description**: added (5 lines)
+
+## 2026-04-01T16:30:37.060Z
+
+- **priority**: LOW → MEDIUM
