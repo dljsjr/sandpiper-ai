@@ -1,8 +1,9 @@
 # Task Storage Strategy — Reducing VCS Churn
 
-**Status:** Design  
+**Status:** Design approved; Phases 1–3 implemented  
 **Ticket:** TCL-82  
 **Date:** 2026-04-01  
+**Implementation:** See `task-storage-implementation-plan.md` and `packages/sandpiper-tasks-cli/STORAGE.md`  
 
 ## Problem
 
