@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { decode, encode } from '@toon-format/toon';
 import { parseFrontmatter } from './frontmatter.js';
-import { writeFileAtomic } from './fs.js';
+import { addPathToGitignore, writeFileAtomic } from './fs.js';
 import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
 import { CURRENT_SCHEMA_VERSION, migrateIndex, validateSchemaVersion } from './schema.js';
 import type {
@@ -18,27 +18,14 @@ import type {
 } from './types.js';
 
 const INDEX_FILENAME = 'index.toon';
-const GITIGNORE_FILENAME = '.gitignore';
 const INDEX_GITIGNORE_ENTRY = 'index.toon';
 
 /**
  * Ensure the tasks directory has a .gitignore that excludes index.toon.
- * Creates the file if absent; appends the entry if present but missing it.
  * Idempotent — safe to call on every invocation.
  */
 export function ensureIndexGitignore(tasksDir: string): void {
-  const gitignorePath = join(tasksDir, GITIGNORE_FILENAME);
-  if (existsSync(gitignorePath)) {
-    const content = readFileSync(gitignorePath, 'utf-8');
-    const alreadyPresent = content.split('\n').some((l) => l.trim() === INDEX_GITIGNORE_ENTRY);
-    if (alreadyPresent) return;
-    const appended = content.endsWith('\n')
-      ? `${content}${INDEX_GITIGNORE_ENTRY}\n`
-      : `${content}\n${INDEX_GITIGNORE_ENTRY}\n`;
-    writeFileAtomic(gitignorePath, appended);
-  } else {
-    writeFileAtomic(gitignorePath, `${INDEX_GITIGNORE_ENTRY}\n`);
-  }
+  addPathToGitignore(tasksDir, INDEX_GITIGNORE_ENTRY);
 }
 
 /**

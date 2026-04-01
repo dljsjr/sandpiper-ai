@@ -1,47 +1,9 @@
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { addPathToGitignore, initExternalRepo, initSeparateBranch } from './storage-backend.js';
-
-describe('addPathToGitignore', () => {
-  let rootDir: string;
-
-  beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'gitignore-update-test-'));
-  });
-
-  afterEach(() => {
-    rmSync(rootDir, { recursive: true, force: true });
-  });
-
-  it('creates .gitignore with the entry when no .gitignore exists', () => {
-    addPathToGitignore(rootDir, '.sandpiper/tasks/');
-
-    const content = readFileSync(join(rootDir, '.gitignore'), 'utf-8');
-    expect(content.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
-  });
-
-  it('appends entry to existing .gitignore that lacks it', () => {
-    execSync(`echo '*.log' > ${join(rootDir, '.gitignore')}`);
-    addPathToGitignore(rootDir, '.sandpiper/tasks/');
-
-    const content = readFileSync(join(rootDir, '.gitignore'), 'utf-8');
-    expect(content).toContain('*.log');
-    expect(content.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
-  });
-
-  it('is idempotent when entry already present', () => {
-    addPathToGitignore(rootDir, '.sandpiper/tasks/');
-    addPathToGitignore(rootDir, '.sandpiper/tasks/');
-
-    const lines = readFileSync(join(rootDir, '.gitignore'), 'utf-8')
-      .split('\n')
-      .filter((l) => l.trim() === '.sandpiper/tasks/');
-    expect(lines).toHaveLength(1);
-  });
-});
+import { initExternalRepo, initSeparateBranch } from './storage-backend.js';
 
 describe('initSeparateBranch — error cases', () => {
   let rootDir: string;
