@@ -1,12 +1,12 @@
 ---
 title: "Phase 3: support external-repo task storage"
-status: NOT STARTED
+status: IN PROGRESS
 kind: TASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:01:57.062Z
-updated_at: 2026-04-01T18:04:22.748Z
+updated_at: 2026-04-01T18:35:35.277Z
 ---
 
 # Phase 3: support external-repo task storage
@@ -42,3 +42,8 @@ Support external-repo task storage via plain clone semantics.
 ## 2026-04-01T18:04:22.749Z
 
 - **description**: added (23 lines)
+
+## 2026-04-01T18:35:35.278Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT

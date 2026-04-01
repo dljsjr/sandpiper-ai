@@ -1,12 +1,13 @@
 ---
 title: "Add coverage and docs for no-index startup/rebuild/counter flows"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:02:15.027Z
-updated_at: 2026-04-01T18:29:50.852Z
+updated_at: 2026-04-01T18:30:09.408Z
 ---
 
 # Add coverage and docs for no-index startup/rebuild/counter flows
@@ -42,3 +43,8 @@ Add or update tests and docs for missing-index startup, stale-index rebuilds, an
 ## 2026-04-01T18:29:50.853Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-04-01T18:30:09.409Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
