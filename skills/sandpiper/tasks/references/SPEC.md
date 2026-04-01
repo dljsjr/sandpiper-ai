@@ -10,9 +10,9 @@ Tasks are work items stored as markdown files with YAML frontmatter in a project
 
 ### 2.1 Project Key
 
-A project key MUST be composed of 2 or more uppercase ASCII letters, matching the pattern `[A-Z]{2,}`. Short keys (2–4 letters) are encouraged for readability.
+A project key MUST be composed of 2 or more uppercase ASCII letters, matching the pattern `[A-Z]{2,}`. Keys of 3–5 letters work best in practice — short enough to scan quickly in commit messages and task lists, long enough to be unambiguous. Keys shorter than 3 letters are permitted but tend to be too ambiguous; keys longer than 5 letters are permitted but become unwieldy in references like `Refs: MYPROJECT-42`.
 
-Examples: `SHR`, `CLI`, `TOOLS`
+Examples: `SHR`, `TCL`, `WEB` (3 letters), `AGENT`, `TOOLS` (5 letters)
 
 ### 2.2 Project Directory
 
