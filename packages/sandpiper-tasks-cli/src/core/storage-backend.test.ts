@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { addPathToGitignore, initSeparateBranch } from './storage-backend.js';
+import { addPathToGitignore, initExternalRepo, initSeparateBranch } from './storage-backend.js';
 
 describe('addPathToGitignore', () => {
   let rootDir: string;
@@ -111,6 +111,54 @@ describe('initSeparateBranch — git backend (integration)', () => {
     // verify via `git worktree list` instead.
     const worktrees = execSync('git worktree list', { cwd: rootDir, encoding: 'utf-8' });
     expect(worktrees).toContain('sandpiper-tasks');
+  });
+});
+
+describe('initExternalRepo — git backend (integration)', () => {
+  let rootDir: string;
+  let remoteDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'ext-repo-git-test-'));
+    remoteDir = mkdtempSync(join(tmpdir(), 'ext-repo-remote-'));
+    // Current project repo
+    execSync('git init -q', { cwd: rootDir });
+    execSync('git config user.email "test@test.com"', { cwd: rootDir });
+    execSync('git config user.name "Test"', { cwd: rootDir });
+    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    // Remote repo to clone from (non-bare is fine for local clones)
+    execSync('git init -q', { cwd: remoteDir });
+    execSync('git config user.email "test@test.com"', { cwd: remoteDir });
+    execSync('git config user.name "Test"', { cwd: remoteDir });
+    execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });
+  });
+
+  afterEach(() => {
+    rmSync(rootDir, { recursive: true, force: true });
+    rmSync(remoteDir, { recursive: true, force: true });
+  });
+
+  it('clones the external repo into .sandpiper/tasks/', () => {
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+    initExternalRepo({
+      rootDir,
+      backend: 'git',
+      repoUrl: remoteDir,
+      clonePath,
+      branchName: '@',
+    });
+
+    expect(existsSync(clonePath)).toBe(true);
+    expect(existsSync(join(clonePath, '.git'))).toBe(true);
+  });
+
+  it('is idempotent when clone path already exists', () => {
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+    initExternalRepo({ rootDir, backend: 'git', repoUrl: remoteDir, clonePath, branchName: '@' });
+    // Should not throw
+    expect(() =>
+      initExternalRepo({ rootDir, backend: 'git', repoUrl: remoteDir, clonePath, branchName: '@' }),
+    ).not.toThrow();
   });
 });
 

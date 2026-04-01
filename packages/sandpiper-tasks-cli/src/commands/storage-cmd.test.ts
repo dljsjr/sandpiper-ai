@@ -183,6 +183,47 @@ describe('auto-commit on task mutation — git backend (integration)', () => {
   });
 });
 
+// ─── storage init — external repo (integration) ─────────────────────
+
+describe('storage init — external repo, git backend (integration)', () => {
+  let rootDir: string;
+  let remoteDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'storage-init-ext-test-'));
+    remoteDir = mkdtempSync(join(tmpdir(), 'storage-init-ext-remote-'));
+    execSync('git init -q', { cwd: rootDir });
+    execSync('git config user.email "test@test.com"', { cwd: rootDir });
+    execSync('git config user.name "Test"', { cwd: rootDir });
+    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    execSync('git init -q', { cwd: remoteDir });
+    execSync('git config user.email "test@test.com"', { cwd: remoteDir });
+    execSync('git config user.name "Test"', { cwd: remoteDir });
+    execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });
+    writeFileSync(
+      join(rootDir, '.sandpiper-tasks.json'),
+      JSON.stringify({ version_control: { mode: { branch: '@', repo: remoteDir } } }),
+    );
+  });
+
+  afterEach(() => {
+    rmSync(rootDir, { recursive: true, force: true });
+    rmSync(remoteDir, { recursive: true, force: true });
+  });
+
+  it('clones external repo into .sandpiper/tasks/', () => {
+    const result = runCli(`--dir ${rootDir} storage init`);
+    expect(result.exitCode).toBe(0);
+    expect(existsSync(join(rootDir, '.sandpiper', 'tasks', '.git'))).toBe(true);
+  });
+
+  it('adds .sandpiper/tasks/ to .gitignore', () => {
+    runCli(`--dir ${rootDir} storage init`);
+    const gitignore = readFileSync(join(rootDir, '.gitignore'), 'utf-8');
+    expect(gitignore.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
+  });
+});
+
 // ─── storage migrate (integration) ──────────────────────────────
 
 describe('storage migrate — git backend (integration)', () => {

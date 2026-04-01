@@ -38,8 +38,9 @@ const storageInitCommand = new Command('init')
       const config = resolveStorageConfig(rootDir);
       const vc = config.version_control;
 
-      // Inline mode (@) needs no special bootstrap
-      if (!vc.enabled || vc.mode.branch === '@') {
+      // Inline mode: enabled, branch="@", no external repo URL
+      const isInline = !vc.enabled || (vc.mode.branch === '@' && !vc.mode.repo);
+      if (isInline) {
         console.log(
           'Task storage is in inline mode — tasks are tracked on the current branch. ' +
             'No special initialisation required.',
@@ -110,7 +111,7 @@ function runSyncOperation(rootDir: string, op: 'sync' | 'push' | 'pull'): void {
   const config = resolveStorageConfig(rootDir);
   const vc = config.version_control;
 
-  if (!vc.enabled || vc.mode.branch === '@') {
+  if (!vc.enabled || (vc.mode.branch === '@' && !vc.mode.repo)) {
     console.log('Task storage is in inline mode. Use your normal VCS workflow for sync.');
     return;
   }
