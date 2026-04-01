@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775061135934
+lastUpdatedAt: 1775064439205
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -852,6 +852,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774903668743
+  "TCL-82":
+    key: TCL-82
+    project: TCL
+    title: "Design doc: task storage strategy for reducing VCS churn"
+    status: IN PROGRESS
+    kind: TASK
+    priority: HIGH
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T17:25:31.265Z"
+    updatedAt: "2026-04-01T17:27:19.198Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775064439204
   "TCL-61":
     key: TCL-61
     project: TCL
@@ -1214,7 +1229,7 @@ tasks:
 counters:
   TCL:
     projectKey: TCL
-    nextTaskNumber: 82
+    nextTaskNumber: 83
   SHR:
     projectKey: SHR
     nextTaskNumber: 97
