@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775068190860
+lastUpdatedAt: 1775068602038
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1067,47 +1067,48 @@ tasks:
     key: TCL-86
     project: TCL
     title: "Phase 1: treat index.toon as derived state and make disk scan primary for counter allocation"
-    status: IN PROGRESS
+    status: COMPLETE
     kind: TASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:01:56.999Z"
-    updatedAt: "2026-04-01T18:18:02.359Z"
+    updatedAt: "2026-04-01T18:30:09.455Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775067482367
+    lastIndexedAt: 1775068209463
   "TCL-87":
     key: TCL-87
     project: TCL
     title: "Phase 2: support separate-branch task storage in the current repo"
-    status: NOT STARTED
+    status: IN PROGRESS
     kind: TASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:01:57.031Z"
-    updatedAt: "2026-04-01T18:04:22.717Z"
+    updatedAt: "2026-04-01T18:35:35.179Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775066662722
+    lastIndexedAt: 1775068535192
   "TCL-88":
     key: TCL-88
     project: TCL
     title: "Phase 3: support external-repo task storage"
-    status: NOT STARTED
+    status: IN PROGRESS
     kind: TASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:01:57.062Z"
-    updatedAt: "2026-04-01T18:04:22.748Z"
+    updatedAt: "2026-04-01T18:35:35.277Z"
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775066662754
+    lastIndexedAt: 1775068535285
   "TCL-89":
     key: TCL-89
     project: TCL
@@ -1127,66 +1128,70 @@ tasks:
     key: TCL-90
     project: TCL
     title: Gitignore index.toon and rebuild it when missing or stale
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:14.960Z"
-    updatedAt: "2026-04-01T18:29:50.764Z"
+    updatedAt: "2026-04-01T18:30:09.319Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-86
-    lastIndexedAt: 1775068190772
+    lastIndexedAt: 1775068209327
   "TCL-91":
     key: TCL-91
     project: TCL
     title: Make scan-from-disk the primary counter allocation path
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:14.995Z"
-    updatedAt: "2026-04-01T18:29:50.811Z"
+    updatedAt: "2026-04-01T18:30:09.366Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-86
-    lastIndexedAt: 1775068190818
+    lastIndexedAt: 1775068209373
   "TCL-92":
     key: TCL-92
     project: TCL
     title: Add coverage and docs for no-index startup/rebuild/counter flows
-    status: NEEDS REVIEW
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.027Z"
-    updatedAt: "2026-04-01T18:29:50.852Z"
+    updatedAt: "2026-04-01T18:30:09.408Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-86
-    lastIndexedAt: 1775068190859
+    lastIndexedAt: 1775068209416
   "TCL-93":
     key: TCL-93
     project: TCL
     title: Implement task storage config resolution and precedence
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: HIGH
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.059Z"
-    updatedAt: "2026-04-01T18:04:22.924Z"
+    updatedAt: "2026-04-01T18:36:42.029Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-87
-    lastIndexedAt: 1775066662933
+    lastIndexedAt: 1775068602037
   "TCL-94":
     key: TCL-94
     project: TCL
