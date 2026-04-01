@@ -1,72 +1,26 @@
 ---
 name: ast-grep
-description: >-
-  Use ast-grep (sg) for structural code search, exploration, lint, and rewrite using
-  AST patterns. Use when exploring or understanding a codebase — finding where functions
-  are defined, locating all call sites of a symbol, mapping a module's public API,
-  discovering what patterns a codebase uses, or answering structural questions like
-  "what does this module export" or "where is this function called". Prefer ast-grep
-  over grep/ripgrep whenever the task involves code structure rather than plain text —
-  finding function calls with specific argument shapes, locating patterns inside
-  particular contexts, renaming symbols while respecting scope, or performing codemod
-  rewrites. Also use when the user asks to find all usages of a function, refactor
-  code patterns, enforce coding conventions, or do search-and-replace that needs to
-  understand syntax. Use when the user mentions "ast-grep", "sg", "structural search",
-  "codemod", "code pattern", or "syntax-aware search".
+description: >
+  Use ast-grep (sg) for structural code search, lint, and rewrite using AST patterns.
+  Prefer ast-grep over grep/ripgrep/sed whenever the task involves matching code by
+  syntactic structure rather than plain text — e.g. finding function calls with specific
+  argument shapes, locating patterns inside particular contexts (a call inside a loop,
+  an import inside a class), renaming symbols while respecting scope, enforcing lint
+  rules based on AST node kinds, or performing large-scale codemod rewrites.
+  Also use when the user mentions "ast-grep", "sg", "structural search",
+  "codemod", "code pattern", "syntax-aware search", or asks to find/replace
+  code based on its structure or AST.
 compatibility: Requires ast-grep CLI installed (brew install ast-grep / npm i -g @ast-grep/cli / cargo install ast-grep --locked / pip install ast-grep-cli).
 ---
 
-# ast-grep — Structural Code Search, Exploration, Lint & Rewrite
+# ast-grep — Structural Code Search, Lint & Rewrite
 
-ast-grep (`sg`) matches code by its Abstract Syntax Tree, not by text. Patterns look like ordinary code with metavariable wildcards — you write the shape of the code you're looking for, and ast-grep finds all matches. It supports 25+ languages out of the box.
-
-This makes it valuable in two complementary ways: **exploring** codebases (finding definitions, call sites, patterns, and structure) and **transforming** them (refactoring, enforcing conventions, rewriting patterns).
+ast-grep (`sg`) matches code by its Abstract Syntax Tree, not by text. Patterns look like ordinary code with metavariable wildcards. It supports 25+ languages out of the box.
 
 ## When to use ast-grep vs text search
 
-- **Use ast-grep** when the question is about code *structure*: "where is this function called?", "what does this module export?", "find all async functions that catch errors", or any search where grep would give false positives from comments, strings, or similarly-named variables.
-- **Use grep/ripgrep** for plain-text or regex-over-text searches where syntax doesn't matter (log messages, comments, string literals, configuration values).
-
-## Exploring a codebase
-
-ast-grep patterns are just code with `$WILDCARD` placeholders. This makes them a natural fit for answering structural questions about unfamiliar code. All of these are simple one-liners:
-
-```bash
-# Map a module's public API — find all exported functions
-ast-grep -p 'export function $NAME($$$PARAMS)' -l ts src/
-
-# Find all exported interfaces
-ast-grep -p 'export interface $NAME { $$$FIELDS }' -l ts src/
-
-# Find all call sites of a specific function
-ast-grep -p 'processEvent($$$ARGS)' -l ts .
-
-# Find all imports from a specific module
-ast-grep -p 'import $$$IMPORTS from "react"' -l ts .
-
-# Find all class definitions
-ast-grep -p 'class $NAME { $$$BODY }' -l ts .
-
-# Find all async functions
-ast-grep -p 'async function $NAME($$$PARAMS) { $$$BODY }' -l ts .
-
-# Find all error handling patterns
-ast-grep -p 'try { $$$BODY } catch ($ERR) { $$$HANDLER }' -l ts .
-
-# Find all throw statements (useful for mapping error paths)
-ast-grep -p 'throw $EXPR' -l ts .
-
-# Find all test cases
-ast-grep -p 'it($DESC, $$$REST)' -l ts .
-ast-grep -p 'describe($DESC, $$$REST)' -l ts .
-
-# Find where a type is used as a parameter
-ast-grep -p 'function $NAME($$$BEFORE, $PARAM: MyType, $$$AFTER)' -l ts .
-```
-
-The advantage over grep: these match by syntax tree, so `processEvent($$$ARGS)` finds function *calls* — not comments mentioning the name, not string literals, not the function definition itself (unless it also calls itself). You get precise, structural results.
-
-For questions that combine structure (e.g., "find console.log inside async functions"), use `scan --inline-rules` with relational rules — see the Rule YAML section below.
+- **Use ast-grep** when you need to match code *structure*: specific function signatures, call patterns with certain argument shapes, expressions inside certain contexts, or rewrites that must preserve syntactic correctness.
+- **Use grep/ripgrep** for plain-text or regex-over-text searches where syntax doesn't matter (log messages, comments, string literals).
 
 ## Quick-start workflow
 

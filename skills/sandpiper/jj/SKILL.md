@@ -94,17 +94,10 @@ jj squash path/to/file.rs         # Specific file only
 
 **Edit workflow** — work directly in named commits:
 ```bash
-# ... make changes ...
-jj commit -m "feat: add auth"     # Name this work, move @ to a new empty commit ← preferred
-# ... make more changes ...
-jj commit -m "feat: next thing"   # Same pattern — snapshot and move on
+jj new -m "feat: add auth"        # Create described commit, start working
+# ... make changes (they land in @) ...
+jj new -m "next thing"            # Done, start next
 ```
-
-Use `jj commit -m "msg"` to finish a unit of work — it names the current commit and moves `@`
-to a fresh empty commit in one step. **Avoid `jj describe -m "msg"` + `jj new`** — that's
-equivalent but error-prone: it's easy to keep adding changes to the described commit instead
-of the new one, silently mixing work that should be in separate commits. Reserve `jj describe`
-for amending a commit's message while staying in it, and `jj new` for branching off an ancestor.
 
 ### Viewing state
 ```bash
@@ -117,16 +110,10 @@ jj diff --from <a> --to <b>       # Compare two revisions
 jj show <rev>                      # Description + diff of a revision
 ```
 
-### Making commits
-```bash
-jj commit -m "msg"                 # Name @, move to new empty @ (finish a unit of work)
-jj commit                          # Same, opens editor for message
-```
-
 ### Rewriting history
 ```bash
-jj describe -m "new message"       # Amend description of @ in place (stay in same commit)
-jj describe -m "msg" -r <rev>     # Amend description of any commit
+jj describe -m "new message"       # Change description of @
+jj describe -m "msg" -r <rev>     # Change description of any commit
 
 jj squash                          # Move @ changes into @-
 jj squash --from <a> --into <b>   # Move changes between any two commits
@@ -152,9 +139,7 @@ jj absorb                          # Auto-route @ changes to correct ancestor co
 ### Bookmarks (branches) and pushing
 ```bash
 jj bookmark create feat -r @       # Create bookmark at @
-jj bookmark set feat               # Move bookmark to @ (any direction)
-jj bookmark advance feat           # Advance bookmark to @ (forward/descendant only — safer)
-jj bookmark advance feat --to @-   # Advance to a specific descendant revision
+jj bookmark set feat               # Move bookmark to @
 jj bookmark delete feat            # Delete bookmark
 jj bookmark list                   # List bookmarks
 
@@ -337,20 +322,9 @@ across rewrites.
 
 **"Push was rejected."** — Remote moved. `jj git fetch`, rebase, push again.
 
-**Using `jj describe` + `jj new` instead of `jj commit`** — These are equivalent, but the
-two-step pattern is error-prone: it's easy to keep adding changes to the described commit
-instead of the new empty one, silently mixing work across commits. Use `jj commit -m "msg"`
-to finish a unit of work. Use `jj describe` only to amend the current commit's message in
-place, and `jj new` to branch off an ancestor commit.
-
 **"How do I git blame?"** — `jj file annotate <path>`.
 
 **"How do I undo everything?"** — `jj op log` to find good state, `jj op restore <op-id>`.
-
-**"I need to recover specific files from an old commit."** — Use `jj restore --from <rev> path/to/files`. Supports glob patterns (quote them to prevent shell expansion). The files are restored into `@` — no need to create a new commit first:
-```
-jj restore --from abc123 '.sandpiper/tasks/*/PROJECT.md'
-```
 
 ---
 
