@@ -115,8 +115,8 @@ Examples: `SHR-1`, `SHR-42`, `CLI-7`
 
 When creating a new task:
 
-1. Read `nextTaskNumber` from the index's counters (primary), legacy `.meta.yml` (fallback), or scan task files for the highest number (last resort).
-2. Use that value as the new task's number.
+1. Scan all `.md` task files and `.moved` tombstones in the project directory to find the highest allocated number; use `highest + 1` as the new task number.
+2. If the index is available and its counter is higher than the scan result (defensive floor against file deletion), use the index counter instead.
 3. Create the task file.
 4. Update the index (which recalculates counters from all task files).
 
