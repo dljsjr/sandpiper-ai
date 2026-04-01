@@ -222,3 +222,26 @@ describe('storage migrate — git backend (integration)', () => {
     expect(worktrees).toContain('sandpiper-tasks');
   });
 });
+
+// ─── storage sync/push/pull inline no-op ───────────────────────────
+
+describe('storage sync/push/pull — inline mode no-op', () => {
+  let rootDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'storage-sync-noop-test-'));
+    mkdirSync(join(rootDir, '.sandpiper', 'tasks'), { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(rootDir, { recursive: true, force: true });
+  });
+
+  for (const subcmd of ['sync', 'push', 'pull'] as const) {
+    it(`storage ${subcmd} exits 0 and prints informational message in inline mode`, () => {
+      const result = runCli(`--dir ${rootDir} storage ${subcmd}`);
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toMatch(/inline|normal VCS/i);
+    });
+  }
+});
