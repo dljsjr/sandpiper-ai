@@ -1,12 +1,13 @@
 ---
 title: "Optimize startup system prompt ordering for prefix caching"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-31T19:55:05.909Z
-updated_at: 2026-03-31T22:35:02.610Z
+updated_at: 2026-04-01T04:38:21.720Z
 ---
 
 # Optimize startup system prompt ordering for prefix caching
@@ -41,3 +42,8 @@ Reorder system prompt construction so static components are emitted first, follo
 ## 2026-03-31T22:35:02.610Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-04-01T04:38:21.720Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

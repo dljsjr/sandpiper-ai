@@ -1,12 +1,13 @@
 ---
 title: "Resurrection-aware shell relay session management"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-31T14:53:00.592Z
-updated_at: 2026-03-31T15:52:00.809Z
+updated_at: 2026-04-01T04:38:21.723Z
 ---
 
 # Resurrection-aware shell relay session management
@@ -70,3 +71,8 @@ Improve shell relay session management to make resumed Sandpiper sessions reconn
 ## 2026-03-31T15:52:00.810Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-04-01T04:38:21.723Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

@@ -1,12 +1,13 @@
 ---
 title: "First command after setup often times out (prompt_ready race condition)"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-25T03:02:39.233Z
-updated_at: 2026-03-31T17:17:15.732Z
+updated_at: 2026-04-01T04:38:21.722Z
 ---
 
 # First command after setup often times out (prompt_ready race condition)
@@ -29,3 +30,8 @@ The first shell_relay command after session setup frequently times out waiting f
 ## 2026-03-31T17:17:15.733Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-04-01T04:38:21.722Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

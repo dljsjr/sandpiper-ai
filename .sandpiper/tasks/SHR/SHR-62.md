@@ -1,12 +1,13 @@
 ---
 title: "Long write-chars injections may wrap and confuse fish parser"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-24T22:53:20.587Z
-updated_at: 2026-03-31T17:15:26.362Z
+updated_at: 2026-04-01T04:38:21.721Z
 ---
 
 # Long write-chars injections may wrap and confuse fish parser
@@ -29,3 +30,8 @@ When the escaped command string is long enough to wrap across terminal lines in 
 ## 2026-03-31T17:15:26.363Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-04-01T04:38:21.721Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

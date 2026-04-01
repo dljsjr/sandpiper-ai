@@ -1,12 +1,13 @@
 ---
 title: "Add /relay-cleanup command to remove stale EXITED relay sessions"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-28T05:04:42.259Z
-updated_at: 2026-03-31T16:21:38.308Z
+updated_at: 2026-04-01T04:38:21.723Z
 ---
 
 # Add /relay-cleanup command to remove stale EXITED relay sessions
@@ -37,3 +38,8 @@ Automatic cleanup of stale Zellij relay sessions is unsafe because other Sandpip
 ## 2026-03-31T16:21:38.309Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-04-01T04:38:21.723Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
