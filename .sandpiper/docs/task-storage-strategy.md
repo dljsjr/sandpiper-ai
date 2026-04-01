@@ -28,7 +28,14 @@ In jj's working-copy-is-a-commit model this is especially pronounced — every t
 
 ### Configuration model
 
-Task storage is configured in `.sandpiper/settings.json` under the `tasks.version_control` key:
+Task storage configuration can live in two places:
+
+1. **Sandpiper project settings** — `.sandpiper/settings.json`, namespaced under the `tasks` key.
+2. **Standalone config file** — a file at the project root (e.g., `.sandpiper-tasks.json`) whose root object maps directly to the `tasks` value.
+
+When both are present, the standalone file wins — it overrides the sandpiper settings block entirely for the `tasks` namespace. This lets teams commit a task storage config to the project root on `main` even when the tasks themselves live on a separate branch or in a separate repo.
+
+#### Sandpiper settings (`/.sandpiper/settings.json`)
 
 ```json
 {
@@ -36,13 +43,32 @@ Task storage is configured in `.sandpiper/settings.json` under the `tasks.versio
     "version_control": {
       "enabled": true,
       "mode": {
-        "branch": "@",
-        "repo": "git@github.com:user/project-tasks.git"
-      }
+        "branch": "sandpiper-tasks"
+      },
+      "auto_commit": false,
+      "auto_push": false
     }
   }
 }
 ```
+
+#### Standalone config (project root, e.g., `.sandpiper-tasks.json`)
+
+```json
+{
+  "version_control": {
+    "enabled": true,
+    "mode": {
+      "branch": "sandpiper-tasks",
+      "repo": "git@github.com:user/project-tasks.git"
+    },
+    "auto_commit": true,
+    "auto_push": false
+  }
+}
+```
+
+The standalone file has no `"tasks"` namespace — its root object IS the tasks config. This keeps the file focused and avoids redundant nesting.
 
 #### `enabled` (boolean)
 
@@ -72,6 +98,18 @@ When set, the CLI clones the external repo into `.sandpiper/tasks/` (or a stagin
 
 The clone is a plain clone, **not** a submodule. Submodules add friction and tooling complexity that isn't justified here.
 
+#### `auto_commit` (boolean, optional, default: `false`)
+
+When `true` and tasks are on a separate branch (or external repo), the CLI automatically commits to the task branch after every mutating operation. When `false`, file changes accumulate in the task worktree's working copy and the user commits manually.
+
+Not applicable when `branch` is `"@"` (inline mode) — the user's normal VCS workflow handles commits.
+
+#### `auto_push` (boolean, optional, default: `false`)
+
+When `true`, the CLI automatically pushes the task branch to its remote after every commit (or batch of commits). When `false`, the user pushes manually via `sandpiper tasks sync` or their VCS tooling.
+
+Requires `auto_commit: true` to have any effect (there's nothing to push if changes aren't committed). Not applicable in inline mode.
+
 #### Configuration matrix
 
 | `enabled` | `repo` | `branch` | Behavior |
@@ -86,18 +124,18 @@ The clone is a plain clone, **not** a submodule. Submodules add friction and too
 
 ```json
 {
-  "tasks": {
-    "version_control": {
-      "enabled": true,
-      "mode": {
-        "branch": "@"
-      }
-    }
+  "version_control": {
+    "enabled": true,
+    "mode": {
+      "branch": "@"
+    },
+    "auto_commit": false,
+    "auto_push": false
   }
 }
 ```
 
-Out-of-the-box behavior is identical to today: tasks tracked inline on the current branch. Users opt into the separate-branch model by changing `"@"` to a branch name. No existing workflows break.
+Out-of-the-box behavior is identical to today: tasks tracked inline on the current branch, no auto-commit or auto-push. Users opt into the separate-branch model by changing `"@"` to a branch name. No existing workflows break.
 
 For non-VCS directories, the CLI behaves as though `enabled: false` regardless of the config value. It may emit a one-time informational message but does not error.
 
@@ -187,43 +225,43 @@ The CLI manages clone, pull, commit, and push as part of task operations — or 
 
 ### CLI bootstrap behavior
 
-On any task CLI invocation, the CLI checks:
+On any task CLI invocation, the CLI resolves configuration and ensures storage is set up:
 
-1. **Is `.sandpiper/tasks/` present and populated?** If yes, use it.
-2. **Is there a config at `.sandpiper/settings.json`?** If yes, read `tasks.version_control` and ensure the storage is set up:
+1. **Resolve config.** Check for a standalone config file at the project root. If present, use it. Otherwise, read `.sandpiper/settings.json` → `tasks` key. If neither exists, use defaults.
+2. **Is `.sandpiper/tasks/` present and populated?** If yes, use it.
+3. **Ensure storage matches config:**
    - `enabled: false` or no VCS → create the directory if missing.
    - `branch: "@"` → nothing to do, files are inline.
    - `branch: "<name>"` → ensure the branch exists, ensure the worktree is checked out.
    - `repo: "<url>"` → ensure the clone exists, ensure the right branch is checked out.
-3. **No config and no existing tasks directory?** Use defaults (`enabled: true, branch: "@"`) and create the directory.
+4. **No config and no existing tasks directory?** Use defaults (`enabled: true, branch: "@"`) and create the directory.
 
 The bootstrap is idempotent — running it multiple times is safe.
 
 ### Commit behavior in separate-branch mode
 
-When tasks are on a separate branch, task CLI operations that modify files should auto-commit to that branch:
+When `auto_commit` is enabled and tasks are on a separate branch, the CLI automatically commits to the task branch after each mutating operation:
 
 - `task create` → commit "Create TCL-82: ..."
 - `task update` → commit "Update TCL-82: ..."
 - `task pickup` → commit "Pick up TCL-82"
 - `task complete` → commit "Complete TCL-82 → DONE"
 
-This keeps the task branch's history granular and meaningful. The user can curate it later if desired.
-
-**Open question:** Should auto-commit be configurable? Some users might prefer to batch task changes and commit manually. A `tasks.version_control.auto_commit: true | false` option could control this. Default: `true` for separate-branch mode, not applicable for inline mode (the user's normal VCS workflow handles it).
+When `auto_commit` is disabled (the default), file changes accumulate in the task worktree and the user commits manually using their VCS tooling. This gives full control over commit granularity — a triage session that updates 12 tasks can be one commit or twelve, at the user's discretion.
 
 ### Push/pull behavior
 
-The task branch should be pushed to the remote for backup and multi-machine sync. Options:
+When `auto_push` is enabled (and `auto_commit` is also enabled), the CLI pushes the task branch to its remote after each commit. This is opt-in because task operations should be fast and offline-capable by default — network I/O should be a conscious choice.
 
-1. **Auto-push on every commit** — simple but potentially slow (network round-trip on every task operation).
-2. **Push on CLI exit / session end** — batch pushes, lower latency per operation.
-3. **Manual push via `sandpiper tasks sync`** — maximum control, risk of forgetting.
-4. **Configurable** — let the user choose.
+When `auto_push` is disabled (the default), the user pushes manually:
 
-**Recommendation:** Default to manual push (`sandpiper tasks sync` or `sandpiper tasks push`) with an option to enable auto-push. Task operations should be fast and offline-capable; network I/O should be explicit.
+```bash
+sandpiper tasks sync    # pull remote changes, then push local changes
+sandpiper tasks push    # push only
+sandpiper tasks pull    # pull only
+```
 
-For the external repo case, the same options apply but with the addition of pull-before-operate to pick up remote changes.
+For the external repo case, the same options apply with the addition of pull-before-operate to pick up remote changes when syncing.
 
 ## Implementation plan
 
@@ -265,10 +303,16 @@ For the external repo case, the same options apply but with the addition of pull
 | [beads](https://github.com/gastownhall/beads) / [beads_rust](https://github.com/Dicklesworthstone/beads_rust) | Flat files in `.beads/` | Same churn problem as us. Viral repo behavior is a cautionary tale — our bootstrap must be explicit and opt-in. |
 | [beans](https://github.com/hmans/beans) / [ticket](https://github.com/wedow/ticket) | Flat file CLI trackers | Same model as us. No evidence of churn mitigation strategies. |
 
+## Resolved decisions
+
+1. **Auto-commit** — opt-in via `auto_commit: true` in config. Default `false`. User controls commit granularity.
+2. **Auto-push** — opt-in via `auto_push: true` in config. Default `false`. Offline-first by default.
+3. **Settings file location** — two locations, standalone overrides sandpiper settings. The standalone file lives at the project root (not in `.sandpiper/` or the tasks directory) so it can be committed to `main` even when tasks are on a separate branch.
+4. **`@` sentinel in external repo context** — when `repo` is set and `branch` is `"@"`, the default branch is whatever HEAD points to on the cloned remote. This is standard `git clone` / `jj git clone` behavior and does not require special handling. Documented in the `mode.branch` section.
+5. **History files** — retained. VCS history is lossy (squashing destroys intermediate states); history files are an append-only audit trail that survives VCS curation and enables efficient rendering for TUI/web UI.
+
 ## Open questions
 
-1. **jj workspace mechanics** — Does `jj workspace add` support targeting a subdirectory of an existing workspace? If not, does `git worktree add` in colocated mode work cleanly with jj's snapshot? Needs a spike.
-2. **Auto-commit granularity** — Should batch operations (e.g., a triage session updating 12 tasks) produce 12 commits or 1? Leaning toward 1-per-CLI-invocation for batch operations, 1-per-operation for single-task commands.
-3. **Auto-push default** — Should auto-push be opt-in (manual sync) or opt-out (auto-push by default)? Leaning toward opt-in for offline-first operation.
-4. **Settings file location** — `.sandpiper/settings.json` is currently the project settings file. Is this the right place for task storage config, or should it live in the task directory itself? If the task directory is on a separate branch, the settings file on main would reference a branch that's not visible in the main checkout — which is fine conceptually but might be surprising.
-5. **`@` sentinel in external repo context** — When `repo` is set and `branch` is `"@"`, what is "the default branch"? For a freshly cloned repo, it's whatever HEAD points to (usually `main`). This should work but needs explicit documentation.
+1. **jj workspace mechanics** — Does `jj workspace add` support targeting a subdirectory of an existing workspace? If not, does `git worktree add` in colocated mode work cleanly with jj's snapshot? Needs a spike (next step after this doc is finalized).
+2. **Standalone config filename** — The standalone config file at the project root needs a well-known name. Candidates: `.sandpiper-tasks.json`, `sandpiper-tasks.config.json`, `.tasks.json`. Leaning toward `.sandpiper-tasks.json` for namespace clarity.
+3. **Config file format** — JSON is the current choice for consistency with `.sandpiper/settings.json`. Should we also support TOML or YAML for the standalone file? Leaning toward JSON-only to keep parsing simple.
