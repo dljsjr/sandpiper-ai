@@ -80,7 +80,11 @@ function initJjWorkspace(rootDir: string, workspacePath: string, branchName: str
   // jj workspace add does not create parent directories
   mkdirSync(workspacePath, { recursive: true });
   run(`jj workspace add "${workspacePath}" --name tasks --revision 'root()'`, rootDir);
-  run(`jj bookmark create "${branchName}" -r @-`, workspacePath);
+  // Point the bookmark at @, not @-: @- is root() in a freshly-created workspace,
+  // and git cannot export a ref pointing at the null SHA, causing a warning on every
+  // subsequent jj operation. @ is the (empty) working-copy commit, which is a real
+  // exportable git object.
+  run(`jj bookmark create "${branchName}" -r @`, workspacePath);
 }
 
 function initGitWorktree(rootDir: string, workspacePath: string, branchName: string): void {

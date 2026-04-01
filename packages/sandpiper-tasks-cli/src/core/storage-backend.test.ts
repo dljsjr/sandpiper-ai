@@ -206,4 +206,22 @@ describe('initSeparateBranch — jj backend (integration)', () => {
     const workspaces = execSync('jj workspace list', { cwd: rootDir, encoding: 'utf-8' });
     expect(workspaces).toContain('tasks');
   });
+
+  it('bookmark does not point at root() after init (avoids git export warning)', () => {
+    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+    initSeparateBranch({
+      rootDir,
+      backend: 'jj',
+      branchName: 'sandpiper-tasks',
+      workspacePath,
+    });
+
+    // If the bookmark were on root(), jj bookmark list would show the null change ID.
+    // A bookmark on a real (non-root) commit shows a non-zero change ID.
+    const bookmarks = execSync('jj bookmark list', { cwd: rootDir, encoding: 'utf-8' });
+    // The line for sandpiper-tasks should NOT contain the root null change ID
+    const line = bookmarks.split('\n').find((l) => l.includes('sandpiper-tasks'));
+    expect(line).toBeDefined();
+    expect(line).not.toContain('zzzzzzzz');
+  });
 });
