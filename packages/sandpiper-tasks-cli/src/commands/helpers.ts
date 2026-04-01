@@ -160,7 +160,11 @@ export function withErrorHandling(fn: () => void): void {
     fn();
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.error(`Error: ${msg}`);
+    // Include stderr from failed child processes (e.g. jj/git error output)
+    // so the user sees *why* the command failed, not just that it did.
+    const stderr = (error as { stderr?: Buffer | string })?.stderr;
+    const detail = stderr ? `\n${String(stderr).trim()}` : '';
+    console.error(`Error: ${msg}${detail}`);
     process.exitCode = 1;
   }
 }

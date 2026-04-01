@@ -17,6 +17,9 @@ export function autoCommitIfEnabled(rootDir: string, config: TaskStorageConfig, 
   if (!vc.enabled || !vc.auto_commit || (vc.mode.branch === '@' && !vc.mode.repo)) return;
 
   const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+  // Detect VCS from the project root. The workspace at .sandpiper/tasks/ always uses
+  // the same VCS as the root (jj root → jj workspace or jj clone; git root → git
+  // worktree or git clone). See task-storage-strategy.md §Backend selection.
   const backend = detectVcsBackend(rootDir);
   commitTaskChanges(workspacePath, backend, message);
 

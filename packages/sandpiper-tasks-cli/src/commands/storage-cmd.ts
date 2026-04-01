@@ -117,6 +117,7 @@ function runSyncOperation(rootDir: string, op: 'sync' | 'push' | 'pull'): void {
   }
 
   const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+  // VCS detected from root — workspace always matches (see task-storage-strategy.md §Backend selection).
   const backend = detectVcsBackend(rootDir);
 
   if (op === 'pull' || op === 'sync') {
