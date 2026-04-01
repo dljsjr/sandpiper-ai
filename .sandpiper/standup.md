@@ -1,75 +1,43 @@
 # Session Stand-Up
 
-Updated: 2026-04-01T15:17:11Z
+Updated: 2026-04-01T16:35:00Z
 Session: current
 
 ## Accomplished
 
-### Refactor Plan Execution (previous pass)
-Implemented the external code-health work plan end-to-end with per-task commits and task tracking:
-- AGENT-39, SHR-96, TCL-72, AGENT-40, AGENT-41, TCL-73, AGENT-42, TCL-74, TCL-75
-- Tooling setup via AGENT-43 (`mise` + `jscpd`/`lizard`, `scc` via brew)
+### Refactor plan review, ticket closure, and history curation
+- Code review passed (revision 2 verdict: **Approve**).
+- Addressed all rev 1 review findings (type-safe test stubs, dynamic import, readonly, JSDoc, naming).
+- Closed all 13 approved refactor-plan tickets (AGENT-39–45, SHR-96, TCL-72–75, TCL-77).
+- Curated history to 2 logical commits; advanced `main` bookmark.
 
-### Backlog Follow-Up Pass (this session)
-Addressed all four backlog items queued at the end of the refactor plan.
+### Documentation sweep — ticket all future work
+- Scanned all design docs, PRDs, and code review findings for documented-but-unticketted future work.
+- Created 11 new backlog tickets covering: WEB deferred features (WEB-9 through WEB-13), ProcessManager open questions (AGENT-46, AGENT-47), and TCL code review follow-ups (TCL-78 through TCL-81).
 
-#### 1) AGENT-45 — Biome schema drift
-- Updated `biome.json` schema URL from `2.4.8` to `2.4.10`.
-- `bun run check` is now clean without schema-version info noise.
-- Task status: **NEEDS REVIEW**.
+### Backlog triage pass
+- Reviewed all 38 NOT STARTED tickets with user; reprioritized 12:
+  - Bumped LOW → MEDIUM: AGENT-14, AGENT-16, AGENT-28, SHR-67, TCL-57/58/59, TCL-80, TOOLS-7, WEB-10, WEB-11
+  - Bumped MEDIUM → HIGH: WEB-9
 
-#### 2) AGENT-44 — shell-relay/core test baseline failures
-- Reproduced failures in:
-  - `packages/core/src/process-manager.test.ts` (`vi.waitFor` not available under current Bun runner)
-  - `extensions/shell-relay/src/fifo.test.ts` (invalid `resolves.not.toThrow()` pattern)
-  - cross-suite shell-relay contamination when `zellij.test.ts` mocked `node:child_process` at module scope
-- Fixes:
-  - Added local polling helper in `process-manager.test.ts` and replaced `vi.waitFor` calls.
-  - Corrected FIFO double-shutdown assertion to `resolves.toBeUndefined()`.
-  - Reworked `zellij.test.ts` to use per-test `vi.spyOn(..., 'execSync')` with restore in `afterEach`, removing hoisted global module mocking.
-- Verified with targeted suites and full test run.
-- Task status: **NEEDS REVIEW**.
-
-#### 3) TCL-76 — tasks-cli baseline regressions (search/index-cmd)
-- Re-ran target suites in isolation and under full package/full repo runs.
-- Stress-ran target suites 10x; all passed.
-- No current reproducible failure remained on this stack.
-- Closed with investigation notes.
-- Task status: **COMPLETE (DONE)**.
-
-#### 4) TCL-77 — remaining move/mutate clone pair
-- Removed remaining duplication by extracting shared counter read helper:
-  - added `readProjectCounter(...)` in `packages/sandpiper-tasks-cli/src/core/index-update.ts`
-  - updated `move.ts` and `mutate.ts` to use it
-- Verified targeted tests and jscpd for the pair (`0 clones found` with configured thresholds).
-- Task status: **NEEDS REVIEW**.
-
-### Verification State
-- `bun run check` ✅
-- `bun test` ✅ (full suite green)
+## Deferred decisions (need dedicated session)
+- **SHR-68/69** (bash/zsh user command capture) — need a discussion before final triage
+- **MEM-1** — user has a detailed design doc; triage after a dedicated MEM design review session
+- **TCL-55/61** (index spike alternatives) — may be subsumed by MEM design, re-triage after MEM review
 
 ## In Progress
 - None.
 
 ## Next Session
-1. Continue from `main` if any follow-up work is needed after this refactor-plan landing.
-2. Optional: push/sync the advanced `main` bookmark to the remote workflow when desired.
+Good candidates to pick up next:
+- **TCL-71** (HIGH) — require key or explicit filter on mutating commands; safety improvement, ready to implement
+- **WEB-9** (HIGH) — CSS selector targeting; easy win, API already designed
+- **AGENT-35** (HIGH) — deterministic enforcement hooks; significant design effort, worth planning
 
 ## Blockers
 - None.
 
-## Re-review Update
-- The review document was updated to revision 2 and recommends **Approve**.
-- I independently double-checked the updated review and agreed with the verdict.
-- The only remaining note is a non-blocking, out-of-scope cast in `draw-sandpiper.ts`.
-
-## Session Closure
-- Closed all remaining approved refactor-plan tickets:
-  - AGENT-39, AGENT-40, AGENT-41, AGENT-42, AGENT-43, AGENT-44, AGENT-45
-  - SHR-96
-  - TCL-72, TCL-73, TCL-74, TCL-75, TCL-77
-- Performed a history-curation pass to collapse the stack to the minimal logical set of commits.
-- Advanced the `main` bookmark to the curated tip.
-
 ## Context
-- Existing unrelated working-copy renames under `skills/sandpiper/{code => code-review}/...` were left untouched.
+- `main` is ahead of `main@origin` by several commits (triage pass + ticket creation). User is handling pushes manually.
+- SHR-68/69 discussion deferred; they remain at MEDIUM pending that conversation.
+- TCL-55/61 remain LOW pending MEM design review.
