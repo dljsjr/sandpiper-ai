@@ -131,3 +131,8 @@ Description and acceptance criteria here.
 ```
 
 See [SPEC.md](../../skills/sandpiper/tasks/references/SPEC.md) for the full specification.
+
+## Related design docs
+
+- [Task storage strategy](../../.sandpiper/docs/task-storage-strategy.md) — approved design for reducing VCS churn from task operations
+- [Task storage implementation plan](../../.sandpiper/docs/task-storage-implementation-plan.md) — phased execution plan and ticket map

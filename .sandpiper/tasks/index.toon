@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775066684904
+lastUpdatedAt: 1775067040520
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -261,6 +261,22 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774838885022
+  "AGENT-48":
+    key: AGENT-48
+    project: AGENT
+    title: Persist self-reflection learnings in skills/docs after task-storage design session
+    status: COMPLETE
+    kind: TASK
+    priority: MEDIUM
+    assignee: AGENT
+    reporter: USER
+    createdAt: "2026-04-01T18:09:03.845Z"
+    updatedAt: "2026-04-01T18:10:40.514Z"
+    resolution: DONE
+    dependsOn[0]:
+    blockedBy[0]:
+    related[0]:
+    lastIndexedAt: 1775067040520
   "AGENT-38":
     key: AGENT-38
     project: AGENT
@@ -1586,4 +1602,4 @@ counters:
     nextTaskNumber: 14
   AGENT:
     projectKey: AGENT
-    nextTaskNumber: 48
+    nextTaskNumber: 49

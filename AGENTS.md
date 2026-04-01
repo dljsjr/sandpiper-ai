@@ -98,6 +98,7 @@ Read the relevant focused doc **before** working in these areas:
 | Environment variables | `.sandpiper/docs/env-vars.md` | Reading/writing env vars or adding config-path resolution |
 | TUI development | `.sandpiper/docs/tui-extension-patterns.md` | Building widgets, banners, or extension UI |
 | CLI development | `.sandpiper/docs/cli-development.md` | Building command-line tools with Commander or changing bundled bins |
+| Task storage & VCS churn | `.sandpiper/docs/task-storage-strategy.md`, `.sandpiper/docs/task-storage-implementation-plan.md` | Changing task storage topology, `.sandpiper-tasks.json`, `tasks.version_control` config, bootstrap/sync flows, or task index persistence |
 
 ## TypeScript
 
