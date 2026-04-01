@@ -82,7 +82,9 @@ See the [tasks skill](../../skills/sandpiper/tasks/SKILL.md) for comprehensive u
 src/
 ├── index.ts              # CLI entry point (Commander program)
 ├── commands/
-│   ├── task-cmd.ts       # Task subcommands (list, show, create, update, etc.)
+│   ├── task-cmd.ts       # Task command orchestrator (wires subcommands)
+│   ├── task-*.ts         # Task subcommands (list, show, create, update, etc.)
+│   ├── task-cmd-helpers.ts # Shared task command helper logic
 │   ├── project-cmd.ts    # Project subcommands (list, create)
 │   ├── index-cmd.ts      # Index management subcommands
 │   └── helpers.ts        # Shared CLI helpers

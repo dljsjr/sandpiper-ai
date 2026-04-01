@@ -112,6 +112,16 @@ const createCommand = new Command('create')
     });
   });
 
+function requireProjectMetadataPath(tasksDir: string, projectKey: string): string {
+  const metaPath = join(tasksDir, projectKey, PROJECT_METADATA_FILENAME);
+  if (!existsSync(metaPath)) {
+    throw new Error(
+      `No PROJECT.md found for project "${projectKey}". ` + `Run 'project create ${projectKey}' to initialize it.`,
+    );
+  }
+  return metaPath;
+}
+
 const showCommand = new Command('show')
   .description('Show PROJECT.md metadata for a project')
   .argument('<key>', 'Project key (e.g., SHR)')
@@ -119,14 +129,7 @@ const showCommand = new Command('show')
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);
       const projectKey = key.toUpperCase();
-      const metaPath = join(tasksDir, projectKey, PROJECT_METADATA_FILENAME);
-
-      if (!existsSync(metaPath)) {
-        throw new Error(
-          `No PROJECT.md found for project "${projectKey}". ` + `Run 'project create ${projectKey}' to initialize it.`,
-        );
-      }
-
+      const metaPath = requireProjectMetadataPath(tasksDir, projectKey);
       console.log(readFileSync(metaPath, 'utf-8'));
     });
   });
@@ -143,13 +146,7 @@ const updateCommand = new Command('update')
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);
       const projectKey = key.toUpperCase();
-      const metaPath = join(tasksDir, projectKey, PROJECT_METADATA_FILENAME);
-
-      if (!existsSync(metaPath)) {
-        throw new Error(
-          `No PROJECT.md found for project "${projectKey}". ` + `Run 'project create ${projectKey}' to initialize it.`,
-        );
-      }
+      const metaPath = requireProjectMetadataPath(tasksDir, projectKey);
 
       if (opts.interactive) {
         let content = readFileSync(metaPath, 'utf-8');

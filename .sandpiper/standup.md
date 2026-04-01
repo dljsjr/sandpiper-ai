@@ -1,91 +1,75 @@
 # Session Stand-Up
 
-Updated: 2026-04-01T05:08:28Z
-Session: 0e5cb1a4-4133-404a-9c36-6e94354d38c4
-Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-03-27T14-50-08-059Z_0e5cb1a4-4133-404a-9c36-6e94354d38c4.jsonl
+Updated: 2026-04-01T15:17:11Z
+Session: current
 
 ## Accomplished
 
-### Shell Relay Stabilization
-- **SHR-89:** Implemented `/relay-cleanup` slash command for explicit stale session cleanup.
-  - Lists EXITED `relay-*` sessions via `zellij list-sessions --no-formatting`
-  - Confirms before deletion
-  - Uses new `ZellijClient.deleteSession()`
-- Restored **auto-connect on startup** behavior (kept `setStatus`, no `notify` footer spam)
-- **SHR-86:** Fixed snapshot-diff `__relay_run` echo leak for long wrapped escaped commands.
-  - Root cause: trimming significant trailing spaces before marker matching
-  - Fix: preserve wrapped line endings during marker search/boundary mapping
-  - Added regression test for wrapped fish quote-break payload
-- **SHR-62:** Updated deprecated `writeChars()` shim to route through `paste()` instead of `action write-chars` to avoid wrapping/parser issues.
-- **SHR-63:** Eliminated first-command race by buffering signal events.
-  - `SignalParser.waitFor()` now consumes matching buffered events that arrived before listener registration
-  - Added regression test
+### Refactor Plan Execution (previous pass)
+Implemented the external code-health work plan end-to-end with per-task commits and task tracking:
+- AGENT-39, SHR-96, TCL-72, AGENT-40, AGENT-41, TCL-73, AGENT-42, TCL-74, TCL-75
+- Tooling setup via AGENT-43 (`mise` + `jscpd`/`lizard`, `scc` via brew)
 
-### Fish Heredoc Investigation
-- Reproduced heredoc failure in fish (`Expected a string, but found a redirection`) and confirmed grammar mismatch behavior.
-- Reframed follow-up as **SHR-95**: block fish heredoc `shell_relay` calls via generic enforcement API.
-- Set **`SHR-95 blocked_by AGENT-35`** (deferred until deterministic enforcement framework exists).
+### Backlog Follow-Up Pass (this session)
+Addressed all four backlog items queued at the end of the refactor plan.
 
-### Startup Prompt / Prefix Caching Maintenance
-- **AGENT-38:** Reordered startup prompt assembly to keep static components first, then dynamic components ordered by volatility.
-- Initially added a dynamic `Current Date` line, then removed it after confirming the harness already provides date context.
-- Final dynamic order (prefix-cache optimized):
-  1. project triggers
-  2. standup context
-  3. active task context
-  4. working-copy context
-  5. cold-start guidance (one-shot, most volatile, intentionally last)
+#### 1) AGENT-45 — Biome schema drift
+- Updated `biome.json` schema URL from `2.4.8` to `2.4.10`.
+- `bun run check` is now clean without schema-version info noise.
+- Task status: **NEEDS REVIEW**.
 
-### Task Hygiene
-- Bulk-closed all `NEEDS REVIEW` tasks as `COMPLETE (DONE)`:
-  - AGENT-27, AGENT-38
-  - SHR-62, SHR-63, SHR-86, SHR-89, SHR-94
+#### 2) AGENT-44 — shell-relay/core test baseline failures
+- Reproduced failures in:
+  - `packages/core/src/process-manager.test.ts` (`vi.waitFor` not available under current Bun runner)
+  - `extensions/shell-relay/src/fifo.test.ts` (invalid `resolves.not.toThrow()` pattern)
+  - cross-suite shell-relay contamination when `zellij.test.ts` mocked `node:child_process` at module scope
+- Fixes:
+  - Added local polling helper in `process-manager.test.ts` and replaced `vi.waitFor` calls.
+  - Corrected FIFO double-shutdown assertion to `resolves.toBeUndefined()`.
+  - Reworked `zellij.test.ts` to use per-test `vi.spyOn(..., 'execSync')` with restore in `afterEach`, removing hoisted global module mocking.
+- Verified with targeted suites and full test run.
+- Task status: **NEEDS REVIEW**.
 
-### Home-Agent Guidance Update (outside repo)
-- Confirmed expanded skill set visibility (19 skills including `gh`, `glab`, `code-review`, `mutation-testing`, etc.).
-- Ingested new testing/code-health guidance into `~/.sandpiper/agent/AGENTS.md` with progressive disclosure:
-  - concise hot-memory rules in AGENTS
-  - routing pointers to leaf docs
-  - created:
-    - `~/.sandpiper/agent/docs/testing.md`
-    - `~/.sandpiper/agent/docs/code-health.md`
+#### 3) TCL-76 — tasks-cli baseline regressions (search/index-cmd)
+- Re-ran target suites in isolation and under full package/full repo runs.
+- Stress-ran target suites 10x; all passed.
+- No current reproducible failure remained on this stack.
+- Closed with investigation notes.
+- Task status: **COMPLETE (DONE)**.
 
-### Self-Reflection Persistence
-- Updated `skills/sandpiper/tasks/SKILL.md` with a CLI flag gotcha note:
-  - `task list` uses `-s/--status`
-  - bulk mutating commands use `--filter-status`
-- Updated `.sandpiper/docs/agent-guidance-evolution.md` to capture prompt-ordering/cache decision:
-  - static-first prompt assembly
-  - dynamic ordering by volatility
-  - one-shot cold-start guidance appended last for better shared prefix caching
+#### 4) TCL-77 — remaining move/mutate clone pair
+- Removed remaining duplication by extracting shared counter read helper:
+  - added `readProjectCounter(...)` in `packages/sandpiper-tasks-cli/src/core/index-update.ts`
+  - updated `move.ts` and `mutate.ts` to use it
+- Verified targeted tests and jscpd for the pair (`0 clones found` with configured thresholds).
+- Task status: **NEEDS REVIEW**.
 
-### Key commits from this session window
-- `7eef79ff` — Simplify `listSessionsWithStatus` using `--no-formatting`
-- `95e9add3` — Snapshot-diff wrapped-marker fix
-- `25e87367` — `writeChars` shim routed to paste
-- `e84dc58b` — SignalParser buffering race fix
-- `0675151a` — Reframe SHR-95 blocked by AGENT-35
-- `6afdbbb4` — Prompt ordering optimized without duplicate date line
-- `f4e16303` — Move cold-start guidance to end of dynamic startup section
-- `1124a6c9` — Bulk close NEEDS REVIEW tasks as COMPLETE
+### Verification State
+- `bun run check` ✅
+- `bun test` ✅ (full suite green)
 
 ## In Progress
 - None.
 
 ## Next Session
-1. **AGENT-35 (HIGH):** design generic deterministic tool-call enforcement API.
-2. Implement **SHR-95** via AGENT-35 API (fish heredoc detection + deterministic rewrite guidance).
-3. **TOOLS-13:** verify source-loaded extension dependency resolution in publish-style installs.
-4. **TCL-71:** fix dangerous unscoped mutating task/project updates.
-5. Optional strategic work: **MEM-1 / PKM-1**.
+1. Continue from `main` if any follow-up work is needed after this refactor-plan landing.
+2. Optional: push/sync the advanced `main` bookmark to the remote workflow when desired.
 
 ## Blockers
-- Sandpiper not published to npm — still blocks self-update notification path.
-- SHR-95 intentionally blocked on AGENT-35.
+- None.
+
+## Re-review Update
+- The review document was updated to revision 2 and recommends **Approve**.
+- I independently double-checked the updated review and agreed with the verdict.
+- The only remaining note is a non-blocking, out-of-scope cast in `draw-sandpiper.ts`.
+
+## Session Closure
+- Closed all remaining approved refactor-plan tickets:
+  - AGENT-39, AGENT-40, AGENT-41, AGENT-42, AGENT-43, AGENT-44, AGENT-45
+  - SHR-96
+  - TCL-72, TCL-73, TCL-74, TCL-75, TCL-77
+- Performed a history-curation pass to collapse the stack to the minimal logical set of commits.
+- Advanced the `main` bookmark to the curated tip.
 
 ## Context
-- Shell relay is now stable with paste-based injection and buffered signal handling.
-- `/relay-cleanup` is available and working.
-- Startup prompt now follows static-first, volatility-ordered dynamic assembly (without duplicate date), with one-shot cold-start guidance intentionally appended last for prefix caching.
-- `/reload` usually refreshes prompt/extension behavior; full restart may still be needed for some module-graph changes.
-- Home-agent global guidance now routes testing/code-health details to dedicated leaf docs.
+- Existing unrelated working-copy renames under `skills/sandpiper/{code => code-review}/...` were left untouched.

@@ -156,16 +156,13 @@ function getMigrationTargets(options: MigrationOptions): MigrationTarget[] {
   return targets;
 }
 
-/**
- * Move (rename) a directory from one location to another.
- */
-function moveDirectory(from: string, to: string): { success: boolean; error?: string } {
+function runWithParentDirectory(to: string, action: () => void): { success: boolean; error?: string } {
   try {
     const parentDir = dirname(to);
     if (!existsSync(parentDir)) {
       mkdirSync(parentDir, { recursive: true });
     }
-    renameSync(from, to);
+    action();
     return { success: true };
   } catch (err) {
     return { success: false, error: err instanceof Error ? err.message : String(err) };
@@ -173,19 +170,21 @@ function moveDirectory(from: string, to: string): { success: boolean; error?: st
 }
 
 /**
+ * Move (rename) a directory from one location to another.
+ */
+function moveDirectory(from: string, to: string): { success: boolean; error?: string } {
+  return runWithParentDirectory(to, () => {
+    renameSync(from, to);
+  });
+}
+
+/**
  * Create a symlink pointing from `to` → `from`.
  */
 function symlinkDirectory(from: string, to: string): { success: boolean; error?: string } {
-  try {
-    const parentDir = dirname(to);
-    if (!existsSync(parentDir)) {
-      mkdirSync(parentDir, { recursive: true });
-    }
+  return runWithParentDirectory(to, () => {
     symlinkSync(from, to);
-    return { success: true };
-  } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : String(err) };
-  }
+  });
 }
 
 /**

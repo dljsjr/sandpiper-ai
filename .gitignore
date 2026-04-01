@@ -4,6 +4,7 @@ patch-workdir
 
 # scratch stuff for LLM
 references/*
+.tmp-*
 
 # output
 out
@@ -17,6 +18,7 @@ coverage
 # logs
 logs
 _.log
+devtools/*.log
 report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # dotenv environment variable files

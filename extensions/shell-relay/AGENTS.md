@@ -6,7 +6,7 @@ This document supplements the [repo-wide AGENTS.md](../../AGENTS.md) with shell-
 
 ### Framework-Independent Core
 
-All core logic lives in framework-independent modules under `src/`. Only `index.ts` imports pi framework APIs. Shell integration scripts live in `shell-integration/`. The extension loads from `src/index.ts` via the package-local `pi.extensions` entry; `postinstall.sh` copies the source tree and assets into `dist/extensions/shell-relay/`.
+Core relay behavior should stay framework-independent under `src/` (escape, signal parsing, FIFO lifecycle, snapshot-diff, zellij client). Pi-specific extension glue is split across `index.ts` plus registration/runtime modules under `src/tools/`, `src/commands/`, and `src/runtime.ts`. Shell integration scripts live in `shell-integration/`. The extension loads from `src/index.ts` via the package-local `pi.extensions` entry; `postinstall.sh` copies the source tree and assets into `dist/extensions/shell-relay/`.
 
 | Module | Purpose | Pi imports? |
 |--------|---------|-------------|
@@ -16,9 +16,11 @@ All core logic lives in framework-independent modules under `src/`. Only `index.
 | `signal.ts` | Signal channel parser (line-delimited protocol) | No |
 | `snapshot-diff.ts` | Output capture via dump-screen before/after diffing | No |
 | `zellij.ts` | Zellij 0.44+ CLI wrapper (paste, send-keys, --session, --pane-id, list-panes) | No |
-| `ansi.ts` | Strip terminal query/response sequences from output | No |
 | `preflight.ts` | Shell integration preflight check (probes for `__relay_prompt_hook`) | No (imports from `sandpiper-ai-core`) |
-| `index.ts` | Pi extension glue (tool registration, lifecycle, preflight registration) | **Yes** — only file |
+| `runtime.ts` | Relay setup/execution lifecycle state machine | Yes (appendEntry + extension context wiring) |
+| `tools/*.ts` | Tool registration wiring (`shell_relay`, `shell_relay_inspect`) | Yes |
+| `commands/*.ts` | Slash-command registration wiring (`relay-*`) | Yes |
+| `index.ts` | Thin orchestrator (preflight + runtime + registrations + event hooks) | Yes |
 
 ### Current Shell Integration Scope
 

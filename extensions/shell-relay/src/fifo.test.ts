@@ -127,7 +127,7 @@ describe('FifoManager', () => {
       manager.create();
 
       await manager.shutdown();
-      await expect(manager.shutdown()).resolves.not.toThrow();
+      await expect(manager.shutdown()).resolves.toBeUndefined();
     });
   });
 

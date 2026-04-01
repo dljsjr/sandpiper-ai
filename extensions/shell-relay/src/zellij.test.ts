@@ -1,21 +1,20 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as childProcess from 'node:child_process';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ZellijClient } from './zellij.js';
 
-// Mock child_process
-vi.mock('node:child_process', () => ({
-  execSync: vi.fn(),
-}));
-
-import { execSync } from 'node:child_process';
-
-const mockExecSync = vi.mocked(execSync);
+let mockExecSync: ReturnType<typeof vi.spyOn>;
 
 describe('ZellijClient', () => {
   let client: ZellijClient;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockExecSync = vi.spyOn(childProcess, 'execSync');
+    mockExecSync.mockReset();
     client = new ZellijClient({ sessionName: 'test-session', paneId: 'terminal_0' });
+  });
+
+  afterEach(() => {
+    mockExecSync.mockRestore();
   });
 
   // ── Session Management ──────────────────────────────────────

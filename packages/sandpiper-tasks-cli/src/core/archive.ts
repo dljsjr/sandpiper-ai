@@ -14,6 +14,23 @@ import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
 
 const ARCHIVE_DIR = 'archive';
 
+function forEachProjectDir(
+  tasksDir: string,
+  projectFilter: string | undefined,
+  visit: (projectKey: string, projectDir: string) => void,
+): void {
+  const entries = readdirSync(tasksDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) {
+      continue;
+    }
+    if (projectFilter && entry.name !== projectFilter) {
+      continue;
+    }
+    visit(entry.name, join(tasksDir, entry.name));
+  }
+}
+
 export interface ArchiveResult {
   /** Task keys that were archived. */
   readonly archived: string[];
@@ -37,30 +54,17 @@ export function archiveCompletedTasks(tasksDir: string, projectFilter?: string):
   const archived: string[] = [];
   const skipped: string[] = [];
 
-  const entries = readdirSync(tasksDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) {
-      continue;
-    }
-
-    if (projectFilter && entry.name !== projectFilter) {
-      continue;
-    }
-
-    const projectKey = entry.name;
-    const projectDir = join(tasksDir, projectKey);
+  forEachProjectDir(tasksDir, projectFilter, (_projectKey, projectDir) => {
     const archiveDir = join(projectDir, ARCHIVE_DIR);
-
-    // Find all top-level task files in this project
     const projectEntries = readdirSync(projectDir, { withFileTypes: true });
 
-    for (const pe of projectEntries) {
-      if (!pe.isFile() || !TASK_FILE_RE.test(pe.name)) {
+    for (const projectEntry of projectEntries) {
+      if (!projectEntry.isFile() || !TASK_FILE_RE.test(projectEntry.name)) {
         continue;
       }
 
-      const taskKey = basename(pe.name, '.md');
-      const taskPath = join(projectDir, pe.name);
+      const taskKey = basename(projectEntry.name, '.md');
+      const taskPath = join(projectDir, projectEntry.name);
       const content = readFileSync(taskPath, 'utf-8');
       const fm = parseFrontmatter(content);
 
@@ -69,20 +73,16 @@ export function archiveCompletedTasks(tasksDir: string, projectFilter?: string):
         continue;
       }
 
-      // Archive this task
       mkdirSync(archiveDir, { recursive: true });
-
-      // Move the task file
-      renameSync(taskPath, join(archiveDir, pe.name));
+      renameSync(taskPath, join(archiveDir, projectEntry.name));
       archived.push(taskKey);
 
-      // Move subtask directory if it exists
       const subtaskDir = join(projectDir, taskKey);
       if (existsSync(subtaskDir) && statSync(subtaskDir).isDirectory()) {
         renameSync(subtaskDir, join(archiveDir, taskKey));
       }
     }
-  }
+  });
 
   return { archived, skipped };
 }
@@ -94,28 +94,19 @@ export function archiveCompletedTasks(tasksDir: string, projectFilter?: string):
 export function listArchivedTasks(tasksDir: string, projectFilter?: string): string[] {
   const archivedKeys: string[] = [];
 
-  const entries = readdirSync(tasksDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) {
-      continue;
-    }
-
-    if (projectFilter && entry.name !== projectFilter) {
-      continue;
-    }
-
-    const archiveDir = join(tasksDir, entry.name, ARCHIVE_DIR);
+  forEachProjectDir(tasksDir, projectFilter, (_projectKey, projectDir) => {
+    const archiveDir = join(projectDir, ARCHIVE_DIR);
     if (!existsSync(archiveDir)) {
-      continue;
+      return;
     }
 
     const archiveEntries = readdirSync(archiveDir, { withFileTypes: true });
-    for (const ae of archiveEntries) {
-      if (ae.isFile() && TASK_FILE_RE.test(ae.name)) {
-        archivedKeys.push(basename(ae.name, '.md'));
+    for (const archiveEntry of archiveEntries) {
+      if (archiveEntry.isFile() && TASK_FILE_RE.test(archiveEntry.name)) {
+        archivedKeys.push(basename(archiveEntry.name, '.md'));
       }
     }
-  }
+  });
 
   return archivedKeys;
 }

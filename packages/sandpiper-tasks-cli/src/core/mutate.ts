@@ -1,11 +1,11 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
-import { decode as decodeToon } from '@toon-format/toon';
 import { appendActivityEntry, type FieldChange } from './activity-log.js';
 import { extractDescription, replaceDescription } from './description.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { writeDiff } from './history.js';
+import { readProjectCounter } from './index-update.js';
 import { PROJECT_KEY_RE, scanHighestNumber } from './patterns.js';
 import type { TaskAssignee, TaskKind, TaskPriority, TaskReporter, TaskResolution, TaskStatus } from './types.js';
 
@@ -111,18 +111,9 @@ export function createTask(tasksDir: string, opts: CreateTaskOptions): CreateTas
  * Checks index counter, legacy .meta.yml, and file scan.
  */
 function getNextTaskNumber(tasksDir: string, projectKey: string): number {
-  // Try reading from index
-  const indexPath = join(tasksDir, 'index.toon');
-  if (existsSync(indexPath)) {
-    try {
-      const raw = decodeToon(readFileSync(indexPath, 'utf-8')) as Record<string, unknown>;
-      const counters = raw.counters as Record<string, { nextTaskNumber: number }> | undefined;
-      if (counters?.[projectKey]?.nextTaskNumber) {
-        return counters[projectKey]?.nextTaskNumber;
-      }
-    } catch {
-      // Fall through to scan
-    }
+  const fromIndex = readProjectCounter(tasksDir, projectKey);
+  if (fromIndex !== undefined) {
+    return fromIndex;
   }
 
   // Try reading from legacy .meta.yml
@@ -285,6 +276,50 @@ export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
   }
 }
 
+const SIMPLE_FIELD_MAPPINGS: Array<{ key: keyof UpdateFields; fmKey: string }> = [
+  { key: 'status', fmKey: 'status' },
+  { key: 'assignee', fmKey: 'assignee' },
+  { key: 'priority', fmKey: 'priority' },
+  { key: 'reporter', fmKey: 'reporter' },
+  { key: 'title', fmKey: 'title' },
+  { key: 'resolution', fmKey: 'resolution' },
+];
+
+const ARRAY_FIELD_MAPPINGS: Array<{ key: keyof UpdateFields; fmKey: string }> = [
+  { key: 'dependsOn', fmKey: 'depends_on' },
+  { key: 'blockedBy', fmKey: 'blocked_by' },
+  { key: 'related', fmKey: 'related' },
+];
+
+function formatScalarFieldChange(
+  field: string,
+  oldValue: string | undefined,
+  newValue: string | undefined,
+): FieldChange | undefined {
+  if (newValue === undefined || oldValue === newValue) {
+    return undefined;
+  }
+  return { field, from: oldValue, to: newValue };
+}
+
+function formatArrayFieldChange(
+  field: string,
+  oldValue: string[] | undefined,
+  newValue: readonly string[] | undefined,
+): FieldChange | undefined {
+  if (newValue === undefined) {
+    return undefined;
+  }
+
+  const oldDisplay = (oldValue ?? []).join(', ') || '(none)';
+  const newDisplay = newValue.join(', ') || '(none)';
+  if (oldDisplay === newDisplay) {
+    return undefined;
+  }
+
+  return { field, from: oldDisplay, to: newDisplay };
+}
+
 /**
  * Compute the list of field changes for the activity log.
  */
@@ -295,36 +330,14 @@ function computeChanges(
 ): FieldChange[] {
   const changes: FieldChange[] = [];
 
-  const simpleFields: Array<{ key: keyof UpdateFields; fmKey: string }> = [
-    { key: 'status', fmKey: 'status' },
-    { key: 'assignee', fmKey: 'assignee' },
-    { key: 'priority', fmKey: 'priority' },
-    { key: 'reporter', fmKey: 'reporter' },
-    { key: 'title', fmKey: 'title' },
-  ];
-
-  for (const { key, fmKey } of simpleFields) {
-    const newVal = fields[key] as string | undefined;
-    if (newVal === undefined) continue;
-    const oldVal = typeof originalFm[fmKey] === 'string' ? originalFm[fmKey] : undefined;
-    if (oldVal !== newVal) {
-      changes.push({
-        field: fmKey,
-        from: oldVal as string | undefined,
-        to: newVal,
-      });
-    }
-  }
-
-  // Resolution (may not exist in original)
-  if (fields.resolution !== undefined) {
-    const oldRes = typeof originalFm.resolution === 'string' ? originalFm.resolution : undefined;
-    if (oldRes !== fields.resolution) {
-      changes.push({
-        field: 'resolution',
-        from: oldRes,
-        to: fields.resolution,
-      });
+  for (const { key, fmKey } of SIMPLE_FIELD_MAPPINGS) {
+    const change = formatScalarFieldChange(
+      fmKey,
+      typeof originalFm[fmKey] === 'string' ? originalFm[fmKey] : undefined,
+      fields[key] as string | undefined,
+    );
+    if (change) {
+      changes.push(change);
     }
   }
 
@@ -337,39 +350,24 @@ function computeChanges(
     const pl = (n: number) => `${n} line${n !== 1 ? 's' : ''}`;
 
     if (oldLines === 0 && newLines > 0) {
-      changes.push({
-        field: 'description',
-        from: undefined,
-        to: `added (${pl(newLines)})`,
-      });
+      changes.push({ field: 'description', from: undefined, to: `added (${pl(newLines)})` });
     } else if (newLines === 0 && oldLines > 0) {
       changes.push({ field: 'description', from: pl(oldLines), to: 'cleared' });
     } else if (oldLines !== newLines) {
-      changes.push({
-        field: 'description',
-        from: pl(oldLines),
-        to: `updated (${pl(newLines)})`,
-      });
+      changes.push({ field: 'description', from: pl(oldLines), to: `updated (${pl(newLines)})` });
     } else {
       changes.push({ field: 'description', from: undefined, to: 'updated' });
     }
   }
 
-  // Array fields
-  const arrayFields: Array<{ key: keyof UpdateFields; fmKey: string }> = [
-    { key: 'dependsOn', fmKey: 'depends_on' },
-    { key: 'blockedBy', fmKey: 'blocked_by' },
-    { key: 'related', fmKey: 'related' },
-  ];
-
-  for (const { key, fmKey } of arrayFields) {
-    const newVal = fields[key] as readonly string[] | undefined;
-    if (newVal === undefined) continue;
-    const oldVal = Array.isArray(originalFm[fmKey]) ? originalFm[fmKey] : [];
-    const oldStr = (oldVal as string[]).join(', ') || '(none)';
-    const newStr = newVal.join(', ') || '(none)';
-    if (oldStr !== newStr) {
-      changes.push({ field: fmKey, from: oldStr, to: newStr });
+  for (const { key, fmKey } of ARRAY_FIELD_MAPPINGS) {
+    const change = formatArrayFieldChange(
+      fmKey,
+      Array.isArray(originalFm[fmKey]) ? (originalFm[fmKey] as string[]) : undefined,
+      fields[key] as readonly string[] | undefined,
+    );
+    if (change) {
+      changes.push(change);
     }
   }
 
