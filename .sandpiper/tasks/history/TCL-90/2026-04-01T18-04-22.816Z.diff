@@ -1,0 +1,35 @@
+--- a/TCL-90.md
++++ b/TCL-90.md
+@@ -6,9 +6,28 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-01T18:02:14.960Z
+-updated_at: 2026-04-01T18:02:14.960Z
++updated_at: 2026-04-01T18:04:22.815Z
+ ---
+ 
+ # Gitignore index.toon and rebuild it when missing or stale
+ 
+-
++Phase 1 subtask.
++
++Add VCS ignore handling for `index.toon` and make commands rebuild the index automatically when it is missing or stale.
++
++## Done when
++
++- `index.toon` is not expected in commits
++- CLI commands detect missing/stale index and rebuild it before proceeding
++- operator-facing behavior is documented
++
++## Parent
++
++- TCL-86
++
++---
++
++# Activity Log
++
++## 2026-04-01T18:04:22.816Z
++
++- **description**: added (13 lines)
++

@@ -1,6 +1,6 @@
 # Session Stand-Up
 
-Updated: 2026-04-01T17:48:00Z
+Updated: 2026-04-01T18:05:23Z
 Session: current
 
 ## Accomplished
@@ -36,7 +36,21 @@ Session: current
   - **external repos are plain clones**, not workspaces/worktrees; use `jj git clone --colocate` in jj projects and `git clone` in git projects
   - **root()-based jj task history pushes/pulls cleanly** via a bookmark-backed branch on the real project remote
   - **remote recovery works**: after deleting the local workspace/bookmark, `jj git fetch` restores the remote-tracking bookmark and a fresh workspace can be recreated from `<bookmark>@origin`
-- Remaining open questions in the design doc are now narrowed to bootstrap UX and how much remote bookmark setup should be automatic on first bootstrap.
+- Finalized the remaining design decisions:
+  - bootstrap is via explicit `sandpiper tasks init`
+  - init always creates the local bookmark/branch and establishes remote tracking
+  - `auto_push` only affects subsequent mutation pushes
+  - no open questions remain in the design doc
+
+### Task storage implementation planning
+- Created and completed **TCL-85** (companion work plan).
+- Added `.sandpiper/docs/task-storage-implementation-plan.md` with phased execution breakdown.
+- Created the implementation task stack:
+  - **TCL-86** Phase 1 — derived index + scan-first counters
+  - **TCL-87** Phase 2 — current-repo separate-branch storage
+  - **TCL-88** Phase 3 — external-repo storage
+  - **TCL-89** Phase 4 — generalized bootstrap for future domains
+- Created detailed subtasks **TCL-90** through **TCL-103** with handoff-ready descriptions mapped to the four phases.
 
 ## Deferred decisions (need dedicated session)
 - **SHR-68/69** (bash/zsh user command capture) — need a discussion before final triage
