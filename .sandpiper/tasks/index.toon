@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775069273804
+lastUpdatedAt: 1775069408202
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1230,18 +1230,19 @@ tasks:
     key: TCL-96
     project: TCL
     title: Implement inline-to-separate-branch migration for current-repo mode
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.159Z"
-    updatedAt: "2026-04-01T18:04:23.035Z"
+    updatedAt: "2026-04-01T18:50:08.194Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-87
-    lastIndexedAt: 1775066663042
+    lastIndexedAt: 1775069408201
   "TCL-97":
     key: TCL-97
     project: TCL

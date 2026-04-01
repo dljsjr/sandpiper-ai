@@ -182,3 +182,43 @@ describe('auto-commit on task mutation — git backend (integration)', () => {
     expect(log).toContain('TST-1');
   });
 });
+
+// ─── storage migrate (integration) ──────────────────────────────
+
+describe('storage migrate — git backend (integration)', () => {
+  let rootDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'storage-migrate-test-'));
+    execSync('git init -q', { cwd: rootDir });
+    execSync('git config user.email "test@test.com"', { cwd: rootDir });
+    execSync('git config user.name "Test"', { cwd: rootDir });
+    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    // Set up inline tasks (current default mode)
+    mkdirSync(join(rootDir, '.sandpiper', 'tasks', 'TST'), { recursive: true });
+    writeFileSync(
+      join(rootDir, '.sandpiper', 'tasks', 'TST', 'TST-1.md'),
+      '---\ntitle: "Existing task"\nstatus: NOT STARTED\nkind: TASK\npriority: HIGH\nassignee: UNASSIGNED\nreporter: USER\ncreated_at: 2026-04-01T00:00:00Z\nupdated_at: 2026-04-01T00:00:00Z\n---\n\n# Existing task\n',
+    );
+    // Configure separate-branch mode
+    writeFileSync(
+      join(rootDir, '.sandpiper-tasks.json'),
+      JSON.stringify({ version_control: { mode: { branch: 'sandpiper-tasks' } } }),
+    );
+  });
+
+  afterEach(() => {
+    rmSync(rootDir, { recursive: true, force: true });
+  });
+
+  it('moves inline task files into the separate-branch workspace', () => {
+    const result = runCli(`--dir ${rootDir} storage migrate`);
+    expect(result.exitCode).toBe(0);
+
+    // Task file now lives in the worktree
+    expect(existsSync(join(rootDir, '.sandpiper', 'tasks', 'TST', 'TST-1.md'))).toBe(true);
+    // The worktree is on the correct branch
+    const worktrees = execSync('git worktree list', { cwd: rootDir, encoding: 'utf-8' });
+    expect(worktrees).toContain('sandpiper-tasks');
+  });
+});

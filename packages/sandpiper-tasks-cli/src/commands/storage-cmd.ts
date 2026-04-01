@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import { Command } from '@commander-js/extra-typings';
+import { migrateInlineToSeparateBranch } from '../core/migrate.js';
 import {
   addPathToGitignore,
   initExternalRepo,
@@ -131,10 +132,15 @@ function runSyncOperation(rootDir: string, op: 'sync' | 'push' | 'pull'): void {
 
 const storageMigrateCommand = new Command('migrate')
   .description('Move inline tasks to the configured separate-branch or external-repo storage')
-  .action((_opts, _cmd) => {
+  .action((_opts, cmd) => {
     withErrorHandling(() => {
-      // Implemented in TCL-96
-      throw new Error('storage migrate is not yet implemented (TCL-96).');
+      const rootDir = getRootDirFromCmd(cmd);
+      const config = resolveStorageConfig(rootDir);
+      const backend = detectVcsBackend(rootDir);
+      migrateInlineToSeparateBranch({ rootDir, config, backend });
+      console.log('Migration complete. Task files are now on the separate branch.');
+      console.log(`  Branch:  ${config.version_control.mode.branch}`);
+      console.log(`  Path:    ${join(rootDir, '.sandpiper', 'tasks')}`);
     });
   });
 

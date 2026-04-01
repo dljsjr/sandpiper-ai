@@ -1,0 +1,27 @@
+--- a/TCL-96.md
++++ b/TCL-96.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Implement inline-to-separate-branch migration for current-repo mode"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T18:02:15.159Z
+-updated_at: 2026-04-01T18:48:06.474Z
++updated_at: 2026-04-01T18:50:08.194Z
+ ---
+ 
+ # Implement inline-to-separate-branch migration for current-repo mode
+@@ -38,3 +39,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T18:50:08.194Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++
