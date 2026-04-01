@@ -58,4 +58,35 @@ describe('autoCommitIfEnabled', () => {
     const log = execSync('git log --oneline sandpiper-tasks', { cwd: rootDir, encoding: 'utf-8' });
     expect(log).toContain('Create TST-1: test task');
   });
+
+  it('pushes to remote when auto_push is true', () => {
+    // Arrange: set up a bare remote and point the worktree at it
+    const remoteDir = mkdtempSync(join(tmpdir(), 'auto-push-remote-'));
+    try {
+      execSync('git init --bare -q', { cwd: remoteDir });
+      execSync(`git remote add origin "${remoteDir}"`, { cwd: workspacePath });
+
+      writeFileSync(join(workspacePath, 'TST-1.md'), '# Task\n');
+      // First commit so the branch exists before we try to push
+      execSync('git add -A && git commit -m "seed"', { cwd: workspacePath });
+
+      const config: TaskStorageConfig = {
+        ...SEPARATE_BRANCH_CONFIG,
+        version_control: { ...SEPARATE_BRANCH_CONFIG.version_control, auto_push: true },
+      };
+      writeFileSync(join(workspacePath, 'TST-2.md'), '# Task 2\n');
+
+      // Act
+      autoCommitIfEnabled(rootDir, config, 'Create TST-2: auto push test');
+
+      // Assert: remote has the commit
+      const remoteLog = execSync(`git log --oneline sandpiper-tasks`, {
+        cwd: remoteDir,
+        encoding: 'utf-8',
+      });
+      expect(remoteLog).toContain('Create TST-2: auto push test');
+    } finally {
+      rmSync(remoteDir, { recursive: true, force: true });
+    }
+  });
 });
