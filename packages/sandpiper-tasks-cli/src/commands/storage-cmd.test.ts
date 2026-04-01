@@ -146,3 +146,39 @@ describe('storage init — jj backend (integration)', () => {
     expect(gitignore.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
   });
 });
+
+// ─── auto-commit on task mutation (integration) ────────────────────
+
+describe('auto-commit on task mutation — git backend (integration)', () => {
+  let rootDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'auto-commit-cli-test-'));
+    execSync('git init -q', { cwd: rootDir });
+    execSync('git config user.email "test@test.com"', { cwd: rootDir });
+    execSync('git config user.name "Test"', { cwd: rootDir });
+    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    writeFileSync(
+      join(rootDir, '.sandpiper-tasks.json'),
+      JSON.stringify({
+        version_control: { mode: { branch: 'sandpiper-tasks' }, auto_commit: true },
+      }),
+    );
+    runCli(`--dir ${rootDir} storage init`);
+    // Create a project directory in the task workspace
+    mkdirSync(join(rootDir, '.sandpiper', 'tasks', 'TST'), { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(rootDir, { recursive: true, force: true });
+  });
+
+  it('commits the task file after task create when auto_commit is true', () => {
+    const result = runCli(`--dir ${rootDir} task create -p TST -t "Auto-commit test" --reporter USER`);
+    expect(result.exitCode).toBe(0);
+
+    // A commit should exist on the sandpiper-tasks branch
+    const log = execSync('git log --oneline sandpiper-tasks', { cwd: rootDir, encoding: 'utf-8' });
+    expect(log).toContain('TST-1');
+  });
+});

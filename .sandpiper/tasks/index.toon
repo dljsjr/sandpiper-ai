@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775069067875
+lastUpdatedAt: 1775069273804
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1213,18 +1213,19 @@ tasks:
     key: TCL-95
     project: TCL
     title: Implement current-repo sync and auto-commit/auto-push behavior
-    status: NOT STARTED
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
-    assignee: UNASSIGNED
+    assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.125Z"
-    updatedAt: "2026-04-01T18:04:22.997Z"
+    updatedAt: "2026-04-01T18:47:53.794Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-87
-    lastIndexedAt: 1775066663004
+    lastIndexedAt: 1775069273803
   "TCL-96":
     key: TCL-96
     project: TCL
