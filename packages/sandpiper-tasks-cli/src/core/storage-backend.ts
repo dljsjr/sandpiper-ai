@@ -5,28 +5,11 @@
  */
 
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { writeFileAtomic } from './fs.js';
+import { existsSync, mkdirSync } from 'node:fs';
+import { addPathToGitignore } from './fs.js';
 import type { VcsBackend } from './vcs.js';
 
-// ─── Gitignore helpers ───────────────────────────────────────────
-
-/**
- * Ensure `entry` appears in `rootDir/.gitignore`.
- * Creates the file if absent; appends the entry if not already present.
- */
-export function addPathToGitignore(rootDir: string, entry: string): void {
-  const path = join(rootDir, '.gitignore');
-  if (existsSync(path)) {
-    const content = readFileSync(path, 'utf-8');
-    if (content.split('\n').some((l) => l.trim() === entry)) return;
-    const appended = content.endsWith('\n') ? `${content}${entry}\n` : `${content}\n${entry}\n`;
-    writeFileAtomic(path, appended);
-  } else {
-    writeFileAtomic(path, `${entry}\n`);
-  }
-}
+export { addPathToGitignore };
 
 // ─── Workspace / worktree bootstrap ─────────────────────────────
 

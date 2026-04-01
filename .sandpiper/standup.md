@@ -1,6 +1,6 @@
 # Session Stand-Up
 
-Updated: 2026-04-01T20:30:00Z
+Updated: 2026-04-01T21:15:00Z
 Session: c82731d3-f981-423f-98c4-521ed9862da2
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-01T18-12-48-013Z_c82731d3-f981-423f-98c4-521ed9862da2.jsonl
 
@@ -29,6 +29,11 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 - Committed both sides: main branch (deletions + gitignore) and tasks branch (all files)
 - Verified `task list` works correctly against the new workspace
 
+### Bug fixes ✅
+- **TCL-104**: `auto_push` now honoured — `autoCommitIfEnabled` calls `pushTaskBranch` after `commitTaskChanges` when `auto_push: true`. 1 integration test (bare remote).
+- **TCL-105**: `storage migrate` data loss on interruption fixed — replaced `try/finally` (always wiped backup) with `try/catch` that preserves `tempDir` on failure and re-throws with recovery path + `cp` command. 2 unit tests in new `migrate.test.ts`.
+- Also fixed: jj bookmark pointed at `root()` after `storage init` — changed `@-` → `@` in `initJjWorkspace`. Regression test added. Fixed live `tasks` bookmark in this repo.
+
 ### Self-reflection pass ✅
 - jj skill: added `jj workspace add` parent-directory gotcha
 - tasks skill: added "Task Storage Modes" section with storage command reference
@@ -41,7 +46,7 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 
 ### Test count
 - Start of session: 267 tests
-- End of session: **306 tests** (+39)
+- End of session: **310 tests** (+43)
 - All 26 test files passing, lint clean
 
 ### Commits (11 total on main..@-)
@@ -57,6 +62,10 @@ TCL-99: branch selection/tracking and sync for external repo mode
 TCL-100: external repo integration tests and conflict/repair docs
 Move tasks to separate 'tasks' branch  ← main branch side of dogfooding
 [tasks workspace] Migrate existing tasks from inline storage  ← tasks branch side
+Self-reflection: update skills, docs, and file loose-end tasks
+Fix jj bookmark pointing at root() after storage init
+TCL-104: honour auto_push in autoCommitIfEnabled
+TCL-105: preserve task files on migrate failure instead of wiping them
 ```
 
 ## In Progress
@@ -67,9 +76,7 @@ Move tasks to separate 'tasks' branch  ← main branch side of dogfooding
 - **Code review** — external review of Phase 1–3 before Phase 4
 - **Phase 4 (TCL-89)** after review: extract reusable storage bootstrap primitives
   - TCL-101, TCL-102, TCL-103
-- **Bugs to fix (LOW priority, fine to defer):**
-  - TCL-104: `auto_push` silently ignored after `autoCommitIfEnabled`
-  - TCL-105: `storage migrate` data loss risk on interruption
+- **Bugs fixed this session:** TCL-104, TCL-105 ✅
 - **Other HIGH backlog:**
   - TCL-71: Require key or explicit filter on mutating commands
   - WEB-9: CSS selector targeting for headless web tool
