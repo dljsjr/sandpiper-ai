@@ -266,3 +266,14 @@ Pipe `--format json` to `jq` for scripting:
 ```bash
 sandpiper-tasks -f json task list -s IN_PROGRESS | jq '.[].key'
 ```
+
+### Status filter flag gotcha
+`task list` uses `-s/--status`, while bulk mutating commands (like `task complete` / `task update`) use `--filter-status`.
+
+```bash
+# Querying
+sandpiper-tasks task list -s NEEDS_REVIEW
+
+# Bulk mutation
+sandpiper-tasks task complete --final --resolution DONE --filter-status NEEDS_REVIEW
+```

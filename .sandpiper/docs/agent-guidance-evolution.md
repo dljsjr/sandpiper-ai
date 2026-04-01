@@ -179,6 +179,7 @@ The prompt-side revision now also includes several low-cost continuity aids:
 - compact dirty-working-copy context injection (with noisy task-history churn filtered out)
 - a `/cold-start-check` prompt template for manual re-orientation
 - cold-start guidance appended on the first agent turn when the session appears to start without restored conversation history
+- startup prompt assembly ordered for prefix caching: static sections first, then dynamic sections by volatility, with one-shot cold-start guidance last to maximize shared prefix between resumed and cold-start first turns
 
 ### Success Criteria
 
