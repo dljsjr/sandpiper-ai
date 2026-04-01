@@ -1,5 +1,32 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ManagedProcess, ProcessManager } from './process-manager.js';
+
+interface WaitForOptions {
+  readonly timeout?: number;
+  readonly interval?: number;
+}
+
+async function waitFor(assertion: () => void, options: WaitForOptions = {}): Promise<void> {
+  const timeout = options.timeout ?? 1000;
+  const interval = options.interval ?? 10;
+  const deadline = Date.now() + timeout;
+  let lastError: unknown;
+
+  while (Date.now() < deadline) {
+    try {
+      assertion();
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, interval);
+    });
+  }
+
+  throw lastError instanceof Error ? lastError : new Error(`waitFor timed out after ${timeout}ms`);
+}
 
 describe('ProcessManager', () => {
   let pm: ProcessManager;
@@ -69,7 +96,7 @@ describe('ProcessManager', () => {
       expect(proc.running).toBe(true);
       pm.kill('test');
       // Wait for exit
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
     });
 
     it('should be safe to kill an unknown ID', () => {
@@ -82,7 +109,7 @@ describe('ProcessManager', () => {
       const a = pm.spawn({ id: 'a', command: 'sleep', args: ['60'] });
       const b = pm.spawn({ id: 'b', command: 'sleep', args: ['60'] });
       pm.killAll();
-      await vi.waitFor(
+      await waitFor(
         () => {
           expect(a.running).toBe(false);
           expect(b.running).toBe(false);
@@ -97,14 +124,14 @@ describe('ProcessManager', () => {
   describe('output buffering', () => {
     it('should buffer stdout', async () => {
       const proc = pm.spawn({ id: 'test', command: 'echo', args: ['hello world'] });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.readStdout()).toContain('hello world');
       expect(proc.stdoutLineCount).toBeGreaterThan(0);
     });
 
     it('should buffer stderr', async () => {
       const proc = pm.spawn({ id: 'test', command: 'bash', args: ['-c', 'echo error >&2'] });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.readStderr()).toContain('error');
       expect(proc.stderrLineCount).toBeGreaterThan(0);
     });
@@ -115,14 +142,14 @@ describe('ProcessManager', () => {
         command: 'bash',
         args: ['-c', 'echo line1; echo line2; echo line3'],
       });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       const tailed = proc.readStdout({ tail: 2 });
       expect(tailed).toBe('line2\nline3');
     });
 
     it('should support clear option', async () => {
       const proc = pm.spawn({ id: 'test', command: 'echo', args: ['hello'] });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.readStdout()).toContain('hello');
       proc.readStdout({ clear: true });
       expect(proc.readStdout()).toBe('');
@@ -135,20 +162,20 @@ describe('ProcessManager', () => {
   describe('exit tracking', () => {
     it('should track exit code on success', async () => {
       const proc = pm.spawn({ id: 'test', command: 'true' });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.exitCode).toBe(0);
     });
 
     it('should track exit code on failure', async () => {
       const proc = pm.spawn({ id: 'test', command: 'false' });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.exitCode).toBe(1);
     });
 
     it('should track exit signal on kill', async () => {
       const proc = pm.spawn({ id: 'test', command: 'sleep', args: ['60'] });
       proc.kill('SIGKILL');
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.exitSignal).toBe('SIGKILL');
     });
   });
@@ -160,7 +187,7 @@ describe('ProcessManager', () => {
       const proc = pm.spawn({ id: 'test', command: 'echo', args: ['callback-test'] });
       const chunks: string[] = [];
       proc.onStdout((data) => chunks.push(data.toString()));
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(chunks.join('')).toContain('callback-test');
     });
 
@@ -168,7 +195,7 @@ describe('ProcessManager', () => {
       const proc = pm.spawn({ id: 'test', command: 'true' });
       const exits: Array<{ code: number | null; signal: string | null }> = [];
       proc.onExit((code, signal) => exits.push({ code, signal }));
-      await vi.waitFor(() => expect(exits).toHaveLength(1), { timeout: 2000 });
+      await waitFor(() => expect(exits).toHaveLength(1), { timeout: 2000 });
       expect(exits[0]?.code).toBe(0);
     });
   });
@@ -178,7 +205,7 @@ describe('ProcessManager', () => {
   describe('acknowledgment', () => {
     it('should report completed unacknowledged processes', async () => {
       const proc = pm.spawn({ id: 'test', command: 'true' });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       const unacked = pm.getCompletedUnacknowledged();
       expect(unacked).toHaveLength(1);
       expect(unacked[0]?.id).toBe('test');
@@ -186,7 +213,7 @@ describe('ProcessManager', () => {
 
     it('should not report acknowledged processes', async () => {
       const proc = pm.spawn({ id: 'test', command: 'true' });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       pm.acknowledge('test');
       expect(pm.getCompletedUnacknowledged()).toHaveLength(0);
     });
@@ -211,7 +238,7 @@ describe('ProcessManager', () => {
 
     it('should return correct info for exited process', async () => {
       const proc = pm.spawn({ id: 'test', command: 'bash', args: ['-c', 'exit 42'] });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       const info = proc.info;
       expect(info.running).toBe(false);
       expect(info.exitCode).toBe(42);
@@ -223,7 +250,7 @@ describe('ProcessManager', () => {
   describe('error handling', () => {
     it('should handle spawn failure for nonexistent command', async () => {
       const proc = pm.spawn({ id: 'test', command: 'nonexistent-command-that-does-not-exist' });
-      await vi.waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
+      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.exitCode).not.toBeNull();
       expect(proc.readStderr()).toContain('spawn error');
     });

@@ -3,6 +3,7 @@ import { basename, join } from 'node:path';
 import { decode as decodeToon, encode as encodeToon } from '@toon-format/toon';
 import { parseFrontmatter } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
+import { readProjectCounter } from './index-update.js';
 import { applyFieldUpdates } from './mutate.js';
 import { projectFromKey, resolveTaskFile, scanHighestNumber, TASK_FILE_RE, TASK_KEY_RE } from './patterns.js';
 import type { TaskKind } from './types.js';
@@ -181,21 +182,7 @@ function collectSubtasks(tasksDir: string, parentKey: string, project: string): 
  * Get the base counter value for a project (the next available number).
  */
 function getBaseCounter(tasksDir: string, project: string): number {
-  const indexPath = join(tasksDir, 'index.toon');
-  let fromIndex = 1;
-
-  if (existsSync(indexPath)) {
-    try {
-      const raw = decodeToon(readFileSync(indexPath, 'utf-8')) as Record<string, unknown>;
-      const counters = raw.counters as Record<string, { nextTaskNumber: number }> | undefined;
-      if (counters?.[project]?.nextTaskNumber) {
-        fromIndex = counters[project]?.nextTaskNumber;
-      }
-    } catch {
-      // Fall through
-    }
-  }
-
+  const fromIndex = readProjectCounter(tasksDir, project) ?? 1;
   return Math.max(fromIndex, scanHighestNumber(tasksDir, project) + 1);
 }
 

@@ -15,10 +15,31 @@ const serverConfig = {
   },
 };
 
+interface AsciiMotionCell {
+  x: number;
+  y: number;
+  char: string;
+  bgColor: string;
+}
+
+interface AsciiMotionTool {
+  new_project: (args: { template: string }) => Promise<void>;
+  set_cells_batch: (args: { cells: readonly AsciiMotionCell[] }) => Promise<{ success: boolean }>;
+  export_image: (args: { filePath: string }) => Promise<{ success: boolean; filePath?: string }>;
+  dispose?: () => Promise<void>;
+}
+
+function row(y: number, fromX: number, toX: number): Array<{ x: number; y: number }> {
+  return Array.from({ length: toX - fromX + 1 }, (_, index) => ({ x: fromX + index, y }));
+}
+
+function paint(bgColor: string, points: readonly { x: number; y: number }[]): AsciiMotionCell[] {
+  return points.map((point) => ({ ...point, char: ' ', bgColor }));
+}
+
 async function main() {
   console.log('Connecting to ascii-motion server...');
-  // The 'any' type is a shortcut to avoid dealing with complex mcporter types.
-  const tool: any = await createServerProxy(serverConfig);
+  const tool = (await createServerProxy(serverConfig)) as AsciiMotionTool;
 
   console.log('Starting new 40x40 project...');
   await tool.new_project({ template: 'square-40x40' });
@@ -26,75 +47,19 @@ async function main() {
   console.log('Preparing pixel data...');
   const cells = [
     // Sun (gold)
-    ...[
-      { x: 33, y: 3 },
-      { x: 34, y: 3 },
-      { x: 35, y: 3 },
-      { x: 32, y: 4 },
-      { x: 33, y: 4 },
-      { x: 34, y: 4 },
-      { x: 35, y: 4 },
-      { x: 36, y: 4 },
-      { x: 31, y: 5 },
-      { x: 32, y: 5 },
-      { x: 33, y: 5 },
-      { x: 34, y: 5 },
-      { x: 35, y: 5 },
-      { x: 36, y: 5 },
-      { x: 37, y: 5 },
-      { x: 31, y: 6 },
-      { x: 32, y: 6 },
-      { x: 33, y: 6 },
-      { x: 34, y: 6 },
-      { x: 35, y: 6 },
-      { x: 36, y: 6 },
-      { x: 37, y: 6 },
-      { x: 32, y: 7 },
-      { x: 33, y: 7 },
-      { x: 34, y: 7 },
-      { x: 35, y: 7 },
-      { x: 36, y: 7 },
-      { x: 33, y: 8 },
-      { x: 34, y: 8 },
-      { x: 35, y: 8 },
-    ].map((p) => ({ ...p, char: ' ', bgColor: 'gold' })),
+    ...paint('gold', [
+      ...row(3, 33, 35),
+      ...row(4, 32, 36),
+      ...row(5, 31, 37),
+      ...row(6, 31, 37),
+      ...row(7, 32, 36),
+      ...row(8, 33, 35),
+    ]),
     // Clouds (white)
-    ...[
-      { x: 27, y: 6 },
-      { x: 28, y: 6 },
-      { x: 29, y: 6 },
-      { x: 30, y: 6 },
-      { x: 31, y: 6 },
-      { x: 32, y: 6 },
-      { x: 33, y: 6 },
-      { x: 34, y: 6 },
-      { x: 35, y: 6 },
-      { x: 36, y: 6 },
-      { x: 37, y: 6 },
-      { x: 38, y: 6 },
-      { x: 39, y: 6 },
-      { x: 27, y: 7 },
-      { x: 28, y: 7 },
-      { x: 29, y: 7 },
-      { x: 30, y: 7 },
-      { x: 31, y: 7 },
-      { x: 32, y: 7 },
-      { x: 33, y: 7 },
-      { x: 34, y: 7 },
-      { x: 35, y: 7 },
-      { x: 36, y: 7 },
-      { x: 37, y: 7 },
-      { x: 38, y: 7 },
-      { x: 39, y: 7 },
-      { x: 29, y: 8 },
-      { x: 30, y: 8 },
-      { x: 31, y: 8 },
-      { x: 32, y: 8 },
-      { x: 33, y: 8 },
-      { x: 34, y: 8 },
-      { x: 35, y: 8 },
-      { x: 36, y: 8 },
-      { x: 37, y: 8 },
+    ...paint('white', [
+      ...row(6, 27, 39),
+      ...row(7, 27, 39),
+      ...row(8, 29, 37),
       { x: 18, y: 4 },
       { x: 19, y: 4 },
       { x: 20, y: 4 },
@@ -137,7 +102,7 @@ async function main() {
       { x: 12, y: 17 },
       { x: 13, y: 17 },
       { x: 14, y: 17 },
-    ].map((p) => ({ ...p, char: ' ', bgColor: 'white' })),
+    ]),
     // Water (darkblue)
     ...Array.from({ length: 36 * 8 }, (_, i) => ({
       x: 2 + (i % 36),

@@ -1,0 +1,29 @@
+--- a/TCL-76.md
++++ b/TCL-76.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "sandpiper-tasks-cli baseline test regressions in search and index command suites"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T06:07:06.413Z
+ updated_at: 2026-04-01T06:07:06.440Z
+-updated_at: 2026-04-01T06:07:06.440Z
++updated_at: 2026-04-01T12:28:13.763Z
+ ---
+ 
+ # sandpiper-tasks-cli baseline test regressions in search and index command suites
+@@ -25,3 +25,8 @@
+ 
+ - **description**: added (5 lines)
+ 
++## 2026-04-01T12:28:13.763Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

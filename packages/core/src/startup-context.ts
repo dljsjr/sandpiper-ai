@@ -116,6 +116,20 @@ interface MutableIndexedTask {
   assignee?: string;
 }
 
+function flushCurrentTask(current: MutableIndexedTask | null, tasks: IndexedTask[]): void {
+  if (current?.key && current.title && current.status && current.priority && current.project && current.kind) {
+    tasks.push({
+      key: current.key,
+      title: current.title,
+      status: current.status,
+      priority: current.priority,
+      project: current.project,
+      kind: current.kind,
+      assignee: current.assignee ?? 'UNASSIGNED',
+    });
+  }
+}
+
 export function parseTaskIndex(content: string): readonly IndexedTask[] {
   const tasks: IndexedTask[] = [];
   let current: MutableIndexedTask | null = null;
@@ -123,17 +137,7 @@ export function parseTaskIndex(content: string): readonly IndexedTask[] {
   for (const line of content.split('\n')) {
     const taskHeader = line.match(/^ {2}"([^"]+)":$/);
     if (taskHeader) {
-      if (current?.key && current.title && current.status && current.priority && current.project && current.kind) {
-        tasks.push({
-          key: current.key,
-          title: current.title,
-          status: current.status,
-          priority: current.priority,
-          project: current.project,
-          kind: current.kind,
-          assignee: current.assignee ?? 'UNASSIGNED',
-        });
-      }
+      flushCurrentTask(current, tasks);
       current = { key: taskHeader[1] };
       continue;
     }
@@ -170,18 +174,7 @@ export function parseTaskIndex(content: string): readonly IndexedTask[] {
     }
   }
 
-  if (current?.key && current.title && current.status && current.priority && current.project && current.kind) {
-    tasks.push({
-      key: current.key,
-      title: current.title,
-      status: current.status,
-      priority: current.priority,
-      project: current.project,
-      kind: current.kind,
-      assignee: current.assignee ?? 'UNASSIGNED',
-    });
-  }
-
+  flushCurrentTask(current, tasks);
   return tasks;
 }
 

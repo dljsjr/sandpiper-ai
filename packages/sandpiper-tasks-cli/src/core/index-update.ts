@@ -36,6 +36,18 @@ export function loadIndex(tasksDir: string): TaskIndex | null {
 }
 
 /**
+ * Read a project's next task counter from the index if available.
+ * Returns undefined when the index is missing/unreadable or the project has no counter.
+ */
+export function readProjectCounter(tasksDir: string, projectKey: string): number | undefined {
+  try {
+    return loadIndex(tasksDir)?.counters[projectKey]?.nextTaskNumber;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
  * Save an index to disk in TOON format.
  */
 export function saveIndex(tasksDir: string, index: TaskIndex): void {

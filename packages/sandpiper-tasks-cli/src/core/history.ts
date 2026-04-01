@@ -109,6 +109,52 @@ interface Change {
   newCount: number;
 }
 
+const MAX_DIFF_LOOKAHEAD = 20;
+
+interface SyncPointMatch {
+  nextOld: number;
+  nextNew: number;
+  change: Change;
+}
+
+function findSyncPoint(
+  oldLines: string[],
+  newLines: string[],
+  oldIndex: number,
+  newIndex: number,
+  maxLookAhead: number,
+): SyncPointMatch | undefined {
+  for (let ahead = 1; ahead < maxLookAhead; ahead++) {
+    if (oldIndex + ahead < oldLines.length && oldLines[oldIndex + ahead] === newLines[newIndex]) {
+      return {
+        nextOld: oldIndex + ahead,
+        nextNew: newIndex,
+        change: {
+          oldStart: oldIndex,
+          oldCount: ahead,
+          newStart: newIndex,
+          newCount: 0,
+        },
+      };
+    }
+
+    if (newIndex + ahead < newLines.length && oldLines[oldIndex] === newLines[newIndex + ahead]) {
+      return {
+        nextOld: oldIndex,
+        nextNew: newIndex + ahead,
+        change: {
+          oldStart: oldIndex,
+          oldCount: 0,
+          newStart: newIndex,
+          newCount: ahead,
+        },
+      };
+    }
+  }
+
+  return undefined;
+}
+
 /**
  * Find changed regions between two line arrays.
  */
@@ -124,50 +170,24 @@ function findChanges(oldLines: string[], newLines: string[]): Change[] {
       continue;
     }
 
-    // Found a difference — find the extent
-    const changeStart = { old: i, new: j };
-
-    // Look ahead to find where lines sync up again
-    let found = false;
-    for (let ahead = 1; ahead < 20 && !found; ahead++) {
-      // Check if skipping 'ahead' old lines realigns
-      if (i + ahead < oldLines.length && oldLines[i + ahead] === newLines[j]) {
-        changes.push({
-          oldStart: changeStart.old,
-          oldCount: ahead,
-          newStart: changeStart.new,
-          newCount: 0,
-        });
-        i += ahead;
-        found = true;
-      }
-      // Check if skipping 'ahead' new lines realigns
-      if (!found && j + ahead < newLines.length && oldLines[i] === newLines[j + ahead]) {
-        changes.push({
-          oldStart: changeStart.old,
-          oldCount: 0,
-          newStart: changeStart.new,
-          newCount: ahead,
-        });
-        j += ahead;
-        found = true;
-      }
+    const syncPoint = findSyncPoint(oldLines, newLines, i, j, MAX_DIFF_LOOKAHEAD);
+    if (syncPoint) {
+      changes.push(syncPoint.change);
+      i = syncPoint.nextOld;
+      j = syncPoint.nextNew;
+      continue;
     }
 
-    if (!found) {
-      // Lines differ — consume one from each
-      changes.push({
-        oldStart: i,
-        oldCount: i < oldLines.length ? 1 : 0,
-        newStart: j,
-        newCount: j < newLines.length ? 1 : 0,
-      });
-      if (i < oldLines.length) i++;
-      if (j < newLines.length) j++;
-    }
+    changes.push({
+      oldStart: i,
+      oldCount: i < oldLines.length ? 1 : 0,
+      newStart: j,
+      newCount: j < newLines.length ? 1 : 0,
+    });
+    if (i < oldLines.length) i++;
+    if (j < newLines.length) j++;
   }
 
-  // Merge adjacent changes
   return mergeChanges(changes);
 }
 

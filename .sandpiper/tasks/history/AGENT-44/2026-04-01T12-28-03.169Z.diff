@@ -1,0 +1,25 @@
+--- a/AGENT-44.md
++++ b/AGENT-44.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "bun test baseline failures in shell-relay/core process tests under current Bun/Vitest setup"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T06:07:06.349Z
+-updated_at: 2026-04-01T12:25:16.230Z
++updated_at: 2026-04-01T12:28:03.169Z
+ ---
+ 
+ # bun test baseline failures in shell-relay/core process tests under current Bun/Vitest setup
+@@ -31,3 +31,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T12:28:03.169Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

@@ -1,5 +1,7 @@
 [tools]
 bun = "latest"
+"npm:jscpd" = "latest"
+"pipx:lizard" = "latest"
 
 [settings]
 
