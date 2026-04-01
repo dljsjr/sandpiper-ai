@@ -68,7 +68,16 @@ export function migrateInlineToSeparateBranch(opts: MigrateOptions): void {
 
     // 4. Gitignore the path on the main branch
     addPathToGitignore(rootDir, '.sandpiper/tasks/');
-  } finally {
+
+    // Success — clean up the temp backup
     rmSync(tempDir, { recursive: true, force: true });
+  } catch (err) {
+    // Leave tempDir intact so the user can recover their task files manually.
+    const msg = err instanceof Error ? err.message : String(err);
+    throw new Error(
+      `Migration failed. Your task files are preserved at: ${tempDir}\n` +
+        `To recover: cp -r "${tempDir}/." "${workspacePath}/"\n` +
+        `Underlying error: ${msg}`,
+    );
   }
 }
