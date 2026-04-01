@@ -189,6 +189,22 @@ sandpiper-tasks --dir /path/to/project storage push
 For jj: `jj rebase -d 'sandpiper-tasks@origin'` in the task workspace to rebase
 your local commits on top of the remote, then `storage push`.
 
+### Concurrent task creation collision (separate-branch / external-repo mode)
+
+If two machines create tasks simultaneously before syncing, they may allocate the
+same counter number. This becomes visible as a VCS conflict on push.
+
+**Resolution:**
+1. `storage pull` — fetch the remote state.
+2. Manually rename one of the conflicting task files (e.g., `TST-5.md` →
+   `TST-<next-available>.md`). Update the task's `title` field key at the top
+   of the frontmatter to match the new filename.
+3. Commit the rename and push.
+
+Counter collisions are prevented going forward as soon as both machines have
+synced — the disk-scan-primary counter allocation will see the remote's files
+after a pull and allocate correctly.
+
 ---
 
 ## `auto_commit` and `auto_push`

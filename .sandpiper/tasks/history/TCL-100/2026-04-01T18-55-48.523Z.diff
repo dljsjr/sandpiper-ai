@@ -1,0 +1,27 @@
+--- a/TCL-100.md
++++ b/TCL-100.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add integration tests and conflict/repair guidance for external repo mode"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T18:02:15.300Z
+-updated_at: 2026-04-01T18:51:37.046Z
++updated_at: 2026-04-01T18:55:48.522Z
+ ---
+ 
+ # Add integration tests and conflict/repair guidance for external repo mode
+@@ -38,3 +39,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T18:55:48.523Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++
