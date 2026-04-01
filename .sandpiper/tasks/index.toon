@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775018301727
+lastUpdatedAt: 1775019702572
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -225,18 +225,18 @@ tasks:
     key: AGENT-38
     project: AGENT
     title: Optimize startup system prompt ordering for prefix caching
-    status: COMPLETE
+    status: NEEDS REVIEW
     kind: TASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-03-31T19:55:05.909Z"
-    updatedAt: "2026-04-01T04:38:21.720Z"
+    updatedAt: "2026-04-01T05:01:42.565Z"
     resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
-    lastIndexedAt: 1775018301726
+    lastIndexedAt: 1775019702571
   "MEM-1":
     key: MEM-1
     project: MEM
