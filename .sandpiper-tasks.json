@@ -1,0 +1,10 @@
+{
+  "version_control": {
+    "enabled": true,
+    "mode": {
+      "branch": "tasks"
+    },
+    "auto_commit": false,
+    "auto_push": false
+  }
+}
