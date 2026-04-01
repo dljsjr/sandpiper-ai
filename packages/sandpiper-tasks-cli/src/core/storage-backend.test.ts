@@ -160,6 +160,24 @@ describe('initExternalRepo — git backend (integration)', () => {
       initExternalRepo({ rootDir, backend: 'git', repoUrl: remoteDir, clonePath, branchName: '@' }),
     ).not.toThrow();
   });
+
+  it('checks out a named branch in the clone', () => {
+    // Add a named branch on the remote
+    execSync('git checkout -b sandpiper-tasks', { cwd: remoteDir });
+    execSync('git checkout main', { cwd: remoteDir });
+
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+    initExternalRepo({
+      rootDir,
+      backend: 'git',
+      repoUrl: remoteDir,
+      clonePath,
+      branchName: 'sandpiper-tasks',
+    });
+
+    const branch = execSync('git branch --show-current', { cwd: clonePath, encoding: 'utf-8' }).trim();
+    expect(branch).toBe('sandpiper-tasks');
+  });
 });
 
 describe('initSeparateBranch — jj backend (integration)', () => {

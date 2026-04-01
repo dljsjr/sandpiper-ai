@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775069648208
+lastUpdatedAt: 1775069706304
 tasks:
   "AGENT-14":
     key: AGENT-14
@@ -1298,18 +1298,19 @@ tasks:
     key: TCL-99
     project: TCL
     title: Implement branch selection/tracking and sync flows for external repo mode
-    status: IN PROGRESS
+    status: COMPLETE
     kind: SUBTASK
     priority: MEDIUM
     assignee: AGENT
     reporter: USER
     createdAt: "2026-04-01T18:02:15.266Z"
-    updatedAt: "2026-04-01T18:51:37.001Z"
+    updatedAt: "2026-04-01T18:55:06.296Z"
+    resolution: DONE
     dependsOn[0]:
     blockedBy[0]:
     related[0]:
     parent: TCL-88
-    lastIndexedAt: 1775069497009
+    lastIndexedAt: 1775069706303
   "TCL-101":
     key: TCL-101
     project: TCL
