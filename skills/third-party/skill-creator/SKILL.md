@@ -95,6 +95,7 @@ These word counts are approximate and you can feel free to go longer if needed.
 **Key patterns:**
 - Keep SKILL.md under 500 lines; if you're approaching this limit, add an additional layer of hierarchy along with clear pointers about where the model using the skill should go next to follow up.
 - Reference files clearly from SKILL.md with guidance on when to read them
+- **When referencing bundled scripts, always use relative paths** (e.g., `scripts/my-tool`) in code examples, not bare command names. Agents resolve these paths against the skill directory at runtime. A bare command name like `my-tool` will cause agents to look for it on `$PATH` and fail. Include a note telling the agent to resolve the relative path to an absolute path before executing.
 - For large reference files (>300 lines), include a table of contents
 
 **Domain organization**: When a skill supports multiple domains/frameworks, organize by variant:

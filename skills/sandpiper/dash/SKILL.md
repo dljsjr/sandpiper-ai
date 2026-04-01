@@ -19,6 +19,10 @@ Search and read programming documentation from Dash, a local documentation brows
 
 This is valuable in two situations: when the **user** asks you to look something up, and when **you** need to verify your own knowledge. If you're about to use an API and aren't fully confident about the exact parameters, return types, or edge-case behavior, look it up. Authoritative docs beat guessing.
 
+## CLI
+
+The `dash` CLI is bundled at `scripts/dash` relative to this skill's directory. **Resolve this path against the skill directory to get the absolute path before running commands.**
+
 ## Workflow
 
 The typical flow has three steps: discover what docsets are available, search for what you need, and load the full documentation page.
@@ -28,7 +32,7 @@ The typical flow has three steps: discover what docsets are available, search fo
 First, find out what documentation the user has installed:
 
 ```bash
-dash list-installed-docsets
+scripts/dash list-installed-docsets
 ```
 
 This returns a JSON array of docsets with their `name`, `identifier`, and `platform`. The `identifier` is what you pass to search commands — it's an opaque string, not the human-readable name.
@@ -38,7 +42,7 @@ This returns a JSON array of docsets with their `name`, `identifier`, and `platf
 Search within specific docsets using their identifiers:
 
 ```bash
-dash search-documentation --query "createReadStream" --docset-identifiers "qmbvbujj"
+scripts/dash search-documentation --query "createReadStream" --docset-identifiers "qmbvbujj"
 ```
 
 - `--query` — what you're looking for (function name, class, concept, etc.)
@@ -53,7 +57,7 @@ Results include a `load_url` for each match — this is the key to loading the f
 Use the `load_url` from a search result to fetch the full documentation:
 
 ```bash
-dash load-documentation-page --load-url "http://127.0.0.1:57767/Dash/..."
+scripts/dash load-documentation-page --load-url "http://127.0.0.1:57767/Dash/..."
 ```
 
 This returns the documentation page as plain text with markdown-style links. The URL must be one returned by a search result (it points to the local Dash API).
@@ -63,7 +67,7 @@ This returns the documentation page as plain text with markdown-style links. The
 By default, docsets only support name-based search (function names, class names, etc.). To search within documentation body text, enable full-text search for a docset:
 
 ```bash
-dash enable-docset-fts --identifier "qmbvbujj"
+scripts/dash enable-docset-fts --identifier "qmbvbujj"
 ```
 
 This is a one-time operation per docset. Check the `full_text_search` field in `list-installed-docsets` output — if it says `"disabled"`, you can enable it. If it says `"not supported"`, the docset doesn't support FTS.
