@@ -1,12 +1,13 @@
 ---
 title: "Implement sandpiper tasks init for current-repo jj/git backends"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:02:15.091Z
-updated_at: 2026-04-01T18:04:22.963Z
+updated_at: 2026-04-01T18:44:27.865Z
 ---
 
 # Implement sandpiper tasks init for current-repo jj/git backends
@@ -33,3 +34,13 @@ Implement explicit `sandpiper tasks init` for current-repo separate-branch mode.
 ## 2026-04-01T18:04:22.963Z
 
 - **description**: added (14 lines)
+
+## 2026-04-01T18:36:53.017Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-04-01T18:44:27.866Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE
