@@ -1,0 +1,31 @@
+--- a/TCL-106.md
++++ b/TCL-106.md
+@@ -6,9 +6,24 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T19:30:07.861Z
+-updated_at: 2026-04-01T19:30:07.861Z
++updated_at: 2026-04-01T19:30:13.888Z
+ ---
+ 
+ # Add storage status command showing current config and workspace health
+ 
+-
++sandpiper-tasks --dir . storage status would show:
++- Current config source (.sandpiper-tasks.json / .sandpiper/settings.json / defaults)
++- Effective mode (inline / separate-branch / external-repo)
++- Workspace path and whether it exists
++- VCS backend detected
++- Whether .gitignore entry is present
++- auto_commit / auto_push settings
++
++Useful for diagnosing misconfiguration or missing workspace without having to read the config files manually.
++
++---
++
++# Activity Log
++
++## 2026-04-01T19:30:13.889Z
++
++- **description**: added (9 lines)
++

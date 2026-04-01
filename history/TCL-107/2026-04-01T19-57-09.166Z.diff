@@ -1,0 +1,27 @@
+--- a/TCL-107.md
++++ b/TCL-107.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "jj external-repo named-branch checkout doesn't track existing remote branch"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T19:48:05.794Z
+-updated_at: 2026-04-01T19:52:40.833Z
++updated_at: 2026-04-01T19:57:09.165Z
+ ---
+ 
+ # jj external-repo named-branch checkout doesn't track existing remote branch
+@@ -40,3 +41,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-01T19:57:09.166Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

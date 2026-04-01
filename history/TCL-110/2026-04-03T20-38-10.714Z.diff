@@ -1,0 +1,31 @@
+--- a/TCL-110.md
++++ b/TCL-110.md
+@@ -6,9 +6,24 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-03T20:38:00.725Z
+-updated_at: 2026-04-03T20:38:00.725Z
++updated_at: 2026-04-03T20:38:10.713Z
+ ---
+ 
+ # Flaky jj test cleanup: rm -rf intermittently fails in afterEach
+ 
+-
++The jj backend integration tests in storage-cmd.test.ts use execSync('rm -rf "${rootDir}"') in afterEach to clean up jj workspace directories (Node's rmSync fails on macOS with jj's .jj/ structure). This cleanup intermittently fails with 'Command failed: rm -rf ...' when run in the full test suite (parallel execution), though tests pass individually.
++
++Likely cause: jj's workspace background processes or file locks haven't released by the time afterEach runs when other test files are executing concurrently.
++
++Options:
++1. Add a short delay before cleanup
++2. Use vitest's --no-file-parallelism for this test file
++3. Wrap rm -rf in a retry loop
++4. Accept the flakiness (it only affects cleanup, not test assertions)
++
++---
++
++# Activity Log
++
++## 2026-04-03T20:38:10.714Z
++
++- **description**: added (9 lines)
++

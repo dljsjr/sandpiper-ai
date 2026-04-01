@@ -1,0 +1,37 @@
+--- a/TCL-107.md
++++ b/TCL-107.md
+@@ -6,9 +6,30 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T19:48:05.794Z
+-updated_at: 2026-04-01T19:48:05.794Z
++updated_at: 2026-04-01T19:48:21.853Z
+ ---
+ 
+ # jj external-repo named-branch checkout doesn't track existing remote branch
+ 
+-
++After 'jj git clone --colocate', checkoutOrCreateBranchJj() calls 'jj bookmark set <name> -r @', which creates a local bookmark pointing at the current working copy (on the remote's default branch), NOT the remote's named branch.
++
++The git equivalent (checkoutOrCreateBranchGit) correctly calls 'git checkout <branch>' which auto-tracks origin/<branch>.
++
++Fix: check if <branch>@origin exists; if so, point the local bookmark there and move the working copy to it. Fall back to creating a new bookmark at @ only if the remote branch doesn't exist.
++
++Suggested impl:
++  try {
++    run('jj bookmark set branch -r branch@origin')  // track remote
++    run('jj edit branch')                            // move working copy
++  } catch {
++    run('jj bookmark create branch -r @')            // remote branch absent
++  }
++
++Needs a jj integration test mirroring the existing git named-branch checkout test in storage-backend.test.ts.
++
++---
++
++# Activity Log
++
++## 2026-04-01T19:48:21.854Z
++
++- **description**: added (15 lines)
++

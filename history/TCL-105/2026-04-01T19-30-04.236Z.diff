@@ -1,0 +1,28 @@
+--- a/TCL-105.md
++++ b/TCL-105.md
+@@ -6,9 +6,21 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T19:29:57.542Z
+-updated_at: 2026-04-01T19:29:57.542Z
++updated_at: 2026-04-01T19:30:04.235Z
+ ---
+ 
+ # storage migrate has no recovery path if interrupted mid-way
+ 
+-
++migrateInlineToSeparateBranch() uses a try/finally that deletes the tempDir backup on any error. If rmSync(workspacePath) succeeds but initSeparateBranch() throws (e.g. jj command fails), the original task files are destroyed.
++
++Fix options:
++1. Don't delete tempDir in the finally block on error — leave it in place so the user can recover manually
++2. Only delete tempDir after cpSync(tempDir, workspacePath) succeeds
++3. Document the recovery path in STORAGE.md (the user still has VCS history)
++
++---
++
++# Activity Log
++
++## 2026-04-01T19:30:04.236Z
++
++- **description**: added (6 lines)
++

@@ -1,0 +1,29 @@
+--- a/TCL-105.md
++++ b/TCL-105.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "storage migrate has no recovery path if interrupted mid-way"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: LOW
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T19:29:57.542Z
+ updated_at: 2026-04-01T19:30:04.235Z
+-updated_at: 2026-04-01T19:30:04.235Z
++updated_at: 2026-04-01T19:35:12.006Z
+ ---
+ 
+ # storage migrate has no recovery path if interrupted mid-way
+@@ -26,3 +26,8 @@
+ 
+ - **description**: added (6 lines)
+ 
++## 2026-04-01T19:35:12.007Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

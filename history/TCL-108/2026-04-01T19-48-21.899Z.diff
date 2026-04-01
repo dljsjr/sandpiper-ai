@@ -1,0 +1,32 @@
+--- a/TCL-108.md
++++ b/TCL-108.md
+@@ -6,9 +6,25 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T19:48:05.845Z
+-updated_at: 2026-04-01T19:48:05.845Z
++updated_at: 2026-04-01T19:48:21.899Z
+ ---
+ 
+ # Replace shell-interpolated run() with execFileSync to prevent metacharacter breakage
+ 
+-
++All run() call sites in storage-backend.ts build shell command strings via template literal interpolation. Paths, branch names, repo URLs, and commit messages are injected unescaped. A task title like 'Fix the "login" flow (1/2)' would produce broken shell quoting.
++
++Fix: replace execSync with execFileSync and pass arguments as an array:
++  function run(args: readonly string[], cwd: string): void {
++    execFileSync(args[0]!, args.slice(1), { cwd, stdio: 'pipe' });
++  }
++
++Call sites become: run(['jj', 'commit', '-m', message], workspacePath)
++
++This is a mechanical but broad refactor — every run() call site in storage-backend.ts needs updating. Do as a dedicated commit.
++
++---
++
++# Activity Log
++
++## 2026-04-01T19:48:21.899Z
++
++- **description**: added (10 lines)
++
