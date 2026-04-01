@@ -1,7 +1,8 @@
 # Session Stand-Up
 
-Updated: 2026-04-01T18:05:23Z
-Session: current
+Updated: 2026-04-01T18:10:45Z
+Session: dcd0a254-f87e-485d-9a4e-8c8fa2f5a106
+Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-01T05-32-54-483Z_dcd0a254-f87e-485d-9a4e-8c8fa2f5a106.jsonl
 
 ## Accomplished
 
@@ -51,6 +52,15 @@ Session: current
   - **TCL-88** Phase 3 — external-repo storage
   - **TCL-89** Phase 4 — generalized bootstrap for future domains
 - Created detailed subtasks **TCL-90** through **TCL-103** with handoff-ready descriptions mapped to the four phases.
+
+### Self-reflection / guidance persistence
+- Created and completed **AGENT-48** to persist session learnings into the repo guidance surface.
+- Reviewed the relevant skills used this session:
+  - **jj** — updated the advanced workspaces guidance with the newly-validated nested-workspace pattern, the `root()` unrelated-history pattern, and the colocated-repo warning to prefer `jj workspace` over `git worktree` when using jj commands in both checkouts
+  - **tasks**, **code-review**, **standup**, **skill-review** — reviewed and left unchanged
+- Updated **root `AGENTS.md`** routing to point future task-storage work at the new strategy + implementation-plan docs.
+- Updated **`packages/sandpiper-tasks-cli/README.md`** to link the new task-storage docs as the current design references.
+- No new skills were identified; the newly-learned patterns were repo-specific guidance or a jj workspace gotcha that fit cleanly into existing docs/skills.
 
 ## Deferred decisions (need dedicated session)
 - **SHR-68/69** (bash/zsh user command capture) — need a discussion before final triage

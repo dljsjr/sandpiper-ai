@@ -224,10 +224,39 @@ jj edit <some-commit>
 jj log -r 'test-workspace@'
 ```
 
+### Less-obvious but useful patterns
+```bash
+# Nested workspace under a subdirectory of the current workspace
+jj workspace add .sandpiper/tasks --name tasks
+
+# Create a workspace with unrelated history rooted at root()
+jj workspace add ../scratch --name scratch --revision 'root()'
+```
+
+Nested workspaces can be useful when a tool expects a canonical path inside the repo tree but you
+still want an independent working copy.
+
+A `root()`-based workspace is the jj-native way to create unrelated history when you need a branch
+that should not share ancestors with the main code history.
+
+### Important colocated-repo gotcha
+
+In a colocated jj/git repo, prefer `jj workspace add` over `git worktree add` if you expect to use
+`jj` inside both checkouts.
+
+A git worktree may look fine from Git's point of view, but jj may not treat it as an independent
+workspace. The result can be surprising: `jj` commands run in the nested git worktree can affect the
+parent workspace state instead of staying isolated.
+
+Rule of thumb:
+- **jj repo** → use `jj workspace`
+- **plain git repo** → use `git worktree`
+
 ### Use cases
 - Run a long test suite in one workspace while continuing to code in another
 - Compare behavior of two different commits side by side
 - Have a "clean" workspace always pointing at main for reference
+- Maintain an unrelated-history workspace rooted at `root()` for specialized content or tooling
 
 ### Cleanup
 ```bash
