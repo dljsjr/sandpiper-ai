@@ -264,6 +264,43 @@ describe('storage migrate — git backend (integration)', () => {
   });
 });
 
+// ─── storage pull — external repo (integration) ─────────────────────
+
+describe('storage pull — external repo, git backend (integration)', () => {
+  let rootDir: string;
+  let remoteDir: string;
+
+  beforeEach(() => {
+    rootDir = mkdtempSync(join(tmpdir(), 'storage-pull-ext-test-'));
+    remoteDir = mkdtempSync(join(tmpdir(), 'storage-pull-ext-remote-'));
+    execSync('git init -q', { cwd: rootDir });
+    execSync('git config user.email "test@test.com"', { cwd: rootDir });
+    execSync('git config user.name "Test"', { cwd: rootDir });
+    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    execSync('git init -q', { cwd: remoteDir });
+    execSync('git config user.email "test@test.com"', { cwd: remoteDir });
+    execSync('git config user.name "Test"', { cwd: remoteDir });
+    execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });
+    writeFileSync(
+      join(rootDir, '.sandpiper-tasks.json'),
+      JSON.stringify({ version_control: { mode: { branch: '@', repo: remoteDir } } }),
+    );
+    // Bootstrap the external repo
+    runCli(`--dir ${rootDir} storage init`);
+  });
+
+  afterEach(() => {
+    rmSync(rootDir, { recursive: true, force: true });
+    rmSync(remoteDir, { recursive: true, force: true });
+  });
+
+  it('storage pull succeeds when no new remote commits exist', () => {
+    const result = runCli(`--dir ${rootDir} storage pull`);
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain('Pulled');
+  });
+});
+
 // ─── storage sync/push/pull inline no-op ───────────────────────────
 
 describe('storage sync/push/pull — inline mode no-op', () => {
