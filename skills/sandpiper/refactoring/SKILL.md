@@ -94,12 +94,13 @@ Prioritize refactoring targets using this hierarchy:
 4. **Low (note for later):** Style inconsistencies, minor naming issues, missing
    type annotations on internal code
 
-**Hotspot heuristic:** If git history is available, prioritize files that are both
-complex AND frequently modified:
+**Hotspot heuristic:** If version control history is available, prioritize files that
+are both complex AND frequently modified:
 
 ```bash
-# Find files with most commits in last 6 months
+# Find files with most commits in last 6 months (git)
 git log --since="6 months ago" --format='' --name-only | sort | uniq -c | sort -rn | head -20
+# For jj repos, use: jj log --no-graph -r 'heads(::@ & committer_date(after:"6 months ago"))' -T 'description ++ "\n"' — then extract paths from each commit's diff
 ```
 
 Cross-reference this list with the complexity data from Phase 1. Files appearing in

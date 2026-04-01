@@ -195,12 +195,13 @@ sentrux analyze <path>
 
 Run the language-specific linter on the full target (see language reference).
 
-If git history is available, identify hotspots:
+If version control history is available, identify hotspots:
 
 ```bash
-# Files with highest churn in the last 6 months
+# Files with highest churn in the last 6 months (git)
 git log --since="6 months ago" --format='' --name-only -- <path> \
   | sort | uniq -c | sort -rn | head -30
+# For jj repos, extract changed paths per commit from the relevant revision range
 ```
 
 ### Step 2: Triage

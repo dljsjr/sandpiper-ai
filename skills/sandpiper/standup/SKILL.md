@@ -34,7 +34,7 @@ The stand-up is written for the **next session's agent** — a fresh context win
 
 One file, always current. The stand-up is overwritten at the start of each new session's first update. Mid-session updates modify it in place.
 
-The stand-up is NOT a historical record. History lives in jj commits, the task tracker, and session files.
+The stand-up is NOT a historical record. History lives in version control commits, the task tracker, and session files.
 
 ## Format
 
