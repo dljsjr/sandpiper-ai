@@ -240,21 +240,42 @@ export function summarizeWorkingCopyPaths(diffSummary: string): WorkingCopySumma
   };
 }
 
-export function collectWorkingCopySummary(cwd: string): WorkingCopySummary | undefined {
+/**
+ * Try a VCS diff command and return trimmed output, or undefined on failure.
+ */
+function tryVcsDiff(cmd: string, args: readonly string[], cwd: string): string | undefined {
   try {
-    const output = execFileSync('jj', ['diff', '--summary'], {
+    const output = execFileSync(cmd, args, {
       cwd,
       encoding: 'utf-8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
-    if (output.length === 0) return undefined;
-
-    const summary = summarizeWorkingCopyPaths(output);
-    if (summary.paths.length === 0 && summary.omittedCount === 0) return undefined;
-    return summary;
+    return output.length > 0 ? output : undefined;
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Collect a summary of uncommitted working copy changes.
+ *
+ * Tries the repo's VCS tool in order: jj (if `.jj/` exists), then git.
+ * Falls back gracefully to `undefined` when neither is available.
+ */
+export function collectWorkingCopySummary(cwd: string): WorkingCopySummary | undefined {
+  // Detect which VCS is present, then run the appropriate diff command.
+  // jj is checked first because colocated jj repos also have .git/.
+  const diffOutput = existsSync(join(cwd, '.jj'))
+    ? tryVcsDiff('jj', ['diff', '--summary'], cwd)
+    : existsSync(join(cwd, '.git'))
+      ? tryVcsDiff('git', ['diff', '--name-status', 'HEAD'], cwd)
+      : undefined;
+
+  if (!diffOutput) return undefined;
+
+  const summary = summarizeWorkingCopyPaths(diffOutput);
+  if (summary.paths.length === 0 && summary.omittedCount === 0) return undefined;
+  return summary;
 }
 
 export function formatWorkingCopySummaryForPrompt(summary: WorkingCopySummary | undefined): string {

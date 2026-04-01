@@ -13,7 +13,7 @@ Work in this order:
    - `sandpiper-tasks task list -s IN_PROGRESS`
    - `sandpiper-tasks task list -s NEEDS_REVIEW`
    - `sandpiper-tasks task list -s NOT_STARTED --priority HIGH`
-3. Check whether the working copy is dirty with `jj status` or `jj diff --summary`, and summarize any meaningful changed files
+3. Check whether the working copy is dirty using the repo's version control tool (e.g., `jj status`, `git status`), and summarize any meaningful changed files
 4. Use the root `AGENTS.md` routing table to identify the focused docs and local `README.md` / `AGENTS.md` files relevant to the user's current request
 5. Report back with:
    - a concise continuity summary

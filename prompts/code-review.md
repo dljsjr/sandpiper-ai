@@ -21,7 +21,7 @@ If no paths were listed, review the changes on their own merits using the code r
 
 ## Review process
 
-1. **Enumerate the changes.** Use `jj log` to list all commits in the range `$1`. Read each commit's diff individually for full context — use `jj diff -r <change_id>` per commit, not a single combined diff. Also check for uncommitted changes in the working copy (`jj diff`) that may belong to the review scope.
+1. **Enumerate the changes.** Use the repo's version control tool to list all commits in the range `$1` and read each commit's diff individually for full context — review per-commit diffs, not a single combined diff. Also check for uncommitted changes in the working copy that may belong to the review scope.
 
 2. **Understand before judging.** For each change, read the commit message and understand the intent before reading the code. Do NOT start line-by-line review without understanding what the change is trying to accomplish.
 
