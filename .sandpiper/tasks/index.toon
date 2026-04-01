@@ -1,5 +1,5 @@
 version: 1
-lastUpdatedAt: 1775057493523
+lastUpdatedAt: 1775057623000
 tasks:
   "TOOLS-7":
     key: TOOLS-7
@@ -214,6 +214,21 @@ tasks:
     blockedBy[0]:
     related[0]:
     lastIndexedAt: 1774836285107
+  "WEB-13":
+    key: WEB-13
+    project: WEB
+    title: "Spike: browser automation tool for interactive and JS-heavy pages"
+    status: NOT STARTED
+    kind: TASK
+    priority: LOW
+    assignee: UNASSIGNED
+    reporter: AGENT
+    createdAt: "2026-04-01T15:33:28.199Z"
+    updatedAt: "2026-04-01T15:33:42.994Z"
+    dependsOn[0]:
+    blockedBy[0]:
+    related[1]: WEB-10
+    lastIndexedAt: 1775057623000
   "AGENT-39":
     key: AGENT-39
     project: AGENT
@@ -1220,7 +1235,7 @@ counters:
     nextTaskNumber: 2
   WEB:
     projectKey: WEB
-    nextTaskNumber: 13
+    nextTaskNumber: 14
   AGENT:
     projectKey: AGENT
     nextTaskNumber: 48
