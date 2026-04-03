@@ -67,6 +67,12 @@ Refactoring the *tests* is equally important. Tests are code. They accumulate te
 debt just like production code. If a test is hard to read, rename things. If tests share
 setup, extract a helper. If a test name doesn't describe the behavior, fix it.
 
+For non-trivial refactoring, use the `refactoring` skill's metrics-based workflow:
+measure complexity (lizard), check duplication (jscpd), and verify that no metric
+worsened after your changes. The refactor step is where design quality emerges —
+skipping the measurements means you're guessing about whether you actually improved
+the code.
+
 Then return to step 1 with the next behavior.
 
 ### The Laws of TDD (Robert C. Martin's Formulation)
