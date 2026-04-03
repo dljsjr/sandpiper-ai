@@ -63,6 +63,10 @@ Also: pattern/match arm deletion, struct literal field deletion.
 
 ### CLI Options
 
+**WARNING: Never use `--in-place`.** This flag mutates your actual source files instead
+of working on a temporary copy. It can leave mutations in committed code and corrupt
+your working tree. Always let cargo-mutants use its default temporary directory.
+
 ```bash
 # Parallel jobs (start conservative — 2-3)
 cargo mutants -j 3
@@ -133,7 +137,11 @@ fn logging_helper(msg: &str) {
 }
 ```
 
-The `mutants` crate must be a dev-dependency: `cargo add --dev mutants`
+The `mutants` crate must be a **regular dependency** (not dev-dependency): `cargo add mutants`
+
+It needs to be a regular dependency because `#[mutants::skip]` must compile during
+`cargo build`, not just `cargo test`. The crate is tiny (just a no-op proc macro that
+compiles away to nothing) so there is no runtime cost.
 
 ## Output Interpretation
 
