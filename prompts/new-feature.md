@@ -14,6 +14,6 @@ Before writing any code:
 Then implement iteratively:
 - Write failing tests
 - Write code to make them pass
-- Run lints (`bun check`) and tests after every meaningful change
+- Run lints and tests after every meaningful change (use the project's lint/test commands)
 - Commit frequently with task key references
 - Update task statuses as you progress

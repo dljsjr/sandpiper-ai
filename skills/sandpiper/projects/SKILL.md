@@ -48,7 +48,7 @@ When starting work in a new repository, add it to the directory:
 
 ```toon
   new-project:
-    path: /Users/doug.stephen/git/new-project
+    path: /home/user/projects/new-project
     description: What this project does
     active: true
 ```
@@ -64,7 +64,7 @@ Don't delete entries — set `active: false` to hide them from session-start sca
 
 ```toon
   old-project:
-    path: /Users/doug.stephen/git/old-project
+    path: /home/user/projects/old-project
     description: No longer actively maintained
     active: false
 ```

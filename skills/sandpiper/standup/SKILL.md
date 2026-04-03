@@ -76,7 +76,7 @@ Session file: {session file path}
 
 - **Updated** — ISO 8601 timestamp of the most recent write. Updated on every write, including mid-session updates.
 - **Session** — UUID that uniquely identifies the current agent session. This is the primary key for "same session" detection.
-- **Session file** — Path to the active session's JSONL file. Sessions are stored under `~/.sandpiper/agent/sessions/` in subdirectories keyed by working directory (e.g., `--Users-doug.stephen-git-sandpiper-ai--/`). Filenames are `{timestamp}_{uuid}.jsonl`. This is a reference pointer for the user — do NOT read session files, they are large JSONL and would create enormous context noise.
+- **Session file** — Path to the active session's JSONL file. Sessions are stored under `~/.sandpiper/agent/sessions/` in subdirectories keyed by working directory (e.g., `--Users-jane-git-my-project--/`). Filenames are `{timestamp}_{uuid}.jsonl`. This is a reference pointer for the user — do NOT read session files, they are large JSONL and would create enormous context noise.
 
 ### How to Access Session Identity
 
