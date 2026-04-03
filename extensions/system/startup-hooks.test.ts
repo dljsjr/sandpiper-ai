@@ -56,37 +56,70 @@ describe('startup hooks', () => {
     expect(state.coldStartGuidancePending).toBe(false);
   });
 
-  it('updates runtime state and env vars on session lifecycle events', async () => {
+  it('sets cold start from heuristic on startup, env vars on all reasons', async () => {
     const state = createSystemRuntimeState();
     const { pi, handlers } = createEventStub();
 
     registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
 
     const onStart = handlers.get('session_start');
-    const onSwitch = handlers.get('session_switch');
-    if (!onStart || !onSwitch) {
-      throw new Error('session continuity hooks not registered');
+    if (!onStart) {
+      throw new Error('session_start handler not registered');
     }
 
     const getSessionFile = vi.fn(() => '/tmp/session.jsonl');
     const getEntries = vi.fn(() => []);
     const getSessionId = vi.fn(() => 'session-1234');
+    const sessionCtx = { sessionManager: { getSessionFile, getEntries, getSessionId } };
 
-    await onStart(
-      {},
-      {
-        sessionManager: { getSessionFile, getEntries, getSessionId },
-      },
-    );
+    // startup: uses shouldTreatInitialLoadAsColdStart heuristic + sets env vars
+    await onStart({ reason: 'startup' }, sessionCtx);
 
     expect(state.startupContextPending).toBe(true);
     expect(state.coldStartGuidancePending).toBe(true);
     expect(process.env.SANDPIPER_SESSION_ID).toBe('session-1234');
     expect(process.env.SANDPIPER_SESSION_FILE).toBe('/tmp/session.jsonl');
+  });
 
-    await onSwitch({ reason: 'new' }, {});
+  it('treats /new as a cold start', async () => {
+    const state = createSystemRuntimeState();
+    const { pi, handlers } = createEventStub();
+    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
+
+    const onStart = handlers.get('session_start')!;
+    const sessionCtx = {
+      sessionManager: {
+        getSessionFile: vi.fn(() => null),
+        getEntries: vi.fn(() => []),
+        getSessionId: vi.fn(() => 'new-session'),
+      },
+    };
+
+    await onStart({ reason: 'new' }, sessionCtx);
+
     expect(state.startupContextPending).toBe(true);
     expect(state.coldStartGuidancePending).toBe(true);
+  });
+
+  it.each(['reload', 'resume', 'fork'] as const)('treats %s as NOT a cold start', async (reason) => {
+    const state = createSystemRuntimeState();
+    state.coldStartGuidancePending = true; // pre-set to verify it gets cleared
+    const { pi, handlers } = createEventStub();
+    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
+
+    const onStart = handlers.get('session_start')!;
+    const sessionCtx = {
+      sessionManager: {
+        getSessionFile: vi.fn(() => '/tmp/s.jsonl'),
+        getEntries: vi.fn(() => []),
+        getSessionId: vi.fn(() => 'id'),
+      },
+    };
+
+    await onStart({ reason }, sessionCtx);
+
+    expect(state.startupContextPending).toBe(true);
+    expect(state.coldStartGuidancePending).toBe(false);
   });
 
   it('emits background process completion context and kills all on shutdown', async () => {

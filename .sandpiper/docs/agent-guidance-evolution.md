@@ -251,16 +251,17 @@ Pi docs indicate that in default parallel tool execution mode:
 
 That matters for any design that queues or deduplicates guidance.
 
-### Cold-Start Detection Finding
+### Cold-Start Detection (Updated for Pi 0.65.0)
 
-Pi's extension lifecycle does **not** appear to expose an explicit "initial start reason = new vs resume" event for the first session load. `session_start` fires on the initial load, but its event payload carries no `reason` field.
+As of Pi 0.65.0, `session_start` fires for all session lifecycle transitions with `event.reason: "startup" | "reload" | "new" | "resume" | "fork"`. The removed events (`session_switch`, `session_fork`, `session_directory`) are replaced by reason-based dispatch.
 
-Current practical heuristic:
+Cold-start determination is now straightforward:
 
-- on `session_start`, treat the session as a cold start if `ctx.sessionManager.getSessionFile()` is still undefined **or** `ctx.sessionManager.getEntries()` contains no `message` entries
-- on later session transitions, use `session_switch.reason === 'new' | 'resume'`
+- `reason === 'new'` → always a cold start
+- `reason === 'reload' | 'resume' | 'fork'` → never a cold start
+- `reason === 'startup'` → ambiguous (Pi may auto-resume last session), so we still use `shouldTreatInitialLoadAsColdStart(sessionFile, entries)` to check session contents
 
-The missing session-file signal is especially useful because a brand-new session does not get a session file until after the first agent response, while a resumed session already has one. This is good enough for the current prompt-side guidance injection, but if Pi later exposes an explicit initial-load reason, that would still be preferable.
+The `shouldTreatInitialLoadAsColdStart` heuristic is only needed for the `startup` case and can be removed if Pi ever distinguishes "fresh start" from "auto-resumed last session" at the event level.
 
 ### Likely First Enforcement Candidates
 

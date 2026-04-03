@@ -20,16 +20,20 @@ export default function (pi: ExtensionAPI) {
   registerRelayStatusCommand(pi, runtime);
   registerRelayCleanupCommand(pi, runtime);
 
-  pi.on('session_start', async (_event, ctx) => {
-    await runtime.onSessionReady(ctx);
-  });
-
-  pi.on('session_switch', async (_event, ctx) => {
-    await runtime.onSessionSwitch(ctx);
-  });
-
-  pi.on('session_fork', async (_event, ctx) => {
-    runtime.restoreStoredSessionFromBranch(ctx.sessionManager.getBranch());
+  pi.on('session_start', async (event, ctx) => {
+    switch (event.reason) {
+      case 'startup':
+      case 'reload':
+        await runtime.onSessionReady(ctx);
+        break;
+      case 'new':
+      case 'resume':
+        await runtime.onSessionSwitch(ctx);
+        break;
+      case 'fork':
+        runtime.restoreStoredSessionFromBranch(ctx.sessionManager.getBranch());
+        break;
+    }
   });
 
   pi.on('session_tree', async (_event, ctx) => {
