@@ -60,7 +60,9 @@ export function registerMigrationControls(pi: ExtensionAPI): void {
     default: false,
   });
 
-  pi.on('session_directory', async (event) => {
+  // Migration flags trigger early-exit behavior (process.exit) before any interaction.
+  // Previously session_directory; moved to session_start (Pi 0.65.0 removed session_directory).
+  pi.on('session_start', async (_event, ctx) => {
     if (pi.getFlag('install-shell-integrations')) {
       const result = installShellIntegrations();
       if (result.success) {
@@ -88,8 +90,8 @@ export function registerMigrationControls(pi: ExtensionAPI): void {
       process.exit(1);
     }
 
-    if (migrate) await handleMigrationFlag(pi, 'move', event.cwd);
-    if (symlink) await handleMigrationFlag(pi, 'symlink', event.cwd);
+    if (migrate) await handleMigrationFlag(pi, 'move', ctx.cwd);
+    if (symlink) await handleMigrationFlag(pi, 'symlink', ctx.cwd);
   });
 
   pi.registerCommand('migrate-pi', {

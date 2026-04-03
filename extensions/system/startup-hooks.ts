@@ -55,21 +55,35 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, state: SystemRuntim
 }
 
 export function registerSessionContinuityHooks(pi: ExtensionAPI, state: SystemRuntimeState): void {
-  pi.on('session_start', async (_event, ctx) => {
+  pi.on('session_start', async (event, ctx) => {
     state.startupContextPending = true;
 
-    const sessionFile = ctx.sessionManager.getSessionFile();
-    state.coldStartGuidancePending = shouldTreatInitialLoadAsColdStart(sessionFile, ctx.sessionManager.getEntries());
+    // Cold-start determination is now reason-driven (Pi 0.65.0).
+    // Only 'startup' is ambiguous — Pi may have auto-resumed the last session,
+    // so we inspect session contents to distinguish fresh vs resumed.
+    switch (event.reason) {
+      case 'startup': {
+        const sessionFile = ctx.sessionManager.getSessionFile();
+        state.coldStartGuidancePending = shouldTreatInitialLoadAsColdStart(
+          sessionFile,
+          ctx.sessionManager.getEntries(),
+        );
+        break;
+      }
+      case 'new':
+        state.coldStartGuidancePending = true;
+        break;
+      default:
+        // 'reload', 'resume', 'fork' — never a cold start
+        state.coldStartGuidancePending = false;
+        break;
+    }
 
     process.env.SANDPIPER_SESSION_ID = ctx.sessionManager.getSessionId();
+    const sessionFile = ctx.sessionManager.getSessionFile();
     if (sessionFile) {
       process.env.SANDPIPER_SESSION_FILE = sessionFile;
     }
-  });
-
-  pi.on('session_switch', async (event) => {
-    state.startupContextPending = true;
-    state.coldStartGuidancePending = event.reason === 'new';
   });
 }
 

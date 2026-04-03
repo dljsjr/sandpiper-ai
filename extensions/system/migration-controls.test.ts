@@ -75,7 +75,7 @@ describe('registerMigrationControls', () => {
     expect(reload).toHaveBeenCalled();
   });
 
-  it('rejects conflicting migrate/symlink flags during session_directory handling', async () => {
+  it('rejects conflicting migrate/symlink flags during session_start handling', async () => {
     const { pi, events } = createMigrationControlsStub({
       'install-shell-integrations': false,
       'migrate-pi-configs': true,
@@ -85,15 +85,15 @@ describe('registerMigrationControls', () => {
     });
     registerMigrationControls(pi as Parameters<typeof registerMigrationControls>[0]);
 
-    const handler = events.get('session_directory');
+    const handler = events.get('session_start');
     if (!handler) {
-      throw new Error('session_directory handler not registered');
+      throw new Error('session_start handler not registered');
     }
 
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await handler({ cwd: '/repo' });
+    await handler({}, { cwd: '/repo' });
 
     expect(errorSpy).toHaveBeenCalledWith('Error: --migrate-pi-configs and --symlink-config are mutually exclusive.');
     expect(exitSpy).toHaveBeenCalledWith(1);

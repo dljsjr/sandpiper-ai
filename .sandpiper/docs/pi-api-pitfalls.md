@@ -6,7 +6,7 @@ Last verified: 2026-03-30
 ## Key Rules
 
 - Register and read flags with bare names: `registerFlag("my-flag")` pairs with `getFlag("my-flag")`, not `getFlag("--my-flag")`.
-- Use `session_directory` for CLI-style flags that do work and exit before a session is created.
+- Use `session_start` for CLI-style early-exit flags (`session_directory` was removed in Pi 0.65.0).
 - Treat module-level state as extension-local. Separate jiti loads do not share module instances.
 - Use `pi.events` for cross-extension coordination, and dedupe listener effects across `/reload` cycles.
 - For cross-package TypeScript imports, prefer project references plus package exports; do not widen `rootDir` to make types line up.
@@ -35,14 +35,15 @@ pi.getFlag("--my-flag");   // ❌ always returns undefined
 
 The pi docs have historically shown `getFlag("--my-flag")`, but the implementation and working examples use bare names.
 
-## `session_directory` for CLI-only early-exit flags
+## Early-exit CLI flags via `session_start`
 
-Use `session_directory` (not `session_start`) for flags that perform an action and exit:
+For flags that perform an action and exit (e.g. `--migrate-pi-configs`, `--install-shell-integrations`), use `session_start`:
 
-- fires after flag values are populated
-- fires before the session manager is created
-- can safely call `process.exit()`
-- receives only `event.cwd` — no `ctx`, no UI
+- fires after flag values are populated and the session is created
+- has full `ctx` available (including `ctx.cwd`)
+- can safely call `process.exit()` — exits before any interaction
+
+> **History:** Before Pi 0.65.0 this used `session_directory`, which fired before the session manager was created. That event was removed in 0.65.0 when the startup lifecycle was unified around `session_start` with `event.reason`.
 
 ## Module-level state is **not** shared across jiti instances
 
