@@ -55,21 +55,11 @@ Before working in a subdirectory for the first time in a session, read that dire
 
 ### Version Control
 
-- Use **`jj`**, not `git`
-- Prefer `jj commit -m "msg"` over `jj describe` + `jj new` when finishing a unit of work
-- Prefer fixups (`jj squash`, `jj absorb`) over stray cleanup commits
-- Curate history into logical commits before finishing a work session
+- Use **`jj`**, not `git`. See the `jj` skill for workflow details.
 
 ### Task Management
 
-All coding work must be tracked against a task.
-
-- Use the **`sandpiper-tasks` CLI**, not direct task file edits
-- Ensure a task exists before implementation
-- Bugs discovered during implementation get their own top-level `BUG` task
-- Every task must have a description rich enough for a cold-start future session
-- Reference task keys in commit messages
-- Keep task statuses current as work progresses
+All coding work tracked against a task via `sandpiper-tasks` CLI. Bugs get their own top-level `BUG` task. Reference task keys in commits. See the `tasks` skill.
 
 ### Source of Truth
 
@@ -136,18 +126,9 @@ Read the relevant focused doc **before** working in these areas:
 - Check real dist layout and package metadata before writing path-dependent code
 - Prefer consistency with nearby code over inventing a new local style
 
-## Architecture and Refactoring
+## Architecture
 
-### Framework-Independent Core
-
-Extension core logic should live in framework-independent TypeScript modules. The Pi extension entrypoint should stay a thin glue layer for tool registration and lifecycle wiring.
-
-### Refactoring Bias
-
-- Extract shared patterns early
-- Prefer argument passing over global state
-- Prefer simplicity and readability over cleverness
-- Replace dynamic imports / `require()` with top-level imports unless there is a compelling reason not to
+Extension core logic in framework-independent TypeScript modules. Pi extension entrypoints are thin glue for tool registration and lifecycle wiring. Replace dynamic imports with top-level imports unless there's a compelling reason.
 
 ## Paths and Serialization
 

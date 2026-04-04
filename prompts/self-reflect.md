@@ -14,7 +14,7 @@ This is the highest-value phase. Skills are the primary mechanism for persisting
 Skills come from two sources, and the rules for editing them differ:
 
 - **Project-local skills** (in `.sandpiper/skills/` or the project's own `skills/` directory): you own these. Edit them freely when improvements are identified.
-- **Package-provided skills** (installed from a Pi Package like `sandpiper-ai`): you do NOT own these. Do not edit package-installed skill files — changes would be overwritten on the next package update. Instead, **note the improvement** and suggest it to the user so they can file it upstream or create a project-local override.
+- **Package-provided skills** (installed from a Pi Package): you do NOT own these. Do not edit package-installed skill files — changes would be overwritten on the next package update. Instead, **note the improvement** and suggest it to the user so they can file it upstream or create a project-local override.
 
 When you identify an improvement to a skill, first check where the skill file lives. If it's inside an installed package's directory (e.g., under a `node_modules/` path or a dist directory you don't control), treat it as package-provided.
 
