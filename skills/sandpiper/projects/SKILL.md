@@ -3,10 +3,11 @@ name: projects
 description: >-
   Manage the project directory — a registry of active projects the user works on
   across different repositories. Use when starting a session to check for cross-project
-  context, when the user mentions other projects, or when asked "what projects am I
-  working on?", "show me my projects", or "add this project". The directory lives at
-  ~/.sandpiper/agent/projects.toon and enables cross-project stand-up scanning and
-  task awareness.
+  context, when the user mentions other projects, when referencing work in a different
+  repo (e.g., "this relates to MEM-1 in sandpiper-ai"), when you notice the current
+  directory isn't registered, or when asked "what projects am I working on?", "show
+  me my projects", or "add this project". Also use when creating a new repo that
+  should be tracked. The directory lives at ~/.sandpiper/agent/projects.toon.
 ---
 
 # Project Directory Skill

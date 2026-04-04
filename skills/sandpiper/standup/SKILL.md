@@ -4,9 +4,11 @@ description: >-
   Create and review session stand-up notes for continuity across agent session
   boundaries. Use at the END of a session to capture what was accomplished, what's
   next, and any context the next session needs. Use at the START of a session to
-  review the previous stand-up and orient. Also use when the user asks "what were we
-  working on?", "where did we leave off?", "what's next?", or "do a stand-up".
-  Mid-session updates after completing significant work are also encouraged.
+  review the previous stand-up and orient. Use MID-SESSION after completing a major
+  work package, fixing a significant bug, or making an important decision — checkpoint
+  progress so it survives if the context window fills up. Also use when the user asks
+  "what were we working on?", "where did we leave off?", "what's next?", or "do a
+  stand-up".
 ---
 
 # Session Stand-Up Skill
