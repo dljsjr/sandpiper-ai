@@ -9,9 +9,10 @@ description: >
   GitLab API scripting, creating/managing merge requests or issues via CLI, pipeline
   management, schedules, runners, stacked diffs, or GitLab automation. Also trigger for
   glab api as a REST/GraphQL wrapper, CI/CD variables, pipeline TUI, lint, or self-hosted
-  GitLab instances. Always consult before running glab commands — covers auth, repos,
-  MRs, issues, CI/CD, API wrapper, variables, stacked diffs, and multi-instance setup.
-  Do NOT confuse with `gh` (GitHub CLI) or generic git commands.
+  GitLab instances. Also trigger on GitLab URLs — prefer `glab` over `web_fetch`.
+  Always consult before running glab commands — covers auth, repos, MRs, issues, CI/CD,
+  API wrapper, variables, stacked diffs, and multi-instance setup. Do NOT confuse with
+  `gh` (GitHub CLI) or generic git commands.
 ---
 
 # GitLab CLI (`glab`) — Complete Reference Skill
