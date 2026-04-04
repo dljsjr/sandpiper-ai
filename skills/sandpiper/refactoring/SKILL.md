@@ -83,7 +83,9 @@ Then run the language-specific linter/analyzer (see language reference).
 
 ### Phase 2: Identify Targets
 
-Prioritize refactoring targets using this hierarchy:
+Target identification has two complementary approaches. Use both.
+
+**Metric-driven targets** — prioritize using this hierarchy:
 
 1. **Critical (fix first):** Functions with CC > 20, files with duplicated blocks that
    have diverged (inconsistent clones), dead code (unreachable branches, unused exports)
@@ -93,6 +95,23 @@ Prioritize refactoring targets using this hierarchy:
    nesting depth of 4, moderate duplication
 4. **Low (note for later):** Style inconsistencies, minor naming issues, missing
    type annotations on internal code
+
+**Systemic targets** — step back from individual functions and look for cross-cutting
+design issues that tools don't detect:
+
+- **Parameter threading:** The same 2–3 parameters passed through many signatures
+  → extract a context/config struct
+- **Monolith modules:** A file under every metric threshold that's still hard to
+  navigate because it contains multiple unrelated concepts → split into modules
+- **Abstraction inconsistency:** One method manages a resource internally while its
+  sibling requires the caller to manage the same resource → make the API consistent
+- **Redundant parameters:** A function takes values it could derive from its other
+  arguments → simplify the signature
+- **Cross-module duplication:** Test helpers, error conversion patterns, or builder
+  logic duplicated across crates → extract to a shared location
+
+Systemic issues often have higher ROI than metric-driven ones because they reduce
+the surface area for future bugs across the entire codebase, not just in one function.
 
 **Hotspot heuristic:** If version control history is available, prioritize files that
 are both complex AND frequently modified:

@@ -204,9 +204,33 @@ git log --since="6 months ago" --format='' --name-only -- <path> \
 # For jj repos, extract changed paths per commit from the relevant revision range
 ```
 
-### Step 2: Triage
+### Step 2: Holistic Design Review
 
-Sort findings into priority tiers using this framework:
+Before triaging metric-based findings, step back and review the code as a
+system. Tools find local problems — high CC in one function, duplication
+between two blocks. But the most impactful review findings are often
+**cross-cutting design issues** that no tool detects:
+
+- **Parameter threading:** Are the same 2-3 parameters passed through many
+  function signatures? That's a missing struct (like a context or config object).
+- **Monolith files:** A file can be under every metric threshold individually
+  but still be too large to navigate. If you have to scroll to find where one
+  concept ends and another begins, the file should be split into modules.
+- **Concept leakage:** Are implementation details of one module visible in
+  another's API? (e.g., raw SQL types in a trait that should be storage-agnostic)
+- **Inconsistent abstraction levels:** Does one method create transactions
+  internally while a sibling method requires the caller to pass a transaction ID?
+  All methods at the same trait level should operate at the same abstraction.
+- **Redundant parameters:** Does a function take parameters it could derive
+  from its other arguments? (e.g., taking both a struct and a field of that struct)
+
+These issues matter more than most metric findings because they compound —
+every new feature built on a leaky abstraction inherits its problems.
+
+### Step 3: Triage
+
+Sort findings from both the metrics (Step 1) and the design review (Step 2)
+into priority tiers using this framework:
 
 **Tier 1 — Fix now (correctness risk):**
 - Functions with CC > 20
@@ -237,13 +261,13 @@ Sort findings into priority tiers using this framework:
 - Tests that test implementation rather than behavior
 - Documentation gaps
 
-### Step 3: Deep-Read Priority Code
+### Step 4: Deep-Read Priority Code
 
 Read the Tier 1 and Tier 2 code carefully, applying the same correctness, security,
 data integrity, and error handling checks from Mode A Step 3. Don't deep-read
 everything — focus review attention proportional to risk.
 
-### Step 4: Compile the Audit
+### Step 5: Compile the Audit
 
 Structure the report as described in "Writing the Review" below, but frame findings
 as prioritized recommendations rather than change requests.
