@@ -8,9 +8,11 @@ description: >
   GitHub API scripting, creating/managing PRs or issues via CLI, GitHub Actions management,
   exploring repos without cloning, code search from terminal, or GitHub automation. Also
   trigger for gh api as a REST/GraphQL wrapper, gh extensions, JSON/JQ/template formatting,
-  secrets/variables, or GitHub Enterprise. Always consult before running gh commands — covers
-  auth, repos, PRs, issues, CI/CD, API wrapper, search, extensions, and multi-account setup.
-  Do NOT confuse with generic git commands.
+  secrets/variables, or GitHub Enterprise. Also trigger when you encounter a GitHub URL
+  (github.com/...) — prefer `gh` over `web_fetch` for GitHub PRs, issues, repos, and
+  actions runs. Always consult before running gh commands — covers auth, repos, PRs,
+  issues, CI/CD, API wrapper, search, extensions, and multi-account setup. Do NOT confuse
+  with generic git commands.
 ---
 
 # GitHub CLI (`gh`) — Complete Reference Skill
