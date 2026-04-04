@@ -227,6 +227,11 @@ between two blocks. But the most impactful review findings are often
 These issues matter more than most metric findings because they compound —
 every new feature built on a leaky abstraction inherits its problems.
 
+Example: if four trait methods all take `(source: TransactionSource, session: Option<&str>)`,
+that's a missing `WriteContext` struct. The tool pass sees "no CC violations, no duplication" —
+but the design review sees that every caller must assemble the same two parameters, and
+every new write method must remember to thread them through.
+
 ### Step 3: Triage
 
 Sort findings from both the metrics (Step 1) and the design review (Step 2)

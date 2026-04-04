@@ -113,6 +113,12 @@ design issues that tools don't detect:
 Systemic issues often have higher ROI than metric-driven ones because they reduce
 the surface area for future bugs across the entire codebase, not just in one function.
 
+Example: a 780-line `lib.rs` that's under every per-function CC threshold but contains
+5 unrelated concepts (entity parsing, error types, search config, storage trait, fact
+types) is a systemic target. No tool flags it. Splitting it into focused modules
+improves navigability, compile-time parallelism, and makes future changes less likely
+to accidentally touch unrelated code.
+
 **Hotspot heuristic:** If version control history is available, prioritize files that
 are both complex AND frequently modified:
 
