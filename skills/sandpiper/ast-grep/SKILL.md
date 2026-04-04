@@ -6,10 +6,13 @@ description: >
   syntactic structure rather than plain text — e.g. finding function calls with specific
   argument shapes, locating patterns inside particular contexts (a call inside a loop,
   an import inside a class), renaming symbols while respecting scope, enforcing lint
-  rules based on AST node kinds, or performing large-scale codemod rewrites.
-  Also use when the user mentions "ast-grep", "sg", "structural search",
-  "codemod", "code pattern", "syntax-aware search", or asks to find/replace
-  code based on its structure or AST.
+  rules based on AST node kinds, or performing large-scale codemod rewrites. Also use
+  during refactoring to find all call sites of a function, all instances of an error
+  handling pattern (like .map_err closures), all trait method implementations, or any
+  repeated code pattern you want to extract or replace. Triggers: "ast-grep", "sg",
+  "structural search", "codemod", "code pattern", "syntax-aware search", "find all
+  call sites", "find everywhere we use", or any code search where the shape of the
+  code matters more than the literal text.
 compatibility: Requires ast-grep CLI installed (brew install ast-grep / npm i -g @ast-grep/cli / cargo install ast-grep --locked / pip install ast-grep-cli).
 ---
 

@@ -2,14 +2,14 @@
 name: dash
 description: >-
   Look up programming documentation using the Dash documentation browser. Use when the
-  user asks to check docs, look up an API, find function signatures, search for how to
-  use a library or framework, or needs reference documentation for any language or tool.
-  Also use when you need to verify your own knowledge against authoritative docs — if
-  you're unsure about an API's exact parameters, return types, or behavior, look it up
-  rather than guessing. Use when the user mentions "docs", "documentation", "API
-  reference", "look up", "how does X work", "what are the parameters for", "Dash", or
-  asks about specific functions, classes, or modules in any language or framework they
-  have installed in Dash.
+  user asks to check docs, look up an API, find function signatures, or needs reference
+  documentation. Also use proactively when WRITING code that calls an API you're not 100%
+  certain about — if you're about to use a function and aren't sure of its exact parameters,
+  return type, feature flags, or trait bounds, look it up before writing the call. This
+  includes: checking whether a type implements a trait, verifying serde feature flags,
+  confirming error types, looking up method signatures on third-party crates. Triggers:
+  "docs", "documentation", "API reference", "look up", "how does X work", "what are the
+  parameters for", "Dash", or when you catch yourself guessing about an API.
 compatibility: macOS only. Requires Dash.app installed (https://kapeli.com/dash).
 ---
 

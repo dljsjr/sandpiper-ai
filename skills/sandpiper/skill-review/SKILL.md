@@ -1,12 +1,13 @@
 ---
 name: skill-review
 description: >-
-  Review and audit skills for quality, triggering accuracy, structure, and adherence to
-  best practices. Use when the user asks to review a skill, check if a skill is
-  well-written, audit skill quality, diagnose why a skill isn't triggering, improve an
-  existing skill's structure or description, or do a quality pass on one or more skills.
-  This is a qualitative structural review — for empirical testing with eval runs and
-  benchmarks, use the skill-creator skill instead.
+  Review and audit skills for quality, triggering accuracy, structure, and adherence
+  to best practices. Use when the user asks to review a skill, check if a skill is
+  well-written, audit skill quality, or do a quality pass. Also use during self-
+  reflection when you are editing or improving skills — before changing a skill's
+  description, structure, or content, consult this skill for the review methodology.
+  Triggers: "review skill", "audit skill", "skill quality", "skill isn't triggering",
+  "improve this skill", or any session phase where skills are being modified.
 ---
 
 # Skill Review
