@@ -14,7 +14,29 @@ cargo clippy --message-format=json -- \
 
 # Per-function CC
 lizard --csv src/
+
+# Line count / maintenance burden (first-class review signal)
+scc --format json --by-file <path>
 ```
+
+Treat `scc` as a first-class code health metric alongside `lizard` and `jscpd`.
+Line count is strongly correlated with maintenance burden and defect density
+at the file level.
+
+### Interpreting lizard CC for Rust
+
+`lizard` counts Rust's `?` (try) operator as a branch point, which inflates
+cyclomatic complexity for functions that do a lot of error propagation. A
+function full of `row.get(N)?` calls may report CC 16 but contain no actual
+decision logic — just linear data extraction with early-exit on error.
+
+When a Rust function exceeds the CC threshold, check whether the complexity
+comes from real branching (if/match/loops/nesting) or from `?`-heavy error
+propagation in flat code. The former is genuinely actionable; the latter is
+a tool artifact and should be weighted lower in review findings.
+
+The threshold is still useful as a signal — just interpret it with this
+context before deciding whether refactoring is warranted.
 
 ## Common Bugs to Catch
 
