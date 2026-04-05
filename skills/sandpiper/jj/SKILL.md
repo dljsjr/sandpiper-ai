@@ -186,6 +186,14 @@ jj op log                          # View operation history
 jj op restore <op-id>             # Restore repo to prior state
 ```
 
+### Restoring individual files
+```bash
+jj restore --from <change-id> -- path/to/file   # Restore one file from another commit
+jj restore --from <change-id>                    # Restore all files from another commit
+```
+Use `--from` to selectively pull files from any commit without reverting the whole
+working copy. Essential during module extraction and recovery from tangled edits.
+
 ### Navigation
 ```bash
 jj next                            # Move to child commit

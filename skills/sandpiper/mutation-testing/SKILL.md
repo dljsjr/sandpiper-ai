@@ -112,7 +112,19 @@ The mutant exposes a genuine gap. Examples:
 When writing this test, name it descriptively (e.g., `test_boundary_at_exactly_18`
 not `test_mutation_1`) and add a comment explaining what gap it fills.
 
-### 2. Equivalent Mutant → Exclude or Accept
+**Technique for comparison operator survivors (ROR)**: When `<`, `<=`, `==`, `>`,
+or `>=` mutations survive, the fix is systematic boundary testing:
+- Test a value **below** the threshold (should/shouldn't enter the branch)
+- Test a value **at exactly** the threshold (the boundary itself)
+- Test a value **above** the threshold
+- Test **extreme values** (negative, zero, MAX) to distinguish `<` from `==` and `>`
+
+If boundary tests are awkward to write, the code representation may need restructuring.
+A range comparison like `x < 1` that really means "x is zero" should be rewritten as
+`x == 0` — exact comparisons are inherently more testable. Also consider testing internal
+functions directly with boundary inputs rather than only through the public API.
+
+### 2. Equivalent Mutant → Exclude or Accept (last resort)
 
 The mutation doesn't change observable behavior. Examples:
 - Replacing `x * 1` with `x * -1` when `x` is always 0
@@ -121,6 +133,20 @@ The mutation doesn't change observable behavior. Examples:
 
 **Action**: Exclude via tool configuration or accept the score impact. Do not write
 meaningless tests just to kill equivalent mutants.
+
+**Important**: "equivalent mutant" should be the **last conclusion**, not the first.
+Before accepting equivalence, work through this progression:
+1. Is it actually a **test gap**? Most survivors mean missing coverage.
+2. Does it expose a **design smell** at a parse/serialization boundary? Survivors
+   in serde defaults, tiny helper functions, or duplicated validation often mean
+   the boundary should be refactored so the behavior becomes explicit and testable.
+3. Is it **overlapping validation**? Two checks catching the same input for different
+   reasons — a parse-don't-validate smell.
+4. Only then conclude it is genuinely equivalent.
+
+Treating survivors as equivalent too quickly is the most common agent mistake in
+mutation testing interpretation. It short-circuits the learning that mutation
+testing is designed to produce.
 
 ### 3. Noisy Survivor → Exclude via Configuration
 

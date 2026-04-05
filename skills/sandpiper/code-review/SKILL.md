@@ -100,6 +100,15 @@ sentrux diff review-before review-after
 
 Also run the language-specific linter (see language reference) on changed files only.
 
+If your measurement tools produce JSON and that structured output is meant to be
+handed to another agent/LLM or pasted back into the conversation, convert it to
+TOON before handoff to reduce token overhead. Keep the original JSON if you still
+need it for debugging.
+
+```bash
+bunx @toon-format/cli report.json --encode --keyFolding safe -o report.toon
+```
+
 **What to look for in the delta:**
 - Did any function's CC increase above 15?
 - Did any function grow beyond 60 lines?
@@ -194,6 +203,13 @@ sentrux analyze <path>
 ```
 
 Run the language-specific linter on the full target (see language reference).
+
+If your audit tools emit JSON and the result will be handed to another agent/LLM,
+convert the JSON artifact to TOON before handoff:
+
+```bash
+bunx @toon-format/cli report.json --encode --keyFolding safe -o report.toon
+```
 
 If version control history is available, identify hotspots:
 

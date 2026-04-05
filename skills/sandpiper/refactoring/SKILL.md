@@ -458,6 +458,23 @@ When a function takes > 5 parameters:
 - Check if some parameters have defaults that are rarely overridden (make them optional)
 - Check if the function is doing too many things (split it)
 
+### Extract module (Rust-specific)
+
+When a Rust `lib.rs` or similar file exceeds the size threshold:
+
+1. **Mark shared helpers `pub(crate)`** in the source file before creating the module.
+   The new module imports them via `use crate::helper_name`.
+2. **Create the module file** with the extracted code. Do not duplicate — move it.
+3. **Add `pub mod newmodule;`** to the parent.
+4. **Remove the moved code** from the parent file.
+5. **Fix test imports.** When tests live in a separate `tests.rs` declared as
+   `#[cfg(test)] mod tests;`, the file content IS the module body — do NOT wrap
+   it in another `mod tests { }`. That creates a nested module where `use super::*`
+   resolves to the wrong scope. Add explicit trait imports if methods come from a
+   trait impl in another module.
+6. **Run clippy after each step.** Unused-import warnings compound fast during extraction.
+   `cargo fix --allow-dirty` handles safe mechanical fixes.
+
 ---
 
 ## Anti-Patterns: What NOT to Do

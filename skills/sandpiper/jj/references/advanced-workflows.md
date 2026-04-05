@@ -292,6 +292,64 @@ configure the `immutable_heads` revset in your jj config to exclude it.
 
 ---
 
+## Bulk History Curation (Squash Consolidation)
+
+When consolidating many commits into fewer logical groups (e.g., cleaning up
+a messy development history before pushing), the squash ordering matters.
+
+### Sequential child-into-parent squashing
+
+The safe pattern is to squash each child into its **immediate parent**,
+working from the tip downward:
+
+```bash
+# For a chain A -> B -> C -> D -> E, consolidating into A:
+jj squash --from E --into E-   # E folds into D
+jj squash --from D --into D-   # D (now containing E) folds into C
+jj squash --from C --into C-   # C folds into B
+jj squash --from B --into B-   # B folds into A
+# Result: A contains everything, B/C/D/E are empty
+```
+
+You can script this with a loop over change IDs:
+
+```bash
+for cid in E D C B; do
+  jj --ignore-immutable squash --from "$cid" --into "$cid"- \
+    -m "WIP: consolidating"
+done
+```
+
+### Why not squash from distant descendant into ancestor?
+
+Using `jj squash --from E --into A` directly (skipping the intermediates)
+causes **conflict cascades** when any file is modified in multiple intermediate
+commits. The ancestor suddenly gains changes that conflict with its direct
+children, and every descendant in the chain picks up conflict markers.
+
+This is especially bad with files like `standup.md` or `CHANGELOG.md` that
+are touched in nearly every commit — squashing the tip into the base will
+conflict with every commit in between.
+
+### Recovery
+
+If a squash operation produces unexpected conflicts:
+
+```bash
+jj op log --limit 10          # find the last clean state
+jj op restore <op-id>         # restore to it
+```
+
+Use `jj op restore`, not `jj restore`. The difference is critical:
+- `jj op restore` rewinds the **entire repository state** to a prior operation
+- `jj restore` overwrites **file content** in the working copy from another revision
+
+Using `jj restore` when you meant `jj op restore` will silently create a new
+commit with the old content on top of the current (possibly broken) state,
+making the situation worse.
+
+---
+
 ## Inserting Changes into History
 
 jj makes it easy to insert new commits anywhere in the graph.
