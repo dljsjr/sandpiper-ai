@@ -143,8 +143,8 @@ writePidFile(sessionId, cwd);
 // On session_shutdown
 removePidFile(sessionId);
 
-// Reading standup context
-const standupContent = execSync('sandpiper-standup read -d ' + cwd, { encoding: 'utf-8' });
+// Reading standup context (shell-safe: no string interpolation)
+const standupContent = execFileSync('sandpiper-standup', ['read', '-d', cwd], { encoding: 'utf-8' });
 ```
 
 ### CLI Commands
@@ -154,7 +154,9 @@ const standupContent = execSync('sandpiper-standup read -d ' + cwd, { encoding: 
 sandpiper-standup read -d /path/to/project
 
 # Write a section (reads body from stdin)
-echo "### Accomplished\n- Work done" | sandpiper-standup write -u session-uuid -f /path/to/session.jsonl -d /path/to/project
+# Session identity comes from SANDPIPER_SESSION_ID and SANDPIPER_SESSION_FILE env vars (set by extension)
+# Flags -u/--uuid and -f/--file are optional overrides
+echo "### Accomplished\n- Work done" | sandpiper-standup write -d /path/to/project
 
 # Clean up dead sessions and PID files
 sandpiper-standup cleanup -d /path/to/project
@@ -164,7 +166,7 @@ sandpiper-standup cleanup -d /path/to/project
 
 ### Legacy Format
 
-If the standup file has the old format (no `## Session` headers), the parser treats the entire content as a single section from an "unknown" session. On first write by a new session, the legacy content is wrapped in a `## Session unknown` header and the new session's section is appended. The legacy section is cleaned up on the next read (no PID file = dead).
+If the standup file has the old format (no `## Session` headers), the parser treats the entire content as a single section from an "unknown" session. On first write by a new session, the legacy content is wrapped in a `## Session unknown` header and the new session's section is appended. The legacy section is **preserved** on subsequent reads (to avoid destructive migration) and remains in the file until explicitly removed or replaced.
 
 ## Known Limitations
 
