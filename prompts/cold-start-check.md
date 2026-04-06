@@ -5,7 +5,7 @@ Treat this as a cold-start continuity check for the current repository.
 
 Work in this order:
 
-1. Read the current `.sandpiper/standup.md` and summarize:
+1. Run `sandpiper-standup read` (from project root) and summarize:
    - what was accomplished recently
    - what is in progress
    - what the next session should do
