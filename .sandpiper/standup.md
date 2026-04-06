@@ -6,16 +6,42 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 
 ## Accomplished
 
-### Skill improvements ✅
-- Fixed undertriggering in 5 skills: dash, ast-grep, skill-review, projects, standup
-- Added holistic design review step to code-review skill (Mode B)
-- Added systemic targets to refactoring skill (Phase 2)
-- Added concrete examples to both new sections
-- Full audit of all 14 sandpiper skills against Anthropic guide
+(Carries forward from prior standup — this session continued the same work.)
 
-### Context engineering ✅
-- Trimmed AGENTS.md: 166→147 lines (collapsed restated content)
-- Left self-reflect.md prompt intact (ships with package, must be self-contained)
+### Task storage Phases 1–3 (TCL-86, TCL-87, TCL-88) ✅
+- All implementation, tests, dogfooding, and docs from the prior session.
+
+### Code review fixes (F1–F5) ✅
+- F1: gitignore deduplication — `addPathToGitignore` extracted to `fs.ts`
+- F2: jj external-repo named-branch checkout — uses `bookmark set -r branch@origin` + `jj new`
+- F3: filed TCL-108 for `execFileSync` migration
+- F4: VCS invariant comments added
+- F5: `withErrorHandling` surfaces child process stderr
+
+### Bug fixes ✅
+- TCL-104: `auto_push` now honoured in `autoCommitIfEnabled`
+- TCL-105: `storage migrate` preserves backup on failure with recovery path
+- jj bookmark pointing at `root()` after `storage init` — fixed `@-` → `@`
+- TCL-107: jj external-repo named-branch checkout tracks remote branch
+
+### Documentation overhaul ✅
+- tasks SKILL.md: "Task Storage Modes" section with config and commands
+- tasks SPEC.md: §2.4 (scan-primary counters), §3.3 (counter operations), §9 (Storage Configuration)
+- tasks references/storage.md: full operator guide
+- Project key guidance: 3–5 letters (was 2–4)
+
+### Distribution coupling audit ✅
+- Audited all distributed prompts, skills, and extensions for implicit coupling to this repo
+- **Unbundled `tui` skill** to `.sandpiper/skills/tui/` (project-local only)
+- **Fixed `self-reflect.md`**: package-provided vs project-local skill ownership distinction
+- **Fixed `new-feature.md` / `refactor.md`**: removed hardcoded `bun check`
+- **Fixed `standup` / `projects` skills**: anonymized example paths
+
+### Test count
+- 311 tests, all passing (one flaky jj cleanup — TCL-110 filed), lint clean
+
+## In Progress
+- None.
 
 ## Next Session
 - **Phase 4 (TCL-89)**: Punted — generalize storage bootstrap when PKM/MEM actually need it
@@ -30,5 +56,8 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 - None.
 
 ## Context
-- Working copy has standup only; skill/AGENTS.md edits are committed
-- User pushes manually; do NOT push without asking
+- Working copy is clean (empty `@`)
+- `main` bookmark behind `main@origin` by all session commits (user pushes manually)
+- Tasks live on separate `tasks` branch in jj workspace at `.sandpiper/tasks/`
+- `tui` skill is now in `.sandpiper/skills/tui/` (project-local, not distributed)
+- `skills/` and `dist/skills/` are confirmed in sync for all distributed skills
