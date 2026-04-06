@@ -45,6 +45,7 @@ If any of these apply, create a new skill in `.sandpiper/skills/` (project-local
 - Update relevant **AGENTS.md** files if new conventions or routing guidance were established
 - Create or update focused **doc files** (`.sandpiper/docs/`, READMEs) for design decisions, investigations, or architectural context
 - Take a **content hygiene pass** on docs touched this session: check for duplicated information, stale references, terminology drift, and whether guidance still lives in the right layer
+- If another session is concurrently active in this project, re-read shared guidance files before editing (`AGENTS.md`, docs, skills) to avoid overwriting concurrent changes
 
 ## Phase 3: Loose Ends
 
@@ -55,7 +56,7 @@ Review work done this session for anything not yet captured:
 
 ## Phase 4: Standup
 
-If a session standup hasn't been written yet, write one now per the **standup** skill. If one was already written earlier in the session, update it to reflect any changes from this self-reflection pass.
+If a session standup hasn't been written yet, write one now per the **standup** skill using `sandpiper-standup write`. If one was already written earlier in the session, update it to reflect any changes from this self-reflection pass.
 
 ---
 
