@@ -19,7 +19,8 @@
   },
   "bin": {
     "sandpiper": "./dist/sandpiper",
-    "sandpiper-tasks": "./packages/sandpiper-tasks-cli/dist/sandpiper-tasks"
+    "sandpiper-tasks": "./packages/sandpiper-tasks-cli/dist/sandpiper-tasks",
+    "sandpiper-standup": "./packages/sandpiper-standup-cli/dist/sandpiper-standup"
   },
   "files": [
     "./dist"
@@ -98,6 +99,7 @@
     "chalk": "catalog:cli",
     "sandpiper-ai-cli": "workspace:*",
     "sandpiper-ai-core": "workspace:*",
+    "sandpiper-standup-cli": "workspace:*",
     "sandpiper-tasks-cli": "workspace:*",
     "supports-color": "catalog:cli"
   },

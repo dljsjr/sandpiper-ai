@@ -83,6 +83,7 @@ Read the relevant focused doc **before** working in these areas:
 | --- | --- | --- |
 | Agent guidance evolution | `.sandpiper/docs/agent-guidance-evolution.md` | Revising `AGENTS.md`, prompt templates, guidance docs, or planning deterministic guidance |
 | Build system & distribution | `.sandpiper/docs/build-system.md` | Modifying build scripts, `postinstall`, `package.json`, or dist assembly |
+| Concurrent sessions | `.sandpiper/docs/concurrent-sessions.md` | Working on standup CLI, PID file lifecycle, or multi-session concurrency |
 | Extension loading | `.sandpiper/docs/extension-loading.md` | Creating extensions, debugging imports, or reasoning about source-loaded extensions |
 | Pi API pitfalls | `.sandpiper/docs/pi-api-pitfalls.md` | Working with extension lifecycle hooks, `getFlag`, `pi.events`, or cross-extension behavior |
 | Environment variables | `.sandpiper/docs/env-vars.md` | Reading/writing env vars or adding config-path resolution |

@@ -1,3 +1,5 @@
+import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
 import * as core from 'sandpiper-ai-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSystemRuntimeState } from './runtime.js';
@@ -152,5 +154,123 @@ describe('startup hooks', () => {
 
     await onShutdown({}, {});
     expect(killAll).toHaveBeenCalled();
+  });
+});
+
+describe('PID file lifecycle', () => {
+  const testSessionsDir = join('/tmp', `test-sandpiper-sessions-${process.pid}`);
+  const savedEnv: Record<string, string | undefined> = {};
+
+  beforeEach(() => {
+    savedEnv.XDG_STATE_HOME = process.env.XDG_STATE_HOME;
+    process.env.XDG_STATE_HOME = testSessionsDir;
+    savedEnv.SANDPIPER_SESSION_ID = process.env.SANDPIPER_SESSION_ID;
+    savedEnv.SANDPIPER_SESSION_FILE = process.env.SANDPIPER_SESSION_FILE;
+
+    if (existsSync(testSessionsDir)) {
+      rmSync(testSessionsDir, { recursive: true, force: true });
+    }
+    mkdirSync(testSessionsDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    if (savedEnv.XDG_STATE_HOME === undefined) {
+      delete process.env.XDG_STATE_HOME;
+    } else {
+      process.env.XDG_STATE_HOME = savedEnv.XDG_STATE_HOME;
+    }
+    if (savedEnv.SANDPIPER_SESSION_ID === undefined) {
+      delete process.env.SANDPIPER_SESSION_ID;
+    } else {
+      process.env.SANDPIPER_SESSION_ID = savedEnv.SANDPIPER_SESSION_ID;
+    }
+    if (savedEnv.SANDPIPER_SESSION_FILE === undefined) {
+      delete process.env.SANDPIPER_SESSION_FILE;
+    } else {
+      process.env.SANDPIPER_SESSION_FILE = savedEnv.SANDPIPER_SESSION_FILE;
+    }
+    if (existsSync(testSessionsDir)) {
+      rmSync(testSessionsDir, { recursive: true, force: true });
+    }
+  });
+
+  it('should create PID file on session_start', async () => {
+    const state = createSystemRuntimeState();
+    const { pi, handlers } = createEventStub();
+    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
+
+    const onStart = handlers.get('session_start');
+    if (!onStart) {
+      throw new Error('session_start handler not registered');
+    }
+
+    const getSessionFile = vi.fn(() => '/tmp/session.jsonl');
+    const getEntries = vi.fn(() => []);
+    const getSessionId = vi.fn(() => 'test-session-123');
+    const sessionCtx = { sessionManager: { getSessionFile, getEntries, getSessionId }, cwd: '/test/cwd' };
+
+    await onStart({ reason: 'startup' }, sessionCtx);
+
+    const pidFilePath = join(testSessionsDir, 'sandpiper', 'sessions', 'test-session-123.pid');
+    expect(existsSync(pidFilePath)).toBe(true);
+
+    const content = readFileSync(pidFilePath, 'utf-8');
+    const lines = content.split('\n');
+    expect(lines[0]).toBe(process.pid.toString());
+    expect(lines[1]).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+    expect(lines[2]).toBe('/test/cwd');
+  });
+
+  it('should remove PID file on session_shutdown', async () => {
+    const state = createSystemRuntimeState();
+    const { pi, handlers } = createEventStub();
+    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
+
+    const onStart = handlers.get('session_start');
+    const onShutdown = handlers.get('session_shutdown');
+    if (!onStart || !onShutdown) {
+      throw new Error('session handlers not registered');
+    }
+
+    const getSessionFile = vi.fn(() => '/tmp/session.jsonl');
+    const getEntries = vi.fn(() => []);
+    const getSessionId = vi.fn(() => 'test-session-456');
+    const sessionCtx = { sessionManager: { getSessionFile, getEntries, getSessionId }, cwd: '/test/cwd' };
+
+    await onStart({ reason: 'startup' }, sessionCtx);
+
+    const pidFilePath = join(testSessionsDir, 'sandpiper', 'sessions', 'test-session-456.pid');
+    expect(existsSync(pidFilePath)).toBe(true);
+
+    await onShutdown({}, sessionCtx);
+
+    expect(existsSync(pidFilePath)).toBe(false);
+  });
+
+  it('should handle session_switch by removing old PID file and creating new one', async () => {
+    const state = createSystemRuntimeState();
+    const { pi, handlers } = createEventStub();
+    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
+
+    const onStart = handlers.get('session_start');
+    if (!onStart) {
+      throw new Error('session_start handler not registered');
+    }
+
+    const getSessionFile = vi.fn(() => '/tmp/session.jsonl');
+    const getEntries = vi.fn(() => []);
+    const getSessionId = vi.fn().mockReturnValueOnce('old-session').mockReturnValueOnce('new-session');
+    const sessionCtx = { sessionManager: { getSessionFile, getEntries, getSessionId }, cwd: '/test/cwd' };
+
+    await onStart({ reason: 'startup' }, sessionCtx);
+
+    const oldPidPath = join(testSessionsDir, 'sandpiper', 'sessions', 'old-session.pid');
+    expect(existsSync(oldPidPath)).toBe(true);
+
+    await onStart({ reason: 'startup' }, sessionCtx);
+
+    expect(existsSync(oldPidPath)).toBe(false);
+    const newPidPath = join(testSessionsDir, 'sandpiper', 'sessions', 'new-session.pid');
+    expect(existsSync(newPidPath)).toBe(true);
   });
 });
