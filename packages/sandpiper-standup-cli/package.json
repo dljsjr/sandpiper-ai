@@ -1,0 +1,20 @@
+{
+  "name": "sandpiper-standup-cli",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "CLI for concurrent session stand-up management with PID-based liveness detection",
+  "bin": {
+    "sandpiper-standup": "./dist/sandpiper-standup"
+  },
+  "dependencies": {
+    "@commander-js/extra-typings": "catalog:cli",
+    "commander": "catalog:cli",
+    "sandpiper-ai-core": "workspace:*"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "mkdir -p dist && tsc --noEmit && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-standup",
+    "preinstall": "mkdir -p dist && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-standup"
+  }
+}
