@@ -1,5 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import {
   buildSandpiperSystemPrompt,
@@ -11,18 +12,51 @@ import {
   formatProjectTriggersForPrompt,
   formatStandupContext,
   formatWorkingCopySummaryForPrompt,
+  getPidFilePath,
   type ProcessManager,
   shouldTreatInitialLoadAsColdStart,
 } from 'sandpiper-ai-core';
 import type { SystemRuntimeState } from './runtime.js';
 
+function writePidFile(sessionId: string, cwd: string): void {
+  const pidFilePath = getPidFilePath(sessionId);
+  mkdirSync(dirname(pidFilePath), { recursive: true });
+
+  const content = [process.pid.toString(), new Date().toISOString(), cwd].join('\n');
+
+  writeFileSync(pidFilePath, content, 'utf-8');
+}
+
+function removePidFile(sessionId: string): void {
+  const pidFilePath = getPidFilePath(sessionId);
+  if (existsSync(pidFilePath)) {
+    rmSync(pidFilePath);
+  }
+}
+
 function readStandupContent(cwd: string): string {
   const standupPath = join(cwd, '.sandpiper', 'standup.md');
   if (!existsSync(standupPath)) return '';
+
+  // Try to use the standup CLI for cleaned output
   try {
-    return readFileSync(standupPath, 'utf-8');
+    const output = execFileSync('sandpiper-standup', ['read', '-d', cwd], {
+      encoding: 'utf-8',
+      env: { ...process.env },
+    });
+    // If CLI returns only the header with no sections, fall back to direct read
+    // This handles the case where CLI succeeds but produces empty output (e.g., legacy migration issue)
+    if (output.trim() === '# Session Stand-Up') {
+      return readFileSync(standupPath, 'utf-8');
+    }
+    return output;
   } catch {
-    return '';
+    // Fallback to direct file read if CLI is not available
+    try {
+      return readFileSync(standupPath, 'utf-8');
+    } catch {
+      return '';
+    }
   }
 }
 
@@ -54,6 +88,8 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, state: SystemRuntim
   });
 }
 
+let currentSessionId: string | undefined;
+
 export function registerSessionContinuityHooks(pi: ExtensionAPI, state: SystemRuntimeState): void {
   pi.on('session_start', async (event, ctx) => {
     state.startupContextPending = true;
@@ -79,10 +115,28 @@ export function registerSessionContinuityHooks(pi: ExtensionAPI, state: SystemRu
         break;
     }
 
-    process.env.SANDPIPER_SESSION_ID = ctx.sessionManager.getSessionId();
+    const sessionId = ctx.sessionManager.getSessionId();
+    process.env.SANDPIPER_SESSION_ID = sessionId;
+
+    // Remove old PID file if switching sessions
+    if (currentSessionId && currentSessionId !== sessionId) {
+      removePidFile(currentSessionId);
+    }
+
+    // Write new PID file
+    writePidFile(sessionId, ctx.cwd);
+    currentSessionId = sessionId;
+
     const sessionFile = ctx.sessionManager.getSessionFile();
     if (sessionFile) {
       process.env.SANDPIPER_SESSION_FILE = sessionFile;
+    }
+  });
+
+  pi.on('session_shutdown', async () => {
+    if (currentSessionId) {
+      removePidFile(currentSessionId);
+      currentSessionId = undefined;
     }
   });
 }
