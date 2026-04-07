@@ -68,16 +68,9 @@ process.env.PI_CODING_AGENT_VERSION = piVersion;
 // own requirements, so they must not be overwritten by mirroring:
 process.env.PI_PACKAGE_DIR = overridesPackageDir;
 process.env.PI_SKIP_VERSION_CHECK = '1'; // sandpiper has its own update check
+console.log(`using pi-coding-agent version: ${piVersion}\n`);
 
-// Consume --show-pi-version before passing args to pi so it doesn't
-// see an unknown flag. Either the flag or the env var enables the print.
-const rawArgs = process.argv.slice(2);
-const showPiVersion = process.env.SANDPIPER_SHOW_PI_VERSION === '1' || rawArgs.includes('--show-pi-version');
-const piArgs = rawArgs.filter((a) => a !== '--show-pi-version');
-
-if (showPiVersion) {
-  console.log(`using pi-coding-agent version: ${piVersion}\n`);
-}
+const piArgs = process.argv.slice(2);
 
 // ── Env var mirroring ──
 // Mirror PI_* ↔ SANDPIPER_* so that:
