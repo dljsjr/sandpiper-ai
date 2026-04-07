@@ -8,6 +8,7 @@
         "chalk": "catalog:cli",
         "sandpiper-ai-cli": "workspace:*",
         "sandpiper-ai-core": "workspace:*",
+        "sandpiper-standup-cli": "workspace:*",
         "sandpiper-tasks-cli": "workspace:*",
         "supports-color": "catalog:cli",
       },
@@ -85,6 +86,18 @@
     "packages/core": {
       "name": "sandpiper-ai-core",
       "version": "0.0.1",
+    },
+    "packages/sandpiper-standup-cli": {
+      "name": "sandpiper-standup-cli",
+      "version": "0.0.1",
+      "bin": {
+        "sandpiper-standup": "./dist/sandpiper-standup",
+      },
+      "dependencies": {
+        "@commander-js/extra-typings": "catalog:cli",
+        "commander": "catalog:cli",
+        "sandpiper-ai-core": "workspace:*",
+      },
     },
     "packages/sandpiper-tasks-cli": {
       "name": "sandpiper-tasks-cli",
@@ -1074,6 +1087,8 @@
     "sandpiper-ai-core": ["sandpiper-ai-core@workspace:packages/core"],
 
     "sandpiper-ai-devtools": ["sandpiper-ai-devtools@workspace:devtools"],
+
+    "sandpiper-standup-cli": ["sandpiper-standup-cli@workspace:packages/sandpiper-standup-cli"],
 
     "sandpiper-tasks-cli": ["sandpiper-tasks-cli@workspace:packages/sandpiper-tasks-cli"],
 

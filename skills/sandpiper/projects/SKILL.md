@@ -82,9 +82,11 @@ cat ~/.sandpiper/agent/projects.toon
 
 At the start of a session, after reading the current project's stand-up:
 
+Resolve `../standup/scripts/sandpiper-standup` against this skill directory before running it.
+
 1. Read `~/.sandpiper/agent/projects.toon`
 2. Check if the current working directory is in the registry — if not, offer to add it
-3. For each **active** project, optionally run `sandpiper-standup read -d <project-path>` for cross-project context
+3. For each **active** project, optionally run `../standup/scripts/sandpiper-standup read -d <project-path>` for cross-project context
 4. Mention any relevant cross-project information (e.g., "the other project has a blocker that might affect this one")
 
 Don't read every project's stand-up every time — that would be noisy. Only scan other projects when:

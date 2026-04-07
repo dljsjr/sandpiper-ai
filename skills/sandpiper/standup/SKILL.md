@@ -34,7 +34,7 @@ The stand-up is written for the **next session's agent** — a fresh context win
 .sandpiper/standup.md
 ```
 
-Treat `sandpiper-standup` as the canonical interface for this file. Do not parse or rewrite the markdown structure manually.
+Treat the bundled CLI at `scripts/sandpiper-standup` as the canonical interface for this file. **Resolve this path against the skill directory to get the absolute path before running commands.** Do not parse or rewrite the markdown structure manually.
 
 ## CLI Workflow
 
@@ -43,7 +43,7 @@ Treat `sandpiper-standup` as the canonical interface for this file. Do not parse
 Use:
 
 ```bash
-sandpiper-standup read
+scripts/sandpiper-standup read
 ```
 
 This command:
@@ -56,7 +56,7 @@ This command:
 Use:
 
 ```bash
-sandpiper-standup write <<'EOF'
+scripts/sandpiper-standup write <<'EOF'
 ### Accomplished
 - ...
 
@@ -81,7 +81,7 @@ EOF
 Use:
 
 ```bash
-sandpiper-standup cleanup
+scripts/sandpiper-standup cleanup
 ```
 
 This removes dead sections and orphaned PID files.
@@ -114,7 +114,7 @@ If you're about to consume lots of context (large reads, long outputs), checkpoi
 At the start of every session:
 
 ```bash
-sandpiper-standup read
+scripts/sandpiper-standup read
 ```
 
 Use output to:
@@ -132,7 +132,7 @@ Also read after `/resume`, or when asked:
 
 ## Session Matching
 
-Session matching / update-vs-create behavior is handled by `sandpiper-standup` using `SANDPIPER_SESSION_ID`. Do not implement your own same-session detection logic in prompts or ad-hoc scripts.
+Session matching / update-vs-create behavior is handled by `scripts/sandpiper-standup` using `SANDPIPER_SESSION_ID`. Do not implement your own same-session detection logic in prompts or ad-hoc scripts.
 
 ## Writing Guidelines
 

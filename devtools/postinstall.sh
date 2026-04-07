@@ -14,6 +14,7 @@ DIST_DIR="${REPO_ROOT}/dist"
 # Remove them first; they'll be recreated at the end of this script.
 
 rm -f "${REPO_ROOT}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+rm -f "${REPO_ROOT}/skills/sandpiper/standup/scripts/sandpiper-standup"
 rm -f "${REPO_ROOT}/skills/sandpiper/dash/scripts/dash"
 
 # ─── Package workspace distributions ───────────────────────────────
@@ -32,6 +33,7 @@ find . \( -name 'dist' -type d -not -path '*/node_modules/*' -not -path './dist'
 
 rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" -ahH "${REPO_ROOT}/packages/cli/dist/" "${DIST_DIR}/"
 ln -sf "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${DIST_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+ln -sf "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${DIST_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
 
 # Copy extension package.json files back (excluded by rsync but needed
 # by pi's package discovery to find extension entry points)
@@ -127,6 +129,7 @@ fi
 
 echo "⚙ Creating dev-mode symlinks for skill binaries"
 ln -sf "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${REPO_ROOT}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+ln -sf "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${REPO_ROOT}/skills/sandpiper/standup/scripts/sandpiper-standup"
 if [ -f "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" ]; then
     ln -sf "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" "${REPO_ROOT}/skills/sandpiper/dash/scripts/dash"
 fi
