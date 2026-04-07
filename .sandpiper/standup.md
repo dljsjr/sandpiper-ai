@@ -1,6 +1,9 @@
 # Session Stand-Up
 
-Updated: 2026-04-03T15:00:00Z
+## Session unknown (Updated: 2026-04-03T15:00:00Z)
+
+Session file: 
+
 Session: c82731d3-f981-423f-98c4-521ed9862da2
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-01T18-12-48-013Z_c82731d3-f981-423f-98c4-521ed9862da2.jsonl
 
@@ -61,3 +64,30 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 - Tasks live on separate `tasks` branch in jj workspace at `.sandpiper/tasks/`
 - `tui` skill is now in `.sandpiper/skills/tui/` (project-local, not distributed)
 - `skills/` and `dist/skills/` are confirmed in sync for all distributed skills
+
+## Session 3c4a6e69-2e7d-46ea-804a-204e9f82bfa9 (Updated: 2026-04-07T04:28:03.205Z)
+
+Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-06T04-30-09-464Z_3c4a6e69-2e7d-46ea-804a-204e9f82bfa9.jsonl
+
+### Accomplished
+- Completed standup concurrency fix (all 4 phases + 3 review rounds)
+- Implemented sandpiper-standup CLI with PID-based liveness detection
+- Extension creates/removes PID files on session lifecycle events
+- Prompts/skills updated to use CLI instead of direct file reads
+- Design doc: .sandpiper/docs/concurrent-sessions.md
+- 6 clean commits merged to main
+- Cleaned up stray empty commits from history
+
+### In Progress
+- None
+
+### Next Session
+- Awaiting user direction — 4 inbox items remaining or fresh work
+
+### Blockers
+- None
+
+### Context
+- Working copy is clean (empty @)
+- standup-concurrency-fix bookmark merged to main
+- All review inbox files deleted
