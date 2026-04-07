@@ -1,0 +1,12 @@
+{
+  "name": "autotoon",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Auto-Tune for your tokens 🎤 — automatically pitch-corrects JSON to TOON format",
+  "pi": {
+    "extensions": [
+      "./autotoon.ts"
+    ]
+  }
+}

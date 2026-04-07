@@ -43,7 +43,7 @@ Read the relevant focused doc **before** working in these areas:
 | Pi extension development | `docs/dev/pi-dev-suite/` | Creating extensions, debugging imports, working with lifecycle hooks, `getFlag`, `pi.events`, or cross-extension behavior |
 | Environment variables | `docs/dev/env-vars.md` | Reading/writing env vars or adding config-path resolution |
 | CLI development | `docs/dev/cli-development.md` | Building command-line tools with Commander or changing bundled bins |
-| AutoTOON | `docs/features/autotoon.md` | Working on JSON→TOON conversion, capability guidance registry, or token optimization |
+| AutoTOON | `.sandpiper/docs/autotoon-extension.md` | Working on JSON→TOON conversion, the autotoon extension, or token optimization |
 | Task storage & VCS churn | `docs/features/tasks/storage-guide.md` | Changing task storage topology, `.sandpiper-tasks.json`, `tasks.version_control` config, `storage init/migrate/sync/push/pull` commands, or task index persistence |
 
 ## TypeScript & Architecture

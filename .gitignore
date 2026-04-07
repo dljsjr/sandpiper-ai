@@ -48,3 +48,4 @@ pi-session*.html
 !.sandpiper
 
 .sandpiper/tasks/
+.sandpiper/jj-workspaces/
