@@ -55,6 +55,7 @@ export const readCommand = new Command('read')
         output.push(`Session file: ${section.sessionFile}`);
         output.push('');
         output.push(section.body);
+        output.push('');
       }
     }
 
@@ -66,6 +67,7 @@ export const readCommand = new Command('read')
         output.push(`Session file: ${section.sessionFile}`);
         output.push('');
         output.push(section.body);
+        output.push('');
       }
     }
 
