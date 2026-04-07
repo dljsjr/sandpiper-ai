@@ -41,6 +41,7 @@ bun install
   → postinstall.sh:
       → rsync sources into dist/
       → copy workspace dist/ outputs
+      → wire skill-bundled CLIs (tasks, standup)
       → copy extension package.json files
       → generate dist/package.json
       → symlink pi internal assets

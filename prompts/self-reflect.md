@@ -56,7 +56,7 @@ Review work done this session for anything not yet captured:
 
 ## Phase 4: Standup
 
-If a session standup hasn't been written yet, write one now per the **standup** skill using `sandpiper-standup write`. If one was already written earlier in the session, update it to reflect any changes from this self-reflection pass.
+If a session standup hasn't been written yet, write one now per the **standup** skill's CLI workflow. If one was already written earlier in the session, update it to reflect any changes from this self-reflection pass.
 
 ---
 
