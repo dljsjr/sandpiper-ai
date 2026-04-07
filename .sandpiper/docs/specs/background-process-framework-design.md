@@ -1,5 +1,44 @@
 # Background Process Framework — Design Sketch
 
+**Status**: ✅ **IMPLEMENTED** (Core) + ⚠️ **PARTIAL** (Notifications, Buffer Limits)  
+**Implementation**: `packages/core/src/process-manager.ts`, `extensions/system/background-process-tools.ts`  
+**Last verified**: 2026-04-16  
+
+---
+
+## Implementation Status
+
+### ✅ Implemented
+
+- `ProcessManager` class in `sandpiper-ai-core` (framework-independent)
+- `ManagedProcess` with lifecycle control, output buffering, event callbacks
+- `spawn()`, `get()`, `kill()`, `killAll()`, `list()` methods
+- `onStdout()`, `onStderr()`, `onExit()` callbacks for stream consumers
+- `readStdout()`, `readStderr()` with `tail` and `clear` options
+- `getCompletedUnacknowledged()` and `acknowledge()` for notification deduplication
+- `start_background_process` tool (agent-facing)
+- `check_background_process` tool with `include_stdout`, `include_stderr`, `tail_lines`, `clear_buffer` parameters
+- `write()` method for stdin input (implemented but not exposed via tool)
+
+### ⚠️ Partial / Not Implemented
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Passive completion notifications via `context` event | ❌ Not implemented | Design specifies automatic injection when process exits. Not wired up. |
+| Buffer size limits | ❌ Not implemented | Buffers are unbounded. No ring buffer or max size. |
+| Process restart | ❌ Not implemented | No auto-restart logic. Consumer responsibility. |
+| Multiple consumers / broadcast | ⚠️ Partial | Multiple handlers supported via `onStdout()`, but no broadcast mechanism for tool consumers. |
+| PTY support | ❌ Not implemented | Uses standard `child_process.spawn()` with pipes. PTY discussed but punted. |
+
+### 🔍 Needs Verification
+
+- Session teardown (`killAll()` on `session_shutdown`) — verify registration in `system.ts`
+- `context` event handler for completion notifications — may be implemented but not found in initial review
+
+---
+
+# Background Process Framework — Design Sketch
+
 AGENT-15. Framework-independent process manager in `sandpiper-ai-core`,
 exposed to the agent via tool calls registered in `system.ts`.
 

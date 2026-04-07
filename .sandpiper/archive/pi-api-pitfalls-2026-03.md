@@ -1,3 +1,31 @@
+# Pi Extension API Pitfalls (ARCHIVED)
+
+**Original location**: `.sandpiper/docs/pi-api-pitfalls.md`  
+**Archived**: 2026-04-16  
+**Reason**: Content consolidated into Pi Developer Documentation Suite
+
+---
+
+## Where to Find This Content Now
+
+All content from this document has been incorporated into:
+
+**`.sandpiper/docs/pi-dev-suite/PI-DEV-PATTERNS.md`** — Section: "Code Organization Patterns" and "Anti-Patterns to Avoid"
+
+Specific topics:
+- Module-level state boundaries → `PI-DEV-PATTERNS.md` "Module State Anti-Pattern"
+- `pi.events` listener accumulation → `PI-DEV-PATTERNS.md` "Event Listener Accumulation on /reload"
+- `instanceof` across jiti boundaries → `PI-DEV-PATTERNS.md` "Anti-Patterns: Assuming UI Exists" (duck typing pattern)
+- Cross-package TypeScript imports → `PI-DEV-ARCHITECTURE.md` "Extension Loading" section
+- `getFlag()` bare names → `PI-DEV-PATTERNS.md` "Pi API Pitfalls" section
+- `session_start` for early-exit flags → `PI-DEV-EVENTS.md` "Session Lifecycle Events"
+
+---
+
+## Original Document (Preserved Below)
+
+*This document is preserved for historical reference. Do not update — make changes to the living docs instead.*
+
 # Pi Extension API Pitfalls
 
 Read when: working on extension lifecycle hooks, flags, cross-extension communication, shared state, or cross-package imports used by extensions.

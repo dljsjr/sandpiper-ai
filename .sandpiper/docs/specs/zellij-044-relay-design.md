@@ -1,5 +1,35 @@
 # Zellij 0.44 Shell Relay Design Notes
 
+**Status**: ✅ **MOSTLY IMPLEMENTED** (Core features done, subscribe not wired)  
+**Implementation**: `extensions/shell-relay/`  
+**Last verified**: 2026-04-16  
+**Related tasks**: SHR-75 through SHR-79  
+
+---
+
+## Implementation Status
+
+See detailed status table at end of this document.
+
+### ✅ Implemented
+
+- Ghost client eliminated — `--pane-id` targeting works without attached client
+- `paste` + `send-keys` pattern replaces `write-chars`
+- `list-panes --json` replaces `waitForPane` polling
+- Attach-then-detach for viewport sizing (`createSessionWithDetach()`)
+- `dump-screen --full` with snapshot-diff output capture
+- Signal FIFO for `prompt_ready` events
+
+### ❌ Not Implemented
+
+- Subscribe for liveness/heartbeat (mentioned as future use, not critical)
+- Pane colors for status indication (nice-to-have)
+- Borderless pinned overlays (future enhancement)
+
+---
+
+# Zellij 0.44 Shell Relay Design Notes
+
 Research notes from the Zellij 0.44 CLI recipes and programmatic control docs.
 Reference for SHR-75 through SHR-79.
 
@@ -202,3 +232,20 @@ pane." Our relay already serializes commands per-pane, so this is fine.
 - Programmatic Control: https://zellij.dev/documentation/programmatic-control.html
 - Subscribe: https://zellij.dev/documentation/zellij-subscribe.html
 - CLI Actions: https://zellij.dev/documentation/cli-actions.html
+
+---
+
+## Implementation Status Summary
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Ghost client elimination | ✅ | No ghost-attach required |
+| `paste` + `send-keys` | ✅ | Replaces `write-chars` |
+| `--pane-id` targeting | ✅ | All actions use pane-level targeting |
+| `list-panes --json` | ✅ | Replaces dump-screen polling |
+| Attach-then-detach | ✅ | `createSessionWithDetach()` implemented |
+| `dump-screen --full` | ✅ | Used in snapshot-diff |
+| Snapshot-diff output capture | ✅ | `snapshot-diff.ts` implements |
+| Subscribe for monitoring | ❌ | Not wired up (future enhancement) |
+| Pane colors | ❌ | Not implemented (nice-to-have) |
+
