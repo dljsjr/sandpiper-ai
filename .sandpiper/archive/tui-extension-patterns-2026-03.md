@@ -1,3 +1,33 @@
+# TUI Extension Patterns (ARCHIVED)
+
+**Original location**: `.sandpiper/docs/tui-extension-patterns.md`  
+**Archived**: 2026-04-16  
+**Reason**: Content consolidated into Pi Developer Documentation Suite
+
+---
+
+## Where to Find This Content Now
+
+All content from this document has been incorporated into:
+
+**`.sandpiper/docs/pi-dev-suite/PI-DEV-UI.md`** — Custom UI (TUI) Developer Guide
+
+Specific topics:
+- Three ways to show content (notify, setWidget, messageRenderer) → `PI-DEV-UI.md` "Three Ways to Show Content"
+- Direct chat container injection → `PI-DEV-UI.md` "Pattern: Direct Chat Container Injection"
+- Component lifecycle (render, invalidate, caching) → `PI-DEV-UI.md` "Caching Pattern"
+- Theme integration → `PI-DEV-UI.md` "Theme Integration Pattern"
+- Event listener accumulation → `PI-DEV-PATTERNS.md` "Event Listener Accumulation on /reload"
+- DynamicBorder, Text, Container usage → `PI-DEV-UI.md` "Key Components"
+- Widget placement (above/below editor) → `PI-DEV-UI.md` "ctx.ui.setWidget()"
+- Custom message renderers → `PI-DEV-UI.md` "pi.registerMessageRenderer() + pi.sendMessage()"
+
+---
+
+## Original Document (Preserved Below)
+
+*This document is preserved for historical reference. Do not update — make changes to the living docs instead.*
+
 # TUI Extension Patterns
 
 Practical reference for building TUI components in sandpiper extensions. Based on

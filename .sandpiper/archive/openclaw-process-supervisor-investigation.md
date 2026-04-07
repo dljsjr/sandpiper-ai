@@ -1,5 +1,75 @@
 # OpenClaw Process/Supervisor Investigation
 
+**Status**: 📚 **RESEARCH NOTES** (PTY adapter punted, background framework implemented without PTY)  
+**Date**: 2026-03-26  
+**Related**: SHR-70 (spike), SHR-71 (PTY MVP - WONTFIX 2026-03-31), AGENT-15 (background framework - COMPLETE/DONE 2026-03-27)  
+**Last verified**: 2026-04-16  
+
+---
+
+## Summary
+
+This is a research document evaluating whether to vendor OpenClaw's process supervisor. The decision was to write our own lean library.
+
+**What was implemented**:
+- ✅ **AGENT-15** (background framework): Implemented 2026-03-27 using `child_process.spawn()` - **no PTY**
+- ❌ **SHR-71** (PTY adapter): Marked WONTFIX 2026-03-31 - punted
+
+**Result**: The background process framework (`packages/core/src/process-manager.ts`) was built **without PTY support** because standard `child_process.spawn()` was sufficient for background builds, test watchers, and similar tasks. The PTY adapter (which would have replaced `unbuffer-relay` and provided color output) was deemed unnecessary.
+
+**See**: 
+- [Background Process Framework Design](./background-process-framework-design.md) - the implemented approach
+- `packages/core/src/process-manager.ts` - current implementation using `child_process.spawn()`
+
+---
+
+## Implementation Status
+
+| Recommendation | Status | Notes |
+|----------------|--------|-------|
+| Use `@lydell/node-pty` as PTY backend | ❌ WONTFIX (2026-03-31) | SHR-71 marked COMPLETE/WONTFIX |
+| Write our own lean adapter (not vendor) | ✅ Decision made | But implementation punted |
+| Create `packages/process-supervisor/` | ❌ Not started | No such package exists |
+| Implement adapter pattern (child + pty modes) | ❌ Not started | Only `child` mode implemented |
+| Add timeout enforcement + graceful kill-tree | ⚠️ Partial | Basic lifecycle in `ProcessManager`, no timeouts |
+| Build pi extension tool for background processes | ✅ Implemented | `start_background_process`, `check_background_process` |
+| Retire `unbuffer-relay` (Tcl/Expect script) | ❌ Not done | Still in use |
+
+---
+
+## Timeline
+
+| Date | Event |
+|------|-------|
+| 2026-03-26 | OpenClaw investigation completed, recommends PTY adapter + background framework |
+| 2026-03-27 | AGENT-15 marked COMPLETE/DONE - background framework implemented with `child_process.spawn()` |
+| 2026-03-31 | SHR-71 marked COMPLETE/WONTFIX - PTY adapter explicitly punted |
+
+---
+
+
+**See**: [Background Process Framework Design](./background-process-framework-design.md) for the implemented approach.
+
+---
+
+## Implementation Status
+
+| Recommendation | Status | Notes |
+|----------------|--------|-------|
+| Use `@lydell/node-pty` as PTY backend | ⚠️ WONTFIX | SHR-71 marked COMPLETE/WONTFIX |
+| Write our own lean adapter (not vendor) | ✅ Decision made | But implementation punted |
+| Create `packages/process-supervisor/` | ❌ Not started | No such package exists |
+| Implement adapter pattern (child + pty modes) | ❌ Not started | — |
+| Add timeout enforcement + graceful kill-tree | ❌ Not started | — |
+| Build pi extension tool for background processes | ❌ Not started | — |
+| Retire `unbuffer-relay` (Tcl/Expect script) | ❌ Not done | Still in use |
+
+**Key insight**: The background process framework was implemented **without PTY support**. It uses standard `child_process.spawn()` which is sufficient for most background tasks but doesn't solve the color output / interactive shell problem that PTY would address.
+
+---
+
+# OpenClaw Process/Supervisor Investigation
+
 **Date:** 2026-03-26
 **Context:** SHR-70 — Spike: replace unbuffer-relay with proper PTY allocation approach
 **Repo:** [openclaw/openclaw](https://github.com/openclaw/openclaw) (MIT license)

@@ -146,3 +146,20 @@ Extension core logic in framework-independent TypeScript modules. Pi extension e
 - Version serialized formats from day one
 - Include migrations where serialized data may evolve
 - Prefer formats that are both human-readable and machine-parseable when practical
+
+## User-Facing Documentation
+
+For user-facing feature documentation, see the `docs/` directory:
+
+| Audience | Location |
+|----------|----------|
+| **Users** (features, guides) | `docs/` — [`docs/README.md`](docs/README.md) |
+| **Extension developers** | `.sandpiper/docs/pi-dev-suite/` |
+| **Maintainers** (architecture, design) | `.sandpiper/docs/` |
+
+**Current features documented**:
+- [AutoTOON](docs/features/autotoon.md) — Automatic JSON→TOON conversion
+- [Shell Relay](docs/features/shell-relay.md) — Shared terminal sessions (coming soon)
+- [Task Management](docs/features/tasks.md) — Project task tracking (coming soon)
+- [Session Standup](docs/features/standup.md) — Cross-session continuity (coming soon)
+

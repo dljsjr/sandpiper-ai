@@ -1,5 +1,27 @@
 # Web Fetch Tool — PRD
 
+**Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ⏸️ **Deferred**: WEB-9–13 (NOT STARTED)  
+**Date**: 2026-03-26  
+**Implementation**: `extensions/web-fetch/`  
+**Last verified**: 2026-04-16  
+
+---
+
+## Implementation Status
+
+| Feature | Status | Ticket |
+|---------|--------|--------|
+| Fetch single URL + return markdown | ✅ Complete | WEB-1 |
+| Extract page links (followLinks) | ✅ Complete | WEB-1 |
+| CSS selector targeting | ❌ Not started | WEB-9 |
+| JS rendering adapter (lightpanda/Playwright) | ❌ Not started | WEB-10 |
+| Single-query web search | ❌ Not started | WEB-11 |
+| Site crawling with robots.txt | ❌ Not started | WEB-12 |
+| Browser automation | ❌ Not started | WEB-13 |
+
+---
+
+
 **Date:** 2026-03-26
 **Ticket:** WEB-1
 **Status:** Design complete, implementation not started
