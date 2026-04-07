@@ -68,7 +68,9 @@ process.env.PI_CODING_AGENT_VERSION = piVersion;
 // own requirements, so they must not be overwritten by mirroring:
 process.env.PI_PACKAGE_DIR = overridesPackageDir;
 process.env.PI_SKIP_VERSION_CHECK = '1'; // sandpiper has its own update check
-console.log(`using pi-coding-agent version: ${piVersion}\n`);
+if (process.env.SANDPIPER_SHOW_PI_VERSION === '1') {
+  console.log(`using pi-coding-agent version: ${piVersion}\n`);
+}
 
 // ── Env var mirroring ──
 // Mirror PI_* ↔ SANDPIPER_* so that:
