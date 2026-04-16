@@ -2,28 +2,19 @@
 
 process.title = 'sandpiper';
 
-import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { realpath } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { main } from '@mariozechner/pi-coding-agent';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
+const upstreamPiDistDir: string = await realpath(
+  dirname(fileURLToPath(import.meta.resolve('@mariozechner/pi-coding-agent'))),
+);
 
-// Locate the system pi binary dynamically via PATH.
-// Always resolves the user's globally installed pi — not the workspace dependency.
-let systemPiDistDir: string;
-
-try {
-  const piBin = execSync('which pi', { encoding: 'utf-8' }).trim();
-  systemPiDistDir = dirname(await realpath(piBin));
-} catch {
-  console.error('Error: Could not find pi binary. Install pi globally first.');
-  process.exit(1);
-}
-
-const systemPiPackageDir = dirname(systemPiDistDir);
-const piPkgJson = JSON.parse(readFileSync(join(systemPiPackageDir, 'package.json'), 'utf-8'));
+const upstreamPiPackageDir = dirname(upstreamPiDistDir);
+const piPkgJson = JSON.parse(readFileSync(join(upstreamPiPackageDir, 'package.json'), 'utf-8'));
 const piVersion = piPkgJson.version;
 
 // Find the package directory that pi should use as its root.
@@ -60,7 +51,7 @@ const overridesPackageDir = findPackageDir(scriptDir);
 //
 // Sandpiper internals — capture pi package info for self-improvement
 // prompting (extension authoring, doc exploration, etc.):
-process.env.PI_CODING_AGENT_PACKAGE = systemPiPackageDir;
+process.env.PI_CODING_AGENT_PACKAGE = upstreamPiPackageDir;
 process.env.PI_CODING_AGENT_VERSION = piVersion;
 //
 // Pi behavior controls — set by sandpiper to configure the pi runtime.
@@ -104,4 +95,4 @@ for (const [key, val] of Object.entries(process.env)) {
   process.env[piKey] = val;
 }
 
-(await import(join(systemPiDistDir, 'main.js'))).main(piArgs);
+await main(piArgs);

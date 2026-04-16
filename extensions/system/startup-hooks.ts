@@ -3,7 +3,6 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { dirname, join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import {
-  buildSandpiperSystemPrompt,
   collectActiveTaskContext,
   collectProjectTriggers,
   collectWorkingCopySummary,
@@ -16,6 +15,7 @@ import {
   type ProcessManager,
   shouldTreatInitialLoadAsColdStart,
 } from 'sandpiper-ai-core';
+import { buildSandpiperSystemPrompt } from '../../packages/core/src/system-prompt.js';
 import type { SystemRuntimeState } from './runtime.js';
 
 function writePidFile(sessionId: string, cwd: string): void {
@@ -60,8 +60,17 @@ function readStandupContent(cwd: string): string {
   }
 }
 
-export function registerStartupPromptHooks(pi: ExtensionAPI, state: SystemRuntimeState): void {
+export function registerStartupPromptHooks(
+  pi: ExtensionAPI,
+  state: SystemRuntimeState,
+  dumpSystemPrompt?: boolean,
+): void {
   pi.on('before_agent_start', async (event, ctx) => {
+    // If the user has specified a custom prompt, we don't want to modify the system prompt at all.
+    if (event.systemPromptOptions.customPrompt) {
+      return;
+    }
+
     const projectTriggers = formatProjectTriggersForPrompt(collectProjectTriggers(ctx.cwd));
     const activeTaskContext = state.startupContextPending
       ? formatActiveTaskContextForPrompt(collectActiveTaskContext(ctx.cwd))
@@ -74,8 +83,9 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, state: SystemRuntim
     state.startupContextPending = false;
     state.coldStartGuidancePending = false;
 
-    return {
-      systemPrompt: buildSandpiperSystemPrompt(event.systemPrompt, {
+    const effectiveSystemPrompt = await buildSandpiperSystemPrompt(
+      {
+        cwd: ctx.cwd,
         piCodingAgentPackage: process.env.PI_CODING_AGENT_PACKAGE,
         piCodingAgentVersion: process.env.PI_CODING_AGENT_VERSION,
         projectTriggers,
@@ -83,7 +93,16 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, state: SystemRuntim
         workingCopyContext,
         coldStartGuidance,
         standupContent: formatStandupContext(readStandupContent(ctx.cwd)),
-      }),
+      },
+      event.systemPromptOptions,
+    );
+    if (dumpSystemPrompt) {
+      // console.error('base prompt:\n', event.systemPrompt);
+      console.error('system prompt:\n', effectiveSystemPrompt);
+      ctx.shutdown();
+    }
+    return {
+      systemPrompt: effectiveSystemPrompt,
     };
   });
 }

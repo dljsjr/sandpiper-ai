@@ -10,10 +10,22 @@ import {
 } from './startup-hooks.js';
 import { createBackgroundContextProcessManagerStub, createEventStub } from './test-helpers.js';
 
+const mockBuildSandpiperSystemPrompt = vi.fn();
+vi.mock('../../packages/core/src/system-prompt.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../packages/core/src/system-prompt.js')>();
+  return {
+    ...actual,
+    buildSandpiperSystemPrompt: (...args: unknown[]) => mockBuildSandpiperSystemPrompt(...args),
+  };
+});
+
+import type { BuildSystemPromptOptions as PiSystemPromptOptions } from '@mariozechner/pi-coding-agent';
+
 describe('startup hooks', () => {
   beforeEach(() => {
-    vi.spyOn(core, 'buildSandpiperSystemPrompt').mockImplementation(
-      (_basePrompt: string, options: Parameters<typeof core.buildSandpiperSystemPrompt>[1]) => JSON.stringify(options),
+    mockBuildSandpiperSystemPrompt.mockImplementation(
+      async (options: Record<string, unknown>, _originalPromptOptions: PiSystemPromptOptions) =>
+        JSON.stringify(options),
     );
     vi.spyOn(core, 'collectProjectTriggers').mockReturnValue([]);
     vi.spyOn(core, 'collectActiveTaskContext').mockReturnValue(undefined);
@@ -44,7 +56,7 @@ describe('startup hooks', () => {
     }
 
     const result = (await handler(
-      { systemPrompt: 'base prompt' },
+      { systemPrompt: 'base prompt', systemPromptOptions: {} },
       {
         cwd: '/repo',
       },

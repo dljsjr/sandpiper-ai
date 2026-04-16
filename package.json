@@ -67,36 +67,51 @@
         "supports-color": "10.2.2"
       },
       "pi": {
-        "@mariozechner/pi-coding-agent": "0.65.0",
-        "@mariozechner/pi-tui": "0.65.0",
+        "@mariozechner/pi-coding-agent": "file:/Users/doug.stephen/git/pi-mono/packages/coding-agent",
+        "@mariozechner/pi-tui": "file:/Users/doug.stephen/git/pi-mono/packages/tui",
+        "@mariozechner/pi-agent-core": "file:/Users/doug.stephen/git/pi-mono/packages/agent",
+        "@mariozechner/pi-ai": "file:/Users/doug.stephen/git/pi-mono/packages/ai",
         "@silvia-odwyer/photon-node": "0.3.4",
-        "@sinclair/typebox": "0.34.48"
+        "@sinclair/typebox": "0.34.49"
       },
       "ts": {
-        "typescript": "6.0.2",
-        "@types/node": "*",
-        "@types/bun": "1.3.11"
+        "typescript": "6.0.3",
+        "@types/node": "25.6.0",
+        "@types/bun": "1.3.12"
       },
       "web": {
         "@mozilla/readability": "0.6.0",
-        "jsdom": "29.0.1",
-        "turndown": "7.2.2",
+        "jsdom": "29.0.2",
+        "turndown": "7.2.4",
         "@types/jsdom": "28.0.1",
         "@types/turndown": "5.0.6"
       },
       "testing": {
-        "vitest": "4.1.1"
+        "vitest": "4.1.4"
       },
       "tooling": {
         "@biomejs/biome": "2.4.6",
-        "ascii-motion-mcp": "file:../ascii-motion-mcp",
-        "mcporter": "0.7.3",
-        "canvas": "3.2.2"
+        "ascii-motion-mcp": "^2.1",
+        "mcporter": "0.9.0",
+        "canvas": "3.2.3"
+      },
+      "inference": {
+        "node-llama-cpp": "3.18.1"
+      },
+      "codec": {
+        "fast-xml-parser": "5.7.1"
       }
     }
   },
+  "overrides": {
+    "@mariozechner/pi-coding-agent": "catalog:pi",
+    "@mariozechner/pi-tui": "catalog:pi",
+    "@mariozechner/pi-agent-core": "catalog:pi",
+    "@mariozechner/pi-ai": "catalog:pi"
+  },
   "dependencies": {
     "chalk": "catalog:cli",
+    "fast-xml-parser": "catalog:codec",
     "sandpiper-ai-cli": "workspace:*",
     "sandpiper-ai-core": "workspace:*",
     "sandpiper-standup-cli": "workspace:*",
@@ -113,6 +128,7 @@
     "@types/node": "catalog:ts",
     "commander": "catalog:cli",
     "mcporter": "catalog:tooling",
+    "node-llama-cpp": "catalog:inference",
     "typescript": "catalog:ts",
     "vitest": "catalog:testing"
   },

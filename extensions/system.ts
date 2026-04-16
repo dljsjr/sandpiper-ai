@@ -13,10 +13,12 @@ import {
 const processManager = new ProcessManager();
 const runtimeState = createSystemRuntimeState();
 
+const DUMP_SYSTEM_PROMPT = process.env.SANDPIPER_DUMP_SYSTEM_PROMPT === '1';
+
 export default function (pi: ExtensionAPI) {
   registerBackgroundProcessTools(pi, processManager);
   registerMigrationControls(pi);
-  registerStartupPromptHooks(pi, runtimeState);
+  registerStartupPromptHooks(pi, runtimeState, DUMP_SYSTEM_PROMPT);
   registerSessionContinuityHooks(pi, runtimeState);
   registerDiagnosticsHooks(pi, () =>
     checkForUpdates({
