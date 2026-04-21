@@ -1,43 +1,34 @@
 # Session Stand-Up
 
-## Session 019d9978-4f6c-75ef-9fa0-25818888a447 (Updated: 2026-04-20T22:19:01.447Z)
+## Session 019db122-2a4d-776e-a476-664012becc2e (Updated: 2026-04-22T05:19:52.522Z)
 
-Session file: /Users/doug.stephen/.pi/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-17T03-24-51-948Z_019d9978-4f6c-75ef-9fa0-25818888a447.jsonl
+Session file: /Users/doug.stephen/.pi/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-21T17-41-39-533Z_019db122-2a4d-776e-a476-664012becc2e.jsonl
 
-### Accomplished
-- **Test fixes for upstream Pi API changes** (`systemPromptOptions` on `BeforeAgentStartEvent`):
-  - Rewrote `packages/core/src/system-prompt.test.ts` for new API: `PiSystemPromptOptions` instead of `ExtensionAPI` stubs, `toolGuidanceBlock` instead of `fallbackToolGuidanceBlock`, `buildSandpiperSystemPrompt` instead of `buildSystemPrompt`
-  - Fixed `extensions/system/startup-hooks.test.ts`: updated mock name, event stubs include `systemPromptOptions`
-  - All passing: 108/108 core + 65/65 extensions, lint clean
-- **AGENTS.md cleanup pass on both files**:
-  - **Homedir** (`~/.pi/agent/AGENTS.md`): ~80 lines → 52 lines. Removed preamble fat, `projects.toon` line, inbox format spec, documentation rule duplicate. Tightened version control, verification, parse-don't-validate, task management. Kept skill editing ownership with project-local line removed.
-  - **Project** (`AGENTS.md`): ~130 lines → ~95 lines. Condensed header, merged three repo structure tables into one, fixed stale `extensions/system.ts` → `extensions/system/`, absorbed skill ownership into table rows, flattened Core Repo Invariants, merged TypeScript+Architecture, compressed Testing/Linting/Verification, dropped stale feature list from user-facing docs.
-  - **Stale refs pass**: all 9 routing table doc paths were stale. Merged extension-loading + pi-api-pitfalls + tui into single pi-dev-suite row. Updated all paths.
-- **Prompt dump files removed from history**: `BASE_PROMPT_DUMP.md`, `FULL_PROMPT_DUMP.md`, `REWRITE_DUMP.md` untracked from their respective commits
-- **jj skill updated**: Added two FAQ entries — `jj squash` editor hang (always use `-m`), and working copy fragility across graph restructuring
-- **Pi PR #3473** open upstream with `systemPromptOptions` changes
+### Accomplished (this session)
+- **Overview → Prompt Deep Dive navigation finalized**: Single-click row selection auto-navigates to Prompt Deep Dive with prompt pre-loaded. After exploring LinkColumn (dead end — query params cleared between pages), settled on `on_select='rerun'` + return-value selection pattern.
+- **Streamlit 1.36+ quirks documented** in self-reflection (Phase 3 of this pass):
+  - `on_select` callback receives **no arguments** — selection state only via `st.dataframe()` return value
+  - `st.query_params` cleared on cross-page navigation — use `st.session_state` + `st.switch_page()` instead
+  - `st.Page.url_path` not populated until after `st.navigation(pages)`
 
 ### In Progress
-- System prompt override detection + gate (planning complete, implementation pending)
-- Dynamic sections reintegration (standup, tasks, working-copy, cold-start)
+- Rule grading UI implemented (`pages/rule_grading.py`) but not yet validated end-to-end
+- No grading criteria defined yet (placeholder `version_id=1`)
+- 4 rulesets cached in DuckDB (global, vultr-core, yaams, sandpiper-ai) — ready for grading
 
 ### Next Session
-- Implement user override detection + gate (now simplified by `event.systemPromptOptions.customPrompt`)
-- Tool guidance A/B test (variant A: full prompt, variant B: no tool info block)
-- Reintegrate dynamic sections
+- Define grading criteria content and insert into `criteria_versions` table
+- Grade 2-3 sample rulesets (vultr-core, sandpiper-ai, global) to validate framework
+- Consider adding grade-based metrics to dashboard overview
+- Dashboard is live at http://127.0.0.1:8787 — 4 pages working
 
 ### Blockers
 - None
 
 ### Context
-- `main` is now at `feat/system-prompt-slimdown` tip, `feat/reinforced-guidance` stacked on top
-- AGENTS.md edits and jj skill edit are in working copy, need to be committed
-- `feat/system-prompt-slimdown` bookmark may be redundant now that `main` points to same commit
-- Key files: `packages/core/src/system-prompt.ts`, `extensions/system/startup-hooks.ts`, `packages/cli/pi_wrapper.ts`
-- **Reinforced guidance session context** (preserved from previous session):
-  - Experiment workspace: `~/git/rg-matrix/`
-  - DuckDB: `~/git/rg-matrix/results_agents_v2/smoke_history.duckdb`
-  - Live retriever prompt: `extensions/system/reinforced-guidance/prompts/RETRIEVER_PROMPT-wip.md` (recovery-v2)
-  - Key design docs: `STAGE4-DESIGN.md`, `STAGE5-OVERVIEW.md`, `HANDOFF.md`, `RESEARCH-BRIEF-ID-HALLUCINATION.md` in reinforced-guidance dir
-  - Eval assets: `evals/retriever-synthetic-v1.json`, `evals/extractor-scope-eval-v1.json`, `evals/SCOPE-RETRIEVER-AUDIT-2026-04-15.md`
-  - Remaining misses: a/p10 (near-miss, 4/5 rules), e/e09 (hosted-review over-retrieval), f-series ceiling cases
+- Project: `~/git/rg-matrix/` (reinforced-guidance experiment dashboard)
+- Dashboard process: `dashboard2` (PID 57742), auto-reloads on file changes
+- Key files: `smoke_dashboard.py` (entry), `shared_utils.py`, `pages/{overview,rule_grading,prompt_deep_dive,model_metrics}.py`
+- DuckDB: `~/git/rg-matrix/results_agents_v2/smoke_history.duckdb`
+- Extraction cache: `~/git/rg-matrix/extracted_rulesets/`
+- HANDOFF.md at `extensions/system/reinforced-guidance/HANDOFF.md` (9-stage plan through Stage 6a)
