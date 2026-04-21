@@ -9,12 +9,25 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
     description:
       'Start a long-running background process. Returns immediately with a process ID. ' +
       'The process runs independently — use check_background_process to poll its status and output. ' +
-      'Use for builds, file watchers, server processes, or any command that should run while you continue working.',
+      'Do not spawn a process then immediately start polling with sleeps; this defeats the point. ' +
+      'Use this time to keep working with the user on other things. ' +
+      'Use for any executable you would normally background with "&", such as "bun run dev", dev servers, file watchers, build watchers, or any long-running command that should run while you continue working. ' +
+      'You SHOULD STRICTLY PREFER THIS over manually backgrounding shell jobs with "&".',
+    promptSnippet: 'Start a long-running background process (builds, dev servers, file watchers)',
+    promptGuidelines: [
+      'STRICTLY PREFER start_background_process over nohup, "&", or manually backgrounding jobs with bash.',
+      "command must be an executable file (e.g. 'bun', 'cargo', 'npm'). It is NOT a shell — do NOT pass 'cd', '&&', '|', '>', or other shell syntax. Use the cwd parameter to change directories. Use bash -c '...' only if you genuinely need compound shell syntax.",
+      'After starting a process, do not immediately poll it with sleeps. Continue working independently and check it later with check_background_process.',
+    ],
     parameters: Type.Object({
       id: Type.String({ description: 'Unique identifier for this process (used to check/kill it later)' }),
-      command: Type.String({ description: 'Command to execute' }),
+      command: Type.String({ description: 'Executable command to run' }),
       args: Type.Optional(Type.Array(Type.String(), { description: 'Command arguments' })),
-      cwd: Type.Optional(Type.String({ description: 'Working directory (defaults to session cwd)' })),
+      cwd: Type.Optional(
+        Type.String({
+          description: 'Working directory for the spawned process. Use this instead of prefixing the command with "cd ...". Defaults to session cwd.',
+        }),
+      ),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       try {
@@ -51,6 +64,12 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
     description:
       'Check the status of a background process. By default returns only status and exit code (no output, low context cost). ' +
       'Set include_stdout/include_stderr to true to retrieve buffered output. Use tail_lines to limit output volume.',
+    promptSnippet: 'Poll background process status and buffered output',
+    promptGuidelines: [
+      'Use check_background_process to monitor processes started with start_background_process.',
+      'By default, only status and exit code are returned (low context cost). Set include_stdout/include_stderr to read buffered output. Use tail_lines to limit volume.',
+      'Do not poll in a tight loop with sleeps. Check occasionally while doing other work.',
+    ],
     parameters: Type.Object({
       id: Type.String({ description: 'Process ID to check' }),
       include_stdout: Type.Optional(Type.Boolean({ description: 'Include buffered stdout (default: false)' })),
