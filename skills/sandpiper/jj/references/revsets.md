@@ -154,7 +154,13 @@ Example: `remote_bookmarks(exact:"main", remote=exact:"origin")`
 Example: `files("src/")`, `files(glob:"**/*.rs")`
 
 **`diff_lines(text, [files])`** — Commits whose diffs contain text matching the pattern.
-Searches actual diff content, not just file names.
+
+**`diff_lines_added(text, [files])`** (0.40.0+) — Commits that *added* a line matching the
+pattern. Useful for identifying the commit that introduced a specific string.
+
+**`diff_lines_removed(text, [files])`** (0.40.0+) — Commits that *removed* a line matching the
+pattern. Useful for identifying the commit that removed a specific string.
+Searches diff content, not file names.
 
 **`conflicts()`** — Commits with unresolved conflicts.
 
@@ -248,7 +254,7 @@ even after overriding. Useful for extending: `immutable_heads() = "builtin_immut
 ## Practical Examples
 
 ### Common queries
-```bash
+```console
 jj log -r '@-'                                    # Parent of working copy
 jj log -r '::@'                                   # All ancestors of @
 jj log -r 'trunk()..@'                            # Local work not on trunk
@@ -260,7 +266,7 @@ jj log -r 'merges()'                              # All merge commits
 ```
 
 ### Search and filter
-```bash
+```console
 jj log -r 'description(regex:"fix.*bug")'         # Search descriptions
 jj log -r 'author("steve") & files("src/")'       # Steve's changes to src/
 jj log -r 'author_date(after:"1 week ago")'       # Recent commits
@@ -268,7 +274,7 @@ jj log -r 'diff_lines("TODO")'                    # Commits adding/removing TODO
 ```
 
 ### Topology
-```bash
+```console
 jj log -r 'ancestors(@, 5)'                       # Last 5 ancestors
 jj log -r 'reachable(@, mutable())'               # Current working stack
 jj log -r 'fork_point(@ | main)'                  # Where @ diverged from main
@@ -276,20 +282,20 @@ jj log -r 'heads(all())'                           # All repo heads
 ```
 
 ### Rebase patterns
-```bash
+```console
 jj rebase -s 'all:roots(trunk()..@)' -o trunk()   # Rebase all branches onto trunk
 jj rebase -r 'description("wip")' -o main         # Move WIP commits onto main
 ```
 
 ### Bookmark queries
-```bash
+```console
 jj log -r 'bookmarks()'                           # All bookmarked commits
 jj log -r 'remote_bookmarks(remote=exact:"origin")' # All origin bookmarks
 jj log -r 'tracked_remote_bookmarks()'             # All tracked bookmarks
 ```
 
 ### Using `present()` safely in aliases
-```bash
+```console
 # Won't error if "main" bookmark doesn't exist:
 jj log -r 'present(main)..@'
 ```
@@ -353,7 +359,7 @@ comparison operators (`<`, `>`, `<=`, `>=`)
 
 ### Template examples
 
-```bash
+```console
 # Compact custom log
 jj log -T 'separate(" ", change_id.shortest(8), description.first_line()) ++ "\n"'
 
