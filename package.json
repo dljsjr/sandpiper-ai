@@ -37,7 +37,8 @@
     "extensions": [
       "./extensions/system.ts",
       "./extensions/shell-relay",
-      "./extensions/web-fetch"
+      "./extensions/web-fetch",
+      "./extensions/autotoon"
     ],
     "skills": [
       "./skills/sandpiper",
@@ -67,10 +68,8 @@
         "supports-color": "10.2.2"
       },
       "pi": {
-        "@mariozechner/pi-coding-agent": "file:/Users/doug.stephen/git/pi-mono/packages/coding-agent",
-        "@mariozechner/pi-tui": "file:/Users/doug.stephen/git/pi-mono/packages/tui",
-        "@mariozechner/pi-agent-core": "file:/Users/doug.stephen/git/pi-mono/packages/agent",
-        "@mariozechner/pi-ai": "file:/Users/doug.stephen/git/pi-mono/packages/ai",
+        "@mariozechner/pi-coding-agent": "0.68.0",
+        "@mariozechner/pi-tui": "0.68.0",
         "@silvia-odwyer/photon-node": "0.3.4",
         "@sinclair/typebox": "0.34.49"
       },
@@ -87,7 +86,7 @@
         "@types/turndown": "5.0.6"
       },
       "testing": {
-        "vitest": "4.1.4"
+        "vitest": "4.1.5"
       },
       "tooling": {
         "@biomejs/biome": "2.4.6",
@@ -102,12 +101,6 @@
         "fast-xml-parser": "5.7.1"
       }
     }
-  },
-  "overrides": {
-    "@mariozechner/pi-coding-agent": "catalog:pi",
-    "@mariozechner/pi-tui": "catalog:pi",
-    "@mariozechner/pi-agent-core": "catalog:pi",
-    "@mariozechner/pi-ai": "catalog:pi"
   },
   "dependencies": {
     "chalk": "catalog:cli",

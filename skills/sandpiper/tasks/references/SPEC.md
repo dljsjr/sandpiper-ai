@@ -2,6 +2,18 @@
 
 This document defines the specification for the markdown-based task management system used by the `tasks` skill. It uses IETF RFC 2119 requirement level key words (MUST, SHOULD, MAY, etc.) to communicate the importance of rules.
 
+## Table of Contents
+
+- [1. Overview](#1-overview)
+- [2. Projects](#2-projects)
+- [3. Task Keys](#3-task-keys)
+- [4. Task Files](#4-task-files)
+- [5. Frontmatter](#5-frontmatter)
+- [6. Task Hierarchy](#6-task-hierarchy)
+- [7. Task Lifecycle](#7-task-lifecycle)
+- [8. History](#8-history)
+- [9. Storage Configuration](#9-storage-configuration)
+
 ## 1. Overview
 
 Tasks are work items stored as markdown files with YAML frontmatter in a project-local `.sandpiper/tasks` directory. The system supports three kinds of work items (tasks, bugs, subtasks), organizes them into projects identified by short keys, and tracks relationships between them.

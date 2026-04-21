@@ -2,14 +2,13 @@
 name: tasks
 description: >-
   Create, update, query, and organize project work items (tasks, bugs, subtasks) as
-  markdown files with YAML frontmatter. Use when the user asks to create a ticket or
-  task, track work, check task status, assign work, manage a backlog, or organize
-  project work. Also use when the user asks things like "what's left to do", "what am
-  I working on", "mark this as done", "create a bug for this", "what tasks are in
-  progress", "show me the backlog", or "what's the status of the project". Use for
-  reviewing tickets, filtering tasks by status or priority, doing code reviews against
-  task acceptance criteria, or querying the task board. Tasks are stored in the local
-  project's .sandpiper/tasks directory.
+  markdown files with YAML frontmatter stored in `.sandpiper/tasks`. Use this skill
+  whenever the user mentions tasks, tickets, backlog, sprints, milestones, todos, or
+  project status. Also use at session start when orienting from standup notes that
+  reference tasks, or when task files in `.sandpiper/tasks/` are visible. Always prefer
+  the bundled CLI over direct file access for any task-related data. Use when the user
+  asks to create or complete tasks, check what's in progress, assign work, manage a
+  backlog, review tickets, filter by status or priority, or query the task board.
 compatibility: Requires a local .sandpiper/tasks directory in the project. Uses ripgrep (rg) for full-text search.
 ---
 
