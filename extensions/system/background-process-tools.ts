@@ -9,15 +9,15 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
     description:
       'Start a long-running background process. Returns immediately with a process ID. ' +
       'The process runs independently — use check_background_process to poll its status and output. ' +
-      'Do not spawn a process then immediately start polling with sleeps; this defeats the point. ' +
-      'Use this time to keep working with the user on other things. ' +
-      'Use for any executable you would normally background with "&", such as "bun run dev", dev servers, file watchers, build watchers, or any long-running command that should run while you continue working. ' +
-      'You SHOULD STRICTLY PREFER THIS over manually backgrounding shell jobs with "&".',
+      'This allows you to keep working with the user on other things. ' +
+      'Use for any executable you would normally background with "&", such as "bun run dev", dev servers, file watchers, build watchers, or any long-running command that should run while you continue working. ',
     promptSnippet: 'Start a long-running background process (builds, dev servers, file watchers)',
     promptGuidelines: [
       'STRICTLY PREFER start_background_process over nohup, "&", or manually backgrounding jobs with bash.',
-      "command must be an executable file (e.g. 'bun', 'cargo', 'npm'). It is NOT a shell — do NOT pass 'cd', '&&', '|', '>', or other shell syntax. Use the cwd parameter to change directories. Use bash -c '...' only if you genuinely need compound shell syntax.",
-      'After starting a process, do not immediately poll it with sleeps. Continue working independently and check it later with check_background_process.',
+      "start_background_process is NOT a shell — do NOT use '&&', '|', '>', or other shell syntax. Use bash -c '...' only if you genuinely need compound shell syntax.",
+      'Do *NOT* use "cd && ..." with start_background_process. Use the cwd parameter.',
+      'The `cwd` parameter MUST be an absolute, *resolved* path; e.g. no `~`, environment variables, or anything that requires a shell to expand',
+      'When using start_background_process, do not immediately start polling it or its output files with "sleep ... && ...". This defeats the point. Continue working on other things with the user.',
     ],
     parameters: Type.Object({
       id: Type.String({ description: 'Unique identifier for this process (used to check/kill it later)' }),
@@ -25,7 +25,8 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       args: Type.Optional(Type.Array(Type.String(), { description: 'Command arguments' })),
       cwd: Type.Optional(
         Type.String({
-          description: 'Working directory for the spawned process. Use this instead of prefixing the command with "cd ...". Defaults to session cwd.',
+          description:
+            'Absolute path to the working directory for the spawned process. You must use absolute, canonical paths (e.g. do not use `~` or `$HOME`). Use this instead of prefixing the command with "cd ...". Defaults to session cwd.',
         }),
       ),
     }),

@@ -9,7 +9,7 @@
  * have been acknowledged (for notification deduplication).
  */
 
-import { type ChildProcess, spawn as nodeSpawn } from 'node:child_process';
+import { type ChildProcess, spawn as nodeSpawn, type SpawnOptionsWithoutStdio } from 'node:child_process';
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -146,11 +146,16 @@ export class ManagedProcess {
   _start(options: SpawnOptions): void {
     if (this._running) return;
 
-    const proc = nodeSpawn(options.command, [...(options.args ?? [])], {
+    console.error('options: ', options);
+    const args = [...(options.args ?? [])];
+    console.error('effective args: ', args);
+    const spawnOpts: SpawnOptionsWithoutStdio = {
       cwd: options.cwd,
-      env: options.env ? { ...process.env, ...options.env } : undefined,
+      env: options.env ? { ...process.env, ...options.env } : process.env,
       stdio: ['pipe', 'pipe', 'pipe'],
-    });
+    };
+    console.error('effective spawn opts: ', spawnOpts);
+    const proc = nodeSpawn(options.command, args, spawnOpts);
 
     this.process = proc;
     this._running = true;
