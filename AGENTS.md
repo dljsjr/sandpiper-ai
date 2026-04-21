@@ -1,79 +1,36 @@
-# Development Guidelines
+# Sandpiper Development Guidelines
 
-## How to Use This File
-
-This root `AGENTS.md` is the repo's **hot-memory guidance**: global invariants, routing, and sources of truth. It should stay concise.
-
-When you need area-specific detail:
-
-1. Read the relevant focused doc in `.sandpiper/docs/`
-2. Read the local `README.md` / `AGENTS.md` in the subdirectory you are touching
-3. Prefer current source-of-truth docs over historical material in `.sandpiper/archive/`
-
-If you change the guidance structure itself (`AGENTS.md`, focused docs, prompt templates, or deterministic-guidance plans), read:
-- `.sandpiper/docs/agent-guidance-evolution.md`
+This file is repo-specific guidance for the sandpiper-ai project. For area-specific detail, read focused docs in `.sandpiper/docs/` or the subdirectory's `README.md` / `AGENTS.md`.
 
 ## Repository Structure
 
-This repository is a **Pi Package** and a Bun/Node.js monorepo.
-
-### Pi Package Layout
-
-| Directory | Purpose |
-| --- | --- |
-| `extensions/` | Pi extensions (`.ts` / `.js` files that register tools, hooks, etc.) |
-| `skills/sandpiper/` | First-party skills |
-| `skills/third-party/` | Vendored third-party skills |
-| `prompts/` | Prompt templates |
-| `themes/` | UI themes |
-
-### Shared Code & Tooling
-
-| Directory | Purpose | Distributed? |
-| --- | --- | --- |
-| `packages/` | Shared libraries and distributable binaries | Yes |
-| `devtools/` | Development scripts and utilities | No |
-
-### Project Map
+This repository is both a **Pi Package** and a **Bun/Node.js monorepo** — an uncommon combination that affects build and distribution.
 
 > **Maintenance note:** Update this table when adding new projects.
 
 | Path | Type | Description |
 | --- | --- | --- |
-| `extensions/system.ts` | Pi Extension | Sandpiper identity, update notifications, migration flags, diagnostics |
+| `extensions/system/` | Pi Extension | Sandpiper identity, system prompt, capability guidance, reinforced guidance, migration, diagnostics |
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
-| `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI |
+| `skills/sandpiper/` | First-party skills | Edit source here, not `dist/skills/` |
+| `skills/third-party/` | Vendored skills | Do not edit |
+| `packages/core/` | Shared Library | System prompt, migration, preflight checks, shell integration, path utilities |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
-| `packages/core/` | Shared Library | Migration, preflight checks, shell integration installer, path utilities |
+| `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI |
+| `prompts/` | Prompt templates | |
+| `themes/` | UI themes | |
 | `devtools/` | Dev-only | Build, vendoring, and development utilities |
 
 ## Core Repo Invariants
 
-### Read Local Docs Before Editing New Areas
-
-Before working in a subdirectory for the first time in a session, read that directory's `README.md` and `AGENTS.md` if they exist.
-
-### Version Control
-
-- Use **`jj`**, not `git`. See the `jj` skill for workflow details.
-
-### Task Management
-
-All coding work tracked against a task via `sandpiper-tasks` CLI. Bugs get their own top-level `BUG` task. Reference task keys in commits. See the `tasks` skill.
-
-### Source of Truth
-
+- Before working in a subdirectory for the first time, read its `README.md` and `AGENTS.md` if they exist
+- All coding work tracked against a task. Bugs get their own top-level `BUG` task. Reference task keys in commits
 - Edit **source**, not generated or assembled artifacts
-- Active agent-operational docs live in **`.sandpiper/docs/`**
-- Historical material lives in **`.sandpiper/archive/`**
-- Treat design docs and guidance docs as living artifacts: update them as decisions are made, deduplicate aggressively, and do consistency sweeps after significant edits
-
-### Runtime & Tooling
-
+- Active agent-operational docs live in **`.sandpiper/docs/`**, historical material in **`.sandpiper/archive/`**
+- Treat design docs and guidance docs as living artifacts: update in place, don't create new files when iterating on a plan or spec
 - Use **Bun** as the preferred runtime, package manager, and script runner
 - Run workspace installs from the repo root
-- Prefer Node built-ins over new runtime dependencies
-- Application code should stay runtime-agnostic unless the code is explicitly dev tooling
+- Application code should stay runtime-agnostic between Node and Bun unless the code is explicitly dev tooling
 
 ## Read-When-Needed Routing
 
@@ -81,32 +38,31 @@ Read the relevant focused doc **before** working in these areas:
 
 | Topic | Doc | Read when... |
 | --- | --- | --- |
-| Agent guidance evolution | `.sandpiper/docs/agent-guidance-evolution.md` | Revising `AGENTS.md`, prompt templates, guidance docs, or planning deterministic guidance |
-| Build system & distribution | `.sandpiper/docs/build-system.md` | Modifying build scripts, `postinstall`, `package.json`, or dist assembly |
-| Concurrent sessions | `.sandpiper/docs/concurrent-sessions.md` | Working on standup CLI, PID file lifecycle, or multi-session concurrency |
-| Extension loading | `.sandpiper/docs/extension-loading.md` | Creating extensions, debugging imports, or reasoning about source-loaded extensions |
-| Pi API pitfalls | `.sandpiper/docs/pi-api-pitfalls.md` | Working with extension lifecycle hooks, `getFlag`, `pi.events`, or cross-extension behavior |
-| Environment variables | `.sandpiper/docs/env-vars.md` | Reading/writing env vars or adding config-path resolution |
-| TUI development | `.sandpiper/docs/tui-extension-patterns.md` | Building widgets, banners, or extension UI |
-| CLI development | `.sandpiper/docs/cli-development.md` | Building command-line tools with Commander or changing bundled bins |
-| Task storage & VCS churn | `.sandpiper/docs/task-storage-strategy.md`, `.sandpiper/docs/task-storage-implementation-plan.md`, `packages/sandpiper-tasks-cli/STORAGE.md` | Changing task storage topology, `.sandpiper-tasks.json`, `tasks.version_control` config, `storage init/migrate/sync/push/pull` commands, bootstrap/sync flows, or task index persistence |
+| Build system & distribution | `docs/dev/build-system.md` | Modifying build scripts, `postinstall`, `package.json`, or dist assembly |
+| Concurrent sessions | `.sandpiper/docs/specs/concurrent-sessions.md` | Working on standup CLI, PID file lifecycle, or multi-session concurrency |
+| Pi extension development | `docs/dev/pi-dev-suite/` | Creating extensions, debugging imports, working with lifecycle hooks, `getFlag`, `pi.events`, or cross-extension behavior |
+| Environment variables | `docs/dev/env-vars.md` | Reading/writing env vars or adding config-path resolution |
+| CLI development | `docs/dev/cli-development.md` | Building command-line tools with Commander or changing bundled bins |
+| AutoTOON | `docs/features/autotoon.md` | Working on JSON→TOON conversion, capability guidance registry, or token optimization |
+| Task storage & VCS churn | `docs/features/tasks/storage-guide.md` | Changing task storage topology, `.sandpiper-tasks.json`, `tasks.version_control` config, `storage init/migrate/sync/push/pull` commands, or task index persistence |
 
-## TypeScript
+## TypeScript & Architecture
 
 - Use `strict: true`
 - Do not use `any`
 - Do not use `@ts-ignore` / `@ts-expect-error` without explicit justification
 - Prefer `interface` for object shapes
 - Use `readonly` where mutation is unnecessary
+- Extension core logic in framework-independent TypeScript modules; Pi extension entrypoints are thin glue for tool registration and lifecycle wiring
+- Do not use dynamic imports except for optional dependencies
 
 ## Testing, Linting, and Verification
 
 ### Testing
 
 - Use **Vitest**
-- Follow a test-first approach where practical
-- Emphasize real behavior over mocks when practical
-- Reproduce bugs with a failing test before fixing them
+- Test-first. Reproduce bugs with a failing test before fixing
+- Emphasize real behavior over mocks
 - Treat edge cases as first-class test cases
 - Tests must **not** touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config, etc.)
 - Parameterize the **concrete resource under test**, not a generic ancestor like `homedir()`
@@ -115,21 +71,15 @@ Read the relevant focused doc **before** working in these areas:
 
 ### Linting
 
-- Run `bun check` from the repo root
-- Lint output must be totally clean: zero errors, zero warnings
+- Run `bun check` from the repo root — output must be clean: zero errors, zero warnings
 - Run lints as frequently as tests
-- Only use safe auto-fixes; never use unsafe lint fixes without review
-- Do not add lint suppression comments without consulting the user
+- Only use safe auto-fixes; no suppressions without asking
 
 ### Verification
 
-- Verify behavior against implementation and working examples, not docs alone
+- Verify against implementation and working examples, not docs alone
 - Check real dist layout and package metadata before writing path-dependent code
 - Prefer consistency with nearby code over inventing a new local style
-
-## Architecture
-
-Extension core logic in framework-independent TypeScript modules. Pi extension entrypoints are thin glue for tool registration and lifecycle wiring. Replace dynamic imports with top-level imports unless there's a compelling reason.
 
 ## Paths and Serialization
 
@@ -143,23 +93,13 @@ Extension core logic in framework-independent TypeScript modules. Pi extension e
 
 ### Serialization
 
-- Version serialized formats from day one
-- Include migrations where serialized data may evolve
+- Version serialized formats from day one; include migrations where data may evolve
 - Prefer formats that are both human-readable and machine-parseable when practical
 
 ## User-Facing Documentation
-
-For user-facing feature documentation, see the `docs/` directory:
 
 | Audience | Location |
 |----------|----------|
 | **Users** (features, guides) | `docs/` — [`docs/README.md`](docs/README.md) |
 | **Extension developers** | `.sandpiper/docs/pi-dev-suite/` |
 | **Maintainers** (architecture, design) | `.sandpiper/docs/` |
-
-**Current features documented**:
-- [AutoTOON](docs/features/autotoon.md) — Automatic JSON→TOON conversion
-- [Shell Relay](docs/features/shell-relay.md) — Shared terminal sessions (coming soon)
-- [Task Management](docs/features/tasks.md) — Project task tracking (coming soon)
-- [Session Standup](docs/features/standup.md) — Cross-session continuity (coming soon)
-

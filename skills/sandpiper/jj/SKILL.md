@@ -332,6 +332,10 @@ across rewrites.
 
 **"How do I git blame?"** — `jj file annotate <path>`.
 
+**"`jj squash` opened my editor!"** — When both source and target have commit messages, `jj squash` opens `$EDITOR` to let you combine them. In non-interactive contexts (scripts, agents), always pass `-m <message>` to skip the editor.
+
+**"I lost my working copy changes after a rebase/edit!"** — Uncommitted changes in `@` can be lost or orphaned when the commit graph is restructured (rebase, abandon, edit, new). **Commit your work before restructuring the graph.** The working copy is a real commit, but it's ephemeral — if `@` becomes orphaned or replaced, its diff goes with it. Use `jj op restore` to recover if caught early.
+
 **"How do I undo everything?"** — `jj op log` to find good state, `jj op restore <op-id>`.
 
 ---
