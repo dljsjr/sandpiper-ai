@@ -255,6 +255,29 @@ Stop tracking a remote bookmark.
 ### `jj bookmark rename <OLD> <NEW>`
 Rename a bookmark.
 
+### `jj bookmark advance [NAMES]...` (0.39.0+)
+Move the nearest bookmark forward to a target (default: `@`). The source bookmark and the target
+revset are both configurable:
+
+```toml
+[revsets]
+bookmark-advance-from = 'heads(::to & bookmarks())'   # default
+bookmark-advance-to = '@'                             # default
+```
+
+Common alternate `to` value — advance only to pushable commits:
+
+```toml
+[revsets]
+bookmark-advance-to = 'closest_pushable(@)'
+```
+
+Superseded the community `jj tug` alias on 0.39.0+.
+
+### `jj bookmark forget <NAMES>...`
+Remove local bookmark without propagating deletion to remote. Use when a local-only bookmark is
+no longer needed; contrast with `jj bookmark delete` which propagates.
+
 ---
 
 ## Git Operations
@@ -267,13 +290,26 @@ Fetch from Git remote(s).
 - `--tracked` — Fetch only tracked bookmarks
 
 ### `jj git push`
-Push to Git remote. Safety: like `git push --force-with-lease`.
+Push to Git remote. Safety: lease-checked by default (like `git push --force-with-lease`, but
+stronger — see `references/git-interop.md`).
 - `-b, --bookmark <PATTERN>` — Push specific bookmark(s)
-- `-c, --change <REVSETS>` — Auto-create bookmark from change ID and push
+- `-c, --change <REVSETS>` — Auto-create bookmark from change ID and push (name via
+  `templates.git_push_bookmark`)
 - `-r, --revisions <REVSETS>` — Push bookmarks pointing to these commits
 - `--all` — Push all bookmarks
+- `--tracked` — Push all tracked bookmarks
 - `--dry-run` — Preview only
 - `--allow-empty-description` — Allow pushing commits without descriptions
+- `--allow-new` — Permit creating new remote bookmarks (required when auto-tracking isn't set up)
+- `-o, --option <OPTION>` (0.39.0+) — Forward server-side push option (repeatable; GitLab CI,
+  MR creation, etc.)
+
+Refuses to push commits matching `git.private-commits`, commits with conflicts, or descendants of
+private commits.
+
+As of `[Unreleased]` (post-0.40.0): `jj git push --all`/`--tracked`/`-r` no longer fails when
+revisions are private or conflicted — it **skips** those bookmarks. Audit stdout for skip
+notices.
 
 ### `jj git import`
 Update jj from underlying Git repo (automatic in colocated repos).
@@ -291,27 +327,45 @@ Convert between colocated and non-colocated modes, or check current mode.
 
 ## Operation Log
 
+See `references/workflows/op-log.md` for the operational patterns. Command summary:
+
 ### `jj op log`
-View operation history.
+View operation history. Each entry shows the command that produced it.
 - `-n, --limit <N>` — Limit entries
-- `-p, --patch` — Show file diffs per operation
+- `-p, --patch` — Show file diffs per operation (0.40.0+: only "interesting" revisions by default;
+  use `--show-changes-in=all()` to see everything)
 - `-d, --op-diff` — Show repo changes per operation
+- `-T, --template <TMPL>` — Custom template (use to extract specific fields such as the op ID)
 
 ### `jj op show [OPERATION]`
-Show changes in an operation.
+Show changes in an operation. Accepts `@` (current op), `@-` (previous op), or an op ID.
+- Same `--show-changes-in` knob as `jj op log -p`
 
 ### `jj op restore <OPERATION>`
-Restore repo to a prior state.
+Restore repo to a prior state. The rest of the op log is preserved (you can step further back or
+forward), but this operation becomes the current head.
 - `--what <WHAT>` — `repo`, `remote-tracking` (both default)
 
 ### `jj op revert [OPERATION]`
-Revert a specific operation (apply inverse).
+Apply the inverse of a specific operation. Everything that happened *after* that operation is
+preserved. (Contrast with `op restore`, which discards everything after.) Replaces the deprecated
+`jj op undo`.
 
 ### `jj undo`
-Undo the last operation.
+Sequentially revert the last operation. Repeated calls walk back through the op log; `jj redo`
+walks forward. Equivalent to `jj op revert @`, then on next call `jj op revert @-`, etc.
 
 ### `jj redo`
-Redo the most recently undone operation.
+Re-apply the most recently undone operation.
+
+### Global flag: `--at-op=<OPERATION>` (alias `--at-operation`)
+Read the repo *as of* a specific operation. Applies to any jj command; typically used with
+read-only commands (`log`, `diff`, `show`, `status`).
+
+```console
+jj --at-op=<op-id> log         # view log as of this op, without modifying current state
+jj --at-op=@- diff -r @        # what @ looked like one op ago
+```
 
 ---
 

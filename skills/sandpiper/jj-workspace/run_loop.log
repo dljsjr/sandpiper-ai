@@ -1,0 +1,64 @@
+Split: 12 train, 8 test (holdout=0.4)
+
+============================================================
+Iteration 1/5
+Description: Use this skill for any Jujutsu (jj) version control work, or in any repo with a `.jj/` directory. Triggers: mentions of "jj" or "jujutsu"; any `jj` CLI command (new, squash, describe, log, rebase, bookmark, git push, split, absorb, edit, diff, status, resolve, op, undo, redo, revert, workspace, duplicate, restore, interdiff, evolog, fix, bisect, etc.); revsets; change IDs (k–z letters like `qzmzpxyl`); operation IDs; colocated repos; bookmarks (including `jj bookmark advance`); megamerges; stacked PRs; the operation log; `--at-op` time-travel; workspaces; templates; jj config files; migrating from Git to jj; PR/MR workflows against a Git upstream. Consult before running any jj command. Do NOT confuse with unrelated uses of "jj" (e.g., a person's initials).
+============================================================
+Train: 18/36 correct, precision=100% recall=0% accuracy=50% (74.8s)
+  [FAIL] rate=0/3 expected=True: is there an equivalent of `jj tug` that's built in now? some
+  [FAIL] rate=0/3 expected=True: i want to set up the private-commits config so that any comm
+  [FAIL] rate=0/3 expected=True: i want to run two claude code sessions in parallel on the sa
+  [FAIL] rate=0/3 expected=True: my working copy is a mess — i've got like 4 different fixes 
+  [FAIL] rate=0/3 expected=True: jj log is showing my working copy as qzmzpxyl but also 2965e
+  [FAIL] rate=0/3 expected=True: im on a team that uses github PRs. my local repo has both a 
+  [PASS] rate=0/3 expected=False: can you review this PR for me? the diff is at https://github
+  [PASS] rate=0/3 expected=False: my initials are JJ and i want them to be the prefix on every
+  [PASS] rate=0/3 expected=False: we're hitting github's 100mb file limit with our ml model ch
+  [PASS] rate=0/3 expected=False: can you look at this commit graph and tell me what it repres
+  [PASS] rate=0/3 expected=False: im trying to learn jujutsu (the japanese martial art). what 
+  [PASS] rate=0/3 expected=False: our ops team wants every shell command i run on the prod box
+Test : 12/24 correct, precision=100% recall=0% accuracy=50% (0.0s)
+  [FAIL] rate=0/3 expected=True: i need to find the commit that first introduced the string '
+  [FAIL] rate=0/3 expected=True: i think i just screwed up bad. i ran abandon on the wrong ch
+  [FAIL] rate=0/3 expected=True: my rebase 'finished' without any errors but now jj log shows
+  [FAIL] rate=0/3 expected=True: i've got three in-flight branches (feat/new-checkout, feat/r
+  [PASS] rate=0/3 expected=False: i've got a 50MB json file at /Users/ada/downloads/exports/fl
+  [PASS] rate=0/3 expected=False: im migrating a repo from hg to github. what's the cleanest w
+  [PASS] rate=0/3 expected=False: how do i squash my last 3 commits in this git repo? the remo
+  [PASS] rate=0/3 expected=False: i have a sql query pulling from orders and order_items and i
+
+Improving description...
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/doug.stephen/.claude/plugins/marketplaces/claude-plugins-official/plugins/skill-creator/skills/skill-creator/scripts/run_loop.py", line 332, in <module>
+    main()
+  File "/Users/doug.stephen/.claude/plugins/marketplaces/claude-plugins-official/plugins/skill-creator/skills/skill-creator/scripts/run_loop.py", line 297, in main
+    output = run_loop(
+             ^^^^^^^^^
+  File "/Users/doug.stephen/.claude/plugins/marketplaces/claude-plugins-official/plugins/skill-creator/skills/skill-creator/scripts/run_loop.py", line 202, in run_loop
+    new_description = improve_description(
+                      ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/doug.stephen/.claude/plugins/marketplaces/claude-plugins-official/plugins/skill-creator/skills/skill-creator/scripts/improve_description.py", line 114, in improve_description
+    response = client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/_utils/_utils.py", line 283, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/resources/messages/messages.py", line 1000, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/_base_client.py", line 1368, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/_base_client.py", line 1062, in request
+    request = self._build_request(options, retries_taken=retries_taken)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/_base_client.py", line 521, in _build_request
+    headers = self._build_headers(options, retries_taken=retries_taken)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/_base_client.py", line 451, in _build_headers
+    self._validate_headers(headers_dict, custom_headers)
+  File "/Users/doug.stephen/.cache/uv/archive-v0/6eebkBkHV5v_MzmDktui5/lib/python3.12/site-packages/anthropic/_client.py", line 196, in _validate_headers
+    raise TypeError(
+TypeError: "Could not resolve authentication method. Expected either api_key or auth_token to be set. Or for one of the `X-Api-Key` or `Authorization` headers to be explicitly omitted"
