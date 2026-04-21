@@ -1,93 +1,43 @@
 # Session Stand-Up
 
-## Session unknown (Updated: 2026-04-03T15:00:00Z)
+## Session 019d9978-4f6c-75ef-9fa0-25818888a447 (Updated: 2026-04-20T22:19:01.447Z)
 
-Session file: 
-
-Session: c82731d3-f981-423f-98c4-521ed9862da2
-Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-01T18-12-48-013Z_c82731d3-f981-423f-98c4-521ed9862da2.jsonl
-
-## Accomplished
-
-(Carries forward from prior standup — this session continued the same work.)
-
-### Task storage Phases 1–3 (TCL-86, TCL-87, TCL-88) ✅
-- All implementation, tests, dogfooding, and docs from the prior session.
-
-### Code review fixes (F1–F5) ✅
-- F1: gitignore deduplication — `addPathToGitignore` extracted to `fs.ts`
-- F2: jj external-repo named-branch checkout — uses `bookmark set -r branch@origin` + `jj new`
-- F3: filed TCL-108 for `execFileSync` migration
-- F4: VCS invariant comments added
-- F5: `withErrorHandling` surfaces child process stderr
-
-### Bug fixes ✅
-- TCL-104: `auto_push` now honoured in `autoCommitIfEnabled`
-- TCL-105: `storage migrate` preserves backup on failure with recovery path
-- jj bookmark pointing at `root()` after `storage init` — fixed `@-` → `@`
-- TCL-107: jj external-repo named-branch checkout tracks remote branch
-
-### Documentation overhaul ✅
-- tasks SKILL.md: "Task Storage Modes" section with config and commands
-- tasks SPEC.md: §2.4 (scan-primary counters), §3.3 (counter operations), §9 (Storage Configuration)
-- tasks references/storage.md: full operator guide
-- Project key guidance: 3–5 letters (was 2–4)
-
-### Distribution coupling audit ✅
-- Audited all distributed prompts, skills, and extensions for implicit coupling to this repo
-- **Unbundled `tui` skill** to `.sandpiper/skills/tui/` (project-local only)
-- **Fixed `self-reflect.md`**: package-provided vs project-local skill ownership distinction
-- **Fixed `new-feature.md` / `refactor.md`**: removed hardcoded `bun check`
-- **Fixed `standup` / `projects` skills**: anonymized example paths
-
-### Test count
-- 311 tests, all passing (one flaky jj cleanup — TCL-110 filed), lint clean
-
-## In Progress
-- None.
-
-## Next Session
-- **Phase 4 (TCL-89)**: Punted — generalize storage bootstrap when PKM/MEM actually need it
-- **Open backlog:**
-  - TCL-71 [HIGH]: Require key or explicit filter on mutating commands
-  - TCL-108 [LOW]: Replace shell-interpolated `run()` with `execFileSync`
-  - TCL-109 [LOW]: Keep `references/storage.md` in sync with `STORAGE.md`
-  - TCL-106 [LOW]: `storage status` diagnostic command
-  - TCL-110 [LOW]: Flaky jj test cleanup in afterEach
-
-## Blockers
-- None.
-
-## Context
-- Working copy is clean (empty `@`)
-- `main` bookmark behind `main@origin` by all session commits (user pushes manually)
-- Tasks live on separate `tasks` branch in jj workspace at `.sandpiper/tasks/`
-- `tui` skill is now in `.sandpiper/skills/tui/` (project-local, not distributed)
-- `skills/` and `dist/skills/` are confirmed in sync for all distributed skills
-
-## Session 3c4a6e69-2e7d-46ea-804a-204e9f82bfa9 (Updated: 2026-04-07T04:28:03.205Z)
-
-Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-06T04-30-09-464Z_3c4a6e69-2e7d-46ea-804a-204e9f82bfa9.jsonl
+Session file: /Users/doug.stephen/.pi/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-17T03-24-51-948Z_019d9978-4f6c-75ef-9fa0-25818888a447.jsonl
 
 ### Accomplished
-- Completed standup concurrency fix (all 4 phases + 3 review rounds)
-- Implemented sandpiper-standup CLI with PID-based liveness detection
-- Extension creates/removes PID files on session lifecycle events
-- Prompts/skills updated to use CLI instead of direct file reads
-- Design doc: .sandpiper/docs/concurrent-sessions.md
-- 6 clean commits merged to main
-- Cleaned up stray empty commits from history
+- **Test fixes for upstream Pi API changes** (`systemPromptOptions` on `BeforeAgentStartEvent`):
+  - Rewrote `packages/core/src/system-prompt.test.ts` for new API: `PiSystemPromptOptions` instead of `ExtensionAPI` stubs, `toolGuidanceBlock` instead of `fallbackToolGuidanceBlock`, `buildSandpiperSystemPrompt` instead of `buildSystemPrompt`
+  - Fixed `extensions/system/startup-hooks.test.ts`: updated mock name, event stubs include `systemPromptOptions`
+  - All passing: 108/108 core + 65/65 extensions, lint clean
+- **AGENTS.md cleanup pass on both files**:
+  - **Homedir** (`~/.pi/agent/AGENTS.md`): ~80 lines → 52 lines. Removed preamble fat, `projects.toon` line, inbox format spec, documentation rule duplicate. Tightened version control, verification, parse-don't-validate, task management. Kept skill editing ownership with project-local line removed.
+  - **Project** (`AGENTS.md`): ~130 lines → ~95 lines. Condensed header, merged three repo structure tables into one, fixed stale `extensions/system.ts` → `extensions/system/`, absorbed skill ownership into table rows, flattened Core Repo Invariants, merged TypeScript+Architecture, compressed Testing/Linting/Verification, dropped stale feature list from user-facing docs.
+  - **Stale refs pass**: all 9 routing table doc paths were stale. Merged extension-loading + pi-api-pitfalls + tui into single pi-dev-suite row. Updated all paths.
+- **Prompt dump files removed from history**: `BASE_PROMPT_DUMP.md`, `FULL_PROMPT_DUMP.md`, `REWRITE_DUMP.md` untracked from their respective commits
+- **jj skill updated**: Added two FAQ entries — `jj squash` editor hang (always use `-m`), and working copy fragility across graph restructuring
+- **Pi PR #3473** open upstream with `systemPromptOptions` changes
 
 ### In Progress
-- None
+- System prompt override detection + gate (planning complete, implementation pending)
+- Dynamic sections reintegration (standup, tasks, working-copy, cold-start)
 
 ### Next Session
-- Awaiting user direction — 4 inbox items remaining or fresh work
+- Implement user override detection + gate (now simplified by `event.systemPromptOptions.customPrompt`)
+- Tool guidance A/B test (variant A: full prompt, variant B: no tool info block)
+- Reintegrate dynamic sections
 
 ### Blockers
 - None
 
 ### Context
-- Working copy is clean (empty @)
-- standup-concurrency-fix bookmark merged to main
-- All review inbox files deleted
+- `main` is now at `feat/system-prompt-slimdown` tip, `feat/reinforced-guidance` stacked on top
+- AGENTS.md edits and jj skill edit are in working copy, need to be committed
+- `feat/system-prompt-slimdown` bookmark may be redundant now that `main` points to same commit
+- Key files: `packages/core/src/system-prompt.ts`, `extensions/system/startup-hooks.ts`, `packages/cli/pi_wrapper.ts`
+- **Reinforced guidance session context** (preserved from previous session):
+  - Experiment workspace: `~/git/rg-matrix/`
+  - DuckDB: `~/git/rg-matrix/results_agents_v2/smoke_history.duckdb`
+  - Live retriever prompt: `extensions/system/reinforced-guidance/prompts/RETRIEVER_PROMPT-wip.md` (recovery-v2)
+  - Key design docs: `STAGE4-DESIGN.md`, `STAGE5-OVERVIEW.md`, `HANDOFF.md`, `RESEARCH-BRIEF-ID-HALLUCINATION.md` in reinforced-guidance dir
+  - Eval assets: `evals/retriever-synthetic-v1.json`, `evals/extractor-scope-eval-v1.json`, `evals/SCOPE-RETRIEVER-AUDIT-2026-04-15.md`
+  - Remaining misses: a/p10 (near-miss, 4/5 rules), e/e09 (hosted-review over-retrieval), f-series ceiling cases
