@@ -1,0 +1,25 @@
+--- a/TAT-71.md
++++ b/TAT-71.md
+@@ -6,12 +6,10 @@
+ assignee: "Huginn"
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:19.332Z
+-updated_at: 2026-05-27T15:57:49.970Z
++updated_at: 2026-05-27T16:36:26.611Z
+ ---
+ 
+ # C1: Append-only Tattler message log + record schema
+ 
+-Create the SQLite message log table and the immutable append record schema at the Tattler layer. Bootstrap from current Tattler/Chorus message JSON — strip ephemeral fields (broker socket paths, batch-wrapper metadata, self flag); keep postId, roomId, from, body, timestamp; add spec-required fields. DECIDED: agentId uses the existing Tattler ID convention for MVP — no identity-layer work (birdup UUID) required before schema definition. birdup already soft-enforces persistent identity; ephemeral agents don't need durability. Schema is designed to be UUID-compatible (same column type, same FK relationship) for directory rollout later — swap key type, same foreign key shape. Snapshot display handle at post time for rendering. Migrations from day 1 so schema evolution is cheap. Stable room UUID as durable key + snapshot roomName at post time. Two columns for ordering: UUIDv7 as globally-stable post id; SQLite rowid seq integer as cursor range-query key (WHERE seq > :cursor). SQLite transaction serialization gives monotonic insertion order. Immutable append-only — no UPDATE/DELETE. C1 schema gates Track 2 (TUI) but not Track 3 (Chorus refactor, which is post-C6 anyway). UNBLOCKED — no identity-layer prerequisite.
++Create the SQLite message log table and the immutable append record schema at the Tattler layer. Bootstrap from current Tattler/Chorus message JSON — strip ephemeral fields (broker socket paths, batch-wrapper metadata, self flag); keep postId, roomId, from, body, timestamp; add spec-required fields. DECIDED: agentId uses the existing Tattler ID convention for MVP — no identity-layer work (birdup UUID) required before schema definition. birdup already soft-enforces persistent identity; ephemeral agents don't need durability. Schema is designed to be UUID-compatible (same column type, same FK relationship) for directory rollout later — swap key type, same foreign key shape. Snapshot display handle at post time for rendering. Migrations from day 1 so schema evolution is cheap. Stable room UUID as durable key + snapshot roomName at post time. Two columns for ordering: UUIDv7 as globally-stable post id; SQLite rowid seq integer as cursor range-query key (WHERE seq > :cursor). SQLite transaction serialization gives monotonic insertion order. Immutable append-only — no UPDATE/DELETE. C1 schema gates Track 2 (TUI) but not Track 3 (Chorus refactor, which is post-C6 anyway). UNBLOCKED — no identity-layer prerequisite. DECIDED: SQLite driver is better-sqlite3 (not bun:sqlite) for runtime-agnostic distribution. Bun for dev, but distributed packages must run under Node. bun:sqlite bundles fail under Node (ERR_UNSUPPORTED_ESM_URL_SCHEME on bun: protocol); compiled binaries are too large. better-sqlite3 works under both Bun and Node runtimes.
+ 
+ ---
+ 
+@@ -39,3 +39,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-27T16:36:26.611Z
++
++- **description**: updated
++

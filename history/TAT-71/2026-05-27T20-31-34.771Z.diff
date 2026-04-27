@@ -1,0 +1,27 @@
+--- a/TAT-71.md
++++ b/TAT-71.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "C1: Append-only Tattler message log + record schema"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:19.332Z
+-updated_at: 2026-05-27T20:30:23.904Z
++updated_at: 2026-05-27T20:31:34.770Z
+ ---
+ 
+ # C1: Append-only Tattler message log + record schema
+@@ -51,3 +52,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-27T20:31:34.771Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

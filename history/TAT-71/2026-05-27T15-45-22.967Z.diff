@@ -1,0 +1,23 @@
+--- a/TAT-71.md
++++ b/TAT-71.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:19.332Z
+-updated_at: 2026-05-27T15:45:19.332Z
++updated_at: 2026-05-27T15:45:22.967Z
+ ---
+ 
+ # C1: Append-only room log + record schema
+ 
+-
++Create the SQLite room log table and the immutable append record schema. Bootstrap from current Chorus message JSON — strip ephemeral fields (broker socket paths, batch-wrapper metadata, self flag); keep postId, roomId, from, body, timestamp; add spec-required fields. Store agentId (stable) as author key, not handle name (handle renames would corrupt historical authorship). Snapshot display handle at post time for rendering. Migrations from day 1 so schema evolution is cheap. Stable room UUID as durable key + snapshot roomName at post time (consistent with agentId pattern). Two columns for ordering: UUIDv7 as globally-stable post id; SQLite rowid seq integer as cursor range-query key (WHERE seq > :cursor). SQLite transaction serialization gives monotonic insertion order regardless of UUIDv7 millisecond granularity. Immutable append-only — no UPDATE/DELETE.
++
++---
++
++# Activity Log
++
++## 2026-05-27T15:45:22.967Z
++
++- **description**: added (1 line)
++
