@@ -1,0 +1,417 @@
+# Package-First Multi-Distribution Refactor
+
+Status: Draft plan  
+Owner task: AGENT-84  
+Created: 2026-04-27
+
+## Summary
+
+Sandpiper should stop treating the repository root as the canonical Pi package. The repository should become a package-first monorepo whose source of truth lives under `packages/`, with separate distribution assemblies for:
+
+1. **Standalone Sandpiper CLI** — a Sandpiper-branded executable/app distribution built on Pi's SDK/CLI entrypoints.
+2. **Neutral Pi package** — Sandpiper's enhanced capabilities, skills, prompts, themes, and CLIs installable into vanilla Pi without Sandpiper identity or system-prompt branding.
+3. **Claude Code plugin** — the same neutral capability/resource set adapted to Claude Code's plugin model where supported.
+
+This is a large structural refactor. The work should proceed through seams, tests, and distribution smoke tests before deleting or moving the existing top-level Pi-package layout.
+
+## Context
+
+The current repository is both a Bun workspace and a Pi package:
+
+- package source lives in `packages/`
+- Pi extensions live in `extensions/`
+- skills live in `skills/`
+- prompts live in `prompts/`
+- themes live in `themes/`
+- `devtools/postinstall.sh` assembles a Pi package in `dist/`
+- the root `package.json` declares `piConfig`, `pi.extensions`, `pi.skills`, `pi.prompts`, and `pi.themes`
+
+That shape made sense while Sandpiper was primarily a rebranded Pi package. It now couples unrelated concerns:
+
+- Sandpiper identity/system prompt
+- neutral agent capabilities
+- Pi package resource propagation
+- standalone CLI concerns
+- future Claude Code plugin distribution
+
+Pi 0.70.x makes a cleaner split more realistic:
+
+- Pi routes more hardcoded `pi` / `.pi` branding through `APP_NAME` and `CONFIG_DIR_NAME` derived from `piConfig`.
+- Pi exports `main(args, { extensionFactories })`, which allows embedded/custom entrypoints to pass inline extension factories.
+- Pi package manifests can expose resource paths independently of CLI branding.
+- Pi's SDK/resource loader APIs accept explicit `cwd`, `agentDir`, additional resource paths, and extension factories.
+
+## Goals
+
+- Move source-of-truth code/resources under `packages/` with clearer package boundaries.
+- Separate Sandpiper identity from neutral capabilities.
+- Make neutral packages host-aware through explicit context objects, not hardcoded Sandpiper/Pi paths.
+- Produce a standalone Sandpiper CLI distribution using Pi's rebranding and extension-factory support.
+- Produce a neutral Pi package distribution without Sandpiper identity/system prompt.
+- Produce a Claude Code plugin distribution where capabilities map cleanly to Claude Code.
+- Keep existing users' data migratable and avoid silent data loss.
+- Preserve or improve testability and verification coverage throughout the migration.
+
+## Non-Goals
+
+- Do not rewrite feature behavior while moving code. Behavior changes get separate tasks.
+- Do not require true single-file binary distribution unless a spike proves it is practical. A binary plus sidecar assets/package metadata is acceptable if that matches Pi/Bun constraints.
+- Do not edit vendored third-party skills except through the vendoring workflow.
+- Do not remove the current root Pi-package assembly until replacement distributions are smoke-tested.
+- Do not solve every historical task-system or shell-relay issue as part of this refactor.
+
+## Architecture Principles
+
+### 1. Packages are the source of truth
+
+Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` should stop being authored source directories. The canonical source should live under `packages/`.
+
+Distribution-specific directories may still exist under `dist/`, but they should be generated artifacts.
+
+### 2. Capability packages are host-neutral
+
+Neutral packages must not hardcode:
+
+- `~/.sandpiper`
+- `./.sandpiper`
+- `~/.pi`
+- `./.pi`
+- `SANDPIPER_*`
+- Pi-specific package-root assumptions
+
+Host adapters provide config/session/resource paths explicitly.
+
+### 3. Identity is a product concern
+
+Sandpiper identity includes:
+
+- app name/title
+- config directory name
+- system prompt/persona
+- startup/handoff behavior specific to Sandpiper
+- Sandpiper update messaging
+- Pi-to-Sandpiper migration commands
+
+Neutral distributions must not include this identity layer.
+
+### 4. Adapters stay thin
+
+Host-specific adapters should wire host APIs to neutral implementation modules. Business logic should live in packages that can be tested without Pi, Claude Code, or a real user config directory.
+
+### 5. Tool definitions are adapter concerns
+
+Harness-neutral code should not define Pi `ToolDefinition`s, Claude/MCP tool definitions, or any other host-specific model-facing tool contract.
+
+The baseline design should be:
+
+- capability core packages expose typed operations and pure implementation logic
+- host adapters own model-facing names, descriptions, schemas, rendering, lifecycle hooks, and transport details
+- Pi adapters translate capability operations into Pi extension factories/tools
+- Claude adapters translate capability operations into stdio-based MCP servers/tools
+
+If duplication across host adapters becomes painful, introduce a small internal capability-contract abstraction that adapters consume. That abstraction must still be host-neutral and must not leak Pi extension types, MCP server types, or runtime-specific lifecycle assumptions into capability core packages.
+
+### 6. Distribution manifests should be generated from one source
+
+Each distribution should be assembled from package/resource manifests rather than hand-maintained duplicated path lists.
+
+## Target Package Groups
+
+Names are provisional; refine during implementation.
+
+| Package group | Purpose |
+| --- | --- |
+| `packages/host-context` | Shared host/app/session/path abstractions and test helpers. |
+| `packages/sandpiper-identity` | Sandpiper-only system prompt, startup behavior, update checks, migration commands. |
+| `packages/capability-background-process` | Host-neutral background process lifecycle logic; no Pi or MCP tool definition imports. |
+| `packages/capability-shell-relay` | Host-neutral shell relay/session orchestration logic; adapters expose host tools where supported. |
+| `packages/capability-web-fetch` | Host-neutral fetch/extract/convert pipeline; adapters expose host tools. |
+| `packages/capability-autotoon` | Host-neutral JSON-to-TOON conversion logic; adapters expose host hooks/tools. |
+| `packages/adapter-pi` | Pi extension factories/tool definitions that expose selected capability packages. |
+| `packages/adapter-claude-mcp` | stdio MCP servers/tool definitions that expose selected capability packages to Claude Code. |
+| `packages/tasks-core` | Task data model, storage, parsing, and operations. |
+| `packages/tasks-cli` | `sandpiper-tasks` binary/CLI wrapper around task core. |
+| `packages/standup-core` | Standup/session-continuity data model and file operations. |
+| `packages/standup-cli` | `sandpiper-standup` binary/CLI wrapper around standup core. |
+| `packages/resources-skills` | First-party skills and vendored third-party skill bundle metadata; maps to Pi skills and Claude plugin `skills/`. |
+| `packages/resources-prompts` | Prompt templates; maps directly to Pi prompts, and may map to Claude plugin `commands/` or skills where behavior is equivalent. |
+| `packages/resources-themes` | Theme resources; maps to Pi themes and Claude plugin `themes/` after schema compatibility review. |
+| `packages/distribution-manifest` | Shared manifest describing resources and entrypoints used by distribution assemblers. |
+| `packages/dist-pi-package` | Neutral Pi package assembler. |
+| `packages/dist-sandpiper-cli` | Standalone Sandpiper app/binary assembler. |
+| `packages/dist-claude-plugin` | Claude Code plugin assembler. |
+
+## Host Context Abstraction
+
+Introduce a small typed boundary for host-provided paths and identity. Exact names can change, but the shape should be explicit and injectable:
+
+```ts
+interface HostContext {
+  readonly appName: string;
+  readonly cwd: string;
+  readonly agentDir: string;
+  readonly projectConfigDir?: string;
+  readonly sessionId?: string;
+  readonly sessionFile?: string;
+}
+```
+
+Additional typed wrappers may be useful for specific concerns:
+
+- `AgentConfigDir`
+- `ProjectConfigDir`
+- `SessionIdentity`
+- `ResourceRoot`
+- `DistributionFlavor`
+- `PluginRoot`
+- `PluginDataDir`
+
+The key rule is: parse host-specific state at the boundary, then pass typed values through the rest of the implementation. For Claude Code, the adapter should translate `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`, and `CLAUDE_PLUGIN_OPTION_*` environment values into typed inputs before invoking capability code.
+
+## Distribution Products
+
+### Standalone Sandpiper CLI
+
+Expected characteristics:
+
+- Branded as Sandpiper.
+- Uses Sandpiper config directory defaults.
+- Includes Sandpiper identity/system prompt.
+- Includes all neutral capability packages/resources.
+- Uses Pi `main(args, { extensionFactories })` or SDK/runtime APIs rather than pretending the repo root is a Pi package.
+- Uses `bun compile` if feasible, with sidecar assets if required by Pi's asset/package lookup behavior.
+
+Open question: whether a true single-file binary is practical. Pi's current compiled-binary model still expects package metadata and assets to be discoverable, so the first target should be a reliable app bundle rather than a strict one-file binary.
+
+### Neutral Pi Package
+
+Expected characteristics:
+
+- Installable with `pi install` from npm/git/local path.
+- Ships enhanced functionality: skills, prompt templates, themes, and neutral extensions/tools.
+- Does **not** set Sandpiper identity, Sandpiper system prompt, or Sandpiper config directory.
+- May still ship CLIs named `sandpiper-tasks` and `sandpiper-standup` if those are product/tool names rather than host identity.
+- Uses Pi's config/path APIs (`getAgentDir()`, session/runtime context, resource loader paths) rather than hardcoded Sandpiper paths.
+
+### Claude Code Plugin
+
+Expected characteristics:
+
+- Ships neutral skills/resources and compatible tools via Claude Code's plugin model.
+- Uses a plugin root with optional `.claude-plugin/plugin.json` metadata.
+- Exposes tools through plugin-provided MCP servers, normally stdio servers configured in `.mcp.json` or inline `plugin.json`, not Pi extension factories.
+- Does not ship Sandpiper identity/system prompt.
+- Has its own MCP adapter layer instead of reusing Pi extension glue directly.
+- Consumes the same host-neutral capability operations as the Pi adapter, but owns MCP-specific tool names, descriptions, schemas, result-size metadata, request/response mapping, process lifecycle, and transport behavior.
+- Uses Claude's plugin path variables (`${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`) for bundled files and persistent plugin state.
+
+Claude plugin support is primarily an adapter and packaging problem, not a Pi-extension parity problem. Skills can map to Claude plugin `skills/`; some Pi prompt templates may map to Claude `commands/` or skills, but that mapping should be reviewed case-by-case because Claude has no identical Pi prompt-template component. Tool support should be implemented as MCP server adapters over neutral capability cores. Pi lifecycle hooks that do not have a Claude/MCP equivalent must either move into a different abstraction, become Sandpiper/Pi-only, or be documented as unsupported in the Claude distribution.
+
+## Claude Code Plugin Reference Findings
+
+Source: <https://code.claude.com/docs/en/plugins-reference> and <https://code.claude.com/docs/en/mcp>.
+
+Claude plugins are self-contained directories. Marketplace-installed plugins are copied into Claude's plugin cache, so installed plugins cannot rely on relative paths that traverse outside the plugin root. Symlinks inside the plugin directory are preserved, but normal references to external workspace files should not be part of the distribution design.
+
+Default component locations:
+
+| Claude component | Default path | Notes for Sandpiper |
+| --- | --- | --- |
+| Manifest | `.claude-plugin/plugin.json` | Optional, but needed for metadata and custom paths. If present, `name` is required. |
+| Skills | `skills/` | Directory-per-skill with `SKILL.md`; closest match to Pi skills. |
+| Commands | `commands/` | Flat markdown command/skill files; possible target for selected prompt templates. |
+| Agents | `agents/` | Optional future distribution surface; plugin agents cannot include hooks, MCP servers, or permission mode. |
+| Hooks | `hooks/hooks.json` or manifest inline | Event handlers can run commands, HTTP calls, MCP tools, prompts, or agents. |
+| MCP servers | `.mcp.json` or manifest inline | Main tool-adapter mechanism for Claude; plugin servers start when plugin is enabled. |
+| LSP servers | `.lsp.json` or manifest inline | Optional future capability, not part of the first migration. |
+| Monitors | `monitors/monitors.json` or manifest inline | Background line-producing processes; potentially relevant to shell relay/process monitoring but not a direct Pi extension equivalent. |
+| Themes | `themes/` | Theme schema compatibility needs review. |
+| Executables | `bin/` | Added to Claude's Bash tool `PATH` while plugin is enabled. Useful for bundled helper CLIs. |
+| Settings | `settings.json` | Limited supported keys; do not assume arbitrary defaults. |
+
+Manifest path rules:
+
+- Custom component paths must be relative to the plugin root and start with `./`.
+- For `skills`, `commands`, `agents`, `outputStyles`, `themes`, and `monitors`, specifying a custom path replaces the default path rather than adding to it. Include the default path explicitly if both are needed.
+- Hooks, MCP servers, and LSP servers support multiple sources with their own semantics.
+
+Claude plugin environment and state:
+
+- `${CLAUDE_PLUGIN_ROOT}` is the absolute path to the installed plugin version. It changes on update and should be treated as read-only/disposable.
+- `${CLAUDE_PLUGIN_DATA}` is persistent plugin state at `~/.claude/plugins/data/{id}/` and survives plugin updates until uninstall. This is the Claude adapter's durable state location.
+- `userConfig` in `plugin.json` prompts users for plugin options and exports them to subprocesses as `CLAUDE_PLUGIN_OPTION_<KEY>`.
+- Sensitive `userConfig` values are stored in secure storage or Claude credentials fallback, not plain plugin files.
+
+MCP-specific constraints:
+
+- Plugin MCP servers start automatically when the plugin is enabled and appear as standard MCP tools.
+- Stdio MCP servers are local processes and are not automatically reconnected after disconnect; design servers to be robust and fail loudly.
+- Claude supports MCP `list_changed` notifications, so servers can update tools/prompts/resources dynamically.
+- Claude has MCP tool-search behavior that can defer tool schema loading. Server instructions and concise tool descriptions matter; descriptions/instructions are truncated around 2KB.
+- Large MCP results are subject to Claude output thresholds. Tool entries can set `_meta["anthropic/maxResultSizeChars"]` up to Claude's ceiling for large text results.
+- MCP servers can request elicitation; plugin hooks can respond to `Elicitation` and `ElicitationResult` events.
+
+These constraints reinforce that neutral packages should expose operations, not model-facing tool definitions. Pi and Claude adapters can share operation code, but each adapter must own its tool schema, lifecycle, transport, and result-shaping behavior.
+
+## Migration Plan
+
+### Phase 0 — Plan and inventory
+
+Task: AGENT-84
+
+Deliverables:
+
+- This plan document.
+- Task breakdown.
+- Initial risk/open-question list.
+- Inventory targets for hardcoded branding/path assumptions.
+
+### Phase 1 — Standalone CLI spike
+
+Task: AGENT-85
+
+Build the smallest useful proof of concept:
+
+- a Sandpiper entrypoint that calls Pi `main(args, { extensionFactories })`
+- one inline/bundled extension factory loaded without relying on root `pi.extensions`
+- one bundled skill/resource path loaded without relying on root `pi.skills`
+- Sandpiper app/config identity proven in a temp config directory
+- asset/package behavior documented for `bun compile`
+
+This spike should happen before broad file movement.
+
+### Phase 2 — Host context and path abstraction
+
+Task: AGENT-86
+
+Introduce typed host-context resolution and update neutral code to receive paths/session identity explicitly.
+
+Early candidates:
+
+- task CLI directory resolution
+- standup CLI directory/session resolution
+- shell integration install paths
+- session continuity PID paths
+- any direct `.sandpiper` / `~/.sandpiper` use in neutral-capability code
+
+### Phase 3 — Split identity from capabilities
+
+Task: AGENT-87
+
+Decompose the current `extensions/system.ts` responsibilities:
+
+Sandpiper-only:
+
+- system prompt/persona
+- startup prompt composition
+- Pi-to-Sandpiper migration commands
+- Sandpiper update banner
+- Sandpiper-specific env mirroring
+
+Neutral:
+
+- background process tools
+- generic diagnostics/preflight where host-neutral
+- standup/session-continuity hooks after path abstraction
+- resource/capability guidance that does not imply Sandpiper identity
+
+### Phase 4 — Move source under packages
+
+Task: AGENT-88
+
+Move neutral packages/resources under `packages/` after seams exist and tests cover behavior.
+
+The first moves should be low-risk and testable. Avoid moving everything in one commit/change.
+
+### Phase 5 — Add invariant checks and smoke tests
+
+Task: AGENT-89
+
+Add automated checks that enforce the new architecture:
+
+- neutral packages contain no hardcoded Sandpiper/Pi config dirs
+- neutral capability packages do not import Pi extension/tool types, MCP server types, or host lifecycle APIs
+- distribution manifests are internally consistent
+- generated Pi package resolves extension/skill/prompt/theme paths
+- standalone Sandpiper runs with temp config dirs
+- no tests touch real `~/.sandpiper` or `~/.pi`
+
+### Phase 6 — Build distribution artifacts
+
+Tasks: AGENT-90, AGENT-91, AGENT-92
+
+Create the three distribution assemblies:
+
+- neutral Pi package
+- standalone Sandpiper app/binary
+- Claude Code plugin
+
+Each distribution must have a smoke test and documented local development workflow.
+
+### Phase 7 — Retire legacy root assembly
+
+Task: AGENT-93
+
+Only after the new distributions work:
+
+- remove or stop authoring top-level Pi-package resource directories
+- simplify root `package.json`
+- update build/dev docs
+- update repo structure guidance in `AGENTS.md`
+- preserve migration guidance for existing users
+
+## Task Breakdown
+
+Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
+
+| Task | Priority | Depends on | Purpose | Completion signal |
+| --- | --- | --- | --- | --- |
+| AGENT-84 | HIGH | — | Plan package-first multi-distribution refactor. | Plan doc and task breakdown written. |
+| AGENT-85 | HIGH | AGENT-84 | Spike standalone Sandpiper CLI using Pi extension factories. | Minimal entrypoint runs with temp config and bundled extension/resource. |
+| AGENT-86 | HIGH | AGENT-84 | Introduce host-context path/config abstraction. | Neutral code paths receive typed host context; path tests use temp dirs. |
+| AGENT-87 | HIGH | AGENT-86 | Split Sandpiper identity from neutral capabilities. | Neutral Pi-loadable extension set excludes identity/system prompt behavior. |
+| AGENT-88 | HIGH | AGENT-87 | Move neutral capabilities/resources under packages. | Source of truth for selected resources lives under `packages/`; old paths generated or bridged. |
+| AGENT-89 | HIGH | AGENT-88 | Add distribution invariant checks and smoke tests. | Automated checks catch hardcoded branding/path regressions and validate generated artifacts. |
+| AGENT-90 | MEDIUM | AGENT-88, AGENT-89 | Build neutral Pi package distribution artifact. | Local Pi install/load smoke test passes without Sandpiper identity. |
+| AGENT-91 | MEDIUM | AGENT-85, AGENT-88, AGENT-89 | Build standalone Sandpiper Bun binary distribution. | App bundle/binary runs and loads identity + neutral capabilities from temp config. |
+| AGENT-92 | MEDIUM | AGENT-88, AGENT-89 | Research and build Claude Code plugin distribution. | Plugin format documented; supported resources and MCP tool adapters load in Claude Code or a faithful local validator. |
+| AGENT-93 | MEDIUM | AGENT-90, AGENT-91, AGENT-92 | Retire legacy Pi-oriented root assembly. | Root no longer acts as canonical Pi package; docs and generated artifacts updated. |
+
+## Verification Gates
+
+Every implementation phase should finish with:
+
+- `bun check`
+- relevant package tests
+- distribution-specific smoke test if a distribution artifact changed
+- search-based invariant checks for the behavior being eliminated
+- end-to-end exercise through the public CLI/package/plugin interface
+
+Suggested invariant searches:
+
+```bash
+rg -n "\.sandpiper|SANDPIPER_|~/.sandpiper" packages/<neutral-package>
+rg -n "\.pi|~/.pi|PI_" packages/<neutral-package>
+rg -n "ToolDefinition|ExtensionAPI|McpServer|@modelcontextprotocol" packages/<neutral-capability-package>
+rg -n "extensions/|skills/|prompts/|themes/" package.json devtools packages
+```
+
+The invariant is not "zero matches everywhere" because Sandpiper identity packages and docs will legitimately mention these names. The invariant is zero matches in neutral capability packages except tests that explicitly assert adapter behavior.
+
+## Open Questions
+
+1. **Project config directory API:** Pi exports `getAgentDir()`, but project-local config dir resolution may not be exposed at the right abstraction level. Verify before designing around it.
+2. **Bun compile asset model:** Determine whether Sandpiper needs a true single binary or an app bundle with sidecar assets/package metadata.
+3. **Claude MCP adapter shape:** Determine the Claude Code plugin packaging format, MCP server lifecycle expectations, and which capability operations should be exposed as MCP tools.
+4. **Existing data migration:** Existing users have `.sandpiper/tasks`, `.sandpiper/standup.md`, and `~/.sandpiper`. Decide when neutral tools should use host config paths versus preserving Sandpiper-branded storage for product compatibility.
+5. **CLI naming:** Confirm whether `sandpiper-tasks` remains the CLI name in neutral Pi/Claude distributions or whether aliases are needed.
+6. **Package granularity:** Confirm the final package names after the first spike; avoid creating many tiny packages before the boundaries are proven.
+
+## First Implementation Guardrails
+
+- Start from a clean working copy.
+- Keep each phase behavior-preserving unless the task explicitly says otherwise.
+- Add characterization tests before moving code with existing behavior.
+- Prefer compatibility bridges during migration over flag-day moves.
+- Do not delete old root resource directories until generated replacements are verified.
+- Commit with task references.
