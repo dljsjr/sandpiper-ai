@@ -94,9 +94,6 @@
         "mcporter": "0.9.0",
         "canvas": "3.2.3"
       },
-      "inference": {
-        "node-llama-cpp": "3.18.1"
-      },
       "codec": {
         "fast-xml-parser": "5.7.1"
       }
@@ -121,7 +118,6 @@
     "@types/node": "catalog:ts",
     "commander": "catalog:cli",
     "mcporter": "catalog:tooling",
-    "node-llama-cpp": "catalog:inference",
     "typescript": "catalog:ts",
     "vitest": "catalog:testing"
   },
