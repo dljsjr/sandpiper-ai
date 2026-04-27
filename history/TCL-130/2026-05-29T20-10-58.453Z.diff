@@ -1,0 +1,25 @@
+--- a/TCL-130.md
++++ b/TCL-130.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Fix Trail filtered subtask display without visible parent"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: "Roux"
+ reporter: USER
+ created_at: 2026-05-29T20:07:49.210Z
+-updated_at: 2026-05-29T20:07:52.694Z
++updated_at: 2026-05-29T20:10:58.451Z
+ ---
+ 
+ # Fix Trail filtered subtask display without visible parent
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Roux
+ 
++## 2026-05-29T20:10:58.453Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++
