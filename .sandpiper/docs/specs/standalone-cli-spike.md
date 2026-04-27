@@ -146,3 +146,24 @@ Start the implementation spike with a deliberately small development entrypoint 
 5. prepends or discovers one bundled skill path without relying on root `pi.skills`
 
 If this works, the standalone distribution can keep using Pi's CLI mode handling while Sandpiper focuses on adapter/resource assembly rather than recreating Pi's runtime.
+
+## AGENT-95 Result: Minimal Inline Extension Entrypoint
+
+Added `packages/cli/standalone_spike.ts` as an experimental entrypoint.
+
+Key properties:
+
+- no static runtime import from `@mariozechner/pi-coding-agent`
+- sets `PI_PACKAGE_DIR` before dynamically importing Pi
+- calls `main(process.argv.slice(2), { extensionFactories: [...] })`
+- registers a harmless `--standalone-spike` flag from an inline extension factory
+
+Smoke command:
+
+```bash
+SANDPIPER_CODING_AGENT_DIR="$(mktemp -d)/agent" \
+  bun run --bun packages/cli/standalone_spike.ts \
+  --help --no-extensions --no-skills --no-prompt-templates --no-themes --no-context-files
+```
+
+Observed result: Pi help output includes `--standalone-spike`, proving that the standalone entrypoint can inject an inline extension factory through `main()` without using root `pi.extensions`.
