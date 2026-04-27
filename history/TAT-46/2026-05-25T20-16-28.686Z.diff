@@ -1,0 +1,27 @@
+--- a/TAT-46.md
++++ b/TAT-46.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Implement tattler_receive cooperative interruption tool"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -11,7 +11,7 @@
+   - TAT-41
+   - TAT-42
+   - TAT-58
+-updated_at: 2026-05-25T20:16:28.567Z
++updated_at: 2026-05-25T20:16:28.686Z
+ ---
+ 
+ # Implement tattler_receive cooperative interruption tool
+@@ -34,3 +34,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T20:16:28.686Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

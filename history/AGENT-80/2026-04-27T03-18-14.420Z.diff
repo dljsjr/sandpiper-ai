@@ -1,0 +1,25 @@
+--- a/AGENT-80.md
++++ b/AGENT-80.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Improve rg-matrix rule grading validity classification"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T02:49:01.255Z
+-updated_at: 2026-04-27T02:51:38.140Z
++updated_at: 2026-04-27T03:18:14.419Z
+ ---
+ 
+ # Improve rg-matrix rule grading validity classification
+@@ -25,3 +25,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-27T03:18:14.420Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++

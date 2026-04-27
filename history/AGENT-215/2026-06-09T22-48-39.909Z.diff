@@ -1,0 +1,45 @@
+--- a/AGENT-215.md
++++ b/AGENT-215.md
+@@ -6,20 +6,16 @@
+ assignee: "Muninn"
+ reporter: "Roux"
+ created_at: 2026-06-09T22:45:05.715Z
+-updated_at: 2026-06-09T22:45:10.967Z
++updated_at: 2026-06-09T22:48:39.908Z
+ ---
+ 
+ # pi-yaams: emit memory bootstrap as a prompt contributor instead of mutating systemPrompt
+ 
+ Owner: Muninn. In ~/git/pi-yaams/index.ts.
+ 
+-- Stop returning { systemPrompt: event.systemPrompt + block } from before_agent_start (discarded by Sandpiper's prompt rebuild).
+-- Instead emit a prompt contributor { id: 'yaams-memory-bootstrap', getContent } on the agreed event-bus channel during resources_discover.
+-- getContent computes the <memory> block once and caches per session (preserve existing memoryBootstrapCache + fail-closed DB scoping + debug-file behavior).
+-- Keep the env gate (YAAMS_BOOTSTRAP_ENABLED) and --memory-guidelines flag semantics.
+-- Coordinate channel name + payload shape with Huginn's sandpiper-ai contract.
+-- pi-yaams must stay harness-agnostic: guard so the contributor path degrades gracefully when the Sandpiper collector isn't present (plain Pi). Decide whether to keep the legacy systemPrompt-append fallback for non-Sandpiper harnesses.
+-
++STATUS 2026-06-09: First pass IMPLEMENTED + verified local (bun test 63/63, tsc clean). HELD at verified-local — do NOT push/merge until AGENT-214 collector confirms it consumes the exact same contract shape.
++
++Shipped shape (candidate contract, pending Huginn ratification in AGENT-214):
++- channel const SANDPIPER_PROMPT_CONTRIBUTOR_EVENT = 'sandpiper:prompt-contributor'
++- payload SandpiperPromptContribution: { id; source; phase?; getContent(): Promise<block>; acknowledge?() }
++- session_start: reset bootstrap cache + collector ack state
++- resources_discover: emit YAAMS bootstrap provider on the channel
++- acknowledge() round-trip resolves the harness-agnostic fallback: collector acks => skip direct before_agent_start mutation; no ack => preserve legacy direct-append for plain Pi / old Sandpiper
++- factored computeMemoryBootstrapPromptBlock() so both paths share cache/debug/DB-fail-closed behavior
++- README updated; tests cover emission, acked-collector path, fallback path
++
++GATE: channel name + payload field names must be identical on both sides or the event-bus handshake silently no-ops. Converge in room before either side hardens.
++
+ ---
+ 
+ # Activity Log
+@@ -29,3 +35,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Muninn
+ 
++## 2026-06-09T22:48:39.909Z
++
++- **description**: 8 lines → updated (14 lines)
++

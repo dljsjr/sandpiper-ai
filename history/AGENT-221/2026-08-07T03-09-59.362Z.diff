@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-221.md
++++ b/AGENT-221.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Adopt/verify CONFIG_DIR_NAME (+ APP_NAME) rebrand extension points for .sandpiper"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: LOW
+ assignee: "sandpiper-0.84-dev"
+ reporter: USER
+ created_at: 2026-06-23T20:28:30.187Z
+-updated_at: 2026-08-07T03:09:31.776Z
++updated_at: 2026-08-07T03:09:59.361Z
+ ---
+ 
+ # Adopt/verify CONFIG_DIR_NAME (+ APP_NAME) rebrand extension points for .sandpiper
+ 
+@@ -40,4 +40,8 @@
+ 
+ ## 2026-08-07T03:09:31.777Z
+ 
+ - **description**: 5 lines → updated (13 lines)
++
++## 2026-08-07T03:09:59.362Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

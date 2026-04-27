@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-267.md
++++ b/AGENT-267.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Expose diagnostic prompt source metadata"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T22:22:24.086Z
+-updated_at: 2026-08-10T22:25:11.942Z
++updated_at: 2026-08-13T21:57:45.551Z
+ ---
+ 
+ # Expose diagnostic prompt source metadata
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-08-10T22:25:11.943Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-13T21:57:45.552Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

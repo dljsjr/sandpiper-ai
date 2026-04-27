@@ -1,0 +1,28 @@
+===================================================================
+--- a/TCL-144.md
++++ b/TCL-144.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Rewrite Trail VCS tests to not require real git/jj (command-runner seam + thin integration set)"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "sandpiper-dev"
+ reporter: USER
+ created_at: 2026-08-07T17:44:50.553Z
+-updated_at: 2026-08-12T22:27:35.018Z
++updated_at: 2026-08-12T22:27:36.350Z
+ ---
+ 
+ # Rewrite Trail VCS tests to not require real git/jj (command-runner seam + thin integration set)
+ 
+@@ -51,4 +51,8 @@
+ 
+ ## 2026-08-12T22:27:35.021Z
+ 
+ - **description**: 7 lines → updated (28 lines)
++
++## 2026-08-12T22:27:36.362Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

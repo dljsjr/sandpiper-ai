@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-29.md
++++ b/TAT-29.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Investigate suppressing assistant follow-up after Chorus replies"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:42:29.684Z
+-updated_at: 2026-05-25T13:59:29.190Z
++updated_at: 2026-07-11T16:53:29.570Z
+ ---
+ 
+ # Investigate suppressing assistant follow-up after Chorus replies
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-05-24T17:49:04.087Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.570Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

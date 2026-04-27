@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-230.md
++++ b/AGENT-230.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Remove dead runtime system-prompt-mutation code (prefix-cache diet)"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-07-10T21:31:29.700Z
+-updated_at: 2026-07-10T21:31:29.700Z
++updated_at: 2026-07-10T21:31:29.804Z
+ ---
+ 
+ # Remove dead runtime system-prompt-mutation code (prefix-cache diet)
+ 
+@@ -25,4 +25,12 @@
+ 
+ Explicit scope decision: project-routing-trigger injection (<available_projects> block, collectProjectTriggers/formatProjectTriggersForPrompt) is NOT being restored even though it's the same dead pattern -- Doug wants the system prompt smaller, not to add anything back. Corrected the tasks skill (packages/resources/skills/sandpiper/tasks/SKILL.md) which incorrectly claimed this happens automatically; it now instructs running `project list` manually.
+ 
+ Verified: check:tsc clean, check:biome-check clean on all touched files, all directly-affected test suites pass (session-continuity.test.ts, startup-prompt.test.ts, startup-hooks.test.ts, extension-factories.test.ts -- the last needed its hook-registration-order assertion updated). Full suite shows the same category of pre-existing devtools/distribution smoke-test flakiness that predates this session (confirmed via isolated re-runs).
++
++---
++
++# Activity Log
++
++## 2026-07-10T21:31:29.806Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

@@ -1,0 +1,44 @@
+--- a/MEM-1.md
++++ b/MEM-1.md
+@@ -6,23 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-25T03:14:28.312Z
+-updated_at: 2026-03-29T00:37:46.896Z
++updated_at: 2026-04-03T22:49:50.055Z
+ ---
+ 
+ # Design memory/brain system for cross-session knowledge retrieval
+ 
+-Design a memory/brain system that supplements and builds on PKM, tasks, sessions, and documentation. Goal: give the agent durable, searchable memory across sessions without requiring full RAG + vector embedding infrastructure.
+-
+-Tangential to PKM but broader scope — PKM captures atomic notes, memory synthesizes knowledge from multiple sources (PKM notes, completed tasks, session transcripts, code patterns, user preferences).
+-
+-Key questions:
+-- Can we get RAG-like benefits with simpler primitives (keyword index, structured summaries, semantic tagging)?
+-- How to decide what enters long-term memory vs stays ephemeral?
+-- Integration with pi's compaction/session system?
+-- What triggers recall? Explicit query? Automatic context injection based on current work?
+-
+-Builds on: PKM (PKM-1), task system, session history, AGENTS.md.
+-
++Design the sandpiper memory/brain system for cross-session knowledge retrieval.
++
++Current direction: core memory engine design has been spun out into the standalone Rust repo at ~/git/yaams (Yet Another Agent Memory System). YAAMS now owns the storage/retrieval engine, schema, search pipeline, and CLI dogfooding path. Relevant design docs live in:
++- ~/git/yaams/docs/architecture.md
++- ~/git/yaams/.sandpiper/docs/mvp-work-plan.md
++- ~/git/yaams/.sandpiper/docs/future-phases.md
++
++This MEM task should now be interpreted as sandpiper-side integration and productization work around YAAMS rather than re-designing the storage engine in-repo. Future follow-up likely includes extension integration, memory prompt injection, extraction orchestration, and session-boundary flushing.
++
+ ---
+ 
+ # Activity Log
+@@ -31,3 +28,7 @@
+ 
+ - **description**: added (11 lines)
+ 
++## 2026-04-03T22:49:50.060Z
++
++- **description**: 11 lines → updated (8 lines)
++

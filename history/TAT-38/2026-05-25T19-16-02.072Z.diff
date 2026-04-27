@@ -1,0 +1,44 @@
+--- a/TAT-38.md
++++ b/TAT-38.md
+@@ -3,28 +3,3 @@
+ status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+-assignee: "Huginn"
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T19:00:59.110Z
+ depends_on:
+   - TAT-36
+-updated_at: 2026-05-25T19:12:47.183Z
++updated_at: 2026-05-25T19:16:02.070Z
+ ---
+ 
+ # Add Tattler receive cooperative interruption tool
+ 
+-Add a cooperative Tattler receive affordance so an agent can intentionally yield its current turn to check pending messages without showing Operation Aborted.
+-
+-This is not the sole correctness path; before_agent_start remains the universal drain for any next turn. tattler_receive is a latency/semantics tool for model-initiated interruption.
+-
+-Acceptance criteria:
+-- Tool has tight prompt guidance and is intended to be called alone.
+-- Tool renderCall communicates that the agent is checking pending messages / ending the current turn; renderResult is quiet.
+-- Tool returns provider-safe content and terminate=true, and sets state for a deferred synthetic receive turn.
+-- agent_end scheduling waits until the session is idle before triggering the synthetic turn.
+-- Synthetic turn drains through before_agent_start, not a separate delivery path.
+-- Tests cover ignored nudge, cooperative receive, and user abort fallback.
+-
++Updated synthetic receive design: do not use pi.sendUserMessage to trigger receive because it always renders as a user/Doug message and is semantically misleading. Use pi.sendMessage(batchCustomMessage,{triggerTurn:true}) after idle instead. Source says sendCustomMessage(triggerTurn:true) calls _runAgentPrompt(appMessage), emits/persists the role custom prompt as custom_message, and convertToLlm sends custom content as user-role content to the provider. tattler_receive should set a receive-after-agent-end flag and terminate:true; agent_end idle-defers, then calls shared drainPendingInboxToBatch() and pi.sendMessage(batch,{triggerTurn:true}). before_agent_start remains the user-resume drain path, not the synthetic receive path.
++
+ ---
+ 
+ # Activity Log
+@@ -44,3 +34,8 @@
+ - **assignee**: AGENT → Huginn
+ - **description**: 1 line → updated (11 lines)
+ 
++## 2026-05-25T19:16:02.072Z
++
++- **assignee**: Huginn → AGENT
++- **description**: 11 lines → updated (1 line)
++

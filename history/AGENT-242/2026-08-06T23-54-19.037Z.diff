@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-242.md
++++ b/AGENT-242.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Env alignment: accept PI_SESSION_* in standup CLI, set AI_AGENT in standalone entry"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-06T20:42:18.480Z
+-updated_at: 2026-08-06T23:54:18.972Z
++updated_at: 2026-08-06T23:54:19.036Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-08-06T23:54:18.973Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-08-06T23:54:19.037Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

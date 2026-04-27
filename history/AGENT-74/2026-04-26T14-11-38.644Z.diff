@@ -1,0 +1,27 @@
+--- a/AGENT-74.md
++++ b/AGENT-74.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Experiment 1: simple retriever grammar latency"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+@@ -9,7 +9,7 @@
+ related:
+   - AGENT-64
+   - AGENT-73
+-updated_at: 2026-04-26T03:24:35.567Z
++updated_at: 2026-04-26T14:11:38.641Z
+ ---
+ 
+ # Experiment 1: simple retriever grammar latency
+@@ -27,3 +27,7 @@
+ 
+ - **related**: (none) → AGENT-64, AGENT-73
+ 
++## 2026-04-26T14:11:38.644Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

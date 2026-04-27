@@ -1,0 +1,33 @@
+--- a/TOOLS-19.md
++++ b/TOOLS-19.md
+@@ -6,9 +6,26 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-08T21:36:25.735Z
+-updated_at: 2026-05-08T21:36:25.735Z
++updated_at: 2026-05-08T21:36:25.785Z
+ ---
+ 
+ # Remove install lifecycle hooks from source and package manifests
+ 
+-
++Make dependency installation independent from Sandpiper artifact generation.
++
++Remove or replace:
++- root `preinstall` and `postinstall` scripts,
++- package-level `preinstall` build scripts,
++- docs and CLI messages that imply `bun install` builds Sandpiper artifacts.
++
++Target behavior:
++- `bun install` installs dependencies only.
++- Developers explicitly run `bun run build:packages` or `bun run prepare:distribution` when artifacts are needed.
++- Published npm artifacts require no install-time build, vendoring, download, or package mutation.
++
++---
++
++# Activity Log
++
++## 2026-05-08T21:36:25.786Z
++
++- **description**: added (11 lines)
++

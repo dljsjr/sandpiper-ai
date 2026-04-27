@@ -1,0 +1,31 @@
+--- a/TAT-33.md
++++ b/TAT-33.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Brainstorm Chorus reply storm and context growth controls"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:57:19.192Z
+ updated_at: 2026-05-24T17:57:19.192Z
+-updated_at: 2026-05-24T17:57:19.192Z
++updated_at: 2026-05-24T17:57:29.481Z
+ ---
+ 
+ # Brainstorm Chorus reply storm and context growth controls
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-24T17:57:29.482Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

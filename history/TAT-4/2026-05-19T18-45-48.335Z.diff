@@ -1,0 +1,29 @@
+--- a/TAT-4.md
++++ b/TAT-4.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Deliver v0 messages as compact system notifications"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-15T03:13:18.485Z
+-updated_at: 2026-05-15T03:13:18.485Z
++updated_at: 2026-05-19T18:45:48.334Z
+ ---
+ 
+ # Deliver v0 messages as compact system notifications
+@@ -22,3 +22,11 @@
+ - Recipient LLM sees only sender display and message text.
+ - Delivery uses steer + triggerTurn where appropriate.
+ 
++---
++
++# Activity Log
++
++## 2026-05-19T18:45:48.335Z
++
++- **status**: NOT STARTED → IN PROGRESS
++

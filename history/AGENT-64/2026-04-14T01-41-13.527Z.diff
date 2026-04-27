@@ -1,0 +1,31 @@
+--- a/AGENT-64.md
++++ b/AGENT-64.md
+@@ -6,13 +6,16 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-13T17:21:13.593Z
+-updated_at: 2026-04-13T18:41:49.740Z
++updated_at: 2026-04-14T01:41:13.522Z
+ ---
+ 
+ # Prototype reinforced-guidance extraction/retrieval prompts and evals
+ 
+ Continue the prompt-only reinforced-guidance prototype under extensions/system/reinforced-guidance/ without wiring it into aux-guidance-hooks yet.
+ 
++Current phase:
++- re-run targeted smoke from cold cache a few times to confirm stability
++- grow the smoke prompt pack with additional sample prompts while preserving the current green baseline
++- simplify prompts and improve latency/token efficiency once the expanded smoke set stays green
++- defer integration planning until after the refactoring/simplification pass
++
+ Focus areas:
+ - prompt-engineer the extractor and retriever as internal skill-like sub-agents
+ - build and calibrate synthetic retriever evals, including clarification signals
+@@ -39,3 +45,7 @@
+ 
+ - **description**: 9 lines → updated (10 lines)
+ 
++## 2026-04-14T01:41:13.527Z
++
++- **description**: 10 lines → updated (16 lines)
++

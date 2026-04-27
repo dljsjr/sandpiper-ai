@@ -1,0 +1,25 @@
+--- a/AGENT-79.md
++++ b/AGENT-79.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Coordinate revised reinforced-guidance grammar experiments"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-26T18:47:08.584Z
+-updated_at: 2026-04-26T18:47:13.861Z
++updated_at: 2026-04-26T22:18:08.664Z
+ related:
+   - AGENT-73
+ ---
+@@ -23,3 +23,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-26T22:18:08.664Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

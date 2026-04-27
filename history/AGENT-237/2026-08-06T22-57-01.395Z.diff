@@ -1,0 +1,124 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-06T22:31:40.282Z
++updated_at: 2026-08-06T22:57:01.394Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -21,8 +21,100 @@
+ (e) Tattler/chorus deliverAs:steer delivery through manual and auto compaction (0.81.0 #6730 + 0.84.0 queued-message fixes) including pending-inbox release/re-deliver paths.
+ 
+ ADDENDUM (2026-08-06, post green-suite): (f) MANDATORY first step before any bump verification: rm -rf .turbo packages/cli/dist dist, then full rebuild - a stale .turbo cache-hit for sandpiper-ai-cli#build was restoring a 5-month-old dist snapshot (old @mariozechner package scope) and caused every ecosystemPackage/npmPackageInstallSmoke "failure" this session; verification on a dirty cache is meaningless. (g) Known environment quirk: npmPackageInstallSmoke is unstable in throwaway workspaces (mise config-trust, cleanup hookTimeouts) - verify it in the trusted checkout only.
+ 
++STATUS ADDENDUM (2026-08-06, post-sweep):
++
++Agent-executable portion of the sweep is complete. Split:
++
++(a) DONE. Root-caused and fixed the SANDPIPER_DUMP_SYSTEM_PROMPT print-mode
++hang (AGENT-248, reviewed/approved, landed as yonzlzttrvkl/57fb73eca36c).
++Produced the before/after system-prompt dump diff using the fix: only the
++Pi version string, a scratch cwd path, and a random request-id differ
++across 110 lines -- systemPromptOptions/prompt content is byte-identical
++across the 0.80.7 -> 0.84.0 bump. Separately verified AGENTS.override.md
++(0.84.0's per-directory context override) with a real scratch-project
++test: injected_context correctly contains only the override content, base
++AGENTS.md is correctly excluded. No code changes needed for the override
++case -- packages/core/src/system-prompt.ts's injectedContextBlock is
++filename-agnostic and Pi resolves the override before handing us
++contextFiles.
++
++(b) DONE. Generated a genuine fresh 0.84.0 session file by forcing a real
++turn to a throwaway API key (fails with a real 401 mid-turn, but the
++session file is written regardless via the atomic-rename path) -- tested
++the actual write/rename mechanism, not a synthesized fixture. Ran the
++standup CLI (write/read/cleanup) and read-session-memories' DuckDB script
++(--session-root and --session-file forms) against it: both consumers
++parse the 0.84.0 entry shapes (session/session_info/model_change/
++thinking_level_change/custom/message) correctly, matching what
++read-session-memories' SKILL.md documents. No format drift.
++
++(f) DONE, applied as standing practice for every gate run since track 3
++of the green-suite sweep: rm -rf .turbo packages/cli/dist dist before any
++distribution verification.
++
++(g) DONE, observed as practiced: npmPackageInstallSmoke's throwaway-
++workspace instability never affected verification in the trusted
++checkout, which is the only place it was relied on for a pass/fail
++signal.
++
++(c) DEFERRED TO DOUG. Fullscreen TUI (--tui-mode fullscreen): chorus room
++UI (setEditorComponent + aboveEditor widget + setStatus) against the
++sticky dock; tattler-inbox-renderer full-width background padding vs
++reserved scrollbar column in always mode. Visual judgment, needs a human
++at a terminal.
++Verify: launch with --tui-mode fullscreen, open a chorus room, confirm
++the editor/status/dock render correctly against the independently
++scrollable transcript; separately confirm tattler-inbox-renderer's
++background padding doesn't collide with the reserved scrollbar column.
++
++(d) DEFERRED TO DOUG, two parts:
++  (d-1) Compiled standalone app /login flows. 0.80.8 fixed OAuth adapter
++  bundling in bun binaries -- may have been silently broken before this
++  bump landed the fix.
++  Verify: run the compiled standalone binary, exercise /login for at
++  least one OAuth-based provider, confirm the flow completes and the
++  credential is usable for a real turn.
++  (d-2) Compiled standalone app image handling. Upstream caveat: worker
++  scripts must be explicit compile entrypoints; we rely on materialized
++  Pi assets for this.
++  Verify: run the compiled standalone binary, exercise an image-handling
++  path (e.g. attach/view an image in a turn) and confirm no missing-
++  worker-entrypoint failures.
++
++(e) DEFERRED TO DOUG. Tattler/chorus deliverAs:steer delivery through
++manual and auto compaction (0.81.0 #6730 + 0.84.0 queued-message fixes)
++including pending-inbox release/re-deliver paths. Checked for a
++test/SDK-harness path first: zero existing test coverage of compaction
++anywhere in extensions/ or packages/core/, and the risk lives entirely
++inside Pi's internal turn/compaction state machine, which only exists
++during a real streaming turn -- nothing to mock without testing the mock
++instead of Pi's actual behavior.
++Written test plan:
++  1. Start a real interactive sandpiper session with tattler active,
++     ideally against a small/cheap model.
++  2. Trigger a long-ish turn (or force one via a debug/test flag if
++     available) so there's an active stream to interrupt.
++  3. From a second peer/session, send a message that resolves to
++     deliverAs: 'steer' (a tattler send_peer_message or chorus room
++     post) while the first turn is still streaming.
++  4. Mid-turn, trigger compaction -- manual via /compact if available,
++     or force auto-compaction via a small context window / long
++     conversation.
++  5. Verify: (a) the steered message survives compaction and gets
++     delivered, not silently dropped; (b) if compaction fires WHILE a
++     batch is in the pending-inbox's released-but-not-yet-delivered
++     window (tattler-inbox.ts's releaseBatch/release path), it doesn't
++     get lost or duplicated on the next turn. <- sharpest check, keep
++     prominent.
++  6. Repeat once with auto-compaction (context-limit-triggered) instead
++     of manual -- the changelog calls out both 0.81.0 (#6730) and 0.84.0
++     fixes, worth confirming both paths.
++
++Status remains IN PROGRESS. Do not complete until Doug's half (c, d-1,
++d-2, e) is done.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -33,4 +125,8 @@
+ ## 2026-08-06T22:31:40.283Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-0.84-dev
++
++## 2026-08-06T22:57:01.395Z
++
++- **description**: 8 lines → updated (100 lines)

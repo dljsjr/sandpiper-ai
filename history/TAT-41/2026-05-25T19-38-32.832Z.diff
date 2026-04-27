@@ -1,0 +1,25 @@
+--- a/TAT-41.md
++++ b/TAT-41.md
+@@ -10,12 +10,10 @@
+   - TAT-40
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:20:14.047Z
++updated_at: 2026-05-25T19:38:32.831Z
+ ---
+ 
+ # Drain pending inbox for normal prompts via before_agent_start
+ 
+-For normal user prompts and user abort + resume, register before_agent_start to drain the shared Tattler pending inbox helper into one or more persistent custom batch messages. Note: before_agent_start does not run for sendMessage(triggerTurn:true) custom-message synthetic turns; cooperative receive uses the same drain helper but triggers the batch directly.
++Implemented in jj change xszoyull / 7401716b. before_agent_start drains normal user-prompt/abort-resume path through the shared pending-inbox helper, returns the custom batch message, marks messages handedToTurn, and clears only after message_end for tattler:pending-batch. Synthetic receive remains a separate direct-batch path for TAT-47.
+ 
+ ---
+ 
+@@ -39,3 +39,7 @@
+ - **title**: Drain pending inbox for normal prompts through before_agent_start → Drain pending inbox for normal prompts via before_agent_start
+ - **description**: updated
+ 
++## 2026-05-25T19:38:32.832Z
++
++- **description**: updated
++

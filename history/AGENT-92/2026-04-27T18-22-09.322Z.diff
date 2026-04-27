@@ -1,0 +1,26 @@
+--- a/AGENT-92.md
++++ b/AGENT-92.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.330Z
+-updated_at: 2026-04-27T18:20:53.330Z
++updated_at: 2026-04-27T18:22:09.321Z
+ depends_on:
+   - AGENT-88
+   - AGENT-89
+@@ -16,4 +16,13 @@
+ 
+ # Research and build Claude Code plugin distribution
+ 
+-
++Research and build the Claude Code plugin distribution for neutral Sandpiper capabilities/resources.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- Claude Code plugin format and capability mapping are documented\n- supported skills/resources/tools load through a Claude adapter or validator\n- unsupported Pi extension concepts are explicitly documented
++
++---
++
++# Activity Log
++
++## 2026-04-27T18:22:09.322Z
++
++- **description**: added (1 line)
++

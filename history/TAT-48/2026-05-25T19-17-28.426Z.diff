@@ -1,0 +1,22 @@
+--- a/TAT-48.md
++++ b/TAT-48.md
+@@ -6,7 +6,10 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.428Z
+-updated_at: 2026-05-25T19:12:56.789Z
++depends_on:
++  - TAT-46
++  - TAT-47
++updated_at: 2026-05-25T19:17:28.425Z
+ ---
+ 
+ # Test tattler_receive termination and fallback paths
+@@ -21,3 +24,7 @@
+ 
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-25T19:17:28.426Z
++
++- **depends_on**: (none) → TAT-46, TAT-47
++

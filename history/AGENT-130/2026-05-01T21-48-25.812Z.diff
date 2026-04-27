@@ -1,0 +1,31 @@
+--- a/AGENT-130.md
++++ b/AGENT-130.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Add Pi package distribution manifest smoke checks"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T21:45:48.103Z
+ updated_at: 2026-05-01T21:45:48.103Z
+-updated_at: 2026-05-01T21:45:48.103Z
++updated_at: 2026-05-01T21:48:25.812Z
+ ---
+ 
+ # Add Pi package distribution manifest smoke checks
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-01T21:48:25.812Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

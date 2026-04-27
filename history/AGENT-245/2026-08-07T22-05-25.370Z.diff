@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-245.md
++++ b/AGENT-245.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Upstream PR: derive bash session env prefix from APP_NAME"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-06T20:42:18.752Z
+-updated_at: 2026-08-07T22:05:24.653Z
++updated_at: 2026-08-07T22:05:25.368Z
+ ---
+ 
+ # Upstream PR: derive bash session env prefix from APP_NAME
+ 
+@@ -25,4 +25,8 @@
+ 
+ ## 2026-08-07T22:05:24.656Z
+ 
+ - **description**: 1 line → updated (7 lines)
++
++## 2026-08-07T22:05:25.370Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

@@ -1,0 +1,27 @@
+--- a/TCL-123.md
++++ b/TCL-123.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Expose trail as the primary binary"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T19:26:19.876Z
+-updated_at: 2026-05-13T19:52:26.298Z
++updated_at: 2026-05-13T20:50:30.235Z
+ ---
+ 
+ # Expose trail as the primary binary
+@@ -30,3 +31,8 @@
+ 
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-13T20:50:30.236Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

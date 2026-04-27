@@ -1,0 +1,27 @@
+--- a/AGENT-101.md
++++ b/AGENT-101.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Implement package-root bootstrap and Sandpiper resource adapter"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T21:23:29.011Z
+-updated_at: 2026-04-27T21:25:59.771Z
++updated_at: 2026-04-29T04:34:17.321Z
+ ---
+ 
+ # Implement package-root bootstrap and Sandpiper resource adapter
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-29T04:34:17.321Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

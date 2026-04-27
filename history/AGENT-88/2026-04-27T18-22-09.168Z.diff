@@ -1,0 +1,26 @@
+--- a/AGENT-88.md
++++ b/AGENT-88.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.166Z
+-updated_at: 2026-04-27T18:20:53.166Z
++updated_at: 2026-04-27T18:22:09.168Z
+ depends_on:
+   - AGENT-87
+ related:
+@@ -15,4 +15,13 @@
+ 
+ # Move neutral capabilities and resources under packages
+ 
+-
++Move neutral capabilities and resources under packages/ after host-context seams and identity split are in place.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- selected source-of-truth extensions/resources no longer live in top-level authored Pi-package directories\n- any remaining top-level paths are generated or compatibility bridges\n- imports/build/test config reflect package-first ownership
++
++---
++
++# Activity Log
++
++## 2026-04-27T18:22:09.168Z
++
++- **description**: added (1 line)
++

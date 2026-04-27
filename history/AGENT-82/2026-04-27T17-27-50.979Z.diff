@@ -1,0 +1,23 @@
+--- a/AGENT-82.md
++++ b/AGENT-82.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-27T17:27:50.940Z
+-updated_at: 2026-04-27T17:27:50.940Z
++updated_at: 2026-04-27T17:27:50.978Z
+ ---
+ 
+ # Review restored package and CLI version edits
+ 
+-
++Review the pre-existing package/CLI edits restored after the reinforced-guidance cut-over.\n\nCurrent dirty files observed after cleanup:\n\n- package.json\n- bun.lock\n- packages/cli/pi_wrapper.ts\n\nKnown intent from diff context: Pi package catalog appears bumped toward 0.70.2, @types/bun and fast-xml-parser bumped, and pi_wrapper.ts has a small comment formatting edit. Verify whether these should be committed, adjusted, or restored. Ensure node-llama-cpp is not reintroduced.
++
++---
++
++# Activity Log
++
++## 2026-04-27T17:27:50.979Z
++
++- **description**: added (1 line)
++

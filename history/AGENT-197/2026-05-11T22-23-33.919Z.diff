@@ -1,0 +1,25 @@
+--- a/AGENT-197.md
++++ b/AGENT-197.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Strengthen skill loading guidance in system prompt"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-11T21:40:32.226Z
+-updated_at: 2026-05-11T21:44:48.681Z
++updated_at: 2026-05-11T22:23:33.919Z
+ ---
+ 
+ # Strengthen skill loading guidance in system prompt
+@@ -33,3 +33,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-11T22:23:33.919Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++

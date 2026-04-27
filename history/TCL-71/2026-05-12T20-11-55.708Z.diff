@@ -1,0 +1,24 @@
+--- a/TCL-71.md
++++ b/TCL-71.md
+@@ -3,10 +3,10 @@
+ status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-30T20:47:48.695Z
+ updated_at: 2026-05-12T20:10:28.675Z
+-updated_at: 2026-05-12T20:10:28.675Z
++updated_at: 2026-05-12T20:11:55.708Z
+ ---
+ 
+ # Make mutating task/project update commands require a key or explicit filter
+@@ -33,3 +33,7 @@
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ 
++## 2026-05-12T20:11:55.708Z
++
++- **assignee**: UNASSIGNED → AGENT
++

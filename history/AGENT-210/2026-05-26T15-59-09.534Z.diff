@@ -1,0 +1,24 @@
+--- a/AGENT-210.md
++++ b/AGENT-210.md
+@@ -6,10 +6,17 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-26T15:59:02.479Z
+-updated_at: 2026-05-26T15:59:02.479Z
++blocked_by:
++  - AGENT-209
++updated_at: 2026-05-26T15:59:09.534Z
+ ---
+ 
+ # Curate low-frequency skills into on-demand storage
+ 
+ After filesystem-source skill loading exists, decide which low-frequency but actively curated skills should move out of the ambient catalogue and into an on-demand skill storage convention.\n\nNotes:\n- Candidate packs from the audit: Streamlit/UI, DuckDB/data/spatial/S3/file conversion, Glimpse UI, sed, fifo-patterns, jj-revdiff-review.\n- Do not move skills until the new loading path is implemented and verified.\n- Decide final directory convention and docs before moving anything.
+ 
++---
++
++# Activity Log
++
++## 2026-05-26T15:59:09.534Z
++
++- **blocked_by**: (none) → AGENT-209
++

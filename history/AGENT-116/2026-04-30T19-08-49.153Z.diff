@@ -1,0 +1,31 @@
+--- a/AGENT-116.md
++++ b/AGENT-116.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Document and verify host-context invariants"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-30T18:08:36.667Z
+ updated_at: 2026-04-30T18:08:36.667Z
+-updated_at: 2026-04-30T18:08:36.667Z
++updated_at: 2026-04-30T19:08:49.153Z
+ ---
+ 
+ # Document and verify host-context invariants
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-04-30T19:08:49.153Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

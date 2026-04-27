@@ -1,0 +1,26 @@
+--- a/AGENT-91.md
++++ b/AGENT-91.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.289Z
+-updated_at: 2026-04-27T18:20:53.289Z
++updated_at: 2026-04-27T18:22:09.283Z
+ depends_on:
+   - AGENT-85
+   - AGENT-88
+@@ -17,4 +17,13 @@
+ 
+ # Build standalone Sandpiper Bun binary distribution
+ 
+-
++Build the standalone Sandpiper Bun binary/app distribution.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- bun compile/app-bundle flow produces a runnable Sandpiper distribution\n- Sandpiper identity and config dir are active\n- bundled neutral capabilities/resources load from the distribution artifact\n- asset/package metadata requirements are documented
++
++---
++
++# Activity Log
++
++## 2026-04-27T18:22:09.284Z
++
++- **description**: added (1 line)
++

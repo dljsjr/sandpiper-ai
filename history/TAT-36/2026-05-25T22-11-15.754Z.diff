@@ -1,0 +1,29 @@
+--- a/TAT-36.md
++++ b/TAT-36.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Batch Chorus and Tattler interim messages outside Pi steering queue"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+@@ -10,7 +11,7 @@
+   - TAT-37
+   - TAT-38
+   - TAT-39
+-updated_at: 2026-05-25T21:32:00.836Z
++updated_at: 2026-05-25T22:11:15.749Z
+ ---
+ 
+ # Batch Chorus and Tattler interim messages outside Pi steering queue
+@@ -56,3 +57,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-25T22:11:15.754Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: USER
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-07T19:14:09.591Z
++updated_at: 2026-08-07T19:20:08.080Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -119,8 +119,12 @@
+ ITEM (e) RESOLVED 2026-08-07 - NO LONGER A MANUAL ITEM: steer-through-compaction is now covered headlessly by the AGENT-253 wave-1 integration tests (devtools/integration/wave1-compaction.integration.test.ts) driving real pi compaction/turn machinery via RPC against the scripted mock provider, zero egress. Structural claims proven: manual compact succeeds with non-empty summary; steer-delivered mid-turn message visible in get_entries pre-compaction; a normal turn completes correctly post-compaction. Summary CONTENT is deliberately not asserted (would encode an indexing accident, not a real claim). Two real findings banked in that test file: default compaction.keepRecentTokens=20000 means realistic scripted conversations have nothing old enough to compact (safeguard, not bug - harness gained a settingsJson option to lower it); the compaction summarization call has a different context shape than a normal turn. REMAINING MANUAL ITEMS FOR DOUG: (c) fullscreen TUI eyeball, (d) compiled-app /login + image handling. Task stays IN PROGRESS until those two land.
+ 
+ ---
+ 
++ITEM (c) IN DOGFOOD (2026-08-07): Doug reloaded his working session in fullscreen TUI mode as ongoing dogfood rather than a one-off eyeball pass. Coverage accrues passively - startup banners (now entry-rendered per AGENT-238), tattler batch renderers on incoming peer messages (AGENT-226), chorus widgets if a room is opened. Close (c) if nothing renders wrong after normal use; only (d) compiled-app /login + image handling remains as a discrete manual step.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-06T22:19:41.456Z
+ 
+@@ -141,4 +145,8 @@
+ 
+ ## 2026-08-07T19:14:09.596Z
+ 
+ - **assignee**: sandpiper-0.84-dev → USER
++
++## 2026-08-07T19:20:08.085Z
++
++- **description**: 104 lines → updated (108 lines)

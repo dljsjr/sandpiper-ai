@@ -1,0 +1,36 @@
+--- a/TAT-70.md
++++ b/TAT-70.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "Durable Chorus room log + per-agent read cursors"
++title: "Durable Tattler message log + per-agent read cursors"
+ status: NOT STARTED
+ kind: TASK
+ priority: HIGH
+@@ -12,12 +12,10 @@
+   - TAT-10
+   - TAT-39
+   - TAT-50
+-updated_at: 2026-05-27T15:45:15.167Z
++updated_at: 2026-05-27T15:50:58.352Z
+ ---
+ 
+ # Durable Chorus room log + per-agent read cursors
+-# Durable Chorus room log + per-agent read cursors
+-
+-Durable append-only Chorus room log (SQLite) + per-agent read cursors that survive abort/resume. This is the targeted slice that both kills the re-delivery bug (TAT-68) at its root and advances the accepted architectural north star, without committing to the full Broadcast MVP (TAT-10). Design is complete per the sizing spec at .sandpiper/docs/specs/durable-rooms-sizing.md — all 5 load-bearing OQs resolved (SQLite ratified, schema from current JSON + migrations, UUIDv7 post id + rowid seq cursor key, advance-on-success semantics, immutable append-only). Six implementation chunks (C1–C6); chunks 1–4 deliver the bug fix, even before the full nudge-demotion rewire.
++# Durable Tattler message log + per-agent read cursors
++
++Durable append-only Tattler message log (SQLite) + per-agent read cursors that survive abort/resume. While Chorus inspired this work, the durability primitive lives at the Tattler layer — Tattler owns the pipe and the persistence of that pipe. Chorus consumes the durable substrate for coordination semantics (broker, fanout, audience). This targeted slice both kills the re-delivery bug (TAT-68) at its root and advances the accepted architectural north star, without committing to the full Broadcast MVP (TAT-10). Design is complete per the sizing spec at .sandpiper/docs/specs/durable-rooms-sizing.md — all 5 load-bearing OQs resolved (SQLite ratified, schema from current JSON + migrations, UUIDv7 post id + rowid seq cursor key, advance-on-success semantics, immutable append-only). Six implementation chunks (C1–C6); chunks 1–4 deliver the bug fix, even before the full nudge-demotion rewire. NOTE: This scope covers the Tattler protocol layer only. A parallel TUI overhaul (decoupling from session-broker model, standalone TUI acceptable for MVP) is separate work to be sized independently.
+ 
+ ---
+ 
+@@ -28,3 +28,8 @@
+ - **description**: added (1 line)
+ - **related**: (none) → TAT-68, TAT-69, TAT-10, TAT-39, TAT-50
+ 
++## 2026-05-27T15:50:58.352Z
++
++- **title**: Durable Chorus room log + per-agent read cursors → Durable Tattler message log + per-agent read cursors
++- **description**: updated
++

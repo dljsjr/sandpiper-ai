@@ -1,0 +1,21 @@
+--- a/SHR-97.md
++++ b/SHR-97.md
+@@ -6,7 +6,9 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-03T20:46:22.153Z
+-updated_at: 2026-04-03T20:46:33.382Z
++related:
++  - SHR-99
++updated_at: 2026-05-14T14:46:07.908Z
+ ---
+ 
+ # Shell relay returns empty output after ~50+ invocations in long session
+@@ -27,3 +29,7 @@
+ 
+ - **description**: added (7 lines)
+ 
++## 2026-05-14T14:46:07.908Z
++
++- **related**: (none) → SHR-99
++

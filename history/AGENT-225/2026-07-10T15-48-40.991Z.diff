@@ -1,0 +1,25 @@
+===================================================================
+--- a/AGENT-225.md
++++ b/AGENT-225.md
+@@ -5,10 +5,20 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-07-10T15:48:36.663Z
+-updated_at: 2026-07-10T15:48:36.663Z
++depends_on:
++  - AGENT-224
++updated_at: 2026-07-10T15:48:40.988Z
+ ---
+ 
+ # Replace chorus.ts idle-poll loop with agent_settled hook
+ 
+ extensions/chorus.ts:256-275 (sendChorusSelfMessageToChatWhenIdle) currently uses a setTimeout/ctx.isIdle() retry loop to defer self-echo messages until the agent is idle. Replace it with the native agent_settled extension hook (added in Pi 0.80.4), which fires exactly when ctx.isIdle() becomes true. Depends on the 0.80.6 version bump subtask.
++
++---
++
++# Activity Log
++
++## 2026-07-10T15:48:40.991Z
++
++- **depends_on**: (none) → AGENT-224

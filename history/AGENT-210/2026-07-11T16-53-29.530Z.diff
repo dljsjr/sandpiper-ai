@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-210.md
++++ b/AGENT-210.md
+@@ -1,14 +1,15 @@
+ ---
+ title: "Curate low-frequency skills into on-demand storage"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Roux"
+ reporter: USER
+ created_at: 2026-05-26T15:59:02.479Z
+ 
+-updated_at: 2026-06-01T04:32:11.854Z
++updated_at: 2026-07-11T16:53:29.530Z
+ ---
+ 
+ # Curate low-frequency skills into on-demand storage
+ 
+@@ -33,4 +34,9 @@
+ 
+ ## 2026-06-01T04:32:11.857Z
+ 
+ - **blocked_by**: AGENT-209 → (none)
++
++## 2026-07-11T16:53:29.530Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

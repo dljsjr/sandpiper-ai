@@ -1,0 +1,23 @@
+--- a/TAT-73.md
++++ b/TAT-73.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:30.357Z
+-updated_at: 2026-05-27T15:45:30.357Z
++updated_at: 2026-05-27T15:45:30.439Z
+ ---
+ 
+ # C3: Per-agent read cursor — persistence + advance-on-handle
+ 
+-
++THIS CHUNK IS THE BUG FIX for TAT-68. Per-agent cursor in a SQLite cursors table (agentId × roomId → last_seq), NOT Pi appendEntry/session files (the thing we're escaping). Advance the cursor on agent-turn completion (last-delivered → cursor), not a specific tool call, so silent/non-tool turns still advance correctly. Advance-on-success semantics: delivered-but-uncommitted messages re-deliver on resume (correct); committed messages never re-deliver (kills the bug). Abort/resume is safe by construction. Legacy cursor initialization: start at current HEAD, not beginning — replaying full history as unread would dump the whole log into context, the opposite of the goal. Depends on C1 (TAT-71) for the log table and C2 (TAT-72) for audience data.
++
++---
++
++# Activity Log
++
++## 2026-05-27T15:45:30.440Z
++
++- **description**: added (1 line)
++

@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-261.md
++++ b/AGENT-261.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Re-enable strict constrained sampling with headless activation coverage"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "sandpiper-dev"
+ reporter: AGENT
+ created_at: 2026-08-10T17:37:46.375Z
+-updated_at: 2026-08-10T18:38:58.439Z
++updated_at: 2026-08-10T18:38:58.495Z
+ ---
+ 
+ # Re-enable strict constrained sampling with headless activation coverage
+ 
+@@ -19,4 +19,8 @@
+ ## 2026-08-10T18:38:58.439Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-dev
++
++## 2026-08-10T18:38:58.496Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

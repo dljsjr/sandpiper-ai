@@ -1,0 +1,26 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -11,13 +11,10 @@
+   - TAT-59
+   - TAT-23
+   - TAT-62
+-updated_at: 2026-05-25T22:00:12.907Z
++updated_at: 2026-05-25T22:00:12.968Z
+ 
+ ---
+ 
+ # Style tattler_receive tool call background
+ 
+-Smoke test found the queue-recovery path working, but custom-rendered Tattler/Chorus delivery cells need final spacing polish. Keep quiet result semantics and avoid noisy assistant follow-up, but render the receive/delivery cells with consistent styling: one line of padding above and one line of padding below the custom rendered cells. After TAT-62, the canonical batch renderer owns the main background styling path; this task should verify whether the remaining issue is the quiet tattler_receive tool-call row itself or the rendered batch cells, and apply the minimal spacing/styling fix.
++Post-reload visual smoke: canonical batch custom rendered cells look good, but need one line of padding above and one line below the rendered cell content. Batch/custom-message background path is otherwise correct after sxrpyyxq / a017f56b. Implement renderer padding while keeping hidden Tattler DMs non-rendered and visible Chorus entries styled through the shared pending batch renderer.
+ 
+ ---
+ 
+@@ -53,3 +53,7 @@
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ 
++## 2026-05-25T22:00:12.969Z
++
++- **description**: updated
++

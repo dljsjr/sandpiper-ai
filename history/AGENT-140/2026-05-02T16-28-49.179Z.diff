@@ -1,0 +1,29 @@
+--- a/AGENT-140.md
++++ b/AGENT-140.md
+@@ -1,14 +1,18 @@
+ ---
+-title: "Bundle standalone native and data assets"
++title: "Build standalone executable and bundle native/data assets"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-02T16:24:51.774Z
+-updated_at: 2026-05-02T16:24:51.774Z
++updated_at: 2026-05-02T16:28:49.179Z
+ ---
+ 
+ # Bundle standalone native and data assets
+-# Bundle standalone native and data assets
++# Build standalone executable and bundle native/data assets
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-02T16:28:49.179Z
++
++- **title**: Bundle standalone native and data assets → Build standalone executable and bundle native/data assets
++

@@ -1,0 +1,25 @@
+--- a/TAT-47.md
++++ b/TAT-47.md
+@@ -8,12 +8,10 @@
+ created_at: 2026-05-25T19:12:00.367Z
+ depends_on:
+   - TAT-46
+-updated_at: 2026-05-25T19:17:28.366Z
++updated_at: 2026-05-25T19:20:14.114Z
+ ---
+ 
+ # Trigger synthetic receive turn with a direct batch message
+ 
+-When tattler_receive has requested delivery and pending inbox is non-empty, defer until the session is idle, drain pending messages with the shared batch helper, and trigger the receive turn with the canonical batch custom message itself. Avoid sending a fake user prompt solely to reach before_agent_start, because sendCustomMessage(triggerTurn=true) bypasses that hook. Guard against reentrancy from inside awaited agent_end listeners.
++After tattler_receive terminates and agent_end fires, defer until idle (zero-timeout/idle polling) before draining the pending inbox with the shared helper and calling pi.sendMessage(batchCustomMessage, { triggerTurn: true }). Do not use sendUserMessage because it renders as the human user. Avoid reentrancy during agent_end handler dispatch and avoid Operation Aborted semantics.
+ 
+ ---
+ 
+@@ -32,3 +32,7 @@
+ 
+ - **depends_on**: (none) → TAT-46
+ 
++## 2026-05-25T19:20:14.117Z
++
++- **description**: updated
++

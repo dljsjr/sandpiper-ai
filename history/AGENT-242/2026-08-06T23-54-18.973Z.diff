@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-242.md
++++ b/AGENT-242.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Env alignment: accept PI_SESSION_* in standup CLI, set AI_AGENT in standalone entry"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-06T20:42:18.480Z
+-updated_at: 2026-08-06T20:42:18.480Z
++updated_at: 2026-08-06T23:54:18.972Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -15,4 +15,12 @@
+ 
+ 0.82.0 injects hardcoded PI_SESSION_ID/PI_SESSION_FILE/PI_PROVIDER/PI_MODEL/PI_REASONING_LEVEL into bash-tool child processes at spawn time (bash.ts; NOT APP_NAME-derived - verified at v0.84.0 - and NOT covered by mirrorPiSandpiperEnvironment, which runs once at boot in the parent process). Post-bump, bash children see these alongside SANDPIPER_SESSION_ID/SANDPIPER_SESSION_FILE from session-continuity (same values; benign coexistence).
+ 
+ Work: (1) teach sandpiper-standup CLI to accept PI_SESSION_ID/PI_SESSION_FILE as fallbacks; keep our injection - shell-relay panes and user shells never receive Pi bash-tool env. (2) AI_AGENT=pi is set only in Pi cli.ts/rpc-entry.ts, not main.ts; sandpiper_standalone.ts calls main() directly and so sets nothing - set AI_AGENT=sandpiper there for child-process attribution.
++
++---
++
++# Activity Log
++
++## 2026-08-06T23:54:18.973Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

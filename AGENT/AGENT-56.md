@@ -1,0 +1,46 @@
+---
+title: "integrate reinforced guidance project"
+status: NOT STARTED
+kind: TASK
+priority: HIGH
+assignee: UNASSIGNED
+reporter: AGENT
+created_at: 2026-04-09T01:38:04.615Z
+updated_at: 2026-05-14T14:04:08.127Z
+---
+
+# integrate reinforced guidance project
+
+Replace the regex/scoring-based aux-guidance system with an LLM classifier.
+
+## Context
+
+The current system uses regex intent detection + scoring heuristics to decide when to inject guidance. This is brittle and doesn't understand prompt semantics.
+
+The LLM classifier (Qwen3-4B-Instruct-2507 with v4-plus-b prompt) tested at 86% strict accuracy on the relabeled corpus (91% guidance, 95% skills).
+
+## Key Decisions
+
+1. **Remove harness signals** - writesSinceVerify, readsSinceGuidance were designed to augment regex. LLM sees prompt content directly.
+2. **Keep cooldown only** - turnsSinceLastInjection as safety net against model quirks
+3. **Skills log-only initially** - Classifier outputs skill recommendations but don't auto-load yet
+4. **One-shot for Phase 4** - Daemon not needed for logging-only mode
+
+## Success Criteria
+
+- [ ] Classifier achieves 85%+ strict accuracy on corpus
+- [ ] Latency under 500ms for 95th percentile
+- [ ] Zero agent crashes from classifier failures
+- [ ] Production logs capture all decisions for 48+ hours
+
+---
+
+# Activity Log
+
+## 2026-04-09T01:38:37.672Z
+
+- **description**: added (21 lines)
+
+## 2026-05-14T14:04:08.129Z
+
+- **title**: Replace regex aux-guidance with LLM classifier → integrate reinforced guidance project

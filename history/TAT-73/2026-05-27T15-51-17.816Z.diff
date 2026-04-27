@@ -1,0 +1,36 @@
+--- a/TAT-73.md
++++ b/TAT-73.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "C3: Per-agent read cursor — persistence + advance-on-handle"
++title: "C3: Per-agent read cursor (Tattler layer) — persistence + advance-on-handle"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+@@ -11,12 +11,10 @@
+   - TAT-72
+ related:
+   - TAT-68
+-updated_at: 2026-05-27T15:46:02.291Z
++updated_at: 2026-05-27T15:51:17.815Z
+ ---
+ 
+ # C3: Per-agent read cursor — persistence + advance-on-handle
+-# C3: Per-agent read cursor — persistence + advance-on-handle
+-
+-THIS CHUNK IS THE BUG FIX for TAT-68. Per-agent cursor in a SQLite cursors table (agentId × roomId → last_seq), NOT Pi appendEntry/session files (the thing we're escaping). Advance the cursor on agent-turn completion (last-delivered → cursor), not a specific tool call, so silent/non-tool turns still advance correctly. Advance-on-success semantics: delivered-but-uncommitted messages re-deliver on resume (correct); committed messages never re-deliver (kills the bug). Abort/resume is safe by construction. Legacy cursor initialization: start at current HEAD, not beginning — replaying full history as unread would dump the whole log into context, the opposite of the goal. Depends on C1 (TAT-71) for the log table and C2 (TAT-72) for audience data.
++# C3: Per-agent read cursor (Tattler layer) — persistence + advance-on-handle
++
++THIS CHUNK IS THE BUG FIX for TAT-68. Per-agent cursor in a SQLite cursors table (agentId × roomId → last_seq), at the Tattler layer — NOT Pi appendEntry/session files (the thing we're escaping). Advance the cursor on agent-turn completion (last-delivered → cursor), not a specific tool call, so silent/non-tool turns still advance correctly. Advance-on-success semantics: delivered-but-uncommitted messages re-deliver on resume (correct); committed messages never re-deliver (kills the bug). Abort/resume is safe by construction. Legacy cursor initialization: start at current HEAD, not beginning — replaying full history would dump the whole log into context. Depends on C1 (TAT-71) and C2 (TAT-72).
+ 
+ ---
+ 
+@@ -31,3 +31,8 @@
+ - **depends_on**: (none) → TAT-71, TAT-72
+ - **related**: (none) → TAT-68
+ 
++## 2026-05-27T15:51:17.816Z
++
++- **title**: C3: Per-agent read cursor — persistence + advance-on-handle → C3: Per-agent read cursor (Tattler layer) — persistence + advance-on-handle
++- **description**: updated
++

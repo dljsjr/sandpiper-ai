@@ -1,0 +1,39 @@
+--- a/TAT-63.md
++++ b/TAT-63.md
+@@ -1,14 +1,28 @@
+ ---
+ title: "Unify idle and batched Tattler/Chorus custom message type"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T21:40:50.198Z
+ updated_at: 2026-05-25T21:40:50.198Z
+-updated_at: 2026-05-25T21:40:50.198Z
++related:
++  - TAT-62
++updated_at: 2026-05-25T21:41:40.668Z
+ ---
+ 
+ # Unify idle and batched Tattler/Chorus custom message type
+ 
+-
++Duplicate created during checkpoint. Canonical task is TAT-62: Unify idle and batched inbound message custom type.
++
++---
++
++# Activity Log
++
++## 2026-05-25T21:41:40.674Z
++
++- **status**: NOT STARTED → COMPLETE
++- **assignee**: UNASSIGNED → AGENT
++- **resolution**: WONTFIX
++- **description**: added (1 line)
++- **related**: (none) → TAT-62
++

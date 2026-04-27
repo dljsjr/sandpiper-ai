@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-228.md
++++ b/AGENT-228.md
+@@ -7,14 +7,14 @@
+ reporter: USER
+ created_at: 2026-07-10T15:48:37.120Z
+ depends_on:
+   - AGENT-224
+-updated_at: 2026-07-10T20:50:07.741Z
++updated_at: 2026-07-10T20:52:55.783Z
+ ---
+ 
+ # Name inline extension factories for standalone distribution
+ 
+-packages/cli/sandpiper_resources.ts's createSandpiperExtensionFactories() returns bare ExtensionFactory[], passed into main()'s extensionFactories in packages/cli/sandpiper_standalone.ts:80-91. Per Pi 0.80.4, unnamed inline factories show as <inline:1>, <inline:2>, etc. in the startup Extensions list. Wrap them as named InlineExtension objects ({ name, factory }) so the standalone distribution's extension list is readable for debugging. Depends on the 0.80.6 version bump subtask.
++Wrapped all 8 inline extension factories in packages/cli/sandpiper_resources.ts as named InlineExtension objects ({ name, factory }) instead of bare ExtensionFactory functions: sandpiper-identity, sandpiper-neutral-capability, web-fetch, web-search, autotoon, tattler, chorus, sandpiper-resources. These now show as <inline:name> instead of <inline:1>/<inline:2>/etc. in the standalone distribution's startup Extensions list. Updated packages/cli/sandpiper_resources.test.ts's applyFactories helper to unwrap the union shape. Verified: check:tsc clean, check:biome-check clean, standalone_resource_discovery.test.ts (exercises createSandpiperExtensionFactories through main()) passes. Two unrelated pre-existing test failures confirmed via git stash to predate this change (shell-relay expectations broken by the earlier 'temporarily disable some extensions' commit, df04a14df55c).
+ 
+ ---
+ 
+ # Activity Log
+@@ -26,4 +26,8 @@
+ ## 2026-07-10T20:50:07.751Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-07-10T20:52:55.784Z
++
++- **description**: updated

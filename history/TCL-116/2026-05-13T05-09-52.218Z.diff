@@ -1,0 +1,27 @@
+--- a/TCL-116.md
++++ b/TCL-116.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Understand and develop a workaround for the branch + workspace storage + auto-commit configuration leading to stale JJ workspaces"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-12T21:11:22.772Z
+-updated_at: 2026-05-13T05:09:11.275Z
++updated_at: 2026-05-13T05:09:52.218Z
+ ---
+ 
+ # Understand and develop a workaround for the branch + workspace storage + auto-commit configuration leading to stale JJ workspaces
+@@ -50,3 +51,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-13T05:09:52.218Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: WONTFIX
++

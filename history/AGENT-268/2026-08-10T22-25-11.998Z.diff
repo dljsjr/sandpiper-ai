@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-268.md
++++ b/AGENT-268.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Build Birdup writable prompt projection"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T22:22:24.170Z
+-updated_at: 2026-08-10T22:22:24.170Z
++updated_at: 2026-08-10T22:25:11.997Z
+ ---
+ 
+ # Build Birdup writable prompt projection
+ 
++
++---
++
++# Activity Log
++
++## 2026-08-10T22:25:11.998Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper

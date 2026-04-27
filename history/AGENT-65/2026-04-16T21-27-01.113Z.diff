@@ -1,0 +1,47 @@
+--- a/AGENT-65.md
++++ b/AGENT-65.md
+@@ -6,9 +6,40 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-16T21:26:54.755Z
+-updated_at: 2026-04-16T21:26:54.755Z
++updated_at: 2026-04-16T21:27:01.112Z
+ ---
+ 
+ # ProcessManager: add PTY spawn mode via @lydell/node-pty
+ 
+-
++Add PTY allocation support to the ProcessManager for use cases that require pseudo-terminal semantics (color output, interactive programs, terminal size detection).
++
++## Context
++
++AGENT-15 implemented the background process framework MVP using `child_process.spawn()`. This works for most background tasks (builds, test watchers, etc.) but doesn't support PTY-specific features:
++- Color output from programs that detect non-TTY stdout
++- Interactive programs requiring terminal control
++- Terminal size detection and viewport awareness
++- Programs that behave differently in PTY vs. pipe mode
++
++## Scope
++
++- Add `mode: 'pty' | 'child'` option to `SpawnOptions`
++- Implement PTY adapter using `@lydell/node-pty` (prebuilt binaries, no compiler needed)
++- Support PTY-specific options: cols, rows, terminal type
++- Handle PTY unified output stream (no separate stdout/stderr)
++- Update tools to expose PTY mode option
++- Tests for PTY spawn mode
++
++## References
++
++- `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — PTY adapter design research
++- `packages/core/src/process-manager.ts` — current implementation (child mode only)
++- AGENT-15 — original background framework (completed without PTY)
++- SHR-71 — PTY adapter for shell_relay (WONTFIX — not needed for shell_relay)
++
++---
++
++# Activity Log
++
++## 2026-04-16T21:27:01.113Z
++
++- **description**: added (25 lines)
++

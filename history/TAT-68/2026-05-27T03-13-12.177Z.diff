@@ -1,0 +1,26 @@
+--- a/TAT-68.md
++++ b/TAT-68.md
+@@ -6,10 +6,19 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-27T03:12:35.504Z
+-updated_at: 2026-05-27T03:12:35.504Z
++related:
++  - TAT-37
++  - TAT-58
++  - TAT-64
++updated_at: 2026-05-27T03:13:12.173Z
+ ---
+ 
+ # Pending inbox re-delivers already-handled messages after abort+resume
+ 
+ Observed by Doug: on a long multi-turn session, a user-originated abort followed by a new user prompt dumps already-handled Tattler/Chorus messages back into context, and the agent reports it already processed them. Diagnosis: the pending-inbox read position (cursor) is not durably advanced through the abort+resume cycle, so before_agent_start re-drains an inbox it already drained. This is the inverse of the loss-direction abort bugs (TAT-37 et al.): over-delivery, not loss. Fix locus: durable-rooms v1 slice -- per-agent cursor in a SQLite cursors table, advanced on tool-call SUCCESS (atomicity boundary), so delivered-but-uncommitted messages re-deliver while committed ones never do. Resolved-by the durable Chorus room log + cursor slice; see .sandpiper/docs/specs/durable-rooms-sizing.md (chunk 3). Distinct from TAT-64/TAT-65 (render-delay).
+ 
++---
++
++# Activity Log
++
++## 2026-05-27T03:13:12.177Z
++
++- **related**: (none) → TAT-37, TAT-58, TAT-64
++

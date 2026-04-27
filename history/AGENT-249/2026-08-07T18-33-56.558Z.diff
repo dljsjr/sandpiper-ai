@@ -1,0 +1,43 @@
+===================================================================
+--- a/AGENT-249.md
++++ b/AGENT-249.md
+@@ -5,25 +5,20 @@
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: USER
+ created_at: 2026-08-07T14:57:16.486Z
+-updated_at: 2026-08-07T18:33:39.758Z
++updated_at: 2026-08-07T18:33:56.557Z
+ ---
+ 
+ # Headless CLI integration-test pathway (second validation lane)
+ 
+-Add a second validation lane alongside unit tests: headless integration tests driven through real CLI operations, per Doug's direction (2026-08-07). Two entry modes: (1) run `sandpiper` itself; (2) run the dependent `pi` binary with CLI flags limiting loaded extensions, enabling isolated and combinatoric testing of individual extensions. Test drivers: `-p`/print mode for one-off prompts with stdout assertions, and Pi RPC mode (`pi --mode rpc`, see $PI_CODING_AGENT_PACKAGE/docs/rpc.md) for multi-turn/stateful/streaming assertions. Doug's call, coordinator-concurred: prefer RPC over the experimental PiClient/CBOR client-server arch - RPC is stable and documented; PiClient is lane/v4-session-coupled and experimental (assessed during the 0.84.0 audit).
++All four subtasks complete and reviewer-approved: AGENT-250 (design), AGENT-251 (harness foundation), AGENT-252 (mock provider + scripting, and a network-deny-guard mechanism that was built, corrected twice for real gaps, then torn down entirely once the actual root cause of the incident that motivated it was found to be a self-inflicted config-isolation gap rather than an ambient-credential leak), AGENT-253 (wave-1 coverage: skill + autotoon isolated/combinatoric, rpc-driver line-buffering unit coverage, and the AGENT-237(e) compaction/steer payoff hypothesis validated headlessly).
+ 
+-Session knowledge this design must absorb (hard-won 2026-08-06, do not re-derive by trial):
+-- Print-mode landmines (AGENT-248 investigation): resolveAppMode() FORCES print mode when stdin/stdout is not a TTY (deterministic for tests - good); readPipedStdin() blocks without stdin EOF (redirect < /dev/null); model resolution exits before before_agent_start without an API key present (placeholder key required); ctx.shutdown() is a silent no-op in print mode (print-mode.js registers no shutdownHandler) - any extension relying on it behaves differently headless.
+-- 0.84.0 RPC breaking change: message_update emits ONLY deltas; clients assemble between message_start/message_end; message_end is authoritative. The RPC driver must be delta-native from day one.
+-- Isolation stack is mandatory by default in the harness, not per-test: SANDPIPER_CODING_AGENT_DIR at a temp dir (real settings execute `!op read` at extension boot), GIT_CONFIG_GLOBAL/GIT_CONFIG_SYSTEM neutralized + JJ_CONFIG fixture where VCS is spawned, provider egress blackholed (base URL at a dead local port) unless a mock provider is registered, tripwire-compatible (op shim PATH prefix must not break the harness).
+-- Root vitest does NOT discover nested per-package vitest configs (no workspace config) - harness placement and env wiring must account for this; the root test:vitest script env is the proven pattern.
+-- Repo invariants: tests never touch real user state (~/.sandpiper, ~/.pi); Bun/Node runtime-agnostic where applicable; bun check zero-warnings gate.
++Delivered at devtools/integration/: prepareIsolatedSpawn() (isolation-by-construction spawn helper, two entry modes -- raw pi and the sandpiper wrapper), print-mode and RPC drivers, a scriptable mock provider (multi-turn, tool calls, deterministic stop reasons), and the config-isolation containment canary that directly proves the fix for the original incident.
+ 
+-Potential payoff to validate en route: RPC exposes Compaction commands - if compaction can be driven via RPC against a deterministic provider, AGENT-237 item (e) (steer-through-compaction, currently deferred to Doug's live-session checklist) may become headless-testable, converting the last manual sweep item into CI coverage.
++Explicitly NOT covered, named as scope rather than left as silent debt: the compiled-binary variant of entry:'sandpiper' (evaluated for wave 1, not cheap to build in this environment, deferred as named wave-2 scope per the coordinator's ruling); tattler (two-process harness capability needed, deferred to wave 2 by AGENT-250's own design); background-process, shell-relay, web-fetch/web-search live paths (deferred with their own stated reasons in the design doc's wave-1 scope section).
+ 
+-SCOPE ADDENDUM (2026-08-07, post AGENT-251): entry mode sandpiper currently runs from SOURCE (sandpiper_standalone.ts), not the compiled binary - a named coverage gap per the AGENT-243 precedent (bunfig bug manifested only in the compiled artifact). Disposition: wave-2 item - AGENT-253 decides whether one representative compiled-binary smoke belongs in wave 1; a full compiled-entry variant is future work, not silent scope. Also carried: rpc-driver happy-path-only coverage closes incidentally in AGENT-253 (reviewer flag, dev-acknowledged).
++Full postmortem lives in .sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md, with the corrected root cause and the guard's build-then-teardown arc recorded so it isn't rebuilt from scratch.
+ 
+ ---
+ 
+ # Activity Log
+@@ -35,4 +30,8 @@
+ ## 2026-08-07T18:33:39.759Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-0.84-dev
++
++## 2026-08-07T18:33:56.558Z
++
++- **description**: 12 lines → updated (7 lines)

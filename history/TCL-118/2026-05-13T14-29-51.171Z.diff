@@ -1,0 +1,25 @@
+--- a/TCL-118.md
++++ b/TCL-118.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Prototype one-repo-per-tab Glimpse task board"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T14:17:03.418Z
+-updated_at: 2026-05-13T14:17:09.841Z
++updated_at: 2026-05-13T14:29:51.170Z
+ ---
+ 
+ # Prototype one-repo-per-tab Glimpse task board
+@@ -22,3 +22,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-13T14:29:51.171Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

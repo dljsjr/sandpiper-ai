@@ -1,0 +1,23 @@
+--- a/TAT-76.md
++++ b/TAT-76.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:50.465Z
+-updated_at: 2026-05-27T15:45:50.465Z
++updated_at: 2026-05-27T15:45:50.536Z
+ ---
+ 
+ # C6: Compatibility fallback for pending-batch migration
+ 
+-
++Keep the pending-batch path as a migration fallback so nothing regresses during cutover. Durable log is authoritative once live; during migration the log is truth and pending-batch is read-only fallback for pre-cutover messages. Avoid dual-write drift. Explicit cutover design before coding. Depends on C5 (TAT-75) — the live-nudge demotion must be in place before the fallback path is narrowed.
++
++---
++
++# Activity Log
++
++## 2026-05-27T15:45:50.537Z
++
++- **description**: added (1 line)
++

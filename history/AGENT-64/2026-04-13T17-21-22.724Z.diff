@@ -1,0 +1,31 @@
+--- a/AGENT-64.md
++++ b/AGENT-64.md
+@@ -6,9 +6,24 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-13T17:21:13.593Z
+-updated_at: 2026-04-13T17:21:13.593Z
++updated_at: 2026-04-13T17:21:22.723Z
+ ---
+ 
+ # Prototype reinforced-guidance extraction/retrieval prompts and evals
+ 
+-
++Continue the prompt-only reinforced-guidance prototype under extensions/system/reinforced-guidance/ without wiring it into aux-guidance-hooks yet.
++
++Focus areas:
++- prompt-engineer the extractor and retriever as internal skill-like sub-agents
++- build and calibrate synthetic retriever evals, including clarification signals
++- document eval-authoring and grading methodology inspired by skill-creator
++- keep work in the reinforced-guidance playpen until the protocol and evals are stable enough for harness integration
++
++Success looks like a clearer retriever/extractor prompt contract, stronger synthetic eval coverage, and handoff-safe docs that preserve the methodology across context compactions.
++
++---
++
++# Activity Log
++
++## 2026-04-13T17:21:22.724Z
++
++- **description**: added (9 lines)
++

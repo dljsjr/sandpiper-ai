@@ -1,0 +1,27 @@
+--- a/AGENT-158.md
++++ b/AGENT-158.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Extract system startup prompt boundary"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-05T06:08:25.855Z
+-updated_at: 2026-05-05T06:08:25.899Z
++updated_at: 2026-05-05T06:25:48.516Z
+ ---
+ 
+ # Extract system startup prompt boundary
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-05T06:25:48.517Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

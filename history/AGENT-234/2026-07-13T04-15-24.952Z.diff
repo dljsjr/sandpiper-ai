@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-234.md
++++ b/AGENT-234.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Tattler shutdown hangs pi exit: session_shutdown awaits an unbounded server.close() while peer connections linger"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: "Fable"
+ reporter: USER
+ created_at: 2026-07-12T04:41:25.312Z
+-updated_at: 2026-07-12T04:44:41.417Z
++updated_at: 2026-07-13T04:15:24.948Z
+ ---
+ 
+ # Tattler shutdown hangs pi exit: session_shutdown awaits an unbounded server.close() while peer connections linger
+ 
+@@ -34,4 +35,9 @@
+ 
+ ## 2026-07-12T04:44:41.418Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-13T04:15:24.952Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

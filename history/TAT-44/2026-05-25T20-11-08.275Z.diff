@@ -1,0 +1,27 @@
+--- a/TAT-44.md
++++ b/TAT-44.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Test pending inbox delivery across busy, abort, and resume paths"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -11,7 +11,7 @@
+   - TAT-41
+   - TAT-42
+   - TAT-43
+-updated_at: 2026-05-25T20:11:08.188Z
++updated_at: 2026-05-25T20:11:08.274Z
+ ---
+ 
+ # Test pending inbox delivery across busy, abort, and resume paths
+@@ -47,3 +47,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T20:11:08.275Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

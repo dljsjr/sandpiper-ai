@@ -1,0 +1,25 @@
+--- a/TAT-40.md
++++ b/TAT-40.md
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:38:32.887Z
++updated_at: 2026-05-25T19:46:26.246Z
+ ---
+ 
+ # Implement Tattler pending inbox state and dedupe
+ 
+-Implemented in jj change xszoyull / 7401716b. Adds TattlerPendingInbox with dedupe keys, ordered snapshots, and explicit lifecycle states pending -> reserved -> handedToTurn -> delivered/cleared. Busy inbound Tattler agent messages ACK at transport and queue here instead of entering Pi steer/followUp. Focused tests cover dedupe and lifecycle. Remaining durability/abort proof is tracked in TAT-37/TAT-44.
++Implemented in jj changes xszoyull / 7401716b plus review fix wxqnulxl / 5874382f. Adds TattlerPendingInbox with dedupe keys, ordered snapshots, session clear/reset, and explicit lifecycle states pending -> reserved -> handedToTurn -> delivered/cleared. Busy inbound Tattler agent messages ACK at transport and queue here instead of entering Pi steer/followUp. Focused tests cover dedupe, lifecycle, mixed visibility guard, and session clear. Remaining durability/abort proof is tracked in TAT-37/TAT-44.
+ 
+ ---
+ 
+@@ -36,3 +36,7 @@
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
+ 
++## 2026-05-25T19:46:26.251Z
++
++- **description**: updated
++

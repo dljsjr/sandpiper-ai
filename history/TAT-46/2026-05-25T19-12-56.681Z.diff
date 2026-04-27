@@ -1,0 +1,27 @@
+--- a/TAT-46.md
++++ b/TAT-46.md
+@@ -3,13 +3,18 @@
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.288Z
+ updated_at: 2026-05-25T19:12:00.288Z
+-updated_at: 2026-05-25T19:12:00.288Z
++updated_at: 2026-05-25T19:12:56.681Z
+ ---
+ 
+ # Implement tattler_receive cooperative interruption tool
+ 
+ Register a Tattler-level receive tool that the model can call when pending messages may affect current work. The tool should have concise prompt guidance, a call renderer that says the agent is checking pending messages / ending the current turn, a quiet result renderer, provider-safe result content, and terminate=true. It should set state for agent_end to schedule the receive turn.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:56.681Z
++
++- **assignee**: UNASSIGNED → Huginn
++

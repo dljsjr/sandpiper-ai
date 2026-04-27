@@ -1,0 +1,25 @@
+--- a/AGENT-120.md
++++ b/AGENT-120.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Wire standalone and Pi package modes to identity-aware extension sets"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T17:34:25.009Z
+-updated_at: 2026-05-01T17:44:10.599Z
++updated_at: 2026-05-01T17:45:30.390Z
+ ---
+ 
+ # Wire standalone and Pi package modes to identity-aware extension sets
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-01T17:45:30.391Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

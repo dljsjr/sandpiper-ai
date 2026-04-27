@@ -1,0 +1,25 @@
+--- a/AGENT-108.md
++++ b/AGENT-108.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Make standup CLI command tests cwd-independent"
+-status: IN PROGRESS
++status: NOT STARTED
+ kind: BUG
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-28T18:37:45.963Z
+-updated_at: 2026-05-12T16:11:57.295Z
++updated_at: 2026-05-12T16:12:00.568Z
+ ---
+ 
+ # Make standup CLI command tests cwd-independent
+@@ -92,3 +92,7 @@
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ 
++## 2026-05-12T16:12:00.569Z
++
++- **status**: IN PROGRESS → NOT STARTED
++

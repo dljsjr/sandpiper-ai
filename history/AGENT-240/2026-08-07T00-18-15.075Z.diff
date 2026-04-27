@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-240.md
++++ b/AGENT-240.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Adopt constrainedSampling across custom tools"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.977Z
+-updated_at: 2026-08-07T00:08:52.150Z
++updated_at: 2026-08-07T00:18:15.074Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -24,4 +24,8 @@
+ ## 2026-08-07T00:08:52.151Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-0.84-dev
++
++## 2026-08-07T00:18:15.075Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,26 @@
+--- a/AGENT-90.md
++++ b/AGENT-90.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.248Z
+-updated_at: 2026-04-27T18:20:53.248Z
++updated_at: 2026-04-27T18:22:09.246Z
+ depends_on:
+   - AGENT-88
+   - AGENT-89
+@@ -16,4 +16,13 @@
+ 
+ # Build neutral Pi package distribution artifact
+ 
+-
++Build the neutral Pi package distribution artifact.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- local Pi install/load smoke test passes\n- package ships neutral capabilities/resources and CLIs\n- package does not set Sandpiper identity, system prompt, or config directory
++
++---
++
++# Activity Log
++
++## 2026-04-27T18:22:09.246Z
++
++- **description**: added (1 line)
++

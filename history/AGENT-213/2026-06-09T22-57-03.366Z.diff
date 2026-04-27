@@ -1,0 +1,25 @@
+--- a/AGENT-213.md
++++ b/AGENT-213.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Prompt-contribution protocol: extensions register system-prompt blocks via event bus"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Roux"
+ reporter: USER
+ created_at: 2026-06-09T22:44:32.784Z
+-updated_at: 2026-06-09T22:53:52.816Z
++updated_at: 2026-06-09T22:57:03.365Z
+ ---
+ 
+ # Prompt-contribution protocol: extensions register system-prompt blocks via event bus
+@@ -40,3 +40,7 @@
+ 
+ - **description**: 12 lines → updated (15 lines)
+ 
++## 2026-06-09T22:57:03.366Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

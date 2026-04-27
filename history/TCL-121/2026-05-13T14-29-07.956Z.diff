@@ -1,0 +1,32 @@
+--- a/TCL-121.md
++++ b/TCL-121.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Fix slash shortcut stealing focus from Glimpse board form fields"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T14:29:07.912Z
+ updated_at: 2026-05-13T14:29:07.912Z
+-updated_at: 2026-05-13T14:29:07.912Z
++updated_at: 2026-05-13T14:29:07.956Z
+ ---
+ 
+ # Fix slash shortcut stealing focus from Glimpse board form fields
+ 
+ The Glimpse task board uses / as a global focus-search shortcut, but it currently fires while typing in task creation fields. That makes / impossible to type or paste reliably in titles/descriptions. Scope the shortcut so it only fires when focus is not in an editable input, textarea, select, or contenteditable element.
+ 
++---
++
++# Activity Log
++
++## 2026-05-13T14:29:07.957Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

@@ -1,0 +1,38 @@
+--- a/TAT-62.md
++++ b/TAT-62.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Unify idle and batched inbound message custom type"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T21:40:22.427Z
+ updated_at: 2026-05-25T21:40:22.427Z
+-updated_at: 2026-05-25T21:40:22.427Z
++updated_at: 2026-05-25T21:40:50.287Z
+ related:
+   - TAT-36
+   - TAT-43
+@@ -15,5 +15,15 @@
+ 
+ # Unify idle and batched inbound message custom type
+ 
+-Refactor Tattler/Chorus inbound delivery so the idle emit path and busy pending-batch path use the same custom message type, details shape, and renderer. The canonical content is the concatenated model-visible message text/XML; details contains messages[] for both cases. The idle case is just a one-element messages array. This should remove the split between old single-message custom types and tattler:pending-batch, reduce renderer branching, and keep visible/hidden filtering consistent.
+-
++Doug decision from smoke: idle single-message delivery and busy batch delivery should use the same custom message type/struct/renderer. The one-message idle case is just a batch with count=1. Use one canonical Tattler message-batch custom type (currently tattler:pending-batch or renamed) with model-facing concatenated content and details {kind:"batch", batchId, messages:[...]}. Renderer filters/branches by item visibility/type, not idle vs busy origin. This should replace divergence between Chorus idle chorus-room-message and Tattler pending-batch. Benefits: one hidden/visible filtering path, one replay/restore/dedupe shape, one renderer, easier participant metadata and TAT-60 styling.
++
++---
++
++# Activity Log
++
++## 2026-05-25T21:40:50.288Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++- **description**: updated
++

@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-139.md
++++ b/TCL-139.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Add mutation-time consistency checks (parent/child, blocker resolution, dangling refs, cycles)"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-07-11T17:22:20.439Z
+-updated_at: 2026-07-11T17:36:49.483Z
++updated_at: 2026-07-11T17:36:49.708Z
+ ---
+ 
+ # Add mutation-time consistency checks (parent/child, blocker resolution, dangling refs, cycles)
+ 
+@@ -42,4 +43,9 @@
+ 
+ ## 2026-07-11T17:36:49.485Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T17:36:49.712Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

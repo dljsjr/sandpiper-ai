@@ -1,0 +1,47 @@
+--- a/AGENT-214.md
++++ b/AGENT-214.md
+@@ -6,25 +6,6 @@
+ assignee: "Huginn"
+ reporter: "Roux"
+ created_at: 2026-06-09T22:45:05.621Z
+-updated_at: 2026-06-09T22:51:05.718Z
++updated_at: 2026-06-09T22:53:02.045Z
+ ---
+ 
+ # sandpiper-ai: implement prompt-contributor collector in startup hook
+ 
+-Owner: Huginn. CONTRACT OWNER + critical path. In sandpiper-ai's system startup hook (extensions/system/startup-hooks.ts + sandpiper-ai-core buildSandpiperStartupPrompt path).
+-
+-GATE 2026-06-09: Muninn (AGENT-215) has shipped a tested concrete contract shape on the pi-yaams side. Do NOT define a second shape cold — adopt or negotiate deltas in-room first. Candidate contract to consume:
+-- channel: 'sandpiper:prompt-contributor'
+-- payload: { id; source; phase?; getContent(): Promise<block>; acknowledge?() }
+-- collector MUST call contribution.acknowledge() when it accepts the block (load-bearing: pi-yaams uses the ack to decide whether to skip its legacy direct-append fallback).
+-
+-Implementation:
+-- Closure state: contributors map + unsubscribe handle.
+-- session_start: reset contributors, (re)subscribe to the channel; synchronous enqueue only; dedupe by id; call acknowledge() on accept.
+-- session_shutdown: unsubscribe.
+-- before_agent_start: drain contributors, await getContent once, splice rendered blocks into the rebuilt Sandpiper prompt at a stable location; cache/freeze for the session (prefix-cache stability).
+-- Export the channel name + payload type as the canonical shared contract; docs (AGENT-216) and pi-yaams (AGENT-215) follow the exported constant.
+-- Tests: contributor registered in resources_discover lands in assembled prompt; acknowledge() called; dedupe by id; absent contributors => unchanged prompt; stable across multiple before_agent_start fires.
++Owner: Huginn. Collector IMPLEMENTED (NEEDS REVIEW) in extensions/system/prompt-contributions.ts + startup-hooks.ts. Canonical contract:
++- channel SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL = 'sandpiper:prompt-contribution'
++- SandpiperPromptContribution { id; phase?: 'prepend'|'append'; getContent }
++- listener installed in session_start (sync enqueue), dedupe by trimmed id (first wins), resolve+freeze on first before_agent_start, prepend-before/append-after base prompt, unsubscribe on session_shutdown, dumpSystemPrompt dumps final.
++- isSandpiperPromptContribution type-guard rejects invalid phase.
++- Tests: append, prepend/append ordering, dedupe, freeze-after-first-build, shutdown unsubscribe. tsc + biome + vitest green.
++
++ARBITRATION 2026-06-09 (Roux): this contract is canonical (better-typed than AGENT-215's draft; owner's call). ONE required addition before merge: re-add acknowledge?(): void to the interface; collector calls contribution.acknowledge?.() inside add() on successful insert. Reason: pi-yaams needs the ack to disable its harness-agnostic direct-append fallback in plain-Pi vs Sandpiper. Without it pi-yaams cannot tell a collector consumed the block (pi.events wrapper exposes no listenerCount). Timing is safe: add() runs in resources_discover, before pi-yaams's before_agent_start fallback.
++
++Also flag for reviewer: Huginn edited extension-factories.test.ts (shared) — removed a stale 'context' neutral-capability expectation. Defensible (suite was unusable) but confirm it isn't masking a real regression.
+ 
+ ---
+ 
+@@ -43,3 +39,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-06-09T22:53:02.046Z
++
++- **description**: 14 lines → updated (10 lines)
++

@@ -1,0 +1,22 @@
+--- a/TAT-34.md
++++ b/TAT-34.md
+@@ -6,7 +6,10 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T14:56:05.439Z
+-updated_at: 2026-05-25T18:27:44.391Z
++related:
++  - TAT-36
++  - TAT-39
++updated_at: 2026-05-25T19:11:48.077Z
+ ---
+ 
+ # Decouple Chorus visual rendering from model-visible message injection
+@@ -27,3 +30,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T19:11:48.078Z
++
++- **related**: (none) → TAT-36, TAT-39
++

@@ -1,0 +1,29 @@
+--- a/AGENT-64.md
++++ b/AGENT-64.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Prototype reinforced-guidance extraction/retrieval prompts and evals"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-13T17:21:13.593Z
+ updated_at: 2026-04-13T17:21:22.723Z
+-updated_at: 2026-04-13T17:21:22.723Z
++updated_at: 2026-04-13T17:21:22.769Z
+ ---
+ 
+ # Prototype reinforced-guidance extraction/retrieval prompts and evals
+@@ -29,3 +29,8 @@
+ 
+ - **description**: added (9 lines)
+ 
++## 2026-04-13T17:21:22.770Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

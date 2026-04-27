@@ -1,0 +1,25 @@
+--- a/AGENT-111.md
++++ b/AGENT-111.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Bring standalone CLI to dogfood parity with pi wrapper"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-30T04:58:01.617Z
+-updated_at: 2026-04-30T05:09:52.224Z
++updated_at: 2026-04-30T16:39:55.883Z
+ related:
+   - AGENT-99
+   - AGENT-86
+@@ -28,3 +28,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-30T16:39:55.884Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++

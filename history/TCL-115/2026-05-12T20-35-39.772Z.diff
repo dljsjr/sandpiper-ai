@@ -1,0 +1,25 @@
+--- a/TCL-115.md
++++ b/TCL-115.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "CLI should enforce that a task cannot transition to COMPLETE + DONE unless it is currently in NEEDS REVIEW"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-12T20:35:36.968Z
+-updated_at: 2026-05-12T20:35:37.023Z
++updated_at: 2026-05-12T20:35:39.771Z
+ ---
+ 
+ # CLI should enforce that a task cannot transition to COMPLETE + DONE unless it is currently in NEEDS REVIEW
+@@ -21,3 +21,7 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-12T20:35:39.772Z
++
++- **status**: NOT STARTED → IN PROGRESS
++

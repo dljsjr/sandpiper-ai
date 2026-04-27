@@ -1,0 +1,32 @@
+--- a/TAT-22.md
++++ b/TAT-22.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Dogfood Chorus v0 with multiple live agents"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:57.040Z
+ updated_at: 2026-05-23T06:23:57.040Z
+-updated_at: 2026-05-23T06:23:57.040Z
++updated_at: 2026-05-24T15:35:03.595Z
+ ---
+ 
+ # Dogfood Chorus v0 with multiple live agents
+ 
+ Run the room broker MVP with multiple live sessions, verify user posts, agent replies, local-agent symmetry, broker rendering, ACK/error behavior, and capture findings for Tattler v1 durable room design.
+ 
++---
++
++# Activity Log
++
++## 2026-05-24T15:35:03.598Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++- **assignee**: UNASSIGNED → AGENT
++

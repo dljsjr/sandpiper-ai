@@ -1,39 +1,37 @@
 ---
 title: "Spike: single-query web search tool (fetch top N results from a search API)"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: "Piper"
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.175Z
-updated_at: 2026-04-01T16:30:37.348Z
+updated_at: 2026-07-11T16:53:29.597Z
 ---
 
 # Spike: single-query web search tool (fetch top N results from a search API)
 
-The web-fetch PRD called single-query search 'a natural v2'. Rather than requiring the user to provide a URL, the agent could issue a search query and automatically fetch and extract the top N results.
+## Design Decisions (2026-06-07)
 
-## Motivation
+**Architecture:** New Pi extension at `extensions/web-search/`, mirroring `web-fetch`'s structure. Registers a `web_search` tool via `pi.registerTool`.
 
-Many agent tasks involve researching something: 'what is the current API for X', 'how do I do Y in Z framework'. Today the agent must know or guess a URL. A search tool would let it search first, then read the best results.
+**Adapter pattern:** `SearchAdapter` interface (mirroring `FetchAdapter`) with pluggable backends:
+- **Brave Search API** — primary adapter. Independent index, 2k queries/month free, clean JSON API. Key via `BRAVE_API_KEY` env var or `braveApiKey` in settings.json. Supports `!op read` pattern.
+- **Parallel MCP** — no-key fallback. Free endpoint at `https://search.parallel.ai/mcp`. Uses mcporter's `createRuntime` with programmatic server definition (no config.json needed). MCP wire protocol: initialize → tools/call → parse content[0].text JSON.
+- **DDG HTML scraping** — last-resort fallback. Zero-config but CAPTCHAs on first request from server-side code.
 
-## Scope (spike)
+**Result shape:** `{title: string, url: string, snippet: string}[]` — structured results, same contract regardless of backend.
 
-This is a spike to evaluate:
-- Which search API to use (DuckDuckGo instant, SearXNG self-hosted, Brave Search API, Tavily, etc.)
-- Whether to fetch all N result pages in parallel or let the agent choose which to follow
-- How to present results: merged ranked summary, separate fetched pages, or metadata list with manual follow-links
-- Cost model: is a search API call + N fetches acceptable latency for a coding agent workflow?
+**Composition:** `web_search` returns URLs; agent feeds them to `web_fetch` for full content. Clean sibling tools.
 
-## Success criteria for spike
+**Config surface:** API key via env var (`BRAVE_API_KEY`), settings.json under extension namespace, or Pi's `!cmd`/``/literal resolver pattern (mirrored in extension, ~15 lines).
 
-- Document the chosen API and rationale
-- Prototype a minimal implementation
-- Report on latency and result quality for 3-5 representative queries
+**Scope boundary:** WEB-10 (JS/SPA rendering) is phase 2 — a separate `FetchAdapter` swap in web-fetch, not part of this tool.
 
-## References
+## Status (2026-06-07)
 
-- `.sandpiper/docs/web-fetch-prd.md` — Deferred capabilities, Scope 3
+Brave adapter built, tested, and live in harness. Parallel MCP adapter in progress. DDG adapter as last-resort fallback.
 
 ---
 
@@ -46,3 +44,29 @@ This is a spike to evaluate:
 ## 2026-04-01T16:30:37.348Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-06-07T22:22:50.208Z
+
+- **description**: 23 lines → updated (16 lines)
+
+## 2026-06-07T22:22:59.442Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → Piper
+
+## 2026-06-08T01:31:03.833Z
+
+- **description**: 16 lines → updated (20 lines)
+
+## 2026-06-08T01:34:14.749Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-06-08T05:10:24.698Z
+
+- **description**: updated
+
+## 2026-07-11T16:53:29.597Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

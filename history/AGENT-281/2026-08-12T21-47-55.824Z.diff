@@ -1,0 +1,39 @@
+===================================================================
+--- a/AGENT-281.md
++++ b/AGENT-281.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.573Z
+-updated_at: 2026-08-12T16:28:45.535Z
++updated_at: 2026-08-12T21:47:55.823Z
+ depends_on:
+   - AGENT-280
+ ---
+ 
+@@ -22,10 +22,15 @@
+ Out of scope (resolved 2026-08-12): the transport does NOT need stdin. Pi's `pi.exec` hard-wires stdio[0] to "ignore" and cannot carry a payload, but rather than reimplement exec in the adapter — and inherit ownership of Pi's stdio-drain fix (pi#5303), abort/timeout escalation, and cross-spawn — the envelope arrives via `--ops` on argv. See YAAMS-93. CliRunner and pi.exec stay exactly as they are.
+ 
+ Done when: the fake CLI emits real YAAMS wire shapes rather than hand-shaped objects, reader and bootstrap tests pass, and a malformed success or error payload fails at the boundary with a diagnostic that names the field.
+ 
++
+ ---
+ 
++**MOVED — not abandoned.** Rewritten by hand as **PIEXT-38** in `~/git/yaams` (2026-08-12). pi-yaams work belongs to the PIEXT project, whose charter is exactly this; AGENT covers capabilities not specific to a single tool or extension. pi-yaams is developed out-of-tree today but moves in-tree with yaams, which is why the board lives there. Trail has no cross-repo move, so this closes WONTFIX rather than leaving a tombstone. All content and work state carried over verbatim.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-12T02:10:19.812Z
+ 
+@@ -34,4 +39,8 @@
+ ## 2026-08-12T16:28:45.536Z
+ 
+ - **title**: Make runYaamsCli typed, stdin-capable, and migrate read paths → Decode YAAMS CLI responses at the transport boundary and migrate the read paths
+ - **description**: 5 lines → updated (9 lines)
++
++## 2026-08-12T21:47:55.824Z
++
++- **description**: 9 lines → updated (14 lines)

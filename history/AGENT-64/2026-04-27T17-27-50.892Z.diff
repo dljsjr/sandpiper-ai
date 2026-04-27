@@ -1,0 +1,32 @@
+--- a/AGENT-64.md
++++ b/AGENT-64.md
+@@ -1,17 +1,12 @@
+ ---
+ title: "Prototype reinforced-guidance extraction/retrieval prompts and evals"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-13T17:21:13.593Z
+-updated_at: 2026-04-21T19:27:24.771Z
++updated_at: 2026-04-27T17:27:50.891Z
+ ---
+ 
+ # Prototype reinforced-guidance extraction/retrieval prompts and evals
+ 
+-Active experiment (2026-04-21): Anonymizing retriever example IDs to fix ID leakage. The model was emitting `use_sanitize_surfaces` (prefix-mutated from the cooking example in its own prompt) on every another-project run. All concrete example IDs replaced with EXAMPLE_* placeholders. A/B comparison matrix running as batch `retriever-anonymized`.
++Prototype reinforced-guidance extraction/retrieval prompts and evals.\n\nStatus update 2026-04-27: the prototype and experiment workbench were extracted to the standalone repository /Users/dstephen/git/reinforced-guidance. The mutable Sandpiper RG/aux-guidance stack qxpptpxm::xlwnnkxv was abandoned, and feat/reinforced-guidance was deleted. Continue Axis 3 work in the standalone repo rather than in sandpiper-ai.
+ 
+ ---
+ 
+@@ -38,3 +38,8 @@
+ 
+ - **description**: 16 lines → updated (1 line)
+ 
++## 2026-04-27T17:27:50.892Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++- **description**: updated
++

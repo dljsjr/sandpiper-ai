@@ -1,0 +1,25 @@
+--- a/AGENT-187.md
++++ b/AGENT-187.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Expose Sandpiper package root and ship public docs"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-07T21:02:45.983Z
+-updated_at: 2026-05-08T18:43:21.647Z
++updated_at: 2026-05-08T18:54:51.633Z
+ ---
+ 
+ # Expose Sandpiper package root and ship public docs
+@@ -34,3 +34,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-08T18:54:51.634Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

@@ -1,0 +1,25 @@
+--- a/TAT-41.md
++++ b/TAT-41.md
+@@ -10,12 +10,10 @@
+   - TAT-40
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:38:32.941Z
++updated_at: 2026-05-25T19:46:26.339Z
+ ---
+ 
+ # Drain pending inbox for normal prompts via before_agent_start
+ 
+-Implemented in jj change xszoyull / 7401716b. before_agent_start drains normal user-prompt/abort-resume path through the shared pending-inbox helper, returns the custom batch message, marks messages handedToTurn, and clears only after message_end for tattler:pending-batch. Synthetic receive remains a separate direct-batch path for TAT-47.
++Implemented in jj changes xszoyull / 7401716b plus review fix wxqnulxl / 5874382f. before_agent_start drains normal user-prompt/abort-resume path through the shared pending-inbox helper, returns the custom batch message, marks messages handedToTurn, clears only after message_end for tattler:pending-batch, and releases handed batches on agent_end if no matching message_end arrives. Synthetic receive remains a separate direct-batch path for TAT-47.
+ 
+ ---
+ 
+@@ -47,3 +47,7 @@
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
+ 
++## 2026-05-25T19:46:26.340Z
++
++- **description**: updated
++

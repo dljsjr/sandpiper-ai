@@ -1,0 +1,45 @@
+--- a/SHR-98.md
++++ b/SHR-98.md
+@@ -6,12 +6,30 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-14T14:26:43.986Z
+-updated_at: 2026-05-14T14:27:16.394Z
++updated_at: 2026-05-14T14:37:25.582Z
+ ---
+ 
+ # Research replacing Shell Relay snapshot-diff output capture
+ 
+-
++Research task for replacing or reducing Shell Relay's brittle dump-screen snapshot-diff output capture.
++
++Findings so far:
++
++- Installed Zellij 0.44.1 includes `zellij subscribe --format json --pane-id ...`.
++- Source shows subscribe streams rendered pane viewport snapshots. JSON events contain event, pane_id, viewport, optional initial scrollback, and is_initial.
++- Scrollback is only included in the initial delivery when requested; later updates contain viewport snapshots only.
++- Bounded local probe in an isolated temporary Zellij session confirmed frequent full-viewport redraw events:
++  - quiet/outputful commands plus five typed keypresses produced 12 JSON events / 7.8 KB.
++  - each user-like keypress emitted another full viewport snapshot.
++  - payloads included prompt decorations and prior command output.
++- High-output probe with 120 fast lines produced only 7 events and captured lines 101-120 from rendered snapshots; lines 1-100 were not observable from the subscribe stream.
++
++Implication:
++
++Zellij subscribe is useful for live visual inspection or avoiding repeated dump-screen calls, but it is not a reliable primary command-output capture channel. It still requires dedupe/diff logic, emits on collaborative redraws/keypresses, includes prompt decorations, and can miss high-volume output that scrolls through the viewport between renders.
++
++Candidate direction:
++
++Prefer either a shell-side capture channel/file that preserves visible terminal output, or a lower-risk marker-based dump-screen extractor that uses unique start/end sentinels instead of before/after prompt diffing. Treat subscribe as optional live-state support rather than the main capture mechanism.
++
+ ---
+ 
+ # Activity Log
+@@ -21,3 +41,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-14T14:37:25.583Z
++
++- **description**: added (20 lines)
++

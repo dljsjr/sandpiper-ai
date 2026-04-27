@@ -1,0 +1,41 @@
+--- a/TAT-36.md
++++ b/TAT-36.md
+@@ -10,19 +10,18 @@
+   - TAT-37
+   - TAT-38
+   - TAT-39
+-updated_at: 2026-05-25T19:12:47.069Z
++updated_at: 2026-05-25T19:14:54.270Z
+ ---
+ 
+ # Batch Chorus and Tattler interim messages outside Pi steering queue
+ 
+ Problem: inbound Tattler/Chorus messages received while an agent is busy currently risk partial context under Pi's one-at-a-time steering mode, and queued custom messages can be dropped if abort clears Pi's steer/followUp queues before they emit message_start/message_end.
+ 
+-Design direction: make Tattler, not Chorus, own a pending inbox for busy-time inbound messages. Real inbound payloads stay out of Pi's clearable queues while busy. The next agent start for any reason drains the pending inbox through before_agent_start as one persistent custom-message batch.
+-
++Design direction: make Tattler, not Chorus, own a pending inbox for busy-time inbound messages. Real inbound payloads stay out of Pi's clearable queues while busy. A shared drainPendingInboxToBatch helper builds one canonical custom-message batch.
++
++Drain callers:
++- before_agent_start drains for normal user prompts, including user abort + resume.
++- the cooperative receive flow drains directly into a batch custom message and triggers that batch turn after agent_end/idle.
++
+ Acceptance criteria:
+ - Busy-time inbound messages are stored/deduped outside Pi steer/followUp queues.
+ - Any next turn drains pending messages into one durable custom_message batch with model-visible content and structured renderer details.
+-- Any next turn drains pending messages into one durable custom_message batch with model-visible content and structured renderer details.
+-- User abort + next prompt recovers queued messages without relying on the model calling a tool.
++- Normal next prompts drain pending messages via before_agent_start.
++- Synthetic receive turns use the same batch helper and do not depend on a fake user prompt solely to reach before_agent_start.
++- User abort + next prompt recovers queued messages even if the model never called tattler_receive.
+ - One-at-a-time queue mode no longer serializes room bursts into partial context.
+ - Pending messages are cleared only after successful injection/persistence.
+ - Tests cover duplicate delivery, abort recovery, and batch rendering.
+@@ -53,3 +58,7 @@
+ 
+ - **description**: 1 line → updated (11 lines)
+ 
++## 2026-05-25T19:14:54.275Z
++
++- **description**: 11 lines → updated (16 lines)
++

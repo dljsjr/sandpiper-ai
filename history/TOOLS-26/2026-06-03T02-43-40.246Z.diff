@@ -1,0 +1,25 @@
+--- a/TOOLS-26.md
++++ b/TOOLS-26.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Send background-process completions as steering notifications"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-06-03T02:39:09.731Z
+-updated_at: 2026-06-03T02:39:13.931Z
++updated_at: 2026-06-03T02:43:40.243Z
+ ---
+ 
+ # Send background-process completions as steering notifications
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-06-03T02:43:40.246Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

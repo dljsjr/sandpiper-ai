@@ -1,0 +1,27 @@
+--- a/AGENT-62.md
++++ b/AGENT-62.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add configuration support"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-09T01:39:55.348Z
+-updated_at: 2026-04-09T01:41:45.468Z
++updated_at: 2026-05-14T14:04:08.476Z
+ ---
+ 
+ # Add configuration support
+@@ -41,3 +42,8 @@
+ 
+ - **description**: added (21 lines)
+ 
++## 2026-05-14T14:04:08.476Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX
++

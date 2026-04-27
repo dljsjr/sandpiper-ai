@@ -1,0 +1,11 @@
+--- a/AGENT-198.md
++++ b/AGENT-198.md
+@@ -6,7 +6,7 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-12T00:36:12.159Z
+-updated_at: 2026-05-12T00:36:12.211Z
++updated_at: 2026-05-12T05:12:04.090Z
+ ---
+ 
+ # Add model-callable skill loading tool

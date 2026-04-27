@@ -1,0 +1,25 @@
+--- a/TOOLS-14.md
++++ b/TOOLS-14.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Fix generated Dash CLI under ESM package type"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-07T17:39:12.846Z
+-updated_at: 2026-05-07T17:39:20.190Z
++updated_at: 2026-05-07T17:48:48.232Z
+ ---
+ 
+ # Fix generated Dash CLI under ESM package type
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-05-07T17:48:48.233Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

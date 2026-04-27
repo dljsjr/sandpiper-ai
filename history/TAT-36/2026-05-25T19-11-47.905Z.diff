@@ -1,0 +1,23 @@
+--- a/TAT-36.md
++++ b/TAT-36.md
+@@ -6,7 +6,11 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T18:27:44.222Z
+-updated_at: 2026-05-25T19:00:59.212Z
++related:
++  - TAT-37
++  - TAT-38
++  - TAT-39
++updated_at: 2026-05-25T19:11:47.904Z
+ ---
+ 
+ # Batch Chorus and Tattler interim messages outside Pi steering queue
+@@ -27,3 +31,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T19:11:47.905Z
++
++- **related**: (none) → TAT-37, TAT-38, TAT-39
++

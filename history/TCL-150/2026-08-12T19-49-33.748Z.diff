@@ -1,0 +1,34 @@
+===================================================================
+--- a/TCL-150.md
++++ b/TCL-150.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Slice 4: initialize command"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "sandpiper-dev"
+ reporter: "Roux"
+ created_at: 2026-08-12T19:08:48.085Z
+-updated_at: 2026-08-12T19:08:48.085Z
++updated_at: 2026-08-12T19:49:33.748Z
+ depends_on:
+   - TCL-149
+ ---
+ 
+@@ -20,4 +20,13 @@
+ 
+ Do NOT fold `storage init` into this yet. That is a deferred UX cleanup and is out of scope for the cutover.
+ 
+ Verification: `tsc --noEmit` clean, suite green, tests covering: fresh directory produces a config the strict parser round-trips; second invocation fails loudly without touching the existing file; emitted config contains every key the parser requires (this test is the real one — it pins `initialize` and the parser to each other, so they cannot drift apart).
++
++---
++
++# Activity Log
++
++## 2026-08-12T19:49:33.748Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-dev

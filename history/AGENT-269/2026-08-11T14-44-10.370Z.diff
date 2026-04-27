@@ -1,0 +1,14 @@
+===================================================================
+--- a/AGENT-269.md
++++ b/AGENT-269.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T22:22:24.233Z
+-updated_at: 2026-08-11T00:58:31.834Z
++updated_at: 2026-08-11T14:44:10.366Z
+ ---
+ 
+ # Add Glimpse prompt editor and end-to-end verification
+ 

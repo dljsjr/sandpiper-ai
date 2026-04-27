@@ -1,0 +1,40 @@
+--- a/AGENT-84.md
++++ b/AGENT-84.md
+@@ -6,7 +6,7 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:52.924Z
+-updated_at: 2026-04-27T18:20:52.960Z
++updated_at: 2026-04-27T18:20:53.000Z
+ related:
+   - AGENT-16
+   - AGENT-82
+@@ -15,7 +15,19 @@
+ 
+ # Plan package-first multi-distribution refactor
+ 
+-
++Plan the repository refactor from a Pi-package-oriented Sandpiper repo to a package-first monorepo with multiple distributions.
++
++Deliverables for this planning task:
++- architecture/design plan in .sandpiper/docs/specs/
++- task breakdown for implementation phases
++- explicit risks, invariants, migration concerns, and verification gates
++
++Context:
++- Standalone Sandpiper should use Pi 0.70.x rebranding/extension-factory improvements and eventually produce a bun-compiled CLI distribution.
++- Neutral Pi package should ship enhanced capabilities/resources without Sandpiper identity/system prompt.
++- Claude Code plugin should ship neutral skills/extensions/resources where the host supports them.
++- Avoid SUBTASK creation for this breakdown until TCL-111 is fixed; use related top-level tasks instead.
++
+ ---
+ 
+ # Activity Log
+@@ -25,3 +37,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-27T18:20:53.001Z
++
++- **description**: added (12 lines)
++

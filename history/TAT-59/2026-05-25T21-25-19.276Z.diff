@@ -1,0 +1,27 @@
+--- a/TAT-59.md
++++ b/TAT-59.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-25T21:23:39.930Z
+-updated_at: 2026-05-25T21:23:39.930Z
++updated_at: 2026-05-25T21:25:19.271Z
+ depends_on:
+   - TAT-46
+   - TAT-47
+@@ -14,5 +14,13 @@
+ 
+ # Add first-arrival pending-message cue for tattler_receive
+ 
+-Add a best-effort, deduped cue when the first busy-time Tattler/Chorus message is queued: tell the current agent that pending messages exist and it may call tattler_receive if relevant. This cue is non-canonical and must not carry the real message payload; correctness remains in the pending inbox + batch delivery path. Reset/dedupe the cue after pending messages drain or are otherwise cleared.
+-
++Implemented in jj change oxnkmvrx / 1f6c5381. Adds best-effort first-arrival pending-inbox cue on accepted busy enqueue. Cue is deduped while the pending inbox remains non-empty, contains only count/instructions (no payload), tells the model to call tattler_receive by itself if relevant, and is not canonical delivery. Tests cover first busy direct Tattler enqueue nudges once across multiple pending messages.
++
++---
++
++# Activity Log
++
++## 2026-05-25T21:25:19.276Z
++
++- **description**: updated
++

@@ -1,0 +1,27 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Style tattler_receive tool call background"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+ assignee: "Huginn"
+@@ -11,7 +11,7 @@
+   - TAT-59
+   - TAT-23
+   - TAT-62
+-updated_at: 2026-05-25T22:00:06.785Z
++updated_at: 2026-05-25T22:00:12.907Z
+ 
+ ---
+ 
+@@ -49,3 +49,7 @@
+ - **description**: updated
+ - **related**: TAT-38, TAT-59, TAT-23 → TAT-38, TAT-59, TAT-23, TAT-62
+ 
++## 2026-05-25T22:00:12.908Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++

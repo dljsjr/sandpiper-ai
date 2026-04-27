@@ -1,5 +1,5 @@
 ---
-title: "Pi TUI integration for task board"
+title: "Integrate reactive task board into CLI/TUI and agent notification flows"
 status: NOT STARTED
 kind: TASK
 priority: MEDIUM
@@ -8,22 +8,12 @@ reporter: USER
 created_at: 2026-03-23T03:18:38.896Z
 depends_on:
   - TCL-57
-updated_at: 2026-04-01T16:30:37.125Z
+updated_at: 2026-05-13T14:08:49.240Z
 ---
 
-# Pi TUI integration for task board
+# Integrate reactive task board into CLI/TUI and agent notification flows
 
-Implement a Pi TUI component for the task board using Pi's custom UI API (`ctx.ui.custom()`).
-
-This should provide:
-- Interactive board view within the Pi TUI
-- Keyboard navigation between lanes and cards
-- Quick actions (pickup, complete, update status) via keybindings
-- Filtering controls
-- Integration with the tasks CLI for mutations
-
-Depends on the board data model from TCL-57.
-Requires understanding of Pi's TUI component API (`docs/tui.md`).
+Rescoped from a Pi-only TUI board. Build or specify the in-CLI task board surface that consumes the reactive board model and receives live task updates. Include how agents are notified about task changes, review requests, status transitions, and user board interactions so task management can become proactive collaboration rather than a static query.
 
 ---
 
@@ -37,3 +27,8 @@ Requires understanding of Pi's TUI component API (`docs/tui.md`).
 ## 2026-04-01T16:30:37.125Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-05-13T14:08:49.242Z
+
+- **title**: Pi TUI integration for task board → Integrate reactive task board into CLI/TUI and agent notification flows
+- **description**: 11 lines → updated (1 line)

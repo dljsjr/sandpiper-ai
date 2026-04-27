@@ -1,0 +1,29 @@
+--- a/AGENT-205.md
++++ b/AGENT-205.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "skill-review source skill depends on generated PDF that is absent from source tree"
+-status: IN PROGRESS
++status: NOT STARTED
+ kind: BUG
+ priority: LOW
+ assignee: "Huginn"
+-assignee: "Huginn"
++assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-20T06:27:08.093Z
+ updated_at: 2026-06-03T04:43:52.488Z
+-updated_at: 2026-06-03T04:43:52.488Z
++updated_at: 2026-06-03T04:44:12.426Z
+ ---
+ 
+ # skill-review source skill depends on generated PDF that is absent from source tree
+@@ -22,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-06-03T04:44:12.426Z
++
++- **status**: IN PROGRESS → NOT STARTED
++- **assignee**: Huginn → UNASSIGNED
++

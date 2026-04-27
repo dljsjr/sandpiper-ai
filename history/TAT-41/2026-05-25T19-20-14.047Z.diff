@@ -1,0 +1,36 @@
+--- a/TAT-41.md
++++ b/TAT-41.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "Drain pending inbox for normal prompts through before_agent_start"
++title: "Drain pending inbox for normal prompts via before_agent_start"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+@@ -10,12 +10,10 @@
+   - TAT-40
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:17:28.034Z
++updated_at: 2026-05-25T19:20:14.047Z
+ ---
+ 
+ # Drain pending inbox for normal prompts through before_agent_start
+-# Drain pending inbox for normal prompts through before_agent_start
+-
+-Implement the normal-prompt drain path. Pi source shows before_agent_start runs through prompt()/sendUserMessage(), but not sendCustomMessage(triggerTurn=true). For normal user prompts, including user abort + resume, before_agent_start should call the shared drainPendingInboxToBatch helper and return one persistent custom batch message for the turn. Clear or mark messages delivered only after successful injection/persistence.
++# Drain pending inbox for normal prompts via before_agent_start
++
++For normal user prompts and user abort + resume, register before_agent_start to drain the shared Tattler pending inbox helper into one or more persistent custom batch messages. Note: before_agent_start does not run for sendMessage(triggerTurn:true) custom-message synthetic turns; cooperative receive uses the same drain helper but triggers the batch directly.
+ 
+ ---
+ 
+@@ -34,3 +34,8 @@
+ 
+ - **depends_on**: (none) → TAT-40, TAT-45, TAT-58
+ 
++## 2026-05-25T19:20:14.047Z
++
++- **title**: Drain pending inbox for normal prompts through before_agent_start → Drain pending inbox for normal prompts via before_agent_start
++- **description**: updated
++

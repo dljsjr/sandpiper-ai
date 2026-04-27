@@ -1,0 +1,25 @@
+--- a/AGENT-77.md
++++ b/AGENT-77.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Revised EXP-1: smoke-corpus retriever grammar with gbnfgen"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-26T18:47:08.500Z
+-updated_at: 2026-04-26T18:47:13.744Z
++updated_at: 2026-04-26T22:18:08.580Z
+ related:
+   - AGENT-73
+   - AGENT-74
+@@ -24,3 +24,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-26T22:18:08.581Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

@@ -1,0 +1,29 @@
+--- a/TAT-40.md
++++ b/TAT-40.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Implement Tattler pending inbox state and dedupe"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -9,7 +10,7 @@
+ depends_on:
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:46:26.246Z
++updated_at: 2026-05-25T19:48:17.910Z
+ ---
+ 
+ # Implement Tattler pending inbox state and dedupe
+@@ -40,3 +41,8 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T19:48:17.914Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

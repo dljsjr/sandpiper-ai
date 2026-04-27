@@ -1,0 +1,28 @@
+===================================================================
+--- a/TCL-148.md
++++ b/TCL-148.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Slice 2: neutral defaults, drop sandpiper paths and aliases"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "sandpiper-dev"
+ reporter: "Roux"
+ created_at: 2026-08-12T19:08:47.936Z
+-updated_at: 2026-08-12T19:17:53.085Z
++updated_at: 2026-08-12T19:24:25.432Z
+ depends_on:
+   - TCL-147
+ ---
+ 
+@@ -49,4 +49,8 @@
+ ## 2026-08-12T19:17:53.085Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-dev
++
++## 2026-08-12T19:24:25.432Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,25 @@
+--- a/AGENT-102.md
++++ b/AGENT-102.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add dogfood standalone CLI dev script and build target"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T21:23:29.052Z
+-updated_at: 2026-04-27T21:26:14.812Z
++updated_at: 2026-04-27T21:28:14.698Z
+ ---
+ 
+ # Add dogfood standalone CLI dev script and build target
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-27T21:28:14.698Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

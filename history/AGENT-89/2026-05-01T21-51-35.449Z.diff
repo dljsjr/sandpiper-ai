@@ -1,0 +1,25 @@
+--- a/AGENT-89.md
++++ b/AGENT-89.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add distribution invariant checks and smoke tests"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.207Z
+-updated_at: 2026-05-01T21:45:47.964Z
++updated_at: 2026-05-01T21:51:35.448Z
+ depends_on:
+   - AGENT-88
+ related:
+@@ -30,3 +30,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-01T21:51:35.449Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

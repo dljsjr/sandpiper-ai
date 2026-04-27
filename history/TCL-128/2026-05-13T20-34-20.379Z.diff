@@ -1,0 +1,33 @@
+--- a/TCL-128.md
++++ b/TCL-128.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Finalize Trail package directory and standalone distribution groundwork"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T20:34:13.548Z
+ updated_at: 2026-05-13T20:34:13.548Z
+-updated_at: 2026-05-13T20:34:13.548Z
++updated_at: 2026-05-13T20:34:20.378Z
+ ---
+ 
+ # Finalize Trail package directory and standalone distribution groundwork
+@@ -19,3 +19,12 @@
+ - Ensure the package-local docs/ directory is included in the standalone @sandpiper-ai/trail package distribution.
+ - Add package metadata and tests/smokes that establish a safe path toward future npm pack/publish without publishing anything yet.
+ 
++---
++
++# Activity Log
++
++## 2026-05-13T20:34:20.379Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

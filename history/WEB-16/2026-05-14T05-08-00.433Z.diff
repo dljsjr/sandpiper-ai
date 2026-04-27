@@ -1,0 +1,27 @@
+--- a/WEB-16.md
++++ b/WEB-16.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Implement Markdown section targeted extraction"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T21:57:46.919Z
+-updated_at: 2026-05-14T04:02:35.141Z
++updated_at: 2026-05-14T05:08:00.432Z
+ ---
+ 
+ # Implement Markdown section targeted extraction
+@@ -37,3 +38,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-14T05:08:00.433Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-35.md
++++ b/TAT-35.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Design Pi display-only message API for live extension transcript entries"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-25T14:56:05.538Z
+-updated_at: 2026-07-01T15:05:30.430Z
++updated_at: 2026-07-11T16:53:29.580Z
+ ---
+ 
+ # Design Pi display-only message API for live extension transcript entries
+ 
+@@ -29,4 +30,9 @@
+ 
+ ## 2026-07-01T15:05:30.433Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.580Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

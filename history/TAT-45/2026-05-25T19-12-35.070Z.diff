@@ -1,0 +1,29 @@
+--- a/TAT-45.md
++++ b/TAT-45.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Map queue recovery implementation seams"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.996Z
+ updated_at: 2026-05-25T19:12:35.007Z
+-updated_at: 2026-05-25T19:12:35.007Z
++updated_at: 2026-05-25T19:12:35.070Z
+ ---
+ 
+ # Map queue recovery implementation seams
+@@ -22,3 +22,8 @@
+ - **title**: Review queue recovery plan and implementation seams → Map queue recovery implementation seams
+ - **description**: updated
+ 
++## 2026-05-25T19:12:35.070Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Huginn
++

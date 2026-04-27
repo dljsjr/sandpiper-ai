@@ -1,0 +1,25 @@
+--- a/TAT-77.md
++++ b/TAT-77.md
+@@ -10,12 +10,10 @@
+   - TAT-71
+ related:
+   - TAT-70
+-updated_at: 2026-05-27T15:51:55.832Z
++updated_at: 2026-05-27T16:51:39.871Z
+ ---
+ 
+ # Track 2: Standalone read-only TUI for durable message log
+ 
+-Standalone TUI (not coupled to Pi harness) that renders the SQLite durable message log. Read-only MVP — send happens via CLI or other client. Can begin sketching against a mock once C1 (TAT-71) schema is frozen. TUI hydration contract (how it reconstructs room state from SQLite on startup) is explicitly in-scope. Read-only MVP scope: renders room transcript, shows participant list, handles cursor-based scroll/navigation. Full send-capable TUI is post-MVP. Decoupled from session-broker model entirely — reads from SQLite, not from live broker events. Parallel-ready with Track 1 once C1 schema is stable.
++Standalone TUI (not coupled to Pi harness) that renders the SQLite durable message log. TypeScript, using terminal-kit for TUI rendering. Read + send capable — Doug uses this as his primary room interface. Reads room transcript and cursors from SQLite, sends messages via Tattler IPC. Hydrates room state from SQLite on startup. Not a Pi widget, not a compiled Bun binary — a separate client binary (like Trail and Standup). Parallel-ready with Track 1 once C1 schema is stable. Post-MVP: Rust + Ratatui is the long-game direction, but TS + terminal-kit ships first. Full send-capable TUI (replacing current Chorus editor UI) is in-scope, not just read-only. Decoupled from session-broker model entirely.
+ 
+ ---
+ 
+@@ -27,3 +27,7 @@
+ - **blocked_by**: (none) → TAT-71
+ - **related**: (none) → TAT-70
+ 
++## 2026-05-27T16:51:39.873Z
++
++- **description**: updated
++

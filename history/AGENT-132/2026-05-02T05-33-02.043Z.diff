@@ -1,0 +1,27 @@
+--- a/AGENT-132.md
++++ b/AGENT-132.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Define neutral Pi package artifact shape"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T23:02:14.261Z
+-updated_at: 2026-05-01T23:04:20.909Z
++updated_at: 2026-05-02T05:33:02.040Z
+ ---
+ 
+ # Define neutral Pi package artifact shape
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-02T05:33:02.043Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

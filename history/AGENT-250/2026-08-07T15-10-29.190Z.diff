@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-250.md
++++ b/AGENT-250.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Grounding + design proposal for the integration harness"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.314Z
+-updated_at: 2026-08-07T14:58:27.849Z
++updated_at: 2026-08-07T15:10:29.189Z
+ ---
+ 
+ # Grounding + design proposal for the integration harness
+ 
+@@ -29,4 +29,8 @@
+ ## 2026-08-07T14:58:27.852Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-0.84-dev
++
++## 2026-08-07T15:10:29.190Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

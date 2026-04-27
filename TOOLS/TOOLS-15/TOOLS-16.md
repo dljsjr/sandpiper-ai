@@ -1,0 +1,44 @@
+---
+title: "Audit Sandpiper runtime asset layout expectations"
+status: COMPLETE
+resolution: DONE
+kind: SUBTASK
+priority: HIGH
+assignee: AGENT
+reporter: USER
+created_at: 2026-05-08T21:36:25.425Z
+updated_at: 2026-05-08T22:31:30.604Z
+---
+
+# Audit Sandpiper runtime asset layout expectations
+
+Map every file and directory Sandpiper and upstream Pi expect to find relative to the installed package/bin.
+
+Include:
+- `package.json` fields consumed by Pi (`piConfig`, `pi`, `bin`, package name/version).
+- Public docs and README/CHANGELOG paths used in prompts, help, or runtime guidance.
+- Resource roots for skills, prompts, themes, and extension source loading.
+- Pi internal asset paths such as modes, core/export templates, themes, and interactive assets.
+- Skill companion executables for tasks, standup, and Dash.
+
+Deliverable:
+- Add or update invariant tests that fail when an npm-packed Sandpiper artifact is missing a required runtime path.
+- Document the canonical runtime layout in the build reference after the behavior is implemented.
+
+---
+
+# Activity Log
+
+## 2026-05-08T21:36:25.470Z
+
+- **description**: added (12 lines)
+
+## 2026-05-08T21:36:54.985Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-05-08T22:31:30.605Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

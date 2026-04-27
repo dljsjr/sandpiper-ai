@@ -1,0 +1,27 @@
+--- a/TCL-78.md
++++ b/TCL-78.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Remove 'as Task' cast in taskFromFrontmatter and verify structural completeness"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: LOW
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:58.355Z
+-updated_at: 2026-05-13T05:17:18.180Z
++updated_at: 2026-05-13T05:19:49.494Z
+ ---
+ 
+ # Remove 'as Task' cast in taskFromFrontmatter and verify structural completeness
+@@ -46,3 +47,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-13T05:19:49.494Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

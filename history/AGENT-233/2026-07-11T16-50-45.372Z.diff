@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-233.md
++++ b/AGENT-233.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Gate pi-coding-agent version diagnostic behind SANDPIPER_PRINT_PI_VERSION, print to stderr"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-07-11T16:50:44.979Z
+-updated_at: 2026-07-11T16:50:45.084Z
++updated_at: 2026-07-11T16:50:45.369Z
+ ---
+ 
+ # Gate pi-coding-agent version diagnostic behind SANDPIPER_PRINT_PI_VERSION, print to stderr
+ 
+@@ -25,4 +26,9 @@
+ 
+ ## 2026-07-11T16:50:45.085Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-07-11T16:50:45.372Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

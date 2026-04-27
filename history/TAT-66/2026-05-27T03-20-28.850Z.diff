@@ -1,0 +1,27 @@
+--- a/TAT-66.md
++++ b/TAT-66.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Author multi-agent room coordination & decision-ownership playbook"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T21:52:33.225Z
+-updated_at: 2026-05-27T03:20:28.780Z
++updated_at: 2026-05-27T03:20:28.849Z
+ related:
+   - TAT-33
+   - TAT-38
+@@ -51,3 +52,8 @@
+ - **title**: Design multi-agent delegation and decision ownership protocol → Author multi-agent room coordination & decision-ownership playbook
+ - **description**: updated
+ 
++## 2026-05-27T03:20:28.850Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,35 @@
+===================================================================
+--- a/TCL-157.md
++++ b/TCL-157.md
+@@ -5,9 +5,11 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:31.792Z
+-updated_at: 2026-08-13T03:13:19.177Z
++blocked_by:
++  - TCL-163
++updated_at: 2026-08-13T03:32:51.690Z
+ related:
+   - TCL-156
+ ---
+ 
+@@ -27,9 +29,8 @@
+ Verification must assert resulting on-disk and VCS state, not exit codes and banners. Three bugs found during the extraction (TCL-151, TCL-152, TCL-153) were all commands reporting intent instead of result, and all were invisible to tests that checked stdout.
+ 
+ Deferred out of TCL-146; filed 2026-08-12 when that ticket reached review.
+ 
+-
+ ---
+ 
+ ## Survey of the actual boards, 2026-08-12
+ 
+@@ -61,4 +62,8 @@
+ 
+ ## 2026-08-13T03:13:19.178Z
+ 
+ - **description**: 14 lines → updated (41 lines)
++
++## 2026-08-13T03:32:51.691Z
++
++- **blocked_by**: (none) → TCL-163

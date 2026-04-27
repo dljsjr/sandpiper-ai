@@ -1,0 +1,25 @@
+--- a/AGENT-117.md
++++ b/AGENT-117.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Parameterize standup CLI identity help and error text"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-30T20:19:23.053Z
+-updated_at: 2026-05-01T17:38:03.743Z
++updated_at: 2026-05-01T17:41:00.279Z
+ ---
+ 
+ # Parameterize standup CLI identity help and error text
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-01T17:41:00.280Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

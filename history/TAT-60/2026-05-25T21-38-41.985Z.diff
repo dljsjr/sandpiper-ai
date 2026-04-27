@@ -1,0 +1,27 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-25T21:38:04.446Z
+-updated_at: 2026-05-25T21:38:04.446Z
++updated_at: 2026-05-25T21:38:41.981Z
+ related:
+   - TAT-38
+   - TAT-59
+@@ -15,5 +15,13 @@
+ 
+ # Style tattler_receive tool call background
+ 
+-Smoke test found the queue-recovery path working, but the tattler_receive tool call row is missing the expected background/styling. Keep quiet result semantics and avoid noisy assistant follow-up, but render the call/action with a styled component/background so the cooperative receive action is visible and consistent with other tool UI. This is cosmetic/UI polish, not a queue-delivery blocker.
+-
++Live queue-recovery smoke showed the tattler_receive tool call/action row missing expected background styling. This is UI renderer polish, not a queue-recovery correctness blocker: cue, cooperative receive, synthetic batch delivery, broker route metadata, and second-burst cue reset all worked. Keep quiet/non-noisy result semantics, but restore a styled visible shell/background for the receive action so the UI state is legible.
++
++---
++
++# Activity Log
++
++## 2026-05-25T21:38:41.985Z
++
++- **description**: updated
++

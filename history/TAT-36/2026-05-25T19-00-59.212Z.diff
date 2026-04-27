@@ -1,0 +1,25 @@
+--- a/TAT-36.md
++++ b/TAT-36.md
+@@ -6,12 +6,10 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T18:27:44.222Z
+-updated_at: 2026-05-25T18:27:44.506Z
++updated_at: 2026-05-25T19:00:59.212Z
+ ---
+ 
+ # Batch Chorus and Tattler interim messages outside Pi steering queue
+ 
+-Problem 1: if multiple Chorus/Tattler messages arrive while an agent is working, Pi steering queue mode one-at-a-time serializes them, so the agent may see only the oldest interim message before responding and the rest later. Source correction: one-at-a-time drains the oldest queued message, not the most recent. Extensions cannot set steeringMode/followUpMode or edit the queue through public ExtensionAPI; they can only enqueue via sendMessage/sendUserMessage deliverAs and see ctx.hasPendingMessages(). No-upstream mitigation: keep an extension-owned pending inbox keyed by roomId/postId while busy, render live in widget, and flush one batched custom message once idle so the Pi queue sees a single catch-up item containing the burst.
++Updated design: Tattler, not Chorus, should own a durable pending inbox for inbound messages that arrive while an agent is busy. Inbound while busy goes to Tattler-owned pending inbox keyed by message/room/post IDs, not Pi steer/followUp. before_agent_start becomes the canonical drain point for any next turn (user prompt, model cooperative receive, normal continuation): if pending exists, inject one persistent custom batch message into that new turn, then clear/mark delivered only after injection succeeds. This also handles user abort + resume: abort may kill the provider stream, but not Tattler inbox; the next prompt drains missed messages. Batch custom message should use content for model-visible concatenated messages and details.kind=batch with structured messages array for custom rendering as individual blocks.
+ 
+ ---
+ 
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-05-25T19:00:59.212Z
++
++- **description**: updated
++

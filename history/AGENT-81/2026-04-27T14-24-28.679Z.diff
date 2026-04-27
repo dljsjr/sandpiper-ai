@@ -1,0 +1,25 @@
+--- a/AGENT-81.md
++++ b/AGENT-81.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Extract reinforced-guidance workbench into standalone project"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T14:09:37.256Z
+-updated_at: 2026-04-27T14:10:01.333Z
++updated_at: 2026-04-27T14:24:28.678Z
+ ---
+ 
+ # Extract reinforced-guidance workbench into standalone project
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-27T14:24:28.679Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

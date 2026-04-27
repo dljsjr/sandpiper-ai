@@ -1,0 +1,25 @@
+--- a/TAT-75.md
++++ b/TAT-75.md
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-73
+   - TAT-74
+-updated_at: 2026-05-27T15:46:02.405Z
++updated_at: 2026-05-27T15:51:30.428Z
+ ---
+ 
+ # C5: Demote live nudge to wake/render hint
+ 
+-Rewire Chorus delivery so the live notification carries no payload custody — the log + cursor own correctness. Currently live nudge is the delivery path; after this chunk, it becomes a wake/render hint only. The durable log + cursor are the source of truth; the live nudge just tells the agent 'something happened, go look.' Depends on C3 (TAT-73) and C4 (TAT-74) — the cursor and replay path must be authoritative before demoting the live path.
++Rewire Chorus delivery so the live notification carries no payload custody — the Tattler log + cursor own correctness, Chorus consumes that substrate. Currently live nudge is the delivery path; after this chunk, it becomes a wake/render hint only: 'something happened, go look at the log.' Depends on C3 (TAT-73) and C4 (TAT-74) — the cursor and replay path must be authoritative before demoting the live path.
+ 
+ ---
+ 
+@@ -28,3 +28,7 @@
+ 
+ - **depends_on**: (none) → TAT-73, TAT-74
+ 
++## 2026-05-27T15:51:30.428Z
++
++- **description**: updated
++

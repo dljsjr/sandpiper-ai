@@ -1,0 +1,29 @@
+--- a/AGENT-139.md
++++ b/AGENT-139.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Add standalone app-bundle assembler and prepare script"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-02T16:24:51.724Z
+ updated_at: 2026-05-02T16:28:49.127Z
+-updated_at: 2026-05-02T16:28:49.127Z
++updated_at: 2026-05-02T16:28:49.222Z
+ ---
+ 
+ # Add standalone app-bundle assembler and prepare script
+@@ -20,3 +20,8 @@
+ 
+ - **title**: Add standalone app-bundle assembler and build script → Add standalone app-bundle assembler and prepare script
+ 
++## 2026-05-02T16:28:49.223Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

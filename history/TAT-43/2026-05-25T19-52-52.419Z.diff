@@ -1,0 +1,25 @@
+--- a/TAT-43.md
++++ b/TAT-43.md
+@@ -8,12 +8,10 @@
+ created_at: 2026-05-25T19:11:37.874Z
+ depends_on:
+   - TAT-42
+-updated_at: 2026-05-25T19:49:00.681Z
++updated_at: 2026-05-25T19:52:52.415Z
+ ---
+ 
+ # Render batched Tattler and Chorus messages as separate blocks
+ 
+-Update custom renderers so legacy single-message details still render as today, while batch details iterate messages[] and render each item as its own Tattler/Chorus block. Preserve current Chorus room-card presentation instead of rendering a burst as one glommed component.
++Implemented in jj change kzovvtpv / 67fd7bc4. Registers a Tattler pending-batch renderer for custom type tattler:pending-batch. Batch messages with any visible item now set display:true, but renderer filters details.messages[] to render only visible Chorus room messages as separate visual blocks; hidden Tattler DMs remain model-visible in canonical content but are not rendered. Invalid/missing details render empty rather than falling back to raw content. Focused tests cover mixed hidden Tattler DM + multiple visible Chorus messages.
+ 
+ ---
+ 
+@@ -31,3 +31,7 @@
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ 
++## 2026-05-25T19:52:52.419Z
++
++- **description**: updated
++

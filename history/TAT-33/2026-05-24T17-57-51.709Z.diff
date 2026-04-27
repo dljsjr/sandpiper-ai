@@ -1,0 +1,24 @@
+--- a/TAT-33.md
++++ b/TAT-33.md
+@@ -6,11 +6,11 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:57:19.192Z
+-updated_at: 2026-05-24T17:57:29.481Z
++updated_at: 2026-05-24T17:57:51.708Z
+ ---
+ 
+ # Brainstorm Chorus reply storm and context growth controls
+ 
++Brainstorm controls for Chorus reply storms/context growth. Problem: model-visible room messages prompt every participant to reply, which is semantically okay but burns context very fast. Initial direction: do not suppress at transport layer for MVP; define participation norms and explicit addressing. Agents should reply only when addressed, when they own a lane, when they have new information, or when silence would block progress. Consider lightweight conventions like @Piper, @Scout, @all, topic/turn ownership, and later message metadata such as audience/replyRequested if norms are insufficient.
+ 
+ ---
+ 
+@@ -21,3 +22,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-24T17:57:51.709Z
++
++- **description**: added (1 line)
++

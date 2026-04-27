@@ -1,0 +1,42 @@
+===================================================================
+--- a/AGENT-252.md
++++ b/AGENT-252.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.447Z
+-updated_at: 2026-08-07T16:25:13.136Z
++updated_at: 2026-08-07T18:03:00.444Z
+ depends_on:
+   - AGENT-250
+ ---
+ 
+@@ -55,8 +55,18 @@
+ ## Verification
+ 
+ bun check clean throughout every iteration. Full bun run test:vitest clean at 119/119 files, 1103/1103 tests (one unrelated transient timeout from concurrent system load during an interim run, same pattern as AGENT-251's revision -- confirmed via uptime, individual re-run, and a clean full-suite re-run). Tripwire shim log held at 3 lines throughout every run, including the ones that drove real dispatch attempts (guard-intercepted after the fix; genuinely real, pre-fix, disclosed immediately).
+ 
++## Teardown revision (2026-08-08)
++
++Doug root-caused the whole incident this design was built around: the "ambient credential leak" the network-deny guard existed to contain was never real. Reconstructed and verified: the original incident's ad hoc debug commands set only PI_CODING_AGENT_DIR, never SANDPIPER_CODING_AGENT_DIR, and never overrode PI_PACKAGE_DIR -- which inherited the invoking session's Sandpiper-branded value, making SANDPIPER_CODING_AGENT_DIR (untouched) the honored name, which inherited the real agent dir. This harness's own prepareIsolatedSpawn() was never affected -- it has set both names unconditionally since it was written.
++
++Doug's follow-up question settled the teardown: no situation causes a pinned --provider invocation to fall through to anything else. An unknown provider is a hard error in pi 0.84.0. The guard, its diagnostic log, all transport patches, the guard-fires tests, and the fake-AWS-credential defaults were scar tissue for a fallback path that doesn't exist. Deleted entirely.
++
++Replaced with config-isolation-canary.integration.test.ts: isolated + keyless + deliberately unpinned (skipProviderPin + skipMockProvider, the incident's exact shape) -- hard error, no completion, empty agent dir, confirmed. harness.ts drops the guard and fake-AWS defaults, adds --offline unconditionally (verified empirically to suppress incidental startup catalog fetches -- a hermeticity fix, not a safety one). Design doc and README rewritten with the corrected root cause and a postmortem.
++
++Verification: bun check clean. devtools/integration/ 4/4 files, 20/20 tests, reliably clean throughout. Full-suite citation NOT clean due to sustained shared-machine load during this revision window (verified via uptime + isolated re-runs of every failure: all pre-existing heavy subprocess tests unrelated to this change, load-correlated timeouts, never devtools/integration/). Submitting per coordinator ruling with this evidence; reviewer's gate run is the load-bearing full-suite verification.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -71,4 +81,8 @@
+ 
+ ## 2026-08-07T16:25:13.137Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-07T18:03:00.451Z
++
++- **description**: 42 lines → updated (52 lines)

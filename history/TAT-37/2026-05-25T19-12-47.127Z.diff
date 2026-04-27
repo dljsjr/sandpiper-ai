@@ -1,0 +1,36 @@
+--- a/TAT-37.md
++++ b/TAT-37.md
+@@ -6,13 +6,19 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T18:27:44.324Z
+-updated_at: 2026-05-25T19:11:48.189Z
++updated_at: 2026-05-25T19:12:47.127Z
+ ---
+ 
+ # Verify queued custom messages after abort are in active context
+ 
+-Refined root cause and validation target: undrained custom messages queued through Pi sendMessage while streaming can be lost on abort because they sit in core steer/followUp queues and are not mirrored in AgentSession string queues. Durable Tattler inbox + before_agent_start drain should prevent this. Still verify current behavior by reproducing mid-turn inbound custom messages + abort and checking whether undrained messages persist in JSONL, active branch, and buildSessionContext. If messages persisted as custom_message on active branch, missing chat render is UI/reconciliation; if not persisted, it is data/context loss.
+-
++Investigate and regression-test the distinction between UI replay delay and true data/context loss for queued custom messages.
++
++Findings to preserve:
++- Already-emitted and persisted custom_message entries on the active branch should be included by buildSessionContext and convertToLlm, or represented by compaction summary after compaction.
++- While streaming, sendCustomMessage queues role=custom objects directly in core steer/followUp queues. These are not mirrored in AgentSession's string queue display/restore path; abort/clearQueue can drop them before persistence.
++
++Acceptance criteria:
++- Source/test evidence documents the current loss path for undrained queued custom messages.
++- Source/test evidence verifies persisted custom_message entries remain context-recoverable.
++- The pending inbox fix proves abort + next prompt drains missed messages through before_agent_start.
++
+ ---
+ 
+ # Activity Log
+@@ -31,3 +40,7 @@
+ 
+ - **assignee**: AGENT → Huginn
+ 
++## 2026-05-25T19:12:47.127Z
++
++- **description**: 1 line → updated (10 lines)
++

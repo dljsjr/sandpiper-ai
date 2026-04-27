@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-279.md
++++ b/AGENT-279.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Complete pi-yaams parser refactor and migrate the YAAMS adapter"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: HIGH
+ assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:09:26.336Z
+-updated_at: 2026-08-12T21:47:56.187Z
++updated_at: 2026-08-12T21:47:56.247Z
+ ---
+ 
+ # Complete pi-yaams parser refactor and migrate the YAAMS adapter
+ 
+@@ -35,4 +36,9 @@
+ 
+ ## 2026-08-12T21:47:56.188Z
+ 
+ - **description**: 7 lines → updated (12 lines)
++
++## 2026-08-12T21:47:56.248Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: WONTFIX

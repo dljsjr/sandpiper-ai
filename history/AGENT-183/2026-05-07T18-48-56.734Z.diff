@@ -1,0 +1,25 @@
+--- a/AGENT-183.md
++++ b/AGENT-183.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Fix full-suite test command and stale package CLI test paths"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-07T18:44:38.252Z
+-updated_at: 2026-05-07T18:44:41.716Z
++updated_at: 2026-05-07T18:48:56.733Z
+ ---
+ 
+ # Fix full-suite test command and stale package CLI test paths
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-05-07T18:48:56.734Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

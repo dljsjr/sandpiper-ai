@@ -1,0 +1,27 @@
+--- a/AGENT-103.md
++++ b/AGENT-103.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add standalone CLI smoke tests"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T21:23:29.094Z
+-updated_at: 2026-04-27T21:28:55.325Z
++updated_at: 2026-04-29T04:34:17.410Z
+ ---
+ 
+ # Add standalone CLI smoke tests
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-29T04:34:17.411Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

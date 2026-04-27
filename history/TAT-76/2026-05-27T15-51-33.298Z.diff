@@ -1,0 +1,25 @@
+--- a/TAT-76.md
++++ b/TAT-76.md
+@@ -8,12 +8,10 @@
+ created_at: 2026-05-27T15:45:50.465Z
+ depends_on:
+   - TAT-75
+-updated_at: 2026-05-27T15:46:02.461Z
++updated_at: 2026-05-27T15:51:33.297Z
+ ---
+ 
+ # C6: Compatibility fallback for pending-batch migration
+ 
+-Keep the pending-batch path as a migration fallback so nothing regresses during cutover. Durable log is authoritative once live; during migration the log is truth and pending-batch is read-only fallback for pre-cutover messages. Avoid dual-write drift. Explicit cutover design before coding. Depends on C5 (TAT-75) — the live-nudge demotion must be in place before the fallback path is narrowed.
++Keep the pending-batch path as a migration fallback so nothing regresses during cutover. Durable Tattler log is authoritative once live; during migration the log is truth and pending-batch is read-only fallback for pre-cutover messages. Avoid dual-write drift. Explicit cutover design before coding. Depends on C5 (TAT-75) — the live-nudge demotion must be in place before the fallback path is narrowed.
+ 
+ ---
+ 
+@@ -27,3 +27,7 @@
+ 
+ - **depends_on**: (none) → TAT-75
+ 
++## 2026-05-27T15:51:33.298Z
++
++- **description**: updated
++

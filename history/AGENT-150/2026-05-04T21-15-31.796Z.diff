@@ -1,0 +1,29 @@
+--- a/AGENT-150.md
++++ b/AGENT-150.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Certify ecosystem package installation paths"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-04T21:15:27.571Z
+ updated_at: 2026-05-04T21:15:31.746Z
+-updated_at: 2026-05-04T21:15:31.746Z
++updated_at: 2026-05-04T21:15:31.795Z
+ ---
+ 
+ # Certify ecosystem package installation paths
+@@ -21,3 +21,8 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-04T21:15:31.796Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

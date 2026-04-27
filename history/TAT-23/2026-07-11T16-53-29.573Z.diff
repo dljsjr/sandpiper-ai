@@ -1,0 +1,31 @@
+===================================================================
+--- a/TAT-23.md
++++ b/TAT-23.md
+@@ -1,14 +1,15 @@
+ ---
+ title: "Refine Chorus post-dogfood room UX"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-24T15:40:14.761Z
+ 
+-updated_at: 2026-05-25T13:59:29.113Z
++updated_at: 2026-07-11T16:53:29.573Z
+ ---
+ 
+ # Refine Chorus post-dogfood room UX
+ 
+@@ -48,4 +49,9 @@
+ 
+ ## 2026-05-25T13:59:29.116Z
+ 
+ - **blocked_by**: TAT-28 → (none)
++
++## 2026-07-11T16:53:29.573Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,29 @@
+--- a/AGENT-74.md
++++ b/AGENT-74.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Experiment 1: simple retriever grammar latency"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+@@ -9,7 +10,7 @@
+ related:
+   - AGENT-64
+   - AGENT-73
+-updated_at: 2026-04-26T14:11:38.641Z
++updated_at: 2026-05-04T19:27:45.376Z
+ ---
+ 
+ # Experiment 1: simple retriever grammar latency
+@@ -31,3 +32,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-04T19:27:45.377Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: WONTFIX
++

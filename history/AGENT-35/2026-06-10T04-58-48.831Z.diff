@@ -1,0 +1,29 @@
+--- a/AGENT-35.md
++++ b/AGENT-35.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Design deferred deterministic guidance/enforcement hooks for tool use"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Piper"
+ reporter: USER
+ created_at: 2026-03-30T20:00:27.396Z
+ updated_at: 2026-06-03T04:44:12.755Z
+-updated_at: 2026-06-03T04:44:12.755Z
++updated_at: 2026-06-10T04:58:48.827Z
+ ---
+ 
+ # Design deferred deterministic guidance/enforcement hooks for tool use
+@@ -35,3 +35,8 @@
+ - **status**: IN PROGRESS → NOT STARTED
+ - **assignee**: Huginn → UNASSIGNED
+ 
++## 2026-06-10T04:58:48.831Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper
++

@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-239.md
++++ b/AGENT-239.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Replace tattler-receive idle polling with agent_settled"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.901Z
+-updated_at: 2026-08-06T23:37:22.670Z
++updated_at: 2026-08-06T23:37:22.732Z
+ ---
+ 
+ # Replace tattler-receive idle polling with agent_settled
+ 
+@@ -19,4 +20,9 @@
+ 
+ ## 2026-08-06T23:37:22.670Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-08-06T23:37:22.732Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

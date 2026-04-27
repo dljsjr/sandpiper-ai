@@ -1,0 +1,34 @@
+===================================================================
+--- a/AGENT-250.md
++++ b/AGENT-250.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Grounding + design proposal for the integration harness"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.314Z
+-updated_at: 2026-08-07T14:57:56.314Z
++updated_at: 2026-08-07T14:58:27.849Z
+ ---
+ 
+ # Grounding + design proposal for the integration harness
+ 
+@@ -20,4 +20,13 @@
+ 4. Harness placement + wiring given the root-vitest nested-config gap: where the harness lives, how env defaults are enforced (single shared helper all integration tests must go through - isolation-by-construction, not per-test discipline), how it coexists with test:vitest gates and turbo.
+ 5. Scope cut for wave 1: propose 2-3 extensions for first coverage with rationale (candidates: skill tool - pure/no external deps; autotoon - tool_result transform observable via RPC events; background-process - timing/notification semantics; tattler - UDS messaging, two-process potential; EXCLUDED from wave 1: shell-relay (needs zellij), web-fetch/web-search live paths (network - though their mock adapters may allow inclusion)).
+ 
+ Report the design to the coordinator for approval before AGENT-251 begins.
++
++---
++
++# Activity Log
++
++## 2026-08-07T14:58:27.852Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

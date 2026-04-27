@@ -1,0 +1,27 @@
+--- a/TAT-41.md
++++ b/TAT-41.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Drain pending inbox for normal prompts via before_agent_start"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -10,7 +10,7 @@
+   - TAT-40
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:38:32.831Z
++updated_at: 2026-05-25T19:38:32.941Z
+ ---
+ 
+ # Drain pending inbox for normal prompts via before_agent_start
+@@ -43,3 +43,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T19:38:32.941Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

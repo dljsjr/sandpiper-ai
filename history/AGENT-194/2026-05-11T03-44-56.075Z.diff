@@ -1,0 +1,25 @@
+--- a/AGENT-194.md
++++ b/AGENT-194.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Codify portable project-local agent guidance rule"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-11T03:41:58.209Z
+-updated_at: 2026-05-11T03:42:20.108Z
++updated_at: 2026-05-11T03:44:56.074Z
+ ---
+ 
+ # Codify portable project-local agent guidance rule
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-11T03:44:56.075Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

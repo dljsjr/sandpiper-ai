@@ -1,0 +1,25 @@
+--- a/TAT-28.md
++++ b/TAT-28.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Chorus send_chorus_reply terminate success can halt agents"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:24:51.381Z
+-updated_at: 2026-05-24T17:24:59.310Z
++updated_at: 2026-05-24T17:36:11.020Z
+ ---
+ 
+ # Chorus send_chorus_reply terminate success can halt agents
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-24T17:36:11.026Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

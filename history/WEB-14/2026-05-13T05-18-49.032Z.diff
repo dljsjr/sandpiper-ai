@@ -1,0 +1,27 @@
+--- a/WEB-14.md
++++ b/WEB-14.md
+@@ -6,9 +6,20 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-13T05:18:48.985Z
+-updated_at: 2026-05-13T05:18:48.985Z
++updated_at: 2026-05-13T05:18:49.031Z
+ ---
+ 
+ # Add ability to probe fetched domains for an `llms.txt`
+ 
+-
++A somewhat new convention many sites are adopting is including an `llms.txt` in their site root, much like a `robots.txt`, that provides LLM friendly routing guidance or site mapping.
++
++Something that might be interesting is having the web_fetch tool perform a HEAD request against that file whenever it sees a new domain for the first time, and if it comes back with a 2xx that indicates the file exists, it should include a “has_llms_txt” true or false property on the payload returned to the agent.
++
++There should also be some level of cache for whether or not a domain has an llms.txt file (but not its content). So we can avoid making HEAD requests again in the future for domains that we have already probed, and just forward the value for whether or not the domain has the file from existing knowledge. Disk persistence for the exisential cache is optional; in-memory or `appendEntry` is sufficient for now.
++
++---
++
++# Activity Log
++
++## 2026-05-13T05:18:49.032Z
++
++- **description**: added (5 lines)
++

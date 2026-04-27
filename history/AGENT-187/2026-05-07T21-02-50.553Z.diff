@@ -1,0 +1,23 @@
+--- a/AGENT-187.md
++++ b/AGENT-187.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-07T21:02:45.983Z
+-updated_at: 2026-05-07T21:02:45.983Z
++updated_at: 2026-05-07T21:02:50.553Z
+ ---
+ 
+ # Expose Sandpiper package root and ship public docs
+ 
+-
++Add SANDPIPER_CODING_AGENT_PACKAGE as the Sandpiper counterpart to PI_CODING_AGENT_PACKAGE. It should resolve to the active Sandpiper package/root (source checkout, dist package, or standalone app bundle as appropriate) so agent guidance can reliably point to Sandpiper public docs/resources. Include public docs/ in dist while continuing to exclude .sandpiper/ operational state. Update env-var/build docs and add tests for env setup, system/startup prompt guidance, dist docs inclusion, and .sandpiper exclusion.
++
++---
++
++# Activity Log
++
++## 2026-05-07T21:02:50.553Z
++
++- **description**: added (1 line)
++

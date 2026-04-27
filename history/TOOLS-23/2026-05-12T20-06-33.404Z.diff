@@ -1,0 +1,27 @@
+--- a/TOOLS-23.md
++++ b/TOOLS-23.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Remove obsolete ascii-motion devtools and scratch scripts"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-09T07:41:25.974Z
+-updated_at: 2026-05-09T07:45:50.161Z
++updated_at: 2026-05-12T20:06:33.404Z
+ ---
+ 
+ # Remove obsolete ascii-motion devtools and scratch scripts
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-12T20:06:33.404Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

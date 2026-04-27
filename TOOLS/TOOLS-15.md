@@ -1,0 +1,45 @@
+---
+title: "Harden publish artifact and remove install lifecycle scripts"
+status: COMPLETE
+resolution: DONE
+kind: TASK
+priority: HIGH
+assignee: AGENT
+reporter: USER
+created_at: 2026-05-08T21:35:37.269Z
+updated_at: 2026-05-08T22:31:30.923Z
+---
+
+# Harden publish artifact and remove install lifecycle scripts
+
+Refactor Sandpiper's source and distribution build flow so package installation is boring and publish artifacts are complete.
+
+Context:
+- Pi's npm package is assembled before publish: package.json files use `files`, `bin`, `prepublishOnly`, and build/copy scripts so installed packages contain the docs, branding metadata, runtime assets, and compiled entrypoints they need.
+- Sandpiper currently relies on source-repo lifecycle hooks (`preinstall`/`postinstall`) to build packages, assemble `dist/`, create symlinks, and download/copy assets.
+- `npm install -g sandpiper-ai` should only install an already-complete package and expose the `sandpiper` bin; it should not need to run install-time assembly scripts or write into the installed package tree at first launch.
+
+Success criteria:
+- `bun install` installs dependencies without building or assembling Sandpiper artifacts.
+- Published/package-packed Sandpiper artifacts include all runtime files relative to the bin: package metadata with `piConfig`, public docs, resources, extensions, skill helper scripts, and Pi asset paths required by Pi's config/resource lookup.
+- No publish-critical runtime layout depends on symlinks that `npm pack` drops.
+- The installed package can run with lifecycle scripts disabled and the package directory made read-only.
+- Distribution assembly and vendoring build tooling are implemented in portable TypeScript rather than bash, except shell integration scripts that are product assets.
+
+---
+
+# Activity Log
+
+## 2026-05-08T21:35:56.056Z
+
+- **description**: added (13 lines)
+
+## 2026-05-08T21:36:54.934Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-05-08T22:31:30.923Z
+
+- **status**: IN PROGRESS → COMPLETE
+- **resolution**: DONE

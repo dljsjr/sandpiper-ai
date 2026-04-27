@@ -1,0 +1,32 @@
+===================================================================
+--- a/TAT-39.md
++++ b/TAT-39.md
+@@ -1,15 +1,16 @@
+ ---
+ title: "Add Chorus participant audience metadata to room messages"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:05:32.074Z
+ related:
+   - TAT-36
+-updated_at: 2026-07-01T02:51:09.442Z
++updated_at: 2026-07-11T16:53:29.590Z
+ ---
+ 
+ # Add Chorus participant audience metadata to room messages
+ 
+@@ -46,4 +47,9 @@
+ 
+ ## 2026-07-01T02:51:09.444Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.590Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

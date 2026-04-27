@@ -1,0 +1,35 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Style tattler_receive tool call background"
+-status: COMPLETE
++status: IN PROGRESS
+ resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+@@ -12,13 +12,10 @@
+   - TAT-59
+   - TAT-23
+   - TAT-62
+-updated_at: 2026-05-25T22:02:08.798Z
++updated_at: 2026-05-25T22:05:32.435Z
+ 
+ ---
+ 
+ # Style tattler_receive tool call background
+ 
+-Implemented in jj change tzuoyxvk / 8b1fca01. Adds one background-padded blank line above and one below each visible Chorus card rendered by the canonical tattler:pending-batch renderer. Preserves blank separator between multiple cards and keeps hidden Tattler DMs non-rendered. Regression asserts top/bottom padded background lines for each visible card. Prior sxrpyyxq / a017f56b unified idle/direct and busy delivery onto this renderer and added background styling.
++Post-TAT-60 visual smoke follow-up: vertical padding is correct, but custom-rendered Chorus cards also need one cell of horizontal padding along the left and right borders. Add one leading and one trailing background-colored cell to each content line while preserving full-width background fill, top/bottom blank lines, inter-card separator, and hidden Tattler DM non-rendering.
+ 
+ ---
+ 
+@@ -71,3 +71,8 @@
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
+ 
++## 2026-05-25T22:05:32.440Z
++
++- **status**: COMPLETE → IN PROGRESS
++- **description**: updated
++

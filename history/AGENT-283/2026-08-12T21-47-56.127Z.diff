@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-283.md
++++ b/AGENT-283.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Make the split pi-yaams package publishable"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.703Z
+-updated_at: 2026-08-12T21:47:56.066Z
++updated_at: 2026-08-12T21:47:56.126Z
+ ---
+ 
+ # Make the split pi-yaams package publishable
+ 
+@@ -30,4 +31,9 @@
+ 
+ ## 2026-08-12T21:47:56.067Z
+ 
+ - **description**: 3 lines → updated (8 lines)
++
++## 2026-08-12T21:47:56.127Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX

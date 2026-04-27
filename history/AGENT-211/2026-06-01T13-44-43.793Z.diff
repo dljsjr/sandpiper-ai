@@ -1,0 +1,25 @@
+--- a/AGENT-211.md
++++ b/AGENT-211.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Run Sandpiper docs consistency sweep for YAAMS-era guidance"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-06-01T13:42:46.523Z
+-updated_at: 2026-06-01T13:42:46.599Z
++updated_at: 2026-06-01T13:44:43.789Z
+ ---
+ 
+ # Run Sandpiper docs consistency sweep for YAAMS-era guidance
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
+ 
++## 2026-06-01T13:44:43.793Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

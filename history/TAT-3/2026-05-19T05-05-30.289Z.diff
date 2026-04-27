@@ -1,0 +1,29 @@
+--- a/TAT-3.md
++++ b/TAT-3.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add v0 list and send agent tools"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-15T03:13:18.425Z
+-updated_at: 2026-05-15T03:13:18.425Z
++updated_at: 2026-05-19T05:05:30.288Z
+ ---
+ 
+ # Add v0 list and send agent tools
+@@ -20,3 +20,11 @@
+ 
+ Non-goals: handle resolution, stable identity, request/reply semantics, and durable message logs.
+ 
++---
++
++# Activity Log
++
++## 2026-05-19T05:05:30.289Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

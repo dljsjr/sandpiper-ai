@@ -1,0 +1,25 @@
+--- a/AGENT-187.md
++++ b/AGENT-187.md
+@@ -6,12 +6,10 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-07T21:02:45.983Z
+-updated_at: 2026-05-08T18:42:59.921Z
++updated_at: 2026-05-08T18:43:21.647Z
+ ---
+ 
+ # Expose Sandpiper package root and ship public docs
+ 
+-Add a Sandpiper package-root environment variable () alongside the existing config/state directory variable, include public  in generated distribution artifacts, and keep  operational state excluded. Update build/env documentation and tests to cover the distribution packaging and environment behavior.
++Add a Sandpiper package-root environment variable (`SANDPIPER_CODING_AGENT_PACKAGE`) alongside the existing config/state directory variable, include public `docs/` in generated distribution artifacts, and keep `.sandpiper/` operational state excluded. Update build/env documentation and tests to cover the distribution packaging and environment behavior.
+ 
+ ---
+ 
+@@ -30,3 +30,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-08T18:43:21.651Z
++
++- **description**: updated
++

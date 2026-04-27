@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-147.md
++++ b/TCL-147.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Slice 1: extract path/config location module (behavior-preserving)"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "sandpiper-dev"
+ reporter: "Roux"
+ created_at: 2026-08-12T19:08:47.854Z
+-updated_at: 2026-08-12T19:13:20.937Z
++updated_at: 2026-08-12T19:14:59.670Z
+ ---
+ 
+ # Slice 1: extract path/config location module (behavior-preserving)
+ 
+@@ -35,4 +36,9 @@
+ 
+ ## 2026-08-12T19:13:20.937Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-12T19:14:59.670Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

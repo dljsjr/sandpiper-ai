@@ -1,0 +1,42 @@
+--- a/AGENT-64.md
++++ b/AGENT-64.md
+@@ -6,28 +6,-5 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-13T17:21:13.593Z
+-updated_at: 2026-04-14T01:41:13.522Z
++updated_at: 2026-04-21T19:27:24.771Z
+ ---
+ 
+ # Prototype reinforced-guidance extraction/retrieval prompts and evals
+ 
+-Continue the prompt-only reinforced-guidance prototype under extensions/system/reinforced-guidance/ without wiring it into aux-guidance-hooks yet.
+-
+-Current phase:
+-- re-run targeted smoke from cold cache a few times to confirm stability
+-- grow the smoke prompt pack with additional sample prompts while preserving the current green baseline
+-- simplify prompts and improve latency/token efficiency once the expanded smoke set stays green
+-- defer integration planning until after the refactoring/simplification pass
+-
+-Focus areas:
+-- prompt-engineer the extractor and retriever as internal skill-like sub-agents
+-- build and calibrate synthetic retriever evals, including clarification signals
+-- document eval-authoring and grading methodology inspired by skill-creator
+-- keep work in the reinforced-guidance playpen until the protocol and evals are stable enough for harness integration
+-- watch extraction/retrieval latency as prompt and output schemas grow; preserve token efficiency and measure regressions before assuming richer rule objects are acceptable
+-
+-Success looks like a clearer retriever/extractor prompt contract, stronger synthetic eval coverage, handoff-safe docs that preserve the methodology across context compactions, and latency that remains plausible for real smoke-test and future harness use.
+-
++Active experiment (2026-04-21): Anonymizing retriever example IDs to fix ID leakage. The model was emitting `use_sanitize_surfaces` (prefix-mutated from the cooking example in its own prompt) on every another-project run. All concrete example IDs replaced with EXAMPLE_* placeholders. A/B comparison matrix running as batch `retriever-anonymized`.
++
+ ---
+ 
+ # Activity Log
+@@ -49,3 +34,7 @@
+ 
+ - **description**: 10 lines → updated (16 lines)
+ 
++## 2026-04-21T19:27:24.772Z
++
++- **description**: 16 lines → updated (1 line)
++

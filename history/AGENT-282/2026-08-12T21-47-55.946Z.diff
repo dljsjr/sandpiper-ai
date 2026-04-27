@@ -1,0 +1,39 @@
+===================================================================
+--- a/AGENT-282.md
++++ b/AGENT-282.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.638Z
+-updated_at: 2026-08-12T16:28:45.615Z
++updated_at: 2026-08-12T21:47:55.945Z
+ depends_on:
+   - AGENT-281
+ ---
+ 
+@@ -20,10 +20,15 @@
+ CROSS-REPO DEPENDENCY: blocked on YAAMS-93 (~/git/yaams), which gives `apply` an `--ops <json>` argument. Pi's pi.exec gives the child /dev/null on stdin, so until --ops lands the write tools have no way to deliver an envelope. Trail cannot express the link across task directories, hence this paragraph.
+ 
+ Also: update the fake CLI to implement apply atomically, and add tests for atomic failure, scalar vs list behavior, result decoding, and structured rejection routing. Update README and the behavior contract as part of the implementation — delete the "created 2 of 3 member(s) before failing" partial-count claim, because apply cannot leave that state.
+ 
++
+ ---
+ 
++**MOVED — not abandoned.** Rewritten by hand as **PIEXT-39** in `~/git/yaams` (2026-08-12). pi-yaams work belongs to the PIEXT project, whose charter is exactly this; AGENT covers capabilities not specific to a single tool or extension. pi-yaams is developed out-of-tree today but moves in-tree with yaams, which is why the board lives there. Trail has no cross-repo move, so this closes WONTFIX rather than leaving a tombstone. All content and work state carried over verbatim.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-12T02:10:19.869Z
+ 
+@@ -31,4 +36,8 @@
+ 
+ ## 2026-08-12T16:28:45.615Z
+ 
+ - **description**: 5 lines → updated (7 lines)
++
++## 2026-08-12T21:47:55.946Z
++
++- **description**: 7 lines → updated (12 lines)

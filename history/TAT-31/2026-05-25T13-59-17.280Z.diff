@@ -1,0 +1,29 @@
+--- a/TAT-31.md
++++ b/TAT-31.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Fix Chorus multiline room message rendering"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: "Librarian"
+-assignee: "Librarian"
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:57:19.038Z
+ updated_at: 2026-05-24T17:57:51.587Z
+-updated_at: 2026-05-24T17:57:51.587Z
++updated_at: 2026-05-25T13:59:17.275Z
+ ---
+ 
+ # Fix Chorus multiline room message rendering
+@@ -26,3 +26,8 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-25T13:59:17.280Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++- **assignee**: Librarian → AGENT
++

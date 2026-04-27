@@ -1,0 +1,25 @@
+--- a/AGENT-185.md
++++ b/AGENT-185.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Fix system/task test stubs and mock isolation"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-07T18:44:54.201Z
+-updated_at: 2026-05-07T18:44:54.248Z
++updated_at: 2026-05-07T18:58:38.939Z
+ ---
+ 
+ # Fix system/task test stubs and mock isolation
+@@ -21,3 +21,7 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-07T18:58:38.940Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

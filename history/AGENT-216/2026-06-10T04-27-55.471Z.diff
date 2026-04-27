@@ -1,0 +1,27 @@
+--- a/AGENT-216.md
++++ b/AGENT-216.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "docs: document the prompt-contributor event-bus convention in sandpiper-ai public docs"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: "Roux"
+ created_at: 2026-06-09T22:45:05.800Z
+-updated_at: 2026-06-09T22:57:03.273Z
++updated_at: 2026-06-10T04:27:55.470Z
+ ---
+ 
+ # docs: document the prompt-contributor event-bus convention in sandpiper-ai public docs
+@@ -31,3 +32,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-06-10T04:27:55.471Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,27 @@
+--- a/TAT-79.md
++++ b/TAT-79.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "SQLite room log schema + migration runner + cursor table"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: AGENT
+ created_at: 2026-05-27T20:31:12.096Z
+-updated_at: 2026-05-27T20:31:45.431Z
++updated_at: 2026-05-27T20:31:51.046Z
+ ---
+ 
+ # SQLite room log schema + migration runner + cursor table
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-27T20:31:51.047Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

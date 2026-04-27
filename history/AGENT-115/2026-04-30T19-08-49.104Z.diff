@@ -1,0 +1,25 @@
+--- a/AGENT-115.md
++++ b/AGENT-115.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Refactor one small install or shell path helper through the seam"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-30T18:08:36.614Z
+-updated_at: 2026-04-30T19:07:51.813Z
++updated_at: 2026-04-30T19:08:49.103Z
+ ---
+ 
+ # Refactor one small install or shell path helper through the seam
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-30T19:08:49.104Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

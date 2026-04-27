@@ -6,7 +6,9 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-03-30T02:04:48.245Z
-updated_at: 2026-03-30T02:04:56.767Z
+related:
+  - SHR-99
+updated_at: 2026-05-14T14:46:07.957Z
 ---
 
 # Wire ctx.signal into shell_relay for user-cancellable command execution
@@ -30,3 +32,7 @@ Lower priority than WEB-8 since relay commands are typically short-lived and the
 ## 2026-03-30T02:04:56.767Z
 
 - **description**: added (11 lines)
+
+## 2026-05-14T14:46:07.958Z
+
+- **related**: (none) → SHR-99

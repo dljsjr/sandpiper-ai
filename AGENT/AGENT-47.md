@@ -6,7 +6,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:52.812Z
-updated_at: 2026-04-01T15:30:58.706Z
+updated_at: 2026-06-03T04:44:12.486Z
 ---
 
 # ProcessManager: design multi-consumer output broadcast pattern
@@ -38,3 +38,13 @@ The shell relay extension might want to consume a process's stdout stream for it
 ## 2026-04-01T15:30:58.706Z
 
 - **description**: added (19 lines)
+
+## 2026-06-03T04:43:52.490Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → Huginn
+
+## 2026-06-03T04:44:12.486Z
+
+- **status**: IN PROGRESS → NOT STARTED
+- **assignee**: Huginn → UNASSIGNED

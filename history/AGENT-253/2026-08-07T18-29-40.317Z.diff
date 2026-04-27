@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-253.md
++++ b/AGENT-253.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Coverage wave 1: isolated + combinatoric extension tests"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.513Z
+-updated_at: 2026-08-07T18:29:24.898Z
++updated_at: 2026-08-07T18:29:40.316Z
+ depends_on:
+   - AGENT-251
+ ---
+ 
+@@ -58,4 +58,8 @@
+ 
+ ## 2026-08-07T18:29:24.901Z
+ 
+ - **description**: 1 line → updated (33 lines)
++
++## 2026-08-07T18:29:40.317Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

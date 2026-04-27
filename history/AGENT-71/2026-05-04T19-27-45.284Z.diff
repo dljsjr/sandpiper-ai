@@ -1,0 +1,27 @@
+--- a/AGENT-71.md
++++ b/AGENT-71.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add extraction cache to rg-matrix for extractor A/B and Stage 2 rule grading"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-21T19:37:12.561Z
+-updated_at: 2026-04-26T02:57:32.289Z
++updated_at: 2026-05-04T19:27:45.284Z
+ ---
+ 
+ # Add extraction cache to rg-matrix for extractor A/B and Stage 2 rule grading
+@@ -39,3 +40,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-04T19:27:45.284Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: WONTFIX
++

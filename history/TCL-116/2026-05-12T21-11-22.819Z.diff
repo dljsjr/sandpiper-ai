@@ -1,0 +1,23 @@
+--- a/TCL-116.md
++++ b/TCL-116.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-12T21:11:22.772Z
+-updated_at: 2026-05-12T21:11:22.772Z
++updated_at: 2026-05-12T21:11:22.818Z
+ ---
+ 
+ # Understand and develop a workaround for the branch + workspace storage + auto-commit configuration leading to stale JJ workspaces
+ 
+-
++This frequently causes agents to blindly apply `jj workspace update-stale` which can make it appear as if work has been lost, and it is also very unintuitive how to get out of this situation. So we need to try to avoid getting in to it.
++
++---
++
++# Activity Log
++
++## 2026-05-12T21:11:22.819Z
++
++- **description**: added (1 line)
++

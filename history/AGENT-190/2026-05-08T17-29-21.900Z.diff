@@ -1,0 +1,25 @@
+--- a/AGENT-190.md
++++ b/AGENT-190.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Normalize workspace package dependency metadata"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-08T16:44:44.692Z
+-updated_at: 2026-05-08T17:21:05.929Z
++updated_at: 2026-05-08T17:29:21.899Z
+ ---
+ 
+ # Normalize workspace package dependency metadata
+@@ -34,3 +34,7 @@
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ 
++## 2026-05-08T17:29:21.900Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

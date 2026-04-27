@@ -1,0 +1,32 @@
+===================================================================
+--- a/TAT-53.md
++++ b/TAT-53.md
+@@ -1,7 +1,7 @@
+ ---
+ title: "Review Chorus participant metadata semantics"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "Muninn"
+ reporter: USER
+@@ -9,9 +9,9 @@
+ depends_on:
+   - TAT-50
+   - TAT-51
+   - TAT-52
+-updated_at: 2026-05-25T19:17:28.718Z
++updated_at: 2026-07-01T02:53:09.564Z
+ ---
+ 
+ # Review Chorus participant metadata semantics
+ 
+@@ -32,4 +32,8 @@
+ 
+ ## 2026-05-25T19:17:28.719Z
+ 
+ - **depends_on**: (none) → TAT-50, TAT-51, TAT-52
++
++## 2026-07-01T02:53:09.566Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

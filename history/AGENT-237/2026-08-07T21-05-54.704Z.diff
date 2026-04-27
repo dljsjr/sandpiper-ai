@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Post-bump verification sweep"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: USER
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-07T21:05:54.640Z
++updated_at: 2026-08-07T21:05:54.703Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -179,4 +179,8 @@
+ 
+ ## 2026-08-07T21:05:54.645Z
+ 
+ - **description**: 116 lines → updated (130 lines)
++
++## 2026-08-07T21:05:54.704Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

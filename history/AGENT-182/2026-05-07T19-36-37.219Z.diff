@@ -1,0 +1,27 @@
+--- a/AGENT-182.md
++++ b/AGENT-182.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Restore clean full-suite test gate and workflow guidance"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-07T18:44:30.508Z
+-updated_at: 2026-05-07T19:01:55.042Z
++updated_at: 2026-05-07T19:36:37.219Z
+ ---
+ 
+ # Restore clean full-suite test gate and workflow guidance
+@@ -27,3 +28,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-07T19:36:37.219Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

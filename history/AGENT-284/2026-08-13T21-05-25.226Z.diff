@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-284.md
++++ b/AGENT-284.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Audit 1Password-triggering harness activity"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-08-13T20:47:10.761Z
+-updated_at: 2026-08-13T20:47:10.844Z
++updated_at: 2026-08-13T21:05:25.225Z
+ ---
+ 
+ # Audit 1Password-triggering harness activity
+ 
+@@ -19,4 +20,9 @@
+ ## 2026-08-13T20:47:10.844Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
++
++## 2026-08-13T21:05:25.226Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: WONTFIX

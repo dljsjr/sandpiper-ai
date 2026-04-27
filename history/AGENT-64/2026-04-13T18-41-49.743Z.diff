@@ -1,0 +1,31 @@
+--- a/AGENT-64.md
++++ b/AGENT-64.md
+@@ -6,7 +6,7 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-13T17:21:13.593Z
+-updated_at: 2026-04-13T17:21:22.769Z
++updated_at: 2026-04-13T18:41:49.740Z
+ ---
+ 
+ # Prototype reinforced-guidance extraction/retrieval prompts and evals
+@@ -18,8 +18,9 @@
+ - build and calibrate synthetic retriever evals, including clarification signals
+ - document eval-authoring and grading methodology inspired by skill-creator
+ - keep work in the reinforced-guidance playpen until the protocol and evals are stable enough for harness integration
+-
+-Success looks like a clearer retriever/extractor prompt contract, stronger synthetic eval coverage, and handoff-safe docs that preserve the methodology across context compactions.
++- watch extraction/retrieval latency as prompt and output schemas grow; preserve token efficiency and measure regressions before assuming richer rule objects are acceptable
++
++Success looks like a clearer retriever/extractor prompt contract, stronger synthetic eval coverage, handoff-safe docs that preserve the methodology across context compactions, and latency that remains plausible for real smoke-test and future harness use.
+ 
+ ---
+ 
+@@ -34,3 +35,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-13T18:41:49.743Z
++
++- **description**: 9 lines → updated (10 lines)
++

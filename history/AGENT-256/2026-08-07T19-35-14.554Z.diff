@@ -1,0 +1,44 @@
+===================================================================
+--- a/AGENT-256.md
++++ b/AGENT-256.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-08-07T19:28:18.767Z
+-updated_at: 2026-08-07T19:35:06.312Z
++updated_at: 2026-08-07T19:35:14.553Z
+ ---
+ 
+ # Chorus room widget starves the transcript in fullscreen TUI mode
+ 
+@@ -34,8 +34,20 @@
+ **Implication for the fix**: bounding `widgetContainerAbove`'s content (this ticket's plan) fixes today's reproduction, but the underlying gap is that `dock` structurally outranks `transcriptScrollView` for space no matter which of dock's children is oversized - any sufficiently large status/widget/editor content could reproduce this the same way. Worth deciding, as a separate and lower-urgency question, whether `transcriptScrollView`'s `minSize` should be raised above 1 (e.g. 3-5) as defense-in-depth independent of how well-behaved any individual widget is - that's a pi-tui-level change, not a chorus-ui.ts one, and fits under the existing "possible upstream companion" note above rather than blocking this fix.
+ 
+ ---
+ 
++LAYOUT MECHANISM, traced 2026-08-07 (sandpiper-0.84-rev, independently corroborating the dev's TuiMainScreen/TuiAltScreen split):
++
++Non-fullscreen is structurally exempt - interactive-mode.js only calls tui.setLayoutRoot(fullscreenLayoutRoot) when TuiLayouts.isViewportTUI(tui), and sets setLayoutRoot(undefined) when switching away; TuiMainScreen has no per-component height allocation at all, streaming the composed frame to native scrollback. There is no flex/shrink path for regular mode to hit.
++
++Fullscreen uses a real flexbox layout: outer VStack = [transcriptScrollView: basis 0, grow 1, shrink 1, minSize 1] + [dock: basis auto, grow 0, shrink 1, minSize 1], dock being a VStack of widgetContainerAbove (shrink 1, minSize 0), editorContainer (shrink 1, minSize 3), footer (shrink 1, minSize 1). Allocator behavior (pi-tui components/stack.js allocateStackSizes/distribute): because transcript has basis 0 it is already AT minSize when space is tight, and the shrink pass requires size > minSize, so transcript is disqualified from absorbing any deficit - the entire overflow lands on dock, and transcript snaps to exactly 1 row. A hard binary threshold at dock natural height > terminalRows - 1, not graceful degradation. Within dock, editor's minSize 3 protects it and widgetAbove's minSize 0 means it absorbs the squeeze first.
++
++CONSEQUENCE FOR THIS FIX (scope unchanged): bounding the chorus widget keeps dock under the threshold and resolves the reported bug. The budget fraction should be justified by this threshold rather than picked arbitrarily - the requirement is that widget + editor (>=3) + footer (>=1) + status stays comfortably below terminalRows - 1 across realistic terminal sizes, leaving a usable transcript. A one-third-of-rows widget budget satisfies that from very short terminals upward; state the reasoning in a comment so the constant is not later "tuned" without understanding what it protects.
++
++UPSTREAM COMPANION (note only, do not act - fourth item on the upstream-ask pile alongside AGENT-245's env prefix, EntryRenderOptions outputPad, and strict-prefer gating): the vulnerability is not Chorus-specific. ANY aboveEditor/belowEditor widget pushing dock's combined natural height past terminalRows - 1 collapses the transcript to 1 row, because dock structurally outranks transcript for space and transcript's basis 0 disqualifies it from the shrink pass. Two candidate upstream asks: give the transcript scroll view a minSize greater than 1 so it cannot be starved to a single row, and/or clamp widget containers to a share of the viewport so a misbehaving extension cannot starve the conversation. Ours to work around regardless - our widget declared the height.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-07T19:33:40.187Z
+ 
+@@ -44,4 +56,8 @@
+ 
+ ## 2026-08-07T19:35:06.313Z
+ 
+ - **description**: 9 lines → updated (21 lines)
++
++## 2026-08-07T19:35:14.554Z
++
++- **description**: 21 lines → updated (33 lines)

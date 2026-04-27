@@ -1,0 +1,25 @@
+--- a/TAT-33.md
++++ b/TAT-33.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Brainstorm Chorus reply storm and context growth controls"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:57:19.192Z
+-updated_at: 2026-05-24T17:57:51.708Z
++updated_at: 2026-05-25T13:59:17.432Z
+ ---
+ 
+ # Brainstorm Chorus reply storm and context growth controls
+@@ -26,3 +26,7 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-25T13:59:17.432Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

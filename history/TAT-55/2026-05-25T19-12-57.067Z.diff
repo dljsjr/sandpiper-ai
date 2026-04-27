@@ -1,0 +1,27 @@
+--- a/TAT-55.md
++++ b/TAT-55.md
+@@ -3,13 +3,18 @@
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:27.264Z
+ updated_at: 2026-05-25T19:12:27.264Z
+-updated_at: 2026-05-25T19:12:27.264Z
++updated_at: 2026-05-25T19:12:57.067Z
+ ---
+ 
+ # Verify persisted custom messages remain in active context
+ 
+ Add or document a regression proving that once a Chorus/Tattler custom_message has emitted and persisted on the active branch, buildSessionContext and convertToLlm include it on subsequent turns or in compaction summary. If chat UI misses it after abort, classify that as UI/replay reconciliation rather than data loss.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:57.067Z
++
++- **assignee**: UNASSIGNED → Huginn
++

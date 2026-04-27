@@ -1,0 +1,31 @@
+--- a/AGENT-121.md
++++ b/AGENT-121.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Document and verify identity/capability split invariants"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T17:34:25.074Z
+ updated_at: 2026-05-01T17:34:25.074Z
+-updated_at: 2026-05-01T17:34:25.074Z
++updated_at: 2026-05-01T17:45:30.438Z
+ ---
+ 
+ # Document and verify identity/capability split invariants
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-01T17:45:30.439Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

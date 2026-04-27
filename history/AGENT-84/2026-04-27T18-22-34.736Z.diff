@@ -1,0 +1,25 @@
+--- a/AGENT-84.md
++++ b/AGENT-84.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Plan package-first multi-distribution refactor"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:52.924Z
+-updated_at: 2026-04-27T18:20:53.000Z
++updated_at: 2026-04-27T18:22:34.735Z
+ related:
+   - AGENT-16
+   - AGENT-82
+@@ -41,3 +41,7 @@
+ 
+ - **description**: added (12 lines)
+ 
++## 2026-04-27T18:22:34.736Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

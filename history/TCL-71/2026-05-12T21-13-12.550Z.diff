@@ -1,0 +1,27 @@
+--- a/TCL-71.md
++++ b/TCL-71.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Make mutating task/project update commands require a key or explicit filter"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-03-30T20:47:48.695Z
+-updated_at: 2026-05-12T20:20:41.377Z
++updated_at: 2026-05-12T21:13:12.550Z
+ ---
+ 
+ # Make mutating task/project update commands require a key or explicit filter
+@@ -41,3 +42,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-12T21:13:12.550Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

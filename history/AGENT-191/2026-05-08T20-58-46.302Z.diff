@@ -1,0 +1,29 @@
+--- a/AGENT-191.md
++++ b/AGENT-191.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Evaluate Turborepo for workspace task orchestration"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-08T17:19:07.515Z
+ updated_at: 2026-05-08T17:19:07.566Z
+-updated_at: 2026-05-08T17:19:07.566Z
++updated_at: 2026-05-08T20:58:46.301Z
+ ---
+ 
+ # Evaluate Turborepo for workspace task orchestration
+@@ -21,3 +21,8 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-08T20:58:46.302Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

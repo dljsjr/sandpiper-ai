@@ -1,0 +1,29 @@
+--- a/TAT-2.md
++++ b/TAT-2.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Create v0 runtime socket and discovery loop"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-15T03:13:18.359Z
+-updated_at: 2026-05-15T03:13:18.359Z
++updated_at: 2026-05-18T18:37:38.275Z
+ ---
+ 
+ # Create v0 runtime socket and discovery loop
+@@ -21,3 +21,11 @@
+ 
+ Non-goals: claim files, flock ownership, stable agent UUIDs, global handles, SQLite directory, and v1 greeting/handshake.
+ 
++---
++
++# Activity Log
++
++## 2026-05-18T18:37:38.276Z
++
++- **status**: NOT STARTED → IN PROGRESS
++

@@ -1,0 +1,30 @@
+--- a/TAT-72.md
++++ b/TAT-72.md
+@@ -1,14 +1,12 @@
+ ---
+ title: "C2: Audience snapshot at append (Tattler layer)"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:26.253Z
+ depends_on:
+   - TAT-71
+-updated_at: 2026-05-27T15:51:14.938Z
++updated_at: 2026-05-27T16:59:18.807Z
+ ---
+ 
+ # C2: Audience snapshot at append (Tattler layer)
+@@ -32,3 +32,8 @@
+ - **title**: C2: Audience snapshot at append → C2: Audience snapshot at append (Tattler layer)
+ - **description**: updated
+ 
++## 2026-05-27T16:59:18.807Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper
++

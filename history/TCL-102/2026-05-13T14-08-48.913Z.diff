@@ -1,0 +1,27 @@
+--- a/TCL-102.md
++++ b/TCL-102.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Implement unified init/status surfaces for configured storage domains"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: SUBTASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-01T18:02:15.374Z
+-updated_at: 2026-04-01T18:04:23.248Z
++updated_at: 2026-05-13T14:08:48.912Z
+ ---
+ 
+ # Implement unified init/status surfaces for configured storage domains
+@@ -27,3 +28,8 @@
+ 
+ - **description**: added (7 lines)
+ 
++## 2026-05-13T14:08:48.913Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX
++

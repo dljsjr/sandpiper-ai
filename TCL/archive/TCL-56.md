@@ -73,9 +73,9 @@ Advisory locks (flock) don't work across all platforms, add complexity, and don'
 3. Move journaling — only if move reliability becomes a practical issue
 4. Skip file locking entirely
 
-### Relationship to Index Spikes (TCL-55, TCL-61)
+### Relationship to Index Spikes (MEM-2, MEM-3)
 
-If we move to SQLite (TCL-55) or Wax (TCL-61) as the index backend, the index staleness problem may change shape entirely — those engines have their own atomicity guarantees. So it may be worth doing #1 (atomic writes) now and deferring #2/#3 until the index spike decisions are made.
+If we move to SQLite (MEM-2) or Wax (MEM-3) as the index backend, the index staleness problem may change shape entirely — those engines have their own atomicity guarantees. So it may be worth doing #1 (atomic writes) now and deferring #2/#3 until the index spike decisions are made.
 
 ---
 

@@ -1,0 +1,21 @@
+--- a/TAT-23.md
++++ b/TAT-23.md
+@@ -6,7 +6,9 @@
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-24T15:40:14.761Z
+-updated_at: 2026-05-24T17:24:51.237Z
++blocked_by:
++  - TAT-28
++updated_at: 2026-05-24T17:24:59.371Z
+ ---
+ 
+ # Refine Chorus post-dogfood room UX
+@@ -37,3 +39,7 @@
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ 
++## 2026-05-24T17:24:59.372Z
++
++- **blocked_by**: (none) → TAT-28
++

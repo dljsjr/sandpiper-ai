@@ -1,0 +1,23 @@
+--- a/TCL-115.md
++++ b/TCL-115.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-12T20:35:36.968Z
+-updated_at: 2026-05-12T20:35:36.968Z
++updated_at: 2026-05-12T20:35:37.023Z
+ ---
+ 
+ # CLI should enforce that a task cannot transition to COMPLETE + DONE unless it is currently in NEEDS REVIEW
+ 
+-
++COMPLETE + WONTFIX can be transitioned to from anywhere, but we should require that a task lands in NEEDS REVIEW before it can be transitioned to COMPLETE + DONE
++
++---
++
++# Activity Log
++
++## 2026-05-12T20:35:37.024Z
++
++- **description**: added (1 line)
++

@@ -1,0 +1,25 @@
+--- a/AGENT-119.md
++++ b/AGENT-119.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Split Sandpiper identity factory from neutral capability factories"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T17:34:24.941Z
+-updated_at: 2026-05-01T17:41:00.327Z
++updated_at: 2026-05-01T17:44:10.549Z
+ ---
+ 
+ # Split Sandpiper identity factory from neutral capability factories
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-01T17:44:10.550Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

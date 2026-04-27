@@ -1,0 +1,32 @@
+--- a/TAT-20.md
++++ b/TAT-20.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Build Chorus room TUI surface"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.909Z
+ updated_at: 2026-05-23T06:23:56.909Z
+-updated_at: 2026-05-23T06:23:56.909Z
++updated_at: 2026-05-23T17:43:50.288Z
+ ---
+ 
+ # Build Chorus room TUI surface
+ 
+ Replace the broadcast-editor UX with an ephemeral channel UI: participant picker, room transcript rendered from Tattler/Chorus messages only, composer/editor for posting to the broker, room status/footer indicators, and an exit/disable flow.
+ 
++---
++
++# Activity Log
++
++## 2026-05-23T17:43:50.289Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++- **assignee**: UNASSIGNED → AGENT
++

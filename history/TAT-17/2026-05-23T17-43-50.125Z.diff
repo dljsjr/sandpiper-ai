@@ -1,0 +1,32 @@
+--- a/TAT-17.md
++++ b/TAT-17.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Implement physical Chorus room broker endpoint"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.726Z
+ updated_at: 2026-05-23T06:23:56.726Z
+-updated_at: 2026-05-23T06:23:56.726Z
++updated_at: 2026-05-23T17:43:50.125Z
+ ---
+ 
+ # Implement physical Chorus room broker endpoint
+ 
+ Create an ephemeral room broker socket/endpoint owned by Chorus. The broker owns roomId, participant set, transcript state, fanout policy, ACK/status tracking, and a routable broker identity distinct from agent identities.
+ 
++---
++
++# Activity Log
++
++## 2026-05-23T17:43:50.125Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++- **assignee**: UNASSIGNED → AGENT
++

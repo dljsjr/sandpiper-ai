@@ -1,0 +1,32 @@
+--- a/TAT-58.md
++++ b/TAT-58.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Draft Tattler/Chorus queue recovery implementation work plan"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T19:12:35.237Z
+ updated_at: 2026-05-25T19:12:35.237Z
+-updated_at: 2026-05-25T19:12:35.237Z
++updated_at: 2026-05-25T19:12:35.375Z
+ ---
+ 
+ # Draft Tattler/Chorus queue recovery implementation work plan
+ 
+ Piper owns the IA/work plan that turns the design into an implementation sequence and review gates: Tattler pending inbox, before_agent_start durable drain, tattler_receive cooperative interruption, Chorus batch rendering, participant metadata, tests, assignments, and coding handoff. Coordinate with Huginn's source seam map and Muninn/Sandpiper Dev review lanes.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:35.376Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper
++

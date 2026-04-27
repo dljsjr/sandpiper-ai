@@ -1,0 +1,29 @@
+===================================================================
+--- a/TCL-149.md
++++ b/TCL-149.md
+@@ -1,14 +1,14 @@
+ ---
+ title: "Slice 3: strict total config parse with exact version match"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "sandpiper-dev"
+ reporter: "Roux"
+ created_at: 2026-08-12T19:08:48.015Z
+-updated_at: 2026-08-12T20:18:49.252Z
++updated_at: 2026-08-12T20:21:43.829Z
+ depends_on:
+   - TCL-148
+ ---
+ 
+@@ -85,4 +85,8 @@
+ 
+ ## 2026-08-12T20:18:49.252Z
+ 
+ - **assignee**: UNASSIGNED → sandpiper-dev
++
++## 2026-08-12T20:21:43.829Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

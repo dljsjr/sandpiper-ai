@@ -1,0 +1,45 @@
+--- a/AGENT-214.md
++++ b/AGENT-214.md
+@@ -6,19 +6,16 @@
+ assignee: "Huginn"
+ reporter: "Roux"
+ created_at: 2026-06-09T22:45:05.621Z
+-updated_at: 2026-06-09T22:45:10.894Z
++updated_at: 2026-06-09T22:48:40.004Z
+ ---
+ 
+ # sandpiper-ai: implement prompt-contributor collector in startup hook
+ 
+-Owner: Huginn. In sandpiper-ai's system startup hook (extensions/system/startup-hooks.ts + sandpiper-ai-core buildSandpiperStartupPrompt path).
+-
+-- Add closure state: contributors map + unsubscribe handle.
+-- session_start: reset contributors, (re)subscribe to the prompt-contributor event-bus channel; synchronous enqueue only, dedupe by id.
+-- session_shutdown: unsubscribe.
+-- before_agent_start: drain contributors, await getContent once, splice rendered blocks into the rebuilt Sandpiper prompt at a stable location; cache/freeze for the session so the prompt stays prefix-cache stable across turns.
+-- Define and export the channel name + contributor payload type ({ id, phase?, getContent }) as the shared contract.
+-- Tests: contributor registered in resources_discover lands in the assembled prompt; dedupe by id; absent contributors => unchanged prompt; stability across multiple before_agent_start fires.
++Owner: Huginn. CONTRACT OWNER + critical path. In sandpiper-ai's system startup hook (extensions/system/startup-hooks.ts + sandpiper-ai-core buildSandpiperStartupPrompt path).
++
++GATE 2026-06-09: Muninn (AGENT-215) has shipped a tested concrete contract shape on the pi-yaams side. Do NOT define a second shape cold — adopt or negotiate deltas in-room first. Candidate contract to consume:
++- channel: 'sandpiper:prompt-contributor'
++- payload: { id; source; phase?; getContent(): Promise<block>; acknowledge?() }
++- collector MUST call contribution.acknowledge() when it accepts the block (load-bearing: pi-yaams uses the ack to decide whether to skip its legacy direct-append fallback).
++
++Implementation:
++- Closure state: contributors map + unsubscribe handle.
++- session_start: reset contributors, (re)subscribe to the channel; synchronous enqueue only; dedupe by id; call acknowledge() on accept.
++- session_shutdown: unsubscribe.
++- before_agent_start: drain contributors, await getContent once, splice rendered blocks into the rebuilt Sandpiper prompt at a stable location; cache/freeze for the session (prefix-cache stability).
++- Export the channel name + payload type as the canonical shared contract; docs (AGENT-216) and pi-yaams (AGENT-215) follow the exported constant.
++- Tests: contributor registered in resources_discover lands in assembled prompt; acknowledge() called; dedupe by id; absent contributors => unchanged prompt; stable across multiple before_agent_start fires.
+ 
+ ---
+ 
+@@ -29,3 +35,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-06-09T22:48:40.005Z
++
++- **description**: 8 lines → updated (14 lines)
++

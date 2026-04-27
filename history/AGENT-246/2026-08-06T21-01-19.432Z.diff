@@ -1,0 +1,34 @@
+===================================================================
+--- a/AGENT-246.md
++++ b/AGENT-246.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Replace direct typebox imports with pi-ai re-exports, drop the typebox pin"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: USER
+ created_at: 2026-08-06T21:00:31.940Z
+-updated_at: 2026-08-06T21:00:31.940Z
++updated_at: 2026-08-06T21:01:19.431Z
+ ---
+ 
+ # Replace direct typebox imports with pi-ai re-exports, drop the typebox pin
+ 
+@@ -15,4 +15,13 @@
+ 
+ Why correctness, not cleanup: we currently run two typebox instances in one process (our 1.3.6 pin vs pi-ai's bundled 1.1.38 dependency), and extensions/tattler/index.ts already mixes them in a single schema (pi-ai StringEnum + our Type.Object). Works today because emitted schemas are plain data; eliminating the dual instance removes the skew class and the keep-typebox-in-lockstep maintenance rule entirely.
+ 
+ Manifest work: remove the typebox pin from all 6 package.jsons (root :83, extensions/{shell-relay,system,web-fetch,web-search}, plugins/pi/extensions); ensure every package whose sources import from pi-ai declares it at the exact pinned version (repo rule: exact versions, bun run check:deps must stay clean; root package.json currently lacks a pi-ai entry while extensions/chorus.ts + tattler live under it). Verify knip stays clean after the dep removal. No typebox usage exists outside the extension host (verified: packages/core, trail, standup-cli, adapter-claude-code, devtools all clean).
++
++---
++
++# Activity Log
++
++## 2026-08-06T21:01:19.432Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-266.md
++++ b/AGENT-266.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Add source-mapped system prompt editor"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-08-10T22:22:17.300Z
+-updated_at: 2026-08-11T00:19:42.778Z
++updated_at: 2026-08-11T00:36:45.823Z
+ ---
+ 
+ # Add source-mapped system prompt editor
+ 
+@@ -29,4 +29,8 @@
+ ## 2026-08-11T00:19:42.779Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ - **description**: updated
++
++## 2026-08-11T00:36:45.823Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

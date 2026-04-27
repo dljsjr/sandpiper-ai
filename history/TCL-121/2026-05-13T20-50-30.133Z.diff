@@ -1,0 +1,27 @@
+--- a/TCL-121.md
++++ b/TCL-121.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Fix slash shortcut stealing focus from Glimpse board form fields"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T14:29:07.912Z
+-updated_at: 2026-05-13T14:29:51.217Z
++updated_at: 2026-05-13T20:50:30.133Z
+ ---
+ 
+ # Fix slash shortcut stealing focus from Glimpse board form fields
+@@ -26,3 +27,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-13T20:50:30.133Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

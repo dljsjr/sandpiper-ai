@@ -1,0 +1,54 @@
+===================================================================
+--- a/TCL-157.md
++++ b/TCL-157.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:31.792Z
+-updated_at: 2026-08-12T22:31:31.792Z
++updated_at: 2026-08-13T03:13:19.177Z
+ related:
+   - TCL-156
+ ---
+ 
+@@ -26,4 +26,39 @@
+ 
+ Verification must assert resulting on-disk and VCS state, not exit codes and banners. Three bugs found during the extraction (TCL-151, TCL-152, TCL-153) were all commands reporting intent instead of result, and all were invisible to tests that checked stdout.
+ 
+ Deferred out of TCL-146; filed 2026-08-12 when that ticket reached review.
++
++
++---
++
++## Survey of the actual boards, 2026-08-12
++
++Eleven boards found under `~/git`. The shape is not what "migrate the config" suggests.
++
++| | Count | Boards |
++|---|---|---|
++| No config — inline mode | 4 | candle, dash_docset_generator, herdr, StreamObserver |
++| Separate-branch (`mode.branch`) | 7 | navigator, pi-claude-code-cli-provider, reinforced-guidance, sandpiper-ai, task-storage-spike, waymark, yaams |
++| External repo (`mode.repo`) | **0** | — |
++
++Three consequences:
++
++**1. The four inline boards are a file move. The seven others are VCS worktree relocations.** `.sandpiper/tasks/` on those boards is a live git worktree or jj workspace on a `tasks`/`sandpiper-tasks` branch. Moving it to `.trail/tasks/` is not `mv` — git records the worktree path in `.git/worktrees/<name>/gitdir` and the worktree's own `.git` file points back at the parent. The tool must either use `git worktree move` / jj's equivalent, or tear down and re-bootstrap while preserving the branch. This is the hard part of the ticket and the part most likely to be underestimated.
++
++**2. Every existing config is in a shape the current parser rejects.** They live at `.sandpiper-tasks.json` in the repo root, not `.trail/config.json`, so Trail does not find them at all and silently falls back to inline defaults — pointing at an empty `.trail/tasks/`. Beyond the path: not one of the seven carries a `version` field, and two (`pi-claude-code-cli-provider`, `waymark`) have no `enabled` key. TCL-149's parse is strict, total and version-exact, so the tool must **synthesize the total shape**, not copy-and-patch. Branch names vary too — five use `tasks`, two use `sandpiper-tasks`.
++
++**3. TCL-153 is not a blocker for this work.** Zero boards use external-repo storage, so `storage migrate` silently ignoring `mode.repo` cannot bite during this migration. It stays HIGH on its own merit; it does not gate here.
++
++## Prove it on one board twice
++
++Before touching eleven, run it against a *copy* of one separate-branch board, then run it again on the result. Assert resulting VCS state — worktree registered at the new path, branch intact, task files present, `task list` returns the same count — not exit code and not stdout. Idempotence is the property that makes a partial run survivable, and re-running is the most likely recovery action a human will take.
++
++A dry-run mode belongs in scope, not as a nicety. These are live boards with real history and no second copy.
++
++---
++
++# Activity Log
++
++## 2026-08-13T03:13:19.178Z
++
++- **description**: 14 lines → updated (41 lines)

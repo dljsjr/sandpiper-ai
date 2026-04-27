@@ -1,0 +1,28 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -6,7 +6,7 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T21:38:04.446Z
+-updated_at: 2026-05-25T21:47:20.865Z
++updated_at: 2026-05-25T21:50:33.780Z
+ related:
+   - TAT-38
+   - TAT-59
+@@ -15,7 +15,7 @@
+ 
+ # Style tattler_receive tool call background
+ 
+-Fixed as part of sxrpyyxq / a017f56b. The Tattler pending batch renderer now applies custom message background styling to visible Chorus entries, using customMessageBg for remote room messages and toolSuccessBg for self messages. Because idle Chorus/self delivery now uses the same tattler:pending-batch custom message shape as received batches, the styling path is shared instead of split across chorus-room-message and pending-batch renderers. Regression asserts the batch renderer applies background styling.
++Partially addressed by sxrpyyxq / a017f56b. The canonical Tattler pending batch renderer now applies custom message background styling to visible Chorus entries, using customMessageBg for remote room messages and toolSuccessBg for self messages, and idle Chorus/self delivery now uses the same tattler:pending-batch custom message shape as received batches. Reviewer caveat: if the originally missing color was specifically the tattler_receive tool-call row, that row still uses quiet/empty tool renderers and needs visual re-smoke before TAT-60 can be closed.
+ 
+ ---
+ 
+@@ -38,3 +38,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-25T21:50:33.781Z
++
++- **description**: updated
++

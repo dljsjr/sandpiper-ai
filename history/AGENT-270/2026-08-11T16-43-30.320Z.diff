@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-270.md
++++ b/AGENT-270.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Keep inline XML tag references editable in prompt editor"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-08-11T16:42:48.062Z
+-updated_at: 2026-08-11T16:42:53.355Z
++updated_at: 2026-08-11T16:43:30.319Z
+ related:
+   - AGENT-269
+ ---
+ 
+@@ -26,4 +26,8 @@
+ 
+ ## 2026-08-11T16:42:53.355Z
+ 
+ - **description**: added (1 line)
++
++## 2026-08-11T16:43:30.320Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

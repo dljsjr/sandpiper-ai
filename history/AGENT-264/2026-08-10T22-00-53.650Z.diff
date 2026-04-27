@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-264.md
++++ b/AGENT-264.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Implement SDK-based system prompt diagnostic runner"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T21:48:03.938Z
+-updated_at: 2026-08-10T21:49:35.220Z
++updated_at: 2026-08-10T22:00:53.649Z
+ ---
+ 
+ # Implement SDK-based system prompt diagnostic runner
+ 
+@@ -19,4 +19,8 @@
+ ## 2026-08-10T21:49:35.220Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
++
++## 2026-08-10T22:00:53.650Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-224.md
++++ b/AGENT-224.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Bump pinned pi-coding-agent to 0.80.6 across the monorepo"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-07-10T15:48:36.578Z
+-updated_at: 2026-07-10T16:49:37.323Z
++updated_at: 2026-07-10T16:49:37.476Z
+ ---
+ 
+ # Bump pinned pi-coding-agent to 0.80.6 across the monorepo
+ 
+@@ -19,4 +20,9 @@
+ 
+ ## 2026-07-10T16:49:37.328Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-07-10T16:49:37.477Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

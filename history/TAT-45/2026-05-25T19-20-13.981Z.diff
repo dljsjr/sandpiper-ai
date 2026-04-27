@@ -1,0 +1,25 @@
+--- a/TAT-45.md
++++ b/TAT-45.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Map queue recovery implementation seams"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.996Z
+-updated_at: 2026-05-25T19:20:13.860Z
++updated_at: 2026-05-25T19:20:13.981Z
+ ---
+ 
+ # Map queue recovery implementation seams
+@@ -70,3 +70,7 @@
+ - **assignee**: Muninn + Sandpiper Dev → Huginn
+ - **description**: 1 line → updated (35 lines)
+ 
++## 2026-05-25T19:20:13.981Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

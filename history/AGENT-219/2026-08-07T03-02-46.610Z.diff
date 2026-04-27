@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-219.md
++++ b/AGENT-219.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: USER
+ created_at: 2026-06-23T20:28:29.339Z
+-updated_at: 2026-08-07T02:59:17.406Z
++updated_at: 2026-08-07T03:02:46.609Z
+ ---
+ 
+ # Adopt Pi coding-agent package asset path helpers for system-prompt docs/examples resolution
+ 
+@@ -18,8 +18,12 @@
+ VERIFIED 2026-08-06: still valid at 0.84.0, no bump required - getDocsPath/getExamplesPath/getPackageDir/getReadmePath are exported at the pinned 0.80.7. Grounding pointer: packages/core/src/system-prompt.ts piDocsBlock() consumes PI_CODING_AGENT_PACKAGE / SANDPIPER_CODING_AGENT_PACKAGE env values rather than the helpers, so this is NOT a WONTFIX - there is real adoption work. Natural companion to the AGENT-235 tree.
+ 
+ ---
+ 
++FALSIFIED AND CLOSED WONTFIX (2026-08-07, overnight shift): the 2026-08-06 verification note above ("this is NOT a WONTFIX") was wrong - it confirmed the env reads exist but never traced what the helpers resolve against in a rebranded install. Full trace by sandpiper-0.84-dev: getDocsPath/getExamplesPath/getReadmePath are all join(getPackageDir(), ...) and getPackageDir() resolves from PI_PACKAGE_DIR - which configurePiEnvironment deliberately points at SANDPIPER own package dir on every CLI invocation (that repointing is the rebrand mechanism itself). PI_CODING_AGENT_PACKAGE is kept separate specifically to reference the real upstream pi package for the harness_docs prompt block. Adopting the helpers at piDocsBlock would therefore emit Sandpiper paths where upstream pi docs paths belong - a regression, not an adoption. Additionally, the consuming code lives in packages/core, which is host-neutral by repo invariant and cannot import pi-coding-agent. The env-var hand-resolution is correct and load-bearing, not debt. Second coordinator-banked claim falsified by evidence this session (first: the chorus /new responder side-finding in AGENT-244).
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-06T20:43:10.025Z
+ 
+@@ -28,4 +32,8 @@
+ ## 2026-08-07T02:59:17.406Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-0.84-dev
++
++## 2026-08-07T03:02:46.610Z
++
++- **description**: 5 lines → updated (9 lines)

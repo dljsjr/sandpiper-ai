@@ -1,0 +1,47 @@
+---
+title: "Replace direct typebox imports with pi-ai re-exports, drop the typebox pin"
+status: COMPLETE
+resolution: DONE
+kind: SUBTASK
+priority: MEDIUM
+assignee: "sandpiper-0.84-dev"
+reporter: USER
+created_at: 2026-08-06T21:00:31.940Z
+updated_at: 2026-08-06T21:33:28.478Z
+---
+
+# Replace direct typebox imports with pi-ai re-exports, drop the typebox pin
+
+Replace import { Type } from 'typebox' with import { Type } from '@earendil-works/pi-ai' at all 10 sites (extensions/chorus.ts, extensions/tattler/{index,tattler-receive}.ts, extensions/system/{background-process-tools,skill-loading-tool,turn-control-tool}.ts, extensions/shell-relay/src/tools/{inspect-pane,start-relay}.ts, extensions/web-fetch/src/index.ts, extensions/web-search/src/index.ts). pi-ai re-exports Type (value) plus Static/TSchema (types) and the typebox-helpers incl. StringEnum - verified present at the current 0.80.7 pin, so this does NOT depend on the version bump and should land BEFORE it.
+
+Why correctness, not cleanup: we currently run two typebox instances in one process (our 1.3.6 pin vs pi-ai's bundled 1.1.38 dependency), and extensions/tattler/index.ts already mixes them in a single schema (pi-ai StringEnum + our Type.Object). Works today because emitted schemas are plain data; eliminating the dual instance removes the skew class and the keep-typebox-in-lockstep maintenance rule entirely.
+
+Manifest work: remove the typebox pin from all 6 package.jsons (root :83, extensions/{shell-relay,system,web-fetch,web-search}, plugins/pi/extensions); add @earendil-works/pi-ai as exact-version peerDependency wherever sources import it (root, shell-relay, system, web-fetch, web-search; plugins/pi/extensions already has it). Verify knip + bun run check:deps stay clean.
+
+DISTRIBUTION MANIFESTS (found by sandpiper-0.84-dev 2026-08-06; corrects this task's earlier 'devtools all clean' claim, which was import-level only): devtools/piPackageArtifactMetadata.ts references typebox as a string key when assembling DISTRIBUTED manifests - createPiPeerDependencies() L89 (feeds dist/package.json peerDependencies via distPackageJson.ts and dist/extensions/system/package.json) and createWebFetchExtensionPackageJson L216. packagePeerDependencyVersion throws on a missing key, so pin removal without this edit breaks test:distribution.
+
+DECISION (coordinator, 2026-08-06): SUBSTITUTE, do not merely drop - createPiPeerDependencies() emits @earendil-works/pi-ai in place of typebox; createWebFetchExtensionPackageJson same. Invariant: distributed peerDependencies mirror what distributed sources import from the host context (pi-coding-agent, pi-tui, pi-ai; typebox nowhere - it rides along as pi-ai's own regular dependency and is never imported directly). Note createPiRuntimeDependencies() already ships pi-ai as a dist runtime dependency, so resolution is proven. The commented-out shell-relay block at L192 is dead code - leave it untouched. Raw string sweep confirms these are the only typebox references outside imports; no invariant tests assert typebox by name.
+
+Submission evidence: before/after emitted-schema snapshot of a union-bearing tool (web_fetch filter or send_peer_message addressType) + generated dist/package.json and dist/extensions/{system,web-fetch}/package.json peer sections showing typebox absent / pi-ai present at the exact pin + full gates.
+
+---
+
+# Activity Log
+
+## 2026-08-06T21:01:19.432Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → sandpiper-0.84-dev
+
+## 2026-08-06T21:05:07.160Z
+
+- **description**: 5 lines → updated (11 lines)
+
+## 2026-08-06T21:33:28.220Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-08-06T21:33:28.479Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

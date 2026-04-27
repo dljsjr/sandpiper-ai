@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-247.md
++++ b/AGENT-247.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Clear pre-existing bun check debt blocking the zero-warning gate"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: "sandpiper-0.84-dev"
+ created_at: 2026-08-06T21:07:58.542Z
+-updated_at: 2026-08-06T21:33:28.350Z
++updated_at: 2026-08-06T21:33:28.632Z
+ ---
+ 
+ # Clear pre-existing bun check debt blocking the zero-warning gate
+ 
+@@ -34,4 +35,9 @@
+ 
+ ## 2026-08-06T21:33:28.351Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-06T21:33:28.634Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

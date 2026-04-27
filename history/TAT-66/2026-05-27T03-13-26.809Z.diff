@@ -1,0 +1,25 @@
+--- a/TAT-66.md
++++ b/TAT-66.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Design multi-agent delegation and decision ownership protocol"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T21:52:33.225Z
+-updated_at: 2026-05-26T03:30:24.064Z
++updated_at: 2026-05-27T03:13:26.808Z
+ related:
+   - TAT-33
+   - TAT-38
+@@ -42,3 +42,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-27T03:13:26.809Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

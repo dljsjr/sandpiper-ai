@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-258.md
++++ b/AGENT-258.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Add root vitest workspace config so per-package configs apply from root"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "sandpiper-dev"
+ reporter: USER
+ created_at: 2026-08-08T01:16:47.296Z
+-updated_at: 2026-08-10T17:37:35.952Z
++updated_at: 2026-08-10T17:37:46.082Z
+ ---
+ 
+ # Add root vitest workspace config so per-package configs apply from root
+ 
+@@ -28,4 +28,8 @@
+ ## 2026-08-10T17:37:35.953Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-dev
++
++## 2026-08-10T17:37:46.083Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

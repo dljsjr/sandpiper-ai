@@ -1,0 +1,35 @@
+===================================================================
+--- a/AGENT-269.md
++++ b/AGENT-269.md
+@@ -1,18 +1,18 @@
+ ---
+ title: "Add Glimpse prompt editor and end-to-end verification"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T22:22:24.233Z
+-updated_at: 2026-08-11T00:36:45.769Z
++updated_at: 2026-08-11T00:56:22.399Z
+ ---
+ 
+ # Add Glimpse prompt editor and end-to-end verification
+ 
+-Add a sourced-fragment navigation sidebar plus explicit Preview and Apply workflow, then verify no source changes occur before approval and apply is atomic.
++Group multiple editable ranges from one source into one sidebar entry with first-range navigation; preserve locked template substitutions inline in the rendered projection where practical. Verify the Glimpse presentation from the reported screenshot.
+ 
+ ---
+ 
+ # Activity Log
+@@ -33,4 +33,9 @@
+ 
+ ## 2026-08-11T00:36:45.770Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-11T00:56:22.400Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++- **description**: updated

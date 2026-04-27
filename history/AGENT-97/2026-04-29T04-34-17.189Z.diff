@@ -1,0 +1,27 @@
+--- a/AGENT-97.md
++++ b/AGENT-97.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Evaluate Bun compile asset and package metadata behavior"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:43:23.600Z
+-updated_at: 2026-04-27T18:52:31.306Z
++updated_at: 2026-04-29T04:34:17.188Z
+ ---
+ 
+ # Evaluate Bun compile asset and package metadata behavior
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-29T04:34:17.189Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

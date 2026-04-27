@@ -1,0 +1,27 @@
+--- a/AGENT-214.md
++++ b/AGENT-214.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "sandpiper-ai: implement prompt-contributor collector in startup hook"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: "Roux"
+ created_at: 2026-06-09T22:45:05.621Z
+-updated_at: 2026-06-09T22:53:55.511Z
++updated_at: 2026-06-10T04:27:55.489Z
+ ---
+ 
+ # sandpiper-ai: implement prompt-contributor collector in startup hook
+@@ -51,3 +52,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-06-10T04:27:55.490Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

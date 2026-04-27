@@ -1,0 +1,27 @@
+--- a/AGENT-75.md
++++ b/AGENT-75.md
+@@ -6,12 +6,12 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-26T03:24:30.683Z
+-updated_at: 2026-04-26T03:24:35.527Z
++related:
++  - AGENT-64
++  - AGENT-73
++updated_at: 2026-04-26T03:24:35.609Z
+ ---
+ 
+ # Experiment 4: extractor JSON schema grammar
+ 
+-
+ ---
+ 
+ # Activity Log
+@@ -21,3 +23,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-26T03:24:35.610Z
++
++- **related**: (none) → AGENT-64, AGENT-73
++

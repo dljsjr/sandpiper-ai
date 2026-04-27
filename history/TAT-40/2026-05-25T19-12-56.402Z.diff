@@ -1,0 +1,27 @@
+--- a/TAT-40.md
++++ b/TAT-40.md
+@@ -3,13 +3,18 @@
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.658Z
+ updated_at: 2026-05-25T19:11:37.658Z
+-updated_at: 2026-05-25T19:11:37.658Z
++updated_at: 2026-05-25T19:12:56.401Z
+ ---
+ 
+ # Implement Tattler pending inbox state and dedupe
+ 
+ Add a Tattler-owned pending inbox for inbound messages received while an agent is busy. The inbox is the source of truth outside Pi's steer/follow-up queues, preserves arrival order, dedupes by message id (and room/post id for Chorus), and can emit an extension-private appendEntry audit/snapshot for recovery before flush. Do not enqueue real inbound payloads into Pi while busy.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:56.402Z
++
++- **assignee**: UNASSIGNED → Huginn
++

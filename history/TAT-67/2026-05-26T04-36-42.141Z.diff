@@ -1,0 +1,31 @@
+--- a/TAT-67.md
++++ b/TAT-67.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Add Chorus reply authorship contract"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Huginn"
+ reporter: "Huginn"
+ created_at: 2026-05-26T04:36:42.075Z
+ updated_at: 2026-05-26T04:36:42.075Z
+-updated_at: 2026-05-26T04:36:42.075Z
++updated_at: 2026-05-26T04:36:42.141Z
+ ---
+ 
+ # Add Chorus reply authorship contract
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-26T04:36:42.141Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Huginn
++

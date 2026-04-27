@@ -1,0 +1,25 @@
+--- a/AGENT-112.md
++++ b/AGENT-112.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Inventory hardcoded host path and env references"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-30T18:08:36.446Z
+-updated_at: 2026-04-30T19:02:43.958Z
++updated_at: 2026-04-30T19:04:28.065Z
+ ---
+ 
+ # Inventory hardcoded host path and env references
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-30T19:04:28.068Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

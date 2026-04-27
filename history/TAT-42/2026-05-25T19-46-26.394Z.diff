@@ -1,0 +1,25 @@
+--- a/TAT-42.md
++++ b/TAT-42.md
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:38:32.994Z
++updated_at: 2026-05-25T19:46:26.393Z
+ ---
+ 
+ # Define Tattler inbox batch content and details schema
+ 
+-Implemented in jj change xszoyull / 7401716b. Defines canonical pending batch custom message type tattler:pending-batch with model-facing XML content and structured details { kind: batch, batchId, messages[] }. Content is canonical for LLM/debug/compaction; details are for renderer fidelity. Dedicated renderer remains TAT-43.
++Implemented in jj changes xszoyull / 7401716b plus review fix wxqnulxl / 5874382f. Defines canonical pending batch custom message type tattler:pending-batch with model-facing XML content and structured details { kind: batch, batchId, messages[] }. Content is canonical for LLM/debug/compaction; details are for renderer fidelity. Batch display is forced false until TAT-43 lands a renderer that can filter hidden vs visible items, preventing mixed hidden Tattler + visible Chorus batches from raw-rendering hidden content.
+ 
+ ---
+ 
+@@ -36,3 +36,7 @@
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
+ 
++## 2026-05-25T19:46:26.394Z
++
++- **description**: updated
++

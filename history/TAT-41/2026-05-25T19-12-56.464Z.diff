@@ -1,0 +1,27 @@
+--- a/TAT-41.md
++++ b/TAT-41.md
+@@ -3,13 +3,18 @@
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.749Z
+ updated_at: 2026-05-25T19:11:37.749Z
+-updated_at: 2026-05-25T19:11:37.749Z
++updated_at: 2026-05-25T19:12:56.463Z
+ ---
+ 
+ # Drain pending inbox through before_agent_start
+ 
+ Use Pi's before_agent_start hook as the universal drain point for any next agent turn. If pending Tattler messages exist, return a persistent custom batch message for the turn, then clear or mark messages delivered only after successful injection/persistence. This must cover cooperative receive turns, user abort plus resume prompt, and ordinary later prompts.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:56.464Z
++
++- **assignee**: UNASSIGNED → Huginn
++

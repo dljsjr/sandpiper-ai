@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-268.md
++++ b/AGENT-268.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Build Birdup writable prompt projection"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T22:22:24.170Z
+-updated_at: 2026-08-11T00:19:42.837Z
++updated_at: 2026-08-11T00:36:45.696Z
+ ---
+ 
+ # Build Birdup writable prompt projection
+ 
+@@ -29,4 +29,8 @@
+ ## 2026-08-11T00:19:42.838Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ - **description**: added (1 line)
++
++## 2026-08-11T00:36:45.701Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

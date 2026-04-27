@@ -1,0 +1,27 @@
+--- a/AGENT-63.md
++++ b/AGENT-63.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Write tests for classifier integration"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-09T01:39:55.396Z
+-updated_at: 2026-04-09T01:42:08.220Z
++updated_at: 2026-05-14T14:04:08.539Z
+ ---
+ 
+ # Write tests for classifier integration
+@@ -31,3 +32,8 @@
+ 
+ - **description**: added (11 lines)
+ 
++## 2026-05-14T14:04:08.539Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX
++

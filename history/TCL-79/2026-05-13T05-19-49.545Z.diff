@@ -1,0 +1,27 @@
+--- a/TCL-79.md
++++ b/TCL-79.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Narrow updateAllReferences to use index instead of full file scan"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: LOW
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:58.387Z
+-updated_at: 2026-05-13T05:17:18.234Z
++updated_at: 2026-05-13T05:19:49.545Z
+ ---
+ 
+ # Narrow updateAllReferences to use index instead of full file scan
+@@ -50,3 +51,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-13T05:19:49.545Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

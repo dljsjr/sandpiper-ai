@@ -1,0 +1,46 @@
+===================================================================
+--- a/AGENT-251.md
++++ b/AGENT-251.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.381Z
+-updated_at: 2026-08-07T15:44:31.535Z
++updated_at: 2026-08-07T16:00:28.804Z
+ depends_on:
+   - AGENT-250
+ ---
+ 
+@@ -34,8 +34,22 @@
+ Verification: bun check clean throughout every iteration. Full bun run test suite run as final post-edit check. Tripwire shim log held at 3-line baseline across every check AND across every real process spawn in the smoke tests -- zero network egress observed empirically, not just claimed.
+ 
+ Deliberately NOT built (explicitly AGENT-252/253 scope): multi-turn/tool-calling mock scripting beyond one canned reply; the guard-fires proof (deliberately misconfigure a spawn to skip the mock and assert the sentinel fires against a real-but-unmocked provider); wave-1 extension coverage tests.
+ 
++## Revision (2026-08-07, during review)
++
++Reviewer caught a false claim: "zero http.request/https.request usage in pi-ai's dependency tree" was wrong. @smithy/node-http-handler (transitive dependency of pi-ai's Bedrock provider via @aws-sdk/client-bedrock-runtime) does `require('node:https')` at module scope and reads `.request` as a call-time property lookup, not a cached reference -- so the require()-based patch (which this task originally dropped) actually DOES work for it, and load order doesn't matter because it's a fresh lookup every call.
++
++Restored the https.request patch (fetch stays patched too), keeping the guard's own explanation of why the ORIGINAL http.request/https.request attempt failed (require/import interop mismatch in how it was tested, not proof the target is unpatchable) distinct from why THIS attempt works (require-to-require, no mismatch).
++
++Documented pi-ai's two Bedrock load paths precisely: (a) an eager/static registration path used only by pi's compiled Bun-binary build, unreachable by either harness entry mode by construction; (b) the normal lazy path (bedrock-converse-stream.lazy.js's lazyApi wrapper around a dynamic import), which only loads smithy on an actual dispatch attempt. Consequence: AGENT-252's Bedrock guard-fires case must drive a real turn, not just pass --provider amazon-bedrock, or smithy never loads and the test proves nothing.
++
++Added a second, independent backstop: harness.ts now pins fake AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_PROFILE unconditionally on every spawn, so if the guard itself regresses, AGENT-252's Bedrock guard-fires test authenticates as garbage and gets a 403 rather than spending real ambient AWS credentials -- same principle as the op-shim tripwire.
++
++Corrected the design doc and devtools/integration/README.md in place with full evidence for both rounds of correction.
++
++Verification: full bun run test:vitest run clean at 117/117 files, 1097/1097 tests, after ruling out a transient false-negative from a period of extreme system load (load avg 24.94 observed via uptime during a concurrent run, ~19 tests timed out across totally unrelated files -- packages/trail's real jj/git-spawning tests, devtools/ecosystemPackage.test.ts -- none touching devtools/integration/; re-ran the same failing files individually seconds later, all passed in ~1-2s each; re-ran the full suite once more after load dropped to 6.64, clean 117/117 -- confirmed via direct uptime observation, not asserted). Tripwire shim log held at 3 lines throughout every run, including the contended one.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -50,4 +64,8 @@
+ 
+ ## 2026-08-07T15:44:31.535Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-07T16:00:28.833Z
++
++- **description**: 21 lines → updated (35 lines)

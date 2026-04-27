@@ -1,0 +1,83 @@
+--- a/TAT-58.md
++++ b/TAT-58.md
+@@ -6,19 +6,56 @@
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T19:12:35.237Z
+-updated_at: 2026-05-25T19:12:35.375Z
++related:
++  - TAT-36
++  - TAT-37
++  - TAT-38
++  - TAT-39
++  - TAT-34
++  - TAT-35
++updated_at: 2026-05-25T19:14:18.272Z
+ ---
+ 
+ # Draft Tattler/Chorus queue recovery implementation work plan
+ 
+-Piper owns the IA/work plan that turns the design into an implementation sequence and review gates: Tattler pending inbox, before_agent_start durable drain, tattler_receive cooperative interruption, Chorus batch rendering, participant metadata, tests, assignments, and coding handoff. Coordinate with Huginn's source seam map and Muninn/Sandpiper Dev review lanes.
+-
+----
+-
+-# Activity Log
+-
+-## 2026-05-25T19:12:35.376Z
+-
+-- **status**: NOT STARTED → IN PROGRESS
+-- **assignee**: UNASSIGNED → Piper
+-
++IA/work plan for the Tattler/Chorus queue-recovery slice. This is the review gate before implementation.
++
++## Problem split
++
++1. Busy-time inbound messages should not depend on Pi's steer/followUp queues. In one-at-a-time mode, bursts are serialized into partial context; abort/clear can drop queued custom messages before they persist.
++2. Main-chat rendering is transcript/model-injection coupled. Chorus widget can remain the live room surface; transcript rendering follows durable custom-message delivery.
++3. Abort recovery must be data-safe: user abort + any next prompt should drain missed Tattler/Chorus messages into the next turn.
++
++## Chosen design
++
++- Tattler owns a pending inbox for inbound messages received while busy.
++- Real inbound payloads are not sent through Pi queues while busy.
++- Normal user prompts and `pi.sendUserMessage` turns run `before_agent_start`; that hook is the canonical drain for user abort + resume and other normal next-turn paths.
++- Pi nuance from source: `pi.sendMessage(..., { triggerTurn:true })` / `sendCustomMessage` calls `_runAgentPrompt(appMessage)` directly and bypasses `before_agent_start`. Synthetic receive turns must either use `pi.sendUserMessage(...)` to run the universal drain hook, or explicitly send the batch custom message as the trigger and treat that as a separate documented drain path.
++- `before_agent_start` custom messages are appended to the prompt batch after the user prompt, not literally prepended. They are still persistent/model-visible custom messages.
++- `tattler_receive` is an optional cooperative interruption tool that lets the model intentionally end the current turn and create the next drain boundary. It is not the only correctness path.
++- Chorus uses the Tattler inbox/batch machinery for visible room traffic while preserving its room/broker semantics.
++- The batch custom message duplicates data intentionally: `content` is complete model-visible text/XML; `details` is structured renderer data with `kind=batch`, `batchId`, and `messages[]`.
++- Chorus broker stamps a participant/audience snapshot into canonical room posts so receiving agents know who will see replies.
++
++## Immediate implementation tickets
++
++- TAT-36: Core pending inbox, drain strategy, batch schema/rendering, and busy/abort/resume delivery tests.
++- TAT-37: Source/test classification for abort data loss vs UI replay and the fixed abort+resume path.
++- TAT-38: Cooperative `tattler_receive` tool and deferred synthetic receive turn.
++- TAT-39: Broker-owned Chorus participant/audience metadata.
++
++## Non-goals for this slice
++
++- No default `context` hook injection; it is provider-payload-only and breaks transcript/cache/replay alignment.
++- No private chat-container injection as default live rendering path.
++- No raw `send_peer_message` replacement for visible Chorus room replies; keep a semantic room-post/reply affordance.
++- No stable roster/read-receipt protocol; participant metadata is a best-effort broker snapshot at fanout time.
++- No broad tool-surface expansion beyond the justified Tattler receive affordance.
++
++## Review gate
++
++Before coding, Huginn should provide the source-grounded seam map. Piper keeps the task breakdown aligned. Muninn + Sandpiper Dev review the plan/seams for public Pi API usage, queue/data-loss semantics, and architectural scope.
++
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:35.376Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper
++
++## 2026-05-25T19:14:18.277Z
++
++- **description**: 1 line → updated (38 lines)
++- **related**: (none) → TAT-36, TAT-37, TAT-38, TAT-39, TAT-34, TAT-35
++

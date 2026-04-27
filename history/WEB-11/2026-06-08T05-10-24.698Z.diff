@@ -1,0 +1,41 @@
+--- a/WEB-11.md
++++ b/WEB-11.md
+@@ -6,7 +6,7 @@
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.175Z
+-updated_at: 2026-06-08T01:34:14.745Z
++updated_at: 2026-06-08T05:10:24.694Z
+ ---
+ 
+ # Spike: single-query web search tool (fetch top N results from a search API)
+@@ -16,9 +16,9 @@
+ **Architecture:** New Pi extension at `extensions/web-search/`, mirroring `web-fetch`'s structure. Registers a `web_search` tool via `pi.registerTool`.
+ 
+ **Adapter pattern:** `SearchAdapter` interface (mirroring `FetchAdapter`) with pluggable backends:
+-- **DDG HTML scraping** — MVP adapter. Zero-config but may hit CAPTCHAs on repeated queries. Includes CAPTCHA detection, rate limiting (1.5s), realistic browser headers.
+-- **Brave Search API** — deferred. Independent index, 2k queries/month free, clean JSON API. Requires API key (`BRAVE_API_KEY` env var or settings.json). ~30 lines to wire when key is available.
+-- **SearXNG** — longer-term, configurable via DI.
++- **Brave Search API** — primary adapter. Independent index, 2k queries/month free, clean JSON API. Key via `BRAVE_API_KEY` env var or `braveApiKey` in settings.json. Supports `!op read` pattern.
++- **Parallel MCP** — no-key fallback. Free endpoint at `https://search.parallel.ai/mcp`. Uses mcporter's `createRuntime` with programmatic server definition (no config.json needed). MCP wire protocol: initialize → tools/call → parse content[0].text JSON.
++- **DDG HTML scraping** — last-resort fallback. Zero-config but CAPTCHAs on first request from server-side code.
+ 
+ **Result shape:** `{title: string, url: string, snippet: string}[]` — structured results, same contract regardless of backend.
+ 
+@@ -30,7 +30,7 @@
+ 
+ ## Status (2026-06-07)
+ 
+-DDG MVP landed. Integration verified: tsc clean, 11/11 tests pass. Brave adapter deferred until API key available.
++Brave adapter built, tested, and live in harness. Parallel MCP adapter in progress. DDG adapter as last-resort fallback.
+ 
+ ---
+ 
+@@ -61,3 +61,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-06-08T05:10:24.698Z
++
++- **description**: updated
++

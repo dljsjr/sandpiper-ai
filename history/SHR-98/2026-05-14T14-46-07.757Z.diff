@@ -1,0 +1,25 @@
+--- a/SHR-98.md
++++ b/SHR-98.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Research replacing Shell Relay snapshot-diff output capture"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-14T14:26:43.986Z
+-updated_at: 2026-05-14T14:46:02.246Z
++updated_at: 2026-05-14T14:46:07.756Z
+ ---
+ 
+ # Research replacing Shell Relay snapshot-diff output capture
+@@ -45,3 +45,7 @@
+ 
+ - **description**: added (20 lines)
+ 
++## 2026-05-14T14:46:07.757Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

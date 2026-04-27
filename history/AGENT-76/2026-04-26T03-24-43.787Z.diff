@@ -1,0 +1,24 @@
+--- a/AGENT-76.md
++++ b/AGENT-76.md
+@@ -6,9 +6,18 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-26T03:24:43.743Z
+-updated_at: 2026-04-26T03:24:43.743Z
++related:
++  - AGENT-64
++  - AGENT-73
++updated_at: 2026-04-26T03:24:43.786Z
+ ---
+ 
+ # Experiment 5: applies_to operational-mode rewrite
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-04-26T03:24:43.787Z
++
++- **related**: (none) → AGENT-64, AGENT-73
++

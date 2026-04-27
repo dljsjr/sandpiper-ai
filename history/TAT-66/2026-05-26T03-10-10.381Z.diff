@@ -1,0 +1,28 @@
+--- a/TAT-66.md
++++ b/TAT-66.md
+@@ -6,7 +6,7 @@
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T21:52:33.225Z
+-updated_at: 2026-05-26T03:09:32.338Z
++updated_at: 2026-05-26T03:10:10.375Z
+ related:
+   - TAT-33
+   - TAT-38
+@@ -15,7 +15,7 @@
+ 
+ # Design multi-agent delegation and decision ownership protocol
+ 
+-Follow-up from Chorus dogfood/post-mortem: design a lightweight multi-agent room operating protocol that avoids duplicate tickets/claims and dead-air waiting, while actively encouraging parallelizable work. This is not a fixed Owner/Lens/Scribe caste system. Start by mapping the work graph: objective, independent lanes, shared files/state, contract boundaries, isolation mechanism, lane artifact, verification, and integration checkpoint. For coding lanes, prefer jj workspace/git worktree isolation when slices can run independently; record workspace path/name, base rev/change ID, intended touchpoints, verification command, and ready head/change ID. For non-coding lanes, use artifact isolation (separate source map, decision ledger, protocol draft, critique, etc.) with a named synthesis pass. Owner/Lens/Scribe are per-lane/per-phase assignments: lane owner mutates that lane's artifact, lens actively challenges from a named perspective, integration owner/scribe maintains the lane→artifact→merge-point map and posts decision deltas. Include stand-down and heartbeat rules: if no useful lane/lens, stand down; if owner work runs long, post progress/blocker/changed contract/ready-for-integration, not chatter. Deliverable should be a compact agent-facing playbook or task description usable before the next multi-agent sprint.
++Drafted first usable artifact at ~/.sandpiper/agent/playbooks/workflow/multi-agent-rooms.md and added it to workflow/index.md. Core design: start with the work graph, not fixed roles; decompose objective into lanes; prefer jj workspace/git worktree isolation for parallel coding lanes; use artifact isolation for non-code lanes; assign Owner/Lens/Scribe locally per lane/phase; require heartbeats only on progress/blocker/changed contract/ready-for-integration; integration owner/scribe maintains lane→artifact→checkpoint map and posts decisions/open questions/conflicts/next mutation owner/deferred work/verification. This task should review/dogfood that playbook before final completion.
+ 
+ ---
+ 
+@@ -30,3 +30,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-26T03:10:10.381Z
++
++- **description**: updated
++

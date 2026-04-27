@@ -1,0 +1,86 @@
+--- a/TAT-72.md
++++ b/TAT-72.md
+@@ -8,25 +8,45 @@
+ created_at: 2026-05-27T15:45:26.253Z
+ depends_on:
+   - TAT-71
+-updated_at: 2026-05-27T16:59:18.807Z
++updated_at: 2026-05-27T16:59:53.277Z
+ ---
+ 
+ # C2: Audience snapshot at append (Tattler layer)
+ 
+-Layer participant/audience snapshot metadata onto records at append time, at the Tattler layer. Reuse TAT-39/TAT-50 audience-snapshot work — do not rebuild. The real new work is snapshotting participants at append time (postId already exists in current JSON, so stable post IDs are effectively done). Depends on C1 (TAT-71) — the append path and schema must exist before you can attach audience snapshots. Design work (snapshot envelope shape, TAT-39/50 integration contract) is parallelizable with C1; implementation is sequential.
+-
+----
+-
+-# Activity Log
+-
+-## 2026-05-27T15:45:26.323Z
+-
+-- **description**: added (1 line)
+-
+-## 2026-05-27T15:46:02.234Z
+-
+-- **depends_on**: (none) → TAT-71
+-
++Layer participant/audience snapshot metadata onto records at append time, at the Tattler layer. Reuse TAT-39/TAT-50 audience-snapshot work — do not rebuild.
++
++**Snapshot envelope design:**
++
++Current Chorus message shapes (from tattler-protocol.ts):
++- ChorusRoomPostV0: { id, roomId, from, broker, message } — broker is ChorusReplyRouteV0 { name, socketPath, shortId }
++- ChorusRoomDeliveryV0: { id, roomId, from, message, postId }
++- TattlerAgentMessageV0: { id, from, message }
++
++Fields to strip from durable record (ephemeral):
++- broker.socketPath (session-bound, not durable)
++- broker.shortId (session-bound, not durable)
++
++Fields to keep:
++- id (UUIDv7 post id → becomes the durable postId)
++- roomId (stable room UUID)
++- from (display handle at post time — snapshot, not FK)
++- message (body)
++
++Fields to add for durability:
++- agentId (stable Tattler ID FK — the durable author key)
++- seq (SQLite rowid, assigned by the DB on insert — cursor range key)
++- roomName (snapshot of room name at post time)
++- audience: array of { agentId, handle } snapshots at append time (from TAT-39/TAT-50)
++- timestamp (ISO 8601, set at append time)
++
++**TAT-39/50 integration contract:**
++- TAT-39 (participant metadata) stamps ChorusRoomPostV0 with audience at fanout time
++- TAT-50 (broker-owned snapshot) ensures the broker populates the participant list, not the agent
++- C2 consumes this by persisting the audience snapshot into the durable record at append time
++- The durable record stores audience as a JSON array in SQLite (not a separate table — it's a point-in-time snapshot, not a relationship)
++
++**SQLite schema addition:**
++The messages table gets an  TEXT column (JSON array of {agentId, handle} objects). This is denormalized by design — it's a snapshot, not a join target.
++
++Depends on C1 (TAT-71) — the append path and schema must exist before attaching audience snapshots. Design work (this ticket) is parallelizable with C1; implementation is sequential.
++
++---
++
++# Activity Log
++
++## 2026-05-27T15:45:26.323Z
++
++- **description**: added (1 line)
++
++## 2026-05-27T15:46:02.234Z
++
++- **depends_on**: (none) → TAT-71
++
+ ## 2026-05-27T15:51:14.939Z
+ 
+ - **title**: C2: Audience snapshot at append → C2: Audience snapshot at append (Tattler layer)
+@@ -37,3 +72,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
+ 
++## 2026-05-27T16:59:53.278Z
++
++- **description**: 1 line → updated (36 lines)
++

@@ -1,0 +1,85 @@
+--- a/AGENT-82.md
++++ b/AGENT-82.md
+@@ -6,18 +6,60 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-27T17:27:50.940Z
+-updated_at: 2026-04-27T17:27:50.978Z
++updated_at: 2026-04-27T17:45:37.358Z
+ ---
+ 
+ # Review restored package and CLI version edits
+ 
+-Review the pre-existing package/CLI edits restored after the reinforced-guidance cut-over.\n\nCurrent dirty files observed after cleanup:\n\n- package.json\n- bun.lock\n- packages/cli/pi_wrapper.ts\n\nKnown intent from diff context: Pi package catalog appears bumped toward 0.70.2, @types/bun and fast-xml-parser bumped, and pi_wrapper.ts has a small comment formatting edit. Verify whether these should be committed, adjusted, or restored. Ensure node-llama-cpp is not reintroduced.
+-
+----
+-
+-# Activity Log
+-
+-## 2026-04-27T17:27:50.979Z
+-
+-- **description**: added (1 line)
+-
++Review the pre-existing package/CLI edits restored after the reinforced-guidance cut-over. This is the intended next core Sandpiper handoff task.\n\nCurrent dirty files:\n\n- package.json\n- bun.lock\n- packages/cli/pi_wrapper.ts\n\nObserved diff summary:\n\n- package catalog :  and  from  to \n- package catalog :  from  to \n- package catalog :  from  to \n- : one blank line changed to a  separator comment before the Explicit PI_* variables section\n- : lockfile updates corresponding to the package catalog changes\n\nDecide whether these should be committed, adjusted, or restored. Ensure  is not reintroduced. Run bun install v1.3.13 (bf2e2cec)
++All 2 vendored entries already present.
++⚙ ensuring root dist directory
++⚙ ensuring root dist subdirectory for extensions
++⚙ ensuring root dist subdirectory for themes
++⚙ ensuring root dist subdirectory for skills
++⚙ ensuring root dist subdirectory for prompts
++⚙ ensuring root dist subdirectory for packages
++sandpiper-standup-cli preinstall: Bundled 29 modules in 6ms
++sandpiper-standup-cli preinstall: 
++sandpiper-standup-cli preinstall:   sandpiper-standup  48.69 KB  (entry point)
++sandpiper-standup-cli preinstall: 
++sandpiper-tasks-cli preinstall: Bundled 49 modules in 6ms
++sandpiper-tasks-cli preinstall: 
++sandpiper-tasks-cli preinstall:   sandpiper-tasks  108.76 KB  (entry point)
++sandpiper-tasks-cli preinstall: 
++sandpiper-standup-cli preinstall: Exited with code 0
++sandpiper-tasks-cli preinstall: Exited with code 0
++sandpiper-ai-cli preinstall: Bundled 2577 modules in 135ms
++sandpiper-ai-cli preinstall: 
++sandpiper-ai-cli preinstall:   sandpiper  6.18 MB  (entry point)
++sandpiper-ai-cli preinstall: 
++sandpiper-ai-cli preinstall: $ bun run --target bun ./copy_pi_assets.ts
++sandpiper-ai-cli preinstall: Exited with code 0
++⚙ Copying extensions packages for distribution
++⚙ Copying themes packages for distribution
++⚙ Copying skills packages for distribution
++⚙ Copying prompts packages for distribution
++⚙ Copying packages packages for distribution
++⚙ Generating CLI distribution package.json
++✓ Generated distribution package.json
++✓ Symlinked pi internal assets
++⚙ Copying configurations
++	Copying mcporter configurations
++⚙ Generating dash CLI...
++Generated CLI at /Users/dstephen/git/sandpiper-ai/dist/dash.ts
++Bundled executable created at /Users/dstephen/git/sandpiper-ai/dist/skills/sandpiper/dash/scripts/dash
++✓ Generated dash CLI → /Users/dstephen/git/sandpiper-ai/dist/skills/sandpiper/dash/scripts/dash
++⬇ Downloading skill-building-guide.pdf...
++✓ Downloaded skill-building-guide.pdf
++⚙ Creating dev-mode symlinks for skill binaries
++using pi-coding-agent version: 0.70.2
++
++Installing /Users/dstephen/git/sandpiper-ai/dist...
++Installed /Users/dstephen/git/sandpiper-ai/dist
++✓ Successfully installed Sandpiper Package
++
++Checked 498 installs across 552 packages (no changes) [3.03s], Checked 187 files in 226ms. No fixes applied., and using pi-coding-agent version: 0.70.2
++
++0.0.1 before committing any package/version outcome.
++
++---
++
++# Activity Log
++
++## 2026-04-27T17:27:50.979Z
++
++- **description**: added (1 line)
++
++## 2026-04-27T17:45:37.359Z
++
++- **description**: 1 line → updated (50 lines)
++

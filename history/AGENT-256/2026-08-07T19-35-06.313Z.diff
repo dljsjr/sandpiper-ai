@@ -1,0 +1,43 @@
+===================================================================
+--- a/AGENT-256.md
++++ b/AGENT-256.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-08-07T19:28:18.767Z
+-updated_at: 2026-08-07T19:33:40.186Z
++updated_at: 2026-08-07T19:35:06.312Z
+ ---
+ 
+ # Chorus room widget starves the transcript in fullscreen TUI mode
+ 
+@@ -20,12 +20,28 @@
+ Verification: this is a fullscreen-visual bug, so unit tests can cover the height-budget arithmetic (given rows R and entries E, total rendered lines <= budget, oldest dropped, indicator correct) but final confirmation is Doug's eyeball in a populated room. Regular (non-fullscreen) mode must not regress.
+ 
+ Possible upstream companion (do not act, note only): Pi arguably should clamp aboveEditor widget height in fullscreen so a misbehaving extension cannot starve the transcript. Ours to fix regardless - our widget declares the height.
+ 
++## Reviewer mechanism trace (pi-tui layout, verified against source, 2026-08-07)
++
++Confirmed empirically rather than assumed, in response to the coordinator's challenge that "non-fullscreen is safe" needed testing, not just belief:
++
++**Non-fullscreen is unconditionally exempt**, not just failing differently. `mountInteractiveTui` (pi-coding-agent dist/modes/interactive/interactive-mode.js, ~line 517) only calls `tui.setLayoutRoot(this.fullscreenLayoutRoot)` when `TuiLayouts.isViewportTUI(tui)` is true, and `switchTuiMode` calls `previousUi.setLayoutRoot(undefined)` when leaving fullscreen (~line 550). `TuiMainScreen` (pi-tui dist/tui-main-screen.js) has no per-component height allocation at all - `doRender()` streams the whole composed frame to the terminal and relies entirely on the terminal's native scrollback. There is no flex/shrink code path for main-screen to hit, so criterion 5 (don't newly impose a bound where none existed) stands as originally written.
++
++**Fullscreen uses a real flexbox-style layout** (interactive-mode.js `init()`, ~line 605): outer VStack = `[transcriptScrollView: basis 0, grow 1, shrink 1, minSize 1]` + `[dock: basis "auto", grow 0, shrink 1, minSize 1]`, where `dock` is itself a VStack containing `pendingMessagesContainer`, `statusContainer`, `widgetContainerAbove` (shrink 1, minSize 0), `editorContainer` (shrink 1, minSize 3), `widgetContainerBelow`, `footerContainer` (shrink 1, minSize 1).
++
++Traced the actual allocator (pi-tui dist/components/stack.js, `allocateStackSizes`/`distribute`): because `transcriptScrollView` has `basis: 0`, its size is immediately clamped to its `minSize` (1) before any distribution runs. `dock` has `grow: 0`, so on the *grow* pass (when there's room to spare) it never claims more than its natural size - all surplus goes to transcript, which is the healthy/common case. But on the *shrink* pass (when `dock`'s natural height exceeds `terminalRows - 1`), transcript is excluded from the candidate set entirely - the shrink filter requires `size > minSize`, and transcript's size already equals its minSize by construction. So the *entire* deficit is absorbed by `dock`, and transcript snaps to exactly 1 row. This is a hard binary threshold at `dock.naturalHeight > terminalRows - 1`, not graceful degradation - there is no intermediate state where transcript is, say, 5 rows instead of 30. Inside `dock`'s own shrink pass, `editorContainer`'s minSize:3 protects it and `footerContainer`'s minSize:1 protects it, while `widgetContainerAbove`'s minSize:0 means it absorbs the squeeze first - so today's Chorus widget is the practical trigger, but it isn't structurally special.
++
++**Implication for the fix**: bounding `widgetContainerAbove`'s content (this ticket's plan) fixes today's reproduction, but the underlying gap is that `dock` structurally outranks `transcriptScrollView` for space no matter which of dock's children is oversized - any sufficiently large status/widget/editor content could reproduce this the same way. Worth deciding, as a separate and lower-urgency question, whether `transcriptScrollView`'s `minSize` should be raised above 1 (e.g. 3-5) as defense-in-depth independent of how well-behaved any individual widget is - that's a pi-tui-level change, not a chorus-ui.ts one, and fits under the existing "possible upstream companion" note above rather than blocking this fix.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-08-07T19:33:40.187Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-08-07T19:35:06.313Z
++
++- **description**: 9 lines → updated (21 lines)

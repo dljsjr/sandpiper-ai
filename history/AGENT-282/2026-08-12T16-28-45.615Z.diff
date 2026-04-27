@@ -1,0 +1,37 @@
+===================================================================
+--- a/AGENT-282.md
++++ b/AGENT-282.md
+@@ -5,24 +5,30 @@
+ priority: HIGH
+ assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.638Z
+-updated_at: 2026-08-12T02:10:19.868Z
++updated_at: 2026-08-12T16:28:45.615Z
+ depends_on:
+   - AGENT-281
+ ---
+ 
+ # Lower all memory write tools onto YAAMS apply
+ 
+ Replace createMemoryWriteOperation, MemberWriteOutcome, writeFactArgs, and the client-side live-read plus add/upsert/retire choreography with one-op YAAMS apply envelopes. memory_create, memory_update, memory_append, and memory_retire each map their typed params to one intent op and consume the tagged positional outcome.
+ 
+-This must remove the client TOCTOU windows and preserve tool-level intent/error wording: create rejects live keys, update/retire reject absent keys, append rejects scalar cardinality, and list update is store-side diff/reconcile. Retain concise agent-facing result text derived from created/retired ledgers. Update the fake CLI to implement apply atomically and add tests for atomic failure, scalar/list behavior, result decoding, and structured rejection routing.
++This is the point of the whole refactor: it removes three client-side TOCTOU windows that the transaction closes by construction, and preserves tool-level intent — create rejects live keys, update/retire reject absent keys, append rejects scalar cardinality, list update is store-side diff/reconcile. Keep concise agent-facing result text derived from the created/retired ledgers.
+ 
+-Update README and the active behavior contract as part of the implementation; remove claims about partial per-member success because apply cannot leave one.
++CROSS-REPO DEPENDENCY: blocked on YAAMS-93 (~/git/yaams), which gives `apply` an `--ops <json>` argument. Pi's pi.exec gives the child /dev/null on stdin, so until --ops lands the write tools have no way to deliver an envelope. Trail cannot express the link across task directories, hence this paragraph.
+ 
++Also: update the fake CLI to implement apply atomically, and add tests for atomic failure, scalar vs list behavior, result decoding, and structured rejection routing. Update README and the behavior contract as part of the implementation — delete the "created 2 of 3 member(s) before failing" partial-count claim, because apply cannot leave that state.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-08-12T02:10:19.869Z
+ 
+ - **assignee**: UNASSIGNED → Doug
++
++## 2026-08-12T16:28:45.615Z
++
++- **description**: 5 lines → updated (7 lines)

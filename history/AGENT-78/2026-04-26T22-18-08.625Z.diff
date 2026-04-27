@@ -1,0 +1,25 @@
+--- a/AGENT-78.md
++++ b/AGENT-78.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Revised EXP-4: extractor gbnfgen grammar semantic parity"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-26T18:47:08.544Z
+-updated_at: 2026-04-26T18:47:13.808Z
++updated_at: 2026-04-26T22:18:08.624Z
+ related:
+   - AGENT-73
+   - AGENT-75
+@@ -24,3 +24,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-26T22:18:08.625Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

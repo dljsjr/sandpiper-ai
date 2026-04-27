@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-232.md
++++ b/AGENT-232.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Fix test failures uncovered during today's session"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-07-11T01:30:20.991Z
+-updated_at: 2026-07-11T01:30:20.991Z
++updated_at: 2026-07-11T01:30:21.100Z
+ ---
+ 
+ # Fix test failures uncovered during today's session
+ 
+@@ -23,4 +23,12 @@
+ 
+ Left alone as genuinely unrelated: devtools/npmPackageInstallSmoke.test.ts (pre-existing, present at the very start of this session, times out in afterEach cleanup doing real npm pack/install -- unrelated to anything touched today) and devtools/standaloneSandpiperAppRuntime.test.ts's apparent full-suite timeout (confirmed flaky-under-parallel-execution, passes cleanly in isolation at ~1.3s).
+ 
+ Verified: check:tsc clean, check:biome-check clean, all 14 directly affected test files pass (69 tests).
++
++---
++
++# Activity Log
++
++## 2026-07-11T01:30:21.103Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

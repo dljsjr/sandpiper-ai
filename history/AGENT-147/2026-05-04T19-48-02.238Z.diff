@@ -1,0 +1,25 @@
+--- a/AGENT-147.md
++++ b/AGENT-147.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add Claude MCP adapter smoke coverage"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-04T18:05:10.711Z
+-updated_at: 2026-05-04T19:42:33.447Z
++updated_at: 2026-05-04T19:48:02.237Z
+ ---
+ 
+ # Add Claude MCP adapter smoke coverage
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-04T19:48:02.238Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

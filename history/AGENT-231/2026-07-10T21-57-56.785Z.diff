@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-231.md
++++ b/AGENT-231.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Split neutral-capability extension bundle; rename identity to sandpiper-core"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-07-10T21:57:56.572Z
+-updated_at: 2026-07-10T21:57:56.572Z
++updated_at: 2026-07-10T21:57:56.750Z
+ related:
+   - AGENT-228
+ ---
+ 
+@@ -25,4 +25,12 @@
+ 
+ extensions/system's single-package bundle (createSandpiperSystemExtension, used by extensions/system/index.ts and extensions/system.ts for the full non-standalone distribution) intentionally still composes everything into one registration -- it's genuinely one cohesive package.json pi.extensions entry in that distribution, not the thing Doug was pointing at.
+ 
+ Verified: check:tsc clean, check:biome-check clean on all touched/new files, devtools/rootPiPackageSmoke.test.ts (exercises the plugins/pi/extensions manifest end-to-end through Pi's real extension loader) passes, all extensions/system/*.test.ts pass, packages/cli/sandpiper_resources.test.ts and standalone_resource_discovery.test.ts pass (same pre-existing unrelated shell-relay failure noted in AGENT-228 persists, confirmed not touched by this change).
++
++---
++
++# Activity Log
++
++## 2026-07-10T21:57:56.785Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

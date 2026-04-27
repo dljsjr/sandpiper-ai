@@ -1,33 +1,24 @@
 ---
-title: "Implement CSS selector targeting in web_fetch"
-status: NOT STARTED
+title: "Implement targeted extraction in web_fetch"
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.112Z
-updated_at: 2026-04-01T16:30:37.271Z
+updated_at: 2026-05-14T05:08:23.208Z
 ---
 
-# Implement CSS selector targeting in web_fetch
+# Implement targeted extraction in web_fetch
 
-The web_fetch pipeline already accepts a `selector?: string` parameter in PipelineOptions, with a JSDoc comment marking it 'not yet implemented'. This was part of the original PRD tool API spec but was deferred from the MVP.
+Add targeted extraction support to `web_fetch` so callers can narrow the returned content to the relevant part of a page.
 
-## What to implement
+This parent task tracks two targeting modes:
+- CSS selector targeting against the extracted/readable DOM.
+- Markdown/block targeting, likely by section header, after conversion.
 
-After Readability extraction, apply the CSS selector to the extracted DOM (via jsdom) and narrow the content to the matching region before running it through Turndown. If no element matches the selector, fall back to the full Readability extract with an informational note in the response metadata.
-
-## Acceptance criteria
-
-- `selector` parameter works end-to-end through fetchAndExtract
-- Tests cover: selector matches content, selector matches nothing (graceful fallback), selector on minimal page
-- The 'not yet implemented' JSDoc comment is removed
-- The tool registration in index.ts exposes selector in the input schema
-
-## References
-
-- `extensions/web-fetch/src/pipeline.ts` — PipelineOptions.selector
-- `.sandpiper/docs/web-fetch-prd.md` — original tool API spec
+The goal is to reduce token noise while preserving graceful fallback behavior. Targeting failures should not fail the whole fetch; they should return the default full extract plus explanatory metadata.
 
 ---
 
@@ -40,3 +31,26 @@ After Readability extraction, apply the CSS selector to the extracted DOM (via j
 ## 2026-04-01T16:30:37.271Z
 
 - **priority**: MEDIUM → HIGH
+
+## 2026-05-13T21:57:05.831Z
+
+- **title**: Implement CSS selector targeting in web_fetch → Implement targeted extraction in web_fetch
+- **description**: 17 lines → updated (7 lines)
+
+## 2026-05-13T21:57:28.328Z
+
+- **description**: updated
+
+## 2026-05-14T03:20:18.487Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-05-14T05:08:00.493Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-05-14T05:08:23.209Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

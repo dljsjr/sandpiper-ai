@@ -1,0 +1,32 @@
+--- a/AGENT-200.md
++++ b/AGENT-200.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Add system notification XML API"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-14T02:58:25.175Z
+ updated_at: 2026-05-14T02:58:25.175Z
+-updated_at: 2026-05-14T02:58:25.175Z
++updated_at: 2026-05-14T02:58:30.278Z
+ ---
+ 
+ # Add system notification XML API
+ 
+ Introduce a generalized Sandpiper system notification API for harness-generated, non-user-authored XML context and migrate web_fetch llms.txt metadata to use it.
+ 
++---
++
++# Activity Log
++
++## 2026-05-14T02:58:30.279Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

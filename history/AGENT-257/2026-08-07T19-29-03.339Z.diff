@@ -1,0 +1,33 @@
+===================================================================
+--- a/AGENT-257.md
++++ b/AGENT-257.md
+@@ -5,23 +5,18 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-07T19:28:32.380Z
+-updated_at: 2026-08-07T19:28:32.380Z
++updated_at: 2026-08-07T19:29:03.338Z
+ ---
+ 
+ # Chorus aboveEditor widget can push chat transcript off-screen with no way to scroll back
+ 
+-Found live during a Chorus room render test (tui-fullscreen-test), reported by Doug.
++Superseded by AGENT-256, filed independently and near-simultaneously by the coordinator with a more precise mechanism (CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4, ~49-line worst case) and already prioritized HIGH with dev picking it up. Closing as WONTFIX-duplicate rather than leaving two open tickets for the same fix. See AGENT-256 for the actioned version; my candidate-fix list there is superseded by its more specific viewport-relative-budget direction.
+ 
+-Symptom: as the Chorus room's sticky 'aboveEditor' widget (ChorusRoomTranscript, extensions/chorus/chorus-ui.ts) accumulates messages, it grows tall enough to push the actual agent chat transcript content off the top of the visible terminal area — and there is no way to scroll back to it. Terminal/TUI scrolling only applies to the main chat transcript pane, not the sticky widget region, and the sticky widget itself has no internal scroll or height clamp.
++---
+ 
+-Root cause (grounded in code, not just observed): ChorusRoomTranscript.render() (chorus-ui.ts ~line 173) caps entries by COUNT via CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12 (line 33), but does not cap by rendered LINE count. Each entry can wrap to multiple lines (formatChorusTranscriptEntryLines), so 12 entries -- or even fewer, if messages are long/multi-sentence -- can produce more terminal rows than the viewport has available. setWidget's 'aboveEditor' placement (per the tui skill's documented tradeoff: "sticky but full components") has no built-in max-height/scroll; it just claims whatever vertical space its render() reports, at the expense of the scrollable chat transcript area beneath/above it.
++# Activity Log
+ 
+-Reproduction: open a Chorus room, have peers post a mix of long prose messages and short bursts (5-8+ messages, some multi-sentence) until the aboveEditor widget's total rendered line count exceeds a typical terminal height; observe the chat transcript scrolls off the top with no way to recover it via normal scroll.
++## 2026-08-07T19:29:03.339Z
+ 
+-Candidate fixes (not evaluated/chosen -- Doug's call):
+-1. Cap ChorusRoomTranscript.render() by an internal line budget (not just entry count), truncating/eliding oldest lines within the limit -- most direct fix, smallest surface.
+-2. Give the aboveEditor widget its own bounded viewport height with internal scroll state, independent of the main transcript.
+-3. Move the room transcript off 'aboveEditor' entirely onto the 'direct chat container injection' pattern the tui skill calls out as the preferred non-sticky, non-persistent option, keeping only the compact one-line status (ctx.ui.setStatus('chorus', ...), already confirmed working per Doug) as the persistent/sticky element.
+-
+-Not yet investigated: whether this is a Sandpiper-owned layout gap (chorus-ui.ts) or an upstream Pi TUI layout limitation (no max-height contract on setWidget). Needs a source check against Pi's TUI layout code before committing to a fix approach.
++- **description**: 14 lines → updated (1 line)

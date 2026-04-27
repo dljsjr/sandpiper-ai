@@ -1,0 +1,25 @@
+--- a/TAT-40.md
++++ b/TAT-40.md
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:17:27.978Z
++updated_at: 2026-05-25T19:38:32.661Z
+ ---
+ 
+ # Implement Tattler pending inbox state and dedupe
+ 
+-Add a Tattler-owned pending inbox for inbound messages received while an agent is busy. The inbox is the source of truth outside Pi's steer/follow-up queues, preserves arrival order, dedupes by message id (and room/post id for Chorus), and can emit an extension-private appendEntry audit/snapshot for recovery before flush. Do not enqueue real inbound payloads into Pi while busy.
++Implemented in jj change xszoyull / 7401716b. Adds TattlerPendingInbox with dedupe keys, ordered snapshots, and explicit lifecycle states pending -> reserved -> handedToTurn -> delivered/cleared. Busy inbound Tattler agent messages ACK at transport and queue here instead of entering Pi steer/followUp. Focused tests cover dedupe and lifecycle. Remaining durability/abort proof is tracked in TAT-37/TAT-44.
+ 
+ ---
+ 
+@@ -28,3 +28,7 @@
+ 
+ - **depends_on**: (none) → TAT-45, TAT-58
+ 
++## 2026-05-25T19:38:32.666Z
++
++- **description**: updated
++

@@ -1,0 +1,25 @@
+--- a/TAT-6.md
++++ b/TAT-6.md
+@@ -6,7 +6,9 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-15T03:13:38.266Z
+-updated_at: 2026-05-15T03:13:38.266Z
++depends_on:
++  - TAT-1
++updated_at: 2026-05-15T03:13:47.510Z
+ ---
+ 
+ # Draft Tattler v1 mini-spec from validation findings
+@@ -21,3 +23,11 @@
+ 
+ Depends on: TAT-1.
+ 
++---
++
++# Activity Log
++
++## 2026-05-15T03:13:47.511Z
++
++- **depends_on**: (none) → TAT-1
++

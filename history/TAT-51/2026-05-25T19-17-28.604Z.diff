@@ -1,0 +1,21 @@
+--- a/TAT-51.md
++++ b/TAT-51.md
+@@ -6,7 +6,9 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.615Z
+-updated_at: 2026-05-25T19:12:56.904Z
++depends_on:
++  - TAT-50
++updated_at: 2026-05-25T19:17:28.603Z
+ ---
+ 
+ # Expose Chorus participants in model content and details
+@@ -21,3 +23,7 @@
+ 
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-25T19:17:28.604Z
++
++- **depends_on**: (none) → TAT-50
++

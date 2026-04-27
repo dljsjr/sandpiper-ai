@@ -1,0 +1,25 @@
+--- a/AGENT-83.md
++++ b/AGENT-83.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Strengthen self-reflection skill trigger audit"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T17:40:39.108Z
+-updated_at: 2026-04-27T17:40:39.151Z
++updated_at: 2026-04-27T17:42:01.163Z
+ ---
+ 
+ # Strengthen self-reflection skill trigger audit
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-04-27T17:42:01.163Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

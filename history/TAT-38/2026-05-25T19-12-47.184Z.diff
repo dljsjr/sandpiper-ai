@@ -1,0 +1,44 @@
+--- a/TAT-38.md
++++ b/TAT-38.md
+@@ -3,18 +3,23 @@
+ status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+-assignee: AGENT
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:00:59.110Z
+ depends_on:
+   - TAT-36
+-updated_at: 2026-05-25T19:11:47.965Z
++updated_at: 2026-05-25T19:12:47.183Z
+ ---
+ 
+ # Add Tattler receive cooperative interruption tool
+ 
+-Design a Tattler-level cooperative interruption tool. When busy and pending inbox gets its first message, send at most one nudge telling the model pending Tattler messages exist and it may call tattler_receive if they may affect current work. The tattler_receive tool should be sequential/called alone, have a call renderer like checking pending Tattler messages, empty result renderer, provider-safe text, terminate:true, and set a receive-after-agent-end flag. agent_end should defer until idle and trigger a synthetic receive turn; before_agent_start then drains the pending inbox into a persistent custom batch message. This is latency/semantics polish; correctness also works when user aborts and sends any next prompt because before_agent_start drains for every turn.
+-
++Add a cooperative Tattler receive affordance so an agent can intentionally yield its current turn to check pending messages without showing Operation Aborted.
++
++This is not the sole correctness path; before_agent_start remains the universal drain for any next turn. tattler_receive is a latency/semantics tool for model-initiated interruption.
++
++Acceptance criteria:
++- Tool has tight prompt guidance and is intended to be called alone.
++- Tool renderCall communicates that the agent is checking pending messages / ending the current turn; renderResult is quiet.
++- Tool returns provider-safe content and terminate=true, and sets state for a deferred synthetic receive turn.
++- agent_end scheduling waits until the session is idle before triggering the synthetic turn.
++- Synthetic turn drains through before_agent_start, not a separate delivery path.
++- Tests cover ignored nudge, cooperative receive, and user abort fallback.
++
+ ---
+ 
+ # Activity Log
+@@ -29,3 +39,8 @@
+ 
+ - **depends_on**: (none) → TAT-36
+ 
++## 2026-05-25T19:12:47.184Z
++
++- **assignee**: AGENT → Huginn
++- **description**: 1 line → updated (11 lines)
++

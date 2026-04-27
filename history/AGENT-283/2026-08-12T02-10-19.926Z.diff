@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-283.md
++++ b/AGENT-283.md
+@@ -2,15 +2,23 @@
+ title: "Make the split pi-yaams package publishable"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.703Z
+-updated_at: 2026-08-12T02:10:06.703Z
++updated_at: 2026-08-12T02:10:19.925Z
+ ---
+ 
+ # Make the split pi-yaams package publishable
+ 
+ The old package manifest ships only index.ts and README.md, but this refactor introduces runtime imports from datom-model, tools, prompt-strings, and yaams.ts. Make the package file set include the complete runtime module tree without including test or development junk.
+ 
+ Add a distribution-level check using the package manager pack output (and a minimal installed/loadable extension smoke test if practical) so a future module split cannot publish an entry point whose relative imports are absent. This is release correctness, not formatting.
++
++---
++
++# Activity Log
++
++## 2026-08-12T02:10:19.926Z
++
++- **assignee**: UNASSIGNED → Doug

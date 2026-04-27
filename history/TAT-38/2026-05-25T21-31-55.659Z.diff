@@ -1,0 +1,27 @@
+--- a/TAT-38.md
++++ b/TAT-38.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Add Tattler receive cooperative interruption tool"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+@@ -8,7 +8,7 @@
+ created_at: 2026-05-25T19:00:59.110Z
+ depends_on:
+   - TAT-36
+-updated_at: 2026-05-25T19:16:02.070Z
++updated_at: 2026-05-25T21:31:55.658Z
+ ---
+ 
+ # Add Tattler receive cooperative interruption tool
+@@ -39,3 +39,7 @@
+ - **assignee**: Huginn → AGENT
+ - **description**: 11 lines → updated (1 line)
+ 
++## 2026-05-25T21:31:55.659Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

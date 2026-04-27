@@ -1,12 +1,13 @@
 ---
 title: "Make mutating task/project update commands require a key or explicit filter"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T20:47:48.695Z
-updated_at: 2026-03-30T20:47:48.737Z
+updated_at: 2026-05-12T21:13:12.550Z
 ---
 
 # Make mutating task/project update commands require a key or explicit filter
@@ -20,3 +21,28 @@ The sandpiper-tasks CLI currently allows dangerous broad mutations when a mutati
 ## 2026-03-30T20:47:48.738Z
 
 - **description**: added (1 line)
+
+## 2026-05-12T14:49:30.628Z
+
+- **status**: NOT STARTED → IN PROGRESS
+
+## 2026-05-12T19:58:26.129Z
+
+- **status**: IN PROGRESS → NOT STARTED
+
+## 2026-05-12T20:10:28.676Z
+
+- **status**: NOT STARTED → IN PROGRESS
+
+## 2026-05-12T20:11:55.708Z
+
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-05-12T20:20:41.378Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-05-12T21:13:12.550Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

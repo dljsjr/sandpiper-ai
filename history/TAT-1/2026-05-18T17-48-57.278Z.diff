@@ -1,0 +1,33 @@
+--- a/TAT-1.md
++++ b/TAT-1.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Implement Tattler v0 validation spike"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-15T03:13:00.988Z
+ updated_at: 2026-05-15T03:13:00.988Z
+-updated_at: 2026-05-15T03:13:00.988Z
++updated_at: 2026-05-18T17:48:57.278Z
+ ---
+ 
+ # Implement Tattler v0 validation spike
+@@ -27,3 +27,12 @@
+ - Recipient sees compact injected prose, not raw transport metadata.
+ - Findings are recorded before promoting v0 shortcuts into any MVP contract.
+ 
++---
++
++# Activity Log
++
++## 2026-05-18T17:48:57.278Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

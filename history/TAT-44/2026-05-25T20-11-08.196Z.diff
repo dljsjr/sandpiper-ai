@@ -1,0 +1,25 @@
+--- a/TAT-44.md
++++ b/TAT-44.md
+@@ -11,12 +11,10 @@
+   - TAT-41
+   - TAT-42
+   - TAT-43
+-updated_at: 2026-05-25T19:48:28.427Z
++updated_at: 2026-05-25T20:11:08.188Z
+ ---
+ 
+ # Test pending inbox delivery across busy, abort, and resume paths
+ 
+-Regression coverage target for the pending-inbox stack. Include Sandpiper Dev review caveat from wxqnulxl / 5874382f: appendEntry restore/durability must clear session-local pending state before restoring same-session durable records, not after. Cover abort-before-drain, handoff failure/release, already-delivered restore dedupe, and no double-injection.
++Implemented minimal durability/recovery slice in jj change qlmwqxwt / 0e561dc5. Adds appendEntry-compatible pending inbox snapshots, restore-from-latest-snapshot on session_start after clearing memory, delivered-batch dedupe using persisted tattler:pending-batch custom_message details, and snapshot persistence on accepted busy IPC/Chorus queue enqueues. Focused tests cover same-session snapshot restore, skipping already-delivered messages, busy IPC snapshot callback, handed-batch release, mixed visibility renderer safety, and existing Chorus/Tattler queue paths. Remaining full abort/user-resume dogfood and synthetic receive are tracked by TAT-37/TAT-38/TAT-47/TAT-56.
+ 
+ ---
+ 
+@@ -43,3 +43,7 @@
+ 
+ - **description**: 3 lines → updated (1 line)
+ 
++## 2026-05-25T20:11:08.196Z
++
++- **description**: updated
++

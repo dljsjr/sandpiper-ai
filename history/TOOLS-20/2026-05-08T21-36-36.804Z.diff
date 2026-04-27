@@ -1,0 +1,21 @@
+--- a/TOOLS-20.md
++++ b/TOOLS-20.md
+@@ -6,7 +6,9 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-08T21:36:25.841Z
+-updated_at: 2026-05-08T21:36:25.887Z
++depends_on:
++  - TOOLS-16
++updated_at: 2026-05-08T21:36:36.799Z
+ ---
+ 
+ # Add npm-pack global install smoke gate for immutable artifacts
+@@ -31,3 +33,7 @@
+ 
+ - **description**: added (11 lines)
+ 
++## 2026-05-08T21:36:36.804Z
++
++- **depends_on**: (none) → TOOLS-16
++

@@ -1,0 +1,22 @@
+---
+title: "Test abort plus next prompt drains Tattler inbox"
+status: NOT STARTED
+kind: SUBTASK
+priority: HIGH
+assignee: "Huginn"
+reporter: USER
+created_at: 2026-05-25T19:12:27.325Z
+updated_at: 2026-05-25T19:12:57.122Z
+---
+
+# Test abort plus next prompt drains Tattler inbox
+
+After the pending inbox/before_agent_start fix, cover the user recovery path: provider busy/hung, inbound messages accumulate in Tattler inbox, user aborts, user sends any next prompt, and before_agent_start injects one durable batch before the prompt proceeds.
+
+---
+
+# Activity Log
+
+## 2026-05-25T19:12:57.123Z
+
+- **assignee**: UNASSIGNED → Huginn

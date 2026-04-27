@@ -1,0 +1,25 @@
+--- a/WEB-9.md
++++ b/WEB-9.md
+@@ -6,12 +6,10 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.112Z
+-updated_at: 2026-05-13T21:57:05.830Z
++updated_at: 2026-05-13T21:57:28.328Z
+ ---
+ 
+ # Implement targeted extraction in web_fetch
+ 
+-Add targeted extraction support to  so callers can narrow the returned content to the relevant part of a page.
++Add targeted extraction support to `web_fetch` so callers can narrow the returned content to the relevant part of a page.
+ 
+ This parent task tracks two targeting modes:
+ - CSS selector targeting against the extracted/readable DOM.
+@@ -36,3 +36,7 @@
+ - **title**: Implement CSS selector targeting in web_fetch → Implement targeted extraction in web_fetch
+ - **description**: 17 lines → updated (7 lines)
+ 
++## 2026-05-13T21:57:28.328Z
++
++- **description**: updated
++

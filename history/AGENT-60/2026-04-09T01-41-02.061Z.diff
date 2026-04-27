@@ -1,0 +1,35 @@
+--- a/AGENT-60.md
++++ b/AGENT-60.md
+@@ -6,9 +6,28 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-09T01:39:55.251Z
+-updated_at: 2026-04-09T01:39:55.251Z
++updated_at: 2026-04-09T01:41:02.060Z
+ ---
+ 
+ # Wire skill manifest from harness
+ 
+-
++Classifier uses real skill manifest from harness, not hardcoded list.
++
++## Current State
++- Classifier has hardcoded SKILL_MANIFEST_XML with 10 skills
++- Harness has dynamic skill loading from filesystem
++
++## Work Items
++
++- [ ] Create `getSkillManifest(): Promise<SkillManifest>` interface
++- [ ] Default implementation returns hardcoded manifest (for CLI/testing)
++- [ ] Harness implementation queries actual loaded skills
++- [ ] Pass manifest to classifier on initialization
++- [ ] Handle manifest changes (rebuild prompt or rebuild on each call)
++
++---
++
++# Activity Log
++
++## 2026-04-09T01:41:02.061Z
++
++- **description**: added (13 lines)
++

@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-255.md
++++ b/AGENT-255.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Re-adopt strict constrainedSampling with strict-valid schema emission (harness-gated)"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "sandpiper-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T15:15:44.996Z
+-updated_at: 2026-08-10T17:37:46.197Z
++updated_at: 2026-08-10T18:38:58.604Z
+ depends_on:
+   - AGENT-252
+ ---
+ 
+@@ -65,4 +65,8 @@
+ ## 2026-08-10T17:37:46.197Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-dev
++
++## 2026-08-10T18:38:58.604Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

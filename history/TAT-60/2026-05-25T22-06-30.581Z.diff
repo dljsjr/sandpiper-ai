@@ -1,0 +1,32 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -12,18 +12,6 @@
+   - TAT-59
+   - TAT-23
+   - TAT-62
+-updated_at: 2026-05-25T22:05:35.324Z
++updated_at: 2026-05-25T22:06:30.575Z
+ 
+ ---
+ 
+ # Style tattler_receive tool call background
+ 
+-Smoke test found the queue-recovery path working, but custom-rendered Tattler/Chorus delivery cells need final spacing polish. Keep quiet result semantics and avoid noisy assistant follow-up.
+-
+-Done so far: the canonical batch renderer/background path exists, and TAT-60 added one background-padded blank line above and one below each visible custom-rendered card/block.
+-
+-Remaining live UI polish from Doug: add one cell/column of padding along the left and right borders inside the colored background, so text does not hug the card edges horizontally. Verify the fix on visible Chorus cards while hidden Tattler DMs remain non-rendered. If this is a second follow-up commit after TAT-60 was already completed, reopen/track under this task or create a child follow-up only if Trail workflow requires it.
+-
++Implemented in jj changes tzuoyxvk / 8b1fca01 and rylstlsy / 69f2d3fc. The canonical tattler:pending-batch renderer now gives each visible Chorus card one background-padded blank line above and below and one background-colored cell of horizontal padding on the left and right of content lines. Content wraps/truncates against width-2 so right padding is preserved; blank padding lines remain full width. Multiple cards retain the separator, and hidden Tattler DMs remain non-rendered. Tests cover top/bottom blank background lines and left/right horizontal padding.
++
+ ---
+ 
+ # Activity Log
+@@ -84,3 +80,7 @@
+ 
+ - **description**: 1 line → updated (5 lines)
+ 
++## 2026-05-25T22:06:30.581Z
++
++- **description**: 5 lines → updated (1 line)
++

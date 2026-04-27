@@ -1,0 +1,25 @@
+--- a/AGENT-99.md
++++ b/AGENT-99.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Create dogfood standalone Sandpiper CLI target"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T21:23:28.880Z
+-updated_at: 2026-04-27T21:23:28.923Z
++updated_at: 2026-04-27T21:29:34.702Z
+ depends_on:
+   - AGENT-85
+ related:
+@@ -26,3 +26,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-27T21:29:34.703Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

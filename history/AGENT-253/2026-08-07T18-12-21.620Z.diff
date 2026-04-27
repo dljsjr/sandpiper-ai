@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-253.md
++++ b/AGENT-253.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Coverage wave 1: isolated + combinatoric extension tests"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.513Z
+-updated_at: 2026-08-07T14:57:56.513Z
++updated_at: 2026-08-07T18:12:21.620Z
+ depends_on:
+   - AGENT-251
+ ---
+ 
+ # Coverage wave 1: isolated + combinatoric extension tests
+ 
+ First real coverage using the harness: the 2-3 extensions chosen in AGENT-250, each tested (a) isolated - only that extension loaded via the restricted-pi entry mode, exercising its tools/hooks through print or RPC as appropriate; (b) combinatoric - at least one pairing that exercises a known cross-extension seam (e.g. tattler+chorus event-bus request/reply, or autotoon transforming another extension tool_result). Also validate the AGENT-237(e) payoff hypothesis: attempt driving compaction via RPC Compaction commands against the mock provider with a steer-delivered message pending - if it works, the last manual sweep item becomes CI coverage and AGENT-237 can close entirely once Doug does the two eyeball items. Acceptance per test: asserts real observable behavior (stdout/RPC events/filesystem effects), not process exit codes alone.
++
++---
++
++# Activity Log
++
++## 2026-08-07T18:12:21.620Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

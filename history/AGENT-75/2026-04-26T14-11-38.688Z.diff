@@ -1,0 +1,27 @@
+--- a/AGENT-75.md
++++ b/AGENT-75.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Experiment 4: extractor JSON schema grammar"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+@@ -9,7 +9,7 @@
+ related:
+   - AGENT-64
+   - AGENT-73
+-updated_at: 2026-04-26T03:24:35.609Z
++updated_at: 2026-04-26T14:11:38.687Z
+ ---
+ 
+ # Experiment 4: extractor JSON schema grammar
+@@ -27,3 +27,7 @@
+ 
+ - **related**: (none) → AGENT-64, AGENT-73
+ 
++## 2026-04-26T14:11:38.688Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

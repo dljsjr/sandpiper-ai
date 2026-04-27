@@ -1,0 +1,29 @@
+--- a/WEB-15.md
++++ b/WEB-15.md
+@@ -6,12 +6,10 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-13T21:57:46.865Z
+-updated_at: 2026-05-13T21:57:46.865Z
++updated_at: 2026-05-13T21:58:03.523Z
+ ---
+ 
+ # Implement CSS selector targeted extraction
+ 
+-Implement CSS selector targeting for .
++Implement CSS selector targeting for `web_fetch`.
+ 
+ Acceptance criteria:
+ - CSS selector parameter works end-to-end through the fetch/extract pipeline.
+@@ -21,3 +21,11 @@
+ - Tests cover selector match, selector miss, and minimal-page behavior.
+ - Tool input schema exposes the selector parameter.
+ 
++---
++
++# Activity Log
++
++## 2026-05-13T21:58:03.524Z
++
++- **description**: updated
++

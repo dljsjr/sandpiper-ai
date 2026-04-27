@@ -1,0 +1,27 @@
+--- a/AGENT-95.md
++++ b/AGENT-95.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add minimal standalone entrypoint with inline extension factory"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:43:23.510Z
+-updated_at: 2026-04-27T18:48:45.164Z
++updated_at: 2026-04-29T04:34:17.097Z
+ ---
+ 
+ # Add minimal standalone entrypoint with inline extension factory
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-29T04:34:17.098Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

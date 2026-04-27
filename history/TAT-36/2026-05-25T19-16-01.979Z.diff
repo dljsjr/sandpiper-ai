@@ -1,0 +1,51 @@
+--- a/TAT-36.md
++++ b/TAT-36.md
+@@ -3,35 +3,-2 @@
+ status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+-assignee: "Huginn"
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T18:27:44.222Z
+ related:
+   - TAT-37
+   - TAT-38
+   - TAT-39
+-updated_at: 2026-05-25T19:14:54.270Z
++updated_at: 2026-05-25T19:16:01.972Z
+ ---
+ 
+ # Batch Chorus and Tattler interim messages outside Pi steering queue
+ 
+-Problem: inbound Tattler/Chorus messages received while an agent is busy currently risk partial context under Pi's one-at-a-time steering mode, and queued custom messages can be dropped if abort clears Pi's steer/followUp queues before they emit message_start/message_end.
+-
+-Design direction: make Tattler, not Chorus, own a pending inbox for busy-time inbound messages. Real inbound payloads stay out of Pi's clearable queues while busy. A shared drainPendingInboxToBatch helper builds one canonical custom-message batch.
+-
+-Drain callers:
+-- before_agent_start drains for normal user prompts, including user abort + resume.
+-- the cooperative receive flow drains directly into a batch custom message and triggers that batch turn after agent_end/idle.
+-
+-Acceptance criteria:
+-- Busy-time inbound messages are stored/deduped outside Pi steer/followUp queues.
+-- Normal next prompts drain pending messages via before_agent_start.
+-- Synthetic receive turns use the same batch helper and do not depend on a fake user prompt solely to reach before_agent_start.
+-- User abort + next prompt recovers queued messages even if the model never called tattler_receive.
+-- One-at-a-time queue mode no longer serializes room bursts into partial context.
+-- Pending messages are cleared only after successful injection/persistence.
+-- Tests cover duplicate delivery, abort recovery, and batch rendering.
+-
++Updated again after source review: before_agent_start only runs through normal prompt/sendUserMessage paths, not pi.sendMessage(customMessage,{triggerTurn:true}). Therefore before_agent_start is a user-resume drain path, not universal. The universal invariant should be shared drain helper/schema. User prompt path: before_agent_start calls drainPendingInboxToBatch() and returns a canonical persistent custom batch message. Synthetic receive path: tattler_receive terminates; agent_end defers until idle; then calls the same drain helper and starts a custom-message turn via pi.sendMessage(batchCustomMessage,{triggerTurn:true}). Do not use sendUserMessage for synthetic receive because it renders as Doug/user and has misleading semantics. Both paths produce the same batch content/details/batchId and persist as custom_message; only entrypoint/order differs.
++
+ ---
+ 
+ # Activity Log
+@@ -62,3 +47,8 @@
+ 
+ - **description**: 11 lines → updated (16 lines)
+ 
++## 2026-05-25T19:16:01.979Z
++
++- **assignee**: Huginn → AGENT
++- **description**: 16 lines → updated (1 line)
++

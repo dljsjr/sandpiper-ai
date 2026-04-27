@@ -1,0 +1,42 @@
+--- a/TAT-68.md
++++ b/TAT-68.md
+@@ -10,13 +10,25 @@
+ related:
+   - TAT-73
+   - TAT-70
+-updated_at: 2026-05-27T15:46:02.518Z
++updated_at: 2026-05-27T16:41:46.822Z
+ ---
+ 
+ # Pending inbox re-delivers already-handled messages after abort+resume
+ 
+-Observed by Doug: on a long multi-turn session, a user-originated abort followed by a new user prompt dumps already-handled Tattler/Chorus messages back into context, and the agent reports it already processed them. Diagnosis: the pending-inbox read position (cursor) is not durably advanced through the abort+resume cycle, so before_agent_start re-drains an inbox it already drained. This is the inverse of the loss-direction abort bugs (TAT-37 et al.): over-delivery, not loss. Fix locus: durable-rooms v1 slice -- per-agent cursor in a SQLite cursors table, advanced on tool-call SUCCESS (atomicity boundary), so delivered-but-uncommitted messages re-deliver while committed ones never do. Resolved-by the durable Chorus room log + cursor slice; see .sandpiper/docs/specs/durable-rooms-sizing.md (chunk 3). Distinct from TAT-64/TAT-65 (render-delay).
+-
++Pending inbox re-delivers already-handled messages after abort+resume. Observed by Doug: on a long multi-turn session, a user-originated abort followed by a new user prompt dumps already-handled Tattler/Chorus messages back into context, and the agent reports it already processed them.
++
++**Root cause:** The pending-inbox read position (cursor) is not durably advanced through the abort+resume cycle. The restore path (tattler-inbox-persistence.ts:restoreTattlerPendingInboxFromSession) reconstructs the inbox from session JSONL entries — it finds the latest snapshot and filters out messages whose keys appear in delivered custom_message entries. But if abort occurs between message delivery and markBatchDelivered(), the in-flight messages are not recorded as delivered in the session JSONL. On resume, before_agent_start re-drains an inbox it already drained.
++
++**Reproduction scenario:**
++1. Agent receives multiple Tattler/Chorus messages across turns
++2. Agent processes them (messages move to handedToTurn state, visible in agent context)
++3. User aborts the agent mid-turn (after delivery but before markBatchDelivered completes)
++4. Session resumes via a new user prompt
++5. before_agent_start fires, restoreTattlerPendingInboxFromSession reconstructs the inbox from JSONL
++6. The abort-epoch messages are not in the delivered set (markBatchDelivered never ran), so they re-enter the inbox
++7. Agent re-receives already-handled messages and reports déjà vu
++
++**Fix locus:** Durable-rooms v1 slice — per-agent cursor in a SQLite cursors table, advanced on tool-call SUCCESS (atomicity boundary), so delivered-but-uncommitted messages re-deliver on resume (correct) while committed messages never re-deliver (kills the bug). See TAT-73.
++
++Distinct from TAT-64/TAT-65 (render-delay) and TAT-37 (message loss on abort). TAT-68 is over-delivery on abort+resume; TAT-37 is under-delivery.
++
+ ---
+ 
+ # Activity Log
+@@ -29,3 +44,7 @@
+ 
+ - **related**: TAT-37, TAT-58, TAT-64 → TAT-73, TAT-70
+ 
++## 2026-05-27T16:41:46.824Z
++
++- **description**: 1 line → updated (16 lines)
++

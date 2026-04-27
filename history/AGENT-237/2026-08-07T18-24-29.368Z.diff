@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-06T22:57:01.394Z
++updated_at: 2026-08-07T18:24:29.367Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -115,8 +115,12 @@
+ d-2, e) is done.
+ 
+ ---
+ 
++ITEM (e) RESOLVED 2026-08-07 - NO LONGER A MANUAL ITEM: steer-through-compaction is now covered headlessly by the AGENT-253 wave-1 integration tests (devtools/integration/wave1-compaction.integration.test.ts) driving real pi compaction/turn machinery via RPC against the scripted mock provider, zero egress. Structural claims proven: manual compact succeeds with non-empty summary; steer-delivered mid-turn message visible in get_entries pre-compaction; a normal turn completes correctly post-compaction. Summary CONTENT is deliberately not asserted (would encode an indexing accident, not a real claim). Two real findings banked in that test file: default compaction.keepRecentTokens=20000 means realistic scripted conversations have nothing old enough to compact (safeguard, not bug - harness gained a settingsJson option to lower it); the compaction summarization call has a different context shape than a normal turn. REMAINING MANUAL ITEMS FOR DOUG: (c) fullscreen TUI eyeball, (d) compiled-app /login + image handling. Task stays IN PROGRESS until those two land.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-06T22:19:41.456Z
+ 
+@@ -129,4 +133,8 @@
+ 
+ ## 2026-08-06T22:57:01.395Z
+ 
+ - **description**: 8 lines → updated (100 lines)
++
++## 2026-08-07T18:24:29.368Z
++
++- **description**: 100 lines → updated (104 lines)

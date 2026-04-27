@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-32.md
++++ b/TAT-32.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Design general quiet completion tool for no-assistant-message turns"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T17:57:19.129Z
+-updated_at: 2026-05-25T13:59:17.371Z
++updated_at: 2026-07-11T16:53:29.577Z
+ ---
+ 
+ # Design general quiet completion tool for no-assistant-message turns
+ 
+@@ -29,4 +30,9 @@
+ ## 2026-05-25T13:59:17.371Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **assignee**: Librarian → AGENT
++
++## 2026-07-11T16:53:29.577Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

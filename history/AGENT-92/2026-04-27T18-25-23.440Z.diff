@@ -1,0 +1,44 @@
+--- a/AGENT-92.md
++++ b/AGENT-92.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.330Z
+-updated_at: 2026-04-27T18:22:09.321Z
++updated_at: 2026-04-27T18:25:23.440Z
+ depends_on:
+   - AGENT-88
+   - AGENT-89
+@@ -16,8 +16,22 @@
+ 
+ # Research and build Claude Code plugin distribution
+ 
+-Research and build the Claude Code plugin distribution for neutral Sandpiper capabilities/resources.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- Claude Code plugin format and capability mapping are documented\n- supported skills/resources/tools load through a Claude adapter or validator\n- unsupported Pi extension concepts are explicitly documented
+-
++Research and build the Claude Code plugin distribution for neutral Sandpiper capabilities/resources.
++
++See .sandpiper/docs/specs/package-first-multi-distribution.md.
++
++Claude plugin reference findings to account for:
++- plugins are self-contained directories with optional `.claude-plugin/plugin.json`
++- skills map to `skills/`; selected prompt templates may map to `commands/` or skills after review
++- plugin tools are exposed via plugin-provided MCP servers (`.mcp.json` or inline manifest), not Pi extension factories
++- plugin adapters should use `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`, and `CLAUDE_PLUGIN_OPTION_*` at the boundary
++- marketplace-installed plugins are cached, so installed plugins cannot rely on path traversal outside plugin root
++
++Completion signal:
++- Claude plugin format and component mapping are documented
++- supported resources and MCP tool adapters load in Claude Code or a faithful local validator
++- unsupported Pi extension/hook concepts are explicitly documented
++
+ ---
+ 
+ # Activity Log
+@@ -26,3 +40,7 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-04-27T18:25:23.440Z
++
++- **description**: 1 line → updated (15 lines)
++

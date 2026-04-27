@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-254.md
++++ b/AGENT-254.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "skill tool schema rejected by strict-schema provider family (possible AGENT-240 interaction)"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: "sandpiper-0.84-dev"
+ created_at: 2026-08-07T15:03:57.415Z
+-updated_at: 2026-08-07T15:21:59.918Z
++updated_at: 2026-08-07T15:27:20.533Z
+ ---
+ 
+ # skill tool schema rejected by strict-schema provider family (possible AGENT-240 interaction)
+ 
+@@ -58,4 +59,9 @@
+ 
+ ## 2026-08-07T15:21:59.919Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-08-07T15:27:20.534Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

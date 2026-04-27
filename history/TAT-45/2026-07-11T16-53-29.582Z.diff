@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-45.md
++++ b/TAT-45.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Map queue recovery implementation seams"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.996Z
+-updated_at: 2026-05-25T19:20:13.981Z
++updated_at: 2026-07-11T16:53:29.582Z
+ ---
+ 
+ # Map queue recovery implementation seams
+ 
+@@ -72,4 +73,9 @@
+ 
+ ## 2026-05-25T19:20:13.981Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.582Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

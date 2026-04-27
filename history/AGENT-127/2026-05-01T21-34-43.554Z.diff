@@ -1,0 +1,30 @@
+--- a/AGENT-127.md
++++ b/AGENT-127.md
+@@ -1,15 +1,11 @@
+ ---
+-title: "Reify Biome as a pinned workspace dev dependency"
++title: "Reify Biome and refresh dependencies"
+ status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-01T21:23:49.631Z
+-updated_at: 2026-05-01T21:25:46.692Z
++updated_at: 2026-05-01T21:34:43.553Z
+ ---
+ 
+ # Reify Biome as a pinned workspace dev dependency
+-# Reify Biome as a pinned workspace dev dependency
++# Reify Biome and refresh dependencies
+ 
+ 
+ ---
+@@ -25,3 +25,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-01T21:34:43.554Z
++
++- **title**: Reify Biome as a pinned workspace dev dependency → Reify Biome and refresh dependencies
++

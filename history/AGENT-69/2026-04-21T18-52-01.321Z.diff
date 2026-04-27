@@ -1,0 +1,27 @@
+--- a/AGENT-69.md
++++ b/AGENT-69.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Improve background_process tool descriptions, snippets, and failure prevention"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-21T18:46:18.411Z
+-updated_at: 2026-04-21T18:46:37.441Z
++updated_at: 2026-04-21T18:52:01.320Z
+ ---
+ 
+ # Improve background_process tool descriptions, snippets, and failure prevention
+@@ -52,3 +53,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-21T18:52:01.321Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

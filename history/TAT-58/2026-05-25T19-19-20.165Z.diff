@@ -1,0 +1,27 @@
+--- a/TAT-58.md
++++ b/TAT-58.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Draft Tattler/Chorus queue recovery implementation work plan"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Piper"
+@@ -14,7 +14,7 @@
+   - TAT-37
+   - TAT-38
+   - TAT-39
+-updated_at: 2026-05-25T19:17:27.916Z
++updated_at: 2026-05-25T19:19:20.160Z
+ ---
+ 
+ # Draft Tattler/Chorus queue recovery implementation work plan
+@@ -82,3 +82,7 @@
+ - **depends_on**: (none) → TAT-45
+ - **related**: TAT-36, TAT-37, TAT-38, TAT-39, TAT-34, TAT-35 → TAT-36, TAT-37, TAT-38, TAT-39
+ 
++## 2026-05-25T19:19:20.165Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

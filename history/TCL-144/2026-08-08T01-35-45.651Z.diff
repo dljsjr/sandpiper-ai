@@ -1,0 +1,34 @@
+===================================================================
+--- a/TCL-144.md
++++ b/TCL-144.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Rewrite Trail VCS tests to not require real git/jj (command-runner seam + thin integration set)"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "sandpiper-dev"
+ reporter: USER
+ created_at: 2026-08-07T17:44:50.553Z
+-updated_at: 2026-08-07T17:44:50.553Z
++updated_at: 2026-08-08T01:35:45.651Z
+ ---
+ 
+ # Rewrite Trail VCS tests to not require real git/jj (command-runner seam + thin integration set)
+ 
+@@ -17,4 +17,13 @@
+ 
+ Shape (test pyramid, avoiding the tautology trap this project keeps catching): (1) the majority of cases move to unit tests against an injected command-runner seam - trail already funnels VCS calls through small helpers (e.g. run(command, args, cwd) in storage-backend.ts), so the seam is natural: assert on the exact command sequences trail ISSUES and its handling of scripted outputs/failures, without executing anything. This tests trail's logic, not a mock of git's behavior. (2) A deliberately thin set of true integration tests KEEPS real git/jj coverage (the reality-check layer - things like the auto_push no-upstream product bug TCL-143 would not be visible to a command-fake), explicitly marked/isolated, running under the existing env neutralization, possibly opt-in or reduced-frequency. (3) The root-script GIT_CONFIG/JJ_CONFIG neutralization STAYS until this lands, and stays even after for the residual integration set.
+ 
+ Not part of the AGENT-249 integration-harness lane (different resources, different problem): this is about the UNIT suite not requiring machine VCS, while the harness lane is about spawned-pi tests not requiring providers/credentials. Same principle, two applications.
++
++---
++
++# Activity Log
++
++## 2026-08-08T01:35:45.651Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-dev

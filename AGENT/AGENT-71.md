@@ -1,0 +1,46 @@
+---
+title: "Add extraction cache to rg-matrix for extractor A/B and Stage 2 rule grading"
+status: COMPLETE
+resolution: WONTFIX
+kind: TASK
+priority: MEDIUM
+assignee: AGENT
+reporter: AGENT
+created_at: 2026-04-21T19:37:12.561Z
+updated_at: 2026-05-04T19:27:45.284Z
+---
+
+# Add extraction cache to rg-matrix for extractor A/B and Stage 2 rule grading
+
+The rg-matrix currently re-extracts rules from AGENTS files on every run, costing ~20-40s per file × 4 files × N batches (~10-15 minutes per matrix run).
+
+This task is to add an extraction cache that:
+1. Caches extracted rulesets keyed by hash(agents_content + extractor_prompt_sha256)
+2. Allows matrix runs to skip extraction on cache hits
+3. Enables Stage 2 real-source rule grading by producing inspectable artifacts
+4. Eventually enables extractor A/B testing (compare rulesets from different extractor prompts)
+
+Cache location: ~/git/rg-matrix/extracted_rulesets/
+Cache format: JSON with rules array, scope breakdown, rule count, extraction metadata.
+
+---
+
+# Activity Log
+
+## 2026-04-21T19:37:22.513Z
+
+- **description**: added (10 lines)
+
+## 2026-04-26T02:57:32.237Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-04-26T02:57:32.290Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-05-04T19:27:45.284Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: WONTFIX

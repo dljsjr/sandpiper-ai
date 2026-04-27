@@ -1,12 +1,13 @@
 ---
 title: "Phase 4: generalize storage bootstrap for future domains and unified init"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-04-01T18:01:57.094Z
-updated_at: 2026-04-01T18:04:22.782Z
+updated_at: 2026-05-13T14:08:49.016Z
 ---
 
 # Phase 4: generalize storage bootstrap for future domains and unified init
@@ -33,3 +34,8 @@ This phase must not block Phases 1–3. It is intentionally future-facing and sh
 ## 2026-04-01T18:04:22.782Z
 
 - **description**: added (14 lines)
+
+## 2026-05-13T14:08:49.017Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

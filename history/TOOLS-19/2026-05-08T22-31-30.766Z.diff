@@ -1,0 +1,29 @@
+--- a/TOOLS-19.md
++++ b/TOOLS-19.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Remove install lifecycle hooks from source and package manifests"
+-status: NOT STARTED
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+@@ -9,7 +10,7 @@
+ depends_on:
+   - TOOLS-18
+   - TOOLS-20
+-updated_at: 2026-05-08T21:36:36.866Z
++updated_at: 2026-05-08T22:31:30.763Z
+ ---
+ 
+ # Remove install lifecycle hooks from source and package manifests
+@@ -38,3 +39,8 @@
+ 
+ - **depends_on**: (none) → TOOLS-18, TOOLS-20
+ 
++## 2026-05-08T22:31:30.766Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: DONE
++

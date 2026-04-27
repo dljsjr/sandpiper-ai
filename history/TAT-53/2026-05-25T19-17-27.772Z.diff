@@ -1,0 +1,29 @@
+--- a/TAT-53.md
++++ b/TAT-53.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Review Chorus participant metadata semantics"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "Muninn + Sandpiper Dev"
+-assignee: "Muninn + Sandpiper Dev"
++assignee: "Muninn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.737Z
+ updated_at: 2026-05-25T19:12:57.286Z
+-updated_at: 2026-05-25T19:12:57.286Z
++updated_at: 2026-05-25T19:17:27.768Z
+ ---
+ 
+ # Review Chorus participant metadata semantics
+@@ -21,3 +21,8 @@
+ 
+ - **assignee**: UNASSIGNED → Muninn + Sandpiper Dev
+ 
++## 2026-05-25T19:17:27.772Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: Muninn + Sandpiper Dev → Muninn
++

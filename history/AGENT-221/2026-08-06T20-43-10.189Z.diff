@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-221.md
++++ b/AGENT-221.md
+@@ -5,14 +5,22 @@
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-06-23T20:28:30.187Z
+-updated_at: 2026-06-23T20:28:30.187Z
++updated_at: 2026-08-06T20:43:10.186Z
+ ---
+ 
+ # Adopt/verify CONFIG_DIR_NAME (+ APP_NAME) rebrand extension points for .sandpiper
+ 
+ Pi 0.79.7 (#5869) exported CONFIG_DIR_NAME so extensions resolve project config paths without hardcoding '.pi'. An older changelog entry notes CONFIG_DIR_NAME + APP_NAME are THE SDK rebrand extension points. Sandpiper rebrands .pi -> .sandpiper.
+ 
+-NEEDS the 0.80.1 bump first (0.79.7 > our 0.79.1 pin).
++FIRST STEP (grounding): check whether Sandpiper already routes .sandpiper path resolution through CONFIG_DIR_NAME/APP_NAME or hardcodes it. Note: packages/core/src/migrate-pi-configs.ts intentionally hardcodes the OLD .pi layout for migration - that is correct and out of scope.
+ 
+-FIRST STEP (grounding): check whether Sandpiper already routes .sandpiper path resolution through CONFIG_DIR_NAME/APP_NAME or hardcodes it. Note: packages/core/src/migrate-pi-configs.ts intentionally hardcodes the OLD .pi layout for migration — that is correct and out of scope.
++VERIFIED 2026-08-06 at v0.84.0: exports and mechanism unchanged; the well-placed package.json piConfig remains the only rebrand extension point (see TOOLS-9 for the upstream env-override ask), so this task's scope is intact and no longer gated on any version bump. Fold into verification: pi 0.82.0 (#6958) fixed TUI debug/crash logs to respect custom agent dirs instead of always writing under ~/.pi/agent - confirm sandpiper logs land under ~/.sandpiper/agent after the AGENT-236 bump.
++
++---
++
++# Activity Log
++
++## 2026-08-06T20:43:10.189Z
++
++- **description**: updated

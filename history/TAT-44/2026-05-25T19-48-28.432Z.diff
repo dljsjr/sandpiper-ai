@@ -1,0 +1,29 @@
+--- a/TAT-44.md
++++ b/TAT-44.md
+@@ -11,15 +11,8 @@
+   - TAT-41
+   - TAT-42
+   - TAT-43
+-updated_at: 2026-05-25T19:25:41.419Z
++updated_at: 2026-05-25T19:48:28.427Z
+ ---
+ 
+ # Test pending inbox delivery across busy, abort, and resume paths
+ 
+-Add regression coverage proving real inbound payloads received while busy are not dropped by Escape/abort, are not serialized one-at-a-time through Pi queues, and are injected as one persistent custom_message batch on the next agent start. Include duplicate delivery and pending-clear timing assertions.
+-
+-Include compaction as an explicit busy-path scenario: Doug observed a room message sent while Piper was compacting appeared to skip delivery. The pending-inbox path should treat compaction like other non-idle work so inbound messages survive compaction and drain on the next agent start or synthetic receive turn.
+-
++Regression coverage target for the pending-inbox stack. Include Sandpiper Dev review caveat from wxqnulxl / 5874382f: appendEntry restore/durability must clear session-local pending state before restoring same-session durable records, not after. Cover abort-before-drain, handoff failure/release, already-delivered restore dedupe, and no double-injection.
++
+ ---
+ 
+ # Activity Log
+@@ -41,3 +39,7 @@
+ 
+ - **description**: 1 line → updated (3 lines)
+ 
++## 2026-05-25T19:48:28.432Z
++
++- **description**: 3 lines → updated (1 line)
++

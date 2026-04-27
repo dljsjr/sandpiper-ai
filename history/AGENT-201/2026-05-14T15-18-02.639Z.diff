@@ -1,0 +1,24 @@
+--- a/AGENT-201.md
++++ b/AGENT-201.md
+@@ -6,11 +6,11 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-14T15:12:36.104Z
+-updated_at: 2026-05-14T15:13:45.492Z
++updated_at: 2026-05-14T15:18:02.638Z
+ ---
+ 
+ # Review mailbox-based multi-agent coordination architecture
+ 
++Working notes for reviewing mailbox-based multi-agent coordination architecture. Notes live at .sandpiper/docs/specs/mailbox-coordination-architecture-notes.md. Scope includes historical notification/mailbox docs, current Pi/Sandpiper implementation reality, and prior art scan findings.
+ 
+ ---
+ 
+@@ -21,3 +22,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-14T15:18:02.639Z
++
++- **description**: added (1 line)
++

@@ -1,0 +1,32 @@
+--- a/SHR-71.md
++++ b/SHR-71.md
+@@ -7,10 +7,12 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-26T15:44:11.246Z
+-updated_at: 2026-04-16T21:21:39.518Z
+ related:
+   - SHR-68
+   - SHR-69
++  - SHR-99
++updated_at: 2026-05-14T14:46:07.856Z
++
+ ---
+ 
+ # Replace unbuffer-relay with @lydell/node-pty PTY adapter
+@@ -44,7 +46,6 @@
+ - `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — PTY approach comparison and `@lydell/node-pty` evaluation
+ - SHR-70 — completed investigation spike
+ 
+-
+ ---
+ 
+ # Activity Log
+@@ -58,3 +59,7 @@
+ 
+ - **status**: COMPLETE → NOT STARTED
+ 
++## 2026-05-14T14:46:07.857Z
++
++- **related**: SHR-68, SHR-69 → SHR-68, SHR-69, SHR-99
++

@@ -1,0 +1,27 @@
+--- a/TAT-53.md
++++ b/TAT-53.md
+@@ -3,13 +3,18 @@
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "Muninn + Sandpiper Dev"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.737Z
+ updated_at: 2026-05-25T19:12:00.737Z
+-updated_at: 2026-05-25T19:12:00.737Z
++updated_at: 2026-05-25T19:12:57.286Z
+ ---
+ 
+ # Review Chorus participant metadata semantics
+ 
+ Reviewer lane for participant metadata. Check that the broker is the sole authority, the model-visible audience is accurate enough for reply semantics, and no stable identity guarantee is implied beyond the v0 best-effort display-name snapshot.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:57.287Z
++
++- **assignee**: UNASSIGNED → Muninn + Sandpiper Dev
++

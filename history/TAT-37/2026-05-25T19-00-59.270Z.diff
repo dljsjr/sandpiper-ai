@@ -1,0 +1,25 @@
+--- a/TAT-37.md
++++ b/TAT-37.md
+@@ -6,12 +6,10 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T18:27:44.324Z
+-updated_at: 2026-05-25T18:27:44.566Z
++updated_at: 2026-05-25T19:00:59.270Z
+ ---
+ 
+ # Verify queued custom messages after abort are in active context
+ 
+-Problem 3: messages may not render in main chat after queued messages exist and the blocking agent turn is aborted. Need distinguish UI bug vs data/context loss. Once a custom message emits message_start/message_end and persists as custom_message on the active branch, buildSessionContext should include it later. But source shows a real loss risk: sendCustomMessage while streaming queues a role custom object directly into core agent.steer/followUp and does not mirror it into AgentSession string queues; clearQueue/abort clears core queues and only restores mirrored string queues. A queued custom Chorus/Tattler message that has not drained can be silently dropped before persistence. Verify by reproducing mid-turn queue + abort and checking JSONL, active branch, and buildSessionContext.
++Refined root cause and validation target: undrained custom messages queued through Pi sendMessage while streaming can be lost on abort because they sit in core steer/followUp queues and are not mirrored in AgentSession string queues. Durable Tattler inbox + before_agent_start drain should prevent this. Still verify current behavior by reproducing mid-turn inbound custom messages + abort and checking whether undrained messages persist in JSONL, active branch, and buildSessionContext. If messages persisted as custom_message on active branch, missing chat render is UI/reconciliation; if not persisted, it is data/context loss.
+ 
+ ---
+ 
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-05-25T19:00:59.270Z
++
++- **description**: updated
++

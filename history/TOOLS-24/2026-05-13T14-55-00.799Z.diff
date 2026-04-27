@@ -1,0 +1,32 @@
+--- a/TOOLS-24.md
++++ b/TOOLS-24.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Copy Dash CommonJS sidecar into source skill helper"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T14:54:52.091Z
+ updated_at: 2026-05-13T14:54:52.091Z
+-updated_at: 2026-05-13T14:54:52.091Z
++updated_at: 2026-05-13T14:55:00.798Z
+ ---
+ 
+ # Copy Dash CommonJS sidecar into source skill helper
+ 
+ The Dash skill helper fix in TOOLS-14 correctly emits dash.cjs for generated dist artifacts, but the source/dev helper copy step in devtools/assembleDistribution.ts copies only scripts/dash back into packages/resources. The active source skill catalog then runs a wrapper that imports ./dash.cjs, which is missing. Add regression coverage and copy/ignore the sidecar for source-local skill execution.
+ 
++---
++
++# Activity Log
++
++## 2026-05-13T14:55:00.799Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

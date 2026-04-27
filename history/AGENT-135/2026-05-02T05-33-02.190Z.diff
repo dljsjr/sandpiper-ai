@@ -1,0 +1,27 @@
+--- a/AGENT-135.md
++++ b/AGENT-135.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Wire neutral Pi package checks into docs and scripts"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T23:02:14.391Z
+-updated_at: 2026-05-01T23:11:22.369Z
++updated_at: 2026-05-02T05:33:02.189Z
+ ---
+ 
+ # Wire neutral Pi package checks into docs and scripts
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-02T05:33:02.190Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,25 @@
+--- a/TAT-42.md
++++ b/TAT-42.md
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:17:28.091Z
++updated_at: 2026-05-25T19:38:32.773Z
+ ---
+ 
+ # Define Tattler inbox batch content and details schema
+ 
+-Define the batch custom-message contract. content is complete model-visible text/XML containing every pending message in order. details carries renderer-friendly structure: kind=batch, batchId, and messages[] with per-message ids, sender, receivedAt, message type, room/post metadata, broker route, and audience fields when present.
++Implemented in jj change xszoyull / 7401716b. Defines canonical pending batch custom message type tattler:pending-batch with model-facing XML content and structured details { kind: batch, batchId, messages[] }. Content is canonical for LLM/debug/compaction; details are for renderer fidelity. Dedicated renderer remains TAT-43.
+ 
+ ---
+ 
+@@ -28,3 +28,7 @@
+ 
+ - **depends_on**: (none) → TAT-45, TAT-58
+ 
++## 2026-05-25T19:38:32.773Z
++
++- **description**: updated
++

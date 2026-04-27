@@ -1,0 +1,27 @@
+--- a/AGENT-87.md
++++ b/AGENT-87.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Split Sandpiper identity from neutral capabilities"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.126Z
+-updated_at: 2026-05-01T17:46:13.807Z
++updated_at: 2026-05-01T18:47:29.502Z
+ depends_on:
+   - AGENT-86
+ related:
+@@ -34,3 +35,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-01T18:47:29.503Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

@@ -1,0 +1,27 @@
+--- a/AGENT-128.md
++++ b/AGENT-128.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Inventory distribution invariant and smoke-test coverage"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-01T21:45:48.012Z
+-updated_at: 2026-05-01T21:46:29.267Z
++updated_at: 2026-05-01T22:48:03.042Z
+ ---
+ 
+ # Inventory distribution invariant and smoke-test coverage
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-01T22:48:03.042Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

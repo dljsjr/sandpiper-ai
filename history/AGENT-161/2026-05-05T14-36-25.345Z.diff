@@ -1,0 +1,27 @@
+--- a/AGENT-161.md
++++ b/AGENT-161.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Decouple system prompt core types from Pi"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-05T14:34:28.007Z
+-updated_at: 2026-05-05T14:34:28.052Z
++updated_at: 2026-05-05T14:36:25.345Z
+ ---
+ 
+ # Decouple system prompt core types from Pi
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-05T14:36:25.345Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

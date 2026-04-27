@@ -1,0 +1,25 @@
+--- a/TAT-80.md
++++ b/TAT-80.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Slim Chorus/Tattler pending batch model envelope"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Muninn"
+ reporter: USER
+ created_at: 2026-06-03T04:06:21.945Z
+-updated_at: 2026-06-03T04:06:30.718Z
++updated_at: 2026-06-03T04:32:27.004Z
+ ---
+ 
+ # Slim Chorus/Tattler pending batch model envelope
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Muninn
+ 
++## 2026-06-03T04:32:27.007Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

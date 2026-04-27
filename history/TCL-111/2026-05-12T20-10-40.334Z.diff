@@ -1,0 +1,25 @@
+--- a/TCL-111.md
++++ b/TCL-111.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Subtask creation can create parent directories containing embedded newlines"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-27T18:07:14.382Z
+-updated_at: 2026-04-27T18:07:22.299Z
++updated_at: 2026-05-12T20:10:40.333Z
+ ---
+ 
+ # Subtask creation can create parent directories containing embedded newlines
+@@ -38,3 +38,7 @@
+ 
+ - **description**: added (18 lines)
+ 
++## 2026-05-12T20:10:40.334Z
++
++- **status**: NOT STARTED → IN PROGRESS
++

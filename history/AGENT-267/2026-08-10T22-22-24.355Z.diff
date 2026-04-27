@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-267.md
++++ b/AGENT-267.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Expose diagnostic prompt source metadata"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T22:22:24.086Z
+-updated_at: 2026-08-10T22:22:24.086Z
++updated_at: 2026-08-10T22:22:24.354Z
+ ---
+ 
+ # Expose diagnostic prompt source metadata
+ 
++
++---
++
++# Activity Log
++
++## 2026-08-10T22:22:24.355Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper

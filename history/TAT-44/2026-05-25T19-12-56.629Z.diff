@@ -1,0 +1,24 @@
+--- a/TAT-44.md
++++ b/TAT-44.md
+@@ -3,10 +3,10 @@
+ status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: "Sandpiper Dev"
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.937Z
+ updated_at: 2026-05-25T19:12:35.181Z
+-updated_at: 2026-05-25T19:12:35.181Z
++updated_at: 2026-05-25T19:12:56.628Z
+ ---
+ 
+ # Test pending inbox delivery across busy, abort, and resume paths
+@@ -22,3 +22,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Sandpiper Dev
+ 
++## 2026-05-25T19:12:56.629Z
++
++- **assignee**: Sandpiper Dev → Huginn
++

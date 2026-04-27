@@ -1,0 +1,29 @@
+--- a/TOOLS-20.md
++++ b/TOOLS-20.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Add npm-pack global install smoke gate for immutable artifacts"
+-status: NOT STARTED
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+@@ -8,7 +9,7 @@
+ created_at: 2026-05-08T21:36:25.841Z
+ depends_on:
+   - TOOLS-16
+-updated_at: 2026-05-08T21:36:36.799Z
++updated_at: 2026-05-08T22:31:30.816Z
+ ---
+ 
+ # Add npm-pack global install smoke gate for immutable artifacts
+@@ -37,3 +38,8 @@
+ 
+ - **depends_on**: (none) → TOOLS-16
+ 
++## 2026-05-08T22:31:30.817Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: DONE
++

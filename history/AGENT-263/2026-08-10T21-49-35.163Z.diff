@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-263.md
++++ b/AGENT-263.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Add model-free system prompt rendering seam"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-08-10T21:48:03.871Z
+-updated_at: 2026-08-10T21:48:07.566Z
++updated_at: 2026-08-10T21:49:35.162Z
+ ---
+ 
+ # Add model-free system prompt rendering seam
+ 
+@@ -19,4 +19,8 @@
+ ## 2026-08-10T21:48:07.567Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
++
++## 2026-08-10T21:49:35.163Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

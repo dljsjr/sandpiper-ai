@@ -1,0 +1,40 @@
+--- a/TAT-58.md
++++ b/TAT-58.md
+@@ -13,7 +13,7 @@
+   - TAT-39
+   - TAT-34
+   - TAT-35
+-updated_at: 2026-05-25T19:14:18.272Z
++updated_at: 2026-05-25T19:14:54.482Z
+ ---
+ 
+ # Draft Tattler/Chorus queue recovery implementation work plan
+@@ -30,8 +30,9 @@
+ 
+ - Tattler owns a pending inbox for inbound messages received while busy.
+ - Real inbound payloads are not sent through Pi queues while busy.
+-- Normal user prompts and `pi.sendUserMessage` turns run `before_agent_start`; that hook is the canonical drain for user abort + resume and other normal next-turn paths.
+-- Pi nuance from source: `pi.sendMessage(..., { triggerTurn:true })` / `sendCustomMessage` calls `_runAgentPrompt(appMessage)` directly and bypasses `before_agent_start`. Synthetic receive turns must either use `pi.sendUserMessage(...)` to run the universal drain hook, or explicitly send the batch custom message as the trigger and treat that as a separate documented drain path.
++- A shared `drainPendingInboxToBatch()` helper creates the canonical batch custom message and owns pending-clear semantics.
++- Normal user prompts and `pi.sendUserMessage` turns run `before_agent_start`; that hook drains via the shared helper for user abort + resume and other normal next-turn paths.
++- Pi nuance from source: `pi.sendMessage(..., { triggerTurn:true })` / `sendCustomMessage` calls `_runAgentPrompt(appMessage)` directly and bypasses `before_agent_start`. Synthetic receive should therefore trigger a turn with the batch custom message itself, using the same drain helper, rather than sending a fake user prompt solely to reach `before_agent_start`.
+ - `before_agent_start` custom messages are appended to the prompt batch after the user prompt, not literally prepended. They are still persistent/model-visible custom messages.
+ - `tattler_receive` is an optional cooperative interruption tool that lets the model intentionally end the current turn and create the next drain boundary. It is not the only correctness path.
+ - Chorus uses the Tattler inbox/batch machinery for visible room traffic while preserving its room/broker semantics.
+@@ -40,7 +41,7 @@
+ 
+ ## Immediate implementation tickets
+ 
+-- TAT-36: Core pending inbox, drain strategy, batch schema/rendering, and busy/abort/resume delivery tests.
++- TAT-36: Core pending inbox, shared drain helper, batch schema/rendering, and busy/abort/resume delivery tests.
+ - TAT-37: Source/test classification for abort data loss vs UI replay and the fixed abort+resume path.
+ - TAT-38: Cooperative `tattler_receive` tool and deferred synthetic receive turn.
+ - TAT-39: Broker-owned Chorus participant/audience metadata.
+@@ -71,3 +72,7 @@
+ - **description**: 1 line → updated (38 lines)
+ - **related**: (none) → TAT-36, TAT-37, TAT-38, TAT-39, TAT-34, TAT-35
+ 
++## 2026-05-25T19:14:54.483Z
++
++- **description**: 38 lines → updated (39 lines)
++

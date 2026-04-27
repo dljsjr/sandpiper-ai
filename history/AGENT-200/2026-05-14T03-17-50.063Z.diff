@@ -1,0 +1,27 @@
+--- a/AGENT-200.md
++++ b/AGENT-200.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add system notification XML API"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-14T02:58:25.175Z
+-updated_at: 2026-05-14T03:08:08.475Z
++updated_at: 2026-05-14T03:17:50.062Z
+ ---
+ 
+ # Add system notification XML API
+@@ -26,3 +27,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-14T03:17:50.063Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

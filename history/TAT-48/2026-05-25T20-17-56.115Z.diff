@@ -1,0 +1,27 @@
+--- a/TAT-48.md
++++ b/TAT-48.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Test tattler_receive termination and fallback paths"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -9,7 +9,7 @@
+ depends_on:
+   - TAT-46
+   - TAT-47
+-updated_at: 2026-05-25T20:17:56.056Z
++updated_at: 2026-05-25T20:17:56.114Z
+ ---
+ 
+ # Test tattler_receive termination and fallback paths
+@@ -32,3 +32,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T20:17:56.115Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

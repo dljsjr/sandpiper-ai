@@ -1,0 +1,31 @@
+--- a/AGENT-76.md
++++ b/AGENT-76.md
+@@ -1,15 +1,12 @@
+ ---
+ title: "Experiment 5: applies_to operational-mode rewrite"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-26T03:24:43.743Z
+ related:
+   - AGENT-64
+   - AGENT-73
+-updated_at: 2026-04-26T03:24:43.786Z
++updated_at: 2026-04-26T03:50:17.470Z
+ ---
+ 
+ # Experiment 5: applies_to operational-mode rewrite
+@@ -23,3 +23,8 @@
+ 
+ - **related**: (none) → AGENT-64, AGENT-73
+ 
++## 2026-04-26T03:50:17.471Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

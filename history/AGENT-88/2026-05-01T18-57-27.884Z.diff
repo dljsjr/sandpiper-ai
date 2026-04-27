@@ -1,0 +1,25 @@
+--- a/AGENT-88.md
++++ b/AGENT-88.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Move neutral capabilities and resources under packages"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.166Z
+-updated_at: 2026-05-01T18:48:10.475Z
++updated_at: 2026-05-01T18:57:27.883Z
+ depends_on:
+   - AGENT-87
+ related:
+@@ -30,3 +30,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-01T18:57:27.884Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

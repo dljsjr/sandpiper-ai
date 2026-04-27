@@ -1,0 +1,61 @@
+===================================================================
+--- a/TCL-139.md
++++ b/TCL-139.md
+@@ -6,29 +6,37 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-07-11T17:22:20.439Z
+-updated_at: 2026-07-11T17:36:49.708Z
++updated_at: 2026-07-11T20:55:41.243Z
+ ---
+ 
+ # Add mutation-time consistency checks (parent/child, blocker resolution, dangling refs, cycles)
+ 
+-Implements .sandpiper/docs/specs/trail-consistency-checks-plan.md (reviewed and converged by Huginn and Muninn before implementation).
++Implements .sandpiper/docs/specs/trail-consistency-checks-plan.md (reviewed and converged by Huginn and Muninn before implementation, then code-reviewed by both after implementation -- two real rounds, not rubber stamps).
+ 
+-Four hard-error-by-default checks, demotable to warning via --force, enforced inline at mutation call sites (mutate.ts/move.ts), not as a separate query/report:
+-1. Parent/child status consistency (bidirectional): completeTask blocks finalizing a parent with non-COMPLETE subtasks; updateTaskFields blocks activating a child under a COMPLETE parent; createTask blocks creating a subtask under a COMPLETE parent; moveTask blocks re-parenting an active task under a COMPLETE parent.
+-2. Blocker-resolution consistency: completeTask/updateTaskFields block moving to NEEDS REVIEW/COMPLETE while a blockedBy entry isn't itself COMPLETE+DONE.
+-3. Dangling relationship references: createTask/updateTaskFields block setting blockedBy/dependsOn/related to a key that doesn't resolve to a real task file.
+-4. Cycle detection: updateTaskFields blocks blockedBy/dependsOn changes that create a cycle back to the origin task (self-reference is the one-hop case, not special-cased).
++Four hard-error-by-default checks, demotable to warning via --force, enforced inline at mutation call sites:
++1. Parent/child status consistency (bidirectional).
++2. Blocker-resolution consistency -- fails closed on a dangling blocker key (Muninn's finding: the original silent-skip created an unguarded gap when a stored, not freshly-set, blockedBy reference goes dangling, since checkReferencesExist never runs in that call shape).
++3. Dangling relationship references.
++4. Cycle detection.
+ 
+-The existing NEEDS-REVIEW-before-DONE rule is untouched, unconditional, no flag.
++NEEDS-REVIEW-before-DONE stays untouched, unconditional, no flag.
+ 
+-Implementation matches the converged design: targeted per-key disk lookups (new packages/trail/src/core/consistency-guards.ts, built on collectSubtasks/resolveParentFromPath -- relocated from move.ts to patterns.ts to avoid a mutate.ts<->move.ts circular import -- plus resolveTaskFile), not a materialized Task[]. --force threaded through all 5 CLI commands (task-complete, task-update, task-create, task-move, task-pickup).
++Post-implementation code review (Huginn + Muninn, both against the actual diff) found and fixed:
++- checkBlockersResolved's silent skip on dangling keys -> fails closed now, plus a new regression test for the exact gap (mutate.test.ts, 'blocks finalizing when a stored (not freshly-set) blocker reference has gone dangling').
++- updateTaskFields CC 20 -> 4 and createTask CC 14 -> 10, via new enforceUpdateFieldGuards/enforceCreateTaskGuards orchestrators in consistency-guards.ts (verified with lizard before/after, not just asserted).
++- Shared isActiveUnderCompleteParent predicate extracted; move.ts no longer reimplements the same boolean inline.
++- console.warn -> console.error in enforceGuard (Trail has no console.warn precedent anywhere).
++- Fixed a wrong docstring and added a missing explanatory comment (why createTask never calls checkNoCycle).
++- Documented that completeTask's two guards are sequential, not simultaneous: only the first violation surfaces per call.
+ 
+-Verified: check:tsc clean, check:biome-check clean, full packages/trail/ suite passes (420 tests, 94 new), knip shows no new orphans, and an end-to-end smoke test through the real CLI (bun run packages/trail/src/index.ts, not just the library layer) confirmed all 4 checks block by default and warn-and-proceed with --force.
++Also surfaced and caught, as a side effect of double-checking a reviewer's numbers rather than trusting them: a real lizard bug where brace-depth tracking desyncs near template literals / multi-line inline object-type annotations, silently swallowing sibling functions into a preceding function's reported CC. Not a Trail issue, but worth remembering for future lizard-based audits in this repo.
+ 
+-Known gaps, left out of scope deliberately: the 4 orphaned query.ts relation-getters (getDependencies/getDependents/getBlockers/getBlocked) were not reused (per the converged design) and were not deleted either -- left as a separate small cleanup per the plan. The --interactive edit path in task-update.ts (writes via writeTaskFileAuditably directly) bypasses all 4 guards, same as it already bypasses other updateTaskFields validation -- not addressed here, consistent with direct-file-edit already being a lower-guarantee path elsewhere in Trail.
++Verified final state: check:tsc clean, check:biome-check clean, full packages/trail/ suite passes (421 tests), end-to-end CLI smoke test still holds.
+ 
++Known gaps, unchanged from before, still deliberately out of scope: the 4 orphaned query.ts relation-getters (not reused, not deleted), and task update --interactive bypassing all 4 guards (same as it already bypasses other updateTaskFields validation).
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -48,4 +56,8 @@
+ ## 2026-07-11T17:36:49.712Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-07-11T20:55:41.248Z
++
++- **description**: 15 lines → updated (23 lines)

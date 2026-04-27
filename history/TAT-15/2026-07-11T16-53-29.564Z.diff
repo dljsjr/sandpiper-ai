@@ -1,0 +1,34 @@
+===================================================================
+--- a/TAT-15.md
++++ b/TAT-15.md
+@@ -1,7 +1,8 @@
+ ---
+ title: "Implement Chorus v0 ephemeral room broker MVP"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+@@ -9,9 +10,9 @@
+ depends_on:
+   - TAT-13
+ related:
+   - TAT-10
+-updated_at: 2026-05-24T15:41:31.523Z
++updated_at: 2026-07-11T16:53:29.564Z
+ ---
+ 
+ # Implement Chorus v0 ephemeral room broker MVP
+ 
+@@ -43,4 +44,9 @@
+ 
+ ## 2026-05-24T15:41:31.527Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.564Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,44 @@
+===================================================================
+--- a/AGENT-254.md
++++ b/AGENT-254.md
+@@ -6,9 +6,9 @@
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: "sandpiper-0.84-dev"
+ created_at: 2026-08-07T15:03:57.415Z
+-updated_at: 2026-08-07T15:27:20.533Z
++updated_at: 2026-08-07T22:10:06.335Z
+ ---
+ 
+ # skill tool schema rejected by strict-schema provider family (possible AGENT-240 interaction)
+ 
+@@ -45,8 +45,20 @@
+ Re-adoption path: AGENT-255 (depends on AGENT-252's mock provider) -- re-adopt with fully strict-valid schema emission, verified headlessly via a scriptable OpenAI-strict validator in the mock provider. Upstream ask (prefer's capability-only gate contradicts its documented "transparent fallback" promise -- it degrades cleanly on unsupported models but ships broken requests on supported ones) recorded there for Doug's pile.
+ 
+ ---
+ 
++CORRECTION (2026-08-07, Doug): the "upstream ask" framing on strict:'prefer' recorded here and in AGENT-254 is WITHDRAWN - it rested on a misreading by the coordinator, not on pi's actual contract.
++
++Pi documents prefer as: "uses provider-side strict schema enforcement when supported and otherwise falls back to normal tool calling." The fallback condition is PROVIDER CAPABILITY, not schema validity, and the implementation matches that exactly (resolveJsonSchemaStrictSampling: supported -> strict:true, unsupported -> normal, unsupported+require -> throw). prefer is a capability switch, not a safety net. The coordinator read "prefer" as connoting "try, and back off if there is trouble" and built an upstream-bug case on that connotation rather than on the documented behavior.
++
++Correct attribution: AGENT-240 was OUR bug. We opted 9 tools into provider-side strict enforcement without meeting strict mode's schema requirements (additionalProperties:false at every object level, every property in required with optionality expressed as nullable unions). Pi did what it said it would do.
++
++Residual, recorded as a DX observation and explicitly NOT an upstream ask (per the AGENTS.md rule against ticketing upstream wishes): strict mode's schema requirements are not stated where the flag is documented, and violating them surfaces as a provider-side request rejection at turn time rather than a registration-time error. Sharp edge, not a defect. No action.
++
++This does not change this task's work: re-adoption still requires emitting strict-valid schemas and verifying them headlessly, which is exactly what the mock-provider gate is for.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-07T15:11:03.594Z
+ 
+@@ -64,4 +76,8 @@
+ ## 2026-08-07T15:27:20.534Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-08-07T22:10:06.337Z
++
++- **description**: 31 lines → updated (43 lines)

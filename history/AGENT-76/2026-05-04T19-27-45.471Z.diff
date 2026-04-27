@@ -1,0 +1,29 @@
+--- a/AGENT-76.md
++++ b/AGENT-76.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Experiment 5: applies_to operational-mode rewrite"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+@@ -9,7 +10,7 @@
+ related:
+   - AGENT-64
+   - AGENT-73
+-updated_at: 2026-04-26T14:11:38.726Z
++updated_at: 2026-05-04T19:27:45.470Z
+ ---
+ 
+ # Experiment 5: applies_to operational-mode rewrite
+@@ -32,3 +33,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-04T19:27:45.471Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: WONTFIX
++

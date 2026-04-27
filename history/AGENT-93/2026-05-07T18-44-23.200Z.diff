@@ -1,0 +1,27 @@
+--- a/AGENT-93.md
++++ b/AGENT-93.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Retire legacy Pi-oriented root assembly after new distributions work"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.372Z
+-updated_at: 2026-05-06T06:19:50.947Z
++updated_at: 2026-05-07T18:44:23.200Z
+ depends_on:
+   - AGENT-90
+   - AGENT-91
+@@ -40,3 +41,8 @@
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ 
++## 2026-05-07T18:44:23.200Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

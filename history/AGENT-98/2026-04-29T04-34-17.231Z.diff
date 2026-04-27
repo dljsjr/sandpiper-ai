@@ -1,0 +1,27 @@
+--- a/AGENT-98.md
++++ b/AGENT-98.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Document standalone CLI spike findings"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:43:23.645Z
+-updated_at: 2026-04-27T18:53:36.265Z
++updated_at: 2026-04-29T04:34:17.230Z
+ ---
+ 
+ # Document standalone CLI spike findings
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-29T04:34:17.231Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

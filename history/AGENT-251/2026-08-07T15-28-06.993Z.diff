@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-251.md
++++ b/AGENT-251.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Harness foundation: isolated-env spawn + print-mode and RPC drivers"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.381Z
+-updated_at: 2026-08-07T14:57:56.381Z
++updated_at: 2026-08-07T15:28:06.992Z
+ depends_on:
+   - AGENT-250
+ ---
+ 
+ # Harness foundation: isolated-env spawn + print-mode and RPC drivers
+ 
+ Build the shared integration harness per the approved AGENT-250 design. Requirements fixed regardless of design details: (1) isolation-by-construction - every spawn goes through one helper that defaults SANDPIPER_CODING_AGENT_DIR to a per-test temp dir, neutralizes GIT_CONFIG_GLOBAL/GIT_CONFIG_SYSTEM, sets JJ_CONFIG to the trail fixture when VCS could spawn, blackholes the provider base URL unless a mock provider is configured, and tolerates the op-shim PATH prefix; (2) two entry modes - sandpiper binary and bare pi with restricted extension loading; (3) print-mode driver handling the AGENT-248 landmines (stdin from /dev/null, placeholder API key, no reliance on ctx.shutdown-dependent behavior); (4) RPC driver that is delta-native for message_update (0.84.0 breaking change; message_end authoritative) and exposes tool-call/tool-result events for assertions; (5) placement compatible with the root test:vitest gate (nested vitest configs are not discovered from root - proven earlier this session). Unit tests for the harness helpers themselves; a smoke integration test proving both drivers against a trivial scripted turn.
++
++---
++
++# Activity Log
++
++## 2026-08-07T15:28:06.993Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

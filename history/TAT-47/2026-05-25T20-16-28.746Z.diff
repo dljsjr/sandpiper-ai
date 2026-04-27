@@ -1,0 +1,27 @@
+--- a/TAT-47.md
++++ b/TAT-47.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Trigger synthetic receive turn with a direct batch message"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -8,7 +8,7 @@
+ created_at: 2026-05-25T19:12:00.367Z
+ depends_on:
+   - TAT-46
+-updated_at: 2026-05-25T20:16:28.628Z
++updated_at: 2026-05-25T20:16:28.746Z
+ ---
+ 
+ # Trigger synthetic receive turn with a direct batch message
+@@ -40,3 +40,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T20:16:28.746Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

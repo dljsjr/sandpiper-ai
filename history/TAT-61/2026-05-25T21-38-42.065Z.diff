@@ -1,0 +1,31 @@
+--- a/TAT-61.md
++++ b/TAT-61.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Restore background styling for tattler_receive messages"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-25T21:38:27.653Z
+-updated_at: 2026-05-25T21:38:27.653Z
++updated_at: 2026-05-25T21:38:42.064Z
+ related:
+   - TAT-36
+   - TAT-38
+@@ -16,3 +17,12 @@
+ 
+ Live queue-recovery smoke showed the tattler_receive tool messages/action row missing the expected background color. This appears to be UI renderer/styling polish, not a queue-recovery correctness blocker: cue, cooperative receive, synthetic batch delivery, broker route metadata, and second-burst cue reset all worked. Keep quiet/non-noisy result semantics, but restore a styled visible shell/background for the receive action so the UI state is legible.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T21:38:42.065Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX
++

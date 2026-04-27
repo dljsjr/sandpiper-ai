@@ -1,0 +1,25 @@
+--- a/TAT-48.md
++++ b/TAT-48.md
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-46
+   - TAT-47
+-updated_at: 2026-05-25T19:17:28.425Z
++updated_at: 2026-05-25T20:17:56.056Z
+ ---
+ 
+ # Test tattler_receive termination and fallback paths
+ 
+-Cover terminate=true behavior, sequential/tool-called-alone guidance, deferred agent_end synthetic turn, ignored nudge behavior, and user abort plus next prompt fallback. Verify pending messages are not cleared unless a durable batch is injected.
++Implemented in jj change plnvlpqy / f6b5724e. Expands tattler_receive focused tests to cover fallback paths: no pending messages results in no synthetic send, and sendMessage handoff failure releases the reserved batch back to pending for retry. Receive test suite now covers termination, idle-deferred direct batch send, no-empty-send, and rollback-on-handoff-failure.
+ 
+ ---
+ 
+@@ -28,3 +28,7 @@
+ 
+ - **depends_on**: (none) → TAT-46, TAT-47
+ 
++## 2026-05-25T20:17:56.057Z
++
++- **description**: updated
++

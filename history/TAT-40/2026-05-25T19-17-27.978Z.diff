@@ -1,0 +1,22 @@
+--- a/TAT-40.md
++++ b/TAT-40.md
+@@ -6,7 +6,10 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.658Z
+-updated_at: 2026-05-25T19:12:56.401Z
++depends_on:
++  - TAT-45
++  - TAT-58
++updated_at: 2026-05-25T19:17:27.978Z
+ ---
+ 
+ # Implement Tattler pending inbox state and dedupe
+@@ -21,3 +24,7 @@
+ 
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-25T19:17:27.978Z
++
++- **depends_on**: (none) → TAT-45, TAT-58
++

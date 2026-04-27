@@ -1,0 +1,22 @@
+--- a/TAT-52.md
++++ b/TAT-52.md
+@@ -6,7 +6,10 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.679Z
+-updated_at: 2026-05-25T19:12:56.957Z
++depends_on:
++  - TAT-50
++  - TAT-51
++updated_at: 2026-05-25T19:17:28.661Z
+ ---
+ 
+ # Render and test Chorus audience metadata
+@@ -21,3 +24,7 @@
+ 
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-25T19:17:28.661Z
++
++- **depends_on**: (none) → TAT-50, TAT-51
++

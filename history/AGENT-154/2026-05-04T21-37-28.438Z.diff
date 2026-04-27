@@ -1,0 +1,31 @@
+--- a/AGENT-154.md
++++ b/AGENT-154.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Document ecosystem install certification paths"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: P2
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-04T21:37:28.391Z
+ updated_at: 2026-05-04T21:37:28.391Z
+-updated_at: 2026-05-04T21:37:28.391Z
++updated_at: 2026-05-04T21:37:28.437Z
+ ---
+ 
+ # Document ecosystem install certification paths
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-04T21:37:28.438Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

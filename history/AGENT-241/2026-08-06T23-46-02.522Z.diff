@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-241.md
++++ b/AGENT-241.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Honor outputPad in chorus and tattler custom message renderers"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-06T20:42:18.399Z
+-updated_at: 2026-08-06T23:46:02.456Z
++updated_at: 2026-08-06T23:46:02.521Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -21,4 +22,9 @@
+ 
+ ## 2026-08-06T23:46:02.457Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-08-06T23:46:02.522Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,27 +1,17 @@
 ---
-title: "Design board data model with swimlanes"
+title: "Design reactive task board data model with swimlanes and event stream"
 status: NOT STARTED
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-23T03:18:38.864Z
-updated_at: 2026-04-01T16:30:37.092Z
+updated_at: 2026-05-13T14:08:49.167Z
 ---
 
-# Design board data model with swimlanes
+# Design reactive task board data model with swimlanes and event stream
 
-Design a data model for a task board with swimlanes, supporting both TUI and web rendering.
-
-The board model should support:
-- Configurable swimlanes (by status, by assignee, by priority, by project, or custom)
-- Card representation of tasks with key metadata visible
-- Drag-and-drop semantics (what fields change when moving between lanes)
-- Filtering and grouping within the board view
-- Subtask expansion/collapse
-- Relationship visualization (dependency arrows, blocked indicators)
-
-Output: a data model specification that can be consumed by both the Pi TUI integration (TCL-58) and the web app (TCL-59).
+Design the canonical board model for task-board views: swimlanes, grouping/filtering, ordering, task cards, status transitions, and event payloads. This should support the current Glimpse prototype as prior art, but target a built-in CLI/server implementation with reactive updates over SSE or WebSocket and hooks for agent notification/proactive collaboration.
 
 ---
 
@@ -34,3 +24,8 @@ Output: a data model specification that can be consumed by both the Pi TUI integ
 ## 2026-04-01T16:30:37.092Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-05-13T14:08:49.168Z
+
+- **title**: Design board data model with swimlanes → Design reactive task board data model with swimlanes and event stream
+- **description**: 11 lines → updated (1 line)

@@ -1,0 +1,25 @@
+--- a/TAT-26.md
++++ b/TAT-26.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Make send_chorus_reply tool results silent"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T15:40:46.827Z
+-updated_at: 2026-05-24T17:24:51.322Z
++updated_at: 2026-05-24T17:36:11.109Z
+ ---
+ 
+ # Make send_chorus_reply tool results silent
+@@ -29,3 +29,7 @@
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ 
++## 2026-05-24T17:36:11.109Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

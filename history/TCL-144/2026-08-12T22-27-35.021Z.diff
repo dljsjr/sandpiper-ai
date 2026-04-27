@@ -1,0 +1,50 @@
+===================================================================
+--- a/TCL-144.md
++++ b/TCL-144.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: "sandpiper-dev"
+ reporter: USER
+ created_at: 2026-08-07T17:44:50.553Z
+-updated_at: 2026-08-08T01:35:45.651Z
++updated_at: 2026-08-12T22:27:35.018Z
+ ---
+ 
+ # Rewrite Trail VCS tests to not require real git/jj (command-runner seam + thin integration set)
+ 
+@@ -20,10 +20,35 @@
+ Not part of the AGENT-249 integration-harness lane (different resources, different problem): this is about the UNIT suite not requiring machine VCS, while the harness lane is about spawned-pi tests not requiring providers/credentials. Same principle, two applications.
+ 
+ ---
+ 
++
++---
++
++## Acceptance evidence, 2026-08-12 (Roux) — this looks DONE
++
++Re-reviewed against `~/git/trail` tip. All three parts of the specified shape are present:
++
++**(1) Command-runner seam, with the unit tests on it.** `storage-backend.ts` owns `VcsRunner`, a module-level `vcsRunner`, and `setVcsRunner`/`resetVcsRunner` test-only seams. Four unit files drive it: `storage-backend.test.ts` (31 tests), `storage-cmd.test.ts`, `auto-commit.test.ts`, `migrate.test.ts`. They assert on the exact command sequences Trail issues and its handling of scripted outputs and failures.
++
++**(2) Thin, explicitly marked integration set.** Real git/jj now lives in exactly three files, all named `*.integration.test.ts`: `storage-backend.integration.test.ts`, `auto-commit.integration.test.ts`, `storage-init-after-initialize.integration.test.ts`. Nothing outside them spawns git or jj — verified by searching every test file for `execFileSync`/`execSync`/`spawnSync`/`Bun.spawn`. The three non-integration files that matched spawn `bun <CLI_PATH>` (end-to-end CLI invocation), not a VCS.
++
++**(3) Neutralization retained, and improved.** The `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM=/dev/null` and `JJ_CONFIG` fixture setup moved out of a root-script env prefix into `vitest.setup.ts`, where it is package-local and carries a comment explaining the 1Password signing-prompt incident that motivated it. That is the ticket's requirement met in a better form than specified.
++
++Suite is green: 487 tests, 32 files, under `bun run test`.
++
++Moving to NEEDS REVIEW rather than closing it — the work landed across the extraction and nobody ever walked it back against this ticket's acceptance criteria. If the reviewer agrees the three parts above satisfy the shape, close it DONE.
++
++Caveat on the assessment: I did not evaluate whether the seam's unit tests fell into the tautology trap this ticket explicitly warns about (asserting on a mock of git's behavior rather than on Trail's logic). Spot-reading `storage-backend.test.ts` suggests not — the assertions are on issued argv and on Trail's branching over scripted results — but a reviewer should confirm that rather than take my word.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-08T01:35:45.651Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-dev
++
++## 2026-08-12T22:27:35.021Z
++
++- **description**: 7 lines → updated (28 lines)

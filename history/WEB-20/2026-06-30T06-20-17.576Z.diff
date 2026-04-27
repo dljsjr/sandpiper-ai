@@ -1,0 +1,30 @@
+===================================================================
+--- a/WEB-20.md
++++ b/WEB-20.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Move web_fetch llms.txt metadata into tool result content; suppress when missing"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-06-30T03:57:44.371Z
+-updated_at: 2026-06-30T05:48:36.690Z
++updated_at: 2026-06-30T06:20:17.571Z
+ ---
+ 
+ # Move web_fetch llms.txt metadata into tool result content; suppress when missing
+ 
+@@ -45,4 +46,9 @@
+ 
+ ## 2026-06-30T05:48:36.691Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-06-30T06:20:17.576Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

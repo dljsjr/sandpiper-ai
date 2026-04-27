@@ -1,0 +1,27 @@
+--- a/TAT-42.md
++++ b/TAT-42.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Define Tattler inbox batch content and details schema"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: "Huginn"
+@@ -9,7 +9,7 @@
+ depends_on:
+   - TAT-45
+   - TAT-58
+-updated_at: 2026-05-25T19:38:32.773Z
++updated_at: 2026-05-25T19:38:32.994Z
+ ---
+ 
+ # Define Tattler inbox batch content and details schema
+@@ -32,3 +32,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T19:38:32.995Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

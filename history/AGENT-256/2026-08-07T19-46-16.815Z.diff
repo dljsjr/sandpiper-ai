@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-256.md
++++ b/AGENT-256.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Chorus room widget starves the transcript in fullscreen TUI mode"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: "sandpiper-0.84-dev"
+ reporter: USER
+ created_at: 2026-08-07T19:28:18.767Z
+-updated_at: 2026-08-07T19:46:16.757Z
++updated_at: 2026-08-07T19:46:16.815Z
+ ---
+ 
+ # Chorus room widget starves the transcript in fullscreen TUI mode
+ 
+@@ -65,4 +65,8 @@
+ ## 2026-08-07T19:46:16.757Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ - **description**: 17 lines → updated (21 lines)
++
++## 2026-08-07T19:46:16.815Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

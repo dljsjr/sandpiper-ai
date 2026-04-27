@@ -1,0 +1,38 @@
+--- a/TAT-66.md
++++ b/TAT-66.md
+@@ -1,21 +1,11 @@
+ ---
+-title: "Design multi-agent delegation and decision ownership protocol"
++title: "Author multi-agent room coordination & decision-ownership playbook"
+ status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T21:52:33.225Z
+-updated_at: 2026-05-27T03:13:26.808Z
++updated_at: 2026-05-27T03:20:28.780Z
+ related:
+   - TAT-33
+   - TAT-38
+   - TAT-64
+ ---
+ 
+-# Design multi-agent delegation and decision ownership protocol
+-
+-Drafted first usable artifact at ~/.sandpiper/agent/playbooks/workflow/multi-agent-rooms.md and added it to workflow/index.md. Core design: start with the work graph, not fixed roles; decompose objective into lanes; prefer jj workspace/git worktree isolation for parallel coding lanes; use artifact isolation for non-code lanes; assign Owner/Lens/Scribe locally per lane/phase; require heartbeats only on progress/blocker/changed contract/ready-for-integration; integration owner/scribe maintains lane→artifact→checkpoint map and posts decisions/open questions/conflicts/next mutation owner/deferred work/verification. Review adjustment incorporated: each lane contract must include explicit integration hazards, even if 'none known', because touchpoints name where work happens while hazards name what can go stale or bite during merge. Chat/discovery phase rules added after Doug's question: batch read → classify → claim → act; chat is for information not mutation; claim visible before acting on requests; let scribe crystallize decisions; no parallel synthesis; temporary thread owner during discussion. This task should review/dogfood that playbook before final completion. **Dogfooded live 2026-05-26** in room "the gang writes some code": the pre-assignment and one-owner/no-parallel-synthesis sections validated in real time during the durable-rooms sizing pass. Muninn's three lived frictions (turn fragmentation; re-delivery after abort, filed as TAT-68; tattler_receive bounce judgment) captured as harness-level and routed to TAT-64. Review/dogfood criterion met; full write-up in the playbook's "Dogfooding review" section. Ready for acceptance.
++# Author multi-agent room coordination & decision-ownership playbook
++
++Delivered: the multi-agent room coordination playbook at ~/.sandpiper/agent/playbooks/workflow/multi-agent-rooms.md (wired into workflow/index.md). It defines how multiple agents coordinate in a Chorus room: start from the work graph not roles; map lanes/shared-state/isolation/artifacts before assigning agents; prefer jj-workspace isolation for coding lanes and artifact isolation for non-code; assign Owner/Lens/Scribe per phase; heartbeats over courtesy ACKs; chat-phase discipline (batch-read, classify, claim, act); and honest harness-limit mitigations (pre-assignment over reactive claiming, shared-state-as-lock, human as serialization point). Dogfooded live 2026-05-26 in room 'the gang writes some code' during the durable-rooms sizing pass: the pre-assignment and one-owner/no-parallel-synthesis sections validated in real time. SCOPE SPLIT: this ticket originally also implied a code-level protocol in the sandpiper-chorus integration; that implementation is split to a new follow-on ticket and deferred until the durable-rooms v1 rebuild lands, so it targets the new room substrate. This ticket covers the delivered playbook/guidelines only.
+ 
+ ---
+ 
+@@ -46,3 +46,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-27T03:20:28.782Z
++
++- **title**: Design multi-agent delegation and decision ownership protocol → Author multi-agent room coordination & decision-ownership playbook
++- **description**: updated
++

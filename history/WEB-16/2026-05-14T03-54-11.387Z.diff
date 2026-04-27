@@ -1,0 +1,29 @@
+--- a/WEB-16.md
++++ b/WEB-16.md
+@@ -1,12 +1,12 @@
+ ---
+ title: "Implement Markdown section targeted extraction"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T21:57:46.919Z
+ updated_at: 2026-05-13T21:58:03.576Z
+-updated_at: 2026-05-13T21:58:03.576Z
++updated_at: 2026-05-14T03:54:11.386Z
+ ---
+ 
+ # Implement Markdown section targeted extraction
+@@ -28,3 +28,8 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-14T03:54:11.387Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

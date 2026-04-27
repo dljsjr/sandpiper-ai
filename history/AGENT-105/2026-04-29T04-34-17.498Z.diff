@@ -1,0 +1,27 @@
+--- a/AGENT-105.md
++++ b/AGENT-105.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Make postinstall Pi package installation opt-in"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-28T02:46:35.410Z
+-updated_at: 2026-04-28T02:48:30.888Z
++updated_at: 2026-04-29T04:34:17.498Z
+ ---
+ 
+ # Make postinstall Pi package installation opt-in
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-04-29T04:34:17.498Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

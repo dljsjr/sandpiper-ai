@@ -1,0 +1,27 @@
+--- a/TCL-114.md
++++ b/TCL-114.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "jj auto_commit leaves task branch bookmark behind"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-12T14:34:53.582Z
+-updated_at: 2026-05-13T05:20:31.362Z
++updated_at: 2026-05-13T05:20:36.775Z
+ ---
+ 
+ # jj auto_commit leaves task branch bookmark behind
+@@ -74,3 +75,8 @@
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
+ 
++## 2026-05-13T05:20:36.776Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: WONTFIX
++

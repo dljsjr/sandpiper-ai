@@ -1,0 +1,28 @@
+--- a/TAT-66.md
++++ b/TAT-66.md
+@@ -6,7 +6,7 @@
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-05-25T21:52:33.225Z
+-updated_at: 2026-05-26T03:10:10.375Z
++updated_at: 2026-05-26T03:10:53.373Z
+ related:
+   - TAT-33
+   - TAT-38
+@@ -15,7 +15,7 @@
+ 
+ # Design multi-agent delegation and decision ownership protocol
+ 
+-Drafted first usable artifact at ~/.sandpiper/agent/playbooks/workflow/multi-agent-rooms.md and added it to workflow/index.md. Core design: start with the work graph, not fixed roles; decompose objective into lanes; prefer jj workspace/git worktree isolation for parallel coding lanes; use artifact isolation for non-code lanes; assign Owner/Lens/Scribe locally per lane/phase; require heartbeats only on progress/blocker/changed contract/ready-for-integration; integration owner/scribe maintains lane→artifact→checkpoint map and posts decisions/open questions/conflicts/next mutation owner/deferred work/verification. This task should review/dogfood that playbook before final completion.
++Drafted first usable artifact at ~/.sandpiper/agent/playbooks/workflow/multi-agent-rooms.md and added it to workflow/index.md. Core design: start with the work graph, not fixed roles; decompose objective into lanes; prefer jj workspace/git worktree isolation for parallel coding lanes; use artifact isolation for non-code lanes; assign Owner/Lens/Scribe locally per lane/phase; require heartbeats only on progress/blocker/changed contract/ready-for-integration; integration owner/scribe maintains lane→artifact→checkpoint map and posts decisions/open questions/conflicts/next mutation owner/deferred work/verification. Review adjustment incorporated: each lane contract must include explicit integration hazards, even if 'none known', because touchpoints name where work happens while hazards name what can go stale or bite during merge. This task should review/dogfood that playbook before final completion.
+ 
+ ---
+ 
+@@ -34,3 +34,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-26T03:10:53.379Z
++
++- **description**: updated
++

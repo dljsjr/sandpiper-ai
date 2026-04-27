@@ -1,0 +1,33 @@
+---
+title: "Add filesystem-source loading to skill tool"
+status: COMPLETE
+resolution: DONE
+kind: TASK
+priority: HIGH
+assignee: "Huginn"
+reporter: USER
+created_at: 2026-05-26T15:59:02.399Z
+updated_at: 2026-07-11T16:53:29.527Z
+---
+
+# Add filesystem-source loading to skill tool
+
+Add an explicit filesystem source mode to the Sandpiper skill-loading tool so curated low-frequency skills can be loaded from a user-provided SKILL.md path without being listed in the ambient skill catalogue.\n\nAcceptance:\n- Existing catalogue loading behavior remains backward compatible.\n- The skill tool accepts source=catalog by name and source=filesystem by explicit path.\n- Filesystem source accepts either a SKILL.md file or a directory containing SKILL.md.\n- Filesystem source parses skill frontmatter/body using the same semantics as startup/catalog loading.\n- Disabled skills (disable-model-invocation: true) are rejected for both catalogue and filesystem source.\n- Filesystem-loaded skills are not registered, cached into the available skills list, or exposed as slash commands.\n- Tests cover catalogue compatibility, filesystem loading, path shape variants, disabled rejection, and invalid input errors.
+
+---
+
+# Activity Log
+
+## 2026-05-26T15:59:09.475Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → Huginn
+
+## 2026-05-26T16:05:42.297Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-07-11T16:53:29.527Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

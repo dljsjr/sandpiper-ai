@@ -1,0 +1,37 @@
+--- a/TAT-36.md
++++ b/TAT-36.md
+@@ -10,13 +10,20 @@
+   - TAT-37
+   - TAT-38
+   - TAT-39
+-updated_at: 2026-05-25T19:11:48.133Z
++updated_at: 2026-05-25T19:12:47.069Z
+ ---
+ 
+ # Batch Chorus and Tattler interim messages outside Pi steering queue
+ 
+-Updated design: Tattler, not Chorus, should own a durable pending inbox for inbound messages that arrive while an agent is busy. Inbound while busy goes to Tattler-owned pending inbox keyed by message/room/post IDs, not Pi steer/followUp. before_agent_start becomes the canonical drain point for any next turn (user prompt, model cooperative receive, normal continuation): if pending exists, inject one persistent custom batch message into that new turn, then clear/mark delivered only after injection succeeds. This also handles user abort + resume: abort may kill the provider stream, but not Tattler inbox; the next prompt drains missed messages. Batch custom message should use content for model-visible concatenated messages and details.kind=batch with structured messages array for custom rendering as individual blocks.
+-
++Problem: inbound Tattler/Chorus messages received while an agent is busy currently risk partial context under Pi's one-at-a-time steering mode, and queued custom messages can be dropped if abort clears Pi's steer/followUp queues before they emit message_start/message_end.
++
++Design direction: make Tattler, not Chorus, own a pending inbox for busy-time inbound messages. Real inbound payloads stay out of Pi's clearable queues while busy. The next agent start for any reason drains the pending inbox through before_agent_start as one persistent custom-message batch.
++
++Acceptance criteria:
++- Busy-time inbound messages are stored/deduped outside Pi steer/followUp queues.
++- Any next turn drains pending messages into one durable custom_message batch with model-visible content and structured renderer details.
++- User abort + next prompt recovers queued messages without relying on the model calling a tool.
++- One-at-a-time queue mode no longer serializes room bursts into partial context.
++- Pending messages are cleared only after successful injection/persistence.
++- Tests cover duplicate delivery, abort recovery, and batch rendering.
++
+ ---
+ 
+ # Activity Log
+@@ -39,3 +49,7 @@
+ 
+ - **assignee**: AGENT → Huginn
+ 
++## 2026-05-25T19:12:47.070Z
++
++- **description**: 1 line → updated (11 lines)
++

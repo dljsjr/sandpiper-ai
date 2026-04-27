@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-252.md
++++ b/AGENT-252.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Deterministic turns: scripted mock provider"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.447Z
+-updated_at: 2026-08-07T14:57:56.447Z
++updated_at: 2026-08-07T16:05:53.315Z
+ depends_on:
+   - AGENT-250
+ ---
+ 
+ # Deterministic turns: scripted mock provider
+ 
+ Implement the AGENT-250-recommended mechanism for deterministic, offline model turns (leading candidate: a scripted provider registered via Pi full provider-extension support, 0.81.0). Must support: scripted multi-turn conversations, scripted tool calls targeting the extension under test, deterministic stop reasons, zero network egress (verifiable against the blackhole/tripwire stack). If the inherited faux-provider surface turns out to be usable directly, prefer it over building our own - evidence from AGENT-250 decides. This is the piece that converts the integration lane from error-path-only assertions into real behavioral coverage.
++
++---
++
++# Activity Log
++
++## 2026-08-07T16:05:53.316Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

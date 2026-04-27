@@ -1,0 +1,27 @@
+--- a/AGENT-188.md
++++ b/AGENT-188.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Overhaul Sandpiper documentation architecture and local agent playbooks"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-07T21:49:05.725Z
+-updated_at: 2026-05-07T22:19:48.314Z
++updated_at: 2026-05-12T20:05:10.130Z
+ ---
+ 
+ # Overhaul Sandpiper documentation architecture and local agent playbooks
+@@ -25,3 +26,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-12T20:05:10.131Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

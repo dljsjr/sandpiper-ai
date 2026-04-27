@@ -1,0 +1,41 @@
+--- a/WEB-11.md
++++ b/WEB-11.md
+@@ -6,7 +6,7 @@
+ assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.175Z
+-updated_at: 2026-06-07T22:32:05.810Z
++updated_at: 2026-06-08T01:31:03.827Z
+ ---
+ 
+ # Spike: single-query web search tool (fetch top N results from a search API)
+@@ -16,8 +16,8 @@
+ **Architecture:** New Pi extension at `extensions/web-search/`, mirroring `web-fetch`'s structure. Registers a `web_search` tool via `pi.registerTool`.
+ 
+ **Adapter pattern:** `SearchAdapter` interface (mirroring `FetchAdapter`) with pluggable backends:
+-- **Brave Search API** — primary adapter. Independent index, 2k queries/month free, clean JSON API. Requires API key (`BRAVE_API_KEY` env var or settings.json).
+-- **DDG HTML scraping** — fallback adapter. Zero-config but unreliable CAPTCHAs on first request from server-side code. Not viable as primary path.
++- **DDG HTML scraping** — MVP adapter. Zero-config but may hit CAPTCHAs on repeated queries. Includes CAPTCHA detection, rate limiting (1.5s), realistic browser headers.
++- **Brave Search API** — deferred. Independent index, 2k queries/month free, clean JSON API. Requires API key (`BRAVE_API_KEY` env var or settings.json). ~30 lines to wire when key is available.
+ - **SearXNG** — longer-term, configurable via DI.
+ 
+ **Result shape:** `{title: string, url: string, snippet: string}[]` — structured results, same contract regardless of backend.
+@@ -28,6 +28,10 @@
+ 
+ **Scope boundary:** WEB-10 (JS/SPA rendering) is phase 2 — a separate `FetchAdapter` swap in web-fetch, not part of this tool.
+ 
++## Status (2026-06-07)
++
++DDG MVP landed. Integration verified: tsc clean, 11/11 tests pass. Brave adapter deferred until API key available.
++
+ ---
+ 
+ # Activity Log
+@@ -49,3 +53,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
+ 
++## 2026-06-08T01:31:03.833Z
++
++- **description**: 16 lines → updated (20 lines)
++

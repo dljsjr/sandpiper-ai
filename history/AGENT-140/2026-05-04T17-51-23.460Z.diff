@@ -1,0 +1,27 @@
+--- a/AGENT-140.md
++++ b/AGENT-140.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Build standalone executable and bundle native/data assets"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-02T16:24:51.774Z
+-updated_at: 2026-05-02T16:43:12.201Z
++updated_at: 2026-05-04T17:51:23.459Z
+ ---
+ 
+ # Build standalone executable and bundle native/data assets
+@@ -29,3 +30,8 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-04T17:51:23.460Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

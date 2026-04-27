@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-19.md
++++ b/TAT-19.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Route agent replies back to the Chorus broker"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.851Z
+-updated_at: 2026-05-23T17:43:50.233Z
++updated_at: 2026-07-11T16:53:29.558Z
+ ---
+ 
+ # Route agent replies back to the Chorus broker
+ 
+@@ -20,4 +21,9 @@
+ ## 2026-05-23T17:43:50.234Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-07-11T16:53:29.558Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

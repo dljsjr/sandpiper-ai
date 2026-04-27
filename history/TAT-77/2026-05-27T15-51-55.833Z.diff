@@ -1,0 +1,29 @@
+--- a/TAT-77.md
++++ b/TAT-77.md
+@@ -6,9 +6,22 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-27T15:51:55.758Z
+-updated_at: 2026-05-27T15:51:55.758Z
++blocked_by:
++  - TAT-71
++related:
++  - TAT-70
++updated_at: 2026-05-27T15:51:55.832Z
+ ---
+ 
+ # Track 2: Standalone read-only TUI for durable message log
+ 
+-
++Standalone TUI (not coupled to Pi harness) that renders the SQLite durable message log. Read-only MVP — send happens via CLI or other client. Can begin sketching against a mock once C1 (TAT-71) schema is frozen. TUI hydration contract (how it reconstructs room state from SQLite on startup) is explicitly in-scope. Read-only MVP scope: renders room transcript, shows participant list, handles cursor-based scroll/navigation. Full send-capable TUI is post-MVP. Decoupled from session-broker model entirely — reads from SQLite, not from live broker events. Parallel-ready with Track 1 once C1 schema is stable.
++
++---
++
++# Activity Log
++
++## 2026-05-27T15:51:55.833Z
++
++- **description**: added (1 line)
++- **blocked_by**: (none) → TAT-71
++- **related**: (none) → TAT-70
++

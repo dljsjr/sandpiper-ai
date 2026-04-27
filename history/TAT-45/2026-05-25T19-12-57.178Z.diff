@@ -1,0 +1,24 @@
+--- a/TAT-45.md
++++ b/TAT-45.md
+@@ -3,10 +3,10 @@
+ status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: "Huginn"
++assignee: "Muninn + Sandpiper Dev"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.996Z
+ updated_at: 2026-05-25T19:12:35.070Z
+-updated_at: 2026-05-25T19:12:35.070Z
++updated_at: 2026-05-25T19:12:57.177Z
+ ---
+ 
+ # Map queue recovery implementation seams
+@@ -27,3 +27,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-25T19:12:57.178Z
++
++- **assignee**: Huginn → Muninn + Sandpiper Dev
++

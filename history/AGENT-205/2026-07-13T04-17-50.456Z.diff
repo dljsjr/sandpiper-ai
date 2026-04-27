@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-205.md
++++ b/AGENT-205.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "skill-review source skill depends on generated PDF that is absent from source tree"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-20T06:27:08.093Z
+-updated_at: 2026-06-03T04:44:12.426Z
++updated_at: 2026-07-13T04:17:50.454Z
+ ---
+ 
+ # skill-review source skill depends on generated PDF that is absent from source tree
+ 
+@@ -25,4 +26,9 @@
+ ## 2026-06-03T04:44:12.426Z
+ 
+ - **status**: IN PROGRESS → NOT STARTED
+ - **assignee**: Huginn → UNASSIGNED
++
++## 2026-07-13T04:17:50.456Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX

@@ -1,0 +1,25 @@
+--- a/AGENT-209.md
++++ b/AGENT-209.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add filesystem-source loading to skill tool"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-26T15:59:02.399Z
+-updated_at: 2026-05-26T15:59:09.475Z
++updated_at: 2026-05-26T16:05:42.293Z
+ ---
+ 
+ # Add filesystem-source loading to skill tool
+@@ -22,3 +22,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Huginn
+ 
++## 2026-05-26T16:05:42.297Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

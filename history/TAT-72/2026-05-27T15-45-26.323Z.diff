@@ -1,0 +1,23 @@
+--- a/TAT-72.md
++++ b/TAT-72.md
+@@ -6,9 +6,16 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-27T15:45:26.253Z
+-updated_at: 2026-05-27T15:45:26.253Z
++updated_at: 2026-05-27T15:45:26.323Z
+ ---
+ 
+ # C2: Audience snapshot at append
+ 
+-
++Layer participant/audience snapshot metadata onto records at append time. Reuse TAT-39/TAT-50 audience-snapshot work — do not rebuild. The real new work is snapshotting room participants at append time (postId already exists in current JSON, so stable post IDs are effectively done). Rename from original 'stable post IDs' reflects that the chunk's scope is audience capture, not ID generation. Depends on C1 (TAT-71) — the append path and schema must exist before you can attach audience snapshots to records flowing through that path. Design work (snapshot envelope shape, TAT-39/50 integration contract) is parallelizable with C1; implementation is sequential.
++
++---
++
++# Activity Log
++
++## 2026-05-27T15:45:26.323Z
++
++- **description**: added (1 line)
++

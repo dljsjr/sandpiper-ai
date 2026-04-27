@@ -1,0 +1,41 @@
+===================================================================
+--- a/AGENT-255.md
++++ b/AGENT-255.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-07T15:15:44.996Z
+-updated_at: 2026-08-07T22:10:05.976Z
++updated_at: 2026-08-07T22:11:44.956Z
+ depends_on:
+   - AGENT-252
+ ---
+ 
+@@ -30,9 +30,26 @@
+ This does not change this task's work: re-adoption still requires emitting strict-valid schemas and verifying them headlessly, which is exactly what the mock-provider gate is for.
+ 
+ ---
+ 
++STRICT-MODE REQUIREMENTS, from pi's constrained-sampling documentation (2026-08-07) - these define the bar re-adoption must clear:
++
++Strict JSON-schema sampling is live across FIVE provider families, not just OpenAI: OpenAI, Anthropic, supported Amazon Bedrock Converse models, Mistral, and Gemini 3 via the Google Generative AI and Vertex adapters. Their requirements are NOT identical, so "strict-valid" is an intersection, not a single target:
++- OpenAI: additionalProperties:false at every object level, every property present in required, optionality expressed as nullable unions rather than omission.
++- Google: VALIDATED function-calling mode (or ANY when explicitly requested), which enforces required parameters. Earlier Gemini versions fall back for prefer and reject require precisely because they do not enforce required params.
++- Bedrock: strict-tool capability is generated from model structured-output metadata, and custom Bedrock model definitions can override compat.supportsStrictMode - meaning strict can activate for a model we have not verified, via config we do not control.
++
++VALIDATION PRECEDENT, same file: pi already does exactly the kind of pre-flight schema validation the strict path lacks - but for the GRAMMAR variant. inferGrammarInputProperty (constrained-sampling.js) requires an object schema with exactly one required string property and throws specific local errors otherwise (wrong type, wrong required count, missing properties entry). That is the model for our own validation: a local check that fails loudly at registration or in CI, before any request is dispatched, rather than surfacing as a provider-side rejection mid-turn. Our mock provider's strict validator should mirror the strictest union above.
++
++ALSO NOTED, not currently applicable: the grammar variant (OpenAI Lark or regex, Lark preferred when both supplied) constrains the CONTENT of a single string property, requires exactly one required string property, and is gated on compat.supportsOpenAIGrammarTools (GPT-5+ on passthrough endpoints only - off for gateways like OpenRouter that normalize tool schemas). None of our 12 tools has a shape or a value domain that would benefit; revisit only if a tool ever takes a grammar-constrained input such as a query language or pattern.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-07T22:10:05.979Z
+ 
+ - **description**: 5 lines → updated (15 lines)
++
++## 2026-08-07T22:11:44.982Z
++
++- **description**: 15 lines → updated (28 lines)

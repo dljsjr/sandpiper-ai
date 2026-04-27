@@ -1,0 +1,27 @@
+--- a/AGENT-143.md
++++ b/AGENT-143.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Create user-local revdiff skill override"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-04T17:55:22.965Z
+-updated_at: 2026-05-04T17:55:27.412Z
++updated_at: 2026-05-04T17:58:07.993Z
+ ---
+ 
+ # Create user-local revdiff skill override
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-04T17:58:07.993Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

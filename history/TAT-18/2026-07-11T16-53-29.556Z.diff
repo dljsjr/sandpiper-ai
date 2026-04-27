@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-18.md
++++ b/TAT-18.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Route room posts through broker fanout"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.789Z
+-updated_at: 2026-05-23T17:43:50.179Z
++updated_at: 2026-07-11T16:53:29.556Z
+ ---
+ 
+ # Route room posts through broker fanout
+ 
+@@ -20,4 +21,9 @@
+ ## 2026-05-23T17:43:50.180Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-07-11T16:53:29.556Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,88 @@
+===================================================================
+--- a/TCL-155.md
++++ b/TCL-155.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: "Roux"
+ created_at: 2026-08-12T22:00:23.405Z
+-updated_at: 2026-08-12T22:00:23.405Z
++updated_at: 2026-08-12T22:05:44.027Z
+ ---
+ 
+ # Bracket in a task title wedges the board, and index update cannot repair it
+ 
+@@ -28,31 +28,62 @@
+ ```
+ 
+ The decoder opens a bracket segment on `[0]` despite it being inside quotes. Recovery required hand-patching the line to a bracket-free title, after which `index update` reconciled cleanly.
+ 
+-## Cause: upstream, and already fixed there
++## Cause: upstream, and fixed in a PATCH release we never took
+ 
+-Not Trail's code. `@toon-format/toon` is pinned at **2.3.0**; latest is **4.1.1**.
++Not Trail's code. `@toon-format/toon` is pinned at **2.3.0**. The fix shipped in **2.3.1** on 2026-07-16 — fifteen days before this wedged a 245-task board — and its release notes name the defect outright:
+ 
+-| Version | `decode` of the quoted-bracket line |
++- `decode: Treat quoted spans as opaque in line classification`
++- `decode: Slice key-value rest at key token end offset`
++- `Harden encode and decode against prototype pollution`
++
++Verified by direct probe of the failing index text:
++
++| Version | decode |
+ |---|---|
+ | 2.3.0 | throws `Unexpected content ... between bracket segment and colon` |
++| 2.3.1 | decodes correctly |
+ | 4.1.1 | decodes correctly |
+ 
+-Note the failure is position-dependent, which is why it went unnoticed: in a **tabular array row** (`[1]{key,title}:`) 2.3.0 handles the same string fine. Only the nested-map key-value form Trail's index actually uses breaks.
++The failure is position-dependent, which is why it went unnoticed: in a **tabular array row** (`[1]{key,title}:`) even 2.3.0 handles the same string fine. Only the nested-map key-value form Trail's index actually uses breaks.
+ 
+-## Encode output is unchanged across the bump
++## Fix: bump to 2.3.1. Do NOT bump to 4.x as part of this.
+ 
+-Encoding a representative index object under 2.3.0 and 4.1.1 produces **byte-identical** output. Despite spanning two majors, this bump does not churn the index format and does not require migrating existing boards. That is the main thing that makes it cheap; re-verify against a real index before landing rather than trusting this note.
++**2.3.0 → 2.3.1 changes nothing but the bug.** Encode output is byte-identical (verified on a multi-task index with uniform and ragged entries plus a deep single-key chain). No index churn, no migration, no breaking changes.
+ 
+-`packages/capability-autotoon` pins 2.3.0 as well and should be checked in the same pass.
++End-to-end verified 2026-08-12 against a copy of Trail tip with 2.3.1 installed: `task create` with the bracket title, then `task list`, then `index update` — all succeed.
+ 
+-## Two fixes, and the second is not optional
++**2.3.0 → 4.1.1 rewrites the index format.** v4 introduced a keyed tabular form for objects of uniform objects, which is exactly what Trail's `tasks` map is:
+ 
+-1. **Bump `@toon-format/toon` to 4.1.1.** Removes the defect. Verify decode against a real 245-task index and run the full suite; two majors deserve more than a green unit run.
+-2. **Make `index update` survivable.** It should tolerate — or skip and report — unparseable index lines rather than dying on them, because it is the repair tool. A tracker whose repair command is disabled by the damage it repairs has no recovery path. This holds independently of the bump: any index written by an older Trail, a different tool, or a hand-edit can still be unparseable, and today that state is terminal.
++```
++# 2.3.x                          # 4.1.1
++tasks:                           tasks[2:]{key,project,title,status,kind,priority}:
++  "TST-1":                         "TST-1": TST-1,TST,one,NOT STARTED,TASK,MEDIUM
++    key: TST-1                     "TST-2": TST-2,TST,two,COMPLETE,BUG,HIGH
++    project: TST
++    ...
++```
+ 
+-Optionally, `task create` could validate or escape titles it writes, but with the parser fixed that is belt-and-braces rather than the fix.
++Ragged entries stay nested, so it is a mixed rewrite rather than a uniform one. Every board's `index.toon` would be rewritten on the first `index update` after the bump. v4.0.0 also removed key folding and path expansion; Trail does not appear to rely on either, but that was not exhaustively checked.
+ 
++That trade may well be worth taking later — the tabular form is markedly smaller, which matters for an index that ships into agent context — but it is a format migration across twelve boards and deserves its own ticket and its own decision. It is not a bug fix.
++
++**Correction to an earlier revision of this ticket:** it claimed 2.3.0 and 4.1.1 encode identically and recommended bumping straight to 4.1.1. That was measured with a single-entry `tasks` map, which does not trigger the keyed tabular form and therefore could not distinguish the two versions. The test was not discriminating; the conclusion drawn from it was wrong.
++
++## Second fix, independent of the bump
++
++`index update` should tolerate — or skip and report — unparseable index lines rather than dying on them, because it is the repair tool. A tracker whose repair command is disabled by the damage it repairs has no recovery path. This holds regardless of the parser fix: an index written by an older Trail, a different tool, or a hand-edit can still be unparseable, and today that state is terminal.
++
++`packages/capability-autotoon` pins 2.3.0 as well and should be checked in the same pass.
++
+ ## Provenance
+ 
+ Originally hit 2026-07-31 in pi-claude-code-cli-provider, where it wedged a 245-task board. Sat in `~/.sandpiper/agent/inbox/` as `tasks-cli-toon-index-chokes-on-brackets-in-quoted-titles.md` until 2026-08-12; re-verified as still live and filed here so it survives the Trail extraction. Inbox item deleted on conversion.
++
++---
++
++# Activity Log
++
++## 2026-08-12T22:05:44.036Z
++
++- **description**: 45 lines → updated (68 lines)

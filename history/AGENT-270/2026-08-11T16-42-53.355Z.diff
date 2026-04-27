@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-270.md
++++ b/AGENT-270.md
+@@ -5,15 +5,16 @@
+ priority: HIGH
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-08-11T16:42:48.062Z
+-updated_at: 2026-08-11T16:42:48.158Z
++updated_at: 2026-08-11T16:42:53.355Z
+ related:
+   - AGENT-269
+ ---
+ 
+ # Keep inline XML tag references editable in prompt editor
+ 
++The prompt markup projector mistakes inline prose references such as `<agency>` in Roux/AGENTS.md for structural sections. Classify only structural element tags as immutable/navigation anchors; keep inline tag references and XML comments editable, including in locked/generated navigation labels where references are not real sections.
+ 
+ ---
+ 
+ # Activity Log
+@@ -21,4 +22,8 @@
+ ## 2026-08-11T16:42:48.159Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
++
++## 2026-08-11T16:42:53.355Z
++
++- **description**: added (1 line)

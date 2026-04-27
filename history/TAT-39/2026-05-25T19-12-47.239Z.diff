@@ -1,0 +1,44 @@
+--- a/TAT-39.md
++++ b/TAT-39.md
+@@ -3,18 +3,23 @@
+ status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: AGENT
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:05:32.074Z
+ related:
+   - TAT-36
+-updated_at: 2026-05-25T19:11:48.021Z
++updated_at: 2026-05-25T19:12:47.238Z
+ ---
+ 
+ # Add Chorus participant audience metadata to room messages
+ 
+-Chorus room messages should include broker-owned participant/audience metadata so recipients know who is in the room and who will see replies. Current visible custom message includes roomId, postId, from, broker route, and message, but not participant names. Active widget knows selected peers locally, but recipient agents do not reliably get that list in model context. Add broker-injected participants:string[] or audience metadata to room posts/deliveries/custom-message details and model-facing content. Broker should populate it from peer set + local author identity; send/reply tools should not require agents to provide it. Renderer can use details participants; model XML can include concise participants block/attribute.
+-
++Add broker-owned participant/audience metadata to Chorus room messages so receiving agents know who can see a reply.
++
++The broker owns this metadata because it owns room membership/fanout. send_chorus_reply and other agent-facing tools should not require agents to populate participant lists.
++
++Acceptance criteria:
++- Canonical broker room posts include a best-effort participant snapshot at fanout time.
++- Model-visible Chorus content includes a concise participant/audience list.
++- Structured details include participants for renderers/batch entries.
++- Batch rendering preserves per-message audience details.
++- Tests cover local, remote, and backwards-compatible messages without participant metadata.
++- Documentation/prompt wording makes clear this is a snapshot, not a stable identity/read-receipt protocol.
++
+ ---
+ 
+ # Activity Log
+@@ -29,3 +39,8 @@
+ 
+ - **related**: (none) → TAT-36
+ 
++## 2026-05-25T19:12:47.239Z
++
++- **assignee**: AGENT → Huginn
++- **description**: 1 line → updated (11 lines)
++

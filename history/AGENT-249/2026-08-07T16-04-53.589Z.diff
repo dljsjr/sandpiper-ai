@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-249.md
++++ b/AGENT-249.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-08-07T14:57:16.486Z
+-updated_at: 2026-08-07T14:57:16.486Z
++updated_at: 2026-08-07T16:04:53.588Z
+ ---
+ 
+ # Headless CLI integration-test pathway (second validation lane)
+ 
+@@ -20,4 +20,14 @@
+ - Root vitest does NOT discover nested per-package vitest configs (no workspace config) - harness placement and env wiring must account for this; the root test:vitest script env is the proven pattern.
+ - Repo invariants: tests never touch real user state (~/.sandpiper, ~/.pi); Bun/Node runtime-agnostic where applicable; bun check zero-warnings gate.
+ 
+ Potential payoff to validate en route: RPC exposes Compaction commands - if compaction can be driven via RPC against a deterministic provider, AGENT-237 item (e) (steer-through-compaction, currently deferred to Doug's live-session checklist) may become headless-testable, converting the last manual sweep item into CI coverage.
++
++SCOPE ADDENDUM (2026-08-07, post AGENT-251): entry mode sandpiper currently runs from SOURCE (sandpiper_standalone.ts), not the compiled binary - a named coverage gap per the AGENT-243 precedent (bunfig bug manifested only in the compiled artifact). Disposition: wave-2 item - AGENT-253 decides whether one representative compiled-binary smoke belongs in wave 1; a full compiled-entry variant is future work, not silent scope. Also carried: rpc-driver happy-path-only coverage closes incidentally in AGENT-253 (reviewer flag, dev-acknowledged).
++
++---
++
++# Activity Log
++
++## 2026-08-07T16:04:53.589Z
++
++- **description**: 10 lines → updated (12 lines)

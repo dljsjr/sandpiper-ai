@@ -1,0 +1,34 @@
+--- a/TAT-45.md
++++ b/TAT-45.md
+@@ -1,15 +1,17 @@
+ ---
+-title: "Review queue recovery plan and implementation seams"
++title: "Map queue recovery implementation seams"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.996Z
+-updated_at: 2026-05-25T19:11:37.996Z
++updated_at: 2026-05-25T19:12:35.007Z
+ ---
+ 
+ # Review queue recovery plan and implementation seams
+-# Review queue recovery plan and implementation seams
+-
+-Reviewer lane for the Tattler pending-inbox work. Check that the design stays within public Pi APIs, does not use context hook or private chat-container injection by default, preserves transcript/cache/debug semantics, and avoids real inbound payloads in Pi's clearable steer queue while busy.
+-
++# Map queue recovery implementation seams
++
++Huginn source exploration: identify concrete refactor points in Tattler IPC/runtime, Pi event hooks, Chorus runtime/UI, Pi before_agent_start/sendMessage behavior, appendEntry durability, batch renderer shape, and test seams. Produce source-cited notes before implementation begins.
++
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:35.008Z
++
++- **title**: Review queue recovery plan and implementation seams → Map queue recovery implementation seams
++- **description**: updated
++

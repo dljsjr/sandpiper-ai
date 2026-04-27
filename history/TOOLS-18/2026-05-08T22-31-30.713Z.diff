@@ -1,0 +1,29 @@
+--- a/TOOLS-18.md
++++ b/TOOLS-18.md
+@@ -1,6 +1,7 @@
+ ---
+ title: "Materialize publish artifact assets without symlink or runtime writes"
+-status: NOT STARTED
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+@@ -9,7 +10,7 @@
+ depends_on:
+   - TOOLS-16
+   - TOOLS-17
+-updated_at: 2026-05-08T21:36:36.749Z
++updated_at: 2026-05-08T22:31:30.712Z
+ ---
+ 
+ # Materialize publish artifact assets without symlink or runtime writes
+@@ -37,3 +38,8 @@
+ 
+ - **depends_on**: (none) → TOOLS-16, TOOLS-17
+ 
++## 2026-05-08T22:31:30.713Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: DONE
++

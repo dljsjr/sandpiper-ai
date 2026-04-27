@@ -1,0 +1,62 @@
+===================================================================
+--- a/AGENT-253.md
++++ b/AGENT-253.md
+@@ -5,21 +5,57 @@
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-07T14:57:56.513Z
+-updated_at: 2026-08-07T18:12:21.620Z
++updated_at: 2026-08-07T18:29:24.898Z
+ depends_on:
+   - AGENT-251
+ ---
+ 
+ # Coverage wave 1: isolated + combinatoric extension tests
+ 
+ First real coverage using the harness: the 2-3 extensions chosen in AGENT-250, each tested (a) isolated - only that extension loaded via the restricted-pi entry mode, exercising its tools/hooks through print or RPC as appropriate; (b) combinatoric - at least one pairing that exercises a known cross-extension seam (e.g. tattler+chorus event-bus request/reply, or autotoon transforming another extension tool_result). Also validate the AGENT-237(e) payoff hypothesis: attempt driving compaction via RPC Compaction commands against the mock provider with a steer-delivered message pending - if it works, the last manual sweep item becomes CI coverage and AGENT-237 can close entirely once Doug does the two eyeball items. Acceptance per test: asserts real observable behavior (stdout/RPC events/filesystem effects), not process exit codes alone.
+ 
++## Implementation (2026-08-08)
++
++### (1)+(2) Isolated + combinatoric coverage
++
++wave1-skill.integration.test.ts: skill tool isolated (only skill-loading.ts loaded). Real filesystem skill load (the jj skill's actual content) via source:'filesystem' (isolated spawns pass --no-skills, so catalog discovery is unavailable -- this is the correct fallback path, and real coverage of it). Real not-found error case too.
++
++wave1-autotoon.integration.test.ts: autotoon isolated (padded bash-tool JSON result, only autotoon as a custom extension) and combinatoric (autotoon + a new fixture tool, probe-tool.ts, proving the real cross-extension seam -- autotoon transforms JSON from a tool it has zero knowledge of). Also proves MIN_JSON_BYTES (256) is a real cutoff via a below-threshold case.
++
++### (3) rpc-driver line-buffering
++
++Real spawns don't reliably exercise multi-line-per-chunk or split-across-chunks stdout delivery (OS/timing-dependent). Extracted the pure line-splitting step as extractCompleteLines() (rpc-driver.ts) and added rpc-driver.test.ts forcing both cases deterministically, plus CRLF and the U+2028/U+2029-non-splitting case docs/rpc.md warns readline gets wrong. Command/response correlation confirmed already exercised incidentally -- every sendCommand() call across the whole suite exercises it.
++
++### (4) AGENT-237(e) payoff hypothesis -- VALIDATED
++
++wave1-compaction.integration.test.ts drives real manual compaction (RPC `compact`) and a real steer-delivered mid-turn message against the mock provider, zero network egress, against pi's actual compaction/turn state machine (only model content is mocked, not pi's internal state).
++
++Two real findings: (1) pi's default compaction.keepRecentTokens (20000) means a realistic scripted conversation never has anything old enough to compact -- genuine safeguard, not a bug. Added harness.ts's settingsJson option (writes settings.json into the isolated agent dir before spawn) to lower it for testing. (2) the compaction summarization call's context shape differs from a normal turn's (observed) -- the mock's context.messages-count indexing doesn't reliably land on a chosen "summary" step for compaction specifically. Tests assert real structural claims (compact succeeds with non-empty summary; steer message visible in get_entries pre-compaction; normal turn completes post-compaction) rather than exact summary content, which would assert an indexing accident, not a real claim.
++
++Net: AGENT-237(e) moves from "needs Doug at a real terminal, no headless path existed" to "headlessly tested, structurally proven, in CI." AGENT-237's own status/disposition is the coordinator's/Doug's call, not changed here.
++
++### (5) Compiled-binary smoke -- evaluated, deferred
++
++Not currently built in this environment; building it is a real bun-compile step, not something a skip-if-not-built test makes cheap on its own. Deferred as named wave-2 scope per the coordinator's explicit ruling (optional, include only if genuinely cheap).
++
++### Docs
++
++Design doc's §5 (wave 1 scope cut) updated with implementation status and a new "AGENT-237(e) payoff, realized" subsection. devtools/integration/README.md gets a "Wave 1 coverage" section and updated limitations (rpc-driver gap closed, compiled-binary decision recorded).
++
++### Verification
++
++bun check clean throughout. Full bun run test:vitest clean at 122/122 files, 1112/1112 tests (one known-flaky unrelated timeout on first attempt at moderate load, confirmed transient via isolated re-run + clean full retry -- both runs announced per the new serialization protocol). Tripwire shim log held at 3 lines throughout every run.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-08-07T18:12:21.620Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → sandpiper-0.84-dev
++
++## 2026-08-07T18:29:24.901Z
++
++- **description**: 1 line → updated (33 lines)

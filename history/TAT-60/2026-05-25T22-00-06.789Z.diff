@@ -1,0 +1,32 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -6,16 +6,15 @@
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T21:38:04.446Z
+-updated_at: 2026-05-25T21:50:33.780Z
+ related:
+   - TAT-38
+   - TAT-59
+   - TAT-23
++  - TAT-62
++updated_at: 2026-05-25T22:00:06.785Z
++
+ ---
+ 
+ # Style tattler_receive tool call background
+ 
+-Partially addressed by sxrpyyxq / a017f56b. The canonical Tattler pending batch renderer now applies custom message background styling to visible Chorus entries, using customMessageBg for remote room messages and toolSuccessBg for self messages, and idle Chorus/self delivery now uses the same tattler:pending-batch custom message shape as received batches. Reviewer caveat: if the originally missing color was specifically the tattler_receive tool-call row, that row still uses quiet/empty tool renderers and needs visual re-smoke before TAT-60 can be closed.
++Smoke test found the queue-recovery path working, but custom-rendered Tattler/Chorus delivery cells need final spacing polish. Keep quiet result semantics and avoid noisy assistant follow-up, but render the receive/delivery cells with consistent styling: one line of padding above and one line of padding below the custom rendered cells. After TAT-62, the canonical batch renderer owns the main background styling path; this task should verify whether the remaining issue is the quiet tattler_receive tool-call row itself or the rendered batch cells, and apply the minimal spacing/styling fix.
+ 
+ ---
+ 
+@@ -42,3 +44,8 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T22:00:06.789Z
++
++- **description**: updated
++- **related**: TAT-38, TAT-59, TAT-23 → TAT-38, TAT-59, TAT-23, TAT-62
++

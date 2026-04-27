@@ -1,0 +1,16 @@
+===================================================================
+--- a/AGENT-227.md
++++ b/AGENT-227.md
+@@ -11,4 +11,12 @@
+ 
+ # Add timeout parameter validation to shell_relay tool
+ 
+ extensions/shell-relay/src/tools/start-relay.ts:24-28 exposes a model-facing 'timeout' parameter with no minimum/maximum bound in its TypeBox schema, and extensions/shell-relay/src/tools/operations.ts:32 computes timeoutMs = (input.timeout ?? 30) * 1000 with no validation. Non-positive or oversized values silently misbehave instead of failing clearly. Mirror Pi's own 0.80.4 fix for its bash tool (fail with a clear validation error instead of clamping to an immediate timeout).
++
++---
++
++# Activity Log
++
++## 2026-08-06T20:42:26.057Z
++
++- **parent**: AGENT-223 → AGENT-235

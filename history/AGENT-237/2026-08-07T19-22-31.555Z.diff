@@ -1,0 +1,40 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: USER
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-07T19:20:08.080Z
++updated_at: 2026-08-07T19:22:31.554Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -123,8 +123,16 @@
+ ITEM (c) IN DOGFOOD (2026-08-07): Doug reloaded his working session in fullscreen TUI mode as ongoing dogfood rather than a one-off eyeball pass. Coverage accrues passively - startup banners (now entry-rendered per AGENT-238), tattler batch renderers on incoming peer messages (AGENT-226), chorus widgets if a room is opened. Close (c) if nothing renders wrong after normal use; only (d) compiled-app /login + image handling remains as a discrete manual step.
+ 
+ ---
+ 
++DISPOSITIONS (2026-08-07, Doug):
++- (c) PARTIALLY CONFIRMED: the Update Available banner - our AGENT-238 entry-renderer reimplementation - renders correctly in fullscreen dogfood. That was the riskiest half of the refactor (it replaced the tui.children[1] reach-in). Remaining (c) surface accrues passively: tattler batch renderers on incoming peer messages, chorus room widgets.
++- (d) DESCOPED by Doug: compiled-app /login (OAuth adapter bundling) and image handling are upstream Pi/Bun behaviors, not ours to verify. Our own compile-pathway hazard is already covered by AGENT-243 (bunfig autoload) and the standalone-app runtime tests. Not a gap, a scope decision.
++- (e) already CI-covered via AGENT-253.
++AGENT-237 closes once chorus renders correctly in fullscreen.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-06T22:19:41.456Z
+ 
+@@ -149,4 +157,8 @@
+ 
+ ## 2026-08-07T19:20:08.085Z
+ 
+ - **description**: 104 lines → updated (108 lines)
++
++## 2026-08-07T19:22:31.555Z
++
++- **description**: 108 lines → updated (116 lines)

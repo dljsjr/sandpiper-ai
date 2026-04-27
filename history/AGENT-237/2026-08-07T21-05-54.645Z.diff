@@ -1,0 +1,46 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: USER
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-07T19:22:31.554Z
++updated_at: 2026-08-07T21:05:54.640Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -131,8 +131,22 @@
+ AGENT-237 closes once chorus renders correctly in fullscreen.
+ 
+ ---
+ 
++CLOSED 2026-08-07. Final disposition of all items:
++
++(a) DONE - system-prompt dump diff across the bump: 3 lines of 110 differ (version string, temp path, request-id), prompt content byte-identical. AGENTS.override.md verified empirically. Required fixing AGENT-248 (dumpSystemPrompt hung in print mode) to produce the evidence.
++(b) DONE - session format verified against a genuine fresh 0.84.0 session file (real turn forced through the atomic-rename write path): standup CLI write/read/cleanup correct including liveness classification, read-session-memories DuckDB patterns extract as documented. No drift.
++(c) DONE - fullscreen TUI confirmed by Doug in live dogfood. Update Available banner (the AGENT-238 entry-renderer reimplementation that replaced the tui.children[1] reach-in) renders correctly. Chorus room widget confirmed in two live multi-agent room sessions; the first surfaced AGENT-256 (widget starving the transcript), which was fixed, reviewed, and visually confirmed by Doug in the second room - "Looks good!" with the line budget holding flat under a mixed long/short/burst message sequence.
++(d) DESCOPED by Doug - compiled-app /login (OAuth adapter bundling) and image handling are upstream Pi/Bun behaviors, not ours to verify. Our own compile-pathway hazard is covered by AGENT-243 plus the standalone-app runtime tests.
++(e) DONE, converted from manual to CI - steer-through-compaction is covered headlessly by devtools/integration/wave1-compaction.integration.test.ts (AGENT-253), driving real pi compaction and steer delivery via RPC against the scripted mock provider with zero egress.
++(f) PRACTICED throughout - .turbo purge before every distribution verification, after the stale-cache incident that masqueraded as invariant failures.
++(g) OBSERVED - npmPackageInstallSmoke verified in the trusted checkout only.
++
++Notable: the sweep found more by dogfooding than by checklist. (c) in particular produced a real HIGH bug (AGENT-256) that no unit test could have reached, because it only manifests in fullscreen's flex-layout allocator.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-06T22:19:41.456Z
+ 
+@@ -161,4 +175,8 @@
+ 
+ ## 2026-08-07T19:22:31.555Z
+ 
+ - **description**: 108 lines → updated (116 lines)
++
++## 2026-08-07T21:05:54.645Z
++
++- **description**: 116 lines → updated (130 lines)

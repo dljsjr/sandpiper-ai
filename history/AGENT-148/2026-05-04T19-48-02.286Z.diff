@@ -1,0 +1,31 @@
+--- a/AGENT-148.md
++++ b/AGENT-148.md
+@@ -1,14 +1,21 @@
+ ---
+ title: "Wire Claude plugin docs and distribution checks"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-04T18:05:10.762Z
+ updated_at: 2026-05-04T18:05:10.762Z
+-updated_at: 2026-05-04T18:05:10.762Z
++updated_at: 2026-05-04T19:48:02.285Z
+ ---
+ 
+ # Wire Claude plugin docs and distribution checks
+ 
+ 
++---
++
++# Activity Log
++
++## 2026-05-04T19:48:02.286Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

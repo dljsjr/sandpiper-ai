@@ -1,12 +1,13 @@
 ---
 title: "Make 'kind' update in applyFieldUpdates an explicit internal API rather than a backdoor cast"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-04-01T15:29:58.451Z
-updated_at: 2026-04-01T15:31:33.516Z
+updated_at: 2026-05-13T05:09:52.282Z
 ---
 
 # Make 'kind' update in applyFieldUpdates an explicit internal API rather than a backdoor cast
@@ -40,3 +41,20 @@ Option 2 is cleanest — it makes the implicit contract explicit and keeps Updat
 ## 2026-04-01T15:31:33.516Z
 
 - **description**: added (21 lines)
+
+## 2026-05-12T21:12:12.360Z
+
+- **status**: NOT STARTED → IN PROGRESS
+
+## 2026-05-12T21:34:11.122Z
+
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-05-12T21:37:13.926Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-05-13T05:09:52.282Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

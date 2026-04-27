@@ -1,0 +1,25 @@
+--- a/TAT-34.md
++++ b/TAT-34.md
+@@ -6,12 +6,10 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-25T14:56:05.439Z
+-updated_at: 2026-05-25T14:56:15.962Z
++updated_at: 2026-05-25T18:27:44.391Z
+ ---
+ 
+ # Decouple Chorus visual rendering from model-visible message injection
+ 
+-Dogfood bug: if Chorus room messages arrive while an agent/session is mid-turn or the upstream provider stream is hung, the messages may not render in the main Pi chat until the turn boundary because the current custom message path queues through agent delivery. Evidence from Piper session: hung-period room posts were later found persisted as custom_message entries with customType chorus-room-message, display true, full XML content, and details, so this appears to be visual/live-render delay rather than transport loss. Need decouple immediate visual rendering from model-visible message injection.
++Problem: main Pi chat rendering of Chorus messages is coupled to custom-message/session injection. While an agent is streaming or hung, pi.sendMessage(customType chorus-room-message) queues through agent steer/followUp, so the main chat transcript does not render until the message drains into the session transcript. Current product read: the active Chorus widget should be the live room surface for MVP; main chat can be transcript/context/history/backfill. Existing APIs do not provide immediate main-chat display-only entries; appendEntry is extension-private state, and renderResult only applies to local tool rows. No-upstream plan: use Chorus widget as authoritative live display plane; use hidden custom_message model/context injection later; fallback to display:true sendMessage only when no widget/live bridge is available.
+ 
+ ---
+ 
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-05-25T18:27:44.392Z
++
++- **description**: updated
++

@@ -1,0 +1,27 @@
+--- a/TCL-127.md
++++ b/TCL-127.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Verify Trail distribution and compatibility behavior"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T19:26:20.156Z
+-updated_at: 2026-05-13T19:52:26.496Z
++updated_at: 2026-05-13T20:50:30.450Z
+ ---
+ 
+ # Verify Trail distribution and compatibility behavior
+@@ -30,3 +31,8 @@
+ 
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-13T20:50:30.451Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
++

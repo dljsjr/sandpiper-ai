@@ -1,0 +1,25 @@
+--- a/AGENT-146.md
++++ b/AGENT-146.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add Claude plugin assembler and manifest"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-04T18:05:10.661Z
+-updated_at: 2026-05-04T19:40:40.828Z
++updated_at: 2026-05-04T19:42:33.401Z
+ ---
+ 
+ # Add Claude plugin assembler and manifest
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-04T19:42:33.402Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

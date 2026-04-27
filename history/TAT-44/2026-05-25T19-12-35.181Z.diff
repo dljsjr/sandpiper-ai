@@ -1,0 +1,32 @@
+--- a/TAT-44.md
++++ b/TAT-44.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Test pending inbox delivery across busy, abort, and resume paths"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Sandpiper Dev"
+ reporter: USER
+ created_at: 2026-05-25T19:11:37.937Z
+ updated_at: 2026-05-25T19:11:37.937Z
+-updated_at: 2026-05-25T19:11:37.937Z
++updated_at: 2026-05-25T19:12:35.181Z
+ ---
+ 
+ # Test pending inbox delivery across busy, abort, and resume paths
+ 
+ Add regression coverage proving real inbound payloads received while busy are not dropped by Escape/abort, are not serialized one-at-a-time through Pi queues, and are injected as one persistent custom_message batch on the next agent start. Include duplicate delivery and pending-clear timing assertions.
+ 
++---
++
++# Activity Log
++
++## 2026-05-25T19:12:35.181Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Sandpiper Dev
++

@@ -1,0 +1,32 @@
+--- a/TAT-18.md
++++ b/TAT-18.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Route room posts through broker fanout"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.789Z
+ updated_at: 2026-05-23T06:23:56.789Z
+-updated_at: 2026-05-23T06:23:56.789Z
++updated_at: 2026-05-23T17:43:50.179Z
+ ---
+ 
+ # Route room posts through broker fanout
+ 
+ Change Chorus composer semantics so user messages post to the room broker first. The broker appends/renders the outbound message, fans it out to participant agent sockets, and tracks delivery status instead of the editor directly broadcasting to peers.
+ 
++---
++
++# Activity Log
++
++## 2026-05-23T17:43:50.180Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++- **assignee**: UNASSIGNED → AGENT
++

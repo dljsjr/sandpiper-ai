@@ -1,0 +1,25 @@
+--- a/TAT-62.md
++++ b/TAT-62.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Unify idle and batched inbound message custom type"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T21:40:22.427Z
+-updated_at: 2026-05-25T21:47:20.614Z
++updated_at: 2026-05-25T21:47:20.691Z
+ related:
+   - TAT-36
+   - TAT-43
+@@ -35,3 +35,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T21:47:20.692Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

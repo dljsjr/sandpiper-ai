@@ -1,0 +1,25 @@
+--- a/TAT-24.md
++++ b/TAT-24.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Expand Chorus room transcript to 12 messages"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-24T15:40:46.688Z
+-updated_at: 2026-05-24T15:41:11.171Z
++updated_at: 2026-05-24T15:46:56.662Z
+ ---
+ 
+ # Expand Chorus room transcript to 12 messages
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-24T15:46:56.665Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

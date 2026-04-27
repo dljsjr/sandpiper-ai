@@ -1,0 +1,27 @@
+--- a/AGENT-155.md
++++ b/AGENT-155.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Fix clean Pi local install from source"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-04T22:29:54.749Z
+-updated_at: 2026-05-04T22:29:54.792Z
++updated_at: 2026-05-04T22:43:31.220Z
+ ---
+ 
+ # Fix clean Pi local install from source
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-04T22:43:31.221Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

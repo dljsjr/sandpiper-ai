@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-255.md
++++ b/AGENT-255.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-07T15:15:44.996Z
+-updated_at: 2026-08-07T22:11:44.956Z
++updated_at: 2026-08-07T22:12:36.241Z
+ depends_on:
+   - AGENT-252
+ ---
+ 
+@@ -43,8 +43,12 @@
+ ALSO NOTED, not currently applicable: the grammar variant (OpenAI Lark or regex, Lark preferred when both supplied) constrains the CONTENT of a single string property, requires exactly one required string property, and is gated on compat.supportsOpenAIGrammarTools (GPT-5+ on passthrough endpoints only - off for gateways like OpenRouter that normalize tool schemas). None of our 12 tools has a shape or a value domain that would benefit; revisit only if a tool ever takes a grammar-constrained input such as a query language or pattern.
+ 
+ ---
+ 
++SOURCE: all of the above is documented in node_modules/@earendil-works/pi-ai/README.md - start there rather than re-deriving from dist sources. The 2026-08-07 investigation traced constrained-sampling behavior through compiled JS across several sessions when the README states it plainly, and the one conclusion that turned out wrong (the "upstream bug" framing) came precisely from having the mechanism right and the contract unread. Guidance added to docs/dev/pi-extension-development.md.
++
++---
++
+ # Activity Log
+ 
+ ## 2026-08-07T22:10:05.979Z
+ 
+@@ -52,4 +56,8 @@
+ 
+ ## 2026-08-07T22:11:44.982Z
+ 
+ - **description**: 15 lines → updated (28 lines)
++
++## 2026-08-07T22:12:36.244Z
++
++- **description**: 28 lines → updated (32 lines)

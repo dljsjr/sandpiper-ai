@@ -1,0 +1,27 @@
+--- a/AGENT-162.md
++++ b/AGENT-162.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Decouple shell relay runtime from Pi API"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-05T14:37:10.110Z
+-updated_at: 2026-05-05T14:37:10.151Z
++updated_at: 2026-05-05T14:38:40.049Z
+ ---
+ 
+ # Decouple shell relay runtime from Pi API
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-05T14:38:40.050Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: DONE
++

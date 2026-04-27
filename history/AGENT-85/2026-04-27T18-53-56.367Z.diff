@@ -1,0 +1,25 @@
+--- a/AGENT-85.md
++++ b/AGENT-85.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Spike standalone Sandpiper CLI using Pi main extension factories"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.043Z
+-updated_at: 2026-04-27T18:43:23.401Z
++updated_at: 2026-04-27T18:53:56.366Z
+ depends_on:
+   - AGENT-84
+ related:
+@@ -30,3 +30,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-04-27T18:53:56.367Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

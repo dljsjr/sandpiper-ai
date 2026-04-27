@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-237.md
++++ b/AGENT-237.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Post-bump verification sweep"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: AGENT
+ created_at: 2026-08-06T20:41:56.756Z
+-updated_at: 2026-08-06T22:19:41.455Z
++updated_at: 2026-08-06T22:31:40.282Z
+ depends_on:
+   - AGENT-236
+ ---
+ 
+@@ -28,4 +28,9 @@
+ 
+ ## 2026-08-06T22:19:41.456Z
+ 
+ - **description**: 6 lines → updated (8 lines)
++
++## 2026-08-06T22:31:40.283Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

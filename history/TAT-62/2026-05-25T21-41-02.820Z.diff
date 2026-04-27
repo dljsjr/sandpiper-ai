@@ -1,0 +1,24 @@
+--- a/TAT-62.md
++++ b/TAT-62.md
+@@ -3,10 +3,10 @@
+ status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+-assignee: AGENT
++assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T21:40:22.427Z
+ updated_at: 2026-05-25T21:40:50.287Z
+-updated_at: 2026-05-25T21:40:50.287Z
++updated_at: 2026-05-25T21:41:02.810Z
+ related:
+   - TAT-36
+   - TAT-43
+@@ -27,3 +27,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: updated
+ 
++## 2026-05-25T21:41:02.820Z
++
++- **assignee**: AGENT → Huginn
++

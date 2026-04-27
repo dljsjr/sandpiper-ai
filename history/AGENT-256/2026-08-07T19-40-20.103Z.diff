@@ -1,0 +1,74 @@
+===================================================================
+--- a/AGENT-256.md
++++ b/AGENT-256.md
+@@ -5,49 +5,33 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-08-07T19:28:18.767Z
+-updated_at: 2026-08-07T19:35:14.553Z
++updated_at: 2026-08-07T19:40:20.102Z
+ ---
+ 
+ # Chorus room widget starves the transcript in fullscreen TUI mode
+ 
+ In fullscreen TUI mode the chorus room widget can grow until it squeezes the host session's transcript off screen, and fullscreen's scrolling applies only to the transcript region - so the agent's own chat becomes unreachable. Found by Doug in fullscreen dogfood, 2026-08-07.
+ 
+-Mechanism: extensions/chorus/chorus-ui.ts bounds the widget by ENTRY COUNT, not by viewport share - CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12 (line 33) entries, each up to CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4 lines (line 35), so the aboveEditor widget can render roughly 1 + 12*4 = 49 lines. In regular TUI mode that is harmless (terminal scrollback absorbs it). In fullscreen the editor/widget/footer dock is sticky, so those lines are subtracted from the transcript viewport permanently.
++Mechanism: extensions/chorus/chorus-ui.ts bounds the widget by ENTRY COUNT, not by viewport share - CHORUS_TRANSCRIPT_ENTRY_LIMIT (was 12) entries, each up to CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4 lines, so the aboveEditor widget could render roughly 1 + 12*4 = 49 lines. Traced further via pi-tui's fullscreen layout allocator (interactive-mode.js / components/stack.js): the dock (widget+editor+footer) is a flex sibling of the scrollable transcript with grow:0, so it never yields space back; the transcript's basis:0 disqualifies it from the shrink pass once its size hits minSize(1), so the entire deficit lands on the dock until terminalRows-1 is crossed, at which point the transcript snaps to exactly 1 row in a single step (not graceful shrinking). Confirmed via source reading (not just observation) that regular (non-fullscreen) TUI mode is unconditionally exempt: TuiMainScreen.doRender() never clips render output to terminal height and unconditionally writes every line, relying entirely on the real terminal's native scrollback - there is no viewport/flex-layout concept in that code path at all.
+ 
+-Fix direction: make the widget's height budget viewport-relative rather than entry-count-relative. Cap total rendered widget lines at a fraction of terminal height (a third is a reasonable starting point, subject to Doug's eye), dropping OLDEST entries first to fit and showing a "+N earlier" indicator so truncation is visible rather than silent. Keep the per-entry line cap as a secondary bound. Determine how the component learns terminal height (the render path currently receives width only - check whether the TUI instance or the widget slot exposes rows) and report if no height signal is available, rather than guessing a constant.
++SCOPE DECISION (2026-08-07, Doug): Doug does not want significant time invested in Chorus, which has known bugs already punted pending the durable chat-room rewrite (TAT-70, on hold). Directed: ship the cheap mitigation, not the real fix.
+ 
+-Verification: this is a fullscreen-visual bug, so unit tests can cover the height-budget arithmetic (given rows R and entries E, total rendered lines <= budget, oldest dropped, indicator correct) but final confirmation is Doug's eyeball in a populated room. Regular (non-fullscreen) mode must not regress.
++SHIPPED: extensions/chorus/chorus-ui.ts - CHORUS_TRANSCRIPT_ENTRY_LIMIT reduced from 12 to 4 (worst case ~49 lines -> ~17 lines), comment explains the collapse mechanism and why 4 was chosen (keeps dock under the terminalRows-1 threshold on any realistic terminal). No height signal, no mode-gating, no truncation indicator, no new tests - existing 29 chorus tests pass unchanged, `bun check` clean. jj change mtxsxksq/719c42dd.
+ 
+-Possible upstream companion (do not act, note only): Pi arguably should clamp aboveEditor widget height in fullscreen so a misbehaving extension cannot starve the transcript. Ours to fix regardless - our widget declares the height.
++NOT SHIPPED (design was completed and verified but abandoned per the scope decision above, recorded here in case Chorus survives past TAT-70's rewrite and this resurfaces):
++- Real fix: a viewport-relative render budget, gated on `tui.mode === 'fullscreen'` and re-evaluated at every render() call (0.84.0 made fullscreen runtime-toggleable via /settings, so mode cannot be cached at widget-registration time).
++- Height signal: `tui.terminal.rows`, read fresh each render via a narrow `{ mode, terminal: { rows } }` viewport type threaded into ChorusRoomTranscript's constructor (TUI structurally satisfies this).
++- Budget rationale (upgraded from an arbitrary fraction): dock (widget + editor minSize 3 + footer 1 + status) must stay under terminalRows-1, since crossing that line collapses the transcript in one step rather than degrading gracefully. A budget of ~1/3 of terminal rows for the widget satisfies that constraint from very short terminals upward.
++- Two independent caps, named to prevent re-merging: CHORUS_TRANSCRIPT_ENTRY_LIMIT stays a DATA RETENTION bound (what the broker/render considers as candidate entries); a separate RENDER bound (the line budget) truncates further only in fullscreen mode.
++- Truncation: drop oldest entries first, guarantee at least the most recent entry renders (further line-truncated if needed), show a "+N earlier" indicator with its own line self-accounted against the budget (never additive) - except at the degenerate 1-row-budget floor, where the indicator is dropped rather than exceeding budget.
++- Regular mode: must not regress - no new bound imposed, since it has no bound today and none is needed (see mechanism trace above).
+ 
+-## Reviewer mechanism trace (pi-tui layout, verified against source, 2026-08-07)
++UPSTREAM-ADJACENT, NOT OURS, NOT FILED (Doug's call if ever): the vulnerability isn't Chorus-specific - any aboveEditor/belowEditor widget whose combined dock height crosses terminalRows-1 collapses the transcript the same way. Candidate asks: give the transcript's scroll view a minSize above 1, and/or clamp widget containers to a viewport share, in pi-tui itself.
+ 
+-Confirmed empirically rather than assumed, in response to the coordinator's challenge that "non-fullscreen is safe" needed testing, not just belief:
+-
+-**Non-fullscreen is unconditionally exempt**, not just failing differently. `mountInteractiveTui` (pi-coding-agent dist/modes/interactive/interactive-mode.js, ~line 517) only calls `tui.setLayoutRoot(this.fullscreenLayoutRoot)` when `TuiLayouts.isViewportTUI(tui)` is true, and `switchTuiMode` calls `previousUi.setLayoutRoot(undefined)` when leaving fullscreen (~line 550). `TuiMainScreen` (pi-tui dist/tui-main-screen.js) has no per-component height allocation at all - `doRender()` streams the whole composed frame to the terminal and relies entirely on the terminal's native scrollback. There is no flex/shrink code path for main-screen to hit, so criterion 5 (don't newly impose a bound where none existed) stands as originally written.
+-
+-**Fullscreen uses a real flexbox-style layout** (interactive-mode.js `init()`, ~line 605): outer VStack = `[transcriptScrollView: basis 0, grow 1, shrink 1, minSize 1]` + `[dock: basis "auto", grow 0, shrink 1, minSize 1]`, where `dock` is itself a VStack containing `pendingMessagesContainer`, `statusContainer`, `widgetContainerAbove` (shrink 1, minSize 0), `editorContainer` (shrink 1, minSize 3), `widgetContainerBelow`, `footerContainer` (shrink 1, minSize 1).
+-
+-Traced the actual allocator (pi-tui dist/components/stack.js, `allocateStackSizes`/`distribute`): because `transcriptScrollView` has `basis: 0`, its size is immediately clamped to its `minSize` (1) before any distribution runs. `dock` has `grow: 0`, so on the *grow* pass (when there's room to spare) it never claims more than its natural size - all surplus goes to transcript, which is the healthy/common case. But on the *shrink* pass (when `dock`'s natural height exceeds `terminalRows - 1`), transcript is excluded from the candidate set entirely - the shrink filter requires `size > minSize`, and transcript's size already equals its minSize by construction. So the *entire* deficit is absorbed by `dock`, and transcript snaps to exactly 1 row. This is a hard binary threshold at `dock.naturalHeight > terminalRows - 1`, not graceful degradation - there is no intermediate state where transcript is, say, 5 rows instead of 30. Inside `dock`'s own shrink pass, `editorContainer`'s minSize:3 protects it and `footerContainer`'s minSize:1 protects it, while `widgetContainerAbove`'s minSize:0 means it absorbs the squeeze first - so today's Chorus widget is the practical trigger, but it isn't structurally special.
+-
+-**Implication for the fix**: bounding `widgetContainerAbove`'s content (this ticket's plan) fixes today's reproduction, but the underlying gap is that `dock` structurally outranks `transcriptScrollView` for space no matter which of dock's children is oversized - any sufficiently large status/widget/editor content could reproduce this the same way. Worth deciding, as a separate and lower-urgency question, whether `transcriptScrollView`'s `minSize` should be raised above 1 (e.g. 3-5) as defense-in-depth independent of how well-behaved any individual widget is - that's a pi-tui-level change, not a chorus-ui.ts one, and fits under the existing "possible upstream companion" note above rather than blocking this fix.
+-
+ ---
+ 
+-LAYOUT MECHANISM, traced 2026-08-07 (sandpiper-0.84-rev, independently corroborating the dev's TuiMainScreen/TuiAltScreen split):
+-
+-Non-fullscreen is structurally exempt - interactive-mode.js only calls tui.setLayoutRoot(fullscreenLayoutRoot) when TuiLayouts.isViewportTUI(tui), and sets setLayoutRoot(undefined) when switching away; TuiMainScreen has no per-component height allocation at all, streaming the composed frame to native scrollback. There is no flex/shrink path for regular mode to hit.
+-
+-Fullscreen uses a real flexbox layout: outer VStack = [transcriptScrollView: basis 0, grow 1, shrink 1, minSize 1] + [dock: basis auto, grow 0, shrink 1, minSize 1], dock being a VStack of widgetContainerAbove (shrink 1, minSize 0), editorContainer (shrink 1, minSize 3), footer (shrink 1, minSize 1). Allocator behavior (pi-tui components/stack.js allocateStackSizes/distribute): because transcript has basis 0 it is already AT minSize when space is tight, and the shrink pass requires size > minSize, so transcript is disqualified from absorbing any deficit - the entire overflow lands on dock, and transcript snaps to exactly 1 row. A hard binary threshold at dock natural height > terminalRows - 1, not graceful degradation. Within dock, editor's minSize 3 protects it and widgetAbove's minSize 0 means it absorbs the squeeze first.
+-
+-CONSEQUENCE FOR THIS FIX (scope unchanged): bounding the chorus widget keeps dock under the threshold and resolves the reported bug. The budget fraction should be justified by this threshold rather than picked arbitrarily - the requirement is that widget + editor (>=3) + footer (>=1) + status stays comfortably below terminalRows - 1 across realistic terminal sizes, leaving a usable transcript. A one-third-of-rows widget budget satisfies that from very short terminals upward; state the reasoning in a comment so the constant is not later "tuned" without understanding what it protects.
+-
+-UPSTREAM COMPANION (note only, do not act - fourth item on the upstream-ask pile alongside AGENT-245's env prefix, EntryRenderOptions outputPad, and strict-prefer gating): the vulnerability is not Chorus-specific. ANY aboveEditor/belowEditor widget pushing dock's combined natural height past terminalRows - 1 collapses the transcript to 1 row, because dock structurally outranks transcript for space and transcript's basis 0 disqualifies it from the shrink pass. Two candidate upstream asks: give the transcript scroll view a minSize greater than 1 so it cannot be starved to a single row, and/or clamp widget containers to a share of the viewport so a misbehaving extension cannot starve the conversation. Ours to work around regardless - our widget declared the height.
+-
+----
+-
+ # Activity Log
+ 
+ ## 2026-08-07T19:33:40.187Z
+ 
+@@ -60,4 +44,8 @@
+ 
+ ## 2026-08-07T19:35:14.554Z
+ 
+ - **description**: 21 lines → updated (33 lines)
++
++## 2026-08-07T19:40:20.103Z
++
++- **description**: 33 lines → updated (17 lines)

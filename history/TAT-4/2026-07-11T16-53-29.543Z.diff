@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-4.md
++++ b/TAT-4.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Deliver v0 messages as compact system notifications"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-05-15T03:13:18.485Z
+-updated_at: 2026-05-19T20:30:08.433Z
++updated_at: 2026-07-11T16:53:29.543Z
+ ---
+ 
+ # Deliver v0 messages as compact system notifications
+ 
+@@ -32,4 +33,9 @@
+ 
+ ## 2026-05-19T20:30:08.433Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.543Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

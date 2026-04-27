@@ -1,0 +1,25 @@
+--- a/TCL-80.md
++++ b/TCL-80.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:58.419Z
+-updated_at: 2026-05-12T21:27:01.651Z
++updated_at: 2026-05-12T21:32:52.664Z
+ ---
+ 
+ # Fix search catch-all to distinguish rg exit code 1 (no matches) from real errors
+@@ -34,3 +34,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: 20 lines → updated (1 line)
+ 
++## 2026-05-12T21:32:52.665Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

@@ -1,0 +1,36 @@
+--- a/TAT-74.md
++++ b/TAT-74.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "C4: read-from-cursor unread API and replay tool"
++title: "C4: read-from-cursor unread API and replay tool (Tattler layer)"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: MEDIUM
+@@ -9,12 +9,10 @@
+ depends_on:
+   - TAT-71
+   - TAT-73
+-updated_at: 2026-05-27T15:46:02.348Z
++updated_at: 2026-05-27T15:51:27.238Z
+ ---
+ 
+ # C4: read-from-cursor unread API and replay tool
+-# C4: read-from-cursor unread API and replay tool
+-
+-Read-since-cursor tool replacing pending-batch reconstruction for correctness. Define a replay envelope distinct from the live DM format — live delivery stays tiny; historical replay carries timestamps + author handles for temporal context (the replay envelope is undesigned — added to scope per spec review). FORK FOR DOUG: is unread history auto-delivered at turn start (as pending-batch does today) or must the agent call a tool? Explicit-only is a breaking UX change. Recommended hybrid: auto-deliver unread-since-cursor at turn start (preserves today's UX, fixes the bug) AND expose explicit read-from-cursor tool for deeper on-demand replay beyond the auto window. Depends on C1 (TAT-71) and C3 (TAT-73).
++# C4: read-from-cursor unread API and replay tool (Tattler layer)
++
++Read-since-cursor tool at the Tattler layer, replacing pending-batch reconstruction. Define a replay envelope distinct from live DM format — live delivery stays tiny; historical replay carries timestamps + author handles for temporal context. FORK FOR DOUG: is unread history auto-delivered at turn start (as pending-batch does today) or must the agent call a tool? Explicit-only is a breaking UX change. Recommended hybrid: auto-deliver unread-since-cursor at turn start (preserves today's UX, fixes the bug) AND expose explicit read-from-cursor tool for deeper replay. Depends on C1 (TAT-71) and C3 (TAT-73).
+ 
+ ---
+ 
+@@ -28,3 +28,8 @@
+ 
+ - **depends_on**: (none) → TAT-71, TAT-73
+ 
++## 2026-05-27T15:51:27.240Z
++
++- **title**: C4: read-from-cursor unread API and replay tool → C4: read-from-cursor unread API and replay tool (Tattler layer)
++- **description**: updated
++

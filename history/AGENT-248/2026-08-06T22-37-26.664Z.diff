@@ -1,0 +1,34 @@
+===================================================================
+--- a/AGENT-248.md
++++ b/AGENT-248.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "dumpSystemPrompt hangs in print mode: ctx.shutdown() is a silent no-op"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "sandpiper-0.84-dev"
+ reporter: "sandpiper-0.84-dev"
+ created_at: 2026-08-06T22:34:22.089Z
+-updated_at: 2026-08-06T22:34:22.089Z
++updated_at: 2026-08-06T22:37:26.663Z
+ ---
+ 
+ # dumpSystemPrompt hangs in print mode: ctx.shutdown() is a silent no-op
+ 
+@@ -15,4 +15,13 @@
+ 
+ Aggravating factor: pi's resolveAppMode() forces print mode whenever stdin/stdout is not a TTY, regardless of flags - so every headless/sandboxed/CI invocation hits this path unavoidably. Three hung invocations observed during AGENT-237 item (a); the dump feature is currently unusable outside a genuine interactive terminal.
+ 
+ Fix direction: make the dump path exit deterministically in both modes - e.g. call ctx.shutdown() (lets interactive cleanup run), then a short-fuse hard process.exit(0) fallback for the no-op case; or branch on ctx.mode. Constraint: the change must live entirely inside the dumpSystemPrompt branch (dormant unless the env var is set) so normal operation is untouched. Side benefit: makes the dump usable in scripted/CI contexts, which AGENT-237 item (a) needs for reproducible before/after prompt diffs (pre-bump side from a workspace at xulrqywv/b2bbf3e7).
++
++---
++
++# Activity Log
++
++## 2026-08-06T22:37:26.664Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-0.84-dev

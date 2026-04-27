@@ -1,0 +1,29 @@
+--- a/TCL-118.md
++++ b/TCL-118.md
+@@ -6,13 +6,12 @@
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T14:17:03.418Z
+-updated_at: 2026-05-13T17:01:14.474Z
++updated_at: 2026-05-13T17:11:00.580Z
+ ---
+ 
+ # Prototype one-repo-per-tab Glimpse task board
+ 
+-Implement milestone 1 for multi-repo Glimpse board support: HTML tab shell, open/add repo by repository root, validate and load that repo's .sandpiper/tasks via the tasks CLI, and map each tab 1:1 to a repo. Do not implement saved filters or aggregate multi-repo filtering yet. Add native Browse using Glimpse pick-directory, persisted open repo tabs in XDG state, a no-repos-open startup state, inactive-tab change indicators, and drag-to-reorder repo tabs.
+-
++Implement milestone 1 for multi-repo Glimpse board support: HTML tab shell, open/add repo by repository root, validate and load that repo's .sandpiper/tasks via the tasks CLI, and map each tab 1:1 to a repo. Do not implement saved filters or aggregate multi-repo filtering yet. Add native Browse using Glimpse pick-directory, persisted open repo tabs in XDG state, a no-repos-open startup state, inactive-tab change indicators, drag-to-reorder repo tabs, and persistent change banners for inactive-tab diffs.
++
++Background refresh banner smoke test at 2026-05-13T17:11:00Z.
++
+ ---
+ 
+ # Activity Log
+@@ -52,3 +54,7 @@
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ 
++## 2026-05-13T17:11:00.581Z
++
++- **description**: 1 line → updated (3 lines)
++

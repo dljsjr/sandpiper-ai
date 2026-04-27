@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-257.md
++++ b/AGENT-257.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Chorus aboveEditor widget can push chat transcript off-screen with no way to scroll back"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-08-07T19:28:32.380Z
+-updated_at: 2026-08-07T19:29:03.338Z
++updated_at: 2026-08-07T19:29:03.407Z
+ ---
+ 
+ # Chorus aboveEditor widget can push chat transcript off-screen with no way to scroll back
+ 
+@@ -19,4 +20,9 @@
+ 
+ ## 2026-08-07T19:29:03.339Z
+ 
+ - **description**: 14 lines → updated (1 line)
++
++## 2026-08-07T19:29:03.407Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX

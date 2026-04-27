@@ -1,0 +1,25 @@
+--- a/TAT-59.md
++++ b/TAT-59.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add first-arrival pending-message cue for tattler_receive"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-25T21:23:39.930Z
+-updated_at: 2026-05-25T21:25:19.271Z
++updated_at: 2026-05-25T21:25:19.350Z
+ depends_on:
+   - TAT-46
+   - TAT-47
+@@ -24,3 +24,7 @@
+ 
+ - **description**: updated
+ 
++## 2026-05-25T21:25:19.351Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

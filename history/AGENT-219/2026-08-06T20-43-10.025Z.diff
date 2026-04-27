@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-219.md
++++ b/AGENT-219.md
+@@ -5,12 +5,22 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-06-23T20:28:29.339Z
+-updated_at: 2026-06-23T20:28:29.339Z
++updated_at: 2026-08-06T20:43:10.021Z
+ ---
+ 
+ # Adopt Pi coding-agent package asset path helpers for system-prompt docs/examples resolution
+ 
+-Pi 0.79.0 (#5415) exported coding-agent package asset path helpers from the public API. ALREADY IN our pinned 0.79.1 build — no bump needed.
++Pi 0.79.0 (#5415) exported coding-agent package asset path helpers from the public API. ALREADY IN our pinned build - no bump needed.
+ 
+ FIRST STEP (grounding): grep Sandpiper for hand-resolved paths to pi-coding-agent docs/examples assets (node_modules/@earendil-works/pi-coding-agent/{docs,examples}, PI_*_PACKAGE, etc.) used during system-prompt assembly. If we hardcode them, replace with the exported helpers. If we don't hand-resolve anywhere, close WONTFIX.
++
++VERIFIED 2026-08-06: still valid at 0.84.0, no bump required - getDocsPath/getExamplesPath/getPackageDir/getReadmePath are exported at the pinned 0.80.7. Grounding pointer: packages/core/src/system-prompt.ts piDocsBlock() consumes PI_CODING_AGENT_PACKAGE / SANDPIPER_CODING_AGENT_PACKAGE env values rather than the helpers, so this is NOT a WONTFIX - there is real adoption work. Natural companion to the AGENT-235 tree.
++
++---
++
++# Activity Log
++
++## 2026-08-06T20:43:10.025Z
++
++- **description**: 3 lines → updated (5 lines)

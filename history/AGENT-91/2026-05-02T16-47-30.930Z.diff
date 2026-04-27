@@ -1,0 +1,25 @@
+--- a/AGENT-91.md
++++ b/AGENT-91.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Build standalone Sandpiper Bun binary distribution"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.289Z
+-updated_at: 2026-05-02T16:24:51.622Z
++updated_at: 2026-05-02T16:47:30.930Z
+ depends_on:
+   - AGENT-85
+   - AGENT-88
+@@ -32,3 +32,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-02T16:47:30.930Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

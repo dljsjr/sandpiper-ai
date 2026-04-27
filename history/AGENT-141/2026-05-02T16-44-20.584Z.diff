@@ -1,0 +1,25 @@
+--- a/AGENT-141.md
++++ b/AGENT-141.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Add standalone binary runtime smoke tests"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-02T16:24:51.823Z
+-updated_at: 2026-05-02T16:43:39.760Z
++updated_at: 2026-05-02T16:44:20.583Z
+ ---
+ 
+ # Add standalone binary runtime smoke tests
+@@ -21,3 +21,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-02T16:44:20.584Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

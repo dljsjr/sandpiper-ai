@@ -1,0 +1,25 @@
+--- a/WEB-15.md
++++ b/WEB-15.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Implement CSS selector targeted extraction"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T21:57:46.865Z
+-updated_at: 2026-05-14T03:37:45.870Z
++updated_at: 2026-05-14T03:44:19.980Z
+ ---
+ 
+ # Implement CSS selector targeted extraction
+@@ -34,3 +34,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-14T03:44:19.981Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

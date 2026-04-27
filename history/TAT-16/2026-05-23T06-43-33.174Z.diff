@@ -1,0 +1,32 @@
+--- a/TAT-16.md
++++ b/TAT-16.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Define Tattler Pi event-bus API for Chorus"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: "Piper"
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.662Z
+ updated_at: 2026-05-23T06:23:56.662Z
+-updated_at: 2026-05-23T06:23:56.662Z
++updated_at: 2026-05-23T06:43:33.173Z
+ ---
+ 
+ # Define Tattler Pi event-bus API for Chorus
+ 
+ Expose Tattler-owned capabilities to Chorus through pi.events rather than direct module imports. Use a non-blocking readiness/request state-machine shape so load order does not matter and Chorus registers /chorus only after the room API is available.
+ 
++---
++
++# Activity Log
++
++## 2026-05-23T06:43:33.174Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → Piper
++

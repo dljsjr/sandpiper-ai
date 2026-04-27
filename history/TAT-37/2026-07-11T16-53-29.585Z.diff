@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-37.md
++++ b/TAT-37.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Verify queued custom messages after abort are in active context"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T18:27:44.324Z
+-updated_at: 2026-07-01T17:36:28.388Z
++updated_at: 2026-07-11T16:53:29.585Z
+ ---
+ 
+ # Verify queued custom messages after abort are in active context
+ 
+@@ -46,4 +47,9 @@
+ 
+ ## 2026-07-01T17:36:28.391Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-07-11T16:53:29.585Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

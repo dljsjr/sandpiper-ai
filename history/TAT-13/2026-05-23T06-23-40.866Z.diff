@@ -1,0 +1,34 @@
+--- a/TAT-13.md
++++ b/TAT-13.md
+@@ -1,16 +1,12 @@
+ ---
+-title: "Extract shared Tattler protocol primitives into tattler-protocol.ts"
++title: "Finish Tattler module split and registration plumbing"
+ status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-21T18:21:41.577Z
+-updated_at: 2026-05-21T18:21:45.880Z
++updated_at: 2026-05-23T06:23:40.863Z
+ ---
+ 
+ # Extract shared Tattler protocol primitives into tattler-protocol.ts
+-# Extract shared Tattler protocol primitives into tattler-protocol.ts
+-
++# Finish Tattler module split and registration plumbing
++
++Complete the in-progress Tattler refactor from a single-file extension into focused modules (protocol, identity, IPC, runtime-dir, Pi event API), then fix extension/plugin registration paths so the split extension still loads correctly in Sandpiper and neutral Pi packaging.
+ 
+ ---
+ 
+@@ -21,3 +22,8 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
+ 
++## 2026-05-23T06:23:40.866Z
++
++- **title**: Extract shared Tattler protocol primitives into tattler-protocol.ts → Finish Tattler module split and registration plumbing
++- **description**: added (1 line)
++

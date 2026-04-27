@@ -6,7 +6,9 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T14:54:25.683Z
-updated_at: 2026-03-31T15:39:16.767Z
+related:
+  - SHR-99
+updated_at: 2026-05-14T14:46:08.059Z
 ---
 
 # Implement zsh user command capture via zle widget override
@@ -32,7 +34,6 @@ updated_at: 2026-03-31T15:39:16.767Z
 - `extensions/shell-relay/shell-integration/relay.fish` — fish_preexec implementation to reference for pattern
 - `extensions/shell-relay/src/relay.ts` — `buildInjectionCommand`, `escapeForBash` (shared with zsh)
 
-
 ---
 
 # Activity Log
@@ -40,3 +41,7 @@ updated_at: 2026-03-31T15:39:16.767Z
 ## 2026-03-31T15:39:16.767Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-05-14T14:46:08.060Z
+
+- **related**: (none) → SHR-99

@@ -1,5 +1,5 @@
 ---
-title: "Web app for task board"
+title: "Build CLI-hosted web task board with SSE or WebSocket reactivity"
 status: NOT STARTED
 kind: TASK
 priority: MEDIUM
@@ -8,25 +8,12 @@ reporter: USER
 created_at: 2026-03-23T03:18:38.927Z
 depends_on:
   - TCL-57
-updated_at: 2026-04-01T16:30:37.157Z
+updated_at: 2026-05-13T14:08:49.312Z
 ---
 
-# Web app for task board
+# Build CLI-hosted web task board with SSE or WebSocket reactivity
 
-Build a simple web application for viewing and interacting with the task board.
-
-This could be:
-- A standalone local web server (serve the board from the .sandpiper/tasks directory)
-- A Pi extension that serves a web UI via Bun.serve or similar
-- A static HTML page that reads the index file
-
-Should share the board data model from TCL-57 and provide:
-- Visual board with drag-and-drop
-- Task detail view
-- Filtering and search
-- Real-time updates (watch for file changes)
-
-Depends on the board data model from TCL-57.
+Build or specify a task board web UI served by the tasks CLI or companion server. It should expose live board state via SSE or WebSocket, support reactive updates when task files change or CLI mutations occur, and preserve the useful interaction patterns proven by the Glimpse prototype while moving toward a first-class built-in solution.
 
 ---
 
@@ -40,3 +27,8 @@ Depends on the board data model from TCL-57.
 ## 2026-04-01T16:30:37.157Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-05-13T14:08:49.314Z
+
+- **title**: Web app for task board → Build CLI-hosted web task board with SSE or WebSocket reactivity
+- **description**: 14 lines → updated (1 line)

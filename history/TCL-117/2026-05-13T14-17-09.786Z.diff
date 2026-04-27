@@ -1,0 +1,32 @@
+--- a/TCL-117.md
++++ b/TCL-117.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Prototype collapsible rows in Glimpse task board"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-05-13T14:17:03.356Z
+ updated_at: 2026-05-13T14:17:03.356Z
+-updated_at: 2026-05-13T14:17:03.356Z
++updated_at: 2026-05-13T14:17:09.785Z
+ ---
+ 
+ # Prototype collapsible rows in Glimpse task board
+ 
+ Add collapsible board rows/sections to the current user-local Glimpse task board prototype. Start with in-memory collapse state and keep the interaction lightweight so the board remains useful immediately.
+ 
++---
++
++# Activity Log
++
++## 2026-05-13T14:17:09.786Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
++

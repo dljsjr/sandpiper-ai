@@ -1,0 +1,32 @@
+===================================================================
+--- a/AGENT-228.md
++++ b/AGENT-228.md
+@@ -1,15 +1,15 @@
+ ---
+ title: "Name inline extension factories for standalone distribution"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: LOW
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-07-10T15:48:37.120Z
+ depends_on:
+   - AGENT-224
+-updated_at: 2026-07-10T15:48:41.314Z
++updated_at: 2026-07-10T20:50:07.741Z
+ ---
+ 
+ # Name inline extension factories for standalone distribution
+ 
+@@ -21,4 +21,9 @@
+ 
+ ## 2026-07-10T15:48:41.315Z
+ 
+ - **depends_on**: (none) → AGENT-224
++
++## 2026-07-10T20:50:07.751Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

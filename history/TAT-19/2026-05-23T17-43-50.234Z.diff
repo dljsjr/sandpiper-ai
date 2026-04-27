@@ -1,0 +1,32 @@
+--- a/TAT-19.md
++++ b/TAT-19.md
+@@ -1,15 +1,21 @@
+ ---
+ title: "Route agent replies back to the Chorus broker"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-23T06:23:56.851Z
+ updated_at: 2026-05-23T06:23:56.851Z
+-updated_at: 2026-05-23T06:23:56.851Z
++updated_at: 2026-05-23T17:43:50.233Z
+ ---
+ 
+ # Route agent replies back to the Chorus broker
+ 
+ Let agent participants receive room prompts through their normal Tattler sockets and reply to the broker endpoint. Ensure the local agent is symmetric with remote agents rather than special-cased through local editor submission.
+ 
++---
++
++# Activity Log
++
++## 2026-05-23T17:43:50.234Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++- **assignee**: UNASSIGNED → AGENT
++

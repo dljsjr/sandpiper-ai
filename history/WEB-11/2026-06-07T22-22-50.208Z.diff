@@ -1,0 +1,64 @@
+--- a/WEB-11.md
++++ b/WEB-11.md
+@@ -6,35 +6,3 @@
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.175Z
+-updated_at: 2026-04-01T16:30:37.348Z
++updated_at: 2026-06-07T22:22:50.205Z
+ ---
+ 
+ # Spike: single-query web search tool (fetch top N results from a search API)
+ 
+-The web-fetch PRD called single-query search 'a natural v2'. Rather than requiring the user to provide a URL, the agent could issue a search query and automatically fetch and extract the top N results.
+-
+-## Motivation
+-
+-Many agent tasks involve researching something: 'what is the current API for X', 'how do I do Y in Z framework'. Today the agent must know or guess a URL. A search tool would let it search first, then read the best results.
+-
+-## Scope (spike)
+-
+-This is a spike to evaluate:
+-- Which search API to use (DuckDuckGo instant, SearXNG self-hosted, Brave Search API, Tavily, etc.)
+-- Whether to fetch all N result pages in parallel or let the agent choose which to follow
+-- How to present results: merged ranked summary, separate fetched pages, or metadata list with manual follow-links
+-- Cost model: is a search API call + N fetches acceptable latency for a coding agent workflow?
+-
+-## Success criteria for spike
+-
+-- Document the chosen API and rationale
+-- Prototype a minimal implementation
+-- Report on latency and result quality for 3-5 representative queries
+-
+-## References
+-
+-- `.sandpiper/docs/web-fetch-prd.md` — Deferred capabilities, Scope 3
+-
++## Design Decisions (2026-06-07)
++
++**Architecture:** New Pi extension at `extensions/web-search/`, mirroring `web-fetch`'s structure. Registers a `web_search` tool via `pi.registerTool`.
++
++**Adapter pattern:** `SearchAdapter` interface (mirroring `FetchAdapter`) with pluggable backends:
++- **Brave Search API** — primary adapter. Independent index, 2k queries/month free, clean JSON API. Requires API key (`BRAVE_API_KEY` env var or settings.json).
++- **DDG HTML scraping** — fallback adapter. Zero-config but unreliable CAPTCHAs on first request from server-side code. Not viable as primary path.
++- **SearXNG** — longer-term, configurable via DI.
++
++**Result shape:** `{title: string, url: string, snippet: string}[]` — structured results, same contract regardless of backend.
++
++**Composition:** `web_search` returns URLs; agent feeds them to `web_fetch` for full content. Clean sibling tools.
++
++**Config surface:** API key via env var (`BRAVE_API_KEY`), settings.json under extension namespace, or Pi's `!cmd`/``/literal resolver pattern (mirrored in extension, ~15 lines).
++
++**Scope boundary:** WEB-10 (JS/SPA rendering) is phase 2 — a separate `FetchAdapter` swap in web-fetch, not part of this tool.
++
+ ---
+ 
+ # Activity Log
+@@ -47,3 +40,7 @@
+ 
+ - **priority**: LOW → MEDIUM
+ 
++## 2026-06-07T22:22:50.208Z
++
++- **description**: 23 lines → updated (16 lines)
++

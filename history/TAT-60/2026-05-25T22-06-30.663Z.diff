@@ -1,0 +1,27 @@
+--- a/TAT-60.md
++++ b/TAT-60.md
+@@ -1,6 +1,6 @@
+ ---
+ title: "Style tattler_receive tool call background"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+@@ -12,7 +12,7 @@
+   - TAT-59
+   - TAT-23
+   - TAT-62
+-updated_at: 2026-05-25T22:06:30.575Z
++updated_at: 2026-05-25T22:06:30.663Z
+ 
+ ---
+ 
+@@ -84,3 +84,7 @@
+ 
+ - **description**: 5 lines → updated (1 line)
+ 
++## 2026-05-25T22:06:30.663Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW
++

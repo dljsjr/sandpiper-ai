@@ -1,0 +1,48 @@
+---
+title: "Add configuration support"
+status: COMPLETE
+resolution: WONTFIX
+kind: SUBTASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: AGENT
+created_at: 2026-04-09T01:39:55.348Z
+updated_at: 2026-05-14T14:04:08.476Z
+---
+
+# Add configuration support
+
+Make classifier behavior configurable.
+
+## Config Interface
+
+```typescript
+interface ClassifierConfig {
+  enabled: boolean;           // fallback to regex if false
+  model: string;              // model URI
+  timeout_ms: number;         // inference timeout
+  cache_size: number;         // LRU cache size
+  cooldown_turns: number;     // turns between injections
+  log_decisions: boolean;     // enable decision logging
+}
+```
+
+## Work Items
+
+- [ ] Add ClassifierConfig interface
+- [ ] Support environment variables (SANDPIPER_CLASSIFIER_ENABLED, SANDPIPER_CLASSIFIER_MODEL, etc.)
+- [ ] Implement graceful degradation (log error, inject nothing on failure)
+- [ ] Never crash the agent on classifier failure
+
+---
+
+# Activity Log
+
+## 2026-04-09T01:41:45.469Z
+
+- **description**: added (21 lines)
+
+## 2026-05-14T14:04:08.476Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

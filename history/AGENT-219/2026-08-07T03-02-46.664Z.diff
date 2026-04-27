@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-219.md
++++ b/AGENT-219.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Adopt Pi coding-agent package asset path helpers for system-prompt docs/examples resolution"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "sandpiper-0.84-dev"
+ reporter: USER
+ created_at: 2026-06-23T20:28:29.339Z
+-updated_at: 2026-08-07T03:02:46.609Z
++updated_at: 2026-08-07T03:02:46.664Z
+ ---
+ 
+ # Adopt Pi coding-agent package asset path helpers for system-prompt docs/examples resolution
+ 
+@@ -36,4 +36,8 @@
+ 
+ ## 2026-08-07T03:02:46.610Z
+ 
+ - **description**: 5 lines → updated (9 lines)
++
++## 2026-08-07T03:02:46.664Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,31 @@
+--- a/TAT-79.md
++++ b/TAT-79.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "SQLite room log schema + migration runner + cursor table"
++title: "TAT-71: SQLite room log schema + migration runner + cursor table"
+ status: COMPLETE
+ resolution: DONE
+ kind: TASK
+@@ -7,10 +7,10 @@
+ assignee: "Huginn"
+ reporter: AGENT
+ created_at: 2026-05-27T20:31:12.096Z
+-updated_at: 2026-05-27T20:31:51.046Z
++updated_at: 2026-05-27T20:32:25.765Z
+ ---
+ 
+ # SQLite room log schema + migration runner + cursor table
+-# SQLite room log schema + migration runner + cursor table
++# TAT-71: SQLite room log schema + migration runner + cursor table
+ 
+ 
+ ---
+@@ -31,3 +31,7 @@
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
+ 
++## 2026-05-27T20:32:25.766Z
++
++- **title**: SQLite room log schema + migration runner + cursor table → TAT-71: SQLite room log schema + migration runner + cursor table
++

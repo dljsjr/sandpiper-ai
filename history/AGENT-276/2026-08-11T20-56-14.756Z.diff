@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-276.md
++++ b/AGENT-276.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Fix truncated SELF.md rendering in prompt editor"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-08-11T20:49:49.350Z
+-updated_at: 2026-08-11T20:49:53.084Z
++updated_at: 2026-08-11T20:56:14.751Z
+ related:
+   - AGENT-271
+   - AGENT-275
+ ---
+@@ -23,4 +23,8 @@
+ ## 2026-08-11T20:49:53.085Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
++
++## 2026-08-11T20:56:14.756Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

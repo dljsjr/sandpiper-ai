@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-260.md
++++ b/AGENT-260.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Emit provider-intersection strict-valid schemas for parameter-bearing tools"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "sandpiper-dev"
+ reporter: AGENT
+ created_at: 2026-08-10T17:37:46.312Z
+-updated_at: 2026-08-10T17:37:46.312Z
++updated_at: 2026-08-10T18:20:50.691Z
+ ---
+ 
+ # Emit provider-intersection strict-valid schemas for parameter-bearing tools
+ 
++
++---
++
++# Activity Log
++
++## 2026-08-10T18:20:50.692Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → sandpiper-dev

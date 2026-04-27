@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-259.md
++++ b/AGENT-259.md
+@@ -1,14 +1,14 @@
+ ---
+ title: "Add scriptable strict-schema validation to the mock provider"
+ status: COMPLETE
+-resolution: DONE
++resolution: WONTFIX
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "sandpiper-dev"
+ reporter: AGENT
+ created_at: 2026-08-10T17:37:46.249Z
+-updated_at: 2026-08-10T18:20:50.634Z
++updated_at: 2026-08-10T18:38:58.269Z
+ ---
+ 
+ # Add scriptable strict-schema validation to the mock provider
+ 
+@@ -29,4 +29,8 @@
+ ## 2026-08-10T18:20:50.635Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-08-10T18:38:58.270Z
++
++- **resolution**: DONE → WONTFIX

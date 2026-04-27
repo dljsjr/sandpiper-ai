@@ -1,0 +1,25 @@
+--- a/AGENT-186.md
++++ b/AGENT-186.md
+@@ -1,12 +1,9 @@
+ ---
+ title: "Document required test workflow for review readiness"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-07T18:44:58.039Z
+-updated_at: 2026-05-07T18:44:58.085Z
++updated_at: 2026-05-07T19:01:12.487Z
+ ---
+ 
+ # Document required test workflow for review readiness
+@@ -21,3 +21,7 @@
+ 
+ - **description**: added (1 line)
+ 
++## 2026-05-07T19:01:12.488Z
++
++- **status**: NOT STARTED → NEEDS REVIEW
++

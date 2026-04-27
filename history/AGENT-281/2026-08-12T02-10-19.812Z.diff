@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-281.md
++++ b/AGENT-281.md
+@@ -2,12 +2,12 @@
+ title: "Make runYaamsCli typed, stdin-capable, and migrate read paths"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.573Z
+-updated_at: 2026-08-12T02:10:06.573Z
++updated_at: 2026-08-12T02:10:19.811Z
+ depends_on:
+   - AGENT-280
+ ---
+ 
+@@ -17,4 +17,12 @@
+ 
+ Migrate every read path to explicit decoders: retrieve by id/EAV/entity, search_memories, getLiveFacts if it remains, and bootstrap list. Update CliRunner and yaams-birdup-runner so the runner contract can deliver stdin safely. Remove `yaamsFactJsonReviver`, unchecked result casts, and parser code that assumes all CLI JSON is a datom array.
+ 
+ Verification: fake CLI responses use the real YAAMS JSON wire shape; reader and bootstrap integration tests pass; malformed success/error payloads fail at the transport boundary with useful diagnostics.
++
++---
++
++# Activity Log
++
++## 2026-08-12T02:10:19.812Z
++
++- **assignee**: UNASSIGNED → Doug

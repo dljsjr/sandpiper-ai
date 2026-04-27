@@ -1,0 +1,27 @@
+--- a/AGENT-61.md
++++ b/AGENT-61.md
+@@ -1,12 +1,10 @@
+ ---
+ title: "Add production logging"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-09T01:39:55.299Z
+-updated_at: 2026-04-09T01:41:23.642Z
++updated_at: 2026-05-14T14:04:08.424Z
+ ---
+ 
+ # Add production logging
+@@ -43,3 +44,8 @@
+ 
+ - **description**: added (23 lines)
+ 
++## 2026-05-14T14:04:08.425Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX
++

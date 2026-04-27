@@ -1,0 +1,26 @@
+--- a/AGENT-89.md
++++ b/AGENT-89.md
+@@ -6,7 +6,7 @@
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.207Z
+-updated_at: 2026-04-27T18:20:53.207Z
++updated_at: 2026-04-27T18:22:09.205Z
+ depends_on:
+   - AGENT-88
+ related:
+@@ -15,4 +15,13 @@
+ 
+ # Add distribution invariant checks and smoke tests
+ 
+-
++Add automated invariant checks and smoke tests for the package-first architecture and distribution outputs.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- checks catch hardcoded branding/path regressions in neutral packages\n- generated distribution manifests/artifacts are validated\n- smoke tests exercise standalone Sandpiper and neutral Pi package with temp config dirs
++
++---
++
++# Activity Log
++
++## 2026-04-27T18:22:09.205Z
++
++- **description**: added (1 line)
++

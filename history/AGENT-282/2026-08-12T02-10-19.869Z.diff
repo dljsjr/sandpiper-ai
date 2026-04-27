@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-282.md
++++ b/AGENT-282.md
+@@ -2,12 +2,12 @@
+ title: "Lower all memory write tools onto YAAMS apply"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: "Doug"
+ reporter: USER
+ created_at: 2026-08-12T02:10:06.638Z
+-updated_at: 2026-08-12T02:10:06.638Z
++updated_at: 2026-08-12T02:10:19.868Z
+ depends_on:
+   - AGENT-281
+ ---
+ 
+@@ -17,4 +17,12 @@
+ 
+ This must remove the client TOCTOU windows and preserve tool-level intent/error wording: create rejects live keys, update/retire reject absent keys, append rejects scalar cardinality, and list update is store-side diff/reconcile. Retain concise agent-facing result text derived from created/retired ledgers. Update the fake CLI to implement apply atomically and add tests for atomic failure, scalar/list behavior, result decoding, and structured rejection routing.
+ 
+ Update README and the active behavior contract as part of the implementation; remove claims about partial per-member success because apply cannot leave one.
++
++---
++
++# Activity Log
++
++## 2026-08-12T02:10:19.869Z
++
++- **assignee**: UNASSIGNED → Doug

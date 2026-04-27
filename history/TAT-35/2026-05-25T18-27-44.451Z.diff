@@ -1,0 +1,25 @@
+--- a/TAT-35.md
++++ b/TAT-35.md
+@@ -6,12 +6,10 @@
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-05-25T14:56:05.538Z
+-updated_at: 2026-05-25T14:56:16.036Z
++updated_at: 2026-05-25T18:27:44.450Z
+ ---
+ 
+ # Design Pi display-only message API for live extension transcript entries
+ 
+-Design/implement a Pi host API for immediate extension transcript rendering that does not participate in LLM context. Source/docs read: pi.appendEntry() maps to appendCustomEntry and is extension-private persistence only; it emits no message_start/message_end, has no registerMessageRenderer path, and buildSessionContext ignores custom entries. pi.sendMessage()/CustomMessageEntry is the current renderer path, but while streaming it queues via agent.steer/followUp and is coupled to model-visible custom message delivery. Proposed shape: sendDisplayMessage/appendDisplayMessage or similar immediate rendered transcript entry, ignored by LLM context, with optional stable caller-provided key/details for dedupe such as chorus:<postId>. Keep hidden model-visible custom_message injection as a separate path.
++Design note: a proper Pi host API would separate display-only transcript entries from model-visible custom messages. Current docs/source: appendEntry -> appendCustomEntry, no renderer, no LLM context, no message events. sendMessage -> CustomMessageEntry, renderable and model-visible, but queues during streaming. Desired upstream shape later: sendDisplayMessage/appendDisplayMessage with stable caller key (e.g. chorus:<postId>) that renders immediately and never enters buildSessionContext, plus separate hidden custom_message/model injection. No-upstream MVP should avoid private chat-container injection unless Doug accepts maintenance risk.
+ 
+ ---
+ 
+@@ -23,3 +23,7 @@
+ - **assignee**: UNASSIGNED → AGENT
+ - **description**: added (1 line)
+ 
++## 2026-05-25T18:27:44.451Z
++
++- **description**: updated
++

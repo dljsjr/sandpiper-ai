@@ -1,0 +1,24 @@
+--- a/TAT-32.md
++++ b/TAT-32.md
+@@ -6,11 +6,11 @@
+ assignee: "Librarian"
+ reporter: USER
+ created_at: 2026-05-24T17:57:19.129Z
+-updated_at: 2026-05-24T17:57:29.424Z
++updated_at: 2026-05-24T17:57:51.653Z
+ ---
+ 
+ # Design general quiet completion tool for no-assistant-message turns
+ 
++Explore a generic system-owned quiet completion/noop/done tool for turns where the agent has already completed the requested action via another tool and should not emit natural-language assistant chatter. Must be very narrowly guided so agents do not ignore substantive requests. Current finding: terminate:true is the only enforceable loop knob today but is too blunt when placed on send_chorus_reply; a dedicated tool may work only if its semantics fit the agent-loop batching rules, otherwise this likely needs a harness feature for scoped post-tool continuation suppression.
+ 
+ ---
+ 
+@@ -21,3 +22,7 @@
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Librarian
+ 
++## 2026-05-24T17:57:51.653Z
++
++- **description**: added (1 line)
++

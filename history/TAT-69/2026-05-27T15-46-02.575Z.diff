@@ -1,0 +1,21 @@
+--- a/TAT-69.md
++++ b/TAT-69.md
+@@ -9,7 +9,9 @@
+ related:
+   - TAT-66
+   - TAT-68
+-updated_at: 2026-05-27T03:20:37.147Z
++blocked_by:
++  - TAT-70
++updated_at: 2026-05-27T15:46:02.574Z
+ ---
+ 
+ # Implement delegation/decision-ownership protocol in sandpiper-chorus integration
+@@ -24,3 +26,7 @@
+ 
+ - **related**: (none) → TAT-66, TAT-68
+ 
++## 2026-05-27T15:46:02.575Z
++
++- **blocked_by**: (none) → TAT-70
++
