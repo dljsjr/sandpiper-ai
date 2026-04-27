@@ -198,3 +198,58 @@ Loaded skill via resources_discover: standalone-spike
 ```
 
 This proves bundled resource discovery can work without root `pi.skills` manifest entries. The current proof still uses a repo-root package directory for Pi branding/asset lookup; the later Bun/package-metadata subtask evaluates replacing that with an app-bundle package directory.
+
+## AGENT-97 Result: Bun Compile and Package Metadata
+
+Compiled the spike entrypoint with Bun:
+
+```bash
+bun build --compile packages/cli/standalone_spike.ts --outfile .tmp-standalone-spike/sandpiper-spike
+```
+
+Observed behavior:
+
+- The compiled binary was about 70 MB in this workspace.
+- Without a real filesystem repo/package root override, the current spike cannot discover the repo root because `import.meta.url` resolves inside Bun's virtual filesystem (`/$bunfs/root`).
+- Providing `SANDPIPER_SPIKE_REPO_ROOT=$PWD` lets the spike find bundled fixture resources during the experiment.
+- Providing `SANDPIPER_SPIKE_PACKAGE_DIR=$PWD/.tmp-standalone-spike` lets the spike point Pi at an app-bundle sidecar `package.json`.
+- A sidecar `package.json` containing only `name`, `version`, `type`, and `piConfig` was sufficient for `--help` and `--version` smoke tests.
+- `--version` returned the sidecar package version (`0.0.0`), proving Pi read package metadata from the app-bundle package directory rather than the upstream Pi package.
+- `--help` included `--standalone-spike`, proving the compiled binary still injected the inline extension factory.
+
+Smoke commands:
+
+```bash
+cat > .tmp-standalone-spike/package.json <<'JSON'
+{
+  "name": "sandpiper-standalone-spike",
+  "version": "0.0.0",
+  "type": "module",
+  "piConfig": {
+    "name": "sandpiper",
+    "configDir": ".sandpiper"
+  }
+}
+JSON
+
+SANDPIPER_SPIKE_REPO_ROOT="$PWD" \
+SANDPIPER_SPIKE_PACKAGE_DIR="$PWD/.tmp-standalone-spike" \
+SANDPIPER_CODING_AGENT_DIR="$(mktemp -d)/agent" \
+  .tmp-standalone-spike/sandpiper-spike --help \
+  --no-extensions --no-skills --no-prompt-templates --no-themes --no-context-files
+
+SANDPIPER_SPIKE_REPO_ROOT="$PWD" \
+SANDPIPER_SPIKE_PACKAGE_DIR="$PWD/.tmp-standalone-spike" \
+SANDPIPER_CODING_AGENT_DIR="$(mktemp -d)/agent" \
+  .tmp-standalone-spike/sandpiper-spike --version
+```
+
+Recommendation: treat the first standalone deliverable as an **app bundle**, not a true single-file binary. The bundle should include:
+
+- compiled executable
+- sidecar `package.json` with Sandpiper `piConfig`
+- Pi assets required by interactive/export flows
+- Sandpiper resources/skills/prompts/themes
+- any helper binaries or MCP/plugin assets needed by adapters
+
+A true single-file binary would require either embedding resources into the executable and teaching adapters to read from Bun's virtual filesystem, or generating runtime temp files. That is possible but should not be the first target.

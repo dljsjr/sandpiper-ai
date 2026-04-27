@@ -48,7 +48,9 @@ function createSpikeExtension(skillRoot: string): ExtensionFactory {
 }
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const repoRoot = findRepoRoot(scriptDir);
+const repoRoot = process.env.SANDPIPER_SPIKE_REPO_ROOT
+  ? resolve(process.env.SANDPIPER_SPIKE_REPO_ROOT)
+  : findRepoRoot(scriptDir);
 const packageDir = resolvePackageDir(repoRoot);
 const spikeSkillRoot = join(repoRoot, 'packages', 'cli', 'fixtures', 'standalone-spike-skills');
 

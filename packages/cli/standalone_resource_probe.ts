@@ -44,7 +44,9 @@ function createResourceDiscoveryExtension(skillRoot: string): ExtensionFactory {
 }
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
-const repoRoot = findRepoRoot(scriptDir);
+const repoRoot = process.env.SANDPIPER_SPIKE_REPO_ROOT
+  ? resolve(process.env.SANDPIPER_SPIKE_REPO_ROOT)
+  : findRepoRoot(scriptDir);
 const packageDir = resolvePackageDir(repoRoot);
 const skillRoot = join(repoRoot, 'packages', 'cli', 'fixtures', 'standalone-spike-skills');
 const skillFile = join(skillRoot, EXPECTED_SKILL_NAME, 'SKILL.md');
