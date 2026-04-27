@@ -1,8 +1,8 @@
 # Agent Guidance Evolution
 
-**Status**: Axis 1 complete; Axis 2 planned; Axis 3 in progress
-**Related tasks**: AGENT-34 (✅ complete), AGENT-35 (📋 planned), AGENT-64 (🔄 in progress)
-**Last updated**: 2026-04-16
+**Status**: Axis 1 complete; Axis 2 planned; Axis 3 extracted to standalone research project
+**Related tasks**: AGENT-34 (✅ complete), AGENT-35 (📋 planned), AGENT-64 (extracted), AGENT-81 (standalone cut-over)
+**Last updated**: 2026-04-27
 **Pi version**: 0.67.4 verified
 
 ## Three-Axis Model
@@ -21,11 +21,11 @@ This work has **three distinct axes**:
    - Workflow invariants (jj, tasks, dist/)
    - **Status**: Deferred until Axis 1 proves out
 
-3. **Axis 3 — Dynamic Progressive Disclosure** (🔄 IN PROGRESS)
+3. **Axis 3 — Dynamic Progressive Disclosure** (🧪 EXTRACTED)
    - Rule extraction + retrieval for context-aware guidance injection
    - Soft enforcement via salience boosting
    - Local Llama inference for rule selection
-   - **Deliverable**: Reinforced Guidance system (AGENT-64)
+   - **Current home**: standalone `~/git/reinforced-guidance` research workbench (AGENT-64 / AGENT-81)
 
 ## Purpose
 
@@ -45,7 +45,7 @@ Sandpiper now also injects a compact startup context that can include:
 ## Decisions Already Made
 
 - There are **three axes** to the problem: static disclosure (Axis 1), deterministic enforcement (Axis 2), and dynamic disclosure (Axis 3).
-- The repository pursued **Axis 1 first** (✅ complete), then **Axis 3** (🔄 in progress), with **Axis 2 deferred** (📋 planned).
+- The repository pursued **Axis 1 first** (✅ complete), then explored **Axis 3** in a prototype workbench; that work has been extracted to standalone `~/git/reinforced-guidance`, with **Axis 2 deferred** (📋 planned).
 - Root `AGENTS.md` should be **small, routing-oriented, and invariant-focused**, but not aggressively minimized at the expense of clarity.
 - The optimization target is **clear routing + tiny high-signal leaf docs + minimal duplication**, not an arbitrary token ceiling.
 - Startup continuity should include **compact live context**, not just narrative context: active tasks and meaningful dirty-working-copy state are worth surfacing.
@@ -207,13 +207,10 @@ The prompt-side revision now includes several low-cost continuity aids:
 
 **Major deliverables**:
 1. **Pi Developer Documentation Suite** (`.sandpiper/docs/pi-dev-suite/`) — 14 comprehensive docs covering all aspects of Pi extension development, with Sandpiper-specific patterns in `PI-DEV-SANDPIPER-PATTERNS.md`
-2. **Reinforced Guidance System** (`extensions/system/reinforced-guidance/`) — Rule extraction + retrieval pipeline for dynamic rule injection (AGENT-64)
-   - `rule-extractor.ts` — Extracts operational rules from AGENTS.md into structured TOON format
-   - `rule-retriever.ts` — Retrieves applicable rules for a given prompt with cross-domain calibration
-   - Local Llama 3-4B-Instruct inference on Apple Silicon
-   - **Current status**: Stage 1 (extractor scope eval) running, fixing TOON quoting reliability issues
-   - **Architecture**: 9-stage plan in `STAGE4-DESIGN.md` and `STAGE5-OVERVIEW.md`
-   - **Quality**: Retriever 93% accuracy (63/68) on synthetic evals; extractor TOON output ~3-14% corruption rate (active fix target)
+2. **Reinforced Guidance workbench** — Rule extraction + retrieval pipeline for dynamic rule injection (AGENT-64 / AGENT-81)
+   - Extracted out of this repository into standalone `~/git/reinforced-guidance`.
+   - Sandpiper no longer carries the prototype source in `extensions/system/`.
+   - Use the standalone repository for extractor/retriever code, prompts, evals, dashboards, and experiment artifacts.
 
 ### Success Criteria
 
@@ -295,46 +292,24 @@ Block incorrect tool use deterministically and redirect with targeted feedback.
 
 ---
 
-## Axis 3 — Dynamic Progressive Disclosure (🔄 IN PROGRESS)
+## Axis 3 — Dynamic Progressive Disclosure (🧪 EXTRACTED)
 
-**Task**: AGENT-64  
-**Status**: Stage 1 (extractor scope eval) running; TOON quoting reliability being fixed
+**Tasks**: AGENT-64, AGENT-81  
+**Status**: Extracted to standalone `~/git/reinforced-guidance` research workbench.
 
 ### Goal
 
 Evolve Axis 1's static disclosure into **context-aware dynamic disclosure** — inject only the rules that apply to the current prompt, boosting salience without overwhelming the context window.
 
-### Architecture
+### Current home
 
-```
-AGENTS.md content
-      ↓
-[Rule Extractor] → TOON rules (id, rule, applies_to, scope)
-      ↓
-[Rule Retriever] → Applicable rules for current prompt
-      ↓
-[before_agent_start] → Inject as high-salience prompt section
+The extractor/retriever prototype, prompt history, evals, matrix dashboard, curated data, and experiment artifacts now live in:
+
+```text
+~/git/reinforced-guidance
 ```
 
-### Components
-
-**Rule Extractor** (`rule-extractor.ts`):
-- Extracts operational rules from AGENTS.md-style documents
-- Outputs structured TOON format: `{ id, rule, applies_to, scope }`
-- Local Llama 3-4B-Instruct via `node-llama-cpp` on Apple Silicon
-- **Performance**: ~24.5s cold, ~19s warm (model sharing saves 2.9GB)
-- **Quality**: TOON output ~3-14% corruption rate (active fix target)
-
-**Rule Retriver** (`rule-retriever.ts`):
-- Retrieves applicable rules for a given user prompt
-- Cross-domain calibration examples (cooking, medical, legal) prevent ID hallucination
-- **Quality**: 93% accuracy (63/68 synthetic evals)
-- Remaining failures: over-retrieval when no matching rule exists
-
-**Injection** (`before_agent_start` hook):
-- Injects retrieved rules as high-salience prompt section
-- Participates in prefix caching when rules are stable
-- Dynamic per-turn based on prompt context
+Sandpiper no longer keeps that prototype source under `extensions/system/`. Future Sandpiper integration should consume the standalone project through an explicit package/API boundary rather than reintroducing ad-hoc in-tree research files.
 
 ### Relationship to Other Axes
 
@@ -407,13 +382,13 @@ The likely Sandpiper-native shape is:
 |------|--------|------|-------------|
 | **Axis 1** — Static Disclosure | ✅ Complete | AGENT-34 | Pi Dev Suite + prompt architecture |
 | **Axis 2** — Deterministic Enforcement | 📋 Planned | AGENT-35 | Hard blocking via `tool_call` hook |
-| **Axis 3** — Dynamic Disclosure | 🔄 In Progress | AGENT-64 | Reinforced Guidance (rule extraction + retrieval) |
+| **Axis 3** — Dynamic Disclosure | 🧪 Extracted | AGENT-64 / AGENT-81 | Standalone reinforced-guidance workbench |
 
 **Next steps**:
-1. Complete Axis 3 Stage 1 (fix TOON quoting, finish scope evals)
-2. Run Axis 3 MVP experiment (Stages 4-7)
-3. Evaluate Axis 3 results → determine Axis 2 scope
-4. Begin Axis 2 design if soft enforcement insufficient
+1. Continue Axis 3 research in `~/git/reinforced-guidance`.
+2. If the prototype becomes shippable, define an explicit package/API boundary for Sandpiper integration.
+3. Evaluate Axis 3 results → determine Axis 2 scope.
+4. Begin Axis 2 design if soft enforcement remains insufficient.
 
 
 ---

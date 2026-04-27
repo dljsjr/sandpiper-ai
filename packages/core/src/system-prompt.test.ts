@@ -24,6 +24,7 @@ function createPiPromptOptions(overrides: Partial<PiSystemPromptOptions> = {}): 
       bash: 'Run a bash command',
     },
     promptGuidelines: ['Use read for files', 'Show file paths clearly when working with files'],
+    cwd: '/tmp/sandpiper-test',
     contextFiles: [],
     skills: [],
     ...overrides,

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "files": {
     "includes": [
@@ -15,7 +15,8 @@
       "!draw-sandpiper.ts",
       "!devtools/ascii-motion.ts",
       "!devtools/dash.ts",
-      "!devtools/config/mcporter.json"
+      "!devtools/config/mcporter.json",
+      "!.sandpiper/jj-workspaces"
     ]
   },
   "linter": {

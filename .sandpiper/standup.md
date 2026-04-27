@@ -1,34 +1,37 @@
 # Session Stand-Up
 
-## Session 019db122-2a4d-776e-a476-664012becc2e (Updated: 2026-04-22T05:19:52.522Z)
+## Session update — 2026-04-27
 
-Session file: /Users/doug.stephen/.pi/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-21T17-41-39-533Z_019db122-2a4d-776e-a476-664012becc2e.jsonl
+### Accomplished
+- Created standalone reinforced-guidance repository at `/Users/doug.stephen/git/reinforced-guidance` and committed initial migration:
+  - `f33a2b72 RG-1: extract reinforced-guidance standalone workbench`
+- Migrated RG TypeScript prototype, prompts/evals, dashboard, curated data, experiment reports/artifacts, docs, task metadata, and project-local dashboard skill into the standalone repo.
+- Finished Sandpiper cut-over by abandoning the mutable `qxpptpxm::xlwnnkxv` RG/aux-guidance stack and deleting bookmark `feat/reinforced-guidance`.
+- Confirmed `extensions/system/reinforced-guidance`, `.sandpiper/test/wrapper-lab`, and aux-guidance files are absent from current Sandpiper history/tree.
+- Removed now-unused root `node-llama-cpp` dependency/catalog entry from Sandpiper after dropping RG/wrapper/aux work.
+- Updated `.sandpiper/docs/specs/agent-guidance-evolution.md` to point Axis 3 to standalone `~/git/reinforced-guidance`.
+- Marked `AGENT-81` as `NEEDS REVIEW`.
 
-### Accomplished (this session)
-- **Overview → Prompt Deep Dive navigation finalized**: Single-click row selection auto-navigates to Prompt Deep Dive with prompt pre-loaded. After exploring LinkColumn (dead end — query params cleared between pages), settled on `on_select='rerun'` + return-value selection pattern.
-- **Streamlit 1.36+ quirks documented** in self-reflection (Phase 3 of this pass):
-  - `on_select` callback receives **no arguments** — selection state only via `st.dataframe()` return value
-  - `st.query_params` cleared on cross-page navigation — use `st.session_state` + `st.switch_page()` instead
-  - `st.Page.url_path` not populated until after `st.navigation(pages)`
+### Verification
+- In `/Users/doug.stephen/git/reinforced-guidance`:
+  - `bun install`
+  - `bun run check`
+  - `python3 -m py_compile dashboard/*.py dashboard/pages/*.py`
+  - DuckDB sanity check: `matrix_runs=164`, `prompt_retrievals=6316`, `rule_grades=30`, and no old `sandpiper-ai` / `rg-matrix` path references in key DB tables.
+  - Dashboard smoke: `PORT=8788 bash dashboard/start_dashboard.sh`, `curl -fsS http://127.0.0.1:8788/`, then stopped the 8788 test process.
+- In `/Users/doug.stephen/git/sandpiper-ai` after abandoning the RG stack:
+  - `bun install`
+  - pending final verification after the small docs/dependency cleanup commit.
 
 ### In Progress
-- Rule grading UI implemented (`pages/rule_grading.py`) but not yet validated end-to-end
-- No grading criteria defined yet (placeholder `version_id=1`)
-- 4 rulesets cached in DuckDB (global, vultr-core, yaams, sandpiper-ai) — ready for grading
+- Old rg-matrix dashboard process `rg-dashboard` remains running at `http://127.0.0.1:8787` for the user’s current browser workflow.
+- Standalone dashboard can be started with `bun run dashboard`; use `PORT=8788 bun run dashboard` if 8787 is occupied.
 
 ### Next Session
-- Define grading criteria content and insert into `criteria_versions` table
-- Grade 2-3 sample rulesets (vultr-core, sandpiper-ai, global) to validate framework
-- Consider adding grade-based metrics to dashboard overview
-- Dashboard is live at http://127.0.0.1:8787 — 4 pages working
+- Review standalone repo commit and Sandpiper cleanup commit.
+- Decide whether to delete/archive old provenance workspaces `/Users/doug.stephen/git/rg-matrix` and `/Users/doug.stephen/git/rg-experiments` after confirming the standalone repo has everything needed.
+- Continue/finish visual browser review of the Rule Grading page as needed.
 
-### Blockers
-- None
-
-### Context
-- Project: `~/git/rg-matrix/` (reinforced-guidance experiment dashboard)
-- Dashboard process: `dashboard2` (PID 57742), auto-reloads on file changes
-- Key files: `smoke_dashboard.py` (entry), `shared_utils.py`, `pages/{overview,rule_grading,prompt_deep_dive,model_metrics}.py`
-- DuckDB: `~/git/rg-matrix/results_agents_v2/smoke_history.duckdb`
-- Extraction cache: `~/git/rg-matrix/extracted_rulesets/`
-- HANDOFF.md at `extensions/system/reinforced-guidance/HANDOFF.md` (9-stage plan through Stage 6a)
+### Notes
+- Pre-existing unrelated package/CLI edits were preserved separately in `/tmp/sandpiper-package-version-edits-after-abandon.patch` before final Sandpiper cleanup. Reapply/review them separately if desired.
+- Old RG/aux material remains recoverable through `jj op log` if needed.
