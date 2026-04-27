@@ -167,3 +167,34 @@ SANDPIPER_CODING_AGENT_DIR="$(mktemp -d)/agent" \
 ```
 
 Observed result: Pi help output includes `--standalone-spike`, proving that the standalone entrypoint can inject an inline extension factory through `main()` without using root `pi.extensions`.
+
+## AGENT-96 Result: Resource Discovery Without Root Pi Manifest
+
+Extended `packages/cli/standalone_spike.ts` so its inline extension also handles `resources_discover` and returns a bundled fixture skill path:
+
+```text
+packages/cli/fixtures/standalone-spike-skills/standalone-spike/SKILL.md
+```
+
+Added `packages/cli/standalone_resource_probe.ts` as a non-interactive probe that uses Pi SDK APIs with temp agent state:
+
+1. sets `PI_PACKAGE_DIR` before importing Pi
+2. creates a `DefaultResourceLoader` with `extensionFactories`
+3. disables default extension/skill/prompt/theme/context discovery
+4. creates an in-memory session
+5. calls `session.bindExtensions({})` to fire `session_start` and `resources_discover`
+6. asserts `resourceLoader.getSkills()` contains the fixture skill name `standalone-spike`
+
+Smoke command:
+
+```bash
+bun run --bun packages/cli/standalone_resource_probe.ts
+```
+
+Observed result:
+
+```text
+Loaded skill via resources_discover: standalone-spike
+```
+
+This proves bundled resource discovery can work without root `pi.skills` manifest entries. The current proof still uses a repo-root package directory for Pi branding/asset lookup; the later Bun/package-metadata subtask evaluates replacing that with an app-bundle package directory.

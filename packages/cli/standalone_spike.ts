@@ -33,17 +33,24 @@ function resolvePackageDir(repoRoot: string): string {
   return repoRoot;
 }
 
-const spikeExtension: ExtensionFactory = (pi: ExtensionAPI) => {
-  pi.registerFlag('standalone-spike', {
-    description: 'Marker flag registered by the standalone Sandpiper spike entrypoint',
-    type: 'boolean',
-    default: false,
-  });
-};
+function createSpikeExtension(skillRoot: string): ExtensionFactory {
+  return (pi: ExtensionAPI) => {
+    pi.registerFlag('standalone-spike', {
+      description: 'Marker flag registered by the standalone Sandpiper spike entrypoint',
+      type: 'boolean',
+      default: false,
+    });
+
+    pi.on('resources_discover', () => ({
+      skillPaths: [skillRoot],
+    }));
+  };
+}
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = findRepoRoot(scriptDir);
 const packageDir = resolvePackageDir(repoRoot);
+const spikeSkillRoot = join(repoRoot, 'packages', 'cli', 'fixtures', 'standalone-spike-skills');
 
 process.env.PI_PACKAGE_DIR = packageDir;
 process.env.PI_SKIP_VERSION_CHECK = '1';
@@ -51,5 +58,5 @@ process.env.PI_SKIP_VERSION_CHECK = '1';
 const { main } = await import('@mariozechner/pi-coding-agent');
 
 await main(process.argv.slice(2), {
-  extensionFactories: [spikeExtension],
+  extensionFactories: [createSpikeExtension(spikeSkillRoot)],
 });
