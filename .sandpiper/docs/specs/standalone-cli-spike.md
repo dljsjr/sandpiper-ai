@@ -318,3 +318,41 @@ Follow-up tasks:
 - AGENT-86 should consume the env/config findings when introducing host context.
 - AGENT-91 should use the app-bundle recommendation as its starting point.
 - AGENT-89 should add automated versions of the source help, resource probe, and compiled app-bundle smoke checks.
+
+## AGENT-99 Dogfood CLI MVP Result
+
+The spike was promoted into a dogfoodable vertical slice while keeping the existing `sandpiper-dev` wrapper intact.
+
+Added production-shaped source files:
+
+- `packages/cli/sandpiper_standalone.ts` — dogfood standalone entrypoint
+- `packages/cli/standalone_bootstrap.ts` — package-root and Pi environment bootstrap helpers
+- `packages/cli/sandpiper_resources.ts` — explicit Sandpiper extension/resource factory adapter
+
+Added scripts:
+
+```bash
+bun run sandpiper-standalone-dev -- --help
+bun run build:standalone
+bun run sandpiper-standalone-built -- --help
+bun run test:standalone
+```
+
+Testing note: invoke these scripts or explicit file paths. Do not test with bare `sandpiper`, because the user's `$PATH` may resolve to a different shell script or installed binary.
+
+The dogfood entrypoint currently:
+
+- sets Pi package metadata before dynamically importing Pi
+- loads existing Sandpiper system, shell-relay, web-fetch, and autotoon extensions via `extensionFactories`
+- contributes existing `skills/sandpiper`, `skills/third-party`, `prompts`, and `themes` paths via a resource-discovery extension
+- supports temp config dirs through `SANDPIPER_CODING_AGENT_DIR`
+
+The dogfood build target emits a Bun-targeted JS bundle under `packages/cli/dist/standalone/`. This is not the final app-bundle distribution. `css-tree` is externalized for now because the web-fetch/jsdom dependency path hits Bun issue <https://github.com/oven-sh/bun/issues/13076>: `css-tree` loads `../data/patch.json` through `createRequire(import.meta.url)`, and Bun can fail to resolve/bundle that JSON asset even with `--target=bun`.
+
+Verified MVP checks:
+
+- `bun run test:standalone`
+- `bun check`
+- `bun run sandpiper-standalone-dev -- --help --no-extensions --no-skills --no-prompt-templates --no-themes --no-context-files`
+- `bun run build:standalone`
+- `bun run sandpiper-standalone-built -- --help --no-extensions --no-skills --no-prompt-templates --no-themes --no-context-files`

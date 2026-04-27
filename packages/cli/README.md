@@ -23,6 +23,28 @@ bun run copy-assets  # Copy README/CHANGELOG into dist
 
 All three run automatically during `preinstall`.
 
+## Dogfood Standalone Target
+
+`AGENT-99` introduced a narrow dogfood target for the package-first refactor. This target keeps using Pi's `main(args, { extensionFactories })`, but loads Sandpiper extensions/resources explicitly instead of relying on root `pi.extensions` / `pi.skills` manifest entries.
+
+Use explicit package scripts or paths when testing. The user's `$PATH` may contain another `sandpiper` executable or shell script.
+
+```bash
+# Source/dev target
+bun run sandpiper-standalone-dev -- --help
+
+# Build the dogfood bundle
+bun run build:standalone
+
+# Run the built dogfood bundle
+bun run sandpiper-standalone-built -- --help
+
+# Standalone smoke tests
+bun run test:standalone
+```
+
+The build target intentionally produces a Bun-targeted JS bundle under `packages/cli/dist/standalone/`; it is not yet the final `bun compile` app bundle. `css-tree` is externalized because the bundled web-fetch dependency path currently hits Bun issue [#13076](https://github.com/oven-sh/bun/issues/13076): `css-tree` loads `../data/patch.json` through `createRequire(import.meta.url)`, and Bun can fail to resolve/bundle that JSON asset even with `--target=bun`.
+
 ## Key Files
 
 | File | Purpose |
