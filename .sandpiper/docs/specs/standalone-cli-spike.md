@@ -253,3 +253,37 @@ Recommendation: treat the first standalone deliverable as an **app bundle**, not
 - any helper binaries or MCP/plugin assets needed by adapters
 
 A true single-file binary would require either embedding resources into the executable and teaching adapters to read from Bun's virtual filesystem, or generating runtime temp files. That is possible but should not be the first target.
+
+## Final Findings
+
+The AGENT-85 spike validated the core standalone direction.
+
+Confirmed:
+
+- Pi `main(args, { extensionFactories })` is sufficient for a standalone Sandpiper entrypoint to inject Pi extension factories without root `pi.extensions`.
+- Inline extensions can contribute bundled resource paths through `resources_discover`, proving resource discovery does not require root `pi.skills` manifest entries.
+- Pi package metadata and branding are read from the package directory at module-import time, so a development/source entrypoint must set `PI_PACKAGE_DIR` before importing Pi.
+- A compiled Bun executable can run the same entrypoint when supplied an app-bundle package directory containing sidecar `package.json` metadata.
+- The first standalone distribution should be an app bundle, not a single-file binary.
+
+Not yet solved:
+
+- replacing repo-root resource lookup with app-bundle-relative resource lookup
+- copying/symlinking Pi interactive/export assets into the standalone bundle
+- converting this spike entrypoint into production CLI package structure
+- deciding compatibility/mirroring between `SANDPIPER_CODING_AGENT_DIR` and existing Sandpiper env conventions
+- removing dependency on root `package.json` as the source of Sandpiper `piConfig`
+
+Recommended next implementation sequence:
+
+1. Convert the spike into a production `packages/cli` bootstrap that sets package metadata before loading Pi.
+2. Introduce a distribution app-bundle layout with sidecar `package.json`, assets, and resource roots.
+3. Move resource discovery from spike fixtures to package-owned Sandpiper resource manifests.
+4. Add invariant/smoke tests that run source and compiled entrypoints with temp config directories.
+5. Only after that, start moving neutral capabilities/resources under `packages/`.
+
+Follow-up tasks:
+
+- AGENT-86 should consume the env/config findings when introducing host context.
+- AGENT-91 should use the app-bundle recommendation as its starting point.
+- AGENT-89 should add automated versions of the source help, resource probe, and compiled app-bundle smoke checks.

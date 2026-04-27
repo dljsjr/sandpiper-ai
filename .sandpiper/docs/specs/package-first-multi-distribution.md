@@ -278,7 +278,7 @@ Build the smallest useful proof of concept:
 - Sandpiper app/config identity proven in a temp config directory
 - asset/package behavior documented for `bun compile`
 
-This spike should happen before broad file movement.
+Spike findings are captured in [standalone-cli-spike.md](standalone-cli-spike.md). Initial result: Pi's `main(args, { extensionFactories })` works for inline extension injection, `resources_discover` works for bundled resource discovery, and the first standalone deliverable should be an app bundle with sidecar package metadata/assets rather than a true single-file binary.
 
 ### Phase 2 — Host context and path abstraction
 
@@ -401,7 +401,7 @@ The invariant is not "zero matches everywhere" because Sandpiper identity packag
 ## Open Questions
 
 1. **Project config directory API:** Pi exports `getAgentDir()`, but project-local config dir resolution may not be exposed at the right abstraction level. Verify before designing around it.
-2. **Bun compile asset model:** Determine whether Sandpiper needs a true single binary or an app bundle with sidecar assets/package metadata.
+2. **Bun compile asset model:** Initial AGENT-85 answer: target an app bundle with sidecar `package.json`, assets, and resources first. A true single-file binary remains a later optimization.
 3. **Claude MCP adapter shape:** Determine the Claude Code plugin packaging format, MCP server lifecycle expectations, and which capability operations should be exposed as MCP tools.
 4. **Existing data migration:** Existing users have `.sandpiper/tasks`, `.sandpiper/standup.md`, and `~/.sandpiper`. Decide when neutral tools should use host config paths versus preserving Sandpiper-branded storage for product compatibility.
 5. **CLI naming:** Confirm whether `sandpiper-tasks` remains the CLI name in neutral Pi/Claude distributions or whether aliases are needed.
