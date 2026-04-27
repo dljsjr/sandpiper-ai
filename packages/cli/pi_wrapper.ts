@@ -45,7 +45,7 @@ function findPackageDir(startDir: string): string {
 }
 
 const overridesPackageDir = findPackageDir(scriptDir);
-
+//
 // ── Explicit PI_* variables ──
 // These are exempt from SANDPIPER_* ↔ PI_* mirroring.
 //
