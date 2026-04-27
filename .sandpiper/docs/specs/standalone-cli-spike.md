@@ -254,7 +254,38 @@ Recommendation: treat the first standalone deliverable as an **app bundle**, not
 
 A true single-file binary would require either embedding resources into the executable and teaching adapters to read from Bun's virtual filesystem, or generating runtime temp files. That is possible but should not be the first target.
 
-## Final Findings
+## Dogfood Standalone CLI MVP Contract
+
+Owner task: AGENT-99  
+MVP contract subtask: AGENT-100
+
+The next vertical slice converts the spike into a dogfoodable standalone CLI target while keeping the existing `sandpiper-dev` wrapper intact.
+
+The MVP is intentionally narrow:
+
+- provide an explicit local development command that cannot be confused with any `sandpiper` shell script on `$PATH`
+- set Pi package metadata before importing Pi
+- load Sandpiper's current identity/capability extensions through explicit factories, not root `pi.extensions`
+- load existing skills/prompts/themes through explicit resource discovery, not root `pi.skills` / `pi.prompts` / `pi.themes`
+- run with temp config dirs in smoke tests
+- leave package moves and neutral capability extraction for later tasks
+
+Acceptance checks:
+
+1. source dogfood command shows extension-provided CLI help (`--migrate-pi-configs` from the existing system extension)
+2. source dogfood command can list/use bundled resources without relying on root Pi manifest entries
+3. dogfood command is invoked by explicit path/script, never by bare `sandpiper` from `$PATH`
+4. existing `bun run sandpiper-dev -- --version` still works
+5. `bun check` passes
+
+Non-goals:
+
+- do not remove or replace `packages/cli/pi_wrapper.ts` yet
+- do not implement the final app-bundle build in this slice
+- do not move top-level `extensions/`, `skills/`, `prompts/`, or `themes/`
+- do not solve Claude/MCP adapter packaging in this slice
+
+## Final AGENT-85 Findings
 
 The AGENT-85 spike validated the core standalone direction.
 
