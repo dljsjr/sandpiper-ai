@@ -20,15 +20,39 @@ When you identify an improvement to a skill, first check where the skill file li
 
 ### Review skills touched or relevant to this session
 
-For each skill that was loaded, consulted, or relevant to the work done:
+Audit both skill effectiveness **and trigger quality**. Do not limit the audit to skills that were actually loaded. Deliberately scan the available skills list and identify skills that should have activated but did not.
 
-1. **Was the skill accurate?** Did you follow its guidance successfully, or did you hit cases where it was wrong, incomplete, or misleading?
-2. **Did the skill trigger when it should have?** Were there moments where you should have consulted a skill but didn't think to?
-3. **Are there new patterns or gotchas discovered this session** that belong in a skill?
+For each skill in any of these categories, report findings:
 
-For project-local skills: fix issues directly. For package-provided skills: note the finding and suggest it to the user.
+- skills loaded or consulted during the session
+- skills the user explicitly told you to use
+- skills that should have triggered automatically based on the work performed, even if they never loaded
+- skills that triggered late, only after user prompting, or only after you hit an avoidable mistake
+- skills whose descriptions may be too vague, too narrow, or too buried in body text to trigger reliably
 
-List the skills you reviewed and what you found (or "no changes needed") for each.
+For each reviewed skill, answer:
+
+1. **Trigger quality:** Did the skill trigger automatically at the right time? If the user explicitly prompted it, would it have triggered without that prompt? Be honest.
+2. **Missed or delayed triggers:** Were there earlier points where the skill should have loaded? Were there skills that never loaded but should have?
+3. **Trigger failure cause:** If activation was missed/delayed/explicit-only, was the likely cause weak description wording, missing trigger phrases, over-narrow scope, over-broad scope, trigger guidance buried in the body instead of frontmatter, or the agent overestimating its own certainty?
+4. **Usage effectiveness:** Once loaded, was the guidance accurate, complete, and actionable? Did you hit cases where it was wrong, incomplete, or misleading?
+5. **Persistable learning:** Are there new patterns or gotchas discovered this session that belong in a skill?
+
+Common under-trigger patterns to check explicitly:
+
+- API/library/framework/CLI/config-format uncertainty → docs lookup skills such as **dash**
+- version control operations, commits, bookmarks, rebases, abandon/drop, operation-log recovery → **jj**
+- tasks, backlog, status, tickets, follow-up work → **tasks**
+- self-reflection involving skills → **skill-review** and possibly **skill-creator**
+- code review or judging code quality → **code-review**
+- cleanup, simplification, restructuring → **refactoring**
+- tests-first work or bug reproduction → **test-driven-development**
+- PDF handling → **pdf**
+- GitHub/GitLab URLs or CLI work → **gh** / **glab**
+
+For project-local skills: fix issues directly. For package-provided skills: note the finding and suggest it to the user instead of editing installed package files.
+
+List every skill you reviewed and what you found. For each skill, include a trigger-quality classification such as: `automatic_trigger_correct`, `explicit_user_trigger_only`, `missed_trigger`, `delayed_trigger`, `overtriggered`, or `not_relevant_after_review`.
 
 ### Consider whether new project-local skills should be authored
 
