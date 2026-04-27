@@ -1,15 +1,13 @@
 ---
 name: dash
 description: >-
-  Look up programming documentation using the Dash documentation browser. Use when the
-  user asks to check docs, look up an API, find function signatures, or needs reference
-  documentation. Also use proactively when WRITING code that calls an API you're not 100%
-  certain about — if you're about to use a function and aren't sure of its exact parameters,
-  return type, feature flags, or trait bounds, look it up before writing the call. This
-  includes: checking whether a type implements a trait, verifying serde feature flags,
-  confirming error types, looking up method signatures on third-party crates. Triggers:
-  "docs", "documentation", "API reference", "look up", "how does X work", "what are the
-  parameters for", "Dash", or when you catch yourself guessing about an API.
+  Look up programming documentation using the Dash documentation browser. Trigger whenever
+  the user asks to check docs, look up an API, find a signature, verify behavior, or mentions
+  Dash/docsets. Also trigger proactively before writing code against any API, library,
+  framework, CLI, config format, package, or crate when exact parameters, return types,
+  options, feature flags, trait/interface support, error types, or edge-case behavior are not
+  already verified. Do not guess from memory when docs are available. If the needed docset is
+  missing, tell the user and ask whether they can add it to Dash or want an alternate source.
 compatibility: macOS only. Requires Dash.app installed (https://kapeli.com/dash).
 ---
 
@@ -17,7 +15,7 @@ compatibility: macOS only. Requires Dash.app installed (https://kapeli.com/dash)
 
 Search and read programming documentation from Dash, a local documentation browser. Dash provides offline, fast access to docsets for hundreds of languages, frameworks, and tools.
 
-This is valuable in two situations: when the **user** asks you to look something up, and when **you** need to verify your own knowledge. If you're about to use an API and aren't fully confident about the exact parameters, return types, or edge-case behavior, look it up. Authoritative docs beat guessing.
+This is valuable in two situations: when the **user** asks you to look something up, and when **you** need to verify your own knowledge. If you're about to use an API, library, framework, CLI, config format, package, or crate and aren't fully confident about the exact parameters, return types, supported options, feature flags, trait/interface support, error types, or edge-case behavior, look it up before coding. Authoritative docs beat guessing.
 
 ## CLI
 
@@ -36,6 +34,8 @@ scripts/dash list-installed-docsets
 ```
 
 This returns a JSON array of docsets with their `name`, `identifier`, and `platform`. The `identifier` is what you pass to search commands — it's an opaque string, not the human-readable name.
+
+If the needed docset is not installed, say so clearly. Dash does not currently provide this skill an endpoint for acquiring/installing docsets automatically. Ask the user whether they can add the docset to Dash or whether they want you to use another documentation source. Do not silently fall back to guessing.
 
 ### 2. Search for documentation
 
