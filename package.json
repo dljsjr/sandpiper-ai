@@ -13,9 +13,12 @@
     "check:ast-grep": "ast-grep scan",
     "check": "bun run check:tsc && bun run check:biome-check",
     "build": "bun --filter sandpiper-ai-cli build",
+    "build:standalone": "bun --filter sandpiper-ai-cli build:standalone",
     "vendor": "bash devtools/vendor.sh",
     "clean": "bun devtools/clean.ts",
-    "sandpiper-dev": "bun run --bun ./packages/cli/pi_wrapper.ts"
+    "sandpiper-dev": "bun run --bun ./packages/cli/pi_wrapper.ts",
+    "sandpiper-standalone-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
+    "sandpiper-standalone-built": "bun ./packages/cli/dist/standalone/sandpiper_standalone.js"
   },
   "bin": {
     "sandpiper": "./dist/sandpiper",
