@@ -1,31 +1,14 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
+import { findPackageRoot } from './standalone_bootstrap.js';
 
 const EXPECTED_SKILL_NAME = 'standalone-spike';
-
-function findRepoRoot(startDir: string): string {
-  let dir = startDir;
-  const root = resolve('/');
-
-  while (dir !== root) {
-    const packageJsonPath = join(dir, 'package.json');
-    if (existsSync(packageJsonPath)) {
-      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as { name?: string };
-      if (packageJson.name === 'sandpiper-ai') {
-        return dir;
-      }
-    }
-    dir = dirname(dir);
-  }
-
-  throw new Error(`Unable to find sandpiper-ai repo root from ${startDir}`);
-}
 
 function resolvePackageDir(repoRoot: string): string {
   const override = process.env.SANDPIPER_SPIKE_PACKAGE_DIR;
@@ -46,7 +29,7 @@ function createResourceDiscoveryExtension(skillRoot: string): ExtensionFactory {
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = process.env.SANDPIPER_SPIKE_REPO_ROOT
   ? resolve(process.env.SANDPIPER_SPIKE_REPO_ROOT)
-  : findRepoRoot(scriptDir);
+  : findPackageRoot(scriptDir, 'sandpiper-ai');
 const packageDir = resolvePackageDir(repoRoot);
 const skillRoot = join(repoRoot, 'packages', 'cli', 'fixtures', 'standalone-spike-skills');
 const skillFile = join(skillRoot, EXPECTED_SKILL_NAME, 'SKILL.md');
@@ -81,15 +64,18 @@ try {
     sessionManager: SessionManager.inMemory(),
   });
 
-  await session.bindExtensions({});
+  try {
+    await session.bindExtensions({});
 
-  const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
-  if (!skillNames.includes(EXPECTED_SKILL_NAME)) {
-    throw new Error(`Expected resource discovery to load ${EXPECTED_SKILL_NAME}; loaded: ${skillNames.join(', ')}`);
+    const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
+    if (!skillNames.includes(EXPECTED_SKILL_NAME)) {
+      throw new Error(`Expected resource discovery to load ${EXPECTED_SKILL_NAME}; loaded: ${skillNames.join(', ')}`);
+    }
+
+    console.log(`Loaded skill via resources_discover: ${EXPECTED_SKILL_NAME}`);
+  } finally {
+    session.dispose();
   }
-
-  console.log(`Loaded skill via resources_discover: ${EXPECTED_SKILL_NAME}`);
-  session.dispose();
 } finally {
   await rm(agentDir, { recursive: true, force: true });
 }

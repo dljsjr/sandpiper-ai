@@ -1,29 +1,11 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
-import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
+import { findPackageRoot } from './standalone_bootstrap.js';
 
 process.title = 'sandpiper-spike';
-
-function findRepoRoot(startDir: string): string {
-  let dir = startDir;
-  const root = resolve('/');
-
-  while (dir !== root) {
-    const packageJsonPath = join(dir, 'package.json');
-    if (existsSync(packageJsonPath)) {
-      const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as { name?: string };
-      if (packageJson.name === 'sandpiper-ai') {
-        return dir;
-      }
-    }
-    dir = dirname(dir);
-  }
-
-  throw new Error(`Unable to find sandpiper-ai repo root from ${startDir}`);
-}
 
 function resolvePackageDir(repoRoot: string): string {
   const override = process.env.SANDPIPER_SPIKE_PACKAGE_DIR;
@@ -50,7 +32,7 @@ function createSpikeExtension(skillRoot: string): ExtensionFactory {
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = process.env.SANDPIPER_SPIKE_REPO_ROOT
   ? resolve(process.env.SANDPIPER_SPIKE_REPO_ROOT)
-  : findRepoRoot(scriptDir);
+  : findPackageRoot(scriptDir, 'sandpiper-ai');
 const packageDir = resolvePackageDir(repoRoot);
 const spikeSkillRoot = join(repoRoot, 'packages', 'cli', 'fixtures', 'standalone-spike-skills');
 

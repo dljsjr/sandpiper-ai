@@ -1,9 +1,8 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createSandpiperExtensionFactories } from './sandpiper_resources.js';
 import { configurePiEnvironment, resolveStandalonePaths } from './standalone_bootstrap.js';
 
 process.title = 'sandpiper';
@@ -27,6 +26,7 @@ configurePiEnvironment(
 );
 
 const { main } = await import('@mariozechner/pi-coding-agent');
+const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
 
 await main(process.argv.slice(2), {
   extensionFactories: createSandpiperExtensionFactories(standalonePaths.resourceRoot),
