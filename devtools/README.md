@@ -6,7 +6,7 @@ Development scripts and build utilities. Not distributed with the package.
 
 | Script | Purpose |
 |--------|---------|
-| `postinstall.sh` | Assembles the `dist/` distribution (rsync, symlinks, dash build, pi package install) |
+| `postinstall.sh` | Assembles the `dist/` distribution (rsync, symlinks, dash build; legacy Pi package install is opt-in) |
 | `preinstall.sh` | Scaffolds `dist/` directory structure before workspace builds |
 | `vendor.sh` | Downloads vendored third-party skills from `vendor.txt` |
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
@@ -47,5 +47,5 @@ bun install
       → symlink pi internal assets
       → build dash CLI via mcporter
       → create dev-mode skill binary symlinks
-      → sandpiper install dist/ (register pi package)
+      → optionally run sandpiper install dist/ when SANDPIPER_INSTALL_PI_PACKAGE=1
 ```

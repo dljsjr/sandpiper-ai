@@ -93,7 +93,7 @@ Workspace packages with real build outputs are built automatically during `bun i
 bun run build                              # Build the sandpiper CLI
 bun --filter sandpiper-tasks-cli run build # Rebuild tasks CLI
 bun --filter sandpiper-ai-core run build   # Rebuild core package declarations/dist
-bash devtools/postinstall.sh               # Reassemble dist/ and reinstall package
+bash devtools/postinstall.sh               # Reassemble dist/ (legacy Pi package install is opt-in)
 ```
 
 ## Development
