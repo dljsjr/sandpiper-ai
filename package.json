@@ -68,8 +68,8 @@
         "supports-color": "10.2.2"
       },
       "pi": {
-        "@mariozechner/pi-coding-agent": "0.70.2",
-        "@mariozechner/pi-tui": "0.70.2",
+        "@mariozechner/pi-coding-agent": "0.70.6",
+        "@mariozechner/pi-tui": "0.70.6",
         "@silvia-odwyer/photon-node": "0.3.4",
         "@sinclair/typebox": "0.34.49"
       },
@@ -80,7 +80,7 @@
       },
       "web": {
         "@mozilla/readability": "0.6.0",
-        "jsdom": "29.0.2",
+        "jsdom": "29.1.0",
         "turndown": "7.2.4",
         "@types/jsdom": "28.0.1",
         "@types/turndown": "5.0.6"
