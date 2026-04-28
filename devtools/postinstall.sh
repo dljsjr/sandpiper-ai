@@ -134,9 +134,21 @@ if [ -f "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" ]; then
     ln -sf "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" "${REPO_ROOT}/skills/sandpiper/dash/scripts/dash"
 fi
 
-# ─── Install Sandpiper Packages ─────────────────────────────────
-if bun run "${DIST_DIR}/sandpiper" -- install "${DIST_DIR}"; then
-    echo "✓ Successfully installed Sandpiper Package"
+# ─── Optional legacy Pi Package install ─────────────────────────
+# Historically postinstall ran `sandpiper install dist/` because the repo root
+# was distributed primarily as a Pi package. The standalone CLI path loads
+# Sandpiper extensions/resources through explicit extension factories and
+# resources_discover, so it does not need the dist package installed.
+#
+# Keeping this opt-in prevents jj workspaces from each adding their own dist/
+# package to the same agent settings, which creates duplicate tool/flag
+# registrations and can prevent Pi/Sandpiper from launching.
+if [ "${SANDPIPER_INSTALL_PI_PACKAGE:-0}" = "1" ]; then
+    if bun run "${DIST_DIR}/sandpiper" -- install "${DIST_DIR}"; then
+        echo "✓ Successfully installed Sandpiper Package"
+    else
+        echo "⚠ Failed to install Sandpiper Package"
+    fi
 else
-    echo "⚠ Failed to install Sandpiper Package"
+    echo "↷ Skipping legacy Pi package install (set SANDPIPER_INSTALL_PI_PACKAGE=1 to install dist/)"
 fi

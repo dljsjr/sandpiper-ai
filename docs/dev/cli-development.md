@@ -176,7 +176,7 @@ The `postinstall.sh` script:
 - Copies CLI binaries to `dist/`
 - Generates `dist/package.json` with bin metadata
 - Symlinks the CLI into place
-- Installs the Sandpiper Pi package
+- Skips legacy Pi package installation by default; set `SANDPIPER_INSTALL_PI_PACKAGE=1` to install `dist/` into the active agent settings
 
 ### Why Two Steps?
 

@@ -82,7 +82,9 @@ This script:
 3. Generates `dist/package.json` with Pi package metadata
 4. Symlinks Pi's internal assets
 5. Builds the Dash CLI via mcporter
-6. Installs the Sandpiper Pi package
+6. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
+
+Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
 ## Understanding `dist/`
 
