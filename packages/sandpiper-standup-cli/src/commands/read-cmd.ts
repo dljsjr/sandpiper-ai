@@ -1,24 +1,25 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { Command } from '@commander-js/extra-typings';
 import { cleanupStandup } from '../core/cleanup.js';
 import { parseStandup, type StandupSection, serializeStandup } from '../core/parser.js';
-import { getRootDir } from './helpers.js';
+import { getRootDir, resolveStandupCommandContext } from './helpers.js';
 
 export const readCommand = new Command('read')
   .description('Read and clean the standup file, outputting active and inactive sections')
   .action((_opts, cmd) => {
-    const cwd = getRootDir(cmd as Command) || process.cwd();
-    const standupPath = join(cwd, '.sandpiper', 'standup.md');
+    const context = resolveStandupCommandContext({
+      rootDir: getRootDir(cmd as Command),
+      cwd: process.cwd(),
+      env: process.env,
+    });
 
-    if (!existsSync(standupPath)) {
+    if (!existsSync(context.standupPath)) {
       process.exitCode = 1;
       return;
     }
 
-    const content = readFileSync(standupPath, 'utf-8');
-    const sessionId = process.env.SANDPIPER_SESSION_ID;
-    const result = cleanupStandup(content, { currentSessionId: sessionId });
+    const content = readFileSync(context.standupPath, 'utf-8');
+    const result = cleanupStandup(content, { currentSessionId: context.session.sessionId });
 
     const parsedContent = parseStandup(content);
     const isLegacyFormat =
@@ -38,9 +39,9 @@ export const readCommand = new Command('read')
     if (!isLegacyFormat) {
       const nextSerialized = serializeStandup(persistedSections);
       if (nextSerialized !== content) {
-        const tempPath = `${standupPath}.tmp`;
+        const tempPath = `${context.standupPath}.tmp`;
         writeFileSync(tempPath, nextSerialized, 'utf-8');
-        renameSync(tempPath, standupPath);
+        renameSync(tempPath, context.standupPath);
       }
     }
 
