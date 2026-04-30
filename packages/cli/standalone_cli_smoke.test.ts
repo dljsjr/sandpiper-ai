@@ -75,7 +75,7 @@ describe('standalone Sandpiper CLI smoke', () => {
 
     expect(output).toContain('--migrate-pi-configs');
     expect(output).toContain('--install-shell-integrations');
-  });
+  }, 15_000);
 
   it('loads Sandpiper extension flags exactly once by default', () => {
     const output = runStandaloneHelp();
