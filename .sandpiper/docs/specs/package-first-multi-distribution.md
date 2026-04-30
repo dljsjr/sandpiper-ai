@@ -294,6 +294,19 @@ Early candidates:
 - session continuity PID paths
 - any direct `.sandpiper` / `~/.sandpiper` use in neutral-capability code
 
+#### AGENT-86 inventory
+
+Initial hardcoded host-path/env references found before introducing the seam:
+
+| Area | Current references | Classification for AGENT-86 |
+| --- | --- | --- |
+| Standup CLI (`packages/sandpiper-standup-cli`) | `./.sandpiper/standup.md`, `SANDPIPER_SESSION_ID`, `SANDPIPER_SESSION_FILE` | First vertical-slice consumer; should receive explicit project paths and session identity. |
+| Task CLI (`packages/sandpiper-tasks-cli`) | `./.sandpiper/tasks`, `.sandpiper-tasks.json`, `./.sandpiper/settings.json` | Candidate for later consumer; avoid a task-storage redesign in AGENT-86. |
+| Shell integration install/preflight | `~/.sandpiper/shell-integrations`, `PI_PACKAGE_DIR` | Small second consumer if the standup slice stays contained. |
+| Shell relay runtime | `SANDPIPER_SESSION_ID`, `SHELL_RELAY_SESSION`, XDG/tmp FIFO paths | Host-adapter/capability boundary candidate; leave deeper runtime split for later capability package work. |
+| Sandpiper identity/adapters (`packages/cli`, `extensions/system`, migration helpers) | Sandpiper/Pi env mirroring, migration paths, system prompt text, package sidecar config | Allowed to remain host-specific. |
+| Startup context (`packages/core/src/startup-context.ts`) | `.sandpiper/tasks` project metadata discovery | Sandpiper identity/support behavior; revisit after task/standup seams exist. |
+
 ### Phase 3 — Split identity from capabilities
 
 Task: AGENT-87
