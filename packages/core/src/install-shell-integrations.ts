@@ -11,6 +11,7 @@
 import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import type { HostContext } from './host-context.js';
 import { displayPath } from './paths.js';
 
 export interface InstallResult {
@@ -19,9 +20,15 @@ export interface InstallResult {
   installedTo: string;
 }
 
+export interface InstallShellIntegrationsOptions {
+  readonly sourceDir?: string;
+  readonly targetDir?: string;
+  readonly hostContext?: HostContext;
+}
+
 /** The well-known location for shell integration scripts. */
-export function getShellIntegrationsDir(): string {
-  return join(homedir(), '.sandpiper', 'shell-integrations');
+export function getShellIntegrationsDir(hostContext?: HostContext): string {
+  return join(hostContext?.paths.globalConfigDir ?? join(homedir(), '.sandpiper'), 'shell-integrations');
 }
 
 /**
@@ -44,10 +51,12 @@ const SCRIPTS: ReadonlyArray<{ file: string; shell: string; rcFile: string }> = 
  * Install shell integration scripts to ~/.sandpiper/shell-integrations/.
  * Overwrites existing files — users should not edit these scripts directly.
  *
- * @param targetDir - Target installation directory. Defaults to the well-known location.
+ * @param input - Target directory string, or explicit source/target path options.
  */
-export function installShellIntegrations(targetDir = getShellIntegrationsDir()): InstallResult {
-  const sourceDir = getSourceDir();
+export function installShellIntegrations(input: string | InstallShellIntegrationsOptions = {}): InstallResult {
+  const options = typeof input === 'string' ? { targetDir: input } : input;
+  const targetDir = options.targetDir ?? getShellIntegrationsDir(options.hostContext);
+  const sourceDir = options.sourceDir ?? getSourceDir();
   if (!sourceDir || !existsSync(sourceDir)) {
     return {
       success: false,
