@@ -3,7 +3,14 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { configurePiEnvironment, resolveStandalonePaths } from './standalone_bootstrap.js';
+import {
+  configurePiEnvironment,
+  defaultStandaloneMainArgs,
+  hasConfiguredSandpiperPackage,
+  mirrorPiSandpiperEnvironment,
+  prepareStandalonePackageDir,
+  resolveStandalonePaths,
+} from './standalone_bootstrap.js';
 
 process.title = 'sandpiper';
 
@@ -16,6 +23,14 @@ const piPackageJson = JSON.parse(readFileSync(join(upstreamPiPackageDir, 'packag
   version: string;
 };
 
+if (standalonePaths.packageDirSource === 'generated') {
+  prepareStandalonePackageDir({
+    packageDir: standalonePaths.packageDir,
+    resourceRoot: standalonePaths.resourceRoot,
+    piPackageDir: upstreamPiPackageDir,
+  });
+}
+
 configurePiEnvironment(
   {
     packageDir: standalonePaths.packageDir,
@@ -24,10 +39,20 @@ configurePiEnvironment(
   },
   process.env,
 );
+mirrorPiSandpiperEnvironment(process.env);
+console.log(`using pi-coding-agent version: ${piPackageJson.version}\n`);
 
 const { main } = await import('@mariozechner/pi-coding-agent');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
 
-await main(process.argv.slice(2), {
-  extensionFactories: createSandpiperExtensionFactories(standalonePaths.resourceRoot),
+const extensionFactories = hasConfiguredSandpiperPackage({
+  resourceRoot: standalonePaths.resourceRoot,
+  cwd: process.cwd(),
+  env: process.env,
+})
+  ? []
+  : createSandpiperExtensionFactories(standalonePaths.resourceRoot);
+
+await main(defaultStandaloneMainArgs(process.argv.slice(2), process.env), {
+  extensionFactories,
 });

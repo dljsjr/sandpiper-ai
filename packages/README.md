@@ -18,4 +18,4 @@ Each package has its own `build` script that runs `tsc` (for declarations) + `bu
 
 Built outputs land in each package's `dist/` directory. The root `postinstall` script copies these into the top-level `dist/` for distribution alongside extensions, skills, prompts, and themes.
 
-Packages that produce CLI binaries are symlinked into `node_modules/.bin/` by bun when listed as dependencies of the root package.
+Packages that produce CLI binaries are symlinked into `node_modules/.bin/` by bun when listed as dependencies of the root package. For generated binaries, prefer a stable checked-in `bin/` shim as the package `bin` target; Bun resolves workspace bin links before install lifecycle scripts have produced fresh `dist/` outputs.

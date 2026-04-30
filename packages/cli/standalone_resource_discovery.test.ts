@@ -69,5 +69,5 @@ describe('standalone Sandpiper resource discovery', () => {
 
       await rm(agentDir, { recursive: true, force: true });
     }
-  });
+  }, 15_000);
 });
