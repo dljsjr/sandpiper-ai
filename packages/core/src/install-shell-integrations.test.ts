@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { resolveHostContext } from './host-context.js';
 import {
   formatInstallInstructions,
   getShellIntegrationsDir,
@@ -14,6 +15,20 @@ describe('getShellIntegrationsDir', () => {
   it('returns a path ending in .sandpiper/shell-integrations', () => {
     const dir = getShellIntegrationsDir();
     expect(dir).toMatch(/\.sandpiper[/\\]shell-integrations$/);
+  });
+
+  it('uses an explicit host context global config directory', () => {
+    const context = resolveHostContext({
+      cwd: '/tmp/project',
+      homeDir: '/tmp/home',
+      identity: {
+        appName: 'example-agent',
+        configDirName: '.example-agent',
+        agentDirName: 'agent',
+      },
+    });
+
+    expect(getShellIntegrationsDir(context)).toBe(join('/tmp/home', '.example-agent', 'shell-integrations'));
   });
 });
 
@@ -87,6 +102,16 @@ describe('installShellIntegrations', () => {
 
   it('copies the correct content', () => {
     installShellIntegrations(tmpTargetDir);
+    expect(readFileSync(join(tmpTargetDir, 'relay.fish'), 'utf-8')).toBe('# test fish integration');
+  });
+
+  it('copies from an explicit source directory without reading PI_PACKAGE_DIR', () => {
+    const srcDir = join(tmpPackageDir, 'extensions', 'shell-relay', 'shell-integration');
+    delete process.env.PI_PACKAGE_DIR;
+
+    const result = installShellIntegrations({ sourceDir: srcDir, targetDir: tmpTargetDir });
+
+    expect(result.success).toBe(true);
     expect(readFileSync(join(tmpTargetDir, 'relay.fish'), 'utf-8')).toBe('# test fish integration');
   });
 
