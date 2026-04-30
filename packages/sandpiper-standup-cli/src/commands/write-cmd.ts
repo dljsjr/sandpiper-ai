@@ -1,9 +1,8 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { Command } from '@commander-js/extra-typings';
 import { cleanupStandup } from '../core/cleanup.js';
 import { parseStandup, type StandupSection, serializeStandup } from '../core/parser.js';
-import { getRootDir } from './helpers.js';
+import { getRootDir, resolveStandupCommandContext } from './helpers.js';
 
 export const writeCommand = new Command('write')
   .description('Write a standup section (reads from stdin)')
@@ -11,12 +10,14 @@ export const writeCommand = new Command('write')
   .option('-f, --file <path>', 'Session file path (defaults to SANDPIPER_SESSION_FILE)')
   .option('-s, --session-file <path>', 'Path to file containing section body (if not provided, reads from stdin)')
   .action(async (opts, cmd) => {
-    const cwd = getRootDir(cmd as Command) || process.cwd();
-    const standupPath = join(cwd, '.sandpiper', 'standup.md');
-
-    // Get session identity from flags or env vars
-    const sessionId = opts.uuid || process.env.SANDPIPER_SESSION_ID;
-    const sessionFile = opts.file || process.env.SANDPIPER_SESSION_FILE;
+    const context = resolveStandupCommandContext({
+      rootDir: getRootDir(cmd as Command),
+      cwd: process.cwd(),
+      env: process.env,
+      sessionId: opts.uuid,
+      sessionFile: opts.file,
+    });
+    const { sessionId, sessionFile } = context.session;
 
     if (!sessionId) {
       console.error('Session UUID required. Provide --uuid or set SANDPIPER_SESSION_ID environment variable.');
@@ -54,8 +55,8 @@ export const writeCommand = new Command('write')
 
     // Read existing standup
     let existingContent = '';
-    if (existsSync(standupPath)) {
-      existingContent = readFileSync(standupPath, 'utf-8');
+    if (existsSync(context.standupPath)) {
+      existingContent = readFileSync(context.standupPath, 'utf-8');
     }
 
     // Parse existing content (don't clean yet - we need to preserve legacy on first write)
@@ -103,9 +104,9 @@ export const writeCommand = new Command('write')
 
     // Serialize and write atomically
     const serialized = serializeStandup(cleanedSections);
-    const tempPath = `${standupPath}.tmp`;
+    const tempPath = `${context.standupPath}.tmp`;
     writeFileSync(tempPath, serialized, 'utf-8');
-    renameSync(tempPath, standupPath);
+    renameSync(tempPath, context.standupPath);
 
     // Output only sessions that were actually removed.
     const removedInactive = cleanupResult.inactiveSections.filter(
