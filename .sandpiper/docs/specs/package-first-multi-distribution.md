@@ -307,6 +307,23 @@ Initial hardcoded host-path/env references found before introducing the seam:
 | Sandpiper identity/adapters (`packages/cli`, `extensions/system`, migration helpers) | Sandpiper/Pi env mirroring, migration paths, system prompt text, package sidecar config | Allowed to remain host-specific. |
 | Startup context (`packages/core/src/startup-context.ts`) | `.sandpiper/tasks` project metadata discovery | Sandpiper identity/support behavior; revisit after task/standup seams exist. |
 
+AGENT-86 introduced a typed seam in `packages/core/src/host-context.ts` and proved it through two consumers:
+
+- `packages/sandpiper-standup-cli` resolves project config paths and session identity through explicit host-context inputs. Command modules no longer construct `./.sandpiper/standup.md` directly.
+- `packages/core/src/install-shell-integrations.ts` accepts explicit source/target paths and can derive target paths from a host context. Its default remains Sandpiper-specific because shell integration installation is still a Sandpiper adapter behavior.
+
+AGENT-86 verification uses these checks:
+
+```bash
+bun check
+bun --filter sandpiper-ai-core test
+bun --filter sandpiper-standup-cli test
+bun run test:standalone
+rg -n "\.sandpiper|~/.sandpiper|SANDPIPER_|PI_" packages/core/src packages/sandpiper-standup-cli/src --glob '!**/*.test.ts'
+```
+
+Expected remaining search matches are Sandpiper adapter/identity defaults, user-facing CLI help text, migration helpers, and existing startup/task discovery behavior that will be revisited in later package-split work.
+
 ### Phase 3 — Split identity from capabilities
 
 Task: AGENT-87
