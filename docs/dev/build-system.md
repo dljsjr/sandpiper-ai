@@ -32,9 +32,11 @@ Only packages that emit distributable artifacts need build steps:
 
 **`packages/cli/`**:
 ```bash
-bun build src/pi_wrapper.ts --outdir dist/sandpiper
+bun build --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper
+bun build --target=bun --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone
 ```
-- Bundles the Sandpiper CLI wrapper
+- Bundles the legacy Sandpiper CLI wrapper
+- Bundles the dogfood standalone CLI target
 - Copies Pi assets (themes, export templates)
 
 **`packages/sandpiper-tasks-cli/`**:
@@ -84,7 +86,7 @@ This script:
 5. Builds the Dash CLI via mcporter
 6. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
 
-Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
+Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
 ## Understanding `dist/`
 
@@ -157,6 +159,12 @@ Build the package first, then run `postinstall.sh`:
 ```bash
 bun --filter sandpiper-tasks-cli run build
 bash devtools/postinstall.sh
+```
+
+For the standalone Sandpiper dogfood binary, either run `bun install` or rebuild it directly:
+```bash
+bun run build:standalone
+./node_modules/.bin/sandpiper-standalone --help
 ```
 
 ## Related Documentation

@@ -39,11 +39,16 @@ bun run build:standalone
 # Run the built dogfood bundle
 bun run sandpiper-standalone-built -- --help
 
+# Dogfood through the workspace-linked bin after bun install
+./node_modules/.bin/sandpiper-standalone --help
+
 # Standalone smoke tests
 bun run test:standalone
 ```
 
-The build target intentionally produces a Bun-targeted JS bundle under `packages/cli/dist/standalone/`; it is not yet the final `bun compile` app bundle. `css-tree` is externalized because the bundled web-fetch dependency path currently hits Bun issue [#13076](https://github.com/oven-sh/bun/issues/13076): `css-tree` loads `../data/patch.json` through `createRequire(import.meta.url)`, and Bun can fail to resolve/bundle that JSON asset even with `--target=bun`.
+The build target intentionally produces a Bun-targeted JS bundle under `packages/cli/dist/standalone/`; it is not yet the final `bun compile` app bundle. `css-tree` is externalized because the bundled web-fetch dependency path currently hits Bun issue [#13076](https://github.com/oven-sh/bun/issues/13076): `css-tree` loads `../data/patch.json` through `createRequire(import.meta.url)`, and Bun can fail to resolve/bundle that JSON asset even with `--target=bun`. Bun links `sandpiper-standalone` through a checked-in bin shim at `packages/cli/bin/sandpiper-standalone`, because generated bundle outputs are not available early enough for first-install bin linking.
+
+By default the standalone entrypoint generates a lightweight package-metadata sidecar under `dist/standalone-package/` and points Pi at that sidecar instead of the repo root. This preserves Sandpiper branding/config defaults without loading the legacy root Pi manifest a second time. Built-in Sandpiper extensions/resources come from explicit extension factories and `resources_discover` unless a legacy Sandpiper package entry is already configured in global or project settings; in that case, standalone lets the configured package provide Sandpiper's own resources so third-party installed packages still load without duplicating Sandpiper extensions. Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
 ## Key Files
 

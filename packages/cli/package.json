@@ -7,7 +7,8 @@
     "email": "dljs.jr@dougstephenjr.com"
   },
   "bin": {
-    "sandpiper": "./dist/sandpiper"
+    "sandpiper": "./dist/sandpiper",
+    "sandpiper-standalone": "./bin/sandpiper-standalone"
   },
   "dependencies": {
     "@mariozechner/pi-coding-agent": "catalog:pi"
@@ -16,9 +17,9 @@
     "@silvia-odwyer/photon-node": "catalog:pi"
   },
   "scripts": {
-    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper",
+    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun run build:standalone",
     "build:standalone": "mkdir -p dist/standalone && bun build --production --minify --target=bun --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone",
     "copy-assets": "bun run --target bun ./copy_pi_assets.ts",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun copy-assets"
+    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun copy-assets && bun run build:standalone"
   }
 }

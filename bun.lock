@@ -80,6 +80,7 @@
       "version": "0.0.1",
       "bin": {
         "sandpiper": "./dist/sandpiper",
+        "sandpiper-standalone": "./bin/sandpiper-standalone",
       },
       "dependencies": {
         "@mariozechner/pi-coding-agent": "catalog:pi",
