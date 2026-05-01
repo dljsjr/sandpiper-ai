@@ -1,31 +1,25 @@
 # Session Stand-Up
 
-## Session 019dd018-64ef-70a4-beac-5d36a4f84536 (Updated: 2026-05-01T17:33:02.474Z)
+## Session 019dd018-64ef-70a4-beac-5d36a4f84536 (Updated: 2026-05-01T21:39:14.972Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-27T17-59-12-879Z_019dd018-64ef-70a4-beac-5d36a4f84536.jsonl
 
 ### Accomplished
-- Finished `AGENT-86` host-context/path/config abstraction and finalized it after code review.
-- Review doc added at `.sandpiper/reviews/agent-86-change-stack-review-2026-04-30.md`.
-- Fixed the one actionable review minor by removing the unused private `packageDir` parameter in `getSourceDir()` and squashed it into `AGENT-115`.
-- Advanced local `main` to `8d2a6b3a AGENT-86: add change stack review notes`.
-- Marked `AGENT-86` and `AGENT-112` through `AGENT-116` `COMPLETE / DONE`.
-- Forgot and deleted `/Users/doug.stephen/git/sandpiper-ai-agent-86`.
-- Created `AGENT-117` under `AGENT-87` to track the forward-looking standup CLI help/error-text identity nits.
+- Finalized and landed AGENT-87 on `main`; deleted `/Users/doug.stephen/git/sandpiper-ai-agent-87`.
+- Completed AGENT-88 package-first AutoTOON migration and landed it on `main` through `6755ce2f AGENT-126: document autotoon migration verification`.
+- Completed AGENT-127 dependency/tooling cleanup and included it in the landed line: Biome is a pinned root dev dependency at 2.4.14, scripts use local `biome`, schema migrated to 2.4.14, Pi deps refreshed to 0.71.1, jsdom to 29.1.1.
+- Marked AGENT-88, AGENT-122–126, and AGENT-127 `COMPLETE / DONE`; deleted `/Users/doug.stephen/git/sandpiper-ai-agent-88`.
 
 ### In Progress
-- Ready to start `AGENT-87`: split Sandpiper identity from neutral capabilities.
-- Current default workspace is clean and empty on top of `main`.
-- Active workspaces are `default` and `tasks` only.
+- Package-first multi-distribution refactor continues. Current `main` includes AGENT-87, AGENT-88, and AGENT-127.
 
 ### Next Session
-- Create a new jj workspace for `AGENT-87`.
-- Pick up `AGENT-87`, review the package-first multi-distribution spec, and decompose it into focused subtasks.
-- Continue the established flow: one jj commit per subtask, verify with `bun check` and relevant tests, then report ready for code review when the parent is complete.
+- Discuss/pick next roadmap slice. Likely candidates: AGENT-91 standalone native asset bundling, AGENT-89/Claude MCP distribution seam if present, or continue AGENT-88 follow-on by moving another neutral capability/resource under `packages/`.
+- Revisit AGENT-111 status; it still appears `NEEDS REVIEW` in tasks even though its code is already on `main`.
 
 ### Blockers
-- None for `AGENT-87`.
+- Known standalone bundling follow-up remains: native `canvas.node` and `css-tree` asset handling under AGENT-91.
 
 ### Context
-- `AGENT-111` still shows `NEEDS REVIEW` in tasks even though its code is already on `main`; decide separately whether to final-complete it.
-- `AGENT-117` preserves the review nits: parameterize standup CLI help/error text instead of hardcoding `SANDPIPER_SESSION_ID` / `SANDPIPER_SESSION_FILE`.
+- Final verification after landing: `bun check`, `bun --filter sandpiper-capability-autotoon test`, `bun --filter sandpiper-capability-autotoon build`, `bun x vitest run extensions/autotoon/autotoon.test.ts packages/cli/sandpiper_resources.test.ts`, `bun run test:standalone` all passed.
+- Invariant searches returned zero matches for host-adapter references in `packages/capability-autotoon/src/core.ts` and for legacy AutoTOON implementation hooks in `extensions/autotoon`.
