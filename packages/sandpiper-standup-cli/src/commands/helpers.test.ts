@@ -1,8 +1,30 @@
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { resolveStandupCommandContext } from './helpers.js';
+import {
+  formatMissingSessionFileMessage,
+  formatMissingSessionIdMessage,
+  formatSessionFileHelp,
+  formatSessionIdHelp,
+  resolveStandupCommandContext,
+} from './helpers.js';
 
 describe('standup command host context', () => {
+  it('derives session identity help and error text from configured env names', () => {
+    const envNames = {
+      sessionId: 'CUSTOM_SESSION_ID',
+      sessionFile: 'CUSTOM_SESSION_FILE',
+    };
+
+    expect(formatSessionIdHelp(envNames)).toBe('Session UUID (defaults to CUSTOM_SESSION_ID)');
+    expect(formatSessionFileHelp(envNames)).toBe('Session file path (defaults to CUSTOM_SESSION_FILE)');
+    expect(formatMissingSessionIdMessage(envNames)).toBe(
+      'Session UUID required. Provide --uuid or set CUSTOM_SESSION_ID environment variable.',
+    );
+    expect(formatMissingSessionFileMessage(envNames)).toBe(
+      'Session file path required. Provide --file or set CUSTOM_SESSION_FILE environment variable.',
+    );
+  });
+
   it('resolves the standup file from an explicit root directory', () => {
     const context = resolveStandupCommandContext({
       rootDir: '/tmp/project',

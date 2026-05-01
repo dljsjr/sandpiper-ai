@@ -20,16 +20,37 @@ export interface StandupCommandContext {
   readonly session: SessionIdentity;
 }
 
+export interface StandupSessionEnvNames {
+  readonly sessionId: string;
+  readonly sessionFile: string;
+}
+
 const SANDPIPER_STANDUP_IDENTITY = {
   appName: 'sandpiper',
   configDirName: '.sandpiper',
   agentDirName: 'agent',
 } as const;
 
-const SANDPIPER_SESSION_ENV_NAMES = {
+export const SANDPIPER_SESSION_ENV_NAMES: StandupSessionEnvNames = {
   sessionId: 'SANDPIPER_SESSION_ID',
   sessionFile: 'SANDPIPER_SESSION_FILE',
 } as const;
+
+export function formatSessionIdHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
+  return `Session UUID (defaults to ${envNames.sessionId})`;
+}
+
+export function formatSessionFileHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
+  return `Session file path (defaults to ${envNames.sessionFile})`;
+}
+
+export function formatMissingSessionIdMessage(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
+  return `Session UUID required. Provide --uuid or set ${envNames.sessionId} environment variable.`;
+}
+
+export function formatMissingSessionFileMessage(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
+  return `Session file path required. Provide --file or set ${envNames.sessionFile} environment variable.`;
+}
 
 /**
  * Resolve the global --dir option from the current command context.
