@@ -424,6 +424,40 @@ AutoTOON target shape:
 - `extensions/autotoon/autotoon.ts` becomes a small compatibility bridge so the legacy root Pi package keeps its current manifest path.
 - `packages/cli/sandpiper_resources.ts` imports the package-first Pi adapter directly for standalone/dogfood distribution paths.
 
+AGENT-88 implementation results:
+
+- Added `packages/capability-autotoon/` as the package-first source for AutoTOON.
+- Moved AutoTOON behavior tests to the new package:
+  - `packages/capability-autotoon/src/core.test.ts`
+  - `packages/capability-autotoon/src/pi-extension.test.ts`
+- Replaced the legacy top-level AutoTOON extension implementation with a compatibility bridge and a small bridge test.
+- Updated standalone resource wiring to import the package-first Pi adapter directly.
+- Updated package/build/docs metadata so `packages/capability-autotoon/` is the documented source of truth.
+
+AGENT-88 verification uses these checks:
+
+```bash
+bun check
+bun --filter sandpiper-capability-autotoon test
+bun --filter sandpiper-capability-autotoon build
+bun x vitest run extensions/autotoon/autotoon.test.ts packages/cli/sandpiper_resources.test.ts
+bun run test:standalone
+bun --filter sandpiper-ai-core build
+bun --filter sandpiper-standup-cli build
+bun --filter sandpiper-tasks-cli build
+(cd packages/cli && mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper)
+bash devtools/postinstall.sh
+rg -n "@mariozechner|ExtensionAPI|ToolDefinition|McpServer|@modelcontextprotocol" packages/capability-autotoon/src/core.ts
+rg -n "@toon-format/toon|pi\\.on\\('tool_result'|function tryConvertJsonToToon" extensions/autotoon --glob '*.ts'
+```
+
+The narrow `packages/cli` build command above prepares the legacy CLI artifact that `postinstall.sh` expects without invoking the standalone bundle target; the standalone target still has known native-asset follow-up work for AGENT-91.
+
+Expected invariant-search results:
+
+- The host-neutral AutoTOON core has zero Pi/MCP adapter imports or types.
+- The legacy top-level AutoTOON extension directory has zero transform implementation or Pi `tool_result` hook definitions; it only re-exports the package-first adapter and tests the bridge.
+
 ### Phase 5 — Add invariant checks and smoke tests
 
 Task: AGENT-89
