@@ -345,6 +345,28 @@ Neutral:
 - standup/session-continuity hooks after path abstraction
 - resource/capability guidance that does not imply Sandpiper identity
 
+#### AGENT-87 inventory
+
+`extensions/system.ts` is already thin glue, but it composes identity and neutral capability behavior into a single Pi extension. Phase 3 should split those registrations without changing user-visible behavior in the legacy Sandpiper package or standalone Sandpiper CLI.
+
+| Current registration | Current location | Classification | AGENT-87 treatment |
+| --- | --- | --- | --- |
+| Background process tools | `extensions/system/background-process-tools.ts` | Neutral capability exposed through a Pi adapter | Move behind a neutral capability extension factory that can load without Sandpiper identity. |
+| Background process completion context and shutdown cleanup | `extensions/system/startup-hooks.ts` | Neutral capability support for background process tools | Keep with the neutral background process capability extension. |
+| Sandpiper prompt replacement, startup task/project/standup context, cold-start guidance, system prompt dump flag | `extensions/system/startup-hooks.ts` | Sandpiper identity/startup behavior | Move behind a Sandpiper identity extension factory. |
+| Session continuity PID files and `SANDPIPER_SESSION_*` env export | `extensions/system/startup-hooks.ts` | Sandpiper session adapter behavior today; candidate for later host-neutral standup package work | Keep with the Sandpiper identity extension for AGENT-87 so neutral mode does not write Sandpiper env vars or PID files in vanilla Pi. |
+| Migration and shell-integration flags/command | `extensions/system/migration-controls.ts` | Sandpiper identity/migration behavior | Keep with the Sandpiper identity extension. |
+| Diagnostics banner, unmigrated Pi config warning, Sandpiper update banner | `extensions/system/diagnostics-hooks.ts` | Sandpiper identity/support behavior | Keep with the Sandpiper identity extension. |
+| `extensions/shell-relay`, `extensions/web-fetch`, `extensions/autotoon` | Separate extension entrypoints | Neutral capability candidates, though shell-relay still has Sandpiper-specific install/preflight wording | Continue to expose them as neutral-capability extension factories; deeper host-neutral package extraction is AGENT-88+. |
+| Resource discovery for skills/prompts/themes | `packages/cli/sandpiper_resources.ts` | Distribution adapter behavior | Keep as an explicit resource adapter and make factory grouping identity-aware. |
+
+AGENT-87 should leave a legacy composed `system` extension for existing root Pi-package behavior, plus explicit factory groups for:
+
+- **Sandpiper identity**: system prompt/startup, session continuity, migration controls, diagnostics/update banners.
+- **Neutral capabilities**: background process tools/hooks, shell relay, web fetch, AutoTOON, and shared resource discovery.
+
+Completion is proven when tests can load the neutral factory set without registering Sandpiper identity flags or prompt hooks, and the Sandpiper factory set still registers the existing identity flags exactly once.
+
 ### Phase 4 — Move source under packages
 
 Task: AGENT-88
