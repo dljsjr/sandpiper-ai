@@ -76,6 +76,16 @@
         "@sinclair/typebox": "catalog:pi",
       },
     },
+    "packages/capability-autotoon": {
+      "name": "sandpiper-capability-autotoon",
+      "version": "0.0.1",
+      "dependencies": {
+        "@toon-format/toon": "2.1.0",
+      },
+      "peerDependencies": {
+        "@mariozechner/pi-coding-agent": "catalog:pi",
+      },
+    },
     "packages/cli": {
       "name": "sandpiper-ai-cli",
       "version": "0.0.1",
@@ -1069,6 +1079,8 @@
     "sandpiper-ai-core": ["sandpiper-ai-core@workspace:packages/core"],
 
     "sandpiper-ai-devtools": ["sandpiper-ai-devtools@workspace:devtools"],
+
+    "sandpiper-capability-autotoon": ["sandpiper-capability-autotoon@workspace:packages/capability-autotoon"],
 
     "sandpiper-standup-cli": ["sandpiper-standup-cli@workspace:packages/sandpiper-standup-cli"],
 

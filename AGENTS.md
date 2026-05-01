@@ -15,6 +15,7 @@ This repository is both a **Pi Package** and a **Bun/Node.js monorepo** — an u
 | `skills/sandpiper/` | First-party skills | Edit source here, not `dist/skills/` |
 | `skills/third-party/` | Vendored skills | Do not edit |
 | `packages/core/` | Shared Library | System prompt, migration, preflight checks, shell integration, path utilities |
+| `packages/capability-autotoon/` | Shared Library + Pi adapter | AutoTOON JSON→TOON neutral transform and Pi event adapter |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
 | `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI |
 | `prompts/` | Prompt templates | |

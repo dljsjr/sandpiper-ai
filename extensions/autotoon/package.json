@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Auto-Tune for your tokens 🎤 — automatically pitch-corrects JSON to TOON format",
+  "description": "Compatibility bridge to packages/capability-autotoon",
   "pi": {
     "extensions": [
       "./autotoon.ts"

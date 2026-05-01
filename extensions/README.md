@@ -8,6 +8,7 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 |-----------|-------------|
 | [`system.ts`](system.ts) | Legacy composed Sandpiper extension — identity plus neutral system capabilities for existing Sandpiper package behavior |
 | [`capabilities.ts`](capabilities.ts) | Neutral system capability entrypoint — background process tools/hooks without Sandpiper identity or startup behavior |
+| [`autotoon/`](autotoon/) | Compatibility bridge to the package-first AutoTOON Pi adapter in `packages/capability-autotoon/` |
 | [`shell-relay/`](shell-relay/) | Shared terminal session between user and agent via Zellij |
 
 ### system.ts and capabilities.ts
@@ -22,6 +23,10 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 The entrypoints are intentionally thin glue layers. Framework-independent logic is extracted into `packages/core/`, while Pi-specific wiring helpers live under `extensions/system/`.
 
 As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic into `packages/core/` or focused extension-local modules rather than expanding a single large file.
+
+### autotoon
+
+`autotoon/` preserves the legacy Pi package entrypoint path. The source of truth now lives in `packages/capability-autotoon/`: `src/core.ts` contains the host-neutral JSON→TOON transform, while `src/pi-extension.ts` contains the Pi `tool_result` adapter.
 
 ### shell-relay
 
