@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, extname, join, resolve } from 'node:path';
 
 export interface ForbiddenTextPattern {
   readonly name: string;
@@ -44,4 +44,49 @@ export function findForbiddenTextMatches(
   }
 
   return matches;
+}
+
+export type PiManifestResourceField = 'extensions' | 'skills' | 'prompts' | 'themes';
+
+export interface PiPackageManifest {
+  readonly pi?: Partial<Record<PiManifestResourceField, readonly string[]>>;
+}
+
+export interface MissingPiManifestPath {
+  readonly field: PiManifestResourceField;
+  readonly declaredPath: string;
+  readonly absolutePath: string;
+}
+
+const PI_MANIFEST_RESOURCE_FIELDS: readonly PiManifestResourceField[] = ['extensions', 'skills', 'prompts', 'themes'];
+
+export function findMissingPiManifestPaths(packageRoot: string, manifest: PiPackageManifest): MissingPiManifestPath[] {
+  const missingPaths: MissingPiManifestPath[] = [];
+
+  for (const field of PI_MANIFEST_RESOURCE_FIELDS) {
+    for (const declaredPath of manifest.pi?.[field] ?? []) {
+      const absolutePath = resolve(packageRoot, declaredPath);
+
+      if (!existsSync(absolutePath)) {
+        missingPaths.push({ field, declaredPath, absolutePath });
+      }
+    }
+  }
+
+  return missingPaths;
+}
+
+export function materializePiManifestPaths(packageRoot: string, manifest: PiPackageManifest): void {
+  for (const field of PI_MANIFEST_RESOURCE_FIELDS) {
+    for (const declaredPath of manifest.pi?.[field] ?? []) {
+      const absolutePath = resolve(packageRoot, declaredPath);
+
+      if (extname(absolutePath) === '') {
+        mkdirSync(absolutePath, { recursive: true });
+      } else {
+        mkdirSync(dirname(absolutePath), { recursive: true });
+        writeFileSync(absolutePath, '');
+      }
+    }
+  }
 }
