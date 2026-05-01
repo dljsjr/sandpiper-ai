@@ -1,7 +1,7 @@
 # 🎤 AutoTOON
 
 **Status**: Implemented (conversion-only)
-**Last Updated**: 2026-04-20
+**Last Updated**: 2026-05-01
 
 ## Overview
 
@@ -19,10 +19,12 @@ See `AGENT-51` for the original ticket and follow-ups for the deferred work.
 
 ## Architecture 🏗️
 
-`extensions/autotoon/autotoon.ts` — single file, ~100 lines:
+AutoTOON is now package-first:
 
-- `tryConvertJsonToToon(text)` — pure function: fast-reject → size gate → parse → encode → length-guard
-- `default export(pi)` — registers a single `tool_result` handler that maps over content blocks
+- `packages/capability-autotoon/src/core.ts` — host-neutral transform source of truth.
+  - `tryConvertJsonToToon(text)` — pure function: fast-reject → size gate → parse → encode → length-guard
+- `packages/capability-autotoon/src/pi-extension.ts` — Pi adapter that registers a single `tool_result` handler and maps over content blocks.
+- `extensions/autotoon/autotoon.ts` — legacy root Pi-package compatibility bridge that re-exports the package-first Pi adapter.
 
 ## How It Works 🎤
 
@@ -76,8 +78,8 @@ Converted output is prefixed with `[TOON]\n` to help the LLM (and humans) identi
 ## Testing
 
 ```bash
+bun --filter sandpiper-capability-autotoon test
 bun x vitest run extensions/autotoon/autotoon.test.ts
-bun x vitest run extensions/autotoon/autotoon-integration.test.ts
 ```
 
 ## Future Enhancements

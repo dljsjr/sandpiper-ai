@@ -7,6 +7,7 @@ Workspace packages — built, tested, and distributed as part of sandpiper.
 | Package | Description |
 |---------|-------------|
 | [`cli/`](cli/) | Sandpiper CLI wrapper around pi-coding-agent |
+| [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON neutral transform and Pi adapter |
 | [`sandpiper-tasks-cli/`](sandpiper-tasks-cli/) | Task management CLI (markdown + YAML frontmatter) |
 | [`core/`](core/) | Shared core utilities |
 
