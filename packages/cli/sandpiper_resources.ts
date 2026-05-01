@@ -2,7 +2,10 @@ import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
-import systemExtension from '../../extensions/system.js';
+import {
+  createNeutralCapabilityExtension,
+  createSandpiperIdentityExtension,
+} from '../../extensions/system/extension-factories.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
 
 export interface SandpiperResourcePaths {
@@ -29,12 +32,20 @@ export function createSandpiperResourceExtension(resourcePaths: SandpiperResourc
   };
 }
 
-export function createSandpiperExtensionFactories(resourceRoot: string): ExtensionFactory[] {
+export function createNeutralCapabilityExtensionFactories(resourceRoot: string): readonly ExtensionFactory[] {
   return [
-    systemExtension,
+    createNeutralCapabilityExtension(),
     shellRelayExtension,
     webFetchExtension,
     autotoonExtension,
     createSandpiperResourceExtension(resolveSandpiperResourcePaths(resourceRoot)),
   ];
+}
+
+export function createSandpiperIdentityExtensionFactories(): readonly ExtensionFactory[] {
+  return [createSandpiperIdentityExtension()];
+}
+
+export function createSandpiperExtensionFactories(resourceRoot: string): ExtensionFactory[] {
+  return [...createSandpiperIdentityExtensionFactories(), ...createNeutralCapabilityExtensionFactories(resourceRoot)];
 }

@@ -109,11 +109,33 @@ describe('standalone Sandpiper CLI smoke', () => {
   it('loads installed third-party packages while avoiding duplicate legacy Sandpiper resources', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-smoke-'));
     const agentDir = join(tempDir, 'agent');
+    const legacySandpiperPackage = join(tempDir, 'legacy-sandpiper-package');
     const thirdPartyPackage = join(tempDir, 'third-party-package');
 
     try {
+      mkdirSync(join(legacySandpiperPackage, 'extensions'), { recursive: true });
       mkdirSync(join(thirdPartyPackage, 'extensions'), { recursive: true });
       mkdirSync(agentDir, { recursive: true });
+      writeFileSync(
+        join(legacySandpiperPackage, 'package.json'),
+        JSON.stringify({ name: 'sandpiper-ai', pi: { extensions: ['./extensions/system.js'] } }),
+      );
+      writeFileSync(
+        join(legacySandpiperPackage, 'extensions', 'system.js'),
+        `export default function system(pi) {
+  pi.registerFlag('migrate-pi-configs', {
+    description: 'Marker flag registered by a legacy Sandpiper package',
+    type: 'boolean',
+    default: false,
+  });
+  pi.registerFlag('install-shell-integrations', {
+    description: 'Marker flag registered by a legacy Sandpiper package',
+    type: 'boolean',
+    default: false,
+  });
+}
+`,
+      );
       writeFileSync(join(thirdPartyPackage, 'package.json'), JSON.stringify({ name: 'third-party-package' }));
       writeFileSync(
         join(thirdPartyPackage, 'extensions', 'probe.js'),
@@ -128,7 +150,7 @@ describe('standalone Sandpiper CLI smoke', () => {
       );
       writeFileSync(
         join(agentDir, 'settings.json'),
-        JSON.stringify({ packages: [join(repoRoot, 'dist'), thirdPartyPackage] }),
+        JSON.stringify({ packages: [legacySandpiperPackage, thirdPartyPackage] }),
       );
 
       const output = runStandalone(
