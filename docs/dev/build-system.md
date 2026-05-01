@@ -23,6 +23,7 @@ Not all changes require a build step. Here's what to do after different types of
 | `packages/cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
+| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, and runs source/distribution/standalone invariant tests |
 
 ## Build Pipeline
 
@@ -134,6 +135,14 @@ bash devtools/postinstall.sh
 ```
 
 These are copied, not built.
+
+### Distribution Invariant and Smoke Checks
+
+```bash
+bun run test:distribution
+```
+
+This command prepares the legacy Pi-package assembly without invoking the known standalone bundle path, then runs distribution invariant tests and standalone smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, and standalone temp-config execution.
 
 ### Clean Build from Scratch
 

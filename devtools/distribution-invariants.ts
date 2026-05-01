@@ -14,6 +14,26 @@ export interface ForbiddenTextMatch {
   readonly text: string;
 }
 
+export const HOST_NEUTRAL_CORE_FORBIDDEN_PATTERNS: readonly ForbiddenTextPattern[] = [
+  { name: 'Sandpiper config reference', expression: /(?:~\/)?\.sandpiper|SANDPIPER_/ },
+  { name: 'Pi config reference', expression: /(?:~\/)?\.pi|\bPI_|\bPi\b/ },
+  { name: 'Pi adapter API', expression: /@mariozechner|ExtensionAPI|ToolDefinition/ },
+  { name: 'MCP adapter API', expression: /@modelcontextprotocol|McpServer/ },
+];
+
+export const NEUTRAL_CAPABILITY_ENTRYPOINT_FORBIDDEN_PATTERNS: readonly ForbiddenTextPattern[] = [
+  { name: 'Sandpiper migration flag', expression: /migrate-pi-configs|install-shell-integrations/ },
+  { name: 'Sandpiper startup prompt hook', expression: /before_agent_start|buildSandpiperSystemPrompt/ },
+  { name: 'Sandpiper identity factory', expression: /createSandpiperIdentityExtension/ },
+];
+
+export const DISTRIBUTION_SMOKE_FORBIDDEN_PATTERNS: readonly ForbiddenTextPattern[] = [
+  { name: 'home directory API', expression: /\bhomedir\s*\(/ },
+  { name: 'literal Sandpiper user config path', expression: /~\/\.sandpiper/ },
+  { name: 'literal Pi user config path', expression: /~\/\.pi/ },
+  { name: 'HOME environment access', expression: /process\.env\.HOME/ },
+];
+
 export function findForbiddenTextMatches(
   rootDir: string,
   relativePaths: readonly string[],
