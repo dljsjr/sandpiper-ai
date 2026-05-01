@@ -39,8 +39,14 @@ const positivePatternCases: readonly PositivePatternCase[] = [
       "pi.registerFlag('migrate-pi-configs', {});",
       "pi.on('before_agent_start', buildSandpiperSystemPrompt);",
       'const factory = createSandpiperIdentityExtension();',
+      "import { createNeutralCapabilityExtension } from './system/extension-factories.js';",
     ].join('\n'),
-    expectedPatternNames: ['Sandpiper migration flag', 'Sandpiper startup prompt hook', 'Sandpiper identity factory'],
+    expectedPatternNames: [
+      'Sandpiper migration flag',
+      'Sandpiper startup prompt hook',
+      'Sandpiper identity factory',
+      'composed identity/capability factory module',
+    ],
   },
   {
     name: 'distribution smoke user-config patterns',
