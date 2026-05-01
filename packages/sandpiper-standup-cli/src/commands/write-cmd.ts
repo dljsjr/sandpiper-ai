@@ -2,12 +2,19 @@ import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { Command } from '@commander-js/extra-typings';
 import { cleanupStandup } from '../core/cleanup.js';
 import { parseStandup, type StandupSection, serializeStandup } from '../core/parser.js';
-import { getRootDir, resolveStandupCommandContext } from './helpers.js';
+import {
+  formatMissingSessionFileMessage,
+  formatMissingSessionIdMessage,
+  formatSessionFileHelp,
+  formatSessionIdHelp,
+  getRootDir,
+  resolveStandupCommandContext,
+} from './helpers.js';
 
 export const writeCommand = new Command('write')
   .description('Write a standup section (reads from stdin)')
-  .option('-u, --uuid <uuid>', 'Session UUID (defaults to SANDPIPER_SESSION_ID)')
-  .option('-f, --file <path>', 'Session file path (defaults to SANDPIPER_SESSION_FILE)')
+  .option('-u, --uuid <uuid>', formatSessionIdHelp())
+  .option('-f, --file <path>', formatSessionFileHelp())
   .option('-s, --session-file <path>', 'Path to file containing section body (if not provided, reads from stdin)')
   .action(async (opts, cmd) => {
     const context = resolveStandupCommandContext({
@@ -20,13 +27,13 @@ export const writeCommand = new Command('write')
     const { sessionId, sessionFile } = context.session;
 
     if (!sessionId) {
-      console.error('Session UUID required. Provide --uuid or set SANDPIPER_SESSION_ID environment variable.');
+      console.error(formatMissingSessionIdMessage());
       process.exitCode = 1;
       return;
     }
 
     if (!sessionFile) {
-      console.error('Session file path required. Provide --file or set SANDPIPER_SESSION_FILE environment variable.');
+      console.error(formatMissingSessionFileMessage());
       process.exitCode = 1;
       return;
     }
