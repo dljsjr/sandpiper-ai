@@ -6,9 +6,9 @@
   "scripts": {
     "preinstall": "bash devtools/vendor.sh --if-missing && bash devtools/preinstall.sh && bun --workspaces --if-present preinstall",
     "postinstall": "bash devtools/postinstall.sh",
-    "check:biome-fmt": "bunx --bun @biomejs/biome format",
-    "check:biome-lint": "bunx --bun @biomejs/biome lint",
-    "check:biome-check": "bunx --bun @biomejs/biome check",
+    "check:biome-fmt": "biome format",
+    "check:biome-lint": "biome lint",
+    "check:biome-check": "biome check",
     "check:tsc": "tsc --noEmit",
     "check:ast-grep": "ast-grep scan",
     "check": "bun run check:tsc && bun run check:biome-check",
@@ -72,8 +72,8 @@
         "supports-color": "10.2.2"
       },
       "pi": {
-        "@mariozechner/pi-coding-agent": "0.70.6",
-        "@mariozechner/pi-tui": "0.70.6",
+        "@mariozechner/pi-coding-agent": "0.71.1",
+        "@mariozechner/pi-tui": "0.71.1",
         "@silvia-odwyer/photon-node": "0.3.4",
         "@sinclair/typebox": "0.34.49"
       },
@@ -84,7 +84,7 @@
       },
       "web": {
         "@mozilla/readability": "0.6.0",
-        "jsdom": "29.1.0",
+        "jsdom": "29.1.1",
         "turndown": "7.2.4",
         "@types/jsdom": "28.0.1",
         "@types/turndown": "5.0.6"
@@ -93,7 +93,7 @@
         "vitest": "4.1.5"
       },
       "tooling": {
-        "@biomejs/biome": "2.4.6",
+        "@biomejs/biome": "2.4.14",
         "ascii-motion-mcp": "^2.1",
         "mcporter": "0.9.0",
         "canvas": "3.2.3"
@@ -118,6 +118,7 @@
     "@sinclair/typebox": "catalog:pi"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:tooling",
     "@commander-js/extra-typings": "catalog:cli",
     "@types/node": "catalog:ts",
     "commander": "catalog:cli",
