@@ -1,14 +1,18 @@
 import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
-import { checkForUpdates as checkForSandpiperUpdates, ProcessManager, type UpdateInfo } from 'sandpiper-ai-core';
-import { registerBackgroundProcessTools } from './background-process-tools.js';
+import { checkForUpdates as checkForSandpiperUpdates, type UpdateInfo } from 'sandpiper-ai-core';
 import { registerDiagnosticsHooks } from './diagnostics-hooks.js';
 import { registerMigrationControls } from './migration-controls.js';
-import { createSystemRuntimeState, type SystemRuntimeState } from './runtime.js';
 import {
-  registerBackgroundProcessContextHooks,
-  registerSessionContinuityHooks,
-  registerStartupPromptHooks,
-} from './startup-hooks.js';
+  createNeutralCapabilityExtension,
+  type NeutralCapabilityExtensionOptions,
+} from './neutral-capability-extension.js';
+import { createSystemRuntimeState, type SystemRuntimeState } from './runtime.js';
+import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
+
+export {
+  createNeutralCapabilityExtension,
+  type NeutralCapabilityExtensionOptions,
+} from './neutral-capability-extension.js';
 
 export interface SandpiperIdentityExtensionOptions {
   readonly checkForUpdates?: () => Promise<readonly UpdateInfo[]>;
@@ -16,24 +20,11 @@ export interface SandpiperIdentityExtensionOptions {
   readonly runtimeState?: SystemRuntimeState;
 }
 
-export interface NeutralCapabilityExtensionOptions {
-  readonly processManager?: ProcessManager;
-}
-
 function defaultCheckForUpdates(): Promise<readonly UpdateInfo[]> {
   return checkForSandpiperUpdates({
     piCodingAgentVersion: process.env.PI_CODING_AGENT_VERSION,
     bunVersion: process.versions.bun,
   });
-}
-
-export function createNeutralCapabilityExtension(options: NeutralCapabilityExtensionOptions = {}): ExtensionFactory {
-  const processManager = options.processManager ?? new ProcessManager();
-
-  return (pi: ExtensionAPI) => {
-    registerBackgroundProcessTools(pi, processManager);
-    registerBackgroundProcessContextHooks(pi, processManager);
-  };
 }
 
 export function createSandpiperIdentityExtension(options: SandpiperIdentityExtensionOptions = {}): ExtensionFactory {

@@ -2,12 +2,9 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import * as core from 'sandpiper-ai-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { registerBackgroundProcessContextHooks } from './background-process-hooks.js';
 import { createSystemRuntimeState } from './runtime.js';
-import {
-  registerBackgroundProcessContextHooks,
-  registerSessionContinuityHooks,
-  registerStartupPromptHooks,
-} from './startup-hooks.js';
+import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
 import { createBackgroundContextProcessManagerStub, createEventStub } from './test-helpers.js';
 
 const mockBuildSandpiperSystemPrompt = vi.fn();

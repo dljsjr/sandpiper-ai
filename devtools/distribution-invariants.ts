@@ -25,6 +25,7 @@ export const NEUTRAL_CAPABILITY_ENTRYPOINT_FORBIDDEN_PATTERNS: readonly Forbidde
   { name: 'Sandpiper migration flag', expression: /migrate-pi-configs|install-shell-integrations/ },
   { name: 'Sandpiper startup prompt hook', expression: /before_agent_start|buildSandpiperSystemPrompt/ },
   { name: 'Sandpiper identity factory', expression: /createSandpiperIdentityExtension/ },
+  { name: 'composed identity/capability factory module', expression: /from ['"].*extension-factories/ },
 ];
 
 export const DISTRIBUTION_SMOKE_FORBIDDEN_PATTERNS: readonly ForbiddenTextPattern[] = [
