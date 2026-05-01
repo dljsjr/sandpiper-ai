@@ -6,24 +6,22 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 | Extension | Description |
 |-----------|-------------|
-| [`system.ts`](system.ts) | Core sandpiper extension — reconfigures pi with sandpiper-specific customizations (identity, update checks, etc.) |
+| [`system.ts`](system.ts) | Legacy composed Sandpiper extension — identity plus neutral system capabilities for existing Sandpiper package behavior |
+| [`capabilities.ts`](capabilities.ts) | Neutral system capability entrypoint — background process tools/hooks without Sandpiper identity or startup behavior |
 | [`shell-relay/`](shell-relay/) | Shared terminal session between user and agent via Zellij |
 
-### system.ts
+### system.ts and capabilities.ts
 
-The central sandpiper extension. This is the main integration point between the pi framework and sandpiper's custom behavior.
+`system.ts` is the legacy composed Sandpiper entrypoint. It preserves existing root Pi-package behavior by loading both:
 
-The entrypoint is intentionally becoming a thinner glue layer. Framework-independent logic is extracted into `packages/core/`, while Pi-specific wiring helpers live under `extensions/system/`.
+- Sandpiper identity/startup behavior: prompt assembly, session continuity, migration / shell-integration controls, diagnostics, and update banners.
+- Neutral system capabilities: background process tools and completion/shutdown hooks.
 
-Current responsibilities include:
+`capabilities.ts` is the neutral system-capability entrypoint. It intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners. Future neutral Pi package assembly should load `capabilities.ts` plus other neutral extension entrypoints (`shell-relay`, `web-fetch`, `autotoon`) instead of `system.ts`.
 
-- Sandpiper identity and startup prompt assembly
-- Compact startup continuity context (projects, active tasks, working-copy summary, cold-start guidance)
-- Background process tool registration and completion notifications
-- Migration / shell-integration install flags and commands
-- Diagnostics and update banners
+The entrypoints are intentionally thin glue layers. Framework-independent logic is extracted into `packages/core/`, while Pi-specific wiring helpers live under `extensions/system/`.
 
-As sandpiper grows, prefer keeping the entrypoint thin and pushing reusable logic into `packages/core/` or focused extension-local modules rather than expanding a single large file.
+As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic into `packages/core/` or focused extension-local modules rather than expanding a single large file.
 
 ### shell-relay
 
