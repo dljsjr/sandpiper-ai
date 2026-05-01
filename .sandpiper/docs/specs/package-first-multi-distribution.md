@@ -367,6 +367,36 @@ AGENT-87 should leave a legacy composed `system` extension for existing root Pi-
 
 Completion is proven when tests can load the neutral factory set without registering Sandpiper identity flags or prompt hooks, and the Sandpiper factory set still registers the existing identity flags exactly once.
 
+AGENT-87 implementation results:
+
+- `extensions/system/extension-factories.ts` owns the split between:
+  - `createSandpiperIdentityExtension(...)` for Sandpiper prompt/startup/session/migration/diagnostics/update behavior.
+  - `createNeutralCapabilityExtension(...)` for background process tools plus completion/shutdown hooks.
+  - `createSandpiperSystemExtension(...)` for the legacy composed `extensions/system.ts` entrypoint, preserving existing root package behavior.
+- `extensions/capabilities.ts` is the neutral Pi-loadable system capability entrypoint. It intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners.
+- `packages/cli/sandpiper_resources.ts` exposes identity-aware factory groups:
+  - `createNeutralCapabilityExtensionFactories(resourceRoot)`
+  - `createSandpiperIdentityExtensionFactories()`
+  - `createSandpiperExtensionFactories(resourceRoot)`
+- Standup CLI help/error text now derives from configured session env names rather than duplicating `SANDPIPER_SESSION_*` strings in command registration.
+
+AGENT-87 verification uses these checks:
+
+```bash
+bun check
+bun x vitest run extensions/capabilities.test.ts extensions/system/extension-factories.test.ts
+bun x vitest run packages/cli/sandpiper_resources.test.ts packages/cli/standalone_cli_smoke.test.ts
+bun --filter sandpiper-standup-cli test -- helpers.test.ts
+bun run test:standalone
+rg -n "migrate-pi-configs|install-shell-integrations|before_agent_start|buildSandpiperSystemPrompt" extensions/capabilities.ts packages/cli/sandpiper_resources.ts
+rg -n "SANDPIPER_SESSION_ID|SANDPIPER_SESSION_FILE" packages/sandpiper-standup-cli/src/commands/write-cmd.ts
+```
+
+Expected invariant-search results:
+
+- The neutral `extensions/capabilities.ts` entrypoint and `packages/cli/sandpiper_resources.ts` factory grouping contain no migration flag strings, no `before_agent_start` prompt hook wiring, and no direct Sandpiper prompt builder imports.
+- `write-cmd.ts` contains zero direct `SANDPIPER_SESSION_*` string references; those names live in the standup command helper identity constants until a later host-neutral standup package split.
+
 ### Phase 4 — Move source under packages
 
 Task: AGENT-88
