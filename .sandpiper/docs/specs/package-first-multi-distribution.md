@@ -502,6 +502,30 @@ Create the three distribution assemblies:
 
 Each distribution must have a smoke test and documented local development workflow.
 
+#### AGENT-90 neutral Pi package target
+
+AGENT-90 introduces a local neutral Pi package artifact at `dist/neutral-pi-package/`. It is a transition artifact, not the final npm-published package. The goal is to prove that Pi can load Sandpiper's neutral resources without the Sandpiper identity layer.
+
+Artifact shape:
+
+- `dist/neutral-pi-package/package.json`
+  - `name`: `sandpiper-ai-neutral-pi-package`
+  - `keywords`: includes `pi-package`
+  - `pi.extensions`: `./extensions/capabilities.ts`, `./extensions/shell-relay`, `./extensions/web-fetch`, `./extensions/autotoon`
+  - `pi.skills`: `./skills/sandpiper`, `./skills/third-party`
+  - `pi.prompts`: `./prompts`
+  - `pi.themes`: `./themes`
+  - no `piConfig`, no Sandpiper app identity, no `bin: sandpiper`
+- Source/resource copies under the artifact root preserve the manifest paths above.
+- Package-first implementation support packages needed by compatibility bridges, such as `packages/capability-autotoon`, are copied into the artifact.
+
+AGENT-90 completion signal:
+
+- A local Pi resource-loader smoke test loads `dist/neutral-pi-package/` or an equivalent temp-built artifact as a package.
+- Neutral tools/resources are present.
+- Sandpiper identity flags/hooks are absent: no migration flags, no install-shell-integration flag, no `before_agent_start` Sandpiper prompt hook, and no `extensions/system.ts` in the loaded extension set.
+- The artifact manifest paths are covered by the AGENT-89 distribution invariant helpers.
+
 ### Phase 7 — Retire legacy root assembly
 
 Task: AGENT-93
