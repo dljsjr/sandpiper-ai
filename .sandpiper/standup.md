@@ -1,25 +1,26 @@
 # Session Stand-Up
 
-## Session 019dd018-64ef-70a4-beac-5d36a4f84536 (Updated: 2026-05-01T21:39:14.972Z)
+## Session 019dd018-64ef-70a4-beac-5d36a4f84536 (Updated: 2026-05-01T22:48:19.340Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-04-27T17-59-12-879Z_019dd018-64ef-70a4-beac-5d36a4f84536.jsonl
 
 ### Accomplished
-- Finalized and landed AGENT-87 on `main`; deleted `/Users/doug.stephen/git/sandpiper-ai-agent-87`.
-- Completed AGENT-88 package-first AutoTOON migration and landed it on `main` through `6755ce2f AGENT-126: document autotoon migration verification`.
-- Completed AGENT-127 dependency/tooling cleanup and included it in the landed line: Biome is a pinned root dev dependency at 2.4.14, scripts use local `biome`, schema migrated to 2.4.14, Pi deps refreshed to 0.71.1, jsdom to 29.1.1.
-- Marked AGENT-88, AGENT-122–126, and AGENT-127 `COMPLETE / DONE`; deleted `/Users/doug.stephen/git/sandpiper-ai-agent-88`.
+- Wrapped AGENT-89 and landed it on `main` through `f9cc77c7 AGENT-131: wire distribution checks`.
+- Added `bun run test:distribution`, source-boundary invariant checks, Pi package manifest smoke checks, and docs for the distribution verification workflow.
+- Marked AGENT-89 and subtasks AGENT-128–131 `COMPLETE / DONE`.
+- Forgot and deleted `/Users/doug.stephen/git/sandpiper-ai-agent-89`.
+- Previously in this session also finalized AGENT-111 bookkeeping and landed AGENT-88/AGENT-127.
 
 ### In Progress
-- Package-first multi-distribution refactor continues. Current `main` includes AGENT-87, AGENT-88, and AGENT-127.
+- Package-first multi-distribution refactor continues. Current `main` includes AGENT-87, AGENT-88, AGENT-89, and AGENT-127.
 
 ### Next Session
-- Discuss/pick next roadmap slice. Likely candidates: AGENT-91 standalone native asset bundling, AGENT-89/Claude MCP distribution seam if present, or continue AGENT-88 follow-on by moving another neutral capability/resource under `packages/`.
-- Revisit AGENT-111 status; it still appears `NEEDS REVIEW` in tasks even though its code is already on `main`.
+- Pick the next distribution task. AGENT-90 (neutral Pi package artifact) and AGENT-91 (standalone Bun app/binary, including `canvas.node`/`css-tree` native asset handling) are now unblocked by AGENT-89. AGENT-92 (Claude Code plugin/MCP distribution) is also unblocked.
+- AGENT-106 remains NOT STARTED and likely needs repro/triage before implementation because the original standup-loss concern may have been invalid.
 
 ### Blockers
-- Known standalone bundling follow-up remains: native `canvas.node` and `css-tree` asset handling under AGENT-91.
+- Known standalone bundling follow-up remains under AGENT-91: native `canvas.node` and `css-tree` asset handling.
 
 ### Context
-- Final verification after landing: `bun check`, `bun --filter sandpiper-capability-autotoon test`, `bun --filter sandpiper-capability-autotoon build`, `bun x vitest run extensions/autotoon/autotoon.test.ts packages/cli/sandpiper_resources.test.ts`, `bun run test:standalone` all passed.
-- Invariant searches returned zero matches for host-adapter references in `packages/capability-autotoon/src/core.ts` and for legacy AutoTOON implementation hooks in `extensions/autotoon`.
+- Final AGENT-89 verification from default workspace after landing: `bun check` and `bun run test:distribution` passed.
+- `test:distribution` prepares legacy dist prerequisites, runs `devtools/distribution-invariants.test.ts`, `devtools/distribution-smoke.test.ts`, then delegates to `bun run test:standalone`.
