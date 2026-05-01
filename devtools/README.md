@@ -11,6 +11,7 @@ Development scripts and build utilities. Not distributed with the package.
 | `vendor.sh` | Downloads vendored third-party skills from `vendor.txt` |
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
 | `distPackageJson.ts` | Generates `dist/package.json` with merged piConfig + pi resource paths |
+| `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
 ## Configuration
@@ -30,6 +31,16 @@ Current uses:
 - **`ascii-motion`** — CLI for the ascii-motion MCP server (separate effort, not part of the distribution).
 
 Server definitions live in `config/mcporter-dist.json` (for distribution builds) and `config/mcporter.json` (for local development, if present).
+
+## Distribution Checks
+
+Run the distribution invariant and smoke gate with:
+
+```bash
+bun run test:distribution
+```
+
+This prepares the legacy `dist/` assembly, verifies source-boundary invariants, checks generated Pi package resource paths, and runs the standalone smoke tests with temporary agent directories.
 
 ## Build Flow
 

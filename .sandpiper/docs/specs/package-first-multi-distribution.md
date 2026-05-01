@@ -482,6 +482,14 @@ AGENT-89 implementation slices:
 
 AGENT-89 intentionally does not build the final neutral Pi package, final Bun app bundle, or Claude plugin. Those artifacts remain AGENT-90, AGENT-91, and AGENT-92 respectively; AGENT-89 creates the checks those tasks must satisfy.
 
+AGENT-89 verification is anchored by:
+
+```bash
+bun run test:distribution
+```
+
+The distribution test script prepares the legacy `dist/` assembly, runs source-boundary invariant tests, verifies Pi package manifest resource paths, and runs standalone smoke tests against temporary agent directories.
+
 ### Phase 6 — Build distribution artifacts
 
 Tasks: AGENT-90, AGENT-91, AGENT-92
