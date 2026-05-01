@@ -526,6 +526,15 @@ AGENT-90 completion signal:
 - Sandpiper identity flags/hooks are absent: no migration flags, no install-shell-integration flag, no `before_agent_start` Sandpiper prompt hook, and no `extensions/system.ts` in the loaded extension set.
 - The artifact manifest paths are covered by the AGENT-89 distribution invariant helpers.
 
+AGENT-90 verification is anchored by:
+
+```bash
+bun run test:neutral-pi-package
+bun run test:distribution
+```
+
+`test:neutral-pi-package` builds `dist/neutral-pi-package/` and runs the focused neutral package manifest/load smoke tests. `test:distribution` includes those neutral checks along with the existing distribution invariant and standalone smoke gates.
+
 ### Phase 7 — Retire legacy root assembly
 
 Task: AGENT-93
