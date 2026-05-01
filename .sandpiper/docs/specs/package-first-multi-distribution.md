@@ -405,6 +405,25 @@ Move neutral packages/resources under `packages/` after seams exist and tests co
 
 The first moves should be low-risk and testable. Avoid moving everything in one commit/change.
 
+#### AGENT-88 migration slice
+
+AGENT-88 starts with **AutoTOON** as the first package-first migration slice. It is the lowest-risk neutral capability because its core behavior is a pure JSON→TOON transform, its Pi adapter is a single `tool_result` hook, and it already has focused tests.
+
+| Candidate | Current source | Package-first risk | AGENT-88 decision |
+| --- | --- | --- | --- |
+| AutoTOON | `extensions/autotoon/autotoon.ts` | Low: pure transform plus one Pi event adapter; no filesystem/session/config behavior | Move source of truth to `packages/capability-autotoon`; leave `extensions/autotoon` as compatibility bridge. |
+| Web fetch | `extensions/web-fetch/src/*` | Medium: multiple modules, external dependencies, Pi tool adapter and host-neutral fetch pipeline already mixed in extension package | Defer until AutoTOON package pattern is proven. |
+| Shell relay | `extensions/shell-relay/src/*` | Higher: Zellij/FIFO runtime, shell integration preflight, Sandpiper-specific install wording and session env assumptions | Defer to a dedicated host-neutral shell-relay package task. |
+| Background process tools | `extensions/system/background-process-tools.ts`, `extensions/system/startup-hooks.ts` | Medium: neutral behavior now split by AGENT-87, but adapter code is still co-located with Sandpiper identity helpers | Defer until neutral adapter package naming is settled. |
+| Skills/prompts/themes resources | `skills/`, `prompts/`, `themes/` | Medium: distribution assembly currently copies top-level resource directories and docs/skills refer to those paths | Defer broad resource movement until distribution manifest work. |
+
+AutoTOON target shape:
+
+- `packages/capability-autotoon/src/core.ts` owns host-neutral transform constants and `tryConvertJsonToToon(...)`; it imports no Pi or MCP types.
+- `packages/capability-autotoon/src/pi-extension.ts` owns the Pi `tool_result` adapter.
+- `extensions/autotoon/autotoon.ts` becomes a small compatibility bridge so the legacy root Pi package keeps its current manifest path.
+- `packages/cli/sandpiper_resources.ts` imports the package-first Pi adapter directly for standalone/dogfood distribution paths.
+
 ### Phase 5 — Add invariant checks and smoke tests
 
 Task: AGENT-89
