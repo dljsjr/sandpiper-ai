@@ -54,8 +54,9 @@ describe('checkShellIntegration', () => {
       expect(result.key).toBe('shell-relay:integration');
       expect(result.healthy).toBe(false);
       expect(result.message).toContain('not installed');
+      expect(result.instructions).toContain('Install the shell relay integration scripts for your host.');
       expect(result.instructions?.some((instruction) => instruction.includes('--install-shell-integrations'))).toBe(
-        true,
+        false,
       );
     });
 
