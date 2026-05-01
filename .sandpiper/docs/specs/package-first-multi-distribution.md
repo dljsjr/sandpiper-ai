@@ -471,6 +471,17 @@ Add automated checks that enforce the new architecture:
 - standalone Sandpiper runs with temp config dirs
 - no tests touch real `~/.sandpiper` or `~/.pi`
 
+AGENT-89 implementation slices:
+
+| Slice | Check surface | Completion signal |
+| --- | --- | --- |
+| Source-boundary invariants | Neutral package sources and neutral Pi capability entrypoints | Automated test fails if neutral core code gains Sandpiper/Pi config strings, Pi adapter imports, MCP server imports, or identity hook registrations. |
+| Pi package manifest smoke | Root and generated Pi package manifests | Automated test verifies declared extension/skill/prompt/theme paths exist relative to their package roots and generated `dist/package.json` preserves expected metadata shape. |
+| Standalone smoke gate | Existing standalone tests plus distribution script | `test:distribution` runs standalone help/resource smoke tests with temp agent directories and no reliance on a user `sandpiper` executable. |
+| Local workflow docs | Build docs and package scripts | Contributors have one command for distribution invariants, with documented generated-artifact prerequisites. |
+
+AGENT-89 intentionally does not build the final neutral Pi package, final Bun app bundle, or Claude plugin. Those artifacts remain AGENT-90, AGENT-91, and AGENT-92 respectively; AGENT-89 creates the checks those tasks must satisfy.
+
 ### Phase 6 — Build distribution artifacts
 
 Tasks: AGENT-90, AGENT-91, AGENT-92
