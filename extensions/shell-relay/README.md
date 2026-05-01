@@ -1,6 +1,6 @@
 # Shell Relay
 
-A Sandpiper extension that lets the agent execute commands in a shared Zellij terminal session instead of a fresh forked shell.
+A Pi extension that lets the agent execute commands in a shared Zellij terminal session instead of a fresh forked shell.
 
 Both the user and the agent can see and interact with the same terminal pane in real time. This is the right tool when a command depends on live shell session state such as:
 
@@ -37,27 +37,23 @@ No `expect`, `tclsh`, ghost client, or extension bundle is required.
 
 ### 1. Install shell integrations
 
-Install the relay shell integration files:
+Install the relay shell integration files using your host distribution's shell-integration installer.
 
-```bash
-sandpiper --install-shell-integrations
-```
-
-Then source the appropriate file from your shell config:
+Then source the appropriate file from your shell config. The examples below use `<config-dir>` for your host config directory, such as `~/.sandpiper` for Sandpiper or `~/.pi` for vanilla Pi:
 
 **Fish** (`~/.config/fish/config.fish`)
 ```fish
-source ~/.sandpiper/shell-integrations/relay.fish
+source <config-dir>/shell-integrations/relay.fish
 ```
 
 **Bash** (`~/.bashrc`)
 ```bash
-source ~/.sandpiper/shell-integrations/relay.bash
+source <config-dir>/shell-integrations/relay.bash
 ```
 
 **Zsh** (`~/.zshrc`)
 ```zsh
-source ~/.sandpiper/shell-integrations/relay.zsh
+source <config-dir>/shell-integrations/relay.zsh
 ```
 
 The scripts are safe to source unconditionally. Outside a relay session they silently no-op.

@@ -8,11 +8,11 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { basename, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
+import { getAgentDir } from '@mariozechner/pi-coding-agent';
 import { displayPath, type PreflightDiagnostic } from 'sandpiper-ai-core';
 
-const defaultWellKnownDir = join(homedir(), '.sandpiper', 'shell-integrations');
+const defaultWellKnownDir = join(dirname(getAgentDir()), 'shell-integrations');
 
 /** Shell probe commands — exit 0 if __relay_prompt_hook is defined, non-zero otherwise.
  * All shells use -i (interactive) because integration scripts are typically
@@ -98,8 +98,7 @@ export function checkShellIntegration(options: ShellIntegrationCheckOptions = {}
           `Add to ${rcFile}:`,
           `  source ${displayPath(join(wellKnownDir, scriptFile))}`,
           '',
-          'If not yet installed, run first:',
-          '  sandpiper --install-shell-integrations',
+          'If not yet installed, install the shell relay integration scripts for your host first.',
         ],
       };
     }
@@ -113,7 +112,7 @@ export function checkShellIntegration(options: ShellIntegrationCheckOptions = {}
       healthy: false,
       message: 'Shell relay integration is not installed',
       instructions: [
-        'Run: sandpiper --install-shell-integrations',
+        'Install the shell relay integration scripts for your host.',
         'Then source the appropriate script for your shell.',
       ],
     };
