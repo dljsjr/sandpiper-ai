@@ -1,0 +1,28 @@
+{
+  "name": "sandpiper-capability-autotoon",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Host-neutral AutoTOON JSON to TOON conversion plus Pi adapter",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./pi-extension": {
+      "types": "./dist/pi-extension.d.ts",
+      "default": "./src/pi-extension.ts"
+    }
+  },
+  "dependencies": {
+    "@toon-format/toon": "2.1.0"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "catalog:pi"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}
