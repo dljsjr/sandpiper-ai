@@ -11,6 +11,7 @@ Development scripts and build utilities. Not distributed with the package.
 | `vendor.sh` | Downloads vendored third-party skills from `vendor.txt` |
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
 | `distPackageJson.ts` | Generates `dist/package.json` with merged piConfig + pi resource paths |
+| `neutralPiPackage.ts` | Assembles `dist/neutral-pi-package/`, the neutral Pi package transition artifact |
 | `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
@@ -40,7 +41,7 @@ Run the distribution invariant and smoke gate with:
 bun run test:distribution
 ```
 
-This prepares the legacy `dist/` assembly, verifies source-boundary invariants, checks generated Pi package resource paths, and runs the standalone smoke tests with temporary agent directories.
+This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies neutral package loading without Sandpiper identity, and runs the standalone smoke tests with temporary agent directories.
 
 ## Build Flow
 
@@ -59,4 +60,8 @@ bun install
       → build dash CLI via mcporter
       → create dev-mode skill binary symlinks
       → optionally run sandpiper install dist/ when SANDPIPER_INSTALL_PI_PACKAGE=1
+
+bun run build:neutral-pi-package
+  → copy neutral extension/resource subset to dist/neutral-pi-package/
+  → generate neutral package.json without Sandpiper piConfig or sandpiper bin
 ```

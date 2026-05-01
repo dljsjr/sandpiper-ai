@@ -8,7 +8,7 @@ Sandpiper is a Pi Package and Bun workspace. The build system has three stages:
 
 1. **Package builds** — Compile TypeScript, bundle binaries
 2. **Dependency hoisting** — Bun workspace install
-3. **Distribution assembly** — Assemble the final Pi Package in `dist/`
+3. **Distribution assembly** — Assemble generated distribution artifacts in `dist/`
 
 This document explains when each stage runs and what you need to do after making changes.
 
@@ -23,7 +23,7 @@ Not all changes require a build step. Here's what to do after different types of
 | `packages/cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
-| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, and runs source/distribution/standalone invariant tests |
+| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, builds the neutral Pi package artifact, and runs source/distribution/standalone invariant tests |
 
 ## Build Pipeline
 
@@ -73,7 +73,7 @@ This means:
 
 ### Stage 3: Distribution Assembly
 
-The `postinstall.sh` script assembles the final Pi Package:
+The `postinstall.sh` script assembles the legacy Sandpiper Pi Package:
 
 ```bash
 bash devtools/postinstall.sh
@@ -86,6 +86,14 @@ This script:
 4. Symlinks Pi's internal assets
 5. Builds the Dash CLI via mcporter
 6. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
+
+The neutral Pi package artifact is built separately:
+
+```bash
+bun run build:neutral-pi-package
+```
+
+This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources without Sandpiper `piConfig`, CLI branding, migration flags, or startup prompt identity hooks.
 
 Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
@@ -142,7 +150,7 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the legacy Pi-package assembly without invoking the known standalone bundle path, then runs distribution invariant tests and standalone smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, and standalone temp-config execution.
+This command prepares the legacy Pi-package assembly and neutral Pi package artifact without invoking the known standalone bundle path, then runs distribution invariant tests and standalone smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, neutral package loading without Sandpiper identity, and standalone temp-config execution.
 
 ### Clean Build from Scratch
 
