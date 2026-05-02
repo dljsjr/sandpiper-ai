@@ -46,15 +46,29 @@ bun run sandpiper-standalone-built -- --help
 bun run test:standalone
 ```
 
-The build target intentionally produces a Bun-targeted JS bundle under `packages/cli/dist/standalone/`; it is not yet the final `bun compile` app bundle. `css-tree` is externalized because the bundled web-fetch dependency path currently hits Bun issue [#13076](https://github.com/oven-sh/bun/issues/13076): `css-tree` loads `../data/patch.json` through `createRequire(import.meta.url)`, and Bun can fail to resolve/bundle that JSON asset even with `--target=bun`. Bun links `sandpiper-standalone` through a checked-in bin shim at `packages/cli/bin/sandpiper-standalone`, because generated bundle outputs are not available early enough for first-install bin linking.
+The dogfood build target intentionally produces a Bun-targeted JS bundle under `packages/cli/dist/standalone/`; it is still useful for fast local dogfooding and the workspace-linked `sandpiper-standalone` bin. `canvas` and `css-tree` are externalized in this dogfood bundle: `canvas` is optional for jsdom, and `css-tree` still uses `createRequire(import.meta.url)` for JSON/package metadata in ways that do not survive this JS-bundle path reliably. Bun links `sandpiper-standalone` through a checked-in bin shim at `packages/cli/bin/sandpiper-standalone`, because generated bundle outputs are not available early enough for first-install bin linking.
 
-By default the standalone entrypoint generates a lightweight package-metadata sidecar under `dist/standalone-package/` and points Pi at that sidecar instead of the repo root. This preserves Sandpiper branding/config defaults without loading the legacy root Pi manifest a second time. Built-in Sandpiper extensions/resources come from explicit extension factories and `resources_discover` unless a legacy Sandpiper package entry is already configured in global or project settings; in that case, standalone lets the configured package provide Sandpiper's own resources so third-party installed packages still load without duplicating Sandpiper extensions. Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
+The standalone app bundle is built separately:
+
+```bash
+bun run build:standalone-app
+bun run test:standalone-app
+./dist/standalone-sandpiper/sandpiper --help
+```
+
+`build:standalone-app` writes `dist/standalone-sandpiper/` with a compiled `sandpiper` executable, Sandpiper sidecar `package.json`, copied resources/support packages, and Pi internal assets. Its Bun build plugin bundles `css-tree`'s JSON/package metadata into the executable; `canvas` remains external so jsdom treats it as unavailable instead of requiring a native sidecar.
+
+By default the source/dogfood standalone entrypoint generates a lightweight package-metadata sidecar under `dist/standalone-package/` and points Pi at that sidecar instead of the repo root. The compiled app bundle instead resolves package metadata and resources relative to `dirname(process.execPath)`, so it does not need `SANDPIPER_STANDALONE_RESOURCE_ROOT` or `SANDPIPER_STANDALONE_PACKAGE_DIR` in normal use. Both modes preserve Sandpiper branding/config defaults without loading the legacy root Pi manifest a second time. Built-in Sandpiper extensions/resources come from explicit extension factories and `resources_discover`; source/dogfood mode can still defer to a configured legacy Sandpiper package to avoid duplicate resources while package-management commands operate on normal Sandpiper global/project settings files.
+
+Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `pi_wrapper.ts` | CLI entry point — locates pi, sets env vars, delegates to `main()` |
+| `sandpiper_standalone.ts` | Standalone entrypoint — sets sidecar package metadata before loading Pi and injects Sandpiper factories/resources |
+| `deferred_pi_import.ts` | Load-order shim so the Sandpiper app bundle imports Pi only after Sandpiper package metadata env vars are set; not a Pi distribution artifact |
 | `copy_pi_assets.ts` | Copies sandpiper README/CHANGELOG into dist |
 | `locatePi.sh` | Writes the system pi binary path to `.pi-binpath` |
 

@@ -12,7 +12,7 @@ Development scripts and build utilities. Not distributed with the package.
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
 | `distPackageJson.ts` | Generates `dist/package.json` with merged piConfig + pi resource paths |
 | `neutralPiPackage.ts` | Assembles `dist/neutral-pi-package/`, the neutral Pi package transition artifact |
-| `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources for the standalone app-bundle transition artifact |
+| `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
 | `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
@@ -42,7 +42,7 @@ Run the distribution invariant and smoke gate with:
 bun run test:distribution
 ```
 
-This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies neutral package loading without Sandpiper identity, and runs the standalone smoke tests with temporary agent directories.
+This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies neutral package loading without Sandpiper identity, and runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories.
 
 ## Build Flow
 
@@ -70,4 +70,12 @@ bun run prepare:standalone-app
   → copy standalone Sandpiper resources/support packages to dist/standalone-sandpiper/
   → generate Sandpiper sidecar package.json without Pi resource manifest entries
   → copy Pi internal asset directories required by the app-bundle layout
+
+bun run build:standalone-app
+  → run prepare:standalone-app
+  → compile dist/standalone-sandpiper/sandpiper with the standalone Bun build plugin
+
+bun run test:standalone-app
+  → verify standalone app metadata/resource assembly
+  → compile the app bundle and run help/resource smoke tests from temp agent directories
 ```

@@ -564,6 +564,22 @@ AGENT-91 completion signal:
 - Help output proves Sandpiper identity flags load, neutral capability tools/resources load from the artifact, and the executable does not rely on root `pi.extensions` / `pi.skills` manifest entries.
 - The standalone asset requirements and known sidecars are documented in the build docs or package README.
 
+AGENT-91 implementation results:
+
+- Added `devtools/standaloneSandpiperApp.ts` as the standalone app-bundle assembler and executable build script.
+- Added `dist/standalone-sandpiper/` as the local app-bundle artifact root.
+- Added `bun run prepare:standalone-app`, `bun run build:standalone-app`, and `bun run test:standalone-app`.
+- The compiled app bundle resolves package metadata/resources relative to `dirname(process.execPath)`, while source/dogfood mode keeps the existing env overrides and generated `dist/standalone-package/` sidecar.
+- `deferred_pi_import.ts` keeps Pi behind a local dynamic-import boundary so Sandpiper package metadata is configured before Pi's module-level constants are evaluated.
+- `css-tree` remains external in the dogfood JS bundle, but the app-bundle build plugin rewrites its JSON/package metadata modules to static imports so `css-tree/data/patch.json` and `css-tree/package.json` are bundled into the executable. Optional `canvas` remains external; jsdom treats it as unavailable without requiring a native sidecar.
+
+AGENT-91 verification is anchored by:
+
+```bash
+bun run test:standalone-app
+bun run test:distribution
+```
+
 ### Phase 7 — Retire legacy root assembly
 
 Task: AGENT-93
