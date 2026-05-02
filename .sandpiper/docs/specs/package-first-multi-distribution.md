@@ -535,6 +535,35 @@ bun run test:distribution
 
 `test:neutral-pi-package` builds `dist/neutral-pi-package/` and runs the focused neutral package manifest/load smoke tests. `test:distribution` includes those neutral checks along with the existing distribution invariant and standalone smoke gates.
 
+#### AGENT-91 standalone Sandpiper app bundle target
+
+AGENT-91 promotes the dogfood standalone CLI into a local standalone app-bundle artifact. The target is still an app bundle, not a strict single-file executable: Bun and Pi both need sidecar package metadata/assets, and native/data assets such as `canvas.node` and `css-tree/data/patch.json` may need filesystem paths outside the executable.
+
+Artifact shape:
+
+- `dist/standalone-sandpiper/`
+  - `sandpiper` — Bun-compiled executable when feasible; a runnable Bun-targeted launcher is acceptable only as an intermediate test fixture, not the final AGENT-91 completion signal.
+  - `package.json` — sidecar metadata read before importing Pi. It includes Sandpiper `piConfig` (`name: sandpiper`, `configDir: .sandpiper`, `bin: sandpiper`) and intentionally does not declare `pi.extensions`, `pi.skills`, `pi.prompts`, or `pi.themes`; resources are loaded through explicit factories/resource discovery.
+  - `README.md` / `CHANGELOG.md` where present.
+  - `extensions/`, `skills/`, `prompts/`, `themes/` — copied resource roots used by `createSandpiperExtensionFactories(...)` and `resources_discover`.
+  - `packages/` support packages needed by compatibility bridges and package-first adapters, including `packages/core` and `packages/capability-autotoon`.
+  - `dist/modes` and `dist/core` — Pi internal assets copied or linked into the sidecar package layout so Pi interactive/export flows keep working.
+  - native/data sidecars required by the executable. These must be shipped intentionally, not by copying a whole source-tree `node_modules/` directory.
+
+Runtime rules:
+
+- The executable resolves its resource root and package metadata relative to the app-bundle directory by default. Development overrides such as `SANDPIPER_STANDALONE_RESOURCE_ROOT` and `SANDPIPER_STANDALONE_PACKAGE_DIR` may remain for tests and dogfooding.
+- The app bundle must preserve Sandpiper identity/config behavior through Pi's package metadata before importing `@mariozechner/pi-coding-agent`.
+- It must not require a bare `sandpiper` executable on `$PATH`, a configured legacy Sandpiper Pi package, or the source repo root.
+- It must not ship a full copied `node_modules/`; if Bun-native or `createRequire(...)` assets need filesystem support, copy only the known asset paths needed by the compiled/bundled runtime and document them in the assembler.
+
+AGENT-91 completion signal:
+
+- `bun run build:standalone-app` (or the final script name chosen during implementation) writes `dist/standalone-sandpiper/`.
+- A smoke test runs the app-bundle executable from that artifact with temp Sandpiper agent/config directories.
+- Help output proves Sandpiper identity flags load, neutral capability tools/resources load from the artifact, and the executable does not rely on root `pi.extensions` / `pi.skills` manifest entries.
+- The standalone asset requirements and known sidecars are documented in the build docs or package README.
+
 ### Phase 7 — Retire legacy root assembly
 
 Task: AGENT-93
