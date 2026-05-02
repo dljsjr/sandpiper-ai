@@ -75,8 +75,8 @@
         "supports-color": "10.2.2"
       },
       "pi": {
-        "@mariozechner/pi-coding-agent": "0.71.1",
-        "@mariozechner/pi-tui": "0.71.1",
+        "@mariozechner/pi-coding-agent": "0.72.0",
+        "@mariozechner/pi-tui": "0.72.0",
         "@silvia-odwyer/photon-node": "0.3.4",
         "@sinclair/typebox": "0.34.49"
       },
