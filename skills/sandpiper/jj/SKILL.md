@@ -97,7 +97,9 @@ These are hard rules for agent sessions. Matched recovery paths for each are in 
 
 3. **Verify after every graph restructuring.** After `rebase`, `squash`, `split`, `abandon`, `edit`,
    or any bookmark move, run `jj log -r 'main@origin..visible_heads()'` (or equivalent) to confirm
-   the shape is what you expected. Do not chain multiple restructures without verifying.
+   the shape is what you expected. Do not chain multiple restructures without verifying. Run graph-
+   mutating jj commands one at a time rather than bundling several into one shell script; jj conflicts
+   are recorded successfully and may not stop a script before later mutations compound the state.
 
 4. **On unexpected failure, reach for the op log, not destructive alternatives.** `jj undo` walks
    back the last op; `jj op restore <op-id>` jumps to a specific state. Do not run `rm -rf .jj`

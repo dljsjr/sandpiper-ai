@@ -28,6 +28,7 @@ This repository is both a **Pi Package** and a **Bun/Node.js monorepo** — an u
 - All coding work tracked against a task. Bugs get their own top-level `BUG` task. Reference task keys in commits
 - Edit **source**, not generated or assembled artifacts
 - Active agent-operational docs live in **`.sandpiper/docs/`**, historical material in **`.sandpiper/archive/`**
+- Code review docs under **`.sandpiper/reviews/`** are scratch artifacts: delete them after the review is resolved; don't commit them unless the user explicitly asks
 - Treat design docs and guidance docs as living artifacts: update in place, don't create new files when iterating on a plan or spec
 - Use **Bun** as the preferred runtime, package manager, and script runner
 - Run workspace installs from the repo root
