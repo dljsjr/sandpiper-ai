@@ -50,6 +50,39 @@ describe('standalone bootstrap', () => {
     }
   });
 
+  it('resolves package metadata to the executable directory for compiled app bundles', () => {
+    const paths = resolveStandalonePaths({
+      startDir: '/$bunfs/root',
+      executablePath: '/tmp/sandpiper-app/sandpiper',
+      env: {},
+    });
+
+    expect(paths.resourceRoot).toBe('/tmp/sandpiper-app');
+    expect(paths.packageDir).toBe('/tmp/sandpiper-app');
+    expect(paths.packageDirSource).toBe('app-bundle');
+  });
+
+  it('detects app bundles from sidecar package metadata without Bun virtual filesystem paths', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
+    try {
+      const appDir = join(dir, 'app');
+      mkdirSync(appDir, { recursive: true });
+      writeFileSync(join(appDir, 'package.json'), JSON.stringify({ piCodingAgentVersion: '0.72.0' }));
+
+      const paths = resolveStandalonePaths({
+        startDir: '/future-bunfs/root',
+        executablePath: join(appDir, 'sandpiper'),
+        env: {},
+      });
+
+      expect(paths.resourceRoot).toBe(appDir);
+      expect(paths.packageDir).toBe(appDir);
+      expect(paths.packageDirSource).toBe('app-bundle');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('defaults package metadata to the generated standalone package directory', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
     try {
