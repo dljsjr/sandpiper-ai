@@ -17,6 +17,7 @@ describe('standalone Sandpiper app assembler', () => {
       version: rootPackageJson.version,
       private: true,
       type: 'module',
+      piCodingAgentVersion: rootPackageJson.workspaces.catalogs.pi['@mariozechner/pi-coding-agent'],
       piConfig: {
         name: 'sandpiper',
         configDir: '.sandpiper',

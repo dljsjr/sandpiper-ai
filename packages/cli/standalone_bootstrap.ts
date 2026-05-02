@@ -15,12 +15,13 @@ import { dirname, join, resolve } from 'node:path';
 export interface StandalonePaths {
   readonly resourceRoot: string;
   readonly packageDir: string;
-  readonly packageDirSource: 'generated' | 'override';
+  readonly packageDirSource: 'generated' | 'override' | 'app-bundle';
 }
 
 export interface ResolveStandalonePathsOptions {
   readonly startDir: string;
   readonly env: NodeJS.ProcessEnv;
+  readonly executablePath?: string;
 }
 
 export interface PiEnvironmentOptions {
@@ -52,6 +53,10 @@ interface PackageJsonWithPiConfig {
   readonly license?: string;
 }
 
+interface StandaloneAppSidecarPackageJson {
+  readonly piCodingAgentVersion?: string;
+}
+
 interface SettingsPackageEntry {
   readonly source?: string;
 }
@@ -69,6 +74,38 @@ const EXEMPT_PI_VARS = new Set([
 
 const SANDPIPER_PACKAGE_NAME = 'sandpiper-ai';
 const SANDPIPER_CONFIG_DIR = '.sandpiper';
+const BUN_EMBEDDED_FILESYSTEM_ROOT = '/$bunfs/';
+
+function standaloneAppDirFromExecutable(executablePath: string): string {
+  return dirname(resolve(executablePath));
+}
+
+function hasStandaloneAppSidecar(executablePath: string): boolean {
+  const packageJsonPath = join(standaloneAppDirFromExecutable(executablePath), 'package.json');
+
+  try {
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as StandaloneAppSidecarPackageJson;
+    return packageJson.piCodingAgentVersion !== undefined;
+  } catch {
+    return false;
+  }
+}
+
+function isCompiledBunEntrypoint(options: ResolveStandalonePathsOptions): boolean {
+  const executablePath = options.executablePath;
+  if (executablePath === undefined) return false;
+
+  return resolve(options.startDir).startsWith(BUN_EMBEDDED_FILESYSTEM_ROOT) || hasStandaloneAppSidecar(executablePath);
+}
+
+function resolveDefaultStandaloneResourceRoot(options: ResolveStandalonePathsOptions): string {
+  const executablePath = options.executablePath;
+  if (executablePath !== undefined && isCompiledBunEntrypoint(options)) {
+    return standaloneAppDirFromExecutable(executablePath);
+  }
+
+  return findPackageRoot(options.startDir, SANDPIPER_PACKAGE_NAME);
+}
 
 export function findPackageRoot(startDir: string, packageName: string): string {
   let dir = resolve(startDir);
@@ -91,13 +128,21 @@ export function findPackageRoot(startDir: string, packageName: string): string {
 export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): StandalonePaths {
   const resourceRoot = options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT
     ? resolve(options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT)
-    : findPackageRoot(options.startDir, 'sandpiper-ai');
+    : resolveDefaultStandaloneResourceRoot(options);
 
   if (options.env.SANDPIPER_STANDALONE_PACKAGE_DIR) {
     return {
       resourceRoot,
       packageDir: resolve(options.env.SANDPIPER_STANDALONE_PACKAGE_DIR),
       packageDirSource: 'override',
+    };
+  }
+
+  if (isCompiledBunEntrypoint(options)) {
+    return {
+      resourceRoot,
+      packageDir: resourceRoot,
+      packageDirSource: 'app-bundle',
     };
   }
 
@@ -256,6 +301,7 @@ export function hasConfiguredSandpiperPackage(options: ConfiguredSandpiperPackag
 }
 
 export function defaultStandaloneMainArgs(args: readonly string[], _env: NodeJS.ProcessEnv): string[] {
+  // Keep the env parameter in the boundary helper so future default CLI arguments can depend on host environment.
   return [...args];
 }
 

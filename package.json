@@ -18,6 +18,7 @@
     "build:legacy-cli": "mkdir -p packages/cli/dist && bun build --production --minify --target=node ./packages/cli/pi_wrapper.ts --outfile ./packages/cli/dist/sandpiper",
     "build:neutral-pi-package": "bun run --bun devtools/neutralPiPackage.ts",
     "prepare:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts",
+    "build:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts --compile",
     "prepare:distribution": "bun --filter sandpiper-ai-core build && bun --filter sandpiper-standup-cli build && bun --filter sandpiper-tasks-cli build && bun run build:legacy-cli && bash devtools/postinstall.sh && bun run build:neutral-pi-package",
     "build": "bun --filter sandpiper-ai-cli build",
     "build:standalone": "bun --filter sandpiper-ai-cli build:standalone",
