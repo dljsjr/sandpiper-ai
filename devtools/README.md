@@ -12,6 +12,7 @@ Development scripts and build utilities. Not distributed with the package.
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
 | `distPackageJson.ts` | Generates `dist/package.json` with merged piConfig + pi resource paths |
 | `neutralPiPackage.ts` | Assembles `dist/neutral-pi-package/`, the neutral Pi package transition artifact |
+| `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources for the standalone app-bundle transition artifact |
 | `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
@@ -64,4 +65,9 @@ bun install
 bun run build:neutral-pi-package
   → copy neutral extension/resource subset to dist/neutral-pi-package/
   → generate neutral package.json without Sandpiper piConfig or sandpiper bin
+
+bun run prepare:standalone-app
+  → copy standalone Sandpiper resources/support packages to dist/standalone-sandpiper/
+  → generate Sandpiper sidecar package.json without Pi resource manifest entries
+  → copy Pi internal asset directories required by the app-bundle layout
 ```
