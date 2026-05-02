@@ -28,7 +28,7 @@ for element in extensions themes skills prompts packages; do
         "${REPO_ROOT}/${element}/" "${DIST_DIR}/${element}/"
 done
 
-find . \( -name 'dist' -type d -not -path '*/node_modules/*' -not -path './dist' -not -path './packages/cli/*' -not -path './extensions/*' \) -print0 |
+find . \( -name 'dist' -type d -not -path '*/node_modules/*' -not -path './dist' -not -path './dist/*' -not -path './packages/cli/*' -not -path './extensions/*' \) -print0 |
     xargs -0 -I{} sh -c 'rsync -ahH --exclude-from="$3" "$1/" "$(realpath "$2/$(dirname $1)/")"' - '{}' "${DIST_DIR}" "${SCRIPT_DIR}/postinstall-excludes.txt"
 
 rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" -ahH "${REPO_ROOT}/packages/cli/dist/" "${DIST_DIR}/"

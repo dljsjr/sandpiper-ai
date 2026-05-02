@@ -23,7 +23,7 @@ Not all changes require a build step. Here's what to do after different types of
 | `packages/cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
-| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, builds the neutral Pi package artifact, and runs source/distribution/standalone invariant tests |
+| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, builds neutral Pi and standalone app artifacts, and runs source/distribution/standalone invariant tests |
 
 ## Build Pipeline
 
@@ -34,10 +34,12 @@ Only packages that emit distributable artifacts need build steps:
 **`packages/cli/`**:
 ```bash
 bun build --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper
-bun build --target=bun --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone
+bun build --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone
+bun run build:standalone-app
 ```
 - Bundles the legacy Sandpiper CLI wrapper
 - Bundles the dogfood standalone CLI target
+- Builds the standalone app-bundle artifact at `dist/standalone-sandpiper/`
 - Copies Pi assets (themes, export templates)
 
 **`packages/sandpiper-tasks-cli/`**:
@@ -95,7 +97,15 @@ bun run build:neutral-pi-package
 
 This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources without Sandpiper `piConfig`, CLI branding, migration flags, or startup prompt identity hooks.
 
-Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
+The standalone Sandpiper app bundle is built separately:
+
+```bash
+bun run build:standalone-app
+```
+
+This writes `dist/standalone-sandpiper/` with a compiled `sandpiper` executable, Sandpiper sidecar package metadata, bundled resources/support packages, and Pi internal assets. The executable bundles `css-tree`'s JSON/package metadata through the standalone assembler's Bun build plugin and leaves optional `canvas` external so jsdom can treat it as unavailable rather than requiring a native sidecar.
+
+Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated dogfood bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
 ## Understanding `dist/`
 
@@ -150,7 +160,7 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the legacy Pi-package assembly and neutral Pi package artifact without invoking the known standalone bundle path, then runs distribution invariant tests and standalone smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, neutral package loading without Sandpiper identity, and standalone temp-config execution.
+This command prepares the legacy Pi-package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, and standalone app-bundle smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, neutral package loading without Sandpiper identity, standalone temp-config execution, and compiled app-bundle help/resource loading.
 
 ### Clean Build from Scratch
 
@@ -182,6 +192,13 @@ For the standalone Sandpiper dogfood binary, either run `bun install` or rebuild
 ```bash
 bun run build:standalone
 ./node_modules/.bin/sandpiper-standalone --help
+```
+
+For the standalone app bundle, rebuild and smoke-test it with:
+```bash
+bun run build:standalone-app
+bun run test:standalone-app
+./dist/standalone-sandpiper/sandpiper --help
 ```
 
 ## Related Documentation
