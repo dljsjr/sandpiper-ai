@@ -15,6 +15,8 @@ Development scripts and build utilities. Not distributed with the package.
 | `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
 | `claudeCodePlugin.ts` | Assembles `dist/claude-plugin/` resources/manifest and bundles Claude hook scripts |
 | `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
+| `ecosystemPackage.ts` | Shared helpers for npm/Pi/Claude install-compatibility checks |
+| `piPackageArtifactMetadata.ts` | Shared manifest/dependency generation for npm-installable Pi package artifacts |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
 ## Configuration
@@ -43,7 +45,7 @@ Run the distribution invariant and smoke gate with:
 bun run test:distribution
 ```
 
-This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
+This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies npm/Pi package install metadata and scratch-file pruning, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
 
 ## Build Flow
 
@@ -57,7 +59,8 @@ bun install
       → copy workspace dist/ outputs
       → wire skill-bundled CLIs (tasks, standup)
       → copy extension package.json files
-      → generate dist/package.json
+      → remove stale nested generated artifacts from dist/
+      → generate dist/package.json with npm-compatible package metadata
       → symlink pi internal assets
       → build dash CLI via mcporter
       → create dev-mode skill binary symlinks
@@ -66,6 +69,7 @@ bun install
 bun run build:neutral-pi-package
   → copy neutral extension/resource subset to dist/neutral-pi-package/
   → generate neutral package.json without Sandpiper piConfig or sandpiper bin
+  → copy support package package.json files and use file: deps for local package-owned runtime code
 
 bun run prepare:standalone-app
   → copy standalone Sandpiper resources/support packages to dist/standalone-sandpiper/
@@ -80,7 +84,7 @@ bun run build:claude-plugin
   → run prepare:distribution for generated helper CLIs
   → copy Claude-compatible skills/commands/themes to dist/claude-plugin/
   → materialize generated skill scripts and bin helpers without external workspace symlinks
-  → write .claude-plugin/plugin.json and hooks/hooks.json
+  → write .claude-plugin/plugin.json, package.json, and hooks/hooks.json
   → bundle hooks/autotoon-post-tool-use.js for Claude's PostToolUse lifecycle
 
 bun run test:standalone-app
@@ -91,3 +95,13 @@ bun run test:claude-plugin
   → verify Claude plugin metadata/resource assembly
   → exercise the AutoTOON hook package and bundled hook artifact
 ```
+
+## Ecosystem Install Checks
+
+`devtools/ecosystemPackage.test.ts` is the release/install compatibility gate. It checks that:
+
+- the repository root contains no `catalog:` or `workspace:*` dependency specs, so Pi's git install path can run npm install after cloning source;
+- generated Pi package artifacts under `dist/` and `dist/neutral-pi-package/` have npm-compatible manifests, no `private`, valid `file:` dependency targets, and no leaked scratch logs/PIDs;
+- the root `dist/` package uses a `files` whitelist so nested generated artifacts are not included by `npm pack`.
+
+`devtools/claudeCodePlugin.test.ts` covers Claude's side of the same gate: the generated plugin package metadata is publishable, `.claude-plugin/plugin.json` and root `.claude-plugin/marketplace.json` validate with the Claude CLI when available, and `npm pack --dry-run` includes the plugin manifest.

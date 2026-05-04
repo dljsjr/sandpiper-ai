@@ -188,6 +188,9 @@ Open question: whether a true single-file binary is practical. Pi's current comp
 Expected characteristics:
 
 - Installable with `pi install` from npm/git/local path.
+- Generated npm package manifests must not contain Bun-only `catalog:` or `workspace:*` specs.
+- Package-owned support code shipped beside a generated artifact should be referenced with local `file:` dependencies whose package roots are present in the artifact.
+- Pi packages imported by extensions should be peer dependencies with `"*"` ranges, matching Pi package guidance.
 - Ships enhanced functionality: skills, prompt templates, themes, and neutral extensions/tools.
 - Does **not** set Sandpiper identity, Sandpiper system prompt, or Sandpiper config directory.
 - May still ship CLIs named `sandpiper-tasks` and `sandpiper-standup` if those are product/tool names rather than host identity.
@@ -198,7 +201,8 @@ Expected characteristics:
 Expected characteristics:
 
 - Ships neutral skills/resources and compatible hooks/tools via Claude Code's plugin model.
-- Uses a plugin root with optional `.claude-plugin/plugin.json` metadata.
+- Uses a plugin root with `.claude-plugin/plugin.json` metadata plus publishable npm package metadata for marketplace-discovered installs.
+- Provides a root `.claude-plugin/marketplace.json` that validates as a Claude marketplace and points installs at the npm plugin package.
 - Exposes automatic lifecycle behavior through Claude plugin hooks where the host has an equivalent event.
 - Exposes model-facing tools through plugin-provided MCP servers, normally stdio servers configured in `.mcp.json` or inline `plugin.json`, not Pi extension factories.
 - Does not ship Sandpiper identity/system prompt.
@@ -218,7 +222,7 @@ Default component locations:
 
 | Claude component | Default path | Notes for Sandpiper |
 | --- | --- | --- |
-| Manifest | `.claude-plugin/plugin.json` | Optional, but needed for metadata and custom paths. If present, `name` is required. |
+| Manifest | `.claude-plugin/plugin.json` | Optional, but needed for metadata and custom paths. If present, `name` is required. Repository metadata in this manifest is a string URL, not an npm-style repository object. |
 | Skills | `skills/` | Directory-per-skill with `SKILL.md`; closest match to Pi skills. |
 | Commands | `commands/` | Flat markdown command/skill files; possible target for selected prompt templates. |
 | Agents | `agents/` | Optional future distribution surface; plugin agents cannot include hooks, MCP servers, or permission mode. |
@@ -587,13 +591,22 @@ The local Claude Code plugin artifact lives at `dist/claude-plugin/`. It is a tr
 
 Artifact shape:
 
+- root `.claude-plugin/marketplace.json`
+  - validates as a Claude marketplace manifest
+  - points the `sandpiper-neutral` plugin at npm package `sandpiper-claude-code-plugin`
 - `dist/claude-plugin/.claude-plugin/plugin.json`
   - `name`: `sandpiper-neutral`
   - `skills`: `./skills/sandpiper/` and `./skills/third-party/`
   - `commands`: `./commands/`
   - `themes`: `./themes/`
   - `hooks`: `./hooks/hooks.json`
+  - includes author/homepage/repository/license metadata for Claude validation and attribution
   - no Sandpiper system prompt, Pi package metadata, or `piConfig`
+- `dist/claude-plugin/package.json`
+  - `name`: `sandpiper-claude-code-plugin`
+  - `type`: `module`
+  - no `private`
+  - includes npm `files` metadata so `npm pack` includes the Claude manifest/resources and excludes unrelated workspace files
 - `dist/claude-plugin/hooks/hooks.json`
   - declares Claude Code plugin hooks, starting with the AutoTOON `PostToolUse` hook
   - invokes bundled hook scripts with `${CLAUDE_PLUGIN_ROOT}` paths
@@ -617,7 +630,7 @@ Initial Claude adapter scope:
 Completion signal:
 
 - `bun run build:claude-plugin` writes `dist/claude-plugin/` with the manifest, resources, helper binaries, hook configuration, and bundled hook scripts.
-- A local plugin smoke test validates Claude path rules, self-contained helper binaries, and hook references without touching real Claude user state.
+- A local plugin smoke test validates Claude path rules, publishable package metadata, self-contained helper binaries, hook references, and marketplace metadata without touching real Claude user state.
 - A hook smoke test executes the bundled AutoTOON hook with a representative `PostToolUse` payload.
 - `bun run test:distribution` includes the Claude plugin checks alongside the neutral Pi package and standalone app gates.
 
@@ -628,6 +641,8 @@ Implementation results:
 - Added `packages/adapter-claude-code/` as the Claude-specific hook adapter package.
 - The initial Claude adapter exposes AutoTOON as a `PostToolUse` hook by calling the host-neutral `sandpiper-capability-autotoon` core.
 - The plugin assembly copies Claude-compatible skills, command files, themes, helper CLIs, and generated skill scripts without preserving source-tree symlinks to the workspace.
+- The generated plugin package is named `sandpiper-claude-code-plugin`, is not private, carries author/homepage/repository/license metadata, and validates with `claude plugin validate dist/claude-plugin`.
+- Added root `.claude-plugin/marketplace.json` so `claude plugin marketplace add ...` can discover the npm-sourced plugin package; it validates with `claude plugin validate .`.
 - Added `bun run prepare:claude-plugin`, `bun run build:claude-plugin`, and `bun run test:claude-plugin`.
 - Wired Claude plugin checks into `bun run test:distribution`.
 
@@ -636,6 +651,39 @@ Verification is anchored by:
 ```bash
 bun run test:claude-plugin
 bun run test:distribution
+```
+
+#### AGENT-150 ecosystem install certification target
+
+AGENT-150 shores up release/install compatibility before AGENT-93 retires the legacy root assembly. The goal is to make installability a tested invariant rather than an assumption from local builds.
+
+Certified paths:
+
+| Install path | Source root | Current gate |
+| --- | --- | --- |
+| `pi install git:github.com/dljsjr/sandpiper-ai` | repository root cloned by Pi | root/package workspace manifests avoid `catalog:` and `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` passes |
+| `pi install npm:sandpiper-ai` | npm package published from `dist/` | `dist/package.json` has no `private`, declares npm-compatible runtime deps, references local support packages with `file:`, and uses a `files` whitelist to keep nested generated artifacts out of `npm pack` |
+| neutral Pi package | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/`, without Sandpiper `piConfig` or `sandpiper` bin |
+| Claude Code plugin marketplace/npm install | root `.claude-plugin/marketplace.json` and npm package from `dist/claude-plugin/` | `claude plugin validate .` and `claude plugin validate dist/claude-plugin` pass; plugin `npm pack --dry-run` includes `.claude-plugin/plugin.json` |
+
+Implementation results:
+
+- Added ecosystem package tests under `devtools/ecosystemPackage.test.ts` and included them in `bun run test:distribution`.
+- Normalized package manifests away from Bun-only dependency protocols while preserving Bun workspace catalogs as non-published version constants.
+- Generated Pi package support `package.json` files and local `file:` dependencies for package-owned runtime code copied into package artifacts.
+- Pruned stale nested generated artifacts and development scratch/log/PID files from generated package artifacts.
+- Added Claude marketplace metadata and publishable plugin package metadata with author/homepage/repository/license attribution.
+
+Manual certification commands:
+
+```bash
+bun run prepare:distribution
+npm install --ignore-scripts --package-lock=false --dry-run
+npm install --ignore-scripts --package-lock=false --dry-run --prefix dist
+npm install --ignore-scripts --package-lock=false --dry-run --prefix dist/neutral-pi-package
+bun run build:claude-plugin
+claude plugin validate .
+claude plugin validate dist/claude-plugin
 ```
 
 ### Phase 7 — Retire legacy root assembly
@@ -665,7 +713,8 @@ Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakd
 | AGENT-90 | MEDIUM | AGENT-88, AGENT-89 | Build neutral Pi package distribution artifact. | Local Pi install/load smoke test passes without Sandpiper identity. |
 | AGENT-91 | MEDIUM | AGENT-85, AGENT-88, AGENT-89 | Build standalone Sandpiper Bun binary distribution. | App bundle/binary runs and loads identity + neutral capabilities from temp config. |
 | AGENT-92 | MEDIUM | AGENT-88, AGENT-89 | Research and build Claude Code plugin distribution. | Plugin format documented; supported resources and Claude adapters load in Claude Code or a faithful local validator. |
-| AGENT-93 | MEDIUM | AGENT-90, AGENT-91, AGENT-92 | Retire legacy Pi-oriented root assembly. | Root no longer acts as canonical Pi package; docs and generated artifacts updated. |
+| AGENT-150 | HIGH | AGENT-90, AGENT-92 | Certify ecosystem package installation paths. | npm/Pi/Claude install compatibility gates pass for source root, generated Pi artifacts, and Claude marketplace/plugin manifests. |
+| AGENT-93 | MEDIUM | AGENT-90, AGENT-91, AGENT-92, AGENT-150 | Retire legacy Pi-oriented root assembly. | Root no longer acts as canonical Pi package; docs and generated artifacts updated. |
 
 ## Verification Gates
 

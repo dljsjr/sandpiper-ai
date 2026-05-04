@@ -91,12 +91,13 @@ bash devtools/postinstall.sh
 ```
 
 This script:
-1. Copies extensions, skills, prompts, themes to `dist/`
-2. Preserves extension `src/` trees (so `pi.extensions` entries resolve)
-3. Generates `dist/package.json` with Pi package metadata
-4. Symlinks Pi's internal assets
-5. Builds the Dash CLI via mcporter
-6. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
+1. Removes stale nested package artifacts from `dist/` (`claude-plugin`, `neutral-pi-package`, `standalone-package`)
+2. Copies extensions, skills, prompts, themes to `dist/`
+3. Preserves extension `src/` trees (so `pi.extensions` entries resolve)
+4. Generates `dist/package.json` with Pi package metadata and an npm `files` whitelist
+5. Symlinks Pi's internal assets
+6. Builds the Dash CLI via mcporter
+7. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
 
 The neutral Pi package artifact is built separately:
 
@@ -104,7 +105,7 @@ The neutral Pi package artifact is built separately:
 bun run build:neutral-pi-package
 ```
 
-This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources without Sandpiper `piConfig`, CLI branding, migration flags, or startup prompt identity hooks.
+This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources without Sandpiper `piConfig`, CLI branding, migration flags, or startup prompt identity hooks. Its generated manifest is npm-installable: package-owned runtime support is copied under `packages/`, referenced with local `file:` dependencies, and Pi packages are declared as `peerDependencies` with `"*"` ranges per Pi packaging guidance.
 
 The standalone Sandpiper app bundle is built separately:
 
@@ -120,7 +121,7 @@ The Claude Code plugin artifact is built separately:
 bun run build:claude-plugin
 ```
 
-This writes `dist/claude-plugin/` with Claude plugin metadata, copied skills/commands/themes, materialized helper CLIs, hook configuration, and a bundled `hooks/autotoon-post-tool-use.js` script. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific hook glue lives in `packages/adapter-claude-code/` and adapts host-neutral capability code.
+This writes `dist/claude-plugin/` with Claude plugin metadata, copied skills/commands/themes, materialized helper CLIs, hook configuration, a bundled `hooks/autotoon-post-tool-use.js` script, and npm package metadata for `sandpiper-claude-code-plugin`. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific hook glue lives in `packages/adapter-claude-code/` and adapts host-neutral capability code. The repository root also contains `.claude-plugin/marketplace.json`, which validates as a Claude marketplace and points marketplace installs at the npm plugin package.
 
 Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated dogfood bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
@@ -177,7 +178,32 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the legacy Pi-package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
+This command prepares the legacy Pi-package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
+
+### Ecosystem Install Certification
+
+The supported local install roots are:
+
+| Ecosystem path | Source root | Gate |
+| --- | --- | --- |
+| `pi install git:github.com/dljsjr/sandpiper-ai` | repository root after clone | root `package.json` dependency specs avoid Bun-only `catalog:` / `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` must pass |
+| `pi install npm:sandpiper-ai` | published package built from `dist/` | `dist/package.json` has no `private`, uses npm-compatible runtime deps and `file:` support packages, and `npm pack --dry-run --json` excludes nested generated artifacts |
+| neutral Pi local/npm artifact | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/` plus no Sandpiper `piConfig` or `sandpiper` bin |
+| Claude plugin marketplace/npm install | root `.claude-plugin/marketplace.json` plus `dist/claude-plugin/` | `claude plugin validate` passes for both marketplace and plugin manifests; plugin package metadata has author/repository/license and no `private` |
+
+Manual certification commands:
+
+```bash
+bun run prepare:distribution
+npm install --ignore-scripts --package-lock=false --dry-run
+npm install --ignore-scripts --package-lock=false --dry-run --prefix dist
+npm install --ignore-scripts --package-lock=false --dry-run --prefix dist/neutral-pi-package
+bun run build:claude-plugin
+claude plugin validate .
+claude plugin validate dist/claude-plugin
+```
+
+Use `--ignore-scripts` for npm install convention checks unless you intentionally want to exercise source builds; source-tree lifecycle scripts call Bun and are covered by the Bun build/test gates.
 
 ### Clean Build from Scratch
 
