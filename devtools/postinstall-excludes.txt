@@ -8,4 +8,7 @@ bun.lock
 dist/
 node_modules/
 *.test.ts
+*.log
+*.pid
+*-workspace
 cli/
