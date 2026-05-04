@@ -1,0 +1,26 @@
+{
+  "name": "sandpiper-ai",
+  "description": "Sandpiper neutral capabilities and resources for Claude Code.",
+  "owner": {
+    "name": "Doug Stephen",
+    "email": "dljs.jr@dougstephenjr.com"
+  },
+  "plugins": [
+    {
+      "name": "sandpiper-neutral",
+      "source": {
+        "source": "npm",
+        "package": "sandpiper-claude-code-plugin"
+      },
+      "description": "Neutral Sandpiper capabilities and resources for Claude Code",
+      "author": {
+        "name": "Doug Stephen",
+        "email": "dljs.jr@dougstephenjr.com"
+      },
+      "homepage": "https://github.com/dljsjr/sandpiper-ai#readme",
+      "repository": "https://github.com/dljsjr/sandpiper-ai",
+      "license": "MIT",
+      "keywords": ["sandpiper", "claude-code", "hooks"]
+    }
+  ]
+}

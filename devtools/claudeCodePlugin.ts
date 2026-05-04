@@ -5,10 +5,19 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import rootJson from '../package.json' with { type: 'json' };
+import {
+  normalizePackageAuthor,
+  normalizePackageRepository,
+  type PackageAuthor,
+  type PackageRepository,
+} from './piPackageArtifactMetadata.js';
 
 interface RootPackageJson {
   readonly version: string;
   readonly license?: string;
+  readonly author?: string | PackageAuthor;
+  readonly homepage?: string;
+  readonly repository?: string | PackageRepository;
 }
 
 export interface ClaudePluginManifest {
@@ -16,6 +25,9 @@ export interface ClaudePluginManifest {
   readonly version: string;
   readonly description: string;
   readonly license?: string;
+  readonly author?: PackageAuthor;
+  readonly homepage?: string;
+  readonly repository?: string;
   readonly keywords: readonly ['sandpiper', 'claude-code', 'hooks'];
   readonly skills: readonly ['./skills/sandpiper/', './skills/third-party/'];
   readonly commands: './commands/';
@@ -24,12 +36,25 @@ export interface ClaudePluginManifest {
 }
 
 export interface ClaudePluginPackageJson {
-  readonly name: 'sandpiper-neutral-claude-plugin';
+  readonly name: 'sandpiper-claude-code-plugin';
   readonly version: string;
-  readonly private: true;
   readonly type: 'module';
   readonly description: string;
+  readonly author?: PackageAuthor;
+  readonly homepage?: string;
+  readonly repository?: PackageRepository;
   readonly license?: string;
+  readonly keywords: readonly ['sandpiper', 'claude-code', 'claude-plugin', 'hooks'];
+  readonly files: readonly [
+    '.claude-plugin/',
+    'bin/',
+    'commands/',
+    'hooks/',
+    'skills/',
+    'themes/',
+    'README.md',
+    'LICENSE',
+  ];
 }
 
 export interface ClaudePluginHooksConfig {
@@ -103,6 +128,11 @@ const ROOT_OPTIONAL_COPY_ENTRIES: readonly CopyEntry[] = [
 const CLAUDE_PLUGIN_ROOT_VARIABLE = '${' + 'CLAUDE_PLUGIN_ROOT}';
 const CLAUDE_AUTOTOON_HOOK_PATH = `${CLAUDE_PLUGIN_ROOT_VARIABLE}/hooks/autotoon-post-tool-use.js`;
 const CLAUDE_AUTOTOON_HOOK_COMMAND = `node "${CLAUDE_AUTOTOON_HOOK_PATH}"`;
+
+function createClaudeRepositoryUrl(rootPackageJson: RootPackageJson): string | undefined {
+  const repository = normalizePackageRepository(rootPackageJson.repository);
+  return repository?.url.replace(/\.git$/, '');
+}
 
 const GENERATED_EXECUTABLE_COPY_ENTRIES: readonly ExecutableCopyEntry[] = [
   {
@@ -186,6 +216,9 @@ export function createClaudePluginManifest(rootPackageJson: RootPackageJson): Cl
     version: rootPackageJson.version,
     description: 'Neutral Sandpiper capabilities and resources for Claude Code',
     license: rootPackageJson.license,
+    author: normalizePackageAuthor(rootPackageJson.author),
+    homepage: rootPackageJson.homepage,
+    repository: createClaudeRepositoryUrl(rootPackageJson),
     keywords: ['sandpiper', 'claude-code', 'hooks'],
     skills: ['./skills/sandpiper/', './skills/third-party/'],
     commands: './commands/',
@@ -196,12 +229,16 @@ export function createClaudePluginManifest(rootPackageJson: RootPackageJson): Cl
 
 export function createClaudePluginPackageJson(rootPackageJson: RootPackageJson): ClaudePluginPackageJson {
   return {
-    name: 'sandpiper-neutral-claude-plugin',
+    name: 'sandpiper-claude-code-plugin',
     version: rootPackageJson.version,
-    private: true,
     type: 'module',
     description: 'Neutral Sandpiper Claude Code plugin runtime metadata',
+    author: normalizePackageAuthor(rootPackageJson.author),
+    homepage: rootPackageJson.homepage,
+    repository: normalizePackageRepository(rootPackageJson.repository),
     license: rootPackageJson.license,
+    keywords: ['sandpiper', 'claude-code', 'claude-plugin', 'hooks'],
+    files: ['.claude-plugin/', 'bin/', 'commands/', 'hooks/', 'skills/', 'themes/', 'README.md', 'LICENSE'],
   };
 }
 
