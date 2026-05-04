@@ -23,7 +23,8 @@ Not all changes require a build step. Here's what to do after different types of
 | `packages/cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
-| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, builds neutral Pi and standalone app artifacts, and runs source/distribution/standalone invariant tests |
+| `packages/adapter-claude-mcp/` | `bun --filter sandpiper-adapter-claude-mcp build` then `bun run build:claude-plugin` | Emits TypeScript declarations and bundles the Claude stdio MCP server into the plugin artifact |
+| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, builds neutral Pi, standalone app, and Claude plugin artifacts, and runs source/distribution/standalone/plugin invariant tests |
 
 ## Build Pipeline
 
@@ -55,6 +56,14 @@ tsc --build
 ```
 - Emits TypeScript declarations (`.d.ts`)
 - Builds package dist artifacts
+
+**`packages/adapter-claude-mcp/`**:
+```bash
+tsc --build
+bun run build:claude-plugin
+```
+- Emits TypeScript declarations for the adapter package
+- Bundles `src/stdio.ts` into `dist/claude-plugin/servers/sandpiper-claude-mcp.js`
 
 **Extensions are NOT built** — they load from source `.ts` files via jiti at runtime.
 
@@ -104,6 +113,14 @@ bun run build:standalone-app
 ```
 
 This writes `dist/standalone-sandpiper/` with a compiled `sandpiper` executable, Sandpiper sidecar package metadata, bundled resources/support packages, and Pi internal assets. The executable bundles `css-tree`'s JSON/package metadata through the standalone assembler's Bun build plugin and leaves optional `canvas` external so jsdom can treat it as unavailable rather than requiring a native sidecar.
+
+The Claude Code plugin artifact is built separately:
+
+```bash
+bun run build:claude-plugin
+```
+
+This writes `dist/claude-plugin/` with Claude plugin metadata, copied skills/commands/themes, materialized helper CLIs, and a bundled `servers/sandpiper-claude-mcp.js` stdio MCP server. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific MCP tool definitions live in `packages/adapter-claude-mcp/` and adapt host-neutral capability code.
 
 Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated dogfood bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
@@ -160,7 +177,7 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the legacy Pi-package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, and standalone app-bundle smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, neutral package loading without Sandpiper identity, standalone temp-config execution, and compiled app-bundle help/resource loading.
+This command prepares the legacy Pi-package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and MCP adapter execution.
 
 ### Clean Build from Scratch
 
@@ -199,6 +216,12 @@ For the standalone app bundle, rebuild and smoke-test it with:
 bun run build:standalone-app
 bun run test:standalone-app
 ./dist/standalone-sandpiper/sandpiper --help
+```
+
+For the Claude Code plugin artifact, rebuild and smoke-test it with:
+```bash
+bun run build:claude-plugin
+bun run test:claude-plugin
 ```
 
 ## Related Documentation

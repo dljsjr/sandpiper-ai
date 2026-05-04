@@ -621,6 +621,16 @@ AGENT-92 completion signal:
 - An MCP smoke test connects to the adapter through the SDK and calls the AutoTOON tool.
 - `bun run test:distribution` includes the Claude plugin checks alongside the neutral Pi package and standalone app gates.
 
+AGENT-92 implementation results:
+
+- Added `devtools/claudeCodePlugin.ts` as the Claude plugin assembler and MCP-server bundler.
+- Added `dist/claude-plugin/` as the local Claude plugin artifact root.
+- Added `packages/adapter-claude-mcp/` as the Claude-specific stdio MCP adapter package.
+- The initial MCP adapter exposes AutoTOON as `convert_json_to_toon` by calling the host-neutral `sandpiper-capability-autotoon` core.
+- The plugin assembly copies Claude-compatible skills, command files, themes, helper CLIs, and generated skill scripts without preserving source-tree symlinks to the workspace.
+- Added `bun run prepare:claude-plugin`, `bun run build:claude-plugin`, and `bun run test:claude-plugin`.
+- Wired Claude plugin checks into `bun run test:distribution`.
+
 AGENT-92 verification is anchored by:
 
 ```bash
