@@ -1,3 +1,4 @@
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, lstatSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -10,6 +11,7 @@ import {
   createClaudePluginManifest,
   createClaudePluginPackageJson,
 } from './claudeCodePlugin.js';
+import { findUnsupportedDependencySpecs } from './ecosystemPackage.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const claudePluginRootVariable = '${' + 'CLAUDE_PLUGIN_ROOT}';
@@ -17,6 +19,20 @@ const claudeAutoToonHookPath = `${claudePluginRootVariable}/hooks/autotoon-post-
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, 'utf-8')) as T;
+}
+
+function npmPackDryRun(packageDir: string): readonly string[] {
+  const output = execFileSync('npm', ['pack', '--dry-run', '--json'], {
+    cwd: packageDir,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const result = JSON.parse(output) as readonly [{ readonly files: readonly { readonly path: string }[] }];
+  return result[0].files.map((file) => file.path);
+}
+
+function hasClaudePluginCli(): boolean {
+  return spawnSync('claude', ['--version'], { stdio: 'ignore' }).status === 0;
 }
 
 describe('Claude Code plugin mapping', () => {
@@ -27,6 +43,8 @@ describe('Claude Code plugin mapping', () => {
       name: 'sandpiper-neutral',
       version: rootPackageJson.version,
       description: 'Neutral Sandpiper capabilities and resources for Claude Code',
+      author: { name: 'Doug Stephen', email: 'dljs.jr@dougstephenjr.com' },
+      repository: 'https://github.com/dljsjr/sandpiper-ai',
       skills: ['./skills/sandpiper/', './skills/third-party/'],
       commands: './commands/',
       themes: './themes/',
@@ -43,10 +61,11 @@ describe('Claude Code plugin mapping', () => {
     const packageJson = createClaudePluginPackageJson(rootPackageJson);
 
     expect(packageJson).toMatchObject({
-      name: 'sandpiper-neutral-claude-plugin',
+      name: 'sandpiper-claude-code-plugin',
       version: rootPackageJson.version,
-      private: true,
       type: 'module',
+      author: { name: 'Doug Stephen', email: 'dljs.jr@dougstephenjr.com' },
+      repository: { type: 'git', url: 'https://github.com/dljsjr/sandpiper-ai.git' },
       license: rootPackageJson.license,
     });
   });
@@ -94,7 +113,9 @@ describe('Claude Code plugin mapping', () => {
       expect(manifest.hooks).toBe('./hooks/hooks.json');
       expect(manifest).not.toHaveProperty('piConfig');
       expect(manifest).not.toHaveProperty('mcpServers');
+      expect(packageJson).not.toHaveProperty('private');
       expect(packageJson.type).toBe('module');
+      expect(findUnsupportedDependencySpecs(outputDir)).toEqual([]);
       expect(hooksConfig.hooks.PostToolUse[0].hooks[0].command).toBe(`node "${claudeAutoToonHookPath}"`);
       expect(existsSync(join(outputDir, '.mcp.json'))).toBe(false);
 
@@ -124,9 +145,47 @@ describe('Claude Code plugin mapping', () => {
         expect(lstatSync(path).isSymbolicLink(), relativePath).toBe(false);
       }
 
+      expect(npmPackDryRun(outputDir)).toContain('.claude-plugin/plugin.json');
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', '.DS_Store'))).toBe(false);
+      expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'jj-workspace', 'run_loop.log'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'SKILL.test.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'node_modules'))).toBe(false);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('declares a marketplace entry for Claude Code plugin installation commands', () => {
+    const marketplace = readJsonFile<{
+      readonly name: string;
+      readonly plugins: readonly [
+        {
+          readonly name: string;
+          readonly source: { readonly source: string; readonly package: string };
+        },
+      ];
+    }>(join(repoRoot, '.claude-plugin', 'marketplace.json'));
+
+    expect(marketplace.name).toBe('sandpiper-ai');
+    expect(marketplace.plugins[0]).toMatchObject({
+      name: 'sandpiper-neutral',
+      source: {
+        source: 'npm',
+        package: 'sandpiper-claude-code-plugin',
+      },
+    });
+  });
+
+  it('passes Claude Code plugin validation when the Claude CLI is available', async () => {
+    if (!hasClaudePluginCli()) return;
+
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-claude-plugin-'));
+
+    try {
+      const outputDir = join(tempDir, 'plugin');
+      await assembleClaudeCodePlugin({ repoRoot, outputDir });
+
+      expect(() => execFileSync('claude', ['plugin', 'validate', outputDir], { stdio: 'pipe' })).not.toThrow();
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
