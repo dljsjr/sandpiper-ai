@@ -580,6 +580,54 @@ bun run test:standalone-app
 bun run test:distribution
 ```
 
+#### AGENT-92 Claude Code plugin target
+
+AGENT-92 introduces a local Claude Code plugin artifact at `dist/claude-plugin/`. It is a transition artifact used to prove Claude-compatible packaging and MCP adapter seams before the repository fully moves source resources under package directories.
+
+Artifact shape:
+
+- `dist/claude-plugin/.claude-plugin/plugin.json`
+  - `name`: `sandpiper-neutral`
+  - `skills`: `./skills/sandpiper/` and `./skills/third-party/`
+  - `commands`: `./commands/`
+  - `themes`: `./themes/`
+  - `mcpServers`: `./.mcp.json`
+  - no Sandpiper system prompt, Pi package metadata, or `piConfig`
+- `dist/claude-plugin/.mcp.json`
+  - declares a stdio MCP server named `sandpiper`
+  - invokes the bundled server with `node ${CLAUDE_PLUGIN_ROOT}/servers/sandpiper-claude-mcp.js`
+  - passes plugin paths through environment variables derived from `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_PLUGIN_DATA}`
+- `dist/claude-plugin/skills/`
+  - copies first-party and vendored skills using Claude's plugin skill directory layout
+  - materializes generated skill scripts instead of preserving source-tree symlinks to external workspace paths
+- `dist/claude-plugin/commands/`
+  - copies compatible Sandpiper prompt templates as Claude command files
+- `dist/claude-plugin/bin/`
+  - includes neutral helper CLIs such as `sandpiper-tasks`, `sandpiper-standup`, and `dash` for skills that invoke bundled scripts
+- `dist/claude-plugin/servers/sandpiper-claude-mcp.js`
+  - bundles Claude/MCP-specific tool definitions and transport wiring
+  - adapts host-neutral capability operations; it does not import Pi extension glue
+
+Initial MCP adapter scope:
+
+- Expose the package-first AutoTOON core as a Claude MCP tool (`convert_json_to_toon`).
+- Keep MCP tool names, descriptions, schemas, Claude result-size metadata, and stdio lifecycle in `packages/adapter-claude-mcp/`.
+- Do not expose Pi extension factories, Pi lifecycle hooks, Sandpiper identity hooks, or migration flags through the Claude plugin.
+
+AGENT-92 completion signal:
+
+- `bun run build:claude-plugin` writes `dist/claude-plugin/` with the manifest, resources, helper binaries, and bundled MCP server.
+- A local plugin smoke test validates Claude path rules, self-contained helper binaries, and manifest/MCP server references without touching real Claude user state.
+- An MCP smoke test connects to the adapter through the SDK and calls the AutoTOON tool.
+- `bun run test:distribution` includes the Claude plugin checks alongside the neutral Pi package and standalone app gates.
+
+AGENT-92 verification is anchored by:
+
+```bash
+bun run test:claude-plugin
+bun run test:distribution
+```
+
 ### Phase 7 — Retire legacy root assembly
 
 Task: AGENT-93
