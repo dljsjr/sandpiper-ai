@@ -6,14 +6,18 @@ import { describe, expect, it } from 'vitest';
 import rootPackageJson from '../package.json' with { type: 'json' };
 import {
   assembleClaudeCodePlugin,
+  createClaudePluginHooksConfig,
   createClaudePluginManifest,
-  createClaudePluginMcpConfig,
+  createClaudePluginPackageJson,
 } from './claudeCodePlugin.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const claudePluginRootVariable = '${' + 'CLAUDE_PLUGIN_ROOT}';
-const claudePluginDataVariable = '${' + 'CLAUDE_PLUGIN_DATA}';
-const claudePluginMcpServerPath = `${claudePluginRootVariable}/servers/sandpiper-claude-mcp.js`;
+const claudeAutoToonHookPath = `${claudePluginRootVariable}/hooks/autotoon-post-tool-use.js`;
+
+function readJsonFile<T>(path: string): T {
+  return JSON.parse(readFileSync(path, 'utf-8')) as T;
+}
 
 describe('Claude Code plugin mapping', () => {
   it('maps neutral Sandpiper resources to Claude plugin component paths', () => {
@@ -26,27 +30,43 @@ describe('Claude Code plugin mapping', () => {
       skills: ['./skills/sandpiper/', './skills/third-party/'],
       commands: './commands/',
       themes: './themes/',
-      mcpServers: './.mcp.json',
+      hooks: './hooks/hooks.json',
       license: rootPackageJson.license,
     });
     expect(manifest).not.toHaveProperty('pi');
     expect(manifest).not.toHaveProperty('piConfig');
     expect(manifest).not.toHaveProperty('bin');
+    expect(manifest).not.toHaveProperty('mcpServers');
   });
 
-  it('declares a bundled stdio MCP server using Claude plugin path variables', () => {
-    const mcpConfig = createClaudePluginMcpConfig();
+  it('creates plugin package metadata that lets Node run bundled ESM hook scripts', () => {
+    const packageJson = createClaudePluginPackageJson(rootPackageJson);
 
-    expect(mcpConfig).toEqual({
-      mcpServers: {
-        sandpiper: {
-          command: 'node',
-          args: [claudePluginMcpServerPath],
-          env: {
-            SANDPIPER_CLAUDE_PLUGIN_ROOT: claudePluginRootVariable,
-            SANDPIPER_CLAUDE_PLUGIN_DATA: claudePluginDataVariable,
+    expect(packageJson).toMatchObject({
+      name: 'sandpiper-neutral-claude-plugin',
+      version: rootPackageJson.version,
+      private: true,
+      type: 'module',
+      license: rootPackageJson.license,
+    });
+  });
+
+  it('declares AutoTOON as a Claude PostToolUse hook', () => {
+    const hooksConfig = createClaudePluginHooksConfig();
+
+    expect(hooksConfig).toEqual({
+      description: 'Sandpiper Claude Code hooks',
+      hooks: {
+        PostToolUse: [
+          {
+            hooks: [
+              {
+                type: 'command',
+                command: `node "${claudeAutoToonHookPath}"`,
+              },
+            ],
           },
-        },
+        ],
       },
     });
   });
@@ -58,24 +78,33 @@ describe('Claude Code plugin mapping', () => {
       const outputDir = join(tempDir, 'plugin');
       await assembleClaudeCodePlugin({ repoRoot, outputDir });
 
-      const manifest = JSON.parse(
-        readFileSync(join(outputDir, '.claude-plugin', 'plugin.json'), 'utf-8'),
-      ) as ReturnType<typeof createClaudePluginManifest>;
-      const mcpConfig = JSON.parse(readFileSync(join(outputDir, '.mcp.json'), 'utf-8')) as ReturnType<
-        typeof createClaudePluginMcpConfig
-      >;
+      const manifest = readJsonFile<ReturnType<typeof createClaudePluginManifest>>(
+        join(outputDir, '.claude-plugin', 'plugin.json'),
+      );
+      const hooksConfig = readJsonFile<ReturnType<typeof createClaudePluginHooksConfig>>(
+        join(outputDir, 'hooks', 'hooks.json'),
+      );
+      const packageJson = readJsonFile<ReturnType<typeof createClaudePluginPackageJson>>(
+        join(outputDir, 'package.json'),
+      );
 
       expect(manifest.skills).toEqual(['./skills/sandpiper/', './skills/third-party/']);
       expect(manifest.commands).toBe('./commands/');
       expect(manifest.themes).toBe('./themes/');
+      expect(manifest.hooks).toBe('./hooks/hooks.json');
       expect(manifest).not.toHaveProperty('piConfig');
-      expect(mcpConfig.mcpServers.sandpiper.args).toEqual([claudePluginMcpServerPath]);
+      expect(manifest).not.toHaveProperty('mcpServers');
+      expect(packageJson.type).toBe('module');
+      expect(hooksConfig.hooks.PostToolUse[0].hooks[0].command).toBe(`node "${claudeAutoToonHookPath}"`);
+      expect(existsSync(join(outputDir, '.mcp.json'))).toBe(false);
 
       for (const relativePath of [
         'skills/sandpiper/tasks/SKILL.md',
         'skills/sandpiper/standup/SKILL.md',
         'skills/third-party/pdf/SKILL.md',
         'commands/new-feature.md',
+        'hooks/hooks.json',
+        'package.json',
         'themes/README.md',
         'LICENSE',
       ]) {
@@ -95,6 +124,7 @@ describe('Claude Code plugin mapping', () => {
         expect(lstatSync(path).isSymbolicLink(), relativePath).toBe(false);
       }
 
+      expect(existsSync(join(outputDir, 'skills', 'sandpiper', '.DS_Store'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'SKILL.test.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'node_modules'))).toBe(false);
     } finally {

@@ -1,0 +1,25 @@
+{
+  "name": "sandpiper-adapter-claude-code",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Claude Code adapter hooks over neutral Sandpiper capabilities",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./autotoon-post-tool-use": {
+      "types": "./dist/autotoon-post-tool-use.d.ts",
+      "default": "./src/autotoon-post-tool-use.ts"
+    }
+  },
+  "dependencies": {
+    "sandpiper-capability-autotoon": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}

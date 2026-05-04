@@ -128,7 +128,7 @@ Names are provisional; refine during implementation.
 | `packages/capability-web-fetch` | Host-neutral fetch/extract/convert pipeline; adapters expose host tools. |
 | `packages/capability-autotoon` | Host-neutral JSON-to-TOON conversion logic; adapters expose host hooks/tools. |
 | `packages/adapter-pi` | Pi extension factories/tool definitions that expose selected capability packages. |
-| `packages/adapter-claude-mcp` | stdio MCP servers/tool definitions that expose selected capability packages to Claude Code. |
+| `packages/adapter-claude-code` | Claude Code hooks and stdio MCP adapters over selected capability packages. |
 | `packages/tasks-core` | Task data model, storage, parsing, and operations. |
 | `packages/tasks-cli` | `sandpiper-tasks` binary/CLI wrapper around task core. |
 | `packages/standup-core` | Standup/session-continuity data model and file operations. |
@@ -197,15 +197,16 @@ Expected characteristics:
 
 Expected characteristics:
 
-- Ships neutral skills/resources and compatible tools via Claude Code's plugin model.
+- Ships neutral skills/resources and compatible hooks/tools via Claude Code's plugin model.
 - Uses a plugin root with optional `.claude-plugin/plugin.json` metadata.
-- Exposes tools through plugin-provided MCP servers, normally stdio servers configured in `.mcp.json` or inline `plugin.json`, not Pi extension factories.
+- Exposes automatic lifecycle behavior through Claude plugin hooks where the host has an equivalent event.
+- Exposes model-facing tools through plugin-provided MCP servers, normally stdio servers configured in `.mcp.json` or inline `plugin.json`, not Pi extension factories.
 - Does not ship Sandpiper identity/system prompt.
-- Has its own MCP adapter layer instead of reusing Pi extension glue directly.
-- Consumes the same host-neutral capability operations as the Pi adapter, but owns MCP-specific tool names, descriptions, schemas, result-size metadata, request/response mapping, process lifecycle, and transport behavior.
+- Has its own Claude adapter layer instead of reusing Pi extension glue directly.
+- Consumes the same host-neutral capability operations as the Pi adapter, but owns Claude-specific hook configuration, MCP tool names, descriptions, schemas, result-size metadata, request/response mapping, process lifecycle, and transport behavior.
 - Uses Claude's plugin path variables (`${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`) for bundled files and persistent plugin state.
 
-Claude plugin support is primarily an adapter and packaging problem, not a Pi-extension parity problem. Skills can map to Claude plugin `skills/`; some Pi prompt templates may map to Claude `commands/` or skills, but that mapping should be reviewed case-by-case because Claude has no identical Pi prompt-template component. Tool support should be implemented as MCP server adapters over neutral capability cores. Pi lifecycle hooks that do not have a Claude/MCP equivalent must either move into a different abstraction, become Sandpiper/Pi-only, or be documented as unsupported in the Claude distribution.
+Claude plugin support is primarily an adapter and packaging problem, not a Pi-extension parity problem. Skills can map to Claude plugin `skills/`; some Pi prompt templates may map to Claude `commands/` or skills, but that mapping should be reviewed case-by-case because Claude has no identical Pi prompt-template component. Automatic lifecycle behavior should use Claude hooks when the host event matches the capability, while model-facing tool support should be implemented as MCP server adapters over neutral capability cores. Pi lifecycle hooks that do not have a Claude/MCP equivalent must either move into a different abstraction, become Sandpiper/Pi-only, or be documented as unsupported in the Claude distribution.
 
 ## Claude Code Plugin Reference Findings
 
@@ -580,9 +581,9 @@ bun run test:standalone-app
 bun run test:distribution
 ```
 
-#### AGENT-92 Claude Code plugin target
+#### Claude Code plugin target
 
-AGENT-92 introduces a local Claude Code plugin artifact at `dist/claude-plugin/`. It is a transition artifact used to prove Claude-compatible packaging and MCP adapter seams before the repository fully moves source resources under package directories.
+The local Claude Code plugin artifact lives at `dist/claude-plugin/`. It is a transition artifact used to prove Claude-compatible packaging and adapter seams before the repository fully moves source resources under package directories.
 
 Artifact shape:
 
@@ -591,12 +592,13 @@ Artifact shape:
   - `skills`: `./skills/sandpiper/` and `./skills/third-party/`
   - `commands`: `./commands/`
   - `themes`: `./themes/`
-  - `mcpServers`: `./.mcp.json`
+  - `hooks`: `./hooks/hooks.json`
   - no Sandpiper system prompt, Pi package metadata, or `piConfig`
-- `dist/claude-plugin/.mcp.json`
-  - declares a stdio MCP server named `sandpiper`
-  - invokes the bundled server with `node ${CLAUDE_PLUGIN_ROOT}/servers/sandpiper-claude-mcp.js`
-  - passes plugin paths through environment variables derived from `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_PLUGIN_DATA}`
+- `dist/claude-plugin/hooks/hooks.json`
+  - declares Claude Code plugin hooks, starting with the AutoTOON `PostToolUse` hook
+  - invokes bundled hook scripts with `${CLAUDE_PLUGIN_ROOT}` paths
+- `dist/claude-plugin/hooks/autotoon-post-tool-use.js`
+  - bundles Claude hook glue that rewrites eligible tool output through the host-neutral AutoTOON core
 - `dist/claude-plugin/skills/`
   - copies first-party and vendored skills using Claude's plugin skill directory layout
   - materializes generated skill scripts instead of preserving source-tree symlinks to external workspace paths
@@ -604,34 +606,32 @@ Artifact shape:
   - copies compatible Sandpiper prompt templates as Claude command files
 - `dist/claude-plugin/bin/`
   - includes neutral helper CLIs such as `sandpiper-tasks`, `sandpiper-standup`, and `dash` for skills that invoke bundled scripts
-- `dist/claude-plugin/servers/sandpiper-claude-mcp.js`
-  - bundles Claude/MCP-specific tool definitions and transport wiring
-  - adapts host-neutral capability operations; it does not import Pi extension glue
 
-Initial MCP adapter scope:
+Initial Claude adapter scope:
 
-- Expose the package-first AutoTOON core as a Claude MCP tool (`convert_json_to_toon`).
-- Keep MCP tool names, descriptions, schemas, Claude result-size metadata, and stdio lifecycle in `packages/adapter-claude-mcp/`.
+- Expose the package-first AutoTOON core as a Claude `PostToolUse` hook so conversion remains automatic rather than becoming a manual MCP tool.
+- Keep Claude hook configuration, command entrypoints, and event-shape mapping in `packages/adapter-claude-code/`.
 - Do not expose Pi extension factories, Pi lifecycle hooks, Sandpiper identity hooks, or migration flags through the Claude plugin.
+- Defer MCP tools until a capability has a host-neutral core and a clear reason to add a Claude model-facing tool. Shell Relay is the likely first candidate for a future MCP adapter; `web_fetch` and background-process tools overlap Claude built-ins.
 
-AGENT-92 completion signal:
+Completion signal:
 
-- `bun run build:claude-plugin` writes `dist/claude-plugin/` with the manifest, resources, helper binaries, and bundled MCP server.
-- A local plugin smoke test validates Claude path rules, self-contained helper binaries, and manifest/MCP server references without touching real Claude user state.
-- An MCP smoke test connects to the adapter through the SDK and calls the AutoTOON tool.
+- `bun run build:claude-plugin` writes `dist/claude-plugin/` with the manifest, resources, helper binaries, hook configuration, and bundled hook scripts.
+- A local plugin smoke test validates Claude path rules, self-contained helper binaries, and hook references without touching real Claude user state.
+- A hook smoke test executes the bundled AutoTOON hook with a representative `PostToolUse` payload.
 - `bun run test:distribution` includes the Claude plugin checks alongside the neutral Pi package and standalone app gates.
 
-AGENT-92 implementation results:
+Implementation results:
 
-- Added `devtools/claudeCodePlugin.ts` as the Claude plugin assembler and MCP-server bundler.
+- Added `devtools/claudeCodePlugin.ts` as the Claude plugin assembler and hook bundler.
 - Added `dist/claude-plugin/` as the local Claude plugin artifact root.
-- Added `packages/adapter-claude-mcp/` as the Claude-specific stdio MCP adapter package.
-- The initial MCP adapter exposes AutoTOON as `convert_json_to_toon` by calling the host-neutral `sandpiper-capability-autotoon` core.
+- Added `packages/adapter-claude-code/` as the Claude-specific hook adapter package.
+- The initial Claude adapter exposes AutoTOON as a `PostToolUse` hook by calling the host-neutral `sandpiper-capability-autotoon` core.
 - The plugin assembly copies Claude-compatible skills, command files, themes, helper CLIs, and generated skill scripts without preserving source-tree symlinks to the workspace.
 - Added `bun run prepare:claude-plugin`, `bun run build:claude-plugin`, and `bun run test:claude-plugin`.
 - Wired Claude plugin checks into `bun run test:distribution`.
 
-AGENT-92 verification is anchored by:
+Verification is anchored by:
 
 ```bash
 bun run test:claude-plugin
@@ -664,7 +664,7 @@ Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakd
 | AGENT-89 | HIGH | AGENT-88 | Add distribution invariant checks and smoke tests. | Automated checks catch hardcoded branding/path regressions and validate generated artifacts. |
 | AGENT-90 | MEDIUM | AGENT-88, AGENT-89 | Build neutral Pi package distribution artifact. | Local Pi install/load smoke test passes without Sandpiper identity. |
 | AGENT-91 | MEDIUM | AGENT-85, AGENT-88, AGENT-89 | Build standalone Sandpiper Bun binary distribution. | App bundle/binary runs and loads identity + neutral capabilities from temp config. |
-| AGENT-92 | MEDIUM | AGENT-88, AGENT-89 | Research and build Claude Code plugin distribution. | Plugin format documented; supported resources and MCP tool adapters load in Claude Code or a faithful local validator. |
+| AGENT-92 | MEDIUM | AGENT-88, AGENT-89 | Research and build Claude Code plugin distribution. | Plugin format documented; supported resources and Claude adapters load in Claude Code or a faithful local validator. |
 | AGENT-93 | MEDIUM | AGENT-90, AGENT-91, AGENT-92 | Retire legacy Pi-oriented root assembly. | Root no longer acts as canonical Pi package; docs and generated artifacts updated. |
 
 ## Verification Gates
@@ -692,7 +692,7 @@ The invariant is not "zero matches everywhere" because Sandpiper identity packag
 
 1. **Project config directory API:** Pi exports `getAgentDir()`, but project-local config dir resolution may not be exposed at the right abstraction level. Verify before designing around it.
 2. **Bun compile asset model:** Initial AGENT-85 answer: target an app bundle with sidecar `package.json`, assets, and resources first. A true single-file binary remains a later optimization.
-3. **Claude MCP adapter shape:** Determine the Claude Code plugin packaging format, MCP server lifecycle expectations, and which capability operations should be exposed as MCP tools.
+3. **Claude adapter shape:** Determine the Claude Code plugin packaging format, hook lifecycle expectations, MCP server lifecycle expectations, and which capability operations should be exposed as hooks or MCP tools.
 4. **Existing data migration:** Existing users have `.sandpiper/tasks`, `.sandpiper/standup.md`, and `~/.sandpiper`. Decide when neutral tools should use host config paths versus preserving Sandpiper-branded storage for product compatibility.
 5. **CLI naming:** Confirm whether `sandpiper-tasks` remains the CLI name in neutral Pi/Claude distributions or whether aliases are needed.
 6. **Package granularity:** Confirm the final package names after the first spike; avoid creating many tiny packages before the boundaries are proven.

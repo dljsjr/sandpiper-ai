@@ -13,7 +13,7 @@ Development scripts and build utilities. Not distributed with the package.
 | `distPackageJson.ts` | Generates `dist/package.json` with merged piConfig + pi resource paths |
 | `neutralPiPackage.ts` | Assembles `dist/neutral-pi-package/`, the neutral Pi package transition artifact |
 | `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
-| `claudeCodePlugin.ts` | Assembles `dist/claude-plugin/` resources/manifest and bundles the Claude stdio MCP server |
+| `claudeCodePlugin.ts` | Assembles `dist/claude-plugin/` resources/manifest and bundles Claude hook scripts |
 | `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
@@ -43,7 +43,7 @@ Run the distribution invariant and smoke gate with:
 bun run test:distribution
 ```
 
-This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus MCP adapter smoke tests.
+This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
 
 ## Build Flow
 
@@ -80,8 +80,8 @@ bun run build:claude-plugin
   → run prepare:distribution for generated helper CLIs
   → copy Claude-compatible skills/commands/themes to dist/claude-plugin/
   → materialize generated skill scripts and bin helpers without external workspace symlinks
-  → write .claude-plugin/plugin.json and .mcp.json
-  → bundle servers/sandpiper-claude-mcp.js for Claude's stdio MCP lifecycle
+  → write .claude-plugin/plugin.json and hooks/hooks.json
+  → bundle hooks/autotoon-post-tool-use.js for Claude's PostToolUse lifecycle
 
 bun run test:standalone-app
   → verify standalone app metadata/resource assembly
@@ -89,5 +89,5 @@ bun run test:standalone-app
 
 bun run test:claude-plugin
   → verify Claude plugin metadata/resource assembly
-  → exercise the MCP adapter in-memory and through the bundled stdio server artifact
+  → exercise the AutoTOON hook package and bundled hook artifact
 ```

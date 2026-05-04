@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { chmod, copyFile, cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
+import { chmod, copyFile, cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,23 +16,35 @@ export interface ClaudePluginManifest {
   readonly version: string;
   readonly description: string;
   readonly license?: string;
-  readonly keywords: readonly ['sandpiper', 'claude-code', 'mcp'];
+  readonly keywords: readonly ['sandpiper', 'claude-code', 'hooks'];
   readonly skills: readonly ['./skills/sandpiper/', './skills/third-party/'];
   readonly commands: './commands/';
   readonly themes: './themes/';
-  readonly mcpServers: './.mcp.json';
+  readonly hooks: './hooks/hooks.json';
 }
 
-export interface ClaudePluginMcpConfig {
-  readonly mcpServers: {
-    readonly sandpiper: {
-      readonly command: 'node';
-      readonly args: readonly [string];
-      readonly env: {
-        readonly SANDPIPER_CLAUDE_PLUGIN_ROOT: string;
-        readonly SANDPIPER_CLAUDE_PLUGIN_DATA: string;
-      };
-    };
+export interface ClaudePluginPackageJson {
+  readonly name: 'sandpiper-neutral-claude-plugin';
+  readonly version: string;
+  readonly private: true;
+  readonly type: 'module';
+  readonly description: string;
+  readonly license?: string;
+}
+
+export interface ClaudePluginHooksConfig {
+  readonly description: string;
+  readonly hooks: {
+    readonly PostToolUse: readonly [
+      {
+        readonly hooks: readonly [
+          {
+            readonly type: 'command';
+            readonly command: string;
+          },
+        ];
+      },
+    ];
   };
 }
 
@@ -89,8 +101,8 @@ const ROOT_OPTIONAL_COPY_ENTRIES: readonly CopyEntry[] = [
 ];
 
 const CLAUDE_PLUGIN_ROOT_VARIABLE = '${' + 'CLAUDE_PLUGIN_ROOT}';
-const CLAUDE_PLUGIN_DATA_VARIABLE = '${' + 'CLAUDE_PLUGIN_DATA}';
-const CLAUDE_PLUGIN_MCP_SERVER_PATH = `${CLAUDE_PLUGIN_ROOT_VARIABLE}/servers/sandpiper-claude-mcp.js`;
+const CLAUDE_AUTOTOON_HOOK_PATH = `${CLAUDE_PLUGIN_ROOT_VARIABLE}/hooks/autotoon-post-tool-use.js`;
+const CLAUDE_AUTOTOON_HOOK_COMMAND = `node "${CLAUDE_AUTOTOON_HOOK_PATH}"`;
 
 const GENERATED_EXECUTABLE_COPY_ENTRIES: readonly ExecutableCopyEntry[] = [
   {
@@ -111,7 +123,11 @@ function shouldPruneArtifactPath(path: string): boolean {
   const name = basename(path);
 
   return (
-    name === 'tsconfig.json' || name === 'vitest.config.ts' || name.endsWith('.test.ts') || name.endsWith('.test.js')
+    name === '.DS_Store' ||
+    name === 'tsconfig.json' ||
+    name === 'vitest.config.ts' ||
+    name.endsWith('.test.ts') ||
+    name.endsWith('.test.js')
   );
 }
 
@@ -167,25 +183,39 @@ export function createClaudePluginManifest(rootPackageJson: RootPackageJson): Cl
     version: rootPackageJson.version,
     description: 'Neutral Sandpiper capabilities and resources for Claude Code',
     license: rootPackageJson.license,
-    keywords: ['sandpiper', 'claude-code', 'mcp'],
+    keywords: ['sandpiper', 'claude-code', 'hooks'],
     skills: ['./skills/sandpiper/', './skills/third-party/'],
     commands: './commands/',
     themes: './themes/',
-    mcpServers: './.mcp.json',
+    hooks: './hooks/hooks.json',
   };
 }
 
-export function createClaudePluginMcpConfig(): ClaudePluginMcpConfig {
+export function createClaudePluginPackageJson(rootPackageJson: RootPackageJson): ClaudePluginPackageJson {
   return {
-    mcpServers: {
-      sandpiper: {
-        command: 'node',
-        args: [CLAUDE_PLUGIN_MCP_SERVER_PATH],
-        env: {
-          SANDPIPER_CLAUDE_PLUGIN_ROOT: CLAUDE_PLUGIN_ROOT_VARIABLE,
-          SANDPIPER_CLAUDE_PLUGIN_DATA: CLAUDE_PLUGIN_DATA_VARIABLE,
+    name: 'sandpiper-neutral-claude-plugin',
+    version: rootPackageJson.version,
+    private: true,
+    type: 'module',
+    description: 'Neutral Sandpiper Claude Code plugin runtime metadata',
+    license: rootPackageJson.license,
+  };
+}
+
+export function createClaudePluginHooksConfig(): ClaudePluginHooksConfig {
+  return {
+    description: 'Sandpiper Claude Code hooks',
+    hooks: {
+      PostToolUse: [
+        {
+          hooks: [
+            {
+              type: 'command',
+              command: CLAUDE_AUTOTOON_HOOK_COMMAND,
+            },
+          ],
         },
-      },
+      ],
     },
   };
 }
@@ -209,11 +239,19 @@ export async function assembleClaudeCodePlugin(options: AssembleClaudeCodePlugin
   }
 
   await mkdir(join(options.outputDir, '.claude-plugin'), { recursive: true });
+  await mkdir(join(options.outputDir, 'hooks'), { recursive: true });
+  await writeFile(
+    join(options.outputDir, 'package.json'),
+    `${JSON.stringify(createClaudePluginPackageJson(rootJson), null, 2)}\n`,
+  );
   await writeFile(
     join(options.outputDir, '.claude-plugin', 'plugin.json'),
     `${JSON.stringify(createClaudePluginManifest(rootJson), null, 2)}\n`,
   );
-  await writeFile(join(options.outputDir, '.mcp.json'), `${JSON.stringify(createClaudePluginMcpConfig(), null, 2)}\n`);
+  await writeFile(
+    join(options.outputDir, 'hooks', 'hooks.json'),
+    `${JSON.stringify(createClaudePluginHooksConfig(), null, 2)}\n`,
+  );
 }
 
 function formatBuildLogs(logs: readonly BunBuildMessage[]): string {
@@ -223,22 +261,19 @@ function formatBuildLogs(logs: readonly BunBuildMessage[]): string {
 export async function buildClaudeCodePlugin(options: BuildClaudeCodePluginOptions): Promise<void> {
   await assembleClaudeCodePlugin(options);
 
-  const serverOutputDir = join(options.outputDir, 'servers');
-  await mkdir(serverOutputDir, { recursive: true });
+  const hooksOutputDir = join(options.outputDir, 'hooks');
+  await mkdir(hooksOutputDir, { recursive: true });
 
   const buildResult = await Bun.build({
-    entrypoints: [join(options.repoRoot, 'packages', 'adapter-claude-mcp', 'src', 'stdio.ts')],
-    outdir: serverOutputDir,
+    entrypoints: [join(options.repoRoot, 'packages', 'adapter-claude-code', 'src', 'autotoon-post-tool-use.ts')],
+    outdir: hooksOutputDir,
     target: 'node',
     minify: true,
   });
 
   if (!buildResult.success) {
-    throw new Error(`Failed to build Claude plugin MCP server:\n${formatBuildLogs(buildResult.logs)}`);
+    throw new Error(`Failed to build Claude plugin AutoTOON hook:\n${formatBuildLogs(buildResult.logs)}`);
   }
-
-  await rm(join(serverOutputDir, 'sandpiper-claude-mcp.js'), { force: true });
-  await rename(join(serverOutputDir, 'stdio.js'), join(serverOutputDir, 'sandpiper-claude-mcp.js'));
 }
 
 const entrypoint = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);
