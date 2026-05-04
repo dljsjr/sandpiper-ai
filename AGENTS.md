@@ -16,7 +16,7 @@ This repository is both a **Pi Package** and a **Bun/Node.js monorepo** — an u
 | `skills/third-party/` | Vendored skills | Do not edit |
 | `packages/core/` | Shared Library | System prompt, migration, preflight checks, shell integration, path utilities |
 | `packages/capability-autotoon/` | Shared Library + Pi adapter | AutoTOON JSON→TOON neutral transform and Pi event adapter |
-| `packages/adapter-claude-mcp/` | Claude MCP Adapter | Stdio MCP server/tool definitions over neutral Sandpiper capabilities |
+| `packages/adapter-claude-code/` | Claude Adapter | Claude Code hooks/adapters over neutral Sandpiper capabilities |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
 | `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI |
 | `prompts/` | Prompt templates | |

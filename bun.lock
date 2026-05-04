@@ -76,13 +76,11 @@
         "@sinclair/typebox": "catalog:pi",
       },
     },
-    "packages/adapter-claude-mcp": {
-      "name": "sandpiper-adapter-claude-mcp",
+    "packages/adapter-claude-code": {
+      "name": "sandpiper-adapter-claude-code",
       "version": "0.0.1",
       "dependencies": {
-        "@modelcontextprotocol/sdk": "catalog:mcp",
         "sandpiper-capability-autotoon": "workspace:*",
-        "zod": "catalog:mcp",
       },
     },
     "packages/capability-autotoon": {
@@ -153,10 +151,6 @@
     },
     "codec": {
       "fast-xml-parser": "5.7.2",
-    },
-    "mcp": {
-      "@modelcontextprotocol/sdk": "1.29.0",
-      "zod": "4.3.6",
     },
     "pi": {
       "@mariozechner/pi-coding-agent": "0.72.0",
@@ -1087,7 +1081,7 @@
 
     "safer-buffer": ["safer-buffer@2.1.2", "", {}, "sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg=="],
 
-    "sandpiper-adapter-claude-mcp": ["sandpiper-adapter-claude-mcp@workspace:packages/adapter-claude-mcp"],
+    "sandpiper-adapter-claude-code": ["sandpiper-adapter-claude-code@workspace:packages/adapter-claude-code"],
 
     "sandpiper-ai-cli": ["sandpiper-ai-cli@workspace:packages/cli"],
 

@@ -16,7 +16,7 @@
     "test:distribution": "bun run prepare:distribution && vitest run devtools/distribution-invariants.test.ts devtools/distribution-smoke.test.ts devtools/neutralPiPackage.test.ts devtools/neutralPiPackageSmoke.test.ts && bun run test:standalone && bun run test:standalone-app && bun run test:claude-plugin",
     "test:neutral-pi-package": "bun run build:neutral-pi-package && vitest run devtools/neutralPiPackage.test.ts devtools/neutralPiPackageSmoke.test.ts",
     "test:standalone-app": "vitest run devtools/standaloneSandpiperApp.test.ts && vitest run devtools/standaloneSandpiperAppCompile.test.ts && vitest run devtools/standaloneSandpiperAppRuntime.test.ts",
-    "test:claude-plugin": "bun run prepare:distribution && bun --filter sandpiper-adapter-claude-mcp build && vitest run packages/adapter-claude-mcp/src/server.test.ts devtools/claudeCodePlugin.test.ts devtools/claudeCodePluginMcpSmoke.test.ts",
+    "test:claude-plugin": "bun run prepare:distribution && bun --filter sandpiper-adapter-claude-code build && vitest run packages/adapter-claude-code/src/autotoon-post-tool-use.test.ts devtools/claudeCodePlugin.test.ts devtools/claudeCodePluginHookSmoke.test.ts",
     "build:legacy-cli": "mkdir -p packages/cli/dist && bun build --production --minify --target=node ./packages/cli/pi_wrapper.ts --outfile ./packages/cli/dist/sandpiper",
     "build:neutral-pi-package": "bun run --bun devtools/neutralPiPackage.ts",
     "prepare:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts",
@@ -102,10 +102,6 @@
       },
       "testing": {
         "vitest": "4.1.5"
-      },
-      "mcp": {
-        "@modelcontextprotocol/sdk": "1.29.0",
-        "zod": "4.3.6"
       },
       "tooling": {
         "@biomejs/biome": "2.4.14",
