@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { chmod, copyFile, cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
+import { chmod, copyFile, cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,10 +27,10 @@ export interface ClaudePluginMcpConfig {
   readonly mcpServers: {
     readonly sandpiper: {
       readonly command: 'node';
-      readonly args: readonly ['${CLAUDE_PLUGIN_ROOT}/servers/sandpiper-claude-mcp.js'];
+      readonly args: readonly [string];
       readonly env: {
-        readonly SANDPIPER_CLAUDE_PLUGIN_ROOT: '${CLAUDE_PLUGIN_ROOT}';
-        readonly SANDPIPER_CLAUDE_PLUGIN_DATA: '${CLAUDE_PLUGIN_DATA}';
+        readonly SANDPIPER_CLAUDE_PLUGIN_ROOT: string;
+        readonly SANDPIPER_CLAUDE_PLUGIN_DATA: string;
       };
     };
   };
@@ -41,6 +41,8 @@ export interface AssembleClaudeCodePluginOptions {
   readonly outputDir: string;
 }
 
+export type BuildClaudeCodePluginOptions = AssembleClaudeCodePluginOptions;
+
 interface CopyEntry {
   readonly from: string;
   readonly to: string;
@@ -50,6 +52,28 @@ interface ExecutableCopyEntry {
   readonly from: string;
   readonly to: readonly string[];
 }
+
+interface BunBuildMessage {
+  readonly message: string;
+}
+
+interface BunBuildResult {
+  readonly success: boolean;
+  readonly logs: readonly BunBuildMessage[];
+}
+
+interface BunBuildOptions {
+  readonly entrypoints: readonly string[];
+  readonly outdir: string;
+  readonly target: 'node';
+  readonly minify: boolean;
+}
+
+interface BunRuntime {
+  build(options: BunBuildOptions): Promise<BunBuildResult>;
+}
+
+declare const Bun: BunRuntime;
 
 const CLAUDE_PLUGIN_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'skills/sandpiper', to: 'skills/sandpiper' },
@@ -63,6 +87,10 @@ const ROOT_OPTIONAL_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'LICENSE', to: 'LICENSE' },
   { from: 'CHANGELOG.md', to: 'CHANGELOG.md' },
 ];
+
+const CLAUDE_PLUGIN_ROOT_VARIABLE = '${' + 'CLAUDE_PLUGIN_ROOT}';
+const CLAUDE_PLUGIN_DATA_VARIABLE = '${' + 'CLAUDE_PLUGIN_DATA}';
+const CLAUDE_PLUGIN_MCP_SERVER_PATH = `${CLAUDE_PLUGIN_ROOT_VARIABLE}/servers/sandpiper-claude-mcp.js`;
 
 const GENERATED_EXECUTABLE_COPY_ENTRIES: readonly ExecutableCopyEntry[] = [
   {
@@ -152,10 +180,10 @@ export function createClaudePluginMcpConfig(): ClaudePluginMcpConfig {
     mcpServers: {
       sandpiper: {
         command: 'node',
-        args: ['${CLAUDE_PLUGIN_ROOT}/servers/sandpiper-claude-mcp.js'],
+        args: [CLAUDE_PLUGIN_MCP_SERVER_PATH],
         env: {
-          SANDPIPER_CLAUDE_PLUGIN_ROOT: '${CLAUDE_PLUGIN_ROOT}',
-          SANDPIPER_CLAUDE_PLUGIN_DATA: '${CLAUDE_PLUGIN_DATA}',
+          SANDPIPER_CLAUDE_PLUGIN_ROOT: CLAUDE_PLUGIN_ROOT_VARIABLE,
+          SANDPIPER_CLAUDE_PLUGIN_DATA: CLAUDE_PLUGIN_DATA_VARIABLE,
         },
       },
     },
@@ -188,9 +216,40 @@ export async function assembleClaudeCodePlugin(options: AssembleClaudeCodePlugin
   await writeFile(join(options.outputDir, '.mcp.json'), `${JSON.stringify(createClaudePluginMcpConfig(), null, 2)}\n`);
 }
 
+function formatBuildLogs(logs: readonly BunBuildMessage[]): string {
+  return logs.map((log) => log.message).join('\n');
+}
+
+export async function buildClaudeCodePlugin(options: BuildClaudeCodePluginOptions): Promise<void> {
+  await assembleClaudeCodePlugin(options);
+
+  const serverOutputDir = join(options.outputDir, 'servers');
+  await mkdir(serverOutputDir, { recursive: true });
+
+  const buildResult = await Bun.build({
+    entrypoints: [join(options.repoRoot, 'packages', 'adapter-claude-mcp', 'src', 'stdio.ts')],
+    outdir: serverOutputDir,
+    target: 'node',
+    minify: true,
+  });
+
+  if (!buildResult.success) {
+    throw new Error(`Failed to build Claude plugin MCP server:\n${formatBuildLogs(buildResult.logs)}`);
+  }
+
+  await rm(join(serverOutputDir, 'sandpiper-claude-mcp.js'), { force: true });
+  await rename(join(serverOutputDir, 'stdio.js'), join(serverOutputDir, 'sandpiper-claude-mcp.js'));
+}
+
 const entrypoint = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);
 
 if (entrypoint === fileURLToPath(import.meta.url)) {
   const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-  await assembleClaudeCodePlugin({ repoRoot, outputDir: join(repoRoot, 'dist', 'claude-plugin') });
+  const options = { repoRoot, outputDir: join(repoRoot, 'dist', 'claude-plugin') };
+
+  if (process.argv.includes('--build')) {
+    await buildClaudeCodePlugin(options);
+  } else {
+    await assembleClaudeCodePlugin(options);
+  }
 }
