@@ -7,9 +7,9 @@
     "sandpiper-tasks": "./dist/sandpiper-tasks"
   },
   "dependencies": {
-    "@commander-js/extra-typings": "catalog:cli",
+    "@commander-js/extra-typings": "14.0.0",
     "@toon-format/toon": "2.1.0",
-    "commander": "catalog:cli"
+    "commander": "14.0.3"
   },
   "devDependencies": {
     "@toon-format/cli": "2.1.0"

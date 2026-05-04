@@ -7,9 +7,9 @@
     "sandpiper-standup": "./dist/sandpiper-standup"
   },
   "dependencies": {
-    "@commander-js/extra-typings": "catalog:cli",
-    "commander": "catalog:cli",
-    "sandpiper-ai-core": "workspace:*"
+    "@commander-js/extra-typings": "14.0.0",
+    "commander": "14.0.3",
+    "sandpiper-ai-core": "0.0.1"
   },
   "scripts": {
     "test": "vitest run",

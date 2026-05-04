@@ -38,7 +38,7 @@ export interface PackageAuthor {
 }
 
 export interface PackageRepository {
-  readonly type: 'git';
+  readonly type: string;
   readonly url: string;
 }
 

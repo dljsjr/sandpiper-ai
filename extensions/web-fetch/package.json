@@ -4,17 +4,17 @@
   "type": "module",
   "description": "Pi extension: fetch web pages and return clean markdown content",
   "dependencies": {
-    "@mozilla/readability": "catalog:web",
-    "jsdom": "catalog:web",
-    "turndown": "catalog:web"
+    "@mozilla/readability": "0.6.0",
+    "jsdom": "29.1.1",
+    "turndown": "7.2.4"
   },
   "devDependencies": {
-    "@types/jsdom": "catalog:web",
-    "@types/turndown": "catalog:web"
+    "@types/jsdom": "28.0.1",
+    "@types/turndown": "5.0.6"
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "catalog:pi",
-    "@sinclair/typebox": "catalog:pi"
+    "@mariozechner/pi-coding-agent": "*",
+    "@sinclair/typebox": "*"
   },
   "scripts": {
     "test": "vitest run",

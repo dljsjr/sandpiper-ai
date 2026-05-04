@@ -30,6 +30,18 @@ export interface DistPackageJson {
   readonly keywords?: readonly string[];
   readonly pi: PiResourceJson;
   readonly license?: string;
+  readonly files: readonly [
+    'config/',
+    'extensions/',
+    'modes',
+    'core',
+    'dist',
+    'packages/',
+    'prompts/',
+    'sandpiper',
+    'skills/',
+    'themes/',
+  ];
   readonly dependencies: Record<string, string>;
   readonly peerDependencies: Record<string, string>;
   readonly bin: {
@@ -58,6 +70,18 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
     keywords: rootPackageJson.keywords,
     pi: rootPackageJson.pi,
     license: rootPackageJson.license,
+    files: [
+      'config/',
+      'extensions/',
+      'modes',
+      'core',
+      'dist',
+      'packages/',
+      'prompts/',
+      'sandpiper',
+      'skills/',
+      'themes/',
+    ],
     dependencies: createPiRuntimeDependencies(rootPackageJson),
     peerDependencies: createPiPeerDependencies(),
     bin: {

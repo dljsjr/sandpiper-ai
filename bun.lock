@@ -5,43 +5,43 @@
     "": {
       "name": "sandpiper-ai",
       "dependencies": {
-        "chalk": "catalog:cli",
-        "fast-xml-parser": "catalog:codec",
-        "sandpiper-ai-cli": "workspace:*",
-        "sandpiper-ai-core": "workspace:*",
-        "sandpiper-standup-cli": "workspace:*",
-        "sandpiper-tasks-cli": "workspace:*",
-        "supports-color": "catalog:cli",
+        "chalk": "5.6.2",
+        "fast-xml-parser": "5.7.2",
+        "sandpiper-ai-cli": "0.0.1",
+        "sandpiper-ai-core": "0.0.1",
+        "sandpiper-standup-cli": "0.0.1",
+        "sandpiper-tasks-cli": "0.0.1",
+        "supports-color": "10.2.2",
       },
       "devDependencies": {
-        "@biomejs/biome": "catalog:tooling",
-        "@commander-js/extra-typings": "catalog:cli",
-        "@types/node": "catalog:ts",
-        "commander": "catalog:cli",
-        "mcporter": "catalog:tooling",
-        "typescript": "catalog:ts",
-        "vitest": "catalog:testing",
+        "@biomejs/biome": "2.4.14",
+        "@commander-js/extra-typings": "14.0.0",
+        "@types/node": "25.6.0",
+        "commander": "14.0.3",
+        "mcporter": "0.9.0",
+        "typescript": "6.0.3",
+        "vitest": "4.1.5",
       },
       "peerDependencies": {
-        "@mariozechner/pi-coding-agent": "catalog:pi",
-        "@mariozechner/pi-tui": "catalog:pi",
-        "@sinclair/typebox": "catalog:pi",
+        "@mariozechner/pi-coding-agent": "*",
+        "@mariozechner/pi-tui": "*",
+        "@sinclair/typebox": "*",
       },
     },
     "devtools": {
       "name": "sandpiper-ai-devtools",
       "version": "0.0.1",
       "dependencies": {
-        "@commander-js/extra-typings": "catalog:cli",
-        "ascii-motion-mcp": "catalog:tooling",
-        "mcporter": "catalog:tooling",
+        "@commander-js/extra-typings": "14.0.0",
+        "ascii-motion-mcp": "^2.1",
+        "mcporter": "0.9.0",
       },
       "devDependencies": {
-        "@types/bun": "catalog:ts",
+        "@types/bun": "1.3.13",
       },
       "peerDependencies": {
-        "canvas": "catalog:tooling",
-        "commander": "catalog:cli",
+        "canvas": "3.2.3",
+        "commander": "14.0.3",
       },
     },
     "extensions/autotoon": {
@@ -55,25 +55,25 @@
         "sandpiper-ai-core": "workspace:*",
       },
       "peerDependencies": {
-        "@mariozechner/pi-coding-agent": "catalog:pi",
-        "@sinclair/typebox": "catalog:pi",
+        "@mariozechner/pi-coding-agent": "*",
+        "@sinclair/typebox": "*",
       },
     },
     "extensions/web-fetch": {
       "name": "web-fetch",
       "version": "0.0.1",
       "dependencies": {
-        "@mozilla/readability": "catalog:web",
-        "jsdom": "catalog:web",
-        "turndown": "catalog:web",
+        "@mozilla/readability": "0.6.0",
+        "jsdom": "29.1.1",
+        "turndown": "7.2.4",
       },
       "devDependencies": {
-        "@types/jsdom": "catalog:web",
-        "@types/turndown": "catalog:web",
+        "@types/jsdom": "28.0.1",
+        "@types/turndown": "5.0.6",
       },
       "peerDependencies": {
-        "@mariozechner/pi-coding-agent": "catalog:pi",
-        "@sinclair/typebox": "catalog:pi",
+        "@mariozechner/pi-coding-agent": "*",
+        "@sinclair/typebox": "*",
       },
     },
     "packages/adapter-claude-code": {
@@ -90,7 +90,7 @@
         "@toon-format/toon": "2.1.0",
       },
       "peerDependencies": {
-        "@mariozechner/pi-coding-agent": "catalog:pi",
+        "@mariozechner/pi-coding-agent": "*",
       },
     },
     "packages/cli": {
@@ -101,10 +101,10 @@
         "sandpiper-standalone": "./bin/sandpiper-standalone",
       },
       "dependencies": {
-        "@mariozechner/pi-coding-agent": "catalog:pi",
+        "@mariozechner/pi-coding-agent": "0.72.0",
       },
       "peerDependencies": {
-        "@silvia-odwyer/photon-node": "catalog:pi",
+        "@silvia-odwyer/photon-node": "*",
       },
     },
     "packages/core": {
@@ -118,9 +118,9 @@
         "sandpiper-standup": "./dist/sandpiper-standup",
       },
       "dependencies": {
-        "@commander-js/extra-typings": "catalog:cli",
-        "commander": "catalog:cli",
-        "sandpiper-ai-core": "workspace:*",
+        "@commander-js/extra-typings": "14.0.0",
+        "commander": "14.0.3",
+        "sandpiper-ai-core": "0.0.1",
       },
     },
     "packages/sandpiper-tasks-cli": {
@@ -130,9 +130,9 @@
         "sandpiper-tasks": "./dist/sandpiper-tasks",
       },
       "dependencies": {
-        "@commander-js/extra-typings": "catalog:cli",
+        "@commander-js/extra-typings": "14.0.0",
         "@toon-format/toon": "2.1.0",
-        "commander": "catalog:cli",
+        "commander": "14.0.3",
       },
       "devDependencies": {
         "@toon-format/cli": "2.1.0",

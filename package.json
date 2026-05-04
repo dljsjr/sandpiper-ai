@@ -2,6 +2,11 @@
   "name": "sandpiper-ai",
   "version": "0.0.1",
   "author": "Doug Stephen <dljs.jr@dougstephenjr.com>",
+  "homepage": "https://github.com/dljsjr/sandpiper-ai#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dljsjr/sandpiper-ai.git"
+  },
   "private": true,
   "scripts": {
     "preinstall": "bash devtools/vendor.sh --if-missing && bash devtools/preinstall.sh && bun --workspaces --if-present preinstall",
@@ -115,27 +120,27 @@
     }
   },
   "dependencies": {
-    "chalk": "catalog:cli",
-    "fast-xml-parser": "catalog:codec",
-    "sandpiper-ai-cli": "workspace:*",
-    "sandpiper-ai-core": "workspace:*",
-    "sandpiper-standup-cli": "workspace:*",
-    "sandpiper-tasks-cli": "workspace:*",
-    "supports-color": "catalog:cli"
+    "chalk": "5.6.2",
+    "fast-xml-parser": "5.7.2",
+    "sandpiper-ai-cli": "0.0.1",
+    "sandpiper-ai-core": "0.0.1",
+    "sandpiper-standup-cli": "0.0.1",
+    "sandpiper-tasks-cli": "0.0.1",
+    "supports-color": "10.2.2"
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "catalog:pi",
-    "@mariozechner/pi-tui": "catalog:pi",
-    "@sinclair/typebox": "catalog:pi"
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*",
+    "@sinclair/typebox": "*"
   },
   "devDependencies": {
-    "@biomejs/biome": "catalog:tooling",
-    "@commander-js/extra-typings": "catalog:cli",
-    "@types/node": "catalog:ts",
-    "commander": "catalog:cli",
-    "mcporter": "catalog:tooling",
-    "typescript": "catalog:ts",
-    "vitest": "catalog:testing"
+    "@biomejs/biome": "2.4.14",
+    "@commander-js/extra-typings": "14.0.0",
+    "@types/node": "25.6.0",
+    "commander": "14.0.3",
+    "mcporter": "0.9.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.5"
   },
   "license": "MIT",
   "type": "module"
