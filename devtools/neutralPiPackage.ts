@@ -5,24 +5,16 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import rootJson from '../package.json' with { type: 'json' };
-import autotoonPackageJson from '../packages/capability-autotoon/package.json' with { type: 'json' };
-
-interface RootPackageJson {
-  readonly version: string;
-  readonly license?: string;
-  readonly workspaces?: {
-    readonly catalogs?: Record<string, Record<string, string>>;
-  };
-}
-
-interface PackageJsonWithDependencies {
-  readonly dependencies?: Record<string, string>;
-}
+import {
+  createPiPeerDependencies,
+  createPiRuntimeDependencies,
+  type RootPackageJson,
+  writePiArtifactSupportPackageJsons,
+} from './piPackageArtifactMetadata.js';
 
 export interface NeutralPiPackageJson {
   readonly name: 'sandpiper-ai-neutral-pi-package';
   readonly version: string;
-  readonly private: true;
   readonly type: 'module';
   readonly description: string;
   readonly keywords: readonly ['pi-package'];
@@ -75,7 +67,14 @@ function shouldPruneArtifactPath(path: string): boolean {
   const name = basename(path);
 
   return (
-    name === 'tsconfig.json' || name === 'vitest.config.ts' || name.endsWith('.test.ts') || name.endsWith('.test.js')
+    name === '.DS_Store' ||
+    name === 'tsconfig.json' ||
+    name === 'vitest.config.ts' ||
+    name.endsWith('-workspace') ||
+    name.endsWith('.log') ||
+    name.endsWith('.pid') ||
+    name.endsWith('.test.ts') ||
+    name.endsWith('.test.js')
   );
 }
 
@@ -98,48 +97,16 @@ async function pruneDevelopmentFiles(directory: string): Promise<void> {
   );
 }
 
-function packageDependencyVersion(packageJson: PackageJsonWithDependencies, dependency: string): string {
-  const version = packageJson.dependencies?.[dependency];
-
-  if (version === undefined) {
-    throw new Error(`Missing package dependency version for ${dependency}`);
-  }
-
-  return version;
-}
-
-function catalogVersion(rootPackageJson: RootPackageJson, catalog: string, dependency: string): string {
-  const version = rootPackageJson.workspaces?.catalogs?.[catalog]?.[dependency];
-
-  if (version === undefined) {
-    throw new Error(`Missing catalog version for ${catalog}.${dependency}`);
-  }
-
-  return version;
-}
-
 export function createNeutralPiPackageJson(rootPackageJson: RootPackageJson): NeutralPiPackageJson {
   return {
     name: 'sandpiper-ai-neutral-pi-package',
     version: rootPackageJson.version,
-    private: true,
     type: 'module',
     description: 'Neutral Sandpiper capabilities and resources for vanilla Pi',
     keywords: ['pi-package'],
     license: rootPackageJson.license,
-    dependencies: {
-      '@mozilla/readability': catalogVersion(rootPackageJson, 'web', '@mozilla/readability'),
-      '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
-      jsdom: catalogVersion(rootPackageJson, 'web', 'jsdom'),
-      'sandpiper-ai-core': 'file:./packages/core',
-      'sandpiper-capability-autotoon': 'file:./packages/capability-autotoon',
-      turndown: catalogVersion(rootPackageJson, 'web', 'turndown'),
-    },
-    peerDependencies: {
-      '@mariozechner/pi-coding-agent': '*',
-      '@mariozechner/pi-tui': '*',
-      '@sinclair/typebox': '*',
-    },
+    dependencies: createPiRuntimeDependencies(rootPackageJson),
+    peerDependencies: createPiPeerDependencies(),
     pi: {
       extensions: [
         './extensions/capabilities.ts',
@@ -166,6 +133,7 @@ export async function assembleNeutralPiPackage(options: AssembleNeutralPiPackage
   }
 
   await pruneDevelopmentFiles(options.outputDir);
+  await writePiArtifactSupportPackageJsons(options.outputDir, rootJson);
   await writeFile(
     join(options.outputDir, 'package.json'),
     `${JSON.stringify(createNeutralPiPackageJson(rootJson), null, 2)}\n`,

@@ -126,6 +126,9 @@ function shouldPruneArtifactPath(path: string): boolean {
     name === '.DS_Store' ||
     name === 'tsconfig.json' ||
     name === 'vitest.config.ts' ||
+    name.endsWith('-workspace') ||
+    name.endsWith('.log') ||
+    name.endsWith('.pid') ||
     name.endsWith('.test.ts') ||
     name.endsWith('.test.js')
   );

@@ -35,6 +35,12 @@ rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" -ahH "${REPO_ROOT}
 ln -sf "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${DIST_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
 ln -sf "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${DIST_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
 
+# Remove stale or ignored development files that rsync preserves when they
+# already exist in dist/ (excluded files are protected from --delete by default).
+find "${DIST_DIR}" \
+    \( -name 'node_modules' -o -name '.DS_Store' -o -name 'tsconfig.json' -o -name 'vitest.config.ts' -o -name '*-workspace' -o -name '*.log' -o -name '*.pid' -o -name '*.test.ts' -o -name '*.test.js' \) \
+    -prune -exec rm -rf {} +
+
 # Copy extension package.json files back (excluded by rsync but needed
 # by pi's package discovery to find extension entry points)
 for ext_dir in "${REPO_ROOT}"/extensions/*/; do

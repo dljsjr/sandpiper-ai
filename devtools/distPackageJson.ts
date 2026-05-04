@@ -5,53 +5,70 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import rootJson from '../package.json' with { type: 'json' };
-
-export interface PiConfigJson {
-  readonly name: string;
-  readonly configDir: string;
-  readonly bin: string;
-}
-
-export interface PiResourceJson {
-  readonly extensions?: readonly string[];
-  readonly skills?: readonly string[];
-  readonly prompts?: readonly string[];
-  readonly themes?: readonly string[];
-}
-
-export interface RootPackageJson {
-  readonly name: string;
-  readonly version: string;
-  readonly piConfig: PiConfigJson;
-  readonly keywords?: readonly string[];
-  readonly pi: PiResourceJson;
-  readonly license?: string;
-}
+import {
+  createPiPeerDependencies,
+  createPiRuntimeDependencies,
+  normalizePackageAuthor,
+  normalizePackageRepository,
+  type PackageAuthor,
+  type PackageRepository,
+  type PiConfigJson,
+  type PiResourceJson,
+  type RootPackageJson,
+  writePiArtifactSupportPackageJsons,
+} from './piPackageArtifactMetadata.js';
 
 export interface DistPackageJson {
   readonly name: string;
   readonly version: string;
+  readonly type: 'module';
+  readonly description: string;
+  readonly author?: PackageAuthor;
+  readonly homepage?: string;
+  readonly repository?: PackageRepository;
   readonly piConfig: PiConfigJson;
   readonly keywords?: readonly string[];
   readonly pi: PiResourceJson;
   readonly license?: string;
-  readonly bin: 'sandpiper';
+  readonly dependencies: Record<string, string>;
+  readonly peerDependencies: Record<string, string>;
+  readonly bin: {
+    readonly sandpiper: './sandpiper';
+  };
 }
 
 export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPackageJson {
+  if (rootPackageJson.piConfig === undefined) {
+    throw new Error('Root package is missing piConfig');
+  }
+
+  if (rootPackageJson.pi === undefined) {
+    throw new Error('Root package is missing pi resources');
+  }
+
   return {
     name: rootPackageJson.name,
     version: rootPackageJson.version,
+    type: 'module',
+    description: 'Sandpiper CLI and Pi package distribution',
+    author: normalizePackageAuthor(rootPackageJson.author),
+    homepage: rootPackageJson.homepage,
+    repository: normalizePackageRepository(rootPackageJson.repository),
     piConfig: rootPackageJson.piConfig,
     keywords: rootPackageJson.keywords,
     pi: rootPackageJson.pi,
     license: rootPackageJson.license,
-    bin: 'sandpiper',
+    dependencies: createPiRuntimeDependencies(rootPackageJson),
+    peerDependencies: createPiPeerDependencies(),
+    bin: {
+      sandpiper: './sandpiper',
+    },
   };
 }
 
 export async function writeDistPackageJson(rootPackageJson: RootPackageJson = rootJson): Promise<void> {
-  await writeFile('../dist/package.json', JSON.stringify(createDistPackageJson(rootPackageJson), null, 2));
+  await writeFile('../dist/package.json', `${JSON.stringify(createDistPackageJson(rootPackageJson), null, 2)}\n`);
+  await writePiArtifactSupportPackageJsons('../dist', rootPackageJson);
 }
 
 const entrypoint = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);
