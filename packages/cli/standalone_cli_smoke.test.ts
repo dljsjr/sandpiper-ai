@@ -10,6 +10,7 @@ const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandp
 const bunExecutable = process.env.BUN_EXECUTABLE ?? 'bun';
 
 interface PackageMetadata {
+  readonly version?: string;
   readonly bin?: Record<string, string>;
   readonly dependencies?: Record<string, string>;
   readonly scripts?: Record<string, string>;
@@ -58,7 +59,7 @@ describe('standalone Sandpiper CLI smoke', () => {
     const rootPackage = readPackageJson(join(repoRoot, 'package.json'));
     const cliPackage = readPackageJson(join(repoRoot, 'packages', 'cli', 'package.json'));
 
-    expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe('workspace:*');
+    expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe(rootPackage.version);
     expect(cliPackage.bin?.['sandpiper-standalone']).toBe('./bin/sandpiper-standalone');
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(true);
     expect(cliPackage.scripts?.preinstall).toContain('build:standalone');

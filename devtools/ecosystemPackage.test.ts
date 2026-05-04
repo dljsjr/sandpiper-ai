@@ -22,6 +22,10 @@ function npmPackDryRun(packageDir: string): readonly string[] {
 }
 
 describe('ecosystem package artifacts', () => {
+  it('keeps the repository root npm-installable for Pi git installs from source', () => {
+    expect(findUnsupportedDependencySpecs(repoRoot)).toEqual([]);
+  });
+
   it('emits a publishable Sandpiper Pi/npm package at dist/', () => {
     const packageDir = join(repoRoot, 'dist');
     const packageJson = readPackageJson(join(packageDir, 'package.json'));
@@ -42,11 +46,26 @@ describe('ecosystem package artifacts', () => {
       '@mariozechner/pi-tui': '*',
       '@sinclair/typebox': '*',
     });
+    expect(packageJson.files).toEqual([
+      'config/',
+      'extensions/',
+      'modes',
+      'core',
+      'dist',
+      'packages/',
+      'prompts/',
+      'sandpiper',
+      'skills/',
+      'themes/',
+    ]);
     expect(findUnsupportedDependencySpecs(packageDir)).toEqual([]);
     expect(findMissingFileDependencyTargets(packageDir)).toEqual([]);
     expect(existsSync(join(packageDir, 'packages', 'core', 'package.json'))).toBe(true);
     expect(existsSync(join(packageDir, 'packages', 'capability-autotoon', 'package.json'))).toBe(true);
-    expect(npmPackDryRun(packageDir)).toContain('package.json');
+    const packedFiles = npmPackDryRun(packageDir);
+    expect(packedFiles).toContain('package.json');
+    expect(packedFiles).not.toContain('neutral-pi-package/package.json');
+    expect(packedFiles).not.toContain('claude-plugin/.claude-plugin/plugin.json');
   });
 
   it('emits a publishable neutral Pi package artifact', () => {

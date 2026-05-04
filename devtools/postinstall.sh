@@ -17,6 +17,11 @@ rm -f "${REPO_ROOT}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
 rm -f "${REPO_ROOT}/skills/sandpiper/standup/scripts/sandpiper-standup"
 rm -f "${REPO_ROOT}/skills/sandpiper/dash/scripts/dash"
 
+# Generated package artifacts live under dist/ but are not part of the legacy
+# Pi/npm package rooted at dist/. Remove stale nested artifacts before refreshing
+# dist/ so npm pack does not include previous distribution outputs.
+rm -rf "${DIST_DIR}/claude-plugin" "${DIST_DIR}/neutral-pi-package" "${DIST_DIR}/standalone-package"
+
 # ─── Package workspace distributions ───────────────────────────────
 
 for element in extensions themes skills prompts packages; do

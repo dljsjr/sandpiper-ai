@@ -15,7 +15,7 @@
     }
   },
   "dependencies": {
-    "sandpiper-capability-autotoon": "workspace:*"
+    "sandpiper-capability-autotoon": "0.0.1"
   },
   "scripts": {
     "build": "tsc --build",

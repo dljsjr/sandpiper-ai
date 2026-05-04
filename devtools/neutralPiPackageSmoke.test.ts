@@ -1,7 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { DefaultResourceLoader, SettingsManager } from '@mariozechner/pi-coding-agent';
 import { describe, expect, it } from 'vitest';
 import { assembleNeutralPiPackage } from './neutralPiPackage.js';
 
@@ -23,6 +22,8 @@ describe('neutral Pi package smoke', () => {
       // as an installed package through SettingsManager below.
       process.env.PI_PACKAGE_DIR = repoRoot;
       process.env.PI_SKIP_VERSION_CHECK = '1';
+
+      const { DefaultResourceLoader, SettingsManager } = await import('@mariozechner/pi-coding-agent');
 
       await assembleNeutralPiPackage({ repoRoot, outputDir: packageDir });
 

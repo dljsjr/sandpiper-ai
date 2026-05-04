@@ -28,7 +28,19 @@ describe('Pi package distribution smoke', () => {
         keywords: rootPackageJson.keywords,
         pi: rootPackageJson.pi,
         license: rootPackageJson.license,
-        bin: 'sandpiper',
+        files: [
+          'config/',
+          'extensions/',
+          'modes',
+          'core',
+          'dist',
+          'packages/',
+          'prompts/',
+          'sandpiper',
+          'skills/',
+          'themes/',
+        ],
+        bin: { sandpiper: './sandpiper' },
       });
       expect(findMissingPiManifestPaths(packageRoot, distPackageJson)).toEqual([]);
     } finally {
