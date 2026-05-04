@@ -4,9 +4,16 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import rootPackageJson from '../package.json' with { type: 'json' };
-import { assembleClaudeCodePlugin, createClaudePluginManifest, createClaudePluginMcpConfig } from './claudeCodePlugin.js';
+import {
+  assembleClaudeCodePlugin,
+  createClaudePluginManifest,
+  createClaudePluginMcpConfig,
+} from './claudeCodePlugin.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
+const claudePluginRootVariable = '${' + 'CLAUDE_PLUGIN_ROOT}';
+const claudePluginDataVariable = '${' + 'CLAUDE_PLUGIN_DATA}';
+const claudePluginMcpServerPath = `${claudePluginRootVariable}/servers/sandpiper-claude-mcp.js`;
 
 describe('Claude Code plugin mapping', () => {
   it('maps neutral Sandpiper resources to Claude plugin component paths', () => {
@@ -34,10 +41,10 @@ describe('Claude Code plugin mapping', () => {
       mcpServers: {
         sandpiper: {
           command: 'node',
-          args: ['${CLAUDE_PLUGIN_ROOT}/servers/sandpiper-claude-mcp.js'],
+          args: [claudePluginMcpServerPath],
           env: {
-            SANDPIPER_CLAUDE_PLUGIN_ROOT: '${CLAUDE_PLUGIN_ROOT}',
-            SANDPIPER_CLAUDE_PLUGIN_DATA: '${CLAUDE_PLUGIN_DATA}',
+            SANDPIPER_CLAUDE_PLUGIN_ROOT: claudePluginRootVariable,
+            SANDPIPER_CLAUDE_PLUGIN_DATA: claudePluginDataVariable,
           },
         },
       },
@@ -51,9 +58,9 @@ describe('Claude Code plugin mapping', () => {
       const outputDir = join(tempDir, 'plugin');
       await assembleClaudeCodePlugin({ repoRoot, outputDir });
 
-      const manifest = JSON.parse(readFileSync(join(outputDir, '.claude-plugin', 'plugin.json'), 'utf-8')) as ReturnType<
-        typeof createClaudePluginManifest
-      >;
+      const manifest = JSON.parse(
+        readFileSync(join(outputDir, '.claude-plugin', 'plugin.json'), 'utf-8'),
+      ) as ReturnType<typeof createClaudePluginManifest>;
       const mcpConfig = JSON.parse(readFileSync(join(outputDir, '.mcp.json'), 'utf-8')) as ReturnType<
         typeof createClaudePluginMcpConfig
       >;
@@ -62,9 +69,7 @@ describe('Claude Code plugin mapping', () => {
       expect(manifest.commands).toBe('./commands/');
       expect(manifest.themes).toBe('./themes/');
       expect(manifest).not.toHaveProperty('piConfig');
-      expect(mcpConfig.mcpServers.sandpiper.args).toEqual([
-        '${CLAUDE_PLUGIN_ROOT}/servers/sandpiper-claude-mcp.js',
-      ]);
+      expect(mcpConfig.mcpServers.sandpiper.args).toEqual([claudePluginMcpServerPath]);
 
       for (const relativePath of [
         'skills/sandpiper/tasks/SKILL.md',
