@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { createReadStream, existsSync, type ReadStream } from 'node:fs';
 import { tmpdir, userInfo } from 'node:os';
 import { join } from 'node:path';
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { exportVars } from './env-export.js';
 import { escapeForBash, escapeForFish } from './escape.js';
 import { FifoManager } from './fifo.js';
@@ -41,7 +40,11 @@ function detectShell(): 'fish' | 'bash' | 'zsh' {
   return 'bash';
 }
 
-export function createRelayRuntime(pi: ExtensionAPI): RelayRuntime {
+export interface RelayRuntimeHost {
+  appendEntry<TDetails>(customType: string, details: TDetails): void;
+}
+
+export function createRelayRuntime(host: RelayRuntimeHost): RelayRuntime {
   let fifoManager: FifoManager | null = null;
   let zellij: ZellijClient | null = null;
   let signalParser: SignalParser | null = null;
@@ -118,7 +121,7 @@ export function createRelayRuntime(pi: ExtensionAPI): RelayRuntime {
 
     isSetUp = true;
     zellijSessionName = resolvedSession;
-    pi.appendEntry<StoredRelaySession>(RELAY_SESSION_CUSTOM_TYPE, { sessionName: resolvedSession });
+    host.appendEntry<StoredRelaySession>(RELAY_SESSION_CUSTOM_TYPE, { sessionName: resolvedSession });
     storedRelaySessionName = resolvedSession;
     ctx.ui.setStatus('shell-relay', `Shell Relay: ${resolvedSession} (${shell})`);
   }
