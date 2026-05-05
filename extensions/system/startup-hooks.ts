@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import {
   collectActiveTaskContext,
@@ -11,27 +11,11 @@ import {
   formatProjectTriggersForPrompt,
   formatStandupContext,
   formatWorkingCopySummaryForPrompt,
-  getPidFilePath,
-  shouldTreatInitialLoadAsColdStart,
+  handleSandpiperSessionShutdown,
+  handleSandpiperSessionStart,
 } from 'sandpiper-ai-core';
 import { buildSandpiperSystemPrompt } from '../../packages/core/src/system-prompt.js';
 import type { SystemRuntimeState } from './runtime.js';
-
-function writePidFile(sessionId: string, cwd: string): void {
-  const pidFilePath = getPidFilePath(sessionId);
-  mkdirSync(dirname(pidFilePath), { recursive: true });
-
-  const content = [process.pid.toString(), new Date().toISOString(), cwd].join('\n');
-
-  writeFileSync(pidFilePath, content, 'utf-8');
-}
-
-function removePidFile(sessionId: string): void {
-  const pidFilePath = getPidFilePath(sessionId);
-  if (existsSync(pidFilePath)) {
-    rmSync(pidFilePath);
-  }
-}
 
 function readStandupContent(cwd: string): string {
   const standupPath = join(cwd, '.sandpiper', 'standup.md');
@@ -106,55 +90,18 @@ export function registerStartupPromptHooks(
   });
 }
 
-let currentSessionId: string | undefined;
-
 export function registerSessionContinuityHooks(pi: ExtensionAPI, state: SystemRuntimeState): void {
   pi.on('session_start', async (event, ctx) => {
-    state.startupContextPending = true;
-
-    // Cold-start determination is now reason-driven (Pi 0.65.0).
-    // Only 'startup' is ambiguous — Pi may have auto-resumed the last session,
-    // so we inspect session contents to distinguish fresh vs resumed.
-    switch (event.reason) {
-      case 'startup': {
-        const sessionFile = ctx.sessionManager.getSessionFile();
-        state.coldStartGuidancePending = shouldTreatInitialLoadAsColdStart(
-          sessionFile,
-          ctx.sessionManager.getEntries(),
-        );
-        break;
-      }
-      case 'new':
-        state.coldStartGuidancePending = true;
-        break;
-      default:
-        // 'reload', 'resume', 'fork' — never a cold start
-        state.coldStartGuidancePending = false;
-        break;
-    }
-
-    const sessionId = ctx.sessionManager.getSessionId();
-    process.env.SANDPIPER_SESSION_ID = sessionId;
-
-    // Remove old PID file if switching sessions
-    if (currentSessionId && currentSessionId !== sessionId) {
-      removePidFile(currentSessionId);
-    }
-
-    // Write new PID file
-    writePidFile(sessionId, ctx.cwd);
-    currentSessionId = sessionId;
-
-    const sessionFile = ctx.sessionManager.getSessionFile();
-    if (sessionFile) {
-      process.env.SANDPIPER_SESSION_FILE = sessionFile;
-    }
+    handleSandpiperSessionStart(state, {
+      reason: event.reason,
+      cwd: ctx.cwd,
+      sessionId: ctx.sessionManager.getSessionId(),
+      sessionFile: ctx.sessionManager.getSessionFile(),
+      entries: ctx.sessionManager.getEntries(),
+    });
   });
 
   pi.on('session_shutdown', async () => {
-    if (currentSessionId) {
-      removePidFile(currentSessionId);
-      currentSessionId = undefined;
-    }
+    handleSandpiperSessionShutdown(state);
   });
 }
