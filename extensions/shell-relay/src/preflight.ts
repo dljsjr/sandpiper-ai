@@ -8,11 +8,10 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
-import { getAgentDir } from '@mariozechner/pi-coding-agent';
-import { displayPath, type PreflightDiagnostic } from 'sandpiper-ai-core';
+import { basename, join } from 'node:path';
+import { displayPath, getShellIntegrationsDir, type PreflightDiagnostic } from 'sandpiper-ai-core';
 
-const defaultWellKnownDir = join(dirname(getAgentDir()), 'shell-integrations');
+const defaultWellKnownDir = getShellIntegrationsDir();
 
 /** Shell probe commands — exit 0 if __relay_prompt_hook is defined, non-zero otherwise.
  * All shells use -i (interactive) because integration scripts are typically
