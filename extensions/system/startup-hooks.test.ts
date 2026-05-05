@@ -1,6 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import * as core from 'sandpiper-ai-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { registerBackgroundProcessContextHooks } from './background-process-hooks.js';
 import { createSystemRuntimeState } from './runtime.js';
@@ -24,15 +23,6 @@ describe('startup hooks', () => {
       async (options: Record<string, unknown>, _originalPromptOptions: PiSystemPromptOptions) =>
         JSON.stringify(options),
     );
-    vi.spyOn(core, 'collectProjectTriggers').mockReturnValue([]);
-    vi.spyOn(core, 'collectActiveTaskContext').mockReturnValue(undefined);
-    vi.spyOn(core, 'collectWorkingCopySummary').mockReturnValue(undefined);
-    vi.spyOn(core, 'formatProjectTriggersForPrompt').mockReturnValue('<projects/>');
-    vi.spyOn(core, 'formatActiveTaskContextForPrompt').mockReturnValue('<active/>');
-    vi.spyOn(core, 'formatWorkingCopySummaryForPrompt').mockReturnValue('<working-copy/>');
-    vi.spyOn(core, 'formatColdStartGuidance').mockReturnValue('<cold-start/>');
-    vi.spyOn(core, 'formatStandupContext').mockReturnValue('<standup/>');
-    vi.spyOn(core, 'shouldTreatInitialLoadAsColdStart').mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -59,10 +49,11 @@ describe('startup hooks', () => {
       },
     )) as { systemPrompt: string };
 
-    expect(result.systemPrompt).toContain('"projectTriggers":"<projects/>"');
-    expect(result.systemPrompt).toContain('"activeTaskContext":"<active/>"');
-    expect(result.systemPrompt).toContain('"workingCopyContext":"<working-copy/>"');
-    expect(result.systemPrompt).toContain('"coldStartGuidance":"<cold-start/>"');
+    expect(result.systemPrompt).toContain('"cwd":"/repo"');
+    expect(result.systemPrompt).toContain('"projectTriggers":""');
+    expect(result.systemPrompt).toContain('"activeTaskContext":""');
+    expect(result.systemPrompt).toContain('"workingCopyContext":""');
+    expect(result.systemPrompt).toContain('Cold-Start Guidance');
     expect(state.startupContextPending).toBe(false);
     expect(state.coldStartGuidancePending).toBe(false);
   });
