@@ -1,4 +1,3 @@
-import type { BuildSystemPromptOptions as PiSystemPromptOptions } from '@mariozechner/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
 import {
   buildSandpiperSystemPrompt,
@@ -6,6 +5,7 @@ import {
   formatStandupContext,
   injectedContextBlock,
   piDocsBlock,
+  type SandpiperBaseSystemPromptOptions,
   skillsBlock,
   systemPromptPersonaBlock,
   toolGuidanceBlock,
@@ -15,7 +15,9 @@ vi.mock('@toon-format/toon', () => ({
   encode: vi.fn(() => 'mocked-toon'),
 }));
 
-function createPiPromptOptions(overrides: Partial<PiSystemPromptOptions> = {}): PiSystemPromptOptions {
+function createPromptOptions(
+  overrides: Partial<SandpiperBaseSystemPromptOptions> = {},
+): SandpiperBaseSystemPromptOptions {
   return {
     selectedTools: ['read', 'edit', 'bash'],
     toolSnippets: {
@@ -110,7 +112,7 @@ describe('system-prompt', () => {
 
   describe('toolGuidanceBlock', () => {
     it('renders tool snippets for selected tools', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         selectedTools: ['read', 'edit'],
         toolSnippets: {
           read: 'Read file contents',
@@ -127,7 +129,7 @@ describe('system-prompt', () => {
     });
 
     it('omits tool snippets for tools not in selectedTools', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         selectedTools: ['read'],
         toolSnippets: {
           read: 'Read file contents',
@@ -141,7 +143,7 @@ describe('system-prompt', () => {
     });
 
     it('renders guidelines and strips "Be concise"', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         promptGuidelines: ['Be concise in your responses', 'Show file paths clearly when working with files'],
       });
 
@@ -152,7 +154,7 @@ describe('system-prompt', () => {
     });
 
     it('omits empty tool snippets', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         selectedTools: ['read', 'edit'],
         toolSnippets: {
           read: 'Read file contents',
@@ -168,12 +170,12 @@ describe('system-prompt', () => {
 
   describe('injectedContextBlock', () => {
     it('returns undefined when no context files are present', () => {
-      const options = createPiPromptOptions({ contextFiles: [] });
+      const options = createPromptOptions({ contextFiles: [] });
       expect(injectedContextBlock(options)).toBeUndefined();
     });
 
     it('renders context files with BEGIN/END markers', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         contextFiles: [{ path: 'AGENTS.md', content: '# Rules\nDo good things' }],
       });
 
@@ -186,7 +188,7 @@ describe('system-prompt', () => {
     });
 
     it('renders multiple context files', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         contextFiles: [
           { path: 'AGENTS.md', content: 'First' },
           { path: 'CLAUDE.md', content: 'Second' },
@@ -201,20 +203,17 @@ describe('system-prompt', () => {
 
   describe('skillsBlock', () => {
     it('returns undefined when no skills are present', () => {
-      const options = createPiPromptOptions({ skills: [] });
+      const options = createPromptOptions({ skills: [] });
       expect(skillsBlock(options)).toBeUndefined();
     });
 
     it('renders skills catalogue with toon encoding', () => {
-      const options = createPiPromptOptions({
+      const options = createPromptOptions({
         skills: [
           {
             name: 'jj',
             description: 'Jujutsu version control',
             filePath: '/skills/jj/SKILL.md',
-            baseDir: '/skills/jj',
-            sourceInfo: { path: '/skills/jj/SKILL.md', source: 'local', scope: 'user', origin: 'top-level' },
-            disableModelInvocation: false,
           },
         ],
       });
@@ -228,7 +227,7 @@ describe('system-prompt', () => {
 
   describe('buildSandpiperSystemPrompt', () => {
     it('produces a prompt with all required sections', async () => {
-      const promptOptions = createPiPromptOptions();
+      const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
 
       expect(prompt).toContain('[BEGIN PERSONA]');
@@ -238,19 +237,19 @@ describe('system-prompt', () => {
     });
 
     it('formats cwd with forward slashes', async () => {
-      const promptOptions = createPiPromptOptions();
+      const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: 'C:\\Users\\test\\repo' }, promptOptions);
       expect(prompt).toContain('Current working directory: C:/Users/test/repo');
     });
 
     it('defaults cwd to process.cwd()', async () => {
-      const promptOptions = createPiPromptOptions();
+      const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).toContain('Current working directory:');
     });
 
     it('includes injected context when context files are present', async () => {
-      const promptOptions = createPiPromptOptions({
+      const promptOptions = createPromptOptions({
         contextFiles: [{ path: 'AGENTS.md', content: '# Rules\nDo good things' }],
       });
 
@@ -261,21 +260,18 @@ describe('system-prompt', () => {
     });
 
     it('omits injected context when no context files are present', async () => {
-      const promptOptions = createPiPromptOptions({ contextFiles: [] });
+      const promptOptions = createPromptOptions({ contextFiles: [] });
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
       expect(prompt).not.toContain('[BEGIN INJECTED CONTEXT]');
     });
 
     it('includes skills block when skills are present', async () => {
-      const promptOptions = createPiPromptOptions({
+      const promptOptions = createPromptOptions({
         skills: [
           {
             name: 'jj',
             description: 'Jujutsu',
             filePath: '/skills/jj/SKILL.md',
-            baseDir: '/skills/jj',
-            sourceInfo: { path: '/skills/jj/SKILL.md', source: 'local', scope: 'user', origin: 'top-level' },
-            disableModelInvocation: false,
           },
         ],
       });
@@ -285,13 +281,13 @@ describe('system-prompt', () => {
     });
 
     it('omits skills block when no skills are present', async () => {
-      const promptOptions = createPiPromptOptions({ skills: [] });
+      const promptOptions = createPromptOptions({ skills: [] });
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
       expect(prompt).not.toContain('[BEGIN SKILLS]');
     });
 
     it('includes pi docs block when piCodingAgentPackage is set', async () => {
-      const promptOptions = createPiPromptOptions();
+      const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt(
         { cwd: '/repo', piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' },
         promptOptions,
@@ -301,13 +297,13 @@ describe('system-prompt', () => {
     });
 
     it('omits pi docs block when piCodingAgentPackage is not set', async () => {
-      const promptOptions = createPiPromptOptions();
+      const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
       expect(prompt).not.toContain('Extending The Harness');
     });
 
     it('includes user appended prompt content when appendSystemPrompt is set', async () => {
-      const promptOptions = createPiPromptOptions({
+      const promptOptions = createPromptOptions({
         appendSystemPrompt: 'Extra instructions from the user',
       });
 
@@ -318,7 +314,7 @@ describe('system-prompt', () => {
     });
 
     it('omits user appended prompt block when appendSystemPrompt is not set', async () => {
-      const promptOptions = createPiPromptOptions();
+      const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
       expect(prompt).not.toContain('[BEGIN USER APPENDED PROMPT CONTENT]');
     });

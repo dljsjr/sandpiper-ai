@@ -1,4 +1,3 @@
-import type { BuildSystemPromptOptions as PiSystemPromptOptions } from '@mariozechner/pi-coding-agent';
 import { encode as toonEncode } from '@toon-format/toon';
 
 const sandpiperIdentityBlock = `You are a friendly expert software engineering/coding assistant operating inside a coding agent harness called Sandpiper.
@@ -112,6 +111,28 @@ consult the documentation:
 `;
 }
 
+export interface SandpiperPromptContextFile {
+  readonly path: string;
+  readonly content: string;
+}
+
+export interface SandpiperPromptSkill {
+  readonly name: string;
+  readonly description: string;
+  readonly filePath: string;
+}
+
+export interface SandpiperBaseSystemPromptOptions {
+  readonly customPrompt?: string;
+  readonly selectedTools?: readonly string[];
+  readonly toolSnippets?: Readonly<Record<string, string>>;
+  readonly promptGuidelines?: readonly string[];
+  readonly appendSystemPrompt?: string;
+  readonly cwd?: string;
+  readonly contextFiles?: readonly SandpiperPromptContextFile[];
+  readonly skills?: readonly SandpiperPromptSkill[];
+}
+
 export interface SandpiperSystemPromptOptions {
   readonly cwd?: string;
   readonly piCodingAgentPackage?: string;
@@ -159,7 +180,7 @@ ${sandpiperIdentityBlock}${options.piCodingAgentPackage ? `\n${piDocsBlock(optio
 `;
 }
 
-export function toolGuidanceBlock(originalPromptOptions: PiSystemPromptOptions) {
+export function toolGuidanceBlock(originalPromptOptions: SandpiperBaseSystemPromptOptions) {
   const selectedTools = originalPromptOptions.selectedTools || [];
   const toolSnippets = originalPromptOptions.toolSnippets || {};
   const toolSnippetBlock = Object.entries(toolSnippets)
@@ -185,7 +206,7 @@ ${guidelinesBlock}
   `;
 }
 
-export function injectedContextBlock(originalPromptOptions: PiSystemPromptOptions): string | undefined {
+export function injectedContextBlock(originalPromptOptions: SandpiperBaseSystemPromptOptions): string | undefined {
   if (!originalPromptOptions.contextFiles || originalPromptOptions.contextFiles.length === 0) {
     return;
   }
@@ -210,7 +231,7 @@ ${agentFileBlocks.join('\n')}
 `;
 }
 
-export function skillsBlock(originalPromptOptions: PiSystemPromptOptions): string | undefined {
+export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOptions): string | undefined {
   if (!originalPromptOptions.skills || originalPromptOptions.skills.length === 0) {
     return;
   }
@@ -244,7 +265,7 @@ ${toonEncode({
 
 export async function buildSandpiperSystemPrompt(
   options: SandpiperSystemPromptOptions,
-  originalPromptOptions: PiSystemPromptOptions,
+  originalPromptOptions: SandpiperBaseSystemPromptOptions,
 ) {
   const resolvedCwd = options.cwd ?? process.cwd();
   const promptCwd = resolvedCwd.replace(/\\/g, '/');
