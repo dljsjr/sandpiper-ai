@@ -690,13 +690,30 @@ claude plugin validate dist/claude-plugin
 
 Task: AGENT-93
 
-Only after the new distributions work:
+AGENT-93 is extraction-first: retire the legacy root assembly only after remaining extension implementation logic has package-owned seams. Treat every extension as a package-ownership candidate, including `system`.
+
+Only after those seams exist:
 
 - remove or stop authoring top-level Pi-package resource directories
 - simplify root `package.json`
 - update build/dev docs
 - update repo structure guidance in `AGENTS.md`
 - preserve migration guidance for existing users
+
+#### AGENT-156 system ownership boundary slice
+
+AGENT-156 starts with the neutral background-process part of `extensions/system/` because it is already separated from Sandpiper identity behavior.
+
+Implementation target:
+
+- `packages/core/src/background-process-capability.ts` owns host-neutral start/check/completion operations over `ProcessManager`.
+- `extensions/system/background-process-tools.ts` remains the Pi adapter: tool names, descriptions, TypeBox schemas, and Pi result formatting.
+- `extensions/system/background-process-hooks.ts` remains the Pi lifecycle adapter: context and shutdown event wiring.
+
+Completion signal:
+
+- Extension code no longer calls `ProcessManager.spawn`, `get`, `getCompletedUnacknowledged`, or `acknowledge` directly; those operations live in package-owned code.
+- Existing neutral and Sandpiper extension factory behavior is unchanged.
 
 ## Task Breakdown
 

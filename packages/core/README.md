@@ -6,6 +6,7 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 
 | Module | Description |
 |--------|-------------|
+| `background-process-capability.ts` | Host-neutral background process start/check/completion operations over `ProcessManager` |
 | `migrate-pi-configs.ts` | Move/symlink pi config directories to sandpiper equivalents |
 | `preflight.ts` | Preflight check registration system (via `pi.events` bus) |
 | `install-shell-integrations.ts` | Copy shell integration scripts to `~/.sandpiper/shell-integrations/` |
@@ -18,7 +19,7 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 
 ```bash
 bun run build    # tsc --build (composite project, emits declarations)
-bun run test     # vitest (17 tests)
+bun run test     # vitest
 ```
 
 ## Usage

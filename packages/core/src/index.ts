@@ -1,3 +1,4 @@
+export * from './background-process-capability.js';
 export * from './env.js';
 export * from './host-context.js';
 export * from './install-shell-integrations.js';

@@ -1,0 +1,92 @@
+import type { ProcessInfo, ProcessManager } from './process-manager.js';
+
+export interface StartBackgroundProcessRequest {
+  readonly id: string;
+  readonly command: string;
+  readonly args?: readonly string[];
+  readonly cwd?: string;
+}
+
+export type StartBackgroundProcessResult =
+  | { readonly ok: true; readonly process: ProcessInfo }
+  | { readonly ok: false; readonly error: string };
+
+export interface CheckBackgroundProcessRequest {
+  readonly id: string;
+  readonly includeStdout?: boolean;
+  readonly includeStderr?: boolean;
+  readonly tailLines?: number;
+  readonly clearBuffer?: boolean;
+}
+
+export interface BackgroundProcessOutput {
+  readonly text: string;
+  readonly lineCount: number;
+}
+
+export type CheckBackgroundProcessResult =
+  | {
+      readonly found: true;
+      readonly process: ProcessInfo;
+      readonly stdout?: BackgroundProcessOutput;
+      readonly stderr?: BackgroundProcessOutput;
+    }
+  | { readonly found: false; readonly id: string };
+
+export interface CompletedBackgroundProcessNotification {
+  readonly id: string;
+  readonly exitCode: number | null;
+}
+
+export function startBackgroundProcess(
+  processManager: ProcessManager,
+  request: StartBackgroundProcessRequest,
+): StartBackgroundProcessResult {
+  try {
+    const process = processManager.spawn({
+      id: request.id,
+      command: request.command,
+      args: request.args,
+      cwd: request.cwd,
+    });
+
+    return { ok: true, process: process.info };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+export function checkBackgroundProcess(
+  processManager: ProcessManager,
+  request: CheckBackgroundProcessRequest,
+): CheckBackgroundProcessResult {
+  const process = processManager.get(request.id);
+  if (process === undefined) {
+    return { found: false, id: request.id };
+  }
+
+  const readOptions = { tail: request.tailLines, clear: request.clearBuffer };
+
+  return {
+    found: true,
+    process: process.info,
+    stdout: request.includeStdout
+      ? { text: process.readStdout(readOptions), lineCount: process.stdoutLineCount }
+      : undefined,
+    stderr: request.includeStderr
+      ? { text: process.readStderr(readOptions), lineCount: process.stderrLineCount }
+      : undefined,
+  };
+}
+
+export function collectCompletedBackgroundProcessNotifications(
+  processManager: ProcessManager,
+): readonly CompletedBackgroundProcessNotification[] {
+  const completed = processManager.getCompletedUnacknowledged();
+
+  for (const process of completed) {
+    processManager.acknowledge(process.id);
+  }
+
+  return completed.map((process) => ({ id: process.id, exitCode: process.exitCode }));
+}
