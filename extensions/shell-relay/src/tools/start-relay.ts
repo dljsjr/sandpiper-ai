@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
 import type { RelayRuntime } from '../types.js';
-import { withRelaySetup } from './with-relay-setup.js';
+import { executeShellRelayTool } from './operations.js';
 
 export function registerStartRelayTool(pi: ExtensionAPI, runtime: RelayRuntime): void {
   pi.registerTool({
@@ -36,45 +36,7 @@ export function registerStartRelayTool(pi: ExtensionAPI, runtime: RelayRuntime):
       ),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
-      return withRelaySetup(
-        runtime,
-        ctx,
-        params.session,
-        (msg) =>
-          `Shell Relay setup failed: ${msg}\n\n` +
-          'If this command does not require session state (auth tokens, shell functions, etc.), ' +
-          'use the bash tool instead.',
-        async () => {
-          const timeoutMs = (params.timeout ?? 30) * 1000;
-          try {
-            const result = await runtime.executeQueued(params.command, timeoutMs);
-            const renderedOutput = result.output.length > 0 ? result.output : '(no output)';
-            return {
-              content: [{ type: 'text', text: `${renderedOutput}\n\nExit code: ${result.exitCode}` }],
-              details: {
-                output: result.output,
-                exitCode: result.exitCode,
-                timedOut: result.timedOut,
-              },
-            };
-          } catch (error) {
-            const msg = error instanceof Error ? error.message : String(error);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text:
-                    `Shell Relay error: ${msg}\n\n` +
-                    'The relay pane may be unavailable or the shell integration may not be sourced. ' +
-                    'If this command does not require session state, use the bash tool instead.',
-                },
-              ],
-              details: { error: msg },
-              isError: true,
-            };
-          }
-        },
-      );
+      return executeShellRelayTool(runtime, ctx, params);
     },
   });
 }

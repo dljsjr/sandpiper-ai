@@ -18,6 +18,7 @@ Core relay behavior should stay framework-independent under `src/` (escape, sign
 | `zellij.ts` | Zellij 0.44+ CLI wrapper (paste, send-keys, --session, --pane-id, list-panes) | No |
 | `preflight.ts` | Shell integration preflight check (probes for `__relay_prompt_hook`; resolves install location through `sandpiper-ai-core`) | No |
 | `runtime.ts` | Relay setup/execution lifecycle state machine over structural host/context interfaces | No |
+| `tools/operations.ts` | Host-neutral tool execution/result shaping for relay tools | No |
 | `tools/*.ts` | Tool registration wiring (`shell_relay`, `shell_relay_inspect`) | Yes |
 | `commands/*.ts` | Slash-command registration wiring (`relay-*`) | Yes |
 | `index.ts` | Thin orchestrator (preflight + runtime + registrations + event hooks) | Yes |
