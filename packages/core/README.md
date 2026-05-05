@@ -8,6 +8,7 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 |--------|-------------|
 | `background-process-capability.ts` | Host-neutral background process start/check/completion operations over `ProcessManager` |
 | `migrate-pi-configs.ts` | Move/symlink pi config directories to sandpiper equivalents |
+| `migration-controls.ts` | Package-owned migration flag and `/migrate-pi` command operations |
 | `preflight.ts` | Preflight check registration system (via `pi.events` bus) |
 | `install-shell-integrations.ts` | Copy shell integration scripts to `~/.sandpiper/shell-integrations/` |
 | `paths.ts` | `displayPath()` — replace homedir prefix with `~` for user-facing output |
