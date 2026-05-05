@@ -1,13 +1,14 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
-import type { ProcessManager } from 'sandpiper-ai-core';
+import { collectCompletedBackgroundProcessNotifications, type ProcessManager } from 'sandpiper-ai-core';
 
 export function registerBackgroundProcessContextHooks(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.on('context', async (event) => {
-    const completed = processManager.getCompletedUnacknowledged();
+    const completed = collectCompletedBackgroundProcessNotifications(processManager);
     if (completed.length === 0) return;
 
-    const lines = completed.map((p) => `Background process "${p.id}" exited with code ${p.exitCode}.`);
-    for (const p of completed) processManager.acknowledge(p.id);
+    const lines = completed.map(
+      (process) => `Background process "${process.id}" exited with code ${process.exitCode}.`,
+    );
 
     return {
       messages: [

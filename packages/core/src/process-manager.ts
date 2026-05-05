@@ -146,15 +146,12 @@ export class ManagedProcess {
   _start(options: SpawnOptions): void {
     if (this._running) return;
 
-    console.error('options: ', options);
     const args = [...(options.args ?? [])];
-    console.error('effective args: ', args);
     const spawnOpts: SpawnOptionsWithoutStdio = {
       cwd: options.cwd,
       env: options.env ? { ...process.env, ...options.env } : process.env,
       stdio: ['pipe', 'pipe', 'pipe'],
     };
-    console.error('effective spawn opts: ', spawnOpts);
     const proc = nodeSpawn(options.command, args, spawnOpts);
 
     this.process = proc;

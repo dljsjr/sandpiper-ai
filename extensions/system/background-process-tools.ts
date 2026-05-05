@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
-import type { ProcessManager } from 'sandpiper-ai-core';
+import { checkBackgroundProcess, type ProcessManager, startBackgroundProcess } from 'sandpiper-ai-core';
 
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.registerTool({
@@ -31,31 +31,30 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       ),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
-      try {
-        const proc = processManager.spawn({
-          id: params.id,
-          command: params.command,
-          args: params.args,
-          cwd: params.cwd ?? ctx.cwd,
-        });
+      const result = startBackgroundProcess(processManager, {
+        id: params.id,
+        command: params.command,
+        args: params.args,
+        cwd: params.cwd ?? ctx.cwd,
+      });
 
+      if (!result.ok) {
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: `Background process "${params.id}" started (PID: ${proc.pid}).`,
-            },
-          ],
-          details: { id: params.id, pid: proc.pid, status: 'running' },
-        };
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        return {
-          content: [{ type: 'text' as const, text: `Failed to start background process: ${msg}` }],
-          details: { error: msg },
+          content: [{ type: 'text' as const, text: `Failed to start background process: ${result.error}` }],
+          details: { error: result.error },
           isError: true,
         };
       }
+
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: `Background process "${params.id}" started (PID: ${result.process.pid}).`,
+          },
+        ],
+        details: { id: params.id, pid: result.process.pid, status: 'running' },
+      };
     },
   });
 
@@ -79,8 +78,15 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       clear_buffer: Type.Optional(Type.Boolean({ description: 'Clear output buffers after reading (default: false)' })),
     }),
     async execute(_toolCallId, params) {
-      const proc = processManager.get(params.id);
-      if (!proc) {
+      const result = checkBackgroundProcess(processManager, {
+        id: params.id,
+        includeStdout: params.include_stdout,
+        includeStderr: params.include_stderr,
+        tailLines: params.tail_lines,
+        clearBuffer: params.clear_buffer,
+      });
+
+      if (!result.found) {
         return {
           content: [{ type: 'text' as const, text: `No background process found with ID "${params.id}".` }],
           details: { id: params.id, pid: undefined, running: false, exitCode: null, exitSignal: null },
@@ -88,27 +94,25 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
         };
       }
 
-      const readOpts = { tail: params.tail_lines, clear: params.clear_buffer };
       const parts: string[] = [];
+      const process = result.process;
 
-      parts.push(`Process "${params.id}": ${proc.running ? 'running' : 'exited'} (PID: ${proc.pid ?? 'n/a'})`);
-      if (!proc.running) {
-        parts.push(`Exit code: ${proc.exitCode}`);
+      parts.push(`Process "${params.id}": ${process.running ? 'running' : 'exited'} (PID: ${process.pid ?? 'n/a'})`);
+      if (!process.running) {
+        parts.push(`Exit code: ${process.exitCode}`);
       }
 
-      if (params.include_stdout) {
-        const stdout = proc.readStdout(readOpts);
-        parts.push(`\nSTDOUT (${proc.stdoutLineCount} lines buffered):\n${stdout || '(empty)'}`);
+      if (result.stdout) {
+        parts.push(`\nSTDOUT (${result.stdout.lineCount} lines buffered):\n${result.stdout.text || '(empty)'}`);
       }
 
-      if (params.include_stderr) {
-        const stderr = proc.readStderr(readOpts);
-        parts.push(`\nSTDERR (${proc.stderrLineCount} lines buffered):\n${stderr || '(empty)'}`);
+      if (result.stderr) {
+        parts.push(`\nSTDERR (${result.stderr.lineCount} lines buffered):\n${result.stderr.text || '(empty)'}`);
       }
 
       return {
         content: [{ type: 'text' as const, text: parts.join('\n') }],
-        details: proc.info,
+        details: process,
       };
     },
   });
