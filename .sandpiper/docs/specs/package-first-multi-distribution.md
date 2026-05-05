@@ -715,6 +715,21 @@ Completion signal:
 - Extension code no longer calls `ProcessManager.spawn`, `get`, `getCompletedUnacknowledged`, or `acknowledge` directly; those operations live in package-owned code.
 - Existing neutral and Sandpiper extension factory behavior is unchanged.
 
+#### AGENT-157 session continuity boundary slice
+
+AGENT-157 moves Sandpiper session startup state and PID-file lifecycle out of the Pi extension implementation while preserving Sandpiper identity behavior.
+
+Implementation target:
+
+- `packages/core/src/session-continuity.ts` owns `SystemRuntimeState`, startup cold-start classification, `SANDPIPER_SESSION_*` env var updates, and PID file create/remove/switch behavior.
+- `extensions/system/runtime.ts` is a compatibility re-export from `sandpiper-ai-core`.
+- `extensions/system/startup-hooks.ts` remains the Pi adapter: it reads Pi session manager values and delegates to package-owned operations.
+
+Completion signal:
+
+- Extension code no longer owns PID-file helpers, session-current tracking, or cold-start classification logic.
+- Existing startup hook and PID lifecycle tests continue to pass.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.

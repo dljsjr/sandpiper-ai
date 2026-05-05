@@ -6,6 +6,7 @@ export * from './migrate-pi-configs.js';
 export * from './paths.js';
 export * from './preflight.js';
 export * from './process-manager.js';
+export * from './session-continuity.js';
 export * from './startup-context.js';
 export * from './system-prompt.js';
 export * from './system-startup.js';
