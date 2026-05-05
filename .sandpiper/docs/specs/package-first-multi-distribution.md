@@ -730,6 +730,20 @@ Completion signal:
 - Extension code no longer owns PID-file helpers, session-current tracking, or cold-start classification logic.
 - Existing startup hook and PID lifecycle tests continue to pass.
 
+#### AGENT-158 startup prompt boundary slice
+
+AGENT-158 moves startup prompt context assembly and standup reading out of the Pi extension implementation.
+
+Implementation target:
+
+- `packages/core/src/startup-prompt.ts` owns startup prompt context collection, one-shot startup/cold-start state consumption, standup CLI/file fallback reading, and delegation to `buildSandpiperSystemPrompt`.
+- `extensions/system/startup-hooks.ts` remains the Pi adapter: it reads `before_agent_start` context and returns the host-specific system prompt replacement.
+
+Completion signal:
+
+- Extension code no longer imports startup-context collectors/formatters, filesystem standup readers, or `buildSandpiperSystemPrompt` directly.
+- Existing startup hook behavior is covered by package tests plus thin adapter tests.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
