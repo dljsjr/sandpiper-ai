@@ -2,7 +2,7 @@ import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { DynamicBorder } from '@mariozechner/pi-coding-agent';
 import { Spacer, Text } from '@mariozechner/pi-tui';
 import type { UpdateInfo } from 'sandpiper-ai-core';
-import { collectPreflightDiagnostics, detectUnmigratedConfigs, resolveEnvVar } from 'sandpiper-ai-core';
+import * as core from 'sandpiper-ai-core';
 import { getChatContainer } from './chat-container.js';
 
 export function registerDiagnosticsHooks(
@@ -10,31 +10,16 @@ export function registerDiagnosticsHooks(
   checkForUpdates: () => Promise<readonly UpdateInfo[]>,
 ): void {
   pi.on('session_start', async (_event, ctx) => {
-    const diagnostics = collectPreflightDiagnostics(pi);
-    const unmigrated = detectUnmigratedConfigs(ctx.cwd);
-    if (unmigrated.length > 0) {
-      diagnostics.push({
-        key: 'system:unmigrated-pi-configs',
-        healthy: false,
-        message: `Unmigrated pi configs detected: ${unmigrated.join(', ')}`,
-        instructions: [
-          'Migrate:  sandpiper --migrate-pi-configs',
-          'Symlink:  sandpiper --symlink-config',
-          'Or run:   /migrate-pi move',
-        ],
-      });
-    }
-
-    const unhealthy = diagnostics.filter((diagnostic) => !diagnostic.healthy);
+    const plan = core.buildSystemDiagnosticsStartupPlan({ cwd: ctx.cwd, preflightSource: pi });
 
     ctx.ui.setWidget('sandpiper-banners', (tui, theme) => {
       const chatContainer = getChatContainer(tui);
       if (chatContainer) {
-        if (unhealthy.length > 0) {
+        if (plan.unhealthyDiagnostics.length > 0) {
           chatContainer.addChild(new Spacer(1));
           chatContainer.addChild(new DynamicBorder((segment: string) => theme.fg('warning', segment)));
           chatContainer.addChild(new Text(theme.bold(theme.fg('warning', '⚠  Sandpiper Diagnostics')), 1, 0));
-          for (const diagnostic of unhealthy) {
+          for (const diagnostic of plan.unhealthyDiagnostics) {
             chatContainer.addChild(new Text(`  ${theme.fg('warning', diagnostic.message)}`, 1, 0));
             for (const instruction of diagnostic.instructions ?? []) {
               chatContainer.addChild(new Text(theme.fg('muted', `    ${instruction}`), 1, 0));
@@ -43,7 +28,7 @@ export function registerDiagnosticsHooks(
           chatContainer.addChild(new DynamicBorder((segment: string) => theme.fg('warning', segment)));
         }
 
-        if (resolveEnvVar('OFFLINE') !== '1') {
+        if (plan.shouldCheckForUpdates) {
           checkForUpdates().then((updates) => {
             for (const update of updates) {
               chatContainer.addChild(new Spacer(1));

@@ -5,16 +5,17 @@ import { createDiagnosticsStub } from './test-helpers.js';
 
 describe('registerDiagnosticsHooks', () => {
   beforeEach(() => {
-    vi.spyOn(core, 'collectPreflightDiagnostics').mockReturnValue([
-      {
-        key: 'shell-relay:integration',
-        healthy: false,
-        message: 'Shell relay integration not sourced',
-        instructions: ['source ~/.sandpiper/shell-integrations/relay.fish'],
-      },
-    ]);
-    vi.spyOn(core, 'detectUnmigratedConfigs').mockReturnValue([]);
-    vi.spyOn(core, 'resolveEnvVar').mockReturnValue('1'); // offline=true: skip update checks in this test
+    vi.spyOn(core, 'buildSystemDiagnosticsStartupPlan').mockReturnValue({
+      unhealthyDiagnostics: [
+        {
+          key: 'shell-relay:integration',
+          healthy: false,
+          message: 'Shell relay integration not sourced',
+          instructions: ['source ~/.sandpiper/shell-integrations/relay.fish'],
+        },
+      ],
+      shouldCheckForUpdates: false,
+    });
   });
 
   afterEach(() => {
@@ -41,6 +42,7 @@ describe('registerDiagnosticsHooks', () => {
       },
     );
 
+    expect(core.buildSystemDiagnosticsStartupPlan).toHaveBeenCalledWith({ cwd: '/repo', preflightSource: pi });
     expect(setWidget).toHaveBeenCalledTimes(2);
     expect(setWidget).toHaveBeenNthCalledWith(1, 'sandpiper-banners', expect.any(Function));
     expect(setWidget).toHaveBeenNthCalledWith(2, 'sandpiper-banners', undefined);
