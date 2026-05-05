@@ -16,7 +16,7 @@ Core relay behavior should stay framework-independent under `src/` (escape, sign
 | `signal.ts` | Signal channel parser (line-delimited protocol) | No |
 | `snapshot-diff.ts` | Output capture via dump-screen before/after diffing | No |
 | `zellij.ts` | Zellij 0.44+ CLI wrapper (paste, send-keys, --session, --pane-id, list-panes) | No |
-| `preflight.ts` | Shell integration preflight check (probes for `__relay_prompt_hook`) | No (imports from `sandpiper-ai-core`) |
+| `preflight.ts` | Shell integration preflight check (probes for `__relay_prompt_hook`; resolves install location through `sandpiper-ai-core`) | No |
 | `runtime.ts` | Relay setup/execution lifecycle state machine over structural host/context interfaces | No |
 | `tools/*.ts` | Tool registration wiring (`shell_relay`, `shell_relay_inspect`) | Yes |
 | `commands/*.ts` | Slash-command registration wiring (`relay-*`) | Yes |

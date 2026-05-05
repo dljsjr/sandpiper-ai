@@ -800,6 +800,20 @@ Completion signal:
 - Shell-relay runtime contains no Pi SDK imports or Pi type aliases.
 - Existing shell-relay TypeScript checks and distribution gates still pass; full shell-relay tests remain subject to their existing local harness issues.
 
+#### AGENT-163 shell-relay preflight config boundary slice
+
+AGENT-163 removes the direct Pi config-directory lookup from shell-relay preflight checks.
+
+Implementation target:
+
+- `extensions/shell-relay/src/preflight.ts` resolves the default shell-integration location through `sandpiper-ai-core` rather than importing Pi helpers.
+- Shell-relay preflight remains a framework-independent preflight checker that returns structural diagnostics.
+
+Completion signal:
+
+- Shell-relay preflight contains no Pi SDK imports or Pi type aliases.
+- Existing preflight tests, TypeScript checks, and distribution gates pass.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
