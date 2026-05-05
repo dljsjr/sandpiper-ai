@@ -828,6 +828,20 @@ Completion signal:
 - Relay tool operation code contains no Pi SDK imports or Pi type aliases.
 - New operation tests cover setup failures, command failures, empty output, inspect output, and inspect failures.
 
+#### AGENT-165 web-fetch tool operation boundary slice
+
+AGENT-165 moves web-fetch result formatting and tool execution decisions out of the Pi extension entrypoint.
+
+Implementation target:
+
+- `extensions/web-fetch/src/tool-operation.ts` owns metadata/header formatting, link-list rendering, fetch pipeline invocation, and fetch error result shaping.
+- `extensions/web-fetch/src/index.ts` remains the Pi adapter that defines tool metadata/schema and delegates execution.
+
+Completion signal:
+
+- Web-fetch operation code contains no Pi SDK imports or Pi tool-definition types.
+- New operation tests cover metadata rendering, metadata omission, link rendering, successful execution, and fetch failure shaping.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
