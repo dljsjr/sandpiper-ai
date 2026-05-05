@@ -786,6 +786,20 @@ Completion signal:
 - `packages/core/src/system-prompt.ts`, its tests, and startup prompt glue contain no Pi SDK imports or Pi type aliases.
 - Existing prompt assembly behavior is covered by the unchanged package test suite.
 
+#### AGENT-162 shell-relay runtime host boundary slice
+
+AGENT-162 removes the direct Pi API dependency from the shell-relay runtime state machine.
+
+Implementation target:
+
+- `extensions/shell-relay/src/runtime.ts` accepts a structural `RelayRuntimeHost` for persisted relay-session entries.
+- `extensions/shell-relay/src/index.ts` remains the Pi adapter that supplies the Pi extension API object and registers tools, commands, and lifecycle hooks.
+
+Completion signal:
+
+- Shell-relay runtime contains no Pi SDK imports or Pi type aliases.
+- Existing shell-relay TypeScript checks and distribution gates still pass; full shell-relay tests remain subject to their existing local harness issues.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
