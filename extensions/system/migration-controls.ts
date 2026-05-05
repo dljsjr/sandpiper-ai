@@ -1,32 +1,5 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
-import {
-  formatInstallInstructions,
-  installShellIntegrations,
-  type MigrationMode,
-  parseMigrationCommandArgs,
-  parseMigrationScope,
-  performMigration,
-} from 'sandpiper-ai-core';
-
-async function handleMigrationFlag(pi: ExtensionAPI, mode: MigrationMode, cwd: string): Promise<void> {
-  const scope = parseMigrationScope(pi.getFlag('pi-configs-global') === true, pi.getFlag('pi-configs-local') === true);
-  const result = await performMigration(mode, { cwd, scope });
-
-  if (result.success) {
-    if (result.migrated.length > 0) {
-      console.log('✓ Migration complete!');
-      for (const path of result.migrated) {
-        console.log(`  Migrated: ${path}`);
-      }
-    } else {
-      console.log('No configs to migrate.');
-    }
-    process.exit(0);
-  } else {
-    console.error(`✗ Migration failed: ${result.error}`);
-    process.exit(1);
-  }
-}
+import * as core from 'sandpiper-ai-core';
 
 export function registerMigrationControls(pi: ExtensionAPI): void {
   pi.registerFlag('install-shell-integrations', {
@@ -63,35 +36,22 @@ export function registerMigrationControls(pi: ExtensionAPI): void {
   // Migration flags trigger early-exit behavior (process.exit) before any interaction.
   // Previously session_directory; moved to session_start (Pi 0.65.0 removed session_directory).
   pi.on('session_start', async (_event, ctx) => {
-    if (pi.getFlag('install-shell-integrations')) {
-      const result = installShellIntegrations();
-      if (result.success) {
-        console.log(formatInstallInstructions(result.installedTo));
-        process.exit(0);
-      } else {
-        console.error(`✗ Install failed: ${result.error}`);
-        process.exit(1);
-      }
+    const result = await core.executeMigrationStartupControls({
+      cwd: ctx.cwd,
+      flags: {
+        installShellIntegrations: pi.getFlag('install-shell-integrations') === true,
+        migratePiConfigs: pi.getFlag('migrate-pi-configs') === true,
+        symlinkConfig: pi.getFlag('symlink-config') === true,
+        piConfigsGlobal: pi.getFlag('pi-configs-global') === true,
+        piConfigsLocal: pi.getFlag('pi-configs-local') === true,
+      },
+    });
+
+    if (result.kind === 'exit') {
+      for (const line of result.stdout) console.log(line);
+      for (const line of result.stderr) console.error(line);
+      process.exit(result.exitCode);
     }
-
-    const migrate = pi.getFlag('migrate-pi-configs');
-    const symlink = pi.getFlag('symlink-config');
-    const hasScope = pi.getFlag('pi-configs-global') || pi.getFlag('pi-configs-local');
-
-    if (hasScope && !migrate && !symlink) {
-      console.error(
-        'Error: --pi-configs-global and --pi-configs-local require --migrate-pi-configs or --symlink-config.',
-      );
-      process.exit(1);
-    }
-
-    if (migrate && symlink) {
-      console.error('Error: --migrate-pi-configs and --symlink-config are mutually exclusive.');
-      process.exit(1);
-    }
-
-    if (migrate) await handleMigrationFlag(pi, 'move', ctx.cwd);
-    if (symlink) await handleMigrationFlag(pi, 'symlink', ctx.cwd);
   });
 
   pi.registerCommand('migrate-pi', {
@@ -101,28 +61,16 @@ export function registerMigrationControls(pi: ExtensionAPI): void {
       return options.filter((option) => option.startsWith(prefix)).map((option) => ({ value: option, label: option }));
     },
     handler: async (args, ctx) => {
-      const parsed = parseMigrationCommandArgs(args ?? '');
+      const result = await core.executeMigrationCommand({ args, cwd: ctx.cwd });
 
-      if ('error' in parsed) {
-        ctx.ui.notify(parsed.error, 'error');
+      if (result.kind === 'notify') {
+        ctx.ui.notify(result.message, result.level);
         return;
       }
 
-      const result = await performMigration(parsed.mode, { cwd: ctx.cwd, scope: parsed.scope });
-
-      if (result.success) {
-        ctx.ui.setWidget('sandpiper-diagnostics', undefined);
-        const verb = parsed.mode === 'move' ? 'Migration' : 'Symlink';
-        if (result.migrated.length > 0) {
-          ctx.ui.notify(`${verb} complete. Reloading...`, 'info');
-          await ctx.reload();
-        } else {
-          ctx.ui.notify('No configs to migrate.', 'info');
-        }
-      } else {
-        const verb = parsed.mode === 'move' ? 'Migration' : 'Symlink';
-        ctx.ui.notify(`${verb} failed: ${result.error}`, 'error');
-      }
+      ctx.ui.setWidget(result.clearDiagnosticsWidget, undefined);
+      ctx.ui.notify(result.message, result.level);
+      await ctx.reload();
     },
   });
 }

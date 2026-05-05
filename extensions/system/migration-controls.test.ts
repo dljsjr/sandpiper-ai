@@ -5,14 +5,11 @@ import { createMigrationControlsStub } from './test-helpers.js';
 
 describe('registerMigrationControls', () => {
   beforeEach(() => {
-    vi.spyOn(core, 'formatInstallInstructions').mockReturnValue('source ~/.sandpiper/shell-integrations/relay.fish');
-    vi.spyOn(core, 'installShellIntegrations').mockReturnValue({ success: true, installedTo: '/tmp/install' });
-    vi.spyOn(core, 'parseMigrationScope').mockReturnValue('both');
-    vi.spyOn(core, 'performMigration').mockResolvedValue({
-      success: true,
-      migrated: ['~/.pi'],
-      skipped: [],
-      error: undefined,
+    vi.spyOn(core, 'executeMigrationStartupControls').mockResolvedValue({ kind: 'none' });
+    vi.spyOn(core, 'executeMigrationCommand').mockResolvedValue({
+      kind: 'notify',
+      message: 'No configs to migrate.',
+      level: 'info',
     });
   });
 
@@ -31,7 +28,11 @@ describe('registerMigrationControls', () => {
       throw new Error('migrate-pi command not registered');
     }
 
-    vi.spyOn(core, 'parseMigrationCommandArgs').mockReturnValue({ error: 'invalid args' });
+    vi.spyOn(core, 'executeMigrationCommand').mockResolvedValue({
+      kind: 'notify',
+      message: 'invalid args',
+      level: 'error',
+    });
     const notify = vi.fn();
     await command.handler('', {
       cwd: '/repo',
@@ -51,12 +52,11 @@ describe('registerMigrationControls', () => {
       throw new Error('migrate-pi command not registered');
     }
 
-    vi.spyOn(core, 'parseMigrationCommandArgs').mockReturnValue({ mode: 'move', scope: 'both' });
-    vi.spyOn(core, 'performMigration').mockResolvedValue({
-      success: true,
-      migrated: ['~/.pi'],
-      skipped: [],
-      error: undefined,
+    vi.spyOn(core, 'executeMigrationCommand').mockResolvedValue({
+      kind: 'reload',
+      clearDiagnosticsWidget: 'sandpiper-diagnostics',
+      message: 'Migration complete. Reloading...',
+      level: 'info',
     });
 
     const notify = vi.fn();
@@ -69,7 +69,7 @@ describe('registerMigrationControls', () => {
       ui: { notify, setWidget },
     });
 
-    expect(core.performMigration).toHaveBeenCalledWith('move', { cwd: '/repo', scope: 'both' });
+    expect(core.executeMigrationCommand).toHaveBeenCalledWith({ args: 'move', cwd: '/repo' });
     expect(setWidget).toHaveBeenCalledWith('sandpiper-diagnostics', undefined);
     expect(notify).toHaveBeenCalledWith('Migration complete. Reloading...', 'info');
     expect(reload).toHaveBeenCalled();
@@ -90,11 +90,27 @@ describe('registerMigrationControls', () => {
       throw new Error('session_start handler not registered');
     }
 
+    vi.spyOn(core, 'executeMigrationStartupControls').mockResolvedValue({
+      kind: 'exit',
+      exitCode: 1,
+      stdout: [],
+      stderr: ['Error: --migrate-pi-configs and --symlink-config are mutually exclusive.'],
+    });
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await handler({}, { cwd: '/repo' });
 
+    expect(core.executeMigrationStartupControls).toHaveBeenCalledWith({
+      cwd: '/repo',
+      flags: {
+        installShellIntegrations: false,
+        migratePiConfigs: true,
+        symlinkConfig: true,
+        piConfigsGlobal: false,
+        piConfigsLocal: false,
+      },
+    });
     expect(errorSpy).toHaveBeenCalledWith('Error: --migrate-pi-configs and --symlink-config are mutually exclusive.');
     expect(exitSpy).toHaveBeenCalledWith(1);
   });

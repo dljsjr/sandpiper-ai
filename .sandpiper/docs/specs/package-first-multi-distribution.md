@@ -744,6 +744,20 @@ Completion signal:
 - Extension code no longer imports startup-context collectors/formatters, filesystem standup readers, or `buildSandpiperSystemPrompt` directly.
 - Existing startup hook behavior is covered by package tests plus thin adapter tests.
 
+#### AGENT-159 migration controls boundary slice
+
+AGENT-159 moves migration flag and `/migrate-pi` command behavior decisions out of the Pi extension implementation.
+
+Implementation target:
+
+- `packages/core/src/migration-controls.ts` owns migration startup flag validation/results, shell-integration install result shaping, and `/migrate-pi` command result decisions.
+- `extensions/system/migration-controls.ts` remains the Pi adapter: flag/command registration, reading Pi flags, console/process-exit behavior, and UI notification/reload calls.
+
+Completion signal:
+
+- Extension code no longer imports migration parsers, scope resolution, shell integration installation, or migration execution directly.
+- Existing migration-control behavior is covered by package tests plus thin adapter tests.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
