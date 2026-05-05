@@ -15,6 +15,7 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | `session-continuity.ts` | Sandpiper session startup state, env vars, and PID file lifecycle operations |
 | `startup-context.ts` | Collect compact startup prompt context (projects, active tasks, working-copy summary) |
 | `startup-prompt.ts` | Assemble Sandpiper startup prompt context and standup content for the Pi adapter |
+| `system-diagnostics.ts` | Package-owned diagnostics startup planning and update-check gating |
 | `system-startup.ts` | Build Sandpiper startup prompt sections and cold-start heuristics |
 | `update-check.ts` | Check for pi update availability and install command suggestions |
 

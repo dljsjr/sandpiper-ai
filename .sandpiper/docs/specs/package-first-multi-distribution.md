@@ -758,6 +758,20 @@ Completion signal:
 - Extension code no longer imports migration parsers, scope resolution, shell integration installation, or migration execution directly.
 - Existing migration-control behavior is covered by package tests plus thin adapter tests.
 
+#### AGENT-160 diagnostics boundary slice
+
+AGENT-160 moves startup diagnostics planning out of the Pi extension implementation while leaving TUI rendering in the adapter.
+
+Implementation target:
+
+- `packages/core/src/system-diagnostics.ts` owns preflight collection, unmigrated Pi config diagnostics, unhealthy filtering, and offline update-check gating.
+- `extensions/system/diagnostics-hooks.ts` remains the Pi/TUI adapter: hook registration, transient chat-container injection, and update banner component rendering.
+
+Completion signal:
+
+- Extension code no longer imports preflight collectors, Pi-config migration detection, or env resolution directly for diagnostics decisions.
+- Existing diagnostics behavior is covered by package tests plus thin adapter tests.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
