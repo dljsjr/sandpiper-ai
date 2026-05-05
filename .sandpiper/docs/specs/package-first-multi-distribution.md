@@ -772,6 +772,20 @@ Completion signal:
 - Extension code no longer imports preflight collectors, Pi-config migration detection, or env resolution directly for diagnostics decisions.
 - Existing diagnostics behavior is covered by package tests plus thin adapter tests.
 
+#### AGENT-161 system prompt type boundary slice
+
+AGENT-161 removes the last Pi SDK type dependency from package-owned system prompt assembly.
+
+Implementation target:
+
+- `packages/core/src/system-prompt.ts` defines host-neutral prompt option, context-file, and skill shapes for the data it consumes.
+- `packages/core/src/startup-prompt.ts` keeps deriving its input type from the core system prompt builder, not from Pi SDK declarations.
+
+Completion signal:
+
+- `packages/core/src/system-prompt.ts`, its tests, and startup prompt glue contain no Pi SDK imports or Pi type aliases.
+- Existing prompt assembly behavior is covered by the unchanged package test suite.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
