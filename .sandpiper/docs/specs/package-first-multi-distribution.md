@@ -814,6 +814,20 @@ Completion signal:
 - Shell-relay preflight contains no Pi SDK imports or Pi type aliases.
 - Existing preflight tests, TypeScript checks, and distribution gates pass.
 
+#### AGENT-164 shell-relay tool operation boundary slice
+
+AGENT-164 moves relay tool execution/result shaping out of Pi registration files.
+
+Implementation target:
+
+- `extensions/shell-relay/src/tools/operations.ts` owns setup failure rendering, command execution result rendering, inspect-pane rendering, and relay/inspect error rendering.
+- `extensions/shell-relay/src/tools/start-relay.ts` and `inspect-pane.ts` remain Pi adapters that define tool metadata/schema and call host-neutral operations.
+
+Completion signal:
+
+- Relay tool operation code contains no Pi SDK imports or Pi type aliases.
+- New operation tests cover setup failures, command failures, empty output, inspect output, and inspect failures.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
