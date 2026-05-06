@@ -213,7 +213,7 @@ Bun is the preferred runtime for CLI development:
 
 | File | Purpose |
 |------|---------|
-| `packages/cli/pi_wrapper.ts` | CLI entry point for Sandpiper |
+| `packages/cli/sandpiper_standalone.ts` | CLI entry point for Sandpiper |
 | `packages/cli/package.json` | Package metadata with bin configuration |
 | `packages/sandpiper-tasks-cli/src/commands/project-cmd.ts` | Commander command wiring |
 | `packages/sandpiper-tasks-cli/src/core/project-metadata.ts` | Core implementation logic |

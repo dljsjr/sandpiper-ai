@@ -36,6 +36,14 @@ function runStandalone(args: readonly string[], env: NodeJS.ProcessEnv): string 
   });
 }
 
+function runSandpiperBin(args: readonly string[], env: NodeJS.ProcessEnv): string {
+  return execFileSync(bunExecutable, ['./packages/cli/bin/sandpiper', ...args], {
+    cwd: repoRoot,
+    encoding: 'utf-8',
+    env,
+  });
+}
+
 function runStandaloneHelp(args: readonly string[] = []): string {
   const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-smoke-'));
   try {
@@ -55,15 +63,36 @@ function countFlagLines(output: string, flag: string): number {
 }
 
 describe('standalone Sandpiper CLI smoke', () => {
-  it('declares a stable workspace bin for standalone dogfooding', () => {
+  it('declares stable workspace bins for the Sandpiper runtime', () => {
     const rootPackage = readPackageJson(join(repoRoot, 'package.json'));
     const cliPackage = readPackageJson(join(repoRoot, 'packages', 'cli', 'package.json'));
 
     expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe(rootPackage.version);
+    expect(cliPackage.bin?.sandpiper).toBe('./bin/sandpiper');
     expect(cliPackage.bin?.['sandpiper-standalone']).toBe('./bin/sandpiper-standalone');
+    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper'))).toBe(true);
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(true);
+    expect(cliPackage.scripts?.preinstall).toContain('build:sandpiper');
     expect(cliPackage.scripts?.preinstall).toContain('build:standalone');
   });
+
+  it('runs the normal sandpiper bin through the standalone runtime', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-bin-smoke-'));
+
+    try {
+      const output = runSandpiperBin(
+        ['--help', '--no-extensions', '--no-skills', '--no-prompt-templates', '--no-themes', '--no-context-files'],
+        standaloneEnv({
+          SANDPIPER_CODING_AGENT_DIR: join(tempDir, 'agent'),
+        }),
+      );
+
+      expect(output).toContain('--migrate-pi-configs');
+      expect(output).toContain('--install-shell-integrations');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  }, 15_000);
 
   it('loads Sandpiper extension flags through the explicit standalone entrypoint', () => {
     const output = runStandaloneHelp([

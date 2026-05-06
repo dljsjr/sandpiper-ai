@@ -31,7 +31,7 @@ The build pipeline has three stages.
 
 Only actual distributable binaries and declaration-emitting workspace packages need build steps:
 
-- `packages/cli/` — `bun build` bundles `pi_wrapper.ts` → `dist/sandpiper`, then runs `copy_pi_assets.ts`
+- `packages/cli/` — `bun build` bundles `sandpiper_standalone.ts` → `dist/sandpiper` and `dist/standalone/sandpiper_standalone.js`, then runs `copy_pi_assets.ts`
 - `packages/sandpiper-tasks-cli/` — `bun build` bundles the CLI → `skills/sandpiper/tasks/scripts/sandpiper-tasks`
 - `packages/core/` — `tsc --build` emits declarations and package dist artifacts
 

@@ -35,6 +35,8 @@ describe('Pi package distribution smoke', () => {
       prompts: ['./packages/resources/prompts'],
       themes: ['./packages/resources/themes'],
     });
+    expect(rootPackageJson.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
+    expect(rootPackageJson.bin).toEqual({ sandpiper: './packages/cli/bin/sandpiper' });
     expect(rootPackageJson).not.toHaveProperty('files');
   });
 

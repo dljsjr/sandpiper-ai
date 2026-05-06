@@ -11,6 +11,14 @@
   "keywords": [
     "pi-package"
   ],
+  "bin": {
+    "sandpiper": "./packages/cli/bin/sandpiper"
+  },
+  "piConfig": {
+    "name": "sandpiper",
+    "configDir": ".sandpiper",
+    "bin": "sandpiper"
+  },
   "pi": {
     "extensions": [
       "./plugins/pi/extensions"
@@ -40,18 +48,19 @@
     "test:neutral-pi-package": "bun run build:neutral-pi-package && vitest run devtools/neutralPiPackage.test.ts devtools/neutralPiPackageSmoke.test.ts",
     "test:standalone-app": "vitest run devtools/standaloneSandpiperApp.test.ts && vitest run devtools/standaloneSandpiperAppCompile.test.ts && vitest run devtools/standaloneSandpiperAppRuntime.test.ts",
     "test:claude-plugin": "bun run prepare:distribution && bun --filter sandpiper-adapter-claude-code build && vitest run packages/adapter-claude-code/src/autotoon-post-tool-use.test.ts devtools/claudeCodePlugin.test.ts devtools/claudeCodePluginHookSmoke.test.ts",
-    "build:legacy-cli": "mkdir -p packages/cli/dist && bun build --production --minify --target=node ./packages/cli/pi_wrapper.ts --outfile ./packages/cli/dist/sandpiper",
+    "build:sandpiper-cli": "bun --filter sandpiper-ai-cli build:sandpiper",
     "build:neutral-pi-package": "bun run --bun devtools/neutralPiPackage.ts",
     "prepare:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts",
     "build:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts --compile",
     "prepare:claude-plugin": "bun run prepare:distribution && bun --bun devtools/claudeCodePlugin.ts",
     "build:claude-plugin": "bun run prepare:distribution && bun --bun devtools/claudeCodePlugin.ts --build",
-    "prepare:distribution": "bun --filter sandpiper-ai-core build && bun --filter sandpiper-standup-cli build && bun --filter sandpiper-tasks-cli build && bun run build:legacy-cli && bash devtools/postinstall.sh && bun run build:neutral-pi-package",
+    "prepare:distribution": "bun --filter sandpiper-ai-core build && bun --filter sandpiper-standup-cli build && bun --filter sandpiper-tasks-cli build && bun run build:sandpiper-cli && bash devtools/postinstall.sh && bun run build:neutral-pi-package",
     "build": "bun --filter sandpiper-ai-cli build",
     "build:standalone": "bun --filter sandpiper-ai-cli build:standalone",
     "vendor": "bash devtools/vendor.sh",
     "clean": "bun devtools/clean.ts",
-    "sandpiper-dev": "bun run --bun ./packages/cli/pi_wrapper.ts",
+    "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
+    "sandpiper-built": "bun ./packages/cli/dist/sandpiper",
     "sandpiper-standalone-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
     "sandpiper-standalone-built": "bun ./packages/cli/dist/standalone/sandpiper_standalone.js"
   },

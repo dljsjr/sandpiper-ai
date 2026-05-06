@@ -33,7 +33,7 @@ export function getShellIntegrationsDir(hostContext?: HostContext): string {
 
 /**
  * Locate the shell integration source scripts within the sandpiper package.
- * Reads PI_PACKAGE_DIR (set by pi_wrapper.ts) to find the dist root.
+ * Reads PI_PACKAGE_DIR (set by the Sandpiper runtime) to find the package/dist root.
  */
 function getSourceDir(): string | undefined {
   const packageDir = process.env.PI_PACKAGE_DIR;

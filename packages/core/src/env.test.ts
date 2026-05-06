@@ -48,7 +48,7 @@ describe('resolveEnvVar', () => {
   });
 
   it('should return PI_* for all exempt var names', () => {
-    // These are set by pi_wrapper.ts — just verify they don't throw
+    // These are set by the Sandpiper runtime — just verify they don't throw
     for (const name of ['PACKAGE_DIR', 'CODING_AGENT_PACKAGE', 'CODING_AGENT_VERSION', 'SKIP_VERSION_CHECK']) {
       expect(() => resolveEnvVar(name)).not.toThrow();
     }
