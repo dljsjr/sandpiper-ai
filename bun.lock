@@ -59,6 +59,17 @@
         "@sinclair/typebox": "*",
       },
     },
+    "extensions/system": {
+      "name": "sandpiper-system",
+      "dependencies": {
+        "sandpiper-ai-core": "0.0.1",
+      },
+      "peerDependencies": {
+        "@mariozechner/pi-coding-agent": "*",
+        "@mariozechner/pi-tui": "*",
+        "@sinclair/typebox": "*",
+      },
+    },
     "extensions/web-fetch": {
       "name": "web-fetch",
       "version": "0.0.1",
@@ -109,6 +120,10 @@
     },
     "packages/core": {
       "name": "sandpiper-ai-core",
+      "version": "0.0.1",
+    },
+    "packages/resources": {
+      "name": "sandpiper-resources",
       "version": "0.0.1",
     },
     "packages/sandpiper-standup-cli": {
@@ -1091,7 +1106,11 @@
 
     "sandpiper-capability-autotoon": ["sandpiper-capability-autotoon@workspace:packages/capability-autotoon"],
 
+    "sandpiper-resources": ["sandpiper-resources@workspace:packages/resources"],
+
     "sandpiper-standup-cli": ["sandpiper-standup-cli@workspace:packages/sandpiper-standup-cli"],
+
+    "sandpiper-system": ["sandpiper-system@workspace:extensions/system"],
 
     "sandpiper-tasks-cli": ["sandpiper-tasks-cli@workspace:packages/sandpiper-tasks-cli"],
 

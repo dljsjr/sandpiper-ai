@@ -51,4 +51,4 @@ pi-session*.html
 .sandpiper/jj-workspaces/
 
 # skill-creator ephemeral eval workspaces (generated next to each skill)
-skills/*/*-workspace/
+packages/resources/skills/*/*-workspace/

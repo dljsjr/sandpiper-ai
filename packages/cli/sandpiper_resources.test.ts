@@ -59,12 +59,15 @@ function applyFactories(factories: readonly ExtensionFactory[]): ReturnType<type
 }
 
 describe('Sandpiper resource adapter', () => {
-  it('maps the current repository resource roots explicitly', () => {
+  it('maps the package-owned resource roots explicitly', () => {
     const paths = resolveSandpiperResourcePaths('/repo');
 
-    expect(paths.skillPaths).toEqual([join('/repo', 'skills', 'sandpiper'), join('/repo', 'skills', 'third-party')]);
-    expect(paths.promptPaths).toEqual([join('/repo', 'prompts')]);
-    expect(paths.themePaths).toEqual([join('/repo', 'themes')]);
+    expect(paths.skillPaths).toEqual([
+      join('/repo', 'packages', 'resources', 'skills', 'sandpiper'),
+      join('/repo', 'packages', 'resources', 'skills', 'third-party'),
+    ]);
+    expect(paths.promptPaths).toEqual([join('/repo', 'packages', 'resources', 'prompts')]);
+    expect(paths.themePaths).toEqual([join('/repo', 'packages', 'resources', 'themes')]);
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {

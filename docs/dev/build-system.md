@@ -19,7 +19,7 @@ Not all changes require a build step. Here's what to do after different types of
 | You changed... | Then run... | Why |
 |----------------|-------------|-----|
 | Extension source (`extensions/`) | `bash devtools/postinstall.sh` | Extensions load from source, no build needed |
-| Skills, prompts, themes | `bash devtools/postinstall.sh` | These are copied, not built |
+| Shared skills, prompts, themes (`packages/resources/`) | `bash devtools/postinstall.sh` | These are copied, not built |
 | `packages/cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
@@ -45,10 +45,10 @@ bun run build:standalone-app
 
 **`packages/sandpiper-tasks-cli/`**:
 ```bash
-bun build src/index.ts --outdir skills/sandpiper/tasks/scripts/
+bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-tasks
 ```
 - Bundles the task management CLI
-- Output is a skill script
+- `postinstall.sh` links the built CLI into the tasks skill script directory
 
 **`packages/core/`**:
 ```bash
@@ -92,7 +92,7 @@ bash devtools/postinstall.sh
 
 This script:
 1. Removes stale nested package artifacts from `dist/` (`claude-plugin`, `neutral-pi-package`, `standalone-package`)
-2. Copies extensions, skills, prompts, themes to `dist/`
+2. Copies extensions and package-owned shared resources to `dist/`
 3. Preserves extension `src/` trees (so `pi.extensions` entries resolve)
 4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist
 5. Symlinks Pi's internal assets
@@ -131,7 +131,7 @@ The `dist/` directory is the **Sandpiper Pi/npm package assembly**, not a depend
 
 **What `dist/` contains**:
 - Extension source trees (not bundled)
-- Skills, prompts, themes
+- Skills, prompts, themes copied from `packages/resources/`
 - Package binaries (from build step)
 - `dist/package.json` with `pi` key and `sandpiper` bin
 
@@ -166,7 +166,7 @@ Packages emit binaries or declarations — build first, then assemble.
 ### After Skill/Prompt/Theme Changes
 
 ```bash
-# Changed: skills/, prompts/, themes/
+# Changed: packages/resources/skills/, packages/resources/prompts/, packages/resources/themes/
 bash devtools/postinstall.sh
 ```
 
@@ -186,7 +186,7 @@ The supported local install roots are:
 
 | Ecosystem path | Source root | Gate |
 | --- | --- | --- |
-| source-root workspace clone | repository root after clone | root `package.json` is npm-installable for development but intentionally does not declare Pi package metadata |
+| source-root workspace clone | repository root after clone | root `package.json` is npm-installable for development and any Pi package routing points only at provider/package-owned paths |
 | `pi install npm:sandpiper-ai` / `pi install <dist>` | published/local package built from `dist/` | `dist/package.json` has no `private`, owns Sandpiper `piConfig` and `pi` resource paths, uses npm-compatible runtime deps and `file:` support packages, and `npm pack --dry-run --json` excludes nested generated artifacts |
 | neutral Pi local/npm artifact | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/` plus no Sandpiper `piConfig` or `sandpiper` bin |
 | Claude plugin marketplace/npm install | root `.claude-plugin/marketplace.json` plus `dist/claude-plugin/` | `claude plugin validate` passes for both marketplace and plugin manifests; plugin package metadata has author/repository/license and no `private` |

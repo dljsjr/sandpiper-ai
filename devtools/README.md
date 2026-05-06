@@ -100,7 +100,7 @@ bun run test:claude-plugin
 
 `devtools/ecosystemPackage.test.ts` is the release/install compatibility gate. It checks that:
 
-- the repository root contains no `catalog:` or `workspace:*` dependency specs and does not declare Pi package metadata;
+- the repository root contains no `catalog:` or `workspace:*` dependency specs and any root Pi package routing points only at provider/package-owned paths;
 - generated Pi package artifacts under `dist/` and `dist/neutral-pi-package/` have npm-compatible manifests, no `private`, valid `file:` dependency targets, and no leaked scratch logs/PIDs;
 - the root `dist/` package uses a `files` whitelist so nested generated artifacts are not included by `npm pack`.
 

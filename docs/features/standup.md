@@ -11,7 +11,7 @@ Standup provides cross-session context handoff, allowing the AI to maintain cont
 ## Related Documentation
 
 - [Concurrent Sessions Design](../.sandpiper/docs/concurrent-sessions.md)
-- [Standup Skill](../skills/sandpiper/standup/SKILL.md)
+- [Standup Skill](../../packages/resources/skills/sandpiper/standup/SKILL.md)
 
 ---
 

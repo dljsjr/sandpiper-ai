@@ -113,10 +113,10 @@ interface BunRuntime {
 declare const Bun: BunRuntime;
 
 const CLAUDE_PLUGIN_COPY_ENTRIES: readonly CopyEntry[] = [
-  { from: 'skills/sandpiper', to: 'skills/sandpiper' },
-  { from: 'skills/third-party', to: 'skills/third-party' },
-  { from: 'prompts', to: 'commands' },
-  { from: 'themes', to: 'themes' },
+  { from: 'packages/resources/skills/sandpiper', to: 'skills/sandpiper' },
+  { from: 'packages/resources/skills/third-party', to: 'skills/third-party' },
+  { from: 'packages/resources/prompts', to: 'commands' },
+  { from: 'packages/resources/themes', to: 'themes' },
 ];
 
 const ROOT_OPTIONAL_COPY_ENTRIES: readonly CopyEntry[] = [

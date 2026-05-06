@@ -74,7 +74,7 @@ $ sandpiper-tasks task archive -p PKM
 Archived 1 task from PKM.
 ```
 
-See the [tasks skill](../../skills/sandpiper/tasks/SKILL.md) for comprehensive usage documentation.
+See the [tasks skill](../resources/skills/sandpiper/tasks/SKILL.md) for comprehensive usage documentation.
 
 ## Architecture
 
@@ -141,7 +141,7 @@ updated_at: 2026-03-24T00:00:00Z
 Description and acceptance criteria here.
 ```
 
-See [SPEC.md](../../skills/sandpiper/tasks/references/SPEC.md) for the full specification.
+See [SPEC.md](../resources/skills/sandpiper/tasks/references/SPEC.md) for the full specification.
 
 ## Related design docs
 

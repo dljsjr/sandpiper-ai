@@ -521,7 +521,7 @@ Use this to orient on what was done, what's planned next, and any important cont
 ### Related Docs
 
 - `.sandpiper/docs/concurrent-sessions.md` - Full design
-- `skills/sandpiper/standup/SKILL.md` - Standup skill
+- `packages/resources/skills/sandpiper/standup/SKILL.md` - Standup skill
 
 ---
 
