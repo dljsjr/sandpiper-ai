@@ -16,15 +16,15 @@ This is a large structural refactor. The work should proceed through seams, test
 
 ## Context
 
-The current repository is both a Bun workspace and a Pi package:
+The current repository is a Bun workspace with legacy top-level Pi resource source directories and generated Pi package artifacts:
 
 - package source lives in `packages/`
-- Pi extensions live in `extensions/`
-- skills live in `skills/`
-- prompts live in `prompts/`
-- themes live in `themes/`
-- `devtools/postinstall.sh` assembles a Pi package in `dist/`
-- the root `package.json` declares `piConfig`, `pi.extensions`, `pi.skills`, `pi.prompts`, and `pi.themes`
+- legacy Pi extension entrypoints still live in `extensions/`
+- skills still live in `skills/`
+- prompts still live in `prompts/`
+- themes still live in `themes/`
+- `devtools/postinstall.sh` assembles the Sandpiper Pi/npm package in `dist/`
+- the root `package.json` is no longer the canonical Pi package manifest; generated artifacts own `piConfig` and `pi` resource declarations
 
 That shape made sense while Sandpiper was primarily a rebranded Pi package. It now couples unrelated concerns:
 
@@ -846,12 +846,12 @@ Completion signal:
 
 AGENT-169 records the remaining root-assembly blockers before any deletion or resource-path migration. The goal is to make the target explicit enough that later subtasks can add invariants and then move/remove code surgically.
 
-Current blockers:
+AGENT-169 start-state blockers:
 
 | Area | Current root-owned behavior | Retirement implication |
 | --- | --- | --- |
-| Root `package.json` Pi identity | The repository root still declares `piConfig`, `keywords: ["pi-package"]`, `files: ["./dist"]`, `bin.sandpiper`, and canonical `pi.extensions` / `pi.skills` / `pi.prompts` / `pi.themes` entries. | The source root still looks like a canonical Pi package. Final retirement should make generated artifacts own Pi package metadata while the root remains a workspace/development package. |
-| Legacy `dist/` assembly | `devtools/postinstall.sh` copies top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist/`, then `devtools/distPackageJson.ts` copies root `piConfig` and `pi` into `dist/package.json`. | `dist/` should continue to be publishable/installable, but its manifest should be generated from artifact-owned resource declarations rather than inherited root metadata. |
+| Root `package.json` Pi identity | At AGENT-169 start, the repository root still declared `piConfig`, `keywords: ["pi-package"]`, `files: ["./dist"]`, `bin.sandpiper`, and canonical `pi.extensions` / `pi.skills` / `pi.prompts` / `pi.themes` entries. AGENT-171 removes those root Pi-package declarations. | Generated artifacts own Pi package metadata while the root remains a workspace/development package. |
+| Legacy `dist/` assembly | At AGENT-169 start, `devtools/postinstall.sh` copied top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist/`, then `devtools/distPackageJson.ts` copied root `piConfig` and `pi` into `dist/package.json`. AGENT-170/171 make `distPackageJson.ts` synthesize artifact-owned Pi metadata instead. | `dist/` should continue to be publishable/installable, but its manifest is generated from artifact-owned resource declarations rather than inherited root metadata. |
 | Root resource directories | Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` are still authored source directories and are copied into every artifact. | Removing or relocating these paths is a later step. Do not delete them until generated/package-owned replacements and compatibility bridges are verified. |
 | Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, skills, prompts, themes, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading, but it still depends on root resource directory layout as input. |
 | Neutral Pi package | `devtools/neutralPiPackage.ts` explicitly copies a neutral subset from root extension/resource directories and generates its own neutral manifest. | This is closer to the target, but still consumes root resource directories as source inputs. Later package ownership should reduce this copy list to package-owned resources/bridges. |
@@ -881,6 +881,22 @@ Implementation target:
 Completion signal:
 
 - The generated `dist/` package remains installable/loadable.
+- `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution` passes.
+
+#### AGENT-171 root package manifest retirement slice
+
+AGENT-171 removes Pi-package identity from the source root while preserving generated Sandpiper Pi package behavior.
+
+Implementation target:
+
+- Root `package.json` no longer declares `piConfig`, `pi`, `keywords: ["pi-package"]`, `files: ["./dist"]`, or root-level package `bin` entries.
+- Distribution tests assert the repository root remains npm-installable as a workspace but is not itself a Pi package manifest.
+- `packages/cli/pi_wrapper.ts` resolves source/dev runs to the generated `dist/` package metadata when the repository root is only a workspace package.
+
+Completion signal:
+
+- `dist/package.json` still contains the Sandpiper `piConfig`, `pi` resource paths, `pi-package` keyword, and `sandpiper` bin.
+- Focused package-dir, distribution smoke, and ecosystem package tests pass.
 - `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution` passes.
 
 ## Task Breakdown

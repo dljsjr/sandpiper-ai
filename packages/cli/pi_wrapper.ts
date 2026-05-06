@@ -2,11 +2,12 @@
 
 process.title = 'sandpiper';
 
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { realpath } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { main } from '@mariozechner/pi-coding-agent';
+import { findPiPackageDir } from './pi_package_dir.js';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const upstreamPiDistDir: string = await realpath(
@@ -18,33 +19,10 @@ const piPkgJson = JSON.parse(readFileSync(join(upstreamPiPackageDir, 'package.js
 const piVersion = piPkgJson.version;
 
 // Find the package directory that pi should use as its root.
-// Walk up from the script location until we find a package.json with the `pi`
-// key (which declares extensions/skills/prompts/themes resource paths).
 // - In dist: dist/sandpiper → dist/package.json (generated with pi + piConfig)
-// - In dev via .bin symlink: packages/cli/dist/sandpiper → walks up to repo root
-// - In dev direct: packages/cli/pi_wrapper.ts → walks up to repo root
-function findPackageDir(startDir: string): string {
-  let dir = startDir;
-  const root = resolve('/');
-  while (dir !== root) {
-    const pkgPath = join(dir, 'package.json');
-    if (existsSync(pkgPath)) {
-      try {
-        const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
-        if (pkg.pi) {
-          return dir;
-        }
-      } catch {
-        // Not valid JSON or not readable — keep walking
-      }
-    }
-    dir = dirname(dir);
-  }
-  // Fallback: two levels up (original behavior)
-  return resolve(join(startDir, '..', '..'));
-}
-
-const overridesPackageDir = findPackageDir(scriptDir);
+// - In dev: source entrypoints use the generated dist/package.json. The repository
+//   root package.json is a workspace manifest, not a Pi package manifest.
+const overridesPackageDir = findPiPackageDir(scriptDir);
 //
 // ── Explicit PI_* variables ──
 // These are exempt from SANDPIPER_* ↔ PI_* mirroring.
