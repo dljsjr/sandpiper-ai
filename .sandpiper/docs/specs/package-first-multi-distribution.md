@@ -456,13 +456,13 @@ bun run test:standalone
 bun --filter sandpiper-ai-core build
 bun --filter sandpiper-standup-cli build
 bun --filter sandpiper-tasks-cli build
-(cd packages/cli && mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper)
+bun --filter sandpiper-ai-cli build:sandpiper
 bash devtools/postinstall.sh
 rg -n "@mariozechner|ExtensionAPI|ToolDefinition|McpServer|@modelcontextprotocol" packages/capability-autotoon/src/core.ts
 rg -n "@toon-format/toon|pi\\.on\\('tool_result'|function tryConvertJsonToToon" extensions/autotoon --glob '*.ts'
 ```
 
-The narrow `packages/cli` build command above prepares the legacy CLI artifact that `postinstall.sh` expects without invoking the standalone bundle target; the standalone target still has known native-asset follow-up work for AGENT-91.
+The narrow `packages/cli` build command above prepares the generated `dist/sandpiper` runtime artifact that `postinstall.sh` expects without rebuilding every distribution target.
 
 Expected invariant-search results:
 
@@ -877,6 +877,7 @@ Next AGENT-93 subtasks:
 | AGENT-176 | Revise root-router architecture invariants. | Spec and tests allow root runtime/package routing metadata while forbidding root `pi` manifest entries that point at top-level resource source dirs. |
 | AGENT-177 | Move shared resources to `packages/resources/`. | Top-level `skills/`, `prompts/`, and `themes/` are absent; source, runtime discovery, and distribution/plugin assemblers consume `packages/resources/`. |
 | AGENT-178 | Move neutral Pi install surface to `plugins/pi/`. | Root and generated neutral Pi manifests route through `./plugins/pi/extensions` plus `./packages/resources/...`; no root `pi` entry points at top-level resource dirs. |
+| AGENT-179 | Promote standalone runtime to `sandpiper`. | Root/package `sandpiper` bins use the deferred-import standalone runtime; `sandpiper-standalone` remains only as a compatibility alias. |
 
 #### AGENT-170 generated dist manifest invariant slice
 
@@ -901,7 +902,7 @@ Interim implementation target:
 
 - Root `package.json` no longer declares `piConfig`, `pi`, `keywords: ["pi-package"]`, `files: ["./dist"]`, or root-level package `bin` entries.
 - Interim distribution tests asserted the repository root remained npm-installable as a workspace while root Pi metadata was absent.
-- `packages/cli/pi_wrapper.ts` resolves source/dev runs to the generated `dist/` package metadata when the repository root is only a workspace package.
+- `packages/cli/pi_wrapper.ts` resolved source/dev runs to the generated `dist/` package metadata during the interim wrapper phase. AGENT-179 moves the normal `sandpiper` bin to the deferred-import runtime.
 
 Completion signal:
 
@@ -944,6 +945,15 @@ Verification target:
 - Tests fail if root `pi` entries point at top-level `./extensions`, `./skills`, `./prompts`, or `./themes` source directories.
 - Stock Pi loading from the root package should exercise only neutral Pi resources.
 - Sandpiper runtime loading should exercise Sandpiper identity through programmatic extension factories, not through root Pi package installation.
+
+#### AGENT-179 runtime promotion
+
+AGENT-179 makes `sandpiper_standalone.ts` the normal Sandpiper runtime:
+
+- Root `package.json` declares `bin.sandpiper` and Sandpiper `piConfig`, while its `pi` manifest remains neutral/provider-owned.
+- `packages/cli/bin/sandpiper` is the stable workspace bin shim for the deferred-import runtime.
+- `packages/cli/dist/sandpiper` is built from `sandpiper_standalone.ts`; `sandpiper-standalone` remains a compatibility alias over `dist/standalone/sandpiper_standalone.js`.
+- `pi_wrapper.ts` remains as temporary legacy code until generated distribution assembly is retired.
 
 ## Task Breakdown
 

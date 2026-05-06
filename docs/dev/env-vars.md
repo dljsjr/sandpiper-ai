@@ -8,7 +8,7 @@ Sandpiper mirrors `PI_*` environment variables into the `SANDPIPER_*` namespace 
 
 ## The Mirroring Model
 
-At startup, `pi_wrapper.ts` performs two-phase mirroring:
+At startup, the Sandpiper CLI runtime performs two-phase mirroring:
 
 1. **PI → SANDPIPER** — When a `SANDPIPER_*` var is not already set
 2. **SANDPIPER → PI** — Unconditionally, so Sandpiper overrides win

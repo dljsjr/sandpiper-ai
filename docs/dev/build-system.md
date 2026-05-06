@@ -34,12 +34,12 @@ Only packages that emit distributable artifacts need build steps:
 
 **`packages/cli/`**:
 ```bash
-bun build --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper
+bun build --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outfile ./dist/sandpiper
 bun build --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone
 bun run build:standalone-app
 ```
-- Bundles the legacy Sandpiper CLI wrapper
-- Bundles the dogfood standalone CLI target
+- Bundles the normal `sandpiper` runtime from the deferred-import standalone entrypoint
+- Bundles the compatibility `sandpiper-standalone` alias target
 - Builds the standalone app-bundle artifact at `dist/standalone-sandpiper/`
 - Copies Pi assets (themes, export templates)
 
@@ -123,7 +123,7 @@ bun run build:claude-plugin
 
 This writes `dist/claude-plugin/` with Claude plugin metadata, copied skills/commands/themes, materialized helper CLIs, hook configuration, a bundled `hooks/autotoon-post-tool-use.js` script, and npm package metadata for `sandpiper-claude-code-plugin`. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific hook glue lives in `packages/adapter-claude-code/` and adapts host-neutral capability code. The repository root also contains `.claude-plugin/marketplace.json`, which validates as a Claude marketplace and points marketplace installs at the npm plugin package.
 
-Automatic package installation is intentionally opt-in. The standalone CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The standalone dogfood launcher is linked as `node_modules/.bin/sandpiper-standalone` from a stable checked-in bin shim, while the generated dogfood bundle lives at `packages/cli/dist/standalone/sandpiper_standalone.js`. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
+Automatic package installation is intentionally opt-in. The normal Sandpiper CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The `sandpiper` and `sandpiper-standalone` workspace bins are stable checked-in shims over generated Bun bundles. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
 ## Understanding `dist/`
 
@@ -155,7 +155,7 @@ Extensions load from source via jiti — no build step needed.
 ### After Package Changes
 
 ```bash
-# Changed: packages/cli/src/pi_wrapper.ts
+# Changed: packages/cli/sandpiper_standalone.ts or runtime bootstrap files
 cd packages/cli && bun run build
 cd ../..
 bash devtools/postinstall.sh
@@ -234,7 +234,7 @@ bash devtools/postinstall.sh
 For the standalone Sandpiper dogfood binary, either run `bun install` or rebuild it directly:
 ```bash
 bun run build:standalone
-./node_modules/.bin/sandpiper-standalone --help
+./node_modules/.bin/sandpiper --help
 ```
 
 For the standalone app bundle, rebuild and smoke-test it with:

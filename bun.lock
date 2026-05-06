@@ -108,7 +108,7 @@
       "name": "sandpiper-ai-cli",
       "version": "0.0.1",
       "bin": {
-        "sandpiper": "./dist/sandpiper",
+        "sandpiper": "./bin/sandpiper",
         "sandpiper-standalone": "./bin/sandpiper-standalone",
       },
       "dependencies": {

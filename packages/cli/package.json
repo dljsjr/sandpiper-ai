@@ -7,7 +7,7 @@
     "email": "dljs.jr@dougstephenjr.com"
   },
   "bin": {
-    "sandpiper": "./dist/sandpiper",
+    "sandpiper": "./bin/sandpiper",
     "sandpiper-standalone": "./bin/sandpiper-standalone"
   },
   "dependencies": {
@@ -17,9 +17,10 @@
     "@silvia-odwyer/photon-node": "*"
   },
   "scripts": {
-    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun run build:standalone",
+    "build": "mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:standalone",
+    "build:sandpiper": "mkdir -p dist && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outfile ./dist/sandpiper && chmod +x ./dist/sandpiper",
     "build:standalone": "mkdir -p dist/standalone && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone",
     "copy-assets": "bun run --target bun ./copy_pi_assets.ts",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node ./pi_wrapper.ts --outfile ./dist/sandpiper && bun copy-assets && bun run build:standalone"
+    "preinstall": "mkdir -p dist && bun copy-assets && bun run build:sandpiper && bun run build:standalone"
   }
 }
