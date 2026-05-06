@@ -22,7 +22,12 @@ function npmPackDryRun(packageDir: string): readonly string[] {
 }
 
 describe('ecosystem package artifacts', () => {
-  it('keeps the repository root npm-installable for Pi git installs from source', () => {
+  it('keeps the repository root npm-installable without making it a Pi package manifest', () => {
+    const packageJson = readPackageJson(join(repoRoot, 'package.json'));
+
+    expect(packageJson).not.toHaveProperty('piConfig');
+    expect(packageJson).not.toHaveProperty('pi');
+    expect(packageJson.keywords ?? []).not.toContain('pi-package');
     expect(findUnsupportedDependencySpecs(repoRoot)).toEqual([]);
   });
 

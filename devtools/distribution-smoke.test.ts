@@ -5,13 +5,22 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import rootPackageJson from '../package.json' with { type: 'json' };
 import { createDistPackageJson, type DistPackageJson, SANDPIPER_DIST_PI_RESOURCES } from './distPackageJson.js';
-import { findMissingPiManifestPaths, materializePiManifestPaths } from './distribution-invariants.js';
+import {
+  findMissingPiManifestPaths,
+  materializePiManifestPaths,
+  type PiPackageManifest,
+} from './distribution-invariants.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
 describe('Pi package distribution smoke', () => {
-  it('keeps the source Pi package manifest internally resolvable', () => {
-    expect(findMissingPiManifestPaths(repoRoot, rootPackageJson)).toEqual([]);
+  it('keeps the repository root from acting as the canonical Pi package manifest', () => {
+    const rootWorkspacePackageJson = rootPackageJson as { readonly keywords?: readonly string[] };
+
+    expect(rootPackageJson).not.toHaveProperty('piConfig');
+    expect(rootPackageJson).not.toHaveProperty('pi');
+    expect(rootWorkspacePackageJson.keywords ?? []).not.toContain('pi-package');
+    expect(rootPackageJson).not.toHaveProperty('files');
   });
 
   it('generates Sandpiper Pi metadata without requiring root package Pi metadata', () => {
@@ -43,8 +52,12 @@ describe('Pi package distribution smoke', () => {
       expect(distPackageJson).toMatchObject({
         name: rootPackageJson.name,
         version: rootPackageJson.version,
-        piConfig: rootPackageJson.piConfig,
-        keywords: rootPackageJson.keywords,
+        piConfig: {
+          name: 'sandpiper',
+          configDir: '.sandpiper',
+          bin: 'sandpiper',
+        },
+        keywords: ['pi-package'],
         pi: SANDPIPER_DIST_PI_RESOURCES,
         license: rootPackageJson.license,
         files: [
@@ -69,7 +82,7 @@ describe('Pi package distribution smoke', () => {
 
   it('keeps the generated dist package manifest resolvable after distribution assembly', () => {
     const distPackageJsonPath = join(repoRoot, 'dist', 'package.json');
-    const distPackageJson = JSON.parse(readFileSync(distPackageJsonPath, 'utf-8')) as typeof rootPackageJson;
+    const distPackageJson = JSON.parse(readFileSync(distPackageJsonPath, 'utf-8')) as PiPackageManifest;
 
     expect(findMissingPiManifestPaths(join(repoRoot, 'dist'), distPackageJson)).toEqual([]);
   });

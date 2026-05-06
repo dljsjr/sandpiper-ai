@@ -37,40 +37,6 @@
     "sandpiper-standalone-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
     "sandpiper-standalone-built": "bun ./packages/cli/dist/standalone/sandpiper_standalone.js"
   },
-  "bin": {
-    "sandpiper": "./dist/sandpiper",
-    "sandpiper-tasks": "./packages/sandpiper-tasks-cli/dist/sandpiper-tasks",
-    "sandpiper-standup": "./packages/sandpiper-standup-cli/dist/sandpiper-standup"
-  },
-  "files": [
-    "./dist"
-  ],
-  "keywords": [
-    "pi-package"
-  ],
-  "piConfig": {
-    "name": "sandpiper",
-    "configDir": ".sandpiper",
-    "bin": "sandpiper"
-  },
-  "pi": {
-    "extensions": [
-      "./extensions/system.ts",
-      "./extensions/shell-relay",
-      "./extensions/web-fetch",
-      "./extensions/autotoon"
-    ],
-    "skills": [
-      "./skills/sandpiper",
-      "./skills/third-party"
-    ],
-    "prompts": [
-      "./prompts"
-    ],
-    "themes": [
-      "./themes"
-    ]
-  },
   "workspaces": {
     "packages": [
       "packages/*",
