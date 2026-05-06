@@ -21,13 +21,24 @@ function npmPackDryRun(packageDir: string): readonly string[] {
   return result[0].files.map((file) => file.path);
 }
 
+function expectRootPiManifestRoutesToProviderOwnedPaths(packageJson: ReturnType<typeof readPackageJson>): void {
+  const rootPiManifest = packageJson.pi as
+    | Partial<Record<'extensions' | 'skills' | 'prompts' | 'themes', readonly string[]>>
+    | undefined;
+
+  for (const entries of Object.values(rootPiManifest ?? {})) {
+    for (const entry of entries ?? []) {
+      expect(entry).not.toMatch(/^\.\/?(?:extensions|skills|prompts|themes)(?:\/|$)/);
+      expect(entry).toMatch(/^\.\/(?:plugins\/pi|packages\/resources)(?:\/|$)/);
+    }
+  }
+}
+
 describe('ecosystem package artifacts', () => {
-  it('keeps the repository root npm-installable without making it a Pi package manifest', () => {
+  it('keeps the repository root npm-installable with only provider-owned Pi package routing', () => {
     const packageJson = readPackageJson(join(repoRoot, 'package.json'));
 
-    expect(packageJson).not.toHaveProperty('piConfig');
-    expect(packageJson).not.toHaveProperty('pi');
-    expect(packageJson.keywords ?? []).not.toContain('pi-package');
+    expectRootPiManifestRoutesToProviderOwnedPaths(packageJson);
     expect(findUnsupportedDependencySpecs(repoRoot)).toEqual([]);
   });
 
