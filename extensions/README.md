@@ -7,18 +7,18 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 | Extension | Description |
 |-----------|-------------|
 | [`system/`](system/) | Composed Sandpiper extension package — identity plus neutral system capabilities for generated Sandpiper package behavior |
-| [`capabilities.ts`](capabilities.ts) | Neutral system capability entrypoint — background process tools/hooks without Sandpiper identity or startup behavior |
+| [`../plugins/pi/extensions/`](../plugins/pi/extensions/) | Neutral Pi provider adapters — neutral capabilities/resources without Sandpiper identity or startup behavior |
 | [`autotoon/`](autotoon/) | Compatibility bridge to the package-first AutoTOON Pi adapter in `packages/capability-autotoon/` |
 | [`shell-relay/`](shell-relay/) | Shared terminal session between user and agent via Zellij |
 
-### system/ and capabilities.ts
+### system/ and neutral Pi adapters
 
 `system/` is the composed Sandpiper extension package. Generated Sandpiper Pi artifacts load it through `extensions/system/package.json`, which keeps the repository root from acting as the canonical Pi package manifest. It loads both:
 
 - Sandpiper identity/startup behavior: prompt assembly, session continuity, migration / shell-integration controls, diagnostics, and update banners.
 - Neutral system capabilities: background process tools and completion/shutdown hooks.
 
-`capabilities.ts` is the neutral system-capability entrypoint. It intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners. Neutral Pi package assembly loads `capabilities.ts` plus other neutral extension entrypoints (`shell-relay`, `web-fetch`, `autotoon`) instead of `system/`.
+`plugins/pi/extensions/` contains the neutral Pi provider adapters. Its `capabilities.ts` entrypoint intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners. Neutral Pi package assembly loads those provider adapters instead of `system/`.
 
 The entrypoints are intentionally thin glue layers. Framework-independent logic is extracted into `packages/core/`, while Pi-specific wiring helpers live under `extensions/system/`.
 

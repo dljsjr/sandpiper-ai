@@ -67,7 +67,7 @@ bun install
       → optionally run sandpiper install dist/ when SANDPIPER_INSTALL_PI_PACKAGE=1
 
 bun run build:neutral-pi-package
-  → copy neutral extension/resource subset to dist/neutral-pi-package/
+  → copy neutral Pi adapters and package-owned resources to dist/neutral-pi-package/
   → generate neutral package.json without Sandpiper piConfig or sandpiper bin
   → copy support package package.json files and use file: deps for local package-owned runtime code
 

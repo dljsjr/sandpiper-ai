@@ -27,8 +27,14 @@ function expectProviderOwnedRootPiManifest(packageJson: typeof rootPackageJson):
 }
 
 describe('Pi package distribution smoke', () => {
-  it('keeps root Pi package routing provider-owned when present', () => {
+  it('keeps root Pi package routing provider-owned', () => {
     expectProviderOwnedRootPiManifest(rootPackageJson);
+    expect(rootPackageJson.pi).toEqual({
+      extensions: ['./plugins/pi/extensions'],
+      skills: ['./packages/resources/skills/sandpiper', './packages/resources/skills/third-party'],
+      prompts: ['./packages/resources/prompts'],
+      themes: ['./packages/resources/themes'],
+    });
     expect(rootPackageJson).not.toHaveProperty('files');
   });
 

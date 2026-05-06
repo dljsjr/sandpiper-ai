@@ -22,15 +22,10 @@ export interface NeutralPiPackageJson {
   readonly dependencies: Record<string, string>;
   readonly peerDependencies: Record<string, string>;
   readonly pi: {
-    readonly extensions: readonly [
-      './extensions/capabilities.ts',
-      './extensions/shell-relay',
-      './extensions/web-fetch',
-      './extensions/autotoon',
-    ];
-    readonly skills: readonly ['./skills/sandpiper', './skills/third-party'];
-    readonly prompts: readonly ['./prompts'];
-    readonly themes: readonly ['./themes'];
+    readonly extensions: readonly ['./plugins/pi/extensions'];
+    readonly skills: readonly ['./packages/resources/skills/sandpiper', './packages/resources/skills/third-party'];
+    readonly prompts: readonly ['./packages/resources/prompts'];
+    readonly themes: readonly ['./packages/resources/themes'];
   };
 }
 
@@ -45,7 +40,8 @@ interface CopyEntry {
 }
 
 const NEUTRAL_PACKAGE_COPY_ENTRIES: readonly CopyEntry[] = [
-  { from: 'extensions/capabilities.ts', to: 'extensions/capabilities.ts' },
+  { from: 'plugins/pi/extensions', to: 'plugins/pi/extensions' },
+  // Compatibility implementation files imported by the provider-owned adapters above.
   { from: 'extensions/system/background-process-hooks.ts', to: 'extensions/system/background-process-hooks.ts' },
   { from: 'extensions/system/background-process-tools.ts', to: 'extensions/system/background-process-tools.ts' },
   {
@@ -54,13 +50,9 @@ const NEUTRAL_PACKAGE_COPY_ENTRIES: readonly CopyEntry[] = [
   },
   { from: 'extensions/shell-relay', to: 'extensions/shell-relay' },
   { from: 'extensions/web-fetch', to: 'extensions/web-fetch' },
-  { from: 'extensions/autotoon', to: 'extensions/autotoon' },
   { from: 'packages/capability-autotoon', to: 'packages/capability-autotoon' },
   { from: 'packages/core', to: 'packages/core' },
-  { from: 'packages/resources/skills/sandpiper', to: 'skills/sandpiper' },
-  { from: 'packages/resources/skills/third-party', to: 'skills/third-party' },
-  { from: 'packages/resources/prompts', to: 'prompts' },
-  { from: 'packages/resources/themes', to: 'themes' },
+  { from: 'packages/resources', to: 'packages/resources' },
 ];
 
 function shouldPruneArtifactPath(path: string): boolean {
@@ -108,15 +100,10 @@ export function createNeutralPiPackageJson(rootPackageJson: RootPackageJson): Ne
     dependencies: createPiRuntimeDependencies(rootPackageJson),
     peerDependencies: createPiPeerDependencies(),
     pi: {
-      extensions: [
-        './extensions/capabilities.ts',
-        './extensions/shell-relay',
-        './extensions/web-fetch',
-        './extensions/autotoon',
-      ],
-      skills: ['./skills/sandpiper', './skills/third-party'],
-      prompts: ['./prompts'],
-      themes: ['./themes'],
+      extensions: ['./plugins/pi/extensions'],
+      skills: ['./packages/resources/skills/sandpiper', './packages/resources/skills/third-party'],
+      prompts: ['./packages/resources/prompts'],
+      themes: ['./packages/resources/themes'],
     },
   };
 }

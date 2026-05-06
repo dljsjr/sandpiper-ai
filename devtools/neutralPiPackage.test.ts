@@ -20,15 +20,10 @@ describe('neutral Pi package assembler', () => {
       type: 'module',
       keywords: ['pi-package'],
       pi: {
-        extensions: [
-          './extensions/capabilities.ts',
-          './extensions/shell-relay',
-          './extensions/web-fetch',
-          './extensions/autotoon',
-        ],
-        skills: ['./skills/sandpiper', './skills/third-party'],
-        prompts: ['./prompts'],
-        themes: ['./themes'],
+        extensions: ['./plugins/pi/extensions'],
+        skills: ['./packages/resources/skills/sandpiper', './packages/resources/skills/third-party'],
+        prompts: ['./packages/resources/prompts'],
+        themes: ['./packages/resources/themes'],
       },
     });
     expect(manifest.dependencies['@toon-format/toon']).toBe(autotoonPackageJson.dependencies['@toon-format/toon']);
@@ -49,13 +44,18 @@ describe('neutral Pi package assembler', () => {
       >;
 
       expect(findMissingPiManifestPaths(outputDir, manifest)).toEqual([]);
+      expect(existsSync(join(outputDir, 'plugins', 'pi', 'extensions', 'capabilities.ts'))).toBe(true);
+      expect(existsSync(join(outputDir, 'plugins', 'pi', 'extensions', 'package.json'))).toBe(true);
+      expect(existsSync(join(outputDir, 'extensions', 'capabilities.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'extensions', 'system', 'neutral-capability-extension.ts'))).toBe(true);
       expect(existsSync(join(outputDir, 'extensions', 'system', 'extension-factories.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'extensions', 'system', 'migration-controls.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'extensions', 'shell-relay', 'src', 'preflight.test.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'extensions', 'shell-relay', 'node_modules'))).toBe(false);
       expect(existsSync(join(outputDir, 'packages', 'capability-autotoon', 'src', 'pi-extension.ts'))).toBe(true);
-      expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'SKILL.md'))).toBe(true);
+      expect(existsSync(join(outputDir, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'SKILL.md'))).toBe(
+        true,
+      );
     } finally {
       rmSync(join(repoRoot, 'extensions', 'shell-relay', 'node_modules'), { recursive: true, force: true });
       rmSync(tempDir, { recursive: true, force: true });

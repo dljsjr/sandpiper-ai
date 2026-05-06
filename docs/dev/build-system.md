@@ -105,7 +105,7 @@ The neutral Pi package artifact is built separately:
 bun run build:neutral-pi-package
 ```
 
-This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources without Sandpiper `piConfig`, CLI branding, migration flags, or startup prompt identity hooks. Its generated manifest is npm-installable: package-owned runtime support is copied under `packages/`, referenced with local `file:` dependencies, and Pi packages are declared as `peerDependencies` with `"*"` ranges per Pi packaging guidance.
+This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources through the same provider-owned paths used by the root Pi router: `plugins/pi/extensions` and `packages/resources`. It excludes Sandpiper `piConfig`, CLI branding, migration flags, and startup prompt identity hooks. Its generated manifest is npm-installable: package-owned runtime support is copied under `packages/`, referenced with local `file:` dependencies, and Pi packages are declared as `peerDependencies` with `"*"` ranges per Pi packaging guidance.
 
 The standalone Sandpiper app bundle is built separately:
 
@@ -178,7 +178,7 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the generated Sandpiper Pi/npm package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
+This command prepares the generated Sandpiper Pi/npm package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, root/provider and generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
 
 ### Ecosystem Install Certification
 

@@ -76,6 +76,8 @@ sandpiper-ai/
 │   ├── resources/       # Shared skills, prompts, and themes
 │   ├── sandpiper-tasks-cli/  # Task management CLI
 │   └── core/            # Shared utilities
+├── plugins/             # Provider install surfaces
+│   └── pi/              # Neutral Pi package adapters
 ├── ast-grep/            # Structural code analysis rules
 ├── devtools/            # Build scripts (not distributed)
 └── dist/                # Distribution output (generated)
