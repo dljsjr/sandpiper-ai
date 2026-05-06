@@ -68,8 +68,8 @@ sandpiper-ai/
 │   ├── features/        # Feature documentation
 │   ├── dev/             # Developer documentation
 │   └── architecture/    # Architecture decisions
-├── extensions/          # Pi extensions (tools, hooks, lifecycle)
-│   ├── system.ts        # Sandpiper identity + update notifications
+├── extensions/          # Pi extension packages and compatibility entrypoints
+│   ├── system/          # Sandpiper identity + system capabilities
 │   └── shell-relay/     # Shared terminal via Zellij
 ├── packages/            # Workspace packages (built + distributed)
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent

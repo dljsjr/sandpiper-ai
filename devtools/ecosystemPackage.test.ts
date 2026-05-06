@@ -67,6 +67,7 @@ describe('ecosystem package artifacts', () => {
     expect(findMissingFileDependencyTargets(packageDir)).toEqual([]);
     expect(existsSync(join(packageDir, 'packages', 'core', 'package.json'))).toBe(true);
     expect(existsSync(join(packageDir, 'packages', 'capability-autotoon', 'package.json'))).toBe(true);
+    expect(existsSync(join(packageDir, 'extensions', 'system', 'package.json'))).toBe(true);
     const packedFiles = npmPackDryRun(packageDir);
     expect(packedFiles).toContain('package.json');
     expect(packedFiles).not.toContain('neutral-pi-package/package.json');

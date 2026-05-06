@@ -899,6 +899,23 @@ Completion signal:
 - Focused package-dir, distribution smoke, and ecosystem package tests pass.
 - `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution` passes.
 
+#### AGENT-172 system extension package entrypoint slice
+
+AGENT-172 narrows the highest-risk legacy root extension authoring path by making the composed Sandpiper system extension a directory package entrypoint.
+
+Implementation target:
+
+- `extensions/system/index.ts` owns the composed Sandpiper system extension entrypoint.
+- `extensions/system/package.json` declares the Pi extension entrypoint as `./index.ts`.
+- Generated Sandpiper Pi manifests reference `./extensions/system` instead of `./extensions/system.ts`.
+- `extensions/system.ts` may remain as an explicit compatibility bridge, but generated artifacts do not point at it.
+
+Completion signal:
+
+- Distribution smoke tests assert the generated manifest uses `./extensions/system`.
+- Generated `dist/extensions/system/package.json` has npm-compatible support-package metadata.
+- Clean distribution gate passes.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
