@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import rootPackageJson from '../package.json' with { type: 'json' };
-import { createDistPackageJson } from './distPackageJson.js';
+import { createDistPackageJson, type DistPackageJson, SANDPIPER_DIST_PI_RESOURCES } from './distPackageJson.js';
 import { findMissingPiManifestPaths, materializePiManifestPaths } from './distribution-invariants.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -12,6 +12,25 @@ const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 describe('Pi package distribution smoke', () => {
   it('keeps the source Pi package manifest internally resolvable', () => {
     expect(findMissingPiManifestPaths(repoRoot, rootPackageJson)).toEqual([]);
+  });
+
+  it('generates Sandpiper Pi metadata without requiring root package Pi metadata', () => {
+    const rootWithoutPiMetadata = {
+      ...rootPackageJson,
+      keywords: undefined,
+      pi: undefined,
+      piConfig: undefined,
+    };
+
+    expect(createDistPackageJson(rootWithoutPiMetadata)).toMatchObject({
+      piConfig: {
+        name: 'sandpiper',
+        configDir: '.sandpiper',
+        bin: 'sandpiper',
+      },
+      keywords: ['pi-package'],
+      pi: SANDPIPER_DIST_PI_RESOURCES,
+    } satisfies Partial<DistPackageJson>);
   });
 
   it('generates a distribution manifest whose declared resources resolve under a package root', () => {
@@ -26,7 +45,7 @@ describe('Pi package distribution smoke', () => {
         version: rootPackageJson.version,
         piConfig: rootPackageJson.piConfig,
         keywords: rootPackageJson.keywords,
-        pi: rootPackageJson.pi,
+        pi: SANDPIPER_DIST_PI_RESOURCES,
         license: rootPackageJson.license,
         files: [
           'config/',

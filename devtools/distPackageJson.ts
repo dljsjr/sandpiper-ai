@@ -18,6 +18,21 @@ import {
   writePiArtifactSupportPackageJsons,
 } from './piPackageArtifactMetadata.js';
 
+const SANDPIPER_DIST_PI_CONFIG = {
+  name: 'sandpiper',
+  configDir: '.sandpiper',
+  bin: 'sandpiper',
+} as const;
+
+export const SANDPIPER_DIST_PI_RESOURCES = {
+  extensions: ['./extensions/system.ts', './extensions/shell-relay', './extensions/web-fetch', './extensions/autotoon'],
+  skills: ['./skills/sandpiper', './skills/third-party'],
+  prompts: ['./prompts'],
+  themes: ['./themes'],
+} as const;
+
+const SANDPIPER_DIST_KEYWORDS = ['pi-package'] as const;
+
 export interface DistPackageJson {
   readonly name: string;
   readonly version: string;
@@ -50,14 +65,6 @@ export interface DistPackageJson {
 }
 
 export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPackageJson {
-  if (rootPackageJson.piConfig === undefined) {
-    throw new Error('Root package is missing piConfig');
-  }
-
-  if (rootPackageJson.pi === undefined) {
-    throw new Error('Root package is missing pi resources');
-  }
-
   return {
     name: rootPackageJson.name,
     version: rootPackageJson.version,
@@ -66,9 +73,9 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
     author: normalizePackageAuthor(rootPackageJson.author),
     homepage: rootPackageJson.homepage,
     repository: normalizePackageRepository(rootPackageJson.repository),
-    piConfig: rootPackageJson.piConfig,
-    keywords: rootPackageJson.keywords,
-    pi: rootPackageJson.pi,
+    piConfig: SANDPIPER_DIST_PI_CONFIG,
+    keywords: SANDPIPER_DIST_KEYWORDS,
+    pi: SANDPIPER_DIST_PI_RESOURCES,
     license: rootPackageJson.license,
     files: [
       'config/',

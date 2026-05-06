@@ -868,6 +868,21 @@ Next AGENT-93 subtasks:
 | AGENT-172 | Retire legacy root resource authoring paths. | Root resource directories are removed, generated, or narrowed to compatibility bridges with verified artifact/resource loading. |
 | AGENT-173 | Certify and document retirement. | Clean distribution gate passes from no `dist/`; build/dev/repo guidance describes the new source-of-truth layout. |
 
+#### AGENT-170 generated dist manifest invariant slice
+
+AGENT-170 starts retirement by moving the generated legacy `dist/package.json` manifest away from root-owned Pi metadata while preserving the artifact output.
+
+Implementation target:
+
+- `devtools/distPackageJson.ts` owns the Sandpiper Pi artifact `piConfig`, `pi` resource paths, and `pi-package` keyword as generated distribution constants.
+- `createDistPackageJson(...)` continues to read version/license/author/repository/dependency inputs from the root workspace manifest, but it no longer requires root `pi`, `piConfig`, or `keywords` fields.
+- `devtools/distribution-smoke.test.ts` proves the generated manifest keeps Sandpiper Pi metadata even when the source root package omits Pi metadata.
+
+Completion signal:
+
+- The generated `dist/` package remains installable/loadable.
+- `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution` passes.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
