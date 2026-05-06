@@ -20,7 +20,8 @@ The current repository is a Bun workspace with package-owned shared resources, l
 
 - package source lives in `packages/`
 - shared skills, prompts, and themes live in `packages/resources/`
-- legacy Pi extension entrypoints still live in `extensions/`
+- neutral Pi provider adapters live in `plugins/pi/extensions/`
+- legacy Sandpiper/runtime extension entrypoints still live in `extensions/`
 - `devtools/postinstall.sh` currently assembles the Sandpiper Pi/npm package in `dist/`, copying package-owned resources into the generated artifact's Pi resource layout
 - AGENT-170/171 temporarily moved Pi package metadata into generated `dist/`, but AGENT-176 corrects the target: root `package.json` remains the package/runtime router while implementation resources move to provider/package-owned paths
 
@@ -383,7 +384,7 @@ AGENT-87 implementation results:
   - `createSandpiperIdentityExtension(...)` for Sandpiper prompt/startup/session/migration/diagnostics/update behavior.
   - `createNeutralCapabilityExtension(...)` for background process tools plus completion/shutdown hooks.
   - `createSandpiperSystemExtension(...)` for the legacy composed `extensions/system.ts` entrypoint, preserving existing root package behavior.
-- `extensions/capabilities.ts` is the neutral Pi-loadable system capability entrypoint. It intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners.
+- `plugins/pi/extensions/capabilities.ts` is the neutral Pi-loadable system capability entrypoint. It intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners. AGENT-178 moved this provider entrypoint out of top-level `extensions/`.
 - `packages/cli/sandpiper_resources.ts` exposes identity-aware factory groups:
   - `createNeutralCapabilityExtensionFactories(resourceRoot)`
   - `createSandpiperIdentityExtensionFactories()`
@@ -394,17 +395,17 @@ AGENT-87 verification uses these checks:
 
 ```bash
 bun check
-bun x vitest run extensions/capabilities.test.ts extensions/system/extension-factories.test.ts
+bun x vitest run plugins/pi/extensions/capabilities.test.ts extensions/system/extension-factories.test.ts
 bun x vitest run packages/cli/sandpiper_resources.test.ts packages/cli/standalone_cli_smoke.test.ts
 bun --filter sandpiper-standup-cli test -- helpers.test.ts
 bun run test:standalone
-rg -n "migrate-pi-configs|install-shell-integrations|before_agent_start|buildSandpiperSystemPrompt" extensions/capabilities.ts packages/cli/sandpiper_resources.ts
+rg -n "migrate-pi-configs|install-shell-integrations|before_agent_start|buildSandpiperSystemPrompt" plugins/pi/extensions/capabilities.ts packages/cli/sandpiper_resources.ts
 rg -n "SANDPIPER_SESSION_ID|SANDPIPER_SESSION_FILE" packages/sandpiper-standup-cli/src/commands/write-cmd.ts
 ```
 
 Expected invariant-search results:
 
-- The neutral `extensions/capabilities.ts` entrypoint and `packages/cli/sandpiper_resources.ts` factory grouping contain no migration flag strings, no `before_agent_start` prompt hook wiring, and no direct Sandpiper prompt builder imports.
+- The neutral `plugins/pi/extensions/capabilities.ts` entrypoint and `packages/cli/sandpiper_resources.ts` factory grouping contain no migration flag strings, no `before_agent_start` prompt hook wiring, and no direct Sandpiper prompt builder imports.
 - `write-cmd.ts` contains zero direct `SANDPIPER_SESSION_*` string references; those names live in the standup command helper identity constants until a later host-neutral standup package split.
 
 ### Phase 4 — Move source under packages
@@ -521,12 +522,12 @@ Artifact shape:
 - `dist/neutral-pi-package/package.json`
   - `name`: `sandpiper-ai-neutral-pi-package`
   - `keywords`: includes `pi-package`
-  - `pi.extensions`: `./extensions/capabilities.ts`, `./extensions/shell-relay`, `./extensions/web-fetch`, `./extensions/autotoon`
-  - `pi.skills`: `./skills/sandpiper`, `./skills/third-party`
-  - `pi.prompts`: `./prompts`
-  - `pi.themes`: `./themes`
+  - `pi.extensions`: `./plugins/pi/extensions`
+  - `pi.skills`: `./packages/resources/skills/sandpiper`, `./packages/resources/skills/third-party`
+  - `pi.prompts`: `./packages/resources/prompts`
+  - `pi.themes`: `./packages/resources/themes`
   - no `piConfig`, no Sandpiper app identity, no `bin: sandpiper`
-- Source/resource copies under the artifact root preserve the manifest paths above.
+- Source/resource copies under the artifact root preserve the provider/package-owned manifest paths above.
 - Package-first implementation support packages needed by compatibility bridges, such as `packages/capability-autotoon`, are copied into the artifact.
 
 AGENT-90 completion signal:
@@ -860,9 +861,9 @@ AGENT-169 start-state blockers:
 | Legacy `dist/` assembly | At AGENT-169 start, `devtools/postinstall.sh` copied top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist`, then `devtools/distPackageJson.ts` copied root `piConfig` and `pi` into `dist/package.json`. AGENT-170/171 made `distPackageJson.ts` synthesize artifact-owned Pi metadata as an interim step. | Long-term `dist/` should primarily contain built Sandpiper runtime outputs/sidecars. Pi and Claude install surfaces should be root/provider/package paths unless host validation proves generated dist roots are required. |
 | Root resource directories | Top-level `skills/`, `prompts/`, and `themes/` have moved to `packages/resources/`; top-level `extensions/` remains as the legacy Pi adapter source. | Continue retiring root `extensions/` into provider/package-owned adapters; do not reintroduce top-level shared resource source directories. |
 | Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, `packages/resources`, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading and now consumes package-owned shared resources. |
-| Neutral Pi package | `devtools/neutralPiPackage.ts` explicitly copies a neutral subset from root extension directories and `packages/resources`. | Neutral resource input is package-owned; the remaining gap is moving neutral Pi extension adapters to `plugins/pi/`. |
+| Neutral Pi package | `devtools/neutralPiPackage.ts` copies neutral Pi adapters from `plugins/pi/extensions` and shared resources from `packages/resources`. Legacy top-level extension code is copied only as support for compatibility imports. | Neutral package entrypoints now use provider/package-owned manifest paths; the remaining gap is extracting shell-relay/web-fetch implementation out of top-level `extensions/`. |
 | Claude plugin | `devtools/claudeCodePlugin.ts` copies `packages/resources` skills/prompts/themes into Claude plugin paths and generated helper binaries from `dist/`. | Claude artifact already owns Claude-specific metadata and now consumes package-owned shared resources, but it still depends on the legacy `dist/` preparation step for helper binaries. |
-| Runtime resource discovery | `packages/cli/sandpiper_resources.ts` loads resources from `packages/resources/skills`, `packages/resources/prompts`, and `packages/resources/themes` under a supplied resource root and imports extension factories from root `extensions/`. | Explicit resource discovery is the preferred direction; extension adapters still need to become provider/package-owned. |
+| Runtime resource discovery | `packages/cli/sandpiper_resources.ts` loads resources from `packages/resources/skills`, `packages/resources/prompts`, and `packages/resources/themes` under a supplied resource root and imports Sandpiper runtime extension factories from root `extensions/`. | Explicit resource discovery is the preferred direction; Sandpiper runtime extension imports still need package-owned adapters. |
 | Docs and repo guidance | `AGENTS.md`, `docs/dev/build-system.md`, `devtools/README.md`, `packages/README.md`, and `extensions/README.md` still describe root-level resources and legacy `postinstall.sh` assembly as normal development workflow. | Update docs only after behavior changes land so guidance matches the verified build model. |
 
 Next AGENT-93 subtasks:
@@ -875,6 +876,7 @@ Next AGENT-93 subtasks:
 | AGENT-173 | Certify and document retirement. | Clean distribution gate passes from no `dist/`; build/dev/repo guidance describes the new source-of-truth layout. |
 | AGENT-176 | Revise root-router architecture invariants. | Spec and tests allow root runtime/package routing metadata while forbidding root `pi` manifest entries that point at top-level resource source dirs. |
 | AGENT-177 | Move shared resources to `packages/resources/`. | Top-level `skills/`, `prompts/`, and `themes/` are absent; source, runtime discovery, and distribution/plugin assemblers consume `packages/resources/`. |
+| AGENT-178 | Move neutral Pi install surface to `plugins/pi/`. | Root and generated neutral Pi manifests route through `./plugins/pi/extensions` plus `./packages/resources/...`; no root `pi` entry points at top-level resource dirs. |
 
 #### AGENT-170 generated dist manifest invariant slice
 

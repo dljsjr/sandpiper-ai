@@ -12,6 +12,7 @@ This repository is a **Bun/Node.js monorepo** that emits generated Pi/npm, stand
 | --- | --- | --- |
 | `extensions/system/` | Pi Extension | Sandpiper identity, system prompt, capability guidance, reinforced guidance, migration, diagnostics |
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
+| `plugins/pi/extensions/` | Pi Provider Surface | Neutral Pi adapters for package/resource-owned capabilities |
 | `packages/resources/skills/sandpiper/` | First-party skills | Edit source here, not `dist/skills/` |
 | `packages/resources/skills/third-party/` | Vendored skills | Do not edit |
 | `packages/core/` | Shared Library | System prompt, migration, preflight checks, shell integration, path utilities |

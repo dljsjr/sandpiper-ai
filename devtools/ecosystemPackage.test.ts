@@ -114,10 +114,15 @@ describe('ecosystem package artifacts', () => {
   });
 
   it('does not leak development scratch files into generated skill packages', () => {
-    for (const packageDir of [join(repoRoot, 'dist'), join(repoRoot, 'dist', 'neutral-pi-package')]) {
-      expect(readFileSync(join(packageDir, 'skills', 'sandpiper', 'jj', 'SKILL.md'), 'utf-8')).toContain('name: jj');
-      expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'jj-workspace', 'run_loop.log'))).toBe(false);
-      expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'jj-workspace', 'run_loop.pid'))).toBe(false);
+    const skillRoots = [
+      join(repoRoot, 'dist', 'skills'),
+      join(repoRoot, 'dist', 'neutral-pi-package', 'packages', 'resources', 'skills'),
+    ];
+
+    for (const skillRoot of skillRoots) {
+      expect(readFileSync(join(skillRoot, 'sandpiper', 'jj', 'SKILL.md'), 'utf-8')).toContain('name: jj');
+      expect(existsSync(join(skillRoot, 'sandpiper', 'jj-workspace', 'run_loop.log'))).toBe(false);
+      expect(existsSync(join(skillRoot, 'sandpiper', 'jj-workspace', 'run_loop.pid'))).toBe(false);
     }
   });
 });

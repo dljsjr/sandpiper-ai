@@ -1,5 +1,5 @@
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
-import { createNeutralCapabilityExtension } from './system/neutral-capability-extension.js';
+import { createNeutralCapabilityExtension } from '../../../extensions/system/neutral-capability-extension.js';
 
 const neutralCapabilityExtension = createNeutralCapabilityExtension();
 

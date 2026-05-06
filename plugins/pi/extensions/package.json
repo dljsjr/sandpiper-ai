@@ -1,0 +1,23 @@
+{
+  "name": "sandpiper-pi-extensions",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Neutral Pi extension adapters for Sandpiper capabilities",
+  "pi": {
+    "extensions": [
+      "./capabilities.ts",
+      "./shell-relay.ts",
+      "./web-fetch.ts",
+      "./autotoon.ts"
+    ]
+  },
+  "dependencies": {
+    "sandpiper-ai-core": "0.0.1",
+    "sandpiper-capability-autotoon": "0.0.1"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-coding-agent": "*",
+    "@sinclair/typebox": "*"
+  }
+}
