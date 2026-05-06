@@ -842,6 +842,32 @@ Completion signal:
 - Web-fetch operation code contains no Pi SDK imports or Pi tool-definition types.
 - New operation tests cover metadata rendering, metadata omission, link rendering, successful execution, and fetch failure shaping.
 
+#### AGENT-169 root assembly retirement inventory
+
+AGENT-169 records the remaining root-assembly blockers before any deletion or resource-path migration. The goal is to make the target explicit enough that later subtasks can add invariants and then move/remove code surgically.
+
+Current blockers:
+
+| Area | Current root-owned behavior | Retirement implication |
+| --- | --- | --- |
+| Root `package.json` Pi identity | The repository root still declares `piConfig`, `keywords: ["pi-package"]`, `files: ["./dist"]`, `bin.sandpiper`, and canonical `pi.extensions` / `pi.skills` / `pi.prompts` / `pi.themes` entries. | The source root still looks like a canonical Pi package. Final retirement should make generated artifacts own Pi package metadata while the root remains a workspace/development package. |
+| Legacy `dist/` assembly | `devtools/postinstall.sh` copies top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist/`, then `devtools/distPackageJson.ts` copies root `piConfig` and `pi` into `dist/package.json`. | `dist/` should continue to be publishable/installable, but its manifest should be generated from artifact-owned resource declarations rather than inherited root metadata. |
+| Root resource directories | Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` are still authored source directories and are copied into every artifact. | Removing or relocating these paths is a later step. Do not delete them until generated/package-owned replacements and compatibility bridges are verified. |
+| Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, skills, prompts, themes, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading, but it still depends on root resource directory layout as input. |
+| Neutral Pi package | `devtools/neutralPiPackage.ts` explicitly copies a neutral subset from root extension/resource directories and generates its own neutral manifest. | This is closer to the target, but still consumes root resource directories as source inputs. Later package ownership should reduce this copy list to package-owned resources/bridges. |
+| Claude plugin | `devtools/claudeCodePlugin.ts` copies root skills/prompts/themes into Claude plugin paths and generated helper binaries from `dist/`. | Claude artifact already owns Claude-specific metadata, but it still depends on root resource directories and the legacy `dist/` preparation step for helper binaries. |
+| Runtime resource discovery | `packages/cli/sandpiper_resources.ts` loads resources from `skills/`, `prompts/`, and `themes/` under a supplied resource root and imports extension factories from root `extensions/`. | Explicit resource discovery is the preferred direction; the source paths it targets still need to become generated/package-owned or compatibility bridges. |
+| Docs and repo guidance | `AGENTS.md`, `docs/dev/build-system.md`, `devtools/README.md`, `packages/README.md`, and `extensions/README.md` still describe root-level resources and legacy `postinstall.sh` assembly as normal development workflow. | Update docs only after behavior changes land so guidance matches the verified build model. |
+
+Next AGENT-93 subtasks:
+
+| Task | Purpose | Completion signal |
+| --- | --- | --- |
+| AGENT-170 | Add root-assembly retirement invariants. | Tests fail on root-owned canonical Pi metadata and pass once generated artifacts own resource manifests explicitly. |
+| AGENT-171 | Move Pi package assembly to generated/package-owned resources. | `dist/package.json` no longer derives its `pi` / `piConfig` directly from root `package.json`; distribution smokes still pass. |
+| AGENT-172 | Retire legacy root resource authoring paths. | Root resource directories are removed, generated, or narrowed to compatibility bridges with verified artifact/resource loading. |
+| AGENT-173 | Certify and document retirement. | Clean distribution gate passes from no `dist/`; build/dev/repo guidance describes the new source-of-truth layout. |
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
