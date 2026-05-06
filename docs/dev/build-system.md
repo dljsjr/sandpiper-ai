@@ -84,7 +84,7 @@ This means:
 
 ### Stage 3: Distribution Assembly
 
-The `postinstall.sh` script assembles the legacy Sandpiper Pi Package:
+The `postinstall.sh` script assembles the generated Sandpiper Pi/npm package at `dist/`:
 
 ```bash
 bash devtools/postinstall.sh
@@ -94,7 +94,7 @@ This script:
 1. Removes stale nested package artifacts from `dist/` (`claude-plugin`, `neutral-pi-package`, `standalone-package`)
 2. Copies extensions, skills, prompts, themes to `dist/`
 3. Preserves extension `src/` trees (so `pi.extensions` entries resolve)
-4. Generates `dist/package.json` with Pi package metadata and an npm `files` whitelist
+4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist
 5. Symlinks Pi's internal assets
 6. Builds the Dash CLI via mcporter
 7. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
@@ -127,7 +127,7 @@ Automatic package installation is intentionally opt-in. The standalone CLI path 
 
 ## Understanding `dist/`
 
-The `dist/` directory is a **Pi Package assembly**, not a dependency manager.
+The `dist/` directory is the **Sandpiper Pi/npm package assembly**, not a dependency manager and not the repository root.
 
 **What `dist/` contains**:
 - Extension source trees (not bundled)
@@ -146,7 +146,7 @@ The `dist/` directory is a **Pi Package assembly**, not a dependency manager.
 ### After Extension Changes
 
 ```bash
-# Changed: extensions/system.ts or extensions/shell-relay/src/index.ts
+# Changed: extensions/system/index.ts or extensions/shell-relay/src/index.ts
 bash devtools/postinstall.sh
 ```
 
@@ -178,7 +178,7 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the legacy Pi-package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
+This command prepares the generated Sandpiper Pi/npm package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
 
 ### Ecosystem Install Certification
 
@@ -186,8 +186,8 @@ The supported local install roots are:
 
 | Ecosystem path | Source root | Gate |
 | --- | --- | --- |
-| `pi install git:github.com/dljsjr/sandpiper-ai` | repository root after clone | root `package.json` dependency specs avoid Bun-only `catalog:` / `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` must pass |
-| `pi install npm:sandpiper-ai` | published package built from `dist/` | `dist/package.json` has no `private`, uses npm-compatible runtime deps and `file:` support packages, and `npm pack --dry-run --json` excludes nested generated artifacts |
+| source-root workspace clone | repository root after clone | root `package.json` is npm-installable for development but intentionally does not declare Pi package metadata |
+| `pi install npm:sandpiper-ai` / `pi install <dist>` | published/local package built from `dist/` | `dist/package.json` has no `private`, owns Sandpiper `piConfig` and `pi` resource paths, uses npm-compatible runtime deps and `file:` support packages, and `npm pack --dry-run --json` excludes nested generated artifacts |
 | neutral Pi local/npm artifact | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/` plus no Sandpiper `piConfig` or `sandpiper` bin |
 | Claude plugin marketplace/npm install | root `.claude-plugin/marketplace.json` plus `dist/claude-plugin/` | `claude plugin validate` passes for both marketplace and plugin manifests; plugin package metadata has author/repository/license and no `private` |
 

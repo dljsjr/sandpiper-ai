@@ -57,7 +57,7 @@ Pi 0.70.x makes a cleaner split more realistic:
 - Do not rewrite feature behavior while moving code. Behavior changes get separate tasks.
 - Do not require true single-file binary distribution unless a spike proves it is practical. A binary plus sidecar assets/package metadata is acceptable if that matches Pi/Bun constraints.
 - Do not edit vendored third-party skills except through the vendoring workflow.
-- Do not remove the current root Pi-package assembly until replacement distributions are smoke-tested.
+- Do not remove the generated Sandpiper Pi/npm package assembly until replacement distributions are smoke-tested.
 - Do not solve every historical task-system or shell-relay issue as part of this refactor.
 
 ## Architecture Principles
@@ -365,7 +365,7 @@ Neutral:
 | `extensions/shell-relay`, `extensions/web-fetch`, `extensions/autotoon` | Separate extension entrypoints | Neutral capability candidates, though shell-relay still has Sandpiper-specific install/preflight wording | Continue to expose them as neutral-capability extension factories; deeper host-neutral package extraction is AGENT-88+. |
 | Resource discovery for skills/prompts/themes | `packages/cli/sandpiper_resources.ts` | Distribution adapter behavior | Keep as an explicit resource adapter and make factory grouping identity-aware. |
 
-AGENT-87 should leave a legacy composed `system` extension for existing root Pi-package behavior, plus explicit factory groups for:
+AGENT-87 should leave a composed Sandpiper `system` extension for the generated Sandpiper Pi package behavior, plus explicit factory groups for:
 
 - **Sandpiper identity**: system prompt/startup, session continuity, migration controls, diagnostics/update banners.
 - **Neutral capabilities**: background process tools/hooks, shell relay, web fetch, AutoTOON, and shared resource discovery.
@@ -493,7 +493,7 @@ AGENT-89 verification is anchored by:
 bun run test:distribution
 ```
 
-The distribution test script prepares the legacy `dist/` assembly, runs source-boundary invariant tests, verifies Pi package manifest resource paths, and runs standalone smoke tests against temporary agent directories.
+The distribution test script prepares the generated `dist/` package assembly, runs source-boundary invariant tests, verifies Pi package manifest resource paths, and runs standalone smoke tests against temporary agent directories.
 
 ### Phase 6 — Build distribution artifacts
 
@@ -661,8 +661,8 @@ Certified paths:
 
 | Install path | Source root | Current gate |
 | --- | --- | --- |
-| `pi install git:github.com/dljsjr/sandpiper-ai` | repository root cloned by Pi | root/package workspace manifests avoid `catalog:` and `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` passes |
-| `pi install npm:sandpiper-ai` | npm package published from `dist/` | `dist/package.json` has no `private`, declares npm-compatible runtime deps, references local support packages with `file:`, and uses a `files` whitelist to keep nested generated artifacts out of `npm pack` |
+| source-root workspace clone | repository root cloned for development | root/package workspace manifests avoid `catalog:` and `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` passes; root intentionally has no Pi package manifest |
+| `pi install npm:sandpiper-ai` / `pi install <dist>` | npm/local package generated at `dist/` | `dist/package.json` has no `private`, owns Sandpiper `piConfig` and `pi` resource paths, declares npm-compatible runtime deps, references local support packages with `file:`, and uses a `files` whitelist to keep nested generated artifacts out of `npm pack` |
 | neutral Pi package | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/`, without Sandpiper `piConfig` or `sandpiper` bin |
 | Claude Code plugin marketplace/npm install | root `.claude-plugin/marketplace.json` and npm package from `dist/claude-plugin/` | `claude plugin validate .` and `claude plugin validate dist/claude-plugin` pass; plugin `npm pack --dry-run` includes `.claude-plugin/plugin.json` |
 

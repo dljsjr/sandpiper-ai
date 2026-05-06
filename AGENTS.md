@@ -4,7 +4,7 @@ This file is repo-specific guidance for the sandpiper-ai project. For area-speci
 
 ## Repository Structure
 
-This repository is both a **Pi Package** and a **Bun/Node.js monorepo** — an uncommon combination that affects build and distribution.
+This repository is a **Bun/Node.js monorepo** that emits generated Pi/npm, standalone app, and Claude plugin artifacts. The repository root is a workspace package, not the canonical Pi package manifest.
 
 > **Maintenance note:** Update this table when adding new projects.
 
