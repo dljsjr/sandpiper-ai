@@ -158,6 +158,22 @@ export function createAutotoonSupportPackageJson(rootPackageJson: RootPackageJso
   };
 }
 
+export function createSystemExtensionPackageJson(rootPackageJson: RootPackageJson): SupportPackageJson {
+  return {
+    name: 'sandpiper-system',
+    version: rootPackageJson.version,
+    type: 'module',
+    description: 'Pi extension: Sandpiper identity and system capabilities',
+    dependencies: {
+      'sandpiper-ai-core': 'file:../../packages/core',
+    },
+    peerDependencies: createPiPeerDependencies(),
+    pi: {
+      extensions: ['./index.ts'],
+    },
+  };
+}
+
 export function createShellRelayExtensionPackageJson(rootPackageJson: RootPackageJson): SupportPackageJson {
   return {
     name: 'shell-relay',
@@ -227,6 +243,10 @@ export async function writePiArtifactSupportPackageJsons(
     writeJson(
       join(outputDir, 'packages', 'capability-autotoon', 'package.json'),
       createAutotoonSupportPackageJson(rootPackageJson),
+    ),
+    writeJson(
+      join(outputDir, 'extensions', 'system', 'package.json'),
+      createSystemExtensionPackageJson(rootPackageJson),
     ),
     writeJson(
       join(outputDir, 'extensions', 'shell-relay', 'package.json'),

@@ -19,7 +19,7 @@ describe('findPiPackageDir', () => {
       writeJson(join(repoRoot, 'packages', 'cli', 'package.json'), { name: 'sandpiper-ai-cli' });
       writeJson(join(repoRoot, 'dist', 'package.json'), {
         name: 'sandpiper-ai',
-        pi: { extensions: ['./extensions/system.ts'] },
+        pi: { extensions: ['./extensions/system'] },
       });
 
       expect(findPiPackageDir(join(repoRoot, 'packages', 'cli', 'dist'))).toBe(join(repoRoot, 'dist'));
@@ -36,7 +36,7 @@ describe('findPiPackageDir', () => {
       writeJson(join(repoRoot, 'package.json'), { name: 'sandpiper-ai' });
       writeJson(join(repoRoot, 'dist', 'package.json'), {
         name: 'sandpiper-ai',
-        pi: { extensions: ['./extensions/system.ts'] },
+        pi: { extensions: ['./extensions/system'] },
       });
 
       expect(findPiPackageDir(join(repoRoot, 'dist'))).toBe(join(repoRoot, 'dist'));
