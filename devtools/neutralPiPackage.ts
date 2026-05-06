@@ -57,10 +57,10 @@ const NEUTRAL_PACKAGE_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'extensions/autotoon', to: 'extensions/autotoon' },
   { from: 'packages/capability-autotoon', to: 'packages/capability-autotoon' },
   { from: 'packages/core', to: 'packages/core' },
-  { from: 'skills/sandpiper', to: 'skills/sandpiper' },
-  { from: 'skills/third-party', to: 'skills/third-party' },
-  { from: 'prompts', to: 'prompts' },
-  { from: 'themes', to: 'themes' },
+  { from: 'packages/resources/skills/sandpiper', to: 'skills/sandpiper' },
+  { from: 'packages/resources/skills/third-party', to: 'skills/third-party' },
+  { from: 'packages/resources/prompts', to: 'prompts' },
+  { from: 'packages/resources/themes', to: 'themes' },
 ];
 
 function shouldPruneArtifactPath(path: string): boolean {

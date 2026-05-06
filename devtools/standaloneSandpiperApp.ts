@@ -81,10 +81,7 @@ declare const Bun: BunRuntime;
 
 const STANDALONE_APP_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'extensions', to: 'extensions' },
-  { from: 'skills/sandpiper', to: 'skills/sandpiper' },
-  { from: 'skills/third-party', to: 'skills/third-party' },
-  { from: 'prompts', to: 'prompts' },
-  { from: 'themes', to: 'themes' },
+  { from: 'packages/resources', to: 'packages/resources' },
   { from: 'packages/capability-autotoon', to: 'packages/capability-autotoon' },
   { from: 'packages/core', to: 'packages/core' },
 ];

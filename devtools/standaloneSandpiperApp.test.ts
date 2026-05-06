@@ -47,9 +47,11 @@ describe('standalone Sandpiper app assembler', () => {
       >;
 
       expect(manifest.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
-      expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'SKILL.md'))).toBe(true);
-      expect(existsSync(join(outputDir, 'prompts', 'new-feature.md'))).toBe(true);
-      expect(existsSync(join(outputDir, 'themes', 'README.md'))).toBe(true);
+      expect(existsSync(join(outputDir, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'SKILL.md'))).toBe(
+        true,
+      );
+      expect(existsSync(join(outputDir, 'packages', 'resources', 'prompts', 'new-feature.md'))).toBe(true);
+      expect(existsSync(join(outputDir, 'packages', 'resources', 'themes', 'README.md'))).toBe(true);
       expect(existsSync(join(outputDir, 'packages', 'core', 'src', 'host-context.ts'))).toBe(true);
       expect(existsSync(join(outputDir, 'packages', 'capability-autotoon', 'src', 'pi-extension.ts'))).toBe(true);
       expect(existsSync(join(outputDir, 'extensions', 'shell-relay', 'src', 'preflight.test.ts'))).toBe(false);

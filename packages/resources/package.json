@@ -1,0 +1,7 @@
+{
+  "name": "sandpiper-resources",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Shared Sandpiper skills, prompts, themes, and companion resource metadata"
+}

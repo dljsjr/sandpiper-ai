@@ -16,14 +16,12 @@ This is a large structural refactor. The work should proceed through seams, test
 
 ## Context
 
-The current repository is a Bun workspace with legacy top-level Pi resource source directories and generated Pi package artifacts:
+The current repository is a Bun workspace with package-owned shared resources, legacy top-level Pi extension entrypoints, and generated Pi package artifacts:
 
 - package source lives in `packages/`
+- shared skills, prompts, and themes live in `packages/resources/`
 - legacy Pi extension entrypoints still live in `extensions/`
-- skills still live in `skills/`
-- prompts still live in `prompts/`
-- themes still live in `themes/`
-- `devtools/postinstall.sh` currently assembles the Sandpiper Pi/npm package in `dist/`
+- `devtools/postinstall.sh` currently assembles the Sandpiper Pi/npm package in `dist/`, copying package-owned resources into the generated artifact's Pi resource layout
 - AGENT-170/171 temporarily moved Pi package metadata into generated `dist/`, but AGENT-176 corrects the target: root `package.json` remains the package/runtime router while implementation resources move to provider/package-owned paths
 
 That shape made sense while Sandpiper was primarily a rebranded Pi package. It now couples unrelated concerns:
@@ -427,7 +425,7 @@ AGENT-88 starts with **AutoTOON** as the first package-first migration slice. It
 | Web fetch | `extensions/web-fetch/src/*` | Medium: multiple modules, external dependencies, Pi tool adapter and host-neutral fetch pipeline already mixed in extension package | Defer until AutoTOON package pattern is proven. |
 | Shell relay | `extensions/shell-relay/src/*` | Higher: Zellij/FIFO runtime, shell integration preflight, Sandpiper-specific install wording and session env assumptions | Defer to a dedicated host-neutral shell-relay package task. |
 | Background process tools | `extensions/system/background-process-tools.ts`, `extensions/system/startup-hooks.ts` | Medium: neutral behavior now split by AGENT-87, but adapter code is still co-located with Sandpiper identity helpers | Defer until neutral adapter package naming is settled. |
-| Skills/prompts/themes resources | `skills/`, `prompts/`, `themes/` | Medium: distribution assembly currently copies top-level resource directories and docs/skills refer to those paths | Defer broad resource movement until distribution manifest work. |
+| Skills/prompts/themes resources | `packages/resources/` | Medium: distribution assembly had copied top-level resource directories and docs/skills referred to those paths | AGENT-177 moved shared resource source to `packages/resources/`; generated artifacts still expose host-native output layouts. |
 
 AutoTOON target shape:
 
@@ -557,8 +555,9 @@ Artifact shape:
   - `sandpiper` — Bun-compiled executable when feasible; a runnable Bun-targeted launcher is acceptable only as an intermediate test fixture, not the final AGENT-91 completion signal.
   - `package.json` — sidecar metadata read before importing Pi. It includes Sandpiper `piConfig` (`name: sandpiper`, `configDir: .sandpiper`, `bin: sandpiper`) and intentionally does not declare `pi.extensions`, `pi.skills`, `pi.prompts`, or `pi.themes`; resources are loaded through explicit factories/resource discovery.
   - `README.md` / `CHANGELOG.md` where present.
-  - `extensions/`, `skills/`, `prompts/`, `themes/` — copied resource roots used by `createSandpiperExtensionFactories(...)` and `resources_discover`.
-  - `packages/` support packages needed by compatibility bridges and package-first adapters, including `packages/core` and `packages/capability-autotoon`.
+  - `extensions/` — legacy Pi adapter entrypoints used by `createSandpiperExtensionFactories(...)`.
+  - `packages/resources/` — copied shared skills, prompts, and themes used by `resources_discover`.
+  - `packages/` support packages needed by compatibility bridges and package-first adapters, including `packages/resources`, `packages/core`, and `packages/capability-autotoon`.
   - `dist/modes` and `dist/core` — Pi internal assets copied or linked into the sidecar package layout so Pi interactive/export flows keep working.
   - native/data sidecars required by the executable. These must be shipped intentionally, not by copying a whole source-tree `node_modules/` directory.
 
@@ -594,7 +593,7 @@ bun run test:distribution
 
 #### Claude Code plugin target
 
-The local Claude Code plugin artifact lives at `dist/claude-plugin/`. It is a transition artifact used to prove Claude-compatible packaging and adapter seams before the repository fully moves source resources under package directories.
+The local Claude Code plugin artifact lives at `dist/claude-plugin/`. It is a transition artifact used to prove Claude-compatible packaging and adapter seams while the source repository uses package-owned shared resources.
 
 Artifact shape:
 
@@ -859,11 +858,11 @@ AGENT-169 start-state blockers:
 | --- | --- | --- |
 | Root `package.json` Pi identity | At AGENT-169 start, the repository root still declared `piConfig`, `keywords: ["pi-package"]`, `files: ["./dist"]`, `bin.sandpiper`, and canonical `pi.extensions` / `pi.skills` / `pi.prompts` / `pi.themes` entries. AGENT-170/171 removed these while exploring generated artifact ownership. AGENT-176 corrects the target: root metadata should route runtime/package entrypoints, but not own implementation resources. | Root `piConfig`/`bin` anchor Sandpiper runtime; root `pi` routes vanilla Pi to neutral provider/package-owned paths only. |
 | Legacy `dist/` assembly | At AGENT-169 start, `devtools/postinstall.sh` copied top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist`, then `devtools/distPackageJson.ts` copied root `piConfig` and `pi` into `dist/package.json`. AGENT-170/171 made `distPackageJson.ts` synthesize artifact-owned Pi metadata as an interim step. | Long-term `dist/` should primarily contain built Sandpiper runtime outputs/sidecars. Pi and Claude install surfaces should be root/provider/package paths unless host validation proves generated dist roots are required. |
-| Root resource directories | Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` are still authored source directories and are copied into every artifact. | Removing or relocating these paths is a later step. Do not delete them until generated/package-owned replacements and compatibility bridges are verified. |
-| Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, skills, prompts, themes, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading, but it still depends on root resource directory layout as input. |
-| Neutral Pi package | `devtools/neutralPiPackage.ts` explicitly copies a neutral subset from root extension/resource directories and generates its own neutral manifest. | This is closer to the target, but still consumes root resource directories as source inputs. Later package ownership should reduce this copy list to package-owned resources/bridges. |
-| Claude plugin | `devtools/claudeCodePlugin.ts` copies root skills/prompts/themes into Claude plugin paths and generated helper binaries from `dist/`. | Claude artifact already owns Claude-specific metadata, but it still depends on root resource directories and the legacy `dist/` preparation step for helper binaries. |
-| Runtime resource discovery | `packages/cli/sandpiper_resources.ts` loads resources from `skills/`, `prompts/`, and `themes/` under a supplied resource root and imports extension factories from root `extensions/`. | Explicit resource discovery is the preferred direction; the source paths it targets still need to become generated/package-owned or compatibility bridges. |
+| Root resource directories | Top-level `skills/`, `prompts/`, and `themes/` have moved to `packages/resources/`; top-level `extensions/` remains as the legacy Pi adapter source. | Continue retiring root `extensions/` into provider/package-owned adapters; do not reintroduce top-level shared resource source directories. |
+| Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, `packages/resources`, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading and now consumes package-owned shared resources. |
+| Neutral Pi package | `devtools/neutralPiPackage.ts` explicitly copies a neutral subset from root extension directories and `packages/resources`. | Neutral resource input is package-owned; the remaining gap is moving neutral Pi extension adapters to `plugins/pi/`. |
+| Claude plugin | `devtools/claudeCodePlugin.ts` copies `packages/resources` skills/prompts/themes into Claude plugin paths and generated helper binaries from `dist/`. | Claude artifact already owns Claude-specific metadata and now consumes package-owned shared resources, but it still depends on the legacy `dist/` preparation step for helper binaries. |
+| Runtime resource discovery | `packages/cli/sandpiper_resources.ts` loads resources from `packages/resources/skills`, `packages/resources/prompts`, and `packages/resources/themes` under a supplied resource root and imports extension factories from root `extensions/`. | Explicit resource discovery is the preferred direction; extension adapters still need to become provider/package-owned. |
 | Docs and repo guidance | `AGENTS.md`, `docs/dev/build-system.md`, `devtools/README.md`, `packages/README.md`, and `extensions/README.md` still describe root-level resources and legacy `postinstall.sh` assembly as normal development workflow. | Update docs only after behavior changes land so guidance matches the verified build model. |
 
 Next AGENT-93 subtasks:
@@ -875,6 +874,7 @@ Next AGENT-93 subtasks:
 | AGENT-172 | Retire legacy root resource authoring paths. | Root resource directories are removed, generated, or narrowed to compatibility bridges with verified artifact/resource loading. |
 | AGENT-173 | Certify and document retirement. | Clean distribution gate passes from no `dist/`; build/dev/repo guidance describes the new source-of-truth layout. |
 | AGENT-176 | Revise root-router architecture invariants. | Spec and tests allow root runtime/package routing metadata while forbidding root `pi` manifest entries that point at top-level resource source dirs. |
+| AGENT-177 | Move shared resources to `packages/resources/`. | Top-level `skills/`, `prompts/`, and `themes/` are absent; source, runtime discovery, and distribution/plugin assemblers consume `packages/resources/`. |
 
 #### AGENT-170 generated dist manifest invariant slice
 

@@ -73,13 +73,9 @@ sandpiper-ai/
 │   └── shell-relay/     # Shared terminal via Zellij
 ├── packages/            # Workspace packages (built + distributed)
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
+│   ├── resources/       # Shared skills, prompts, and themes
 │   ├── sandpiper-tasks-cli/  # Task management CLI
 │   └── core/            # Shared utilities
-├── skills/              # Pi skills (agent guidance + companion scripts)
-│   ├── sandpiper/       # First-party skills
-│   └── third-party/     # Vendored skills
-├── prompts/             # Prompt templates
-├── themes/              # UI themes
 ├── ast-grep/            # Structural code analysis rules
 ├── devtools/            # Build scripts (not distributed)
 └── dist/                # Distribution output (generated)

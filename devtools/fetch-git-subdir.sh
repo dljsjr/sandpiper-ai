@@ -9,7 +9,7 @@
 # Example:
 #   fetch-git-subdir.sh \
 #     https://github.com/anthropics/skills/tree/main/skills/pdf \
-#     ./skills/third-party/pdf
+#     ./packages/resources/skills/third-party/pdf
 
 set -euo pipefail
 

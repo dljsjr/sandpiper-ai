@@ -13,9 +13,11 @@ DIST_DIR="${REPO_ROOT}/dist"
 # them into dist/, they become circular (symlink pointing to itself).
 # Remove them first; they'll be recreated at the end of this script.
 
-rm -f "${REPO_ROOT}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
-rm -f "${REPO_ROOT}/skills/sandpiper/standup/scripts/sandpiper-standup"
-rm -f "${REPO_ROOT}/skills/sandpiper/dash/scripts/dash"
+RESOURCE_DIR="${REPO_ROOT}/packages/resources"
+
+rm -f "${RESOURCE_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+rm -f "${RESOURCE_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
+rm -f "${RESOURCE_DIR}/skills/sandpiper/dash/scripts/dash"
 
 # Generated package artifacts live under dist/ but are not part of the legacy
 # Pi/npm package rooted at dist/. Remove stale nested artifacts before refreshing
@@ -24,13 +26,22 @@ rm -rf "${DIST_DIR}/claude-plugin" "${DIST_DIR}/neutral-pi-package" "${DIST_DIR}
 
 # ─── Package workspace distributions ───────────────────────────────
 
-for element in extensions themes skills prompts packages; do
+for element in extensions packages; do
     echo "⚙ Copying ${element} packages for distribution"
     mkdir -p "${DIST_DIR}/${element}"
     rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" \
         -ahH \
         --delete \
         "${REPO_ROOT}/${element}/" "${DIST_DIR}/${element}/"
+done
+
+for element in themes skills prompts; do
+    echo "⚙ Copying ${element} resources for distribution"
+    mkdir -p "${DIST_DIR}/${element}"
+    rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" \
+        -ahH \
+        --delete \
+        "${RESOURCE_DIR}/${element}/" "${DIST_DIR}/${element}/"
 done
 
 find . \( -name 'dist' -type d -not -path '*/node_modules/*' -not -path './dist' -not -path './dist/*' -not -path './packages/cli/*' -not -path './extensions/*' \) -print0 |
@@ -139,10 +150,10 @@ fi
 # binaries when running from the repo (not from dist).
 
 echo "⚙ Creating dev-mode symlinks for skill binaries"
-ln -sf "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${REPO_ROOT}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
-ln -sf "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${REPO_ROOT}/skills/sandpiper/standup/scripts/sandpiper-standup"
+ln -sf "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${RESOURCE_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+ln -sf "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${RESOURCE_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
 if [ -f "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" ]; then
-    ln -sf "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" "${REPO_ROOT}/skills/sandpiper/dash/scripts/dash"
+    ln -sf "${DIST_DIR}/skills/sandpiper/dash/scripts/dash" "${RESOURCE_DIR}/skills/sandpiper/dash/scripts/dash"
 fi
 
 # ─── Optional legacy Pi Package install ─────────────────────────

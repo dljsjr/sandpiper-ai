@@ -9,6 +9,7 @@ Workspace packages — built, tested, and distributed as part of sandpiper.
 | [`cli/`](cli/) | Sandpiper CLI wrapper around pi-coding-agent |
 | [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON neutral transform and Pi adapter |
 | [`adapter-claude-code/`](adapter-claude-code/) | Claude Code hooks/adapters over neutral Sandpiper capabilities |
+| [`resources/`](resources/) | Shared skills, prompts, and themes |
 | [`sandpiper-tasks-cli/`](sandpiper-tasks-cli/) | Task management CLI (markdown + YAML frontmatter) |
 | [`core/`](core/) | Shared core utilities |
 
@@ -18,6 +19,6 @@ Each package has its own `build` script that runs `tsc` (for declarations) + `bu
 
 ## Distribution
 
-Built outputs land in each package's `dist/` directory. The root `postinstall` script copies these into the generated Sandpiper Pi/npm package at top-level `dist/` alongside extension, skill, prompt, and theme resources.
+Built outputs land in each package's `dist/` directory. The root `postinstall` script copies these into the generated Sandpiper Pi/npm package at top-level `dist/` alongside extension adapters and shared resources from `packages/resources/`.
 
 Packages that produce CLI binaries are symlinked into `node_modules/.bin/` by bun when listed as dependencies of the root package. For generated binaries, prefer a stable checked-in `bin/` shim as the package `bin` target; Bun resolves workspace bin links before install lifecycle scripts have produced fresh `dist/` outputs.

@@ -42,6 +42,16 @@ describe('ecosystem package artifacts', () => {
     expect(findUnsupportedDependencySpecs(repoRoot)).toEqual([]);
   });
 
+  it('keeps shared resource source package-owned', () => {
+    expect(existsSync(join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'SKILL.md'))).toBe(true);
+    expect(existsSync(join(repoRoot, 'packages', 'resources', 'prompts', 'new-feature.md'))).toBe(true);
+    expect(existsSync(join(repoRoot, 'packages', 'resources', 'themes', 'README.md'))).toBe(true);
+
+    for (const legacyRoot of ['skills', 'prompts', 'themes']) {
+      expect(existsSync(join(repoRoot, legacyRoot))).toBe(false);
+    }
+  });
+
   it('emits a publishable Sandpiper Pi/npm package at dist/', () => {
     const packageDir = join(repoRoot, 'dist');
     const packageJson = readPackageJson(join(packageDir, 'package.json'));

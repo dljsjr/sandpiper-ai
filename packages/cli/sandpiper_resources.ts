@@ -15,10 +15,12 @@ export interface SandpiperResourcePaths {
 }
 
 export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperResourcePaths {
+  const resourcesRoot = join(resourceRoot, 'packages', 'resources');
+
   return {
-    skillPaths: [join(resourceRoot, 'skills', 'sandpiper'), join(resourceRoot, 'skills', 'third-party')],
-    promptPaths: [join(resourceRoot, 'prompts')],
-    themePaths: [join(resourceRoot, 'themes')],
+    skillPaths: [join(resourcesRoot, 'skills', 'sandpiper'), join(resourcesRoot, 'skills', 'third-party')],
+    promptPaths: [join(resourcesRoot, 'prompts')],
+    themePaths: [join(resourcesRoot, 'themes')],
   };
 }
 

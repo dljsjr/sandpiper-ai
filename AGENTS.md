@@ -12,15 +12,15 @@ This repository is a **Bun/Node.js monorepo** that emits generated Pi/npm, stand
 | --- | --- | --- |
 | `extensions/system/` | Pi Extension | Sandpiper identity, system prompt, capability guidance, reinforced guidance, migration, diagnostics |
 | `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
-| `skills/sandpiper/` | First-party skills | Edit source here, not `dist/skills/` |
-| `skills/third-party/` | Vendored skills | Do not edit |
+| `packages/resources/skills/sandpiper/` | First-party skills | Edit source here, not `dist/skills/` |
+| `packages/resources/skills/third-party/` | Vendored skills | Do not edit |
 | `packages/core/` | Shared Library | System prompt, migration, preflight checks, shell integration, path utilities |
 | `packages/capability-autotoon/` | Shared Library + Pi adapter | AutoTOON JSON→TOON neutral transform and Pi event adapter |
 | `packages/adapter-claude-code/` | Claude Adapter | Claude Code hooks/adapters over neutral Sandpiper capabilities |
 | `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
 | `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI |
-| `prompts/` | Prompt templates | |
-| `themes/` | UI themes | |
+| `packages/resources/prompts/` | Prompt templates | |
+| `packages/resources/themes/` | UI themes | |
 | `devtools/` | Dev-only | Build, vendoring, and development utilities |
 
 ## Core Repo Invariants
