@@ -13,13 +13,22 @@ import {
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
-describe('Pi package distribution smoke', () => {
-  it('keeps the repository root from acting as the canonical Pi package manifest', () => {
-    const rootWorkspacePackageJson = rootPackageJson as { readonly keywords?: readonly string[] };
+function expectProviderOwnedRootPiManifest(packageJson: typeof rootPackageJson): void {
+  const rootPackage = packageJson as {
+    readonly pi?: Partial<Record<'extensions' | 'skills' | 'prompts' | 'themes', readonly string[]>>;
+  };
 
-    expect(rootPackageJson).not.toHaveProperty('piConfig');
-    expect(rootPackageJson).not.toHaveProperty('pi');
-    expect(rootWorkspacePackageJson.keywords ?? []).not.toContain('pi-package');
+  for (const entries of Object.values(rootPackage.pi ?? {})) {
+    for (const entry of entries ?? []) {
+      expect(entry).not.toMatch(/^\.\/?(?:extensions|skills|prompts|themes)(?:\/|$)/);
+      expect(entry).toMatch(/^\.\/(?:plugins\/pi|packages\/resources)(?:\/|$)/);
+    }
+  }
+}
+
+describe('Pi package distribution smoke', () => {
+  it('keeps root Pi package routing provider-owned when present', () => {
+    expectProviderOwnedRootPiManifest(rootPackageJson);
     expect(rootPackageJson).not.toHaveProperty('files');
   });
 

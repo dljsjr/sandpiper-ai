@@ -6,11 +6,11 @@ Created: 2026-04-27
 
 ## Summary
 
-Sandpiper should stop treating the repository root as the canonical Pi package. The repository should become a package-first monorepo whose source of truth lives under `packages/`, with separate distribution assemblies for:
+Sandpiper should stop treating top-level resource directories as the canonical Pi package implementation. The repository should become a package-first monorepo whose source of truth lives under `packages/`, with provider-specific install surfaces that route to package-owned resources:
 
-1. **Standalone Sandpiper CLI** — a Sandpiper-branded executable/app distribution built on Pi's SDK/CLI entrypoints.
-2. **Neutral Pi package** — Sandpiper's enhanced capabilities, skills, prompts, themes, and CLIs installable into vanilla Pi without Sandpiper identity or system-prompt branding.
-3. **Claude Code plugin** — the same neutral capability/resource set adapted to Claude Code's plugin model where supported.
+1. **Sandpiper CLI/runtime** — a Sandpiper-branded executable built on Pi's `main(args, { extensionFactories })` entrypoint, with `sandpiper-standalone` becoming the normal `sandpiper` runtime.
+2. **Neutral Pi install surface** — root Pi package metadata that points vanilla Pi at neutral Pi adapters/resources without Sandpiper identity or system-prompt branding.
+3. **Claude Code plugin** — root `.claude-plugin` metadata plus Claude-specific adapters over the same neutral capability/resource set where supported.
 
 This is a large structural refactor. The work should proceed through seams, tests, and distribution smoke tests before deleting or moving the existing top-level Pi-package layout.
 
@@ -23,8 +23,8 @@ The current repository is a Bun workspace with legacy top-level Pi resource sour
 - skills still live in `skills/`
 - prompts still live in `prompts/`
 - themes still live in `themes/`
-- `devtools/postinstall.sh` assembles the Sandpiper Pi/npm package in `dist/`
-- the root `package.json` is no longer the canonical Pi package manifest; generated artifacts own `piConfig` and `pi` resource declarations
+- `devtools/postinstall.sh` currently assembles the Sandpiper Pi/npm package in `dist/`
+- AGENT-170/171 temporarily moved Pi package metadata into generated `dist/`, but AGENT-176 corrects the target: root `package.json` remains the package/runtime router while implementation resources move to provider/package-owned paths
 
 That shape made sense while Sandpiper was primarily a rebranded Pi package. It now couples unrelated concerns:
 
@@ -64,9 +64,9 @@ Pi 0.70.x makes a cleaner split more realistic:
 
 ### 1. Packages are the source of truth
 
-Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` should stop being authored source directories. The canonical source should live under `packages/`.
+Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` should stop being authored source directories. Shared resource source should live under `packages/resources/`; implementation logic should live under focused packages.
 
-Distribution-specific directories may still exist under `dist/`, but they should be generated artifacts.
+Provider-specific router/adapter directories may live outside `packages/` when the host requires a conventional location, e.g. `plugins/pi/` for Pi install adapters and root `.claude-plugin/` for Claude Code marketplace/plugin metadata. `dist/` should be reserved for built Sandpiper runtime outputs and sidecar assets that genuinely need build materialization.
 
 ### 2. Capability packages are host-neutral
 
@@ -115,6 +115,16 @@ If duplication across host adapters becomes painful, introduce a small internal 
 
 Each distribution should be assembled from package/resource manifests rather than hand-maintained duplicated path lists.
 
+### 7. Root package metadata is a router, not an implementation owner
+
+The root `package.json` may expose multiple integration roles:
+
+- `piConfig` anchors Sandpiper runtime branding/config-directory behavior for the `sandpiper` binary.
+- `bin.sandpiper` points at the built Sandpiper runtime executable.
+- `pi` exposes the neutral Pi install surface for vanilla Pi users.
+
+Those roles must not make top-level resource directories canonical. Root `pi` entries should point only at provider/package-owned paths such as `plugins/pi/...` and `packages/resources/...`. The neutral Pi install surface must not include Sandpiper identity/system-prompt/migration/update behavior.
+
 ## Target Package Groups
 
 Names are provisional; refine during implementation.
@@ -133,11 +143,8 @@ Names are provisional; refine during implementation.
 | `packages/tasks-cli` | `sandpiper-tasks` binary/CLI wrapper around task core. |
 | `packages/standup-core` | Standup/session-continuity data model and file operations. |
 | `packages/standup-cli` | `sandpiper-standup` binary/CLI wrapper around standup core. |
-| `packages/resources-skills` | First-party skills and vendored third-party skill bundle metadata; maps to Pi skills and Claude plugin `skills/`. |
-| `packages/resources-prompts` | Prompt templates; maps directly to Pi prompts, and may map to Claude plugin `commands/` or skills where behavior is equivalent. |
-| `packages/resources-themes` | Theme resources; maps to Pi themes and Claude plugin `themes/` after schema compatibility review. |
+| `packages/resources` | Shared skills, prompt templates, themes, companion scripts/CLI materialization, and resource metadata; maps to Pi resources and Claude plugin resources where schemas are compatible. |
 | `packages/distribution-manifest` | Shared manifest describing resources and entrypoints used by distribution assemblers. |
-| `packages/dist-pi-package` | Neutral Pi package assembler. |
 | `packages/dist-sandpiper-cli` | Standalone Sandpiper app/binary assembler. |
 | `packages/dist-claude-plugin` | Claude Code plugin assembler. |
 
@@ -661,10 +668,10 @@ Certified paths:
 
 | Install path | Source root | Current gate |
 | --- | --- | --- |
-| source-root workspace clone | repository root cloned for development | root/package workspace manifests avoid `catalog:` and `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` passes; root intentionally has no Pi package manifest |
-| `pi install npm:sandpiper-ai` / `pi install <dist>` | npm/local package generated at `dist/` | `dist/package.json` has no `private`, owns Sandpiper `piConfig` and `pi` resource paths, declares npm-compatible runtime deps, references local support packages with `file:`, and uses a `files` whitelist to keep nested generated artifacts out of `npm pack` |
-| neutral Pi package | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/`, without Sandpiper `piConfig` or `sandpiper` bin |
-| Claude Code plugin marketplace/npm install | root `.claude-plugin/marketplace.json` and npm package from `dist/claude-plugin/` | `claude plugin validate .` and `claude plugin validate dist/claude-plugin` pass; plugin `npm pack --dry-run` includes `.claude-plugin/plugin.json` |
+| source-root workspace clone | repository root cloned for development | root/package workspace manifests avoid `catalog:` and `workspace:*`; `npm install --ignore-scripts --package-lock=false --dry-run` passes; AGENT-176 target allows root Pi metadata only as provider/package-owned routing |
+| Sandpiper runtime package | root npm package plus built `dist/sandpiper` | root `piConfig` anchors Sandpiper branding/config-dir behavior; `sandpiper` loads identity programmatically via extension factories, not by installing the root Pi package into itself |
+| neutral Pi install surface | root package `pi` manifest | root `pi` entries route vanilla Pi to neutral `plugins/pi` and `packages/resources` paths only, without Sandpiper identity/system prompt/migration/update behavior |
+| Claude Code plugin marketplace/npm install | root `.claude-plugin/marketplace.json` and root/plugin metadata | `claude plugin validate .` passes; Claude-specific hooks live under provider-owned paths and shared resources are referenced directly when Claude supports it |
 
 Implementation results:
 
@@ -850,8 +857,8 @@ AGENT-169 start-state blockers:
 
 | Area | Current root-owned behavior | Retirement implication |
 | --- | --- | --- |
-| Root `package.json` Pi identity | At AGENT-169 start, the repository root still declared `piConfig`, `keywords: ["pi-package"]`, `files: ["./dist"]`, `bin.sandpiper`, and canonical `pi.extensions` / `pi.skills` / `pi.prompts` / `pi.themes` entries. AGENT-171 removes those root Pi-package declarations. | Generated artifacts own Pi package metadata while the root remains a workspace/development package. |
-| Legacy `dist/` assembly | At AGENT-169 start, `devtools/postinstall.sh` copied top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist/`, then `devtools/distPackageJson.ts` copied root `piConfig` and `pi` into `dist/package.json`. AGENT-170/171 make `distPackageJson.ts` synthesize artifact-owned Pi metadata instead. | `dist/` should continue to be publishable/installable, but its manifest is generated from artifact-owned resource declarations rather than inherited root metadata. |
+| Root `package.json` Pi identity | At AGENT-169 start, the repository root still declared `piConfig`, `keywords: ["pi-package"]`, `files: ["./dist"]`, `bin.sandpiper`, and canonical `pi.extensions` / `pi.skills` / `pi.prompts` / `pi.themes` entries. AGENT-170/171 removed these while exploring generated artifact ownership. AGENT-176 corrects the target: root metadata should route runtime/package entrypoints, but not own implementation resources. | Root `piConfig`/`bin` anchor Sandpiper runtime; root `pi` routes vanilla Pi to neutral provider/package-owned paths only. |
+| Legacy `dist/` assembly | At AGENT-169 start, `devtools/postinstall.sh` copied top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist`, then `devtools/distPackageJson.ts` copied root `piConfig` and `pi` into `dist/package.json`. AGENT-170/171 made `distPackageJson.ts` synthesize artifact-owned Pi metadata as an interim step. | Long-term `dist/` should primarily contain built Sandpiper runtime outputs/sidecars. Pi and Claude install surfaces should be root/provider/package paths unless host validation proves generated dist roots are required. |
 | Root resource directories | Top-level `extensions/`, `skills/`, `prompts/`, and `themes/` are still authored source directories and are copied into every artifact. | Removing or relocating these paths is a later step. Do not delete them until generated/package-owned replacements and compatibility bridges are verified. |
 | Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, skills, prompts, themes, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading, but it still depends on root resource directory layout as input. |
 | Neutral Pi package | `devtools/neutralPiPackage.ts` explicitly copies a neutral subset from root extension/resource directories and generates its own neutral manifest. | This is closer to the target, but still consumes root resource directories as source inputs. Later package ownership should reduce this copy list to package-owned resources/bridges. |
@@ -863,10 +870,11 @@ Next AGENT-93 subtasks:
 
 | Task | Purpose | Completion signal |
 | --- | --- | --- |
-| AGENT-170 | Add root-assembly retirement invariants. | Tests fail on root-owned canonical Pi metadata and pass once generated artifacts own resource manifests explicitly. |
+| AGENT-170 | Add root-assembly retirement invariants. | Tests fail on root-owned implementation resource paths and pass once generated/resource manifests own resource paths explicitly. |
 | AGENT-171 | Move Pi package assembly to generated/package-owned resources. | `dist/package.json` no longer derives its `pi` / `piConfig` directly from root `package.json`; distribution smokes still pass. |
 | AGENT-172 | Retire legacy root resource authoring paths. | Root resource directories are removed, generated, or narrowed to compatibility bridges with verified artifact/resource loading. |
 | AGENT-173 | Certify and document retirement. | Clean distribution gate passes from no `dist/`; build/dev/repo guidance describes the new source-of-truth layout. |
+| AGENT-176 | Revise root-router architecture invariants. | Spec and tests allow root runtime/package routing metadata while forbidding root `pi` manifest entries that point at top-level resource source dirs. |
 
 #### AGENT-170 generated dist manifest invariant slice
 
@@ -885,12 +893,12 @@ Completion signal:
 
 #### AGENT-171 root package manifest retirement slice
 
-AGENT-171 removes Pi-package identity from the source root while preserving generated Sandpiper Pi package behavior.
+AGENT-171 removed Pi-package identity from the source root while preserving generated Sandpiper Pi package behavior. AGENT-176 supersedes the final interpretation: root Pi metadata is allowed as runtime/install routing metadata, but it must not point at top-level implementation resource directories.
 
-Implementation target:
+Interim implementation target:
 
 - Root `package.json` no longer declares `piConfig`, `pi`, `keywords: ["pi-package"]`, `files: ["./dist"]`, or root-level package `bin` entries.
-- Distribution tests assert the repository root remains npm-installable as a workspace but is not itself a Pi package manifest.
+- Interim distribution tests asserted the repository root remained npm-installable as a workspace while root Pi metadata was absent.
 - `packages/cli/pi_wrapper.ts` resolves source/dev runs to the generated `dist/` package metadata when the repository root is only a workspace package.
 
 Completion signal:
@@ -916,6 +924,25 @@ Completion signal:
 - Generated `dist/extensions/system/package.json` has npm-compatible support-package metadata.
 - Clean distribution gate passes.
 
+#### AGENT-176 root-router architecture correction
+
+AGENT-176 corrects the AGENT-170/171 interim interpretation that the repository root should have no Pi metadata. Pi's install model treats the installed source directory as the package root and also auto-discovers conventional root resource directories when no `pi` manifest is present. The target is therefore root-as-router, not root-without-Pi-metadata.
+
+Target shape:
+
+- `packages/resources/` is the shared source of truth for skills, prompts, themes, and companion scripts/CLIs generated during prepack/build.
+- `plugins/pi/` is the neutral Pi install surface. It contains thin Pi adapters over package-owned logic and must not include Sandpiper identity/system-prompt/migration/update behavior.
+- Root `.claude-plugin/` remains the Claude Code marketplace/plugin entrypoint. It should reference shared resources directly if Claude supports that; otherwise duplicate only unavoidable Claude-specific resource packaging.
+- `sandpiper-standalone` subsumes the normal `sandpiper` runtime. The `sandpiper` binary configures `PI_PACKAGE_DIR`/mirrored env first, then imports Pi through the deferred import shim and calls `main(args, { extensionFactories })`.
+- There is no separate long-term `neutral-pi-package` artifact: the root Pi package install surface is neutral.
+- Root `package.json` may contain `piConfig`, `bin.sandpiper`, `keywords: ["pi-package"]`, and a `pi` manifest, but root `pi` entries must route only to provider/package-owned paths like `./plugins/pi/...` and `./packages/resources/...`.
+
+Verification target:
+
+- Tests fail if root `pi` entries point at top-level `./extensions`, `./skills`, `./prompts`, or `./themes` source directories.
+- Stock Pi loading from the root package should exercise only neutral Pi resources.
+- Sandpiper runtime loading should exercise Sandpiper identity through programmatic extension factories, not through root Pi package installation.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.
@@ -932,7 +959,7 @@ Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakd
 | AGENT-91 | MEDIUM | AGENT-85, AGENT-88, AGENT-89 | Build standalone Sandpiper Bun binary distribution. | App bundle/binary runs and loads identity + neutral capabilities from temp config. |
 | AGENT-92 | MEDIUM | AGENT-88, AGENT-89 | Research and build Claude Code plugin distribution. | Plugin format documented; supported resources and Claude adapters load in Claude Code or a faithful local validator. |
 | AGENT-150 | HIGH | AGENT-90, AGENT-92 | Certify ecosystem package installation paths. | npm/Pi/Claude install compatibility gates pass for source root, generated Pi artifacts, and Claude marketplace/plugin manifests. |
-| AGENT-93 | MEDIUM | AGENT-90, AGENT-91, AGENT-92, AGENT-150 | Retire legacy Pi-oriented root assembly. | Root no longer acts as canonical Pi package; docs and generated artifacts updated. |
+| AGENT-93 | MEDIUM | AGENT-90, AGENT-91, AGENT-92, AGENT-150 | Retire legacy Pi-oriented root assembly. | Top-level root resource dirs are no longer canonical; root package routes Sandpiper runtime, neutral Pi install, and Claude plugin entrypoints to provider/package-owned paths. |
 
 ## Verification Gates
 
@@ -959,16 +986,15 @@ The invariant is not "zero matches everywhere" because Sandpiper identity packag
 
 1. **Project config directory API:** Pi exports `getAgentDir()`, but project-local config dir resolution may not be exposed at the right abstraction level. Verify before designing around it.
 2. **Bun compile asset model:** Initial AGENT-85 answer: target an app bundle with sidecar `package.json`, assets, and resources first. A true single-file binary remains a later optimization.
-3. **Claude adapter shape:** Determine the Claude Code plugin packaging format, hook lifecycle expectations, MCP server lifecycle expectations, and which capability operations should be exposed as hooks or MCP tools.
+3. **Claude adapter shape:** Root `.claude-plugin` is required. Still verify whether Claude plugin metadata can union shared resource paths directly or whether unavoidable Claude-specific resource duplication is required.
 4. **Existing data migration:** Existing users have `.sandpiper/tasks`, `.sandpiper/standup.md`, and `~/.sandpiper`. Decide when neutral tools should use host config paths versus preserving Sandpiper-branded storage for product compatibility.
 5. **CLI naming:** Confirm whether `sandpiper-tasks` remains the CLI name in neutral Pi/Claude distributions or whether aliases are needed.
-6. **Package granularity:** Confirm the final package names after the first spike; avoid creating many tiny packages before the boundaries are proven.
+6. **Package granularity:** Use `packages/resources/` for shared resources; confirm additional package names only when boundaries are proven.
 
 ## First Implementation Guardrails
 
 - Start from a clean working copy.
 - Keep each phase behavior-preserving unless the task explicitly says otherwise.
 - Add characterization tests before moving code with existing behavior.
-- Prefer compatibility bridges during migration over flag-day moves.
-- Do not delete old root resource directories until generated replacements are verified.
+- Prefer compatibility bridges during migration when they reduce risk, but remove old root resource directories outright once replacement paths are verified.
 - Commit with task references.
