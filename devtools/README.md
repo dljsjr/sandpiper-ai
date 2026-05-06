@@ -10,7 +10,7 @@ Development scripts and build utilities. Not distributed with the package.
 | `preinstall.sh` | Scaffolds `dist/` directory structure before workspace builds |
 | `vendor.sh` | Downloads vendored third-party skills from `vendor.txt` |
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
-| `distPackageJson.ts` | Generates `dist/package.json` with merged piConfig + pi resource paths |
+| `distPackageJson.ts` | Generates `dist/package.json` with artifact-owned Sandpiper `piConfig` + `pi` resource paths |
 | `neutralPiPackage.ts` | Assembles `dist/neutral-pi-package/`, the neutral Pi package transition artifact |
 | `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
 | `claudeCodePlugin.ts` | Assembles `dist/claude-plugin/` resources/manifest and bundles Claude hook scripts |
@@ -45,7 +45,7 @@ Run the distribution invariant and smoke gate with:
 bun run test:distribution
 ```
 
-This prepares the legacy `dist/` assembly, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies npm/Pi package install metadata and scratch-file pruning, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
+This prepares the generated Sandpiper Pi/npm package at `dist/`, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies npm/Pi package install metadata and scratch-file pruning, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
 
 ## Build Flow
 
@@ -60,7 +60,7 @@ bun install
       → wire skill-bundled CLIs (tasks, standup)
       → copy extension package.json files
       → remove stale nested generated artifacts from dist/
-      → generate dist/package.json with npm-compatible package metadata
+      → generate dist/package.json with npm-compatible package metadata and artifact-owned Pi resource metadata
       → symlink pi internal assets
       → build dash CLI via mcporter
       → create dev-mode skill binary symlinks
@@ -100,7 +100,7 @@ bun run test:claude-plugin
 
 `devtools/ecosystemPackage.test.ts` is the release/install compatibility gate. It checks that:
 
-- the repository root contains no `catalog:` or `workspace:*` dependency specs, so Pi's git install path can run npm install after cloning source;
+- the repository root contains no `catalog:` or `workspace:*` dependency specs and does not declare Pi package metadata;
 - generated Pi package artifacts under `dist/` and `dist/neutral-pi-package/` have npm-compatible manifests, no `private`, valid `file:` dependency targets, and no leaked scratch logs/PIDs;
 - the root `dist/` package uses a `files` whitelist so nested generated artifacts are not included by `npm pack`.
 
