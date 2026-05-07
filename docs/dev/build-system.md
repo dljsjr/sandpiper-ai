@@ -4,7 +4,7 @@ Understanding Sandpiper's build pipeline and when to run build steps.
 
 ## Overview
 
-Sandpiper is a Pi Package and Bun workspace. The build system has three stages:
+Sandpiper is a Bun workspace that emits generated Pi/npm, standalone app, and Claude plugin artifacts. The build system has three stages:
 
 1. **Package builds** — Compile TypeScript, bundle binaries
 2. **Dependency hoisting** — Bun workspace install
@@ -24,7 +24,7 @@ Not all changes require a build step. Here's what to do after different types of
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
 | `packages/adapter-claude-code/` | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin` | Emits TypeScript declarations and bundles Claude hook scripts into the plugin artifact |
-| Distribution invariant or smoke checks | `bun run test:distribution` | Builds legacy dist prerequisites, assembles `dist/`, builds neutral Pi, standalone app, and Claude plugin artifacts, and runs source/distribution/standalone/plugin invariant tests |
+| Distribution invariant or smoke checks | `bun run test:distribution` | Builds dist prerequisites, assembles `dist/`, verifies root neutral Pi routing, builds standalone app and Claude plugin artifacts, and runs source/distribution/standalone/plugin invariant tests |
 
 ## Build Pipeline
 
@@ -99,13 +99,7 @@ This script:
 6. Builds the Dash CLI via mcporter
 7. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
 
-The neutral Pi package artifact is built separately:
-
-```bash
-bun run build:neutral-pi-package
-```
-
-This writes `dist/neutral-pi-package/`, a local transition artifact that exposes neutral capabilities/resources through the same provider-owned paths used by the root Pi router: `plugins/pi/extensions` and `packages/resources`. It excludes Sandpiper `piConfig`, CLI branding, migration flags, and startup prompt identity hooks. Its generated manifest is npm-installable: package-owned runtime support is copied under `packages/`, referenced with local `file:` dependencies, and Pi packages are declared as `peerDependencies` with `"*"` ranges per Pi packaging guidance.
+The neutral Pi install surface is the repository root itself: root `package.json` keeps its `pi` manifest routed through provider/package-owned paths (`plugins/pi/extensions` and `packages/resources/...`). Sandpiper runtime branding lives in root `piConfig` and the `sandpiper` bin, while vanilla Pi resource loading is covered by the root Pi package smoke test and must not load Sandpiper identity/system-prompt/migration/update behavior.
 
 The standalone Sandpiper app bundle is built separately:
 
@@ -121,7 +115,7 @@ The Claude Code plugin artifact is built separately:
 bun run build:claude-plugin
 ```
 
-This writes `dist/claude-plugin/` with Claude plugin metadata, copied skills/commands/themes, materialized helper CLIs, hook configuration, a bundled `hooks/autotoon-post-tool-use.js` script, and npm package metadata for `sandpiper-claude-code-plugin`. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific hook glue lives in `packages/adapter-claude-code/` and adapts host-neutral capability code. The repository root also contains `.claude-plugin/marketplace.json`, which validates as a Claude marketplace and points marketplace installs at the npm plugin package.
+This writes `dist/claude-plugin/` with Claude plugin metadata, copied skills/commands/themes, materialized helper CLIs, hook configuration, a bundled `hooks/autotoon-post-tool-use.js` script, and npm package metadata for `sandpiper-claude-code-plugin`. This generated package remains intentional: marketplace-installed Claude plugins are copied into Claude's plugin cache and must be self-contained, so shared resources are duplicated into Claude's component layout at package time. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific hook glue lives in `packages/adapter-claude-code/` and adapts host-neutral capability code. The repository root also contains `.claude-plugin/marketplace.json`, which validates as a Claude marketplace and points marketplace installs at the npm plugin package.
 
 Automatic package installation is intentionally opt-in. The normal Sandpiper CLI path loads Sandpiper extensions/resources through explicit extension factories and `resources_discover`; it does not need `dist/` installed as a Pi package. The `sandpiper` and `sandpiper-standalone` workspace bins are stable checked-in shims over generated Bun bundles. This avoids duplicate package entries when running `bun install` from multiple jj workspaces.
 
@@ -178,7 +172,7 @@ These are copied, not built.
 bun run test:distribution
 ```
 
-This command prepares the generated Sandpiper Pi/npm package assembly and neutral Pi package artifact, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, root/provider and generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, neutral package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
+This command prepares the generated Sandpiper Pi/npm package assembly, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, root/provider and generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, root Pi package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
 
 ### Ecosystem Install Certification
 
@@ -188,7 +182,7 @@ The supported local install roots are:
 | --- | --- | --- |
 | source-root workspace clone | repository root after clone | root `package.json` is npm-installable for development and any Pi package routing points only at provider/package-owned paths |
 | `pi install npm:sandpiper-ai` / `pi install <dist>` | published/local package built from `dist/` | `dist/package.json` has no `private`, owns Sandpiper `piConfig` and `pi` resource paths, uses npm-compatible runtime deps and `file:` support packages, and `npm pack --dry-run --json` excludes nested generated artifacts |
-| neutral Pi local/npm artifact | `dist/neutral-pi-package/` | same npm-compatible dependency/file-target checks as `dist/` plus no Sandpiper `piConfig` or `sandpiper` bin |
+| neutral Pi local install surface | repository root | root `pi` routes only through `plugins/pi/extensions` and `packages/resources/...`; root smoke tests load those resources without Sandpiper identity hooks |
 | Claude plugin marketplace/npm install | root `.claude-plugin/marketplace.json` plus `dist/claude-plugin/` | `claude plugin validate` passes for both marketplace and plugin manifests; plugin package metadata has author/repository/license and no `private` |
 
 Manual certification commands:
@@ -197,7 +191,6 @@ Manual certification commands:
 bun run prepare:distribution
 npm install --ignore-scripts --package-lock=false --dry-run
 npm install --ignore-scripts --package-lock=false --dry-run --prefix dist
-npm install --ignore-scripts --package-lock=false --dry-run --prefix dist/neutral-pi-package
 bun run build:claude-plugin
 claude plugin validate .
 claude plugin validate dist/claude-plugin

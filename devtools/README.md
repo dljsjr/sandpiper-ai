@@ -11,7 +11,6 @@ Development scripts and build utilities. Not distributed with the package.
 | `vendor.sh` | Downloads vendored third-party skills from `vendor.txt` |
 | `fetch-git-subdir.sh` | Downloads a subdirectory from a git repo (used by `vendor.sh`) |
 | `distPackageJson.ts` | Generates `dist/package.json` with artifact-owned Sandpiper `piConfig` + `pi` resource paths |
-| `neutralPiPackage.ts` | Assembles `dist/neutral-pi-package/`, the neutral Pi package transition artifact |
 | `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
 | `claudeCodePlugin.ts` | Assembles `dist/claude-plugin/` resources/manifest and bundles Claude hook scripts |
 | `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
@@ -45,7 +44,7 @@ Run the distribution invariant and smoke gate with:
 bun run test:distribution
 ```
 
-This prepares the generated Sandpiper Pi/npm package at `dist/`, builds `dist/neutral-pi-package/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies npm/Pi package install metadata and scratch-file pruning, verifies neutral package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
+This prepares the generated Sandpiper Pi/npm package at `dist/`, verifies source-boundary invariants, checks generated Pi package resource paths, verifies npm/Pi package install metadata and scratch-file pruning, verifies root Pi package loading without Sandpiper identity, runs both dogfood standalone and compiled standalone app smoke tests with temporary agent directories, and validates the Claude plugin artifact plus hook smoke tests.
 
 ## Build Flow
 
@@ -66,11 +65,6 @@ bun install
       → create dev-mode skill binary symlinks
       → optionally run sandpiper install dist/ when SANDPIPER_INSTALL_PI_PACKAGE=1
 
-bun run build:neutral-pi-package
-  → copy neutral Pi adapters and package-owned resources to dist/neutral-pi-package/
-  → generate neutral package.json without Sandpiper piConfig or sandpiper bin
-  → copy support package package.json files and use file: deps for local package-owned runtime code
-
 bun run prepare:standalone-app
   → copy standalone Sandpiper resources/support packages to dist/standalone-sandpiper/
   → generate Sandpiper sidecar package.json without Pi resource manifest entries
@@ -82,7 +76,7 @@ bun run build:standalone-app
 
 bun run build:claude-plugin
   → run prepare:distribution for generated helper CLIs
-  → copy Claude-compatible skills/commands/themes to dist/claude-plugin/
+  → copy Claude-compatible skills/commands/themes to dist/claude-plugin/ because installed Claude plugins must be self-contained
   → materialize generated skill scripts and bin helpers without external workspace symlinks
   → write .claude-plugin/plugin.json, package.json, and hooks/hooks.json
   → bundle hooks/autotoon-post-tool-use.js for Claude's PostToolUse lifecycle
@@ -101,7 +95,7 @@ bun run test:claude-plugin
 `devtools/ecosystemPackage.test.ts` is the release/install compatibility gate. It checks that:
 
 - the repository root contains no `catalog:` or `workspace:*` dependency specs and any root Pi package routing points only at provider/package-owned paths;
-- generated Pi package artifacts under `dist/` and `dist/neutral-pi-package/` have npm-compatible manifests, no `private`, valid `file:` dependency targets, and no leaked scratch logs/PIDs;
+- the generated Sandpiper Pi/npm package under `dist/` has npm-compatible manifests, no `private`, valid `file:` dependency targets, and no leaked scratch logs/PIDs;
 - the root `dist/` package uses a `files` whitelist so nested generated artifacts are not included by `npm pack`.
 
 `devtools/claudeCodePlugin.test.ts` covers Claude's side of the same gate: the generated plugin package metadata is publishable, `.claude-plugin/plugin.json` and root `.claude-plugin/marketplace.json` validate with the Claude CLI when available, and `npm pack --dry-run` includes the plugin manifest.

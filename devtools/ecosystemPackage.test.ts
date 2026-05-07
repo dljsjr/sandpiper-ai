@@ -95,29 +95,8 @@ describe('ecosystem package artifacts', () => {
     expect(packedFiles).not.toContain('claude-plugin/.claude-plugin/plugin.json');
   });
 
-  it('emits a publishable neutral Pi package artifact', () => {
-    const packageDir = join(repoRoot, 'dist', 'neutral-pi-package');
-    const packageJson = readPackageJson(join(packageDir, 'package.json'));
-
-    expect(packageJson.private).toBeUndefined();
-    expect(packageJson.type).toBe('module');
-    expect(packageJson.keywords).toContain('pi-package');
-    expect(packageJson.dependencies).toMatchObject({
-      'sandpiper-ai-core': 'file:./packages/core',
-      'sandpiper-capability-autotoon': 'file:./packages/capability-autotoon',
-    });
-    expect(packageJson).not.toHaveProperty('piConfig');
-    expect(packageJson).not.toHaveProperty('bin');
-    expect(findUnsupportedDependencySpecs(packageDir)).toEqual([]);
-    expect(findMissingFileDependencyTargets(packageDir)).toEqual([]);
-    expect(npmPackDryRun(packageDir)).toContain('package.json');
-  });
-
   it('does not leak development scratch files into generated skill packages', () => {
-    const skillRoots = [
-      join(repoRoot, 'dist', 'skills'),
-      join(repoRoot, 'dist', 'neutral-pi-package', 'packages', 'resources', 'skills'),
-    ];
+    const skillRoots = [join(repoRoot, 'dist', 'skills')];
 
     for (const skillRoot of skillRoots) {
       expect(readFileSync(join(skillRoot, 'sandpiper', 'jj', 'SKILL.md'), 'utf-8')).toContain('name: jj');

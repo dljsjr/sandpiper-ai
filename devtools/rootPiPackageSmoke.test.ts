@@ -2,12 +2,11 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { assembleNeutralPiPackage } from './neutralPiPackage.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
-async function expectNeutralPackageLoads(packageDir: string): Promise<void> {
-  const tempRoot = mkdtempSync(join(repoRoot, '.tmp-neutral-pi-package-smoke-'));
+async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void> {
+  const tempRoot = mkdtempSync(join(repoRoot, '.tmp-root-pi-package-smoke-'));
   const agentDir = join(tempRoot, 'agent');
   const cwd = join(tempRoot, 'project');
   const previousPackageDir = process.env.PI_PACKAGE_DIR;
@@ -76,20 +75,8 @@ async function expectNeutralPackageLoads(packageDir: string): Promise<void> {
   }
 }
 
-describe('neutral Pi package smoke', () => {
+describe('root Pi package smoke', () => {
   it('loads source-root neutral Pi routing without Sandpiper identity behavior', async () => {
-    await expectNeutralPackageLoads(repoRoot);
-  }, 15_000);
-
-  it('loads generated neutral tools and resources without Sandpiper identity behavior', async () => {
-    const tempRoot = mkdtempSync(join(repoRoot, '.tmp-neutral-pi-package-build-'));
-
-    try {
-      const packageDir = join(tempRoot, 'package');
-      await assembleNeutralPiPackage({ repoRoot, outputDir: packageDir });
-      await expectNeutralPackageLoads(packageDir);
-    } finally {
-      rmSync(tempRoot, { recursive: true, force: true });
-    }
+    await expectRootNeutralPiPackageLoads(repoRoot);
   }, 15_000);
 });
