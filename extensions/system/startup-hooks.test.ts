@@ -6,22 +6,29 @@ import { createSystemRuntimeState } from './runtime.js';
 import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
 import { createBackgroundContextProcessManagerStub, createEventStub } from './test-helpers.js';
 
-const mockBuildSandpiperSystemPrompt = vi.fn();
-vi.mock('../../packages/core/src/system-prompt.js', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../packages/core/src/system-prompt.js')>();
+const mockBuildSandpiperStartupPrompt = vi.hoisted(() => vi.fn());
+vi.mock('sandpiper-ai-core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('sandpiper-ai-core')>();
   return {
     ...actual,
-    buildSandpiperSystemPrompt: (...args: unknown[]) => mockBuildSandpiperSystemPrompt(...args),
+    buildSandpiperStartupPrompt: (...args: unknown[]) => mockBuildSandpiperStartupPrompt(...args),
   };
 });
 
-import type { BuildSystemPromptOptions as PiSystemPromptOptions } from '@mariozechner/pi-coding-agent';
-
 describe('startup hooks', () => {
   beforeEach(() => {
-    mockBuildSandpiperSystemPrompt.mockImplementation(
-      async (options: Record<string, unknown>, _originalPromptOptions: PiSystemPromptOptions) =>
-        JSON.stringify(options),
+    mockBuildSandpiperStartupPrompt.mockImplementation(
+      async (state: { startupContextPending: boolean; coldStartGuidancePending: boolean }, input: { cwd: string }) => {
+        state.startupContextPending = false;
+        state.coldStartGuidancePending = false;
+        return JSON.stringify({
+          cwd: input.cwd,
+          projectTriggers: '',
+          activeTaskContext: '',
+          workingCopyContext: '',
+          coldStartGuidance: 'Cold-Start Guidance',
+        });
+      },
     );
   });
 
