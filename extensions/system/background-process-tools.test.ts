@@ -5,7 +5,9 @@ import { createProcessManagerStub, createToolRegistrationStub } from './test-hel
 describe('registerBackgroundProcessTools', () => {
   it('registers tools and starts a background process successfully', async () => {
     const { pi, tools } = createToolRegistrationStub();
-    const spawn = vi.fn(() => ({ pid: 4242 }));
+    const spawn = vi.fn(() => ({
+      info: { id: 'dev-server', pid: 4242, running: true, exitCode: null, exitSignal: null },
+    }));
     const processManager = createProcessManagerStub({ spawn, get: vi.fn() });
 
     registerBackgroundProcessTools(

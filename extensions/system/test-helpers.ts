@@ -9,7 +9,7 @@
  * event handlers, etc.) for assertion purposes.
  */
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
-import type { ProcessManager } from 'sandpiper-ai-core';
+import type { ProcessInfo, ProcessManager } from 'sandpiper-ai-core';
 import { vi } from 'vitest';
 
 // ─── Common handler types ────────────────────────────────────────
@@ -119,11 +119,31 @@ export function createMigrationControlsStub(flags: Record<string, boolean | stri
 
 // ─── Process manager stubs ───────────────────────────────────────
 
+function createManagedProcessStub(info: ProcessInfo): ReturnType<ProcessManager['spawn']> {
+  return {
+    id: info.id,
+    info,
+    readStdout: vi.fn(() => ''),
+    readStderr: vi.fn(() => ''),
+    stdoutLineCount: 0,
+    stderrLineCount: 0,
+  } as unknown as ReturnType<ProcessManager['spawn']>;
+}
+
 export function createProcessManagerStub(
   overrides: { spawn?: (...args: unknown[]) => unknown; get?: (...args: unknown[]) => unknown } = {},
 ): Pick<ProcessManager, 'spawn' | 'get'> {
   return {
-    spawn: (overrides.spawn ?? vi.fn(() => ({ pid: 1234 }))) as ProcessManager['spawn'],
+    spawn: (overrides.spawn ??
+      vi.fn((options: Parameters<ProcessManager['spawn']>[0]) =>
+        createManagedProcessStub({
+          id: options.id,
+          pid: 1234,
+          running: true,
+          exitCode: null,
+          exitSignal: null,
+        }),
+      )) as ProcessManager['spawn'],
     get: (overrides.get ?? vi.fn(() => undefined)) as ProcessManager['get'],
   };
 }
