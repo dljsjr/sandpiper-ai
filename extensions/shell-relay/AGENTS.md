@@ -77,7 +77,7 @@ The scripts only require `SHELL_RELAY_SIGNAL`. They should not assume stdout/std
 - Test the "extreme wrapping" case where output starts on the same line as the command echo (currently a known limitation)
 
 ### Zellij Tests
-- Mock `child_process.execSync` — tests should NOT depend on a running Zellij instance
+- Inject a mocked `execSync` through `ZellijClient` options — tests should NOT depend on a running Zellij instance
 - When mocking `execSync` with `encoding: "utf-8"`, return `string` values cast as `never`
 
 ### FIFO Tests

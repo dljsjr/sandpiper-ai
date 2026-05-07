@@ -1,20 +1,14 @@
-import * as childProcess from 'node:child_process';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ZellijClient } from './zellij.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ZellijClient, type ZellijExecSync } from './zellij.js';
 
-let mockExecSync: ReturnType<typeof vi.spyOn>;
+let mockExecSync: ReturnType<typeof vi.fn<ZellijExecSync>>;
 
 describe('ZellijClient', () => {
   let client: ZellijClient;
 
   beforeEach(() => {
-    mockExecSync = vi.spyOn(childProcess, 'execSync');
-    mockExecSync.mockReset();
-    client = new ZellijClient({ sessionName: 'test-session', paneId: 'terminal_0' });
-  });
-
-  afterEach(() => {
-    mockExecSync.mockRestore();
+    mockExecSync = vi.fn<ZellijExecSync>();
+    client = new ZellijClient({ sessionName: 'test-session', paneId: 'terminal_0', execSync: mockExecSync });
   });
 
   // ── Session Management ──────────────────────────────────────
@@ -272,7 +266,7 @@ describe('ZellijClient', () => {
 
   describe('pane targeting', () => {
     it('should throw when pane-targeted operation is called without pane ID', () => {
-      const noPaneClient = new ZellijClient({ sessionName: 'test-session' });
+      const noPaneClient = new ZellijClient({ sessionName: 'test-session', execSync: mockExecSync });
 
       expect(() => noPaneClient.paste('hello')).toThrow('No pane ID set');
       expect(() => noPaneClient.sendKeys('Enter')).toThrow('No pane ID set');
@@ -282,7 +276,7 @@ describe('ZellijClient', () => {
     it('should work after setPaneId is called', () => {
       mockExecSync.mockReturnValue('' as never);
 
-      const noPaneClient = new ZellijClient({ sessionName: 'test-session' });
+      const noPaneClient = new ZellijClient({ sessionName: 'test-session', execSync: mockExecSync });
       noPaneClient.setPaneId('terminal_1');
       noPaneClient.paste('hello');
 

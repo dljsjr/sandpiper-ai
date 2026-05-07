@@ -30,7 +30,7 @@ describe('Shell Integration Scripts', () => {
   describe('Fish prompt hook', () => {
     it('should be a no-op when SHELL_RELAY_SIGNAL is not set', () => {
       // Source the script and trigger a prompt — should produce no errors
-      const result = execSync(`fish -c "source ${FISH_SCRIPT}; __relay_prompt_hook" 2>&1`, {
+      const result = execSync(`fish --no-config -c "source ${FISH_SCRIPT}; __relay_prompt_hook" 2>&1`, {
         encoding: 'utf-8',
         timeout: 5000,
         env: { PATH: process.env.PATH ?? '' },
@@ -40,7 +40,7 @@ describe('Shell Integration Scripts', () => {
     });
 
     it('should be a no-op when SHELL_RELAY_SIGNAL points to nonexistent file', () => {
-      const result = execSync(`fish -c "source ${FISH_SCRIPT}; __relay_prompt_hook" 2>&1`, {
+      const result = execSync(`fish --no-config -c "source ${FISH_SCRIPT}; __relay_prompt_hook" 2>&1`, {
         encoding: 'utf-8',
         timeout: 5000,
         env: {
@@ -52,7 +52,7 @@ describe('Shell Integration Scripts', () => {
     });
 
     it('should write prompt_ready when FIFO is valid', () => {
-      execSync(`fish -c "source ${FISH_SCRIPT}; __relay_prompt_hook" 2>&1`, {
+      execSync(`fish --no-config -c "source ${FISH_SCRIPT}; __relay_prompt_hook" 2>&1`, {
         encoding: 'utf-8',
         timeout: 5000,
         env: {
@@ -79,7 +79,7 @@ describe('Shell Integration Scripts', () => {
     it('should error when SHELL_RELAY_SIGNAL is not set', () => {
       let output = '';
       try {
-        output = execSync(`fish -c "source ${FISH_SCRIPT}; __relay_run 'echo hello'" 2>&1 || true`, {
+        output = execSync(`fish --no-config -c "source ${FISH_SCRIPT}; __relay_run 'echo hello'" 2>&1 || true`, {
           encoding: 'utf-8',
           timeout: 5000,
           env: { PATH: process.env.PATH ?? '' },
@@ -93,14 +93,17 @@ describe('Shell Integration Scripts', () => {
     });
 
     it('should write last_status when SHELL_RELAY_SIGNAL is set', () => {
-      execSync(`fish -c "source ${FISH_SCRIPT}; __relay_run (string escape --style=script -- 'true')" 2>&1`, {
-        encoding: 'utf-8',
-        timeout: 5000,
-        env: {
-          PATH: process.env.PATH ?? '',
-          SHELL_RELAY_SIGNAL: fifoManager.paths.signal,
+      execSync(
+        `fish --no-config -c "source ${FISH_SCRIPT}; __relay_run (string escape --style=script -- 'true')" 2>&1`,
+        {
+          encoding: 'utf-8',
+          timeout: 5000,
+          env: {
+            PATH: process.env.PATH ?? '',
+            SHELL_RELAY_SIGNAL: fifoManager.paths.signal,
+          },
         },
-      });
+      );
 
       const { openSync: fsOpen, readSync, closeSync: fsClose } = require('node:fs');
       const { constants } = require('node:fs');
