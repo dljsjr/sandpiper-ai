@@ -12,10 +12,18 @@ describe('standalone Sandpiper compiled app bundle', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-compile-'));
 
     try {
-      const executable = join(repoRoot, 'dist', 'standalone-sandpiper', 'sandpiper');
+      const appBundleDir = join(tempDir, 'standalone-sandpiper');
+      const executable = join(appBundleDir, 'sandpiper');
       const agentDir = join(tempDir, 'agent');
 
-      execFileSync('bun', ['run', 'build:standalone-app'], { cwd: repoRoot, stdio: 'pipe' });
+      execFileSync(
+        'bun',
+        ['run', '--bun', 'devtools/standaloneSandpiperApp.ts', '--compile', '--output-dir', appBundleDir],
+        {
+          cwd: repoRoot,
+          stdio: 'pipe',
+        },
+      );
 
       const output = execFileSync(
         executable,
