@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { type ExecSyncOptions, execSync } from 'node:child_process';
 
 /**
  * Zellij CLI client for shell relay operations.
@@ -16,11 +16,15 @@ import { execSync } from 'node:child_process';
 
 // ─── Types ──────────────────────────────────────────────────────
 
+export type ZellijExecSync = (command: string, options?: ExecSyncOptions) => string | Buffer;
+
 export interface ZellijClientOptions {
   /** Session name to target. */
   readonly sessionName: string;
   /** Pane ID to target (e.g., "terminal_0"). Set after session creation. */
   readonly paneId?: string;
+  /** Command executor seam for tests. */
+  readonly execSync?: ZellijExecSync;
 }
 
 export interface PaneInfo {
@@ -43,11 +47,13 @@ export interface PaneInfo {
 
 export class ZellijClient {
   private readonly sessionName: string;
+  private readonly execSync: ZellijExecSync;
   private paneId: string | undefined;
 
   constructor(options: ZellijClientOptions) {
     this.sessionName = options.sessionName;
     this.paneId = options.paneId;
+    this.execSync = options.execSync ?? execSync;
   }
 
   /** Update the target pane ID. */
@@ -70,7 +76,7 @@ export class ZellijClient {
    * For a wider viewport, use createSessionWithDetach() instead.
    */
   createBackgroundSession(): void {
-    execSync(`zellij attach --create-background ${this.shellQuote(this.sessionName)}`, {
+    this.execSync(`zellij attach --create-background ${this.shellQuote(this.sessionName)}`, {
       stdio: 'pipe',
     });
   }
@@ -95,7 +101,7 @@ export class ZellijClient {
     const paneReady = await this.waitForPane(timeoutMs);
     if (paneReady) {
       try {
-        execSync(`zellij --session ${this.shellQuote(this.sessionName)} action detach`, {
+        this.execSync(`zellij --session ${this.shellQuote(this.sessionName)} action detach`, {
           stdio: 'pipe',
         });
       } catch {
@@ -122,7 +128,7 @@ export class ZellijClient {
    */
   isAvailable(): boolean {
     try {
-      execSync('command -v zellij', { stdio: 'pipe' });
+      this.execSync('command -v zellij', { stdio: 'pipe' });
       return true;
     } catch {
       return false;
@@ -135,10 +141,12 @@ export class ZellijClient {
    */
   listSessions(): string[] {
     try {
-      const output = execSync('zellij list-sessions --short --no-formatting', {
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      });
+      const output = String(
+        this.execSync('zellij list-sessions --short --no-formatting', {
+          stdio: 'pipe',
+          encoding: 'utf-8',
+        }),
+      );
       return output
         .split('\n')
         .map((line) => line.trim())
@@ -154,10 +162,12 @@ export class ZellijClient {
    */
   listSessionsWithStatus(): Array<{ name: string; exited: boolean }> {
     try {
-      const output = execSync('zellij list-sessions --no-formatting', {
-        stdio: 'pipe',
-        encoding: 'utf-8',
-      });
+      const output = String(
+        this.execSync('zellij list-sessions --no-formatting', {
+          stdio: 'pipe',
+          encoding: 'utf-8',
+        }),
+      );
       return output
         .split('\n')
         .map((line) => {
@@ -178,7 +188,7 @@ export class ZellijClient {
    * Only works on EXITED sessions; running sessions must be killed first.
    */
   deleteSession(sessionName: string): void {
-    execSync(`zellij delete-session ${sessionName}`, {
+    this.execSync(`zellij delete-session ${sessionName}`, {
       stdio: 'pipe',
       encoding: 'utf-8' as never,
     });
@@ -309,10 +319,12 @@ export class ZellijClient {
    * Execute a zellij command targeting the session.
    */
   private execInSession(command: string): string {
-    return execSync(`zellij --session ${this.shellQuote(this.sessionName)} ${command}`, {
-      stdio: 'pipe',
-      encoding: 'utf-8',
-    });
+    return String(
+      this.execSync(`zellij --session ${this.shellQuote(this.sessionName)} ${command}`, {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      }),
+    );
   }
 
   /**
@@ -323,10 +335,12 @@ export class ZellijClient {
     if (!this.paneId) {
       throw new Error('No pane ID set. Call setPaneId() or waitForPane() first.');
     }
-    return execSync(`zellij --session ${this.shellQuote(this.sessionName)} ${command} --pane-id ${this.paneId}`, {
-      stdio: 'pipe',
-      encoding: 'utf-8',
-    });
+    return String(
+      this.execSync(`zellij --session ${this.shellQuote(this.sessionName)} ${command} --pane-id ${this.paneId}`, {
+        stdio: 'pipe',
+        encoding: 'utf-8',
+      }),
+    );
   }
 
   /**

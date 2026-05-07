@@ -16,7 +16,7 @@ function verifyRoundTrip(input: string): void {
   // Ask fish to unescape the escaped string and print it with printf.
   // We use printf '%s\0' and read with -z to preserve newlines.
   // The escaped token is passed via env var to avoid shell interpretation.
-  const result = execSync(`fish -c 'string unescape --style=script -- $ESCAPED_CMD'`, {
+  const result = execSync(`fish --no-config -c 'string unescape --style=script -- $ESCAPED_CMD'`, {
     encoding: 'utf-8',
     timeout: 5000,
     env: { ...process.env, ESCAPED_CMD: escaped },
