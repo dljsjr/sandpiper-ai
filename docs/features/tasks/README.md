@@ -1,113 +1,88 @@
-# Task Management — Project Task Tracking
+# How to track work with Sandpiper tasks
 
-Track project work items with a markdown-based task system designed for both humans and AI agents.
+`sandpiper-tasks` stores project work items as markdown files with YAML frontmatter. The files are easy to inspect directly, but the CLI is the normal way to create, update, move, complete, and archive tasks.
 
-## What It Does
-
-Sandpiper's task system provides:
-
-- **Markdown tasks** with YAML frontmatter — readable by humans and agents
-- **Project-local tracking** — tasks live in your project's `.sandpiper/tasks/` directory
-- **CLI management** — create, update, complete, and query tasks from the command line
-- **Flexible storage** — inline on your branch, separate branch, or external repository
-- **Cross-session continuity** — active tasks injected into agent context
-
-## Quick Start
-
-### Create a Task
+## Create a project task
 
 ```bash
-bun sandpiper-tasks create --title "Implement login feature" --key PROJ
+sandpiper-tasks task create -p AGENT -t "Implement feature X" --priority HIGH --reporter USER
 ```
 
-### List Tasks
+The CLI allocates the next task key, writes the task file, and updates the index.
+
+## Pick up work
 
 ```bash
-bun sandpiper-tasks list
-bun sandpiper-tasks list --status active
-bun sandpiper-tasks list --assignee doug
+sandpiper-tasks task pickup AGENT-123
 ```
 
-### Update a Task
+Picking up a task sets it to `IN_PROGRESS` and assigns it to `AGENT`.
+
+## List and inspect tasks
 
 ```bash
-bun sandpiper-tasks update PROJ-1 --status "in-progress"
+sandpiper-tasks task list
+sandpiper-tasks task list -p AGENT --top-level
+sandpiper-tasks task list -s NOT_STARTED --priority HIGH
+sandpiper-tasks task show AGENT-123
+sandpiper-tasks task summary
 ```
 
-### Complete a Task
+Use structured output when scripting:
 
 ```bash
-bun sandpiper-tasks complete PROJ-1
+sandpiper-tasks -f json task list -s IN_PROGRESS
+sandpiper-tasks -f toon task show AGENT-123 --metadata-only
 ```
 
-## Storage Modes
+## Update a task
 
-Task storage is configured in `.sandpiper-tasks.json` or `.sandpiper/settings.json`:
-
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| **Inline** (default) | Tasks on current branch | Solo development |
-| **Separate branch** | Tasks on dedicated branch | Reduce VCS churn |
-| **External repo** | Tasks in separate repository | Shared task tracking |
-
-See [Storage Guide](./storage-guide.md) for configuration details.
-
-## Task File Format
-
-```markdown
----
-key: PROJ-1
-title: Implement login feature
-status: active
-created: 2026-04-16T10:00:00Z
----
-
-## Description
-
-Implement user login with OAuth2 support.
-
-## Acceptance Criteria
-
-- [ ] Login form with email/password
-- [ ] OAuth2 integration (Google, GitHub)
-- [ ] Session management
-- [ ] Logout functionality
+```bash
+sandpiper-tasks task update AGENT-123 --status BLOCKED
+sandpiper-tasks task update AGENT-123 --priority MEDIUM
+sandpiper-tasks task update AGENT-123 --depends-on AGENT-122
 ```
 
-## Commands
+For larger description edits, use the interactive editor mode:
 
-| Command | Description |
-|---------|-------------|
-| `create` | Create a new task |
-| `list` | List tasks with filters |
-| `show` | Show task details |
-| `update` | Update task fields |
-| `complete` | Mark task as done |
-| `pickup` | Mark task as in-progress |
-| `move` | Move task between projects |
-| `archive` | Archive completed tasks |
-| `storage init` | Initialize separate-branch storage |
-| `storage migrate` | Migrate inline tasks to separate branch |
-| `storage sync` | Sync task branch with remote |
+```bash
+sandpiper-tasks task update AGENT-123 -i
+```
 
-See [Storage Guide](./storage-guide.md) for storage commands.
+## Complete a task
 
-## For Agents
+Completion is a two-step workflow. First mark the task ready for review:
 
-Tasks are automatically injected into the agent's context at session start. The agent can:
+```bash
+sandpiper-tasks task complete AGENT-123
+```
 
-- Read active tasks for context
-- Update task status as work progresses
-- Reference task keys in commits
-- Create tasks for discovered work
+After review, finalize it with a resolution:
 
-## Related Documentation
+```bash
+sandpiper-tasks task complete AGENT-123 --final --resolution DONE
+```
 
-- [Architecture](./architecture.md) — Design rationale and configuration model
-- [Storage Guide](./storage-guide.md) — Operator guide for storage modes
-- [Session Standup](./standup.md) — Cross-session continuity
+Use `WONTFIX` when the work is no longer needed.
 
----
+## Archive completed tasks
 
-**Last updated**: 2026-04-16  
-**CLI**: `bun sandpiper-tasks`
+```bash
+sandpiper-tasks task archive
+sandpiper-tasks task archive -p AGENT
+sandpiper-tasks task archive --list
+```
+
+Archiving moves completed task files to an archive directory while preserving their history.
+
+## Storage modes
+
+By default, task files live inline on the current branch. For active projects, this can create VCS noise. Sandpiper can also store tasks on a separate branch or in an external repository.
+
+See [Task storage modes](storage-guide.md) for setup and migration commands.
+
+## File format and architecture
+
+Tasks are markdown files with structured frontmatter and an append-only activity log. The index is derived state; task files on disk are the source of truth.
+
+See [Task storage architecture](architecture.md) for the design rationale and [the task CLI package README](../../../packages/sandpiper-tasks-cli/README.md) for implementation details.

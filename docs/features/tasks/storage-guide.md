@@ -4,18 +4,16 @@ By default, `sandpiper-tasks` stores task files inline on the current branch alo
 your code. This guide explains how to move tasks to a dedicated branch (or a separate
 repository) to eliminate the VCS churn that task lifecycle operations produce.
 
-See also: `.sandpiper/docs/task-storage-strategy.md` for the full design rationale.
-
----
+See [Task storage architecture](architecture.md) for the design rationale.
 
 ## Configuration
 
 Task storage is configured in one of two places:
 
-| File | Location | Notes |
-|------|----------|-------|
-| `.sandpiper-tasks.json` | Project root | Wins over settings.json |
-| `.sandpiper/settings.json` | `.sandpiper/` dir | Under the `tasks` key |
+| File                       | Location          | Notes                   |
+| -------------------------- | ----------------- | ----------------------- |
+| `.sandpiper-tasks.json`    | Project root      | Wins over settings.json |
+| `.sandpiper/settings.json` | `.sandpiper/` dir | Under the `tasks` key   |
 
 The standalone file format (`.sandpiper-tasks.json`):
 
@@ -34,13 +32,13 @@ The standalone file format (`.sandpiper-tasks.json`):
 
 ### Configuration reference
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| `version_control.enabled` | `true` | VCS-track tasks at all |
-| `version_control.mode.branch` | `"@"` | `"@"` = inline; any other value = separate branch name |
-| `version_control.mode.repo` | _(omit)_ | External repo URL; omit to use current repo |
-| `version_control.auto_commit` | `false` | Auto-commit to task branch after every mutation |
-| `version_control.auto_push` | `false` | Auto-push after every auto-commit (requires `auto_commit: true`) |
+| Field                         | Default  | Description                                                      |
+| ----------------------------- | -------- | ---------------------------------------------------------------- |
+| `version_control.enabled`     | `true`   | VCS-track tasks at all                                           |
+| `version_control.mode.branch` | `"@"`    | `"@"` = inline; any other value = separate branch name           |
+| `version_control.mode.repo`   | _(omit)_ | External repo URL; omit to use current repo                      |
+| `version_control.auto_commit` | `false`  | Auto-commit to task branch after every mutation                  |
+| `version_control.auto_push`   | `false`  | Auto-push after every auto-commit (requires `auto_commit: true`) |
 
 ---
 
@@ -83,6 +81,7 @@ This creates the workspace/worktree and adds `.sandpiper/tasks/` to the main
 branch's `.gitignore`.
 
 **Backend rules:**
+
 - `.jj/` present → `jj workspace add .sandpiper/tasks --revision 'root()'`
 - `.git/` only → `git worktree add --orphan -b sandpiper-tasks .sandpiper/tasks`
 
@@ -109,6 +108,7 @@ sandpiper-tasks --dir /path/to/project storage pull   # pull only
 Remote tracking must be established manually after the first push:
 
 **jj backend**
+
 ```bash
 cd .sandpiper/tasks
 jj git push --bookmark sandpiper-tasks
@@ -116,6 +116,7 @@ jj git push --bookmark sandpiper-tasks
 ```
 
 **git backend**
+
 ```bash
 cd .sandpiper/tasks
 git push --set-upstream origin sandpiper-tasks
@@ -143,6 +144,7 @@ sandpiper-tasks --dir /path/to/project storage init
 ```
 
 This clones the repo into `.sandpiper/tasks/` using the appropriate VCS:
+
 - jj project → `jj git clone --colocate <url> .sandpiper/tasks`
 - git project → `git clone <url> .sandpiper/tasks`
 
@@ -195,6 +197,7 @@ If two machines create tasks simultaneously before syncing, they may allocate th
 same counter number. This becomes visible as a VCS conflict on push.
 
 **Resolution:**
+
 1. `storage pull` — fetch the remote state.
 2. Manually rename one of the conflicting task files (e.g., `TST-5.md` →
    `TST-<next-available>.md`). Update the task's `title` field key at the top
@@ -210,10 +213,12 @@ after a pull and allocate correctly.
 ## `auto_commit` and `auto_push`
 
 When `auto_commit: true`:
+
 - Every `task create`, `task update`, `task pickup`, `task complete`, etc. automatically
   commits the changed files to the task branch with a descriptive message.
 - The main repo's working copy is never touched by task operations.
 
 When `auto_push: true` (requires `auto_commit: true`):
+
 - After every auto-commit, changes are pushed to the remote immediately.
 - This is opt-in because it requires a working remote connection. Default is `false`.

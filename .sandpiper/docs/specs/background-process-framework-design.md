@@ -1,8 +1,9 @@
 # Background Process Framework — Design Sketch
 
-**Status**: ✅ **IMPLEMENTED** (Core) + ⚠️ **PARTIAL** (Notifications, Buffer Limits)  
-**Implementation**: `packages/core/src/process-manager.ts`, `extensions/system/background-process-tools.ts`  
-**Last verified**: 2026-04-16  
+- **Diátaxis mode**: Reference spec with explanatory design notes
+- **Status**: ✅ **IMPLEMENTED** (Core) + ⚠️ **PARTIAL** (Notifications, Buffer Limits)
+- **Implementation**: `packages/core/src/process-manager.ts`, `extensions/system/background-process-tools.ts`
+- **Last verified**: 2026-04-16
 
 ---
 
@@ -22,13 +23,13 @@
 
 ### ⚠️ Partial / Not Implemented
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Passive completion notifications via `context` event | ❌ Not implemented | Design specifies automatic injection when process exits. Not wired up. |
-| Buffer size limits | ❌ Not implemented | Buffers are unbounded. No ring buffer or max size. |
-| Process restart | ❌ Not implemented | No auto-restart logic. Consumer responsibility. |
-| Multiple consumers / broadcast | ⚠️ Partial | Multiple handlers supported via `onStdout()`, but no broadcast mechanism for tool consumers. |
-| PTY support | ❌ Not implemented | Uses standard `child_process.spawn()` with pipes. PTY discussed but punted. |
+| Feature                                              | Status             | Notes                                                                                        |
+| ---------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------- |
+| Passive completion notifications via `context` event | ❌ Not implemented | Design specifies automatic injection when process exits. Not wired up.                       |
+| Buffer size limits                                   | ❌ Not implemented | Buffers are unbounded. No ring buffer or max size.                                           |
+| Process restart                                      | ❌ Not implemented | No auto-restart logic. Consumer responsibility.                                              |
+| Multiple consumers / broadcast                       | ⚠️ Partial         | Multiple handlers supported via `onStdout()`, but no broadcast mechanism for tool consumers. |
+| PTY support                                          | ❌ Not implemented | Uses standard `child_process.spawn()` with pipes. PTY discussed but punted.                  |
 
 ### 🔍 Needs Verification
 
@@ -36,8 +37,6 @@
 - `context` event handler for completion notifications — may be implemented but not found in initial review
 
 ---
-
-# Background Process Framework — Design Sketch
 
 AGENT-15. Framework-independent process manager in `sandpiper-ai-core`,
 exposed to the agent via tool calls registered in `system.ts`.
@@ -137,6 +136,7 @@ Polls a process for status. Parameterized to control context cost.
 ```
 
 Parameters:
+
 - `id` — process to check (required)
 - `include_stdout` — include buffered stdout in response (default: false)
 - `include_stderr` — include buffered stderr in response (default: false)
@@ -150,20 +150,20 @@ On the next LLM turn, a `context` event handler checks for unacknowledged
 completions and injects a system message:
 
 ```typescript
-pi.on('context', async (event, ctx) => {
+pi.on("context", async (event, ctx) => {
   const completed = processManager.getCompletedUnacknowledged();
   if (completed.length === 0) return;
 
-  const notifications = completed.map(p =>
-    `Background process "${p.id}" exited with code ${p.exitCode}.`
-  ).join('\n');
+  const notifications = completed
+    .map((p) => `Background process "${p.id}" exited with code ${p.exitCode}.`)
+    .join("\n");
 
   for (const p of completed) processManager.acknowledge(p.id);
 
   return {
     messages: [
       ...event.messages,
-      { role: 'user', content: [{ type: 'text', text: notifications }] },
+      { role: "user", content: [{ type: "text", text: notifications }] },
     ],
   };
 });
@@ -176,7 +176,7 @@ notifications.
 ### Lifecycle: Session Teardown
 
 ```typescript
-pi.on('session_shutdown', async () => {
+pi.on("session_shutdown", async () => {
   processManager.killAll();
 });
 ```
@@ -191,9 +191,17 @@ infrastructure:
 ```typescript
 // Start subscribe stream
 const sub = processManager.spawn({
-  id: 'zellij-subscribe',
-  command: 'zellij',
-  args: ['--session', session, 'subscribe', '--pane-id', paneId, '--format', 'json'],
+  id: "zellij-subscribe",
+  command: "zellij",
+  args: [
+    "--session",
+    session,
+    "subscribe",
+    "--pane-id",
+    paneId,
+    "--format",
+    "json",
+  ],
 });
 
 // Extension-level consumer parses NDJSON
@@ -224,20 +232,20 @@ Agent: "The tests failed. Let me check the output."
 Full inventory of how extensions can share state, communicate with the LLM,
 and persist data. Assessed for relevance to the background process framework.
 
-| Mechanism | LLM context? | Persisted? | Triggers turn? | Direction |
-|-----------|-------------|------------|----------------|-----------|
-| `pi.events` (event bus) | No | No | No | Extension ↔ Extension |
-| `context` event handler | Yes (injects messages) | No | No (piggybacks) | Extension → LLM |
-| `before_agent_start` return | Yes (system prompt) | No | No | Extension → LLM |
-| `sendMessage` | Yes (if display:true) | Yes | Optional | Extension → Chat + LLM |
-| `sendUserMessage` | Yes | Yes | Always | Extension → LLM |
-| `appendEntry` | **No** | Yes | No | Extension → Session |
-| `ctx.ui.notify` | No | No | No | Extension → User |
-| `ctx.ui.setWidget` | No | No | No | Extension → User |
-| `ctx.ui.setStatus` | No | No | No | Extension → User (footer) |
-| `process.env` | No | No | No | Global |
-| Tool `onUpdate` callback | Yes (partial) | No | No (mid-execution) | Tool → LLM |
-| Tool return value | Yes | Yes | No | Tool → LLM |
+| Mechanism                   | LLM context?           | Persisted? | Triggers turn?     | Direction                 |
+| --------------------------- | ---------------------- | ---------- | ------------------ | ------------------------- |
+| `pi.events` (event bus)     | No                     | No         | No                 | Extension ↔ Extension     |
+| `context` event handler     | Yes (injects messages) | No         | No (piggybacks)    | Extension → LLM           |
+| `before_agent_start` return | Yes (system prompt)    | No         | No                 | Extension → LLM           |
+| `sendMessage`               | Yes (if display:true)  | Yes        | Optional           | Extension → Chat + LLM    |
+| `sendUserMessage`           | Yes                    | Yes        | Always             | Extension → LLM           |
+| `appendEntry`               | **No**                 | Yes        | No                 | Extension → Session       |
+| `ctx.ui.notify`             | No                     | No         | No                 | Extension → User          |
+| `ctx.ui.setWidget`          | No                     | No         | No                 | Extension → User          |
+| `ctx.ui.setStatus`          | No                     | No         | No                 | Extension → User (footer) |
+| `process.env`               | No                     | No         | No                 | Global                    |
+| Tool `onUpdate` callback    | Yes (partial)          | No         | No (mid-execution) | Tool → LLM                |
+| Tool return value           | Yes                    | Yes        | No                 | Tool → LLM                |
 
 ### Mechanisms chosen for the framework
 

@@ -1,9 +1,10 @@
 # Sandpiper System Prompt Architecture
 
+**Diátaxis mode**: Explanation with implementation-plan sections
 **Status**: ✅ **ARCHITECTURE DECISION** - Chosen approach for system prompt assembly  
 **Date**: 2026-04-16  
 **Related**: AGENT-? (implementation task)  
-**Last verified**: 2026-04-16  
+**Last verified**: 2026-04-16
 
 ---
 
@@ -17,7 +18,6 @@
 
 ---
 
-
 **Date**: 2026-04-16  
 **Based on**: Deep dive into Pi internals, extension examples, and PoC testing
 
@@ -26,6 +26,7 @@
 ## Problem Statement
 
 We need to:
+
 1. Replace PI's identity block with unified Sandpiper identity
 2. Fix Pi docs paths (currently point to our repo, not actual Pi package)
 3. Add Sandpiper docs with same granularity as Pi's
@@ -40,9 +41,11 @@ We need to:
 ### Dynamic Tools (BLOCKER for SYSTEM.md approach)
 
 From `docs/extensions.md`:
+
 > "`pi.registerTool()` works both during extension load and **after startup**. You can call it inside `session_start`, command handlers, or other event handlers. **New tools are refreshed immediately** in the same session, so they appear in `pi.getAllTools()` and are callable by the LLM **without `/reload`**."
 
 **Implication**: A static SYSTEM.md file would NEVER have the complete tools list. Tools can be registered:
+
 - During extension load
 - In `session_start` handlers
 - In command handlers (e.g., `/add-echo-tool`)
@@ -69,15 +72,15 @@ From `docs/extensions.md`:
 
 ### Why This Approach?
 
-| Requirement | How We Meet It |
-|-------------|----------------|
-| ✅ Unified identity | Replace identity section in `before_agent_start` |
-| ✅ Fix Pi docs paths | Replace docs section with correct paths |
-| ✅ Add Sandpiper docs | Add parallel docs section with same granularity |
-| ✅ Handle dynamic tools | **KEEP PI's tools section** (already dynamic) |
-| ✅ Reuse AGENTS.md loading | **KEEP PI's context files** (already appended) |
-| ✅ Reuse skills loading | **KEEP PI's skills section** (already appended) |
-| ✅ Add dynamic sections | Append in `before_agent_start` |
+| Requirement                | How We Meet It                                   |
+| -------------------------- | ------------------------------------------------ |
+| ✅ Unified identity        | Replace identity section in `before_agent_start` |
+| ✅ Fix Pi docs paths       | Replace docs section with correct paths          |
+| ✅ Add Sandpiper docs      | Add parallel docs section with same granularity  |
+| ✅ Handle dynamic tools    | **KEEP PI's tools section** (already dynamic)    |
+| ✅ Reuse AGENTS.md loading | **KEEP PI's context files** (already appended)   |
+| ✅ Reuse skills loading    | **KEEP PI's skills section** (already appended)  |
+| ✅ Add dynamic sections    | Append in `before_agent_start`                   |
 
 **Key insight**: We're not replacing PI's base prompt - we're **surgically modifying** it to fix the identity/docs while keeping everything else PI built.
 
@@ -133,7 +136,7 @@ You are a coding assistant running in Sandpiper, a framework built on top of the
 - Extension development: README.md, docs/extensions.md, examples/extensions/
 - Skills: docs/skills.md, skills/
 - TUI: docs/tui.md
-- Tasks CLI: docs/task-storage-strategy.md
+- Tasks CLI: docs/features/tasks/README.md
 - Always read docs completely and follow cross-references before implementing.
 
 **Pi Framework Documentation** (read when working on Pi itself):
@@ -157,7 +160,7 @@ export function reassemblePrompt(sections: PromptSections): string {
     sections.contextFiles,
     sections.skills,
     sections.dateCwd,
-  ].join('\n\n');
+  ].join("\n\n");
 }
 ```
 
@@ -171,16 +174,16 @@ import { parsePromptSections, buildSandpiperIdentity, reassemblePrompt } from 's
 pi.on('before_agent_start', async (event, ctx) => {
   // 1. Parse PI's assembled prompt
   const sections = parsePromptSections(event.systemPrompt);
-  
+
   // 2. Replace identity/docs sections
   sections.identity = buildSandpiperIdentity({
     piCodingAgentPackage: process.env.PI_CODING_AGENT_PACKAGE!,
     piCodingAgentVersion: process.env.PI_CODING_AGENT_VERSION!,
   });
-  
+
   // 3. Reassemble base prompt
   let newPrompt = reassemblePrompt(sections);
-  
+
   // 4. Add our dynamic sections
   const dynamicSections = [
     formatStandupContext(...),
@@ -189,9 +192,9 @@ pi.on('before_agent_start', async (event, ctx) => {
     formatProjectTriggers(...),
     formatColdStartGuidance(),
   ].filter(Boolean).join('\n\n');
-  
+
   newPrompt += '\n\n' + dynamicSections;
-  
+
   return {
     systemPrompt: newPrompt,
   };
@@ -201,11 +204,13 @@ pi.on('before_agent_start', async (event, ctx) => {
 ### Step 3: Testing
 
 **Unit tests**:
+
 - `parsePromptSections()` correctly extracts sections
 - `buildSandpiperIdentity()` produces correct output
 - `reassemblePrompt()` produces valid prompt
 
 **Integration test**:
+
 - Run `SANDPIPER_DUMP_SYSTEM_PROMPT=1 pi`
 - Verify structure:
   - Sandpiper identity (not PI's)
@@ -228,17 +233,19 @@ pi.on('before_agent_start', async (event, ctx) => {
 ✅ **Reuses PI's work** - AGENTS.md, skills, guidelines all from PI  
 ✅ **Minimal code** - Just parse/replace/reassemble, no duplication  
 ✅ **Clean separation** - Identity/docs are ours, rest is PI's  
-✅ **No placeholder mechanism** - Direct string manipulation  
+✅ **No placeholder mechanism** - Direct string manipulation
 
 ### Cons
 
-⚠️ **Tight coupling to PI's prompt structure** - If PI changes section markers, our regex breaks  
-  - Mitigation: Section markers are stable ("Available tools:", "Guidelines:", etc.)  
-  - Mitigation: We'd notice immediately in testing  
+⚠️ **Tight coupling to PI's prompt structure** - If PI changes section markers, our regex breaks
 
-⚠️ **String manipulation** - Parsing and reassembling strings feels fragile  
-  - Mitigation: Well-tested regex patterns  
-  - Mitigation: Fallback to current behavior on parse failure  
+- Mitigation: Section markers are stable ("Available tools:", "Guidelines:", etc.)
+- Mitigation: We'd notice immediately in testing
+
+⚠️ **String manipulation** - Parsing and reassembling strings feels fragile
+
+- Mitigation: Well-tested regex patterns
+- Mitigation: Fallback to current behavior on parse failure
 
 ---
 
@@ -249,6 +256,7 @@ pi.on('before_agent_start', async (event, ctx) => {
 **Idea**: Use SYSTEM.md for static base, inject tools in `before_agent_start`
 
 **Why rejected**:
+
 - Tools can be registered AFTER `session_start` (in command handlers)
 - Would need to re-inject tools on every `before_agent_start`
 - More complex than just keeping PI's tools section
@@ -259,6 +267,7 @@ pi.on('before_agent_start', async (event, ctx) => {
 **Idea**: Build entire prompt from scratch using `pi.getAllTools()`
 
 **Why rejected**:
+
 - Duplicates PI's tools/guidelines logic
 - More code to maintain
 - No benefit - PI already built it correctly
@@ -269,6 +278,7 @@ pi.on('before_agent_start', async (event, ctx) => {
 **Idea**: Generate SYSTEM.md dynamically, pass via `--system-prompt`
 
 **Why rejected**:
+
 - Still can't handle tools registered after `session_start`
 - More complex (file generation, template substitution)
 - No benefit over recommended approach
@@ -281,6 +291,7 @@ pi.on('before_agent_start', async (event, ctx) => {
 **Recommended approach**: Parse PI's assembled prompt in `before_agent_start`, replace identity/docs sections, keep everything else, add our dynamic sections.
 
 **Why**:
+
 - Handles dynamic tools correctly
 - Reuses PI's work (no duplication)
 - Minimal code changes
@@ -288,6 +299,7 @@ pi.on('before_agent_start', async (event, ctx) => {
 - No complex placeholder mechanisms
 
 **Next steps**:
+
 1. Implement `packages/core/src/sandpiper-prompt-builder.ts`
 2. Modify `extensions/system/startup-hooks.ts`
 3. Add unit tests

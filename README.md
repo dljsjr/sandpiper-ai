@@ -11,7 +11,7 @@ On top of pi's core functionality, Sandpiper provides:
 ### Core Features
 
 - **[Shell Relay](docs/features/shell-relay.md)** — A shared terminal session via Zellij where both you and the agent can see and interact with the same shell. The agent inherits your session state: auth tokens, shell functions, activated environments, everything. No more copying commands to your terminal — the agent runs them in yours.
-- **[Task Management](docs/features/tasks.md)** — A markdown-based task tracker with YAML frontmatter, designed for both humans and agents to read and update. Organize work by project, track status, archive completed items.
+- **[Task Management](docs/features/tasks/README.md)** — A markdown-based task tracker with YAML frontmatter, designed for both humans and agents to read and update. Organize work by project, track status, archive completed items.
 - **[Session Continuity](docs/features/standup.md)** — Stand-up notes at the start of each session orient the agent on what was done last time, what's blocked, and what's next. A project directory tracks active projects across repositories.
 
 ### Enhanced Capabilities
@@ -44,20 +44,15 @@ bun sandpiper        # Launch sandpiper (interactive mode)
 
 ### For Users
 
-- **[Documentation Home](docs/README.md)** — Complete routing table for user-facing docs
+- **[Documentation Home](docs/README.md)** — Start here for feature and development docs
 - **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion
 - **[Shell Relay](docs/features/shell-relay.md)** — Shared terminal sessions
-- **[Task Management](docs/features/tasks.md)** — Project task tracking
+- **[Task Management](docs/features/tasks/README.md)** — Project task tracking
 - **[Session Standup](docs/features/standup.md)** — Cross-session continuity
 
 ### For Contributors
 
-See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
-- Developer documentation
-- Extension development guide
-- Architecture decisions
-- Code style guidelines
-- Pull request process
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for local development workflow, checks, code style, and documentation guidance.
 
 ## Repository Layout
 
@@ -67,7 +62,7 @@ sandpiper-ai/
 │   ├── README.md        # User docs routing
 │   ├── features/        # Feature documentation
 │   ├── dev/             # Developer documentation
-│   └── architecture/    # Architecture decisions
+│   └── concepts/        # Conceptual/reference documentation
 ├── extensions/          # Pi extension packages and compatibility entrypoints
 │   ├── system/          # Sandpiper identity + system capabilities
 │   └── shell-relay/     # Shared terminal via Zellij
@@ -75,6 +70,7 @@ sandpiper-ai/
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
 │   ├── resources/       # Shared skills, prompts, and themes
 │   ├── sandpiper-tasks-cli/  # Task management CLI
+│   ├── sandpiper-standup-cli/ # Standup/session-continuity CLI
 │   └── core/            # Shared utilities
 ├── plugins/             # Provider install surfaces
 │   └── pi/              # Neutral Pi package adapters
@@ -113,6 +109,7 @@ bun run clean                     # Remove node_modules, dist, caches
 Sandpiper uses `~/.sandpiper/agent/` for global config and `.sandpiper/` for project-local config — distinct from pi's `~/.pi/agent/` and `.pi/` directories. This allows sandpiper and pi to coexist on the same system with separate settings.
 
 Key files:
+
 - `~/.sandpiper/agent/settings.json` — global settings, installed packages
 - `~/.sandpiper/agent/AGENTS.md` — global agent guidelines
 - `.sandpiper/settings.json` — project settings
@@ -139,12 +136,12 @@ PI_OFFLINE=0 SANDPIPER_OFFLINE=1 sandpiper
 
 A small number of `PI_*` variables are used internally by sandpiper to configure the underlying pi runtime and are not mirrored to the `SANDPIPER_*` namespace:
 
-| Variable | Purpose |
-|----------|---------|
-| `PI_CODING_AGENT_PACKAGE` | Path to the pi-coding-agent package |
-| `PI_CODING_AGENT_VERSION` | Version of the underlying pi-coding-agent |
-| `PI_PACKAGE_DIR` | Package directory for loading extensions and skills |
-| `PI_SKIP_VERSION_CHECK` | Suppresses pi's built-in update check |
+| Variable                  | Purpose                                             |
+| ------------------------- | --------------------------------------------------- |
+| `PI_CODING_AGENT_PACKAGE` | Path to the pi-coding-agent package                 |
+| `PI_CODING_AGENT_VERSION` | Version of the underlying pi-coding-agent           |
+| `PI_PACKAGE_DIR`          | Package directory for loading extensions and skills |
+| `PI_SKIP_VERSION_CHECK`   | Suppresses pi's built-in update check               |
 
 These are set automatically at startup. You generally don't need to interact with them.
 

@@ -1,18 +1,16 @@
-# Task Management — Project Task Tracking
+# Task Management
 
-**Coming soon.**
+Sandpiper includes `sandpiper-tasks`, a markdown-based task tracker designed for project-local work. Tasks live under `.sandpiper/tasks/` and can be read by humans, agents, and normal filesystem tools.
 
-Sandpiper includes a task management CLI (`sandpiper-tasks`) for tracking project work items as markdown files with YAML frontmatter.
+Use the task system to track work items, bugs, subtasks, status, ownership, and relationships between pieces of work.
 
-## What It Does
+## Start here
 
-<!-- TODO: Document task management feature -->
+- [Task overview](tasks/README.md) — create, list, update, and complete tasks.
+- [Storage modes](tasks/storage-guide.md) — keep tasks inline, on a separate branch, or in an external repository.
+- [Storage architecture](tasks/architecture.md) — design rationale and indexing model.
 
-## Related Documentation
+## Related docs
 
-- [Task Storage Strategy](../.sandpiper/docs/task-storage-strategy.md)
-- [CLI Documentation](../packages/sandpiper-tasks-cli/README.md)
-
----
-
-**Status**: Documentation in progress
+- [Session standup](standup.md)
+- [Directory layout](../concepts/directory-layout.md)

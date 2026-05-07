@@ -13,6 +13,7 @@ The most important principle in CLI development is **decoupling implementation l
 ### Why This Matters
 
 When CLI argument parsing is mixed with implementation logic:
+
 - **Testing becomes harder** — you need to mock the CLI framework or spawn subprocesses
 - **Logic can't be reused** — implementation is tied to Commander objects
 - **Changes ripple** — modifying argument parsing affects core logic
@@ -37,6 +38,7 @@ my-cli/
 ```
 
 **CLI Layer** (`index.ts`, `commands/`):
+
 - Defines Commander programs and commands
 - Parses arguments and options
 - Validates input at the boundary
@@ -44,6 +46,7 @@ my-cli/
 - Formats output for display
 
 **Core Layer** (`core/`):
+
 - Accepts plain TypeScript arguments (not Commander objects)
 - Contains all business logic
 - Has no imports from Commander or CLI frameworks
@@ -52,31 +55,36 @@ my-cli/
 ### Example
 
 **CLI Layer** (thin):
+
 ```typescript
 // commands/create.ts
-import { Command } from '@commander-js/extra-typings';
-import { createProject } from '../core/create.js';
+import { Command } from "@commander-js/extra-typings";
+import { createProject } from "../core/create.js";
 
-const createCommand = new Command('create')
-  .description('Create a new project')
-  .argument('<name>', 'project name')
-  .option('-t, --type <type>', 'project type', 'default')
+const createCommand = new Command("create")
+  .description("Create a new project")
+  .argument("<name>", "project name")
+  .option("-t, --type <type>", "project type", "default")
   .action(async (name, options) => {
     // Parse and validate at the boundary
     const projectType = validateProjectType(options.type);
-    
+
     // Delegate to core implementation
     await createProject(name, projectType);
-    
+
     // Format output
     console.log(`Created project: ${name}`);
   });
 ```
 
 **Core Layer** (no CLI dependencies):
+
 ```typescript
 // core/create.ts
-export async function createProject(name: string, type: ProjectType): Promise<void> {
+export async function createProject(
+  name: string,
+  type: ProjectType,
+): Promise<void> {
   // Implementation logic here
   // No Commander imports, no process.argv, no CLI-specific types
 }
@@ -92,18 +100,19 @@ Unit tests call implementation functions directly with plain arguments:
 
 ```typescript
 // core/create.test.ts
-import { describe, it, expect } from 'vitest';
-import { createProject } from './create.js';
+import { describe, it, expect } from "vitest";
+import { createProject } from "./create.js";
 
-describe('createProject', () => {
-  it('creates a project with the given name', async () => {
-    await createProject('my-project', 'default');
+describe("createProject", () => {
+  it("creates a project with the given name", async () => {
+    await createProject("my-project", "default");
     // Assert file creation, config generation, etc.
   });
 });
 ```
 
 **What this catches:**
+
 - Business logic bugs
 - Edge cases in implementation
 - File I/O errors
@@ -115,24 +124,29 @@ E2E tests exercise the full CLI pathway:
 
 ```typescript
 // test/cli.test.ts
-import { describe, it, expect } from 'vitest';
-import { execSync } from 'node:child_process';
+import { describe, it, expect } from "vitest";
+import { execSync } from "node:child_process";
 
-describe('CLI', () => {
-  it('parses arguments correctly', () => {
-    const output = execSync('bun sandpiper-tasks create --help', { encoding: 'utf8' });
-    expect(output).toContain('Create a new task');
+describe("CLI", () => {
+  it("parses arguments correctly", () => {
+    const output = execSync("bun sandpiper-tasks create --help", {
+      encoding: "utf8",
+    });
+    expect(output).toContain("Create a new task");
   });
-  
-  it('handles invalid arguments', () => {
+
+  it("handles invalid arguments", () => {
     expect(() => {
-      execSync('bun sandpiper-tasks create --invalid-flag', { encoding: 'utf8' });
+      execSync("bun sandpiper-tasks create --invalid-flag", {
+        encoding: "utf8",
+      });
     }).toThrow();
   });
 });
 ```
 
 **What this catches:**
+
 - Argument parsing bugs
 - Option validation
 - Output formatting
@@ -140,10 +154,10 @@ describe('CLI', () => {
 
 ### Why Both Are Required
 
-| Test Type | Catches | Misses |
-|-----------|---------|--------|
-| **Unit tests** | Logic bugs, edge cases | Argument parsing, output formatting |
-| **E2E tests** | CLI pathway, user experience | Internal logic, edge cases |
+| Test Type      | Catches                      | Misses                              |
+| -------------- | ---------------------------- | ----------------------------------- |
+| **Unit tests** | Logic bugs, edge cases       | Argument parsing, output formatting |
+| **E2E tests**  | CLI pathway, user experience | Internal logic, edge cases          |
 
 Unit tests alone miss argument parsing bugs. E2E tests alone are slower and harder to debug. **Both layers are required.**
 
@@ -154,6 +168,7 @@ CLI packages that emit bundled binaries or type declarations need to be built be
 ### When to Build
 
 Build a CLI package when:
+
 - It emits a bundled binary (e.g., `packages/cli/dist/sandpiper`)
 - It emits TypeScript declarations (`.d.ts` files)
 - It uses a bundler (Bun build, esbuild, Rollup, etc.)
@@ -161,6 +176,7 @@ Build a CLI package when:
 ### Build Process
 
 1. **Build the package**:
+
    ```bash
    bun run build                              # Build the sandpiper CLI
    bun --filter sandpiper-tasks-cli run build # Rebuild tasks CLI
@@ -173,6 +189,7 @@ Build a CLI package when:
    ```
 
 The `postinstall.sh` script:
+
 - Copies CLI binaries to `dist/`
 - Generates `dist/package.json` with bin metadata
 - Symlinks the CLI into place
@@ -212,20 +229,14 @@ Bun is the preferred runtime for CLI development:
 
 ## Examples in This Repository
 
-| File | Purpose |
-|------|---------|
-| `packages/cli/sandpiper_standalone.ts` | CLI entry point for Sandpiper |
-| `packages/cli/package.json` | Package metadata with bin configuration |
-| `packages/sandpiper-tasks-cli/src/commands/project-cmd.ts` | Commander command wiring |
-| `packages/sandpiper-tasks-cli/src/core/project-metadata.ts` | Core implementation logic |
+| File                                                        | Purpose                                 |
+| ----------------------------------------------------------- | --------------------------------------- |
+| `packages/cli/sandpiper_standalone.ts`                      | CLI entry point for Sandpiper           |
+| `packages/cli/package.json`                                 | Package metadata with bin configuration |
+| `packages/sandpiper-tasks-cli/src/commands/project-cmd.ts`  | Commander command wiring                |
+| `packages/sandpiper-tasks-cli/src/core/project-metadata.ts` | Core implementation logic               |
 
 ## Related Documentation
 
-- [Pi Dev Suite - SDK Guide](./pi-dev-suite/PI-DEV-SDK.md) — Programmatic usage patterns
-- [Pi Dev Suite - Patterns](./pi-dev-suite/PI-DEV-PATTERNS.md) — Code organization patterns
-- [Build System](../.sandpiper/docs/build-system.md) — When CLI builds are required
-
----
-
-**Last updated**: 2026-04-16  
-**Audience**: Contributors building CLI tools
+- [Pi extension development](./pi-extension-development.md) — Sandpiper's Pi integration surfaces
+- [Build System](./build-system.md) — When CLI builds are required

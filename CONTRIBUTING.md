@@ -1,117 +1,88 @@
 # Contributing to Sandpiper
 
-Welcome! This document is your guide to contributing to Sandpiper — whether you're fixing bugs, adding features, improving documentation, or building extensions.
+Thanks for working on Sandpiper. This guide covers the local development workflow; feature and architecture details live in the docs linked below.
 
-## Documentation Structure
+## Get the repo ready
 
-Sandpiper organizes documentation by **audience**:
+```bash
+git clone https://github.com/dljsjr/sandpiper-ai.git
+cd sandpiper-ai
+bun install
+```
 
-| Location | Primary Audience | Purpose |
-|----------|------------------|---------|
-| [`docs/`](docs/README.md) | **Humans** (users, contributors, maintainers) | User-facing features, contributor guides, architecture docs |
-| [`.sandpiper/`](.sandpiper/) | **Agent** | Config, tasks, standup, operational docs the agent reads |
+Sandpiper uses Bun for package management and scripts. Run workspace installs from the repository root.
 
-## Routing Table
+## Development checks
 
-| You are... | Read this first | Then read |
-|------------|-----------------|-----------|
-| **End user** | [README.md](README.md) | [`docs/features/`](docs/features/) |
-| **Contributor** | This file | [`docs/dev/`](docs/dev/) |
-| **Maintainer** | This file | [`docs/architecture/`](docs/architecture/) |
-| **Extension developer** | [`docs/dev/pi-dev-suite/`](docs/dev/pi-dev-suite/README.md) | [Routing Table](docs/dev/pi-dev-suite/PI-DEV-ROUTING.md) |
-| **Agent** | [AGENTS.md](AGENTS.md) | [`.sandpiper/docs/`](.sandpiper/docs/) |
+Use these commands while developing:
 
-## For Contributors
+```bash
+bun check                         # Type-check + lint
+bun run test:vitest -- <testpath> # Focused Vitest run
+bun run test                      # Full Vitest gate
+```
 
-### Getting Started
+Before claiming distribution health, run the clean distribution gate:
 
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/dljsjr/sandpiper-ai.git
-   cd sandpiper-ai
-   ```
+```bash
+rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution
+```
 
-2. **Install dependencies**
-   ```bash
-   bun install
-   ```
+Do not use bare `bun test` as the repository health gate; it invokes Bun's test runner, not the Vitest suite configured for this repo.
 
-3. **Run tests**
-   ```bash
-   bun check              # Type-check + lint
-   bun --filter sandpiper-tasks-cli test
-   bun --filter shell-relay test
-   ```
+## Version control
 
-### Documentation Guidelines
+This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control operations even though the repository is Git-backed.
 
-When adding documentation:
+## Repository map
 
-- **User-facing features** → `docs/features/`
-- **Developer guides** → `docs/dev/`
-- **Architecture decisions** → `docs/architecture/`
-- **Agent-operational docs** → `.sandpiper/docs/`
+| Path                  | Purpose                                                                        |
+| --------------------- | ------------------------------------------------------------------------------ |
+| `docs/`               | Public Sandpiper documentation                                                 |
+| `packages/`           | Workspace packages that are built and distributed                              |
+| `extensions/`         | Sandpiper Pi extensions and compatibility entrypoints                          |
+| `plugins/pi/`         | Neutral Pi package adapter surface                                             |
+| `packages/resources/` | Shared skills, prompts, and themes                                             |
+| `devtools/`           | Development-only build and distribution tooling                                |
+| `.sandpiper/`         | Project-local agent state, tasks, playbooks, active specs, notes, and archives |
 
-**Rule of thumb**: If a human reads it to build something, it goes in `docs/`. If the agent reads it as part of its context, it goes in `.sandpiper/`.
+## Useful docs
 
-### Code Style
+- [Documentation home](docs/README.md)
+- [Build workflows](docs/dev/build-workflows.md)
+- [Build system reference](docs/dev/build-system.md)
+- [CLI development](docs/dev/cli-development.md)
+- [Environment variables](docs/dev/env-vars.md)
+- [Pi extension development](docs/dev/pi-extension-development.md)
+- [Task management](docs/features/tasks/README.md)
+- [Shell Relay](docs/features/shell-relay.md)
+- [Directory layout](docs/concepts/directory-layout.md)
+
+## Documentation changes
+
+Documentation under `docs/` follows the [Diátaxis](https://diataxis.fr/) framework. A page should have a clear job: tutorial, how-to guide, reference, or explanation. If a page starts mixing jobs, split it and link between the pieces.
+
+Keep public docs direct and natural. Agent-operational guidance belongs in `.sandpiper/playbooks/`; active internal specs and design notes belong in `.sandpiper/docs/`; completed or superseded material belongs in `.sandpiper/archive/`.
+
+## Code style
 
 - TypeScript with `strict: true`
-- No `any` types
-- No `@ts-ignore` without justification
-- Use `interface` for object shapes
+- No `any`
+- No `@ts-ignore` or `@ts-expect-error` without explicit justification
+- Prefer `interface` for object shapes
 - Use `readonly` where mutation is unnecessary
+- Keep runtime code portable between Node and Bun unless it is explicitly dev tooling
 
-Run linting before committing:
+Use safe auto-fixes when appropriate:
+
 ```bash
-bun check
-bun check --write  # Auto-fix formatting
+bun check --write
 ```
 
-### Pull Requests
+## Pull requests
 
-1. Create a branch for your change
-2. Make your changes
-3. Run tests and linting
-4. Submit a PR with a clear description
-
-## For Maintainers
-
-### Repository Structure
-
-```
-sandpiper-ai/
-├── docs/                    # Human-facing docs
-│   ├── README.md            # User docs routing
-│   ├── features/            # Feature documentation
-│   ├── dev/                 # Developer documentation
-│   │   └── pi-dev-suite/    # Extension dev reference
-│   └── architecture/        # Architecture decisions
-├── .sandpiper/              # Agent-facing docs
-│   ├── docs/                # Agent-operational docs
-│   ├── tasks/               # Task tracker
-│   └── standup.md           # Session continuity
-├── extensions/              # Pi extensions
-├── packages/                # Workspace packages
-└── AGENTS.md                # Agent routing
-```
-
-### Documentation Deployment
-
-- **User docs** (`docs/`) → Published to GitHub Pages (future)
-- **Dev docs** (`docs/dev/`) → Available in repo for contributors
-- **Agent docs** (`.sandpiper/`) → Bundled with Pi package, injected into agent context
-
-### Version Control
-
-Sandpiper uses **Jujutsu (`jj`)** for version control. See [`.sandpiper/docs/agent-guidance-evolution.md`](.sandpiper/docs/agent-guidance-evolution.md) for workflow details.
-
-## Questions?
-
-- **User questions**: Check [`docs/features/`](docs/features/)
-- **Contributor questions**: Check [`docs/dev/`](docs/dev/)
-- **Agent behavior**: Check [AGENTS.md](AGENTS.md) and [`.sandpiper/docs/`](.sandpiper/docs/)
-
----
-
-**Last updated**: 2026-04-16
+1. Work against a focused task or issue.
+2. Keep changes surgical.
+3. Update docs when behavior changes.
+4. Run the relevant checks and include them in the PR notes.
+5. Mention task keys in commits or PR descriptions when applicable.

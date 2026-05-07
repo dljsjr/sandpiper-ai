@@ -1,67 +1,38 @@
 # Sandpiper Documentation
 
-Welcome to the Sandpiper documentation. This directory contains **user-facing documentation** for the Sandpiper harness — a distribution of the Pi coding agent with enhanced capabilities.
+Sandpiper is a distribution of the Pi coding agent with additional tools for shared terminals, task tracking, session continuity, skills, prompt templates, themes, and multi-surface packaging.
 
-## For Users
+## Start here
 
-If you're using Sandpiper as your AI coding assistant:
+- [Repository README](../README.md) - what Sandpiper is and how to run it.
+- [Contributing](../CONTRIBUTING.md) - local development workflow and checks.
+- [Directory layout](concepts/directory-layout.md) - how global and project `.sandpiper` directories are organized.
 
-- **[Features](./features/)** — What Sandpiper can do
-  - [AutoTOON](./features/autotoon.md) — Automatic JSON→TOON conversion for token efficiency
-  - [Shell Relay](./features/shell-relay.md) — Shared terminal sessions via Zellij
-  - [Task Management](./features/tasks.md) — Project task tracking with CLI
-  - [Session Continuity](./features/standup.md) — Cross-session context handoff
+## Features
 
-- **[Guides](./guides/)** — How to use Sandpiper effectively
-  - Getting Started (coming soon)
-  - Best Practices (coming soon)
-  - Configuration (coming soon)
+- [AutoTOON](features/autotoon.md) - automatic JSON-to-TOON conversion for token efficiency.
+- [Shell Relay](features/shell-relay.md) - shared terminal sessions through Zellij.
+- [Task Management](features/tasks/README.md) - project task tracking with `sandpiper-tasks`.
+- [Session Standup](features/standup.md) - handoff notes for continuity across sessions.
 
-## For Developers
+## Development
 
-If you're building extensions or integrating with Sandpiper:
+- [Build workflows](dev/build-workflows.md) - choose the right build or verification command after a change.
+- [Build system reference](dev/build-system.md) - package builds, generated artifacts, and distribution layout.
+- [CLI development](dev/cli-development.md) - Commander patterns and bundled CLI packages.
+- [Environment variables](dev/env-vars.md) - `SANDPIPER_*` / `PI_*` mirroring and config lookup.
+- [Pi extension development](dev/pi-extension-development.md) - how Sandpiper uses Pi extension surfaces and where to check Pi API docs.
 
-- **[Architecture](./architecture/)** — How Sandpiper works
-  - System Overview (coming soon)
-  - Extension API (coming soon)
+## Task system
 
-- **Pi Developer Documentation Suite** — Extension development reference
-  - Location: `.sandpiper/docs/pi-dev-suite/`
-  - 14 comprehensive docs covering Pi extension development
-  - Sandpiper-specific patterns in `PI-DEV-SANDPIPER-PATTERNS.md`
+- [Task overview](features/tasks/README.md)
+- [Task storage modes](features/tasks/storage-guide.md)
+- [Task storage architecture](features/tasks/architecture.md)
 
-## Documentation Structure
+## Package and extension entrypoints
 
-```
-docs/
-├── README.md              # This file
-├── features/              # User-facing feature documentation
-│   ├── autotoon.md        # AutoTOON feature
-│   └── ...                # Other features
-├── guides/                # User guides and tutorials
-│   └── ...                # Coming soon
-└── architecture/          # Technical architecture docs
-    └── ...                # Coming soon
-```
+- [Packages](../packages/README.md)
+- [Extensions](../extensions/README.md)
+- [Neutral Pi plugin surface](../plugins/pi/README.md)
 
-## Internal vs External Documentation
-
-| Audience | Location | Purpose |
-|----------|----------|---------|
-| **Users** | `docs/` (this directory) | Feature documentation, guides, tutorials |
-| **Extension Developers** | `.sandpiper/docs/pi-dev-suite/` | Pi extension API reference |
-| **Sandpiper Maintainers** | `.sandpiper/docs/` | Internal architecture, design decisions, planning docs |
-| **Historical/Archived** | `.sandpiper/archive/` | Superseded docs preserved for reference |
-
-## Contributing
-
-When adding new documentation:
-
-1. **User-facing features** → `docs/features/`
-2. **User guides/tutorials** → `docs/guides/`
-3. **Architecture/technical** → `docs/architecture/`
-4. **Internal guidance** → `.sandpiper/docs/`
-5. **Extension development** → `.sandpiper/docs/pi-dev-suite/`
-
-Keep user-facing docs in `docs/` focused on **what** and **how**, not implementation details.
-
+Agent operating rules for this repository live in [AGENTS.md](../AGENTS.md) and `.sandpiper/playbooks/`; they are separate from the public documentation.
