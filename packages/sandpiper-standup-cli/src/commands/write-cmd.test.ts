@@ -1,7 +1,10 @@
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+const standupBin = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'dist', 'sandpiper-standup');
 
 describe('write command', () => {
   const testDir = join('/tmp', `test-standup-write-${process.pid}`);
@@ -62,7 +65,7 @@ describe('write command', () => {
 
     const body = '### Accomplished\n- Test work';
 
-    execSync(`echo '${body}' | node dist/sandpiper-standup write -d ${testDir}`, {
+    execSync(`echo '${body}' | node ${JSON.stringify(standupBin)} write -d ${testDir}`, {
       encoding: 'utf-8',
       env: {
         ...process.env,
@@ -84,9 +87,12 @@ describe('write command', () => {
 
     const body = '### Accomplished\n- Explicit flag work';
 
-    execSync(`echo '${body}' | node dist/sandpiper-standup write -d ${testDir} -u ${sessionId} -f ${sessionFile}`, {
-      encoding: 'utf-8',
-    });
+    execSync(
+      `echo '${body}' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      {
+        encoding: 'utf-8',
+      },
+    );
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
     expect(standupContent).toContain(`## Session ${sessionId}`);
@@ -101,7 +107,7 @@ describe('write command', () => {
 
     // First write
     execSync(
-      `echo '### Accomplished\n- First' | node dist/sandpiper-standup write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '### Accomplished\n- First' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
@@ -109,7 +115,7 @@ describe('write command', () => {
 
     // Second write (update)
     execSync(
-      `echo '### Accomplished\n- Updated' | node dist/sandpiper-standup write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '### Accomplished\n- Updated' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
@@ -140,7 +146,7 @@ Updated: 2026-04-05T10:00:00Z
 
     // Write new section
     execSync(
-      `echo '### Accomplished\n- New work' | node dist/sandpiper-standup write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '### Accomplished\n- New work' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
@@ -160,7 +166,7 @@ Updated: 2026-04-05T10:00:00Z
 
     const body = '### Accomplished\n- Env var test';
 
-    execSync(`echo '${body}' | node dist/sandpiper-standup write -d ${testDir}`, {
+    execSync(`echo '${body}' | node ${JSON.stringify(standupBin)} write -d ${testDir}`, {
       encoding: 'utf-8',
       env: {
         ...process.env,
@@ -182,7 +188,7 @@ Updated: 2026-04-05T10:00:00Z
     createPidFile(sessionA.id, 1);
     createPidFile(sessionB.id, 1);
 
-    execSync(`echo '### Accomplished\n- Work A' | node dist/sandpiper-standup write -d ${testDir}`, {
+    execSync(`echo '### Accomplished\n- Work A' | node ${JSON.stringify(standupBin)} write -d ${testDir}`, {
       encoding: 'utf-8',
       env: {
         ...process.env,
@@ -191,7 +197,7 @@ Updated: 2026-04-05T10:00:00Z
       },
     });
 
-    execSync(`echo '### Accomplished\n- Work B' | node dist/sandpiper-standup write -d ${testDir}`, {
+    execSync(`echo '### Accomplished\n- Work B' | node ${JSON.stringify(standupBin)} write -d ${testDir}`, {
       encoding: 'utf-8',
       env: {
         ...process.env,

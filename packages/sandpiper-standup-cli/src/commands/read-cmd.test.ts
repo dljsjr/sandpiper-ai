@@ -1,7 +1,10 @@
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+const standupBin = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'dist', 'sandpiper-standup');
 
 describe('read command', () => {
   const testDir = join('/tmp', `test-standup-read-${process.pid}`);
@@ -51,7 +54,7 @@ describe('read command', () => {
 
   it('should return exit code 1 when standup file does not exist', () => {
     try {
-      execSync(`node dist/sandpiper-standup read -d ${testDir}`, { encoding: 'utf-8' });
+      execSync(`node ${JSON.stringify(standupBin)} read -d ${testDir}`, { encoding: 'utf-8' });
       expect.fail('Should have thrown');
     } catch (error) {
       const err = error as { status?: number };
@@ -87,7 +90,7 @@ Session file: /path/to/session.jsonl
 
     writeFileSync(join(testDir, '.sandpiper', 'standup.md'), standupContent);
 
-    const output = execSync(`node dist/sandpiper-standup read -d ${testDir}`, {
+    const output = execSync(`node ${JSON.stringify(standupBin)} read -d ${testDir}`, {
       encoding: 'utf-8',
       env: { ...process.env, SANDPIPER_SESSION_ID: sessionId },
     });
@@ -145,7 +148,7 @@ Session file: /path/to/dead.jsonl
 
     writeFileSync(join(testDir, '.sandpiper', 'standup.md'), standupContent);
 
-    const output = execSync(`node dist/sandpiper-standup read -d ${testDir}`, {
+    const output = execSync(`node ${JSON.stringify(standupBin)} read -d ${testDir}`, {
       encoding: 'utf-8',
       env: { ...process.env, SANDPIPER_SESSION_ID: aliveSessionId },
     });
@@ -169,7 +172,7 @@ Updated: 2026-04-05T10:00:00Z
     const standupPath = join(testDir, '.sandpiper', 'standup.md');
     writeFileSync(standupPath, legacyContent);
 
-    const output = execSync(`node dist/sandpiper-standup read -d ${testDir}`, {
+    const output = execSync(`node ${JSON.stringify(standupBin)} read -d ${testDir}`, {
       encoding: 'utf-8',
       env: { ...process.env, SANDPIPER_SESSION_ID: 'current-session' },
     });

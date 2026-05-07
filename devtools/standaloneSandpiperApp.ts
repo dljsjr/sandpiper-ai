@@ -264,6 +264,17 @@ export async function buildStandaloneSandpiperApp(options: BuildStandaloneSandpi
   throw new Error(`Standalone Sandpiper app build did not emit ${defaultOutputPath} or ${executablePath}`);
 }
 
+function readOptionValue(name: string): string | undefined {
+  const index = process.argv.indexOf(name);
+  if (index === -1) return undefined;
+
+  const value = process.argv[index + 1];
+  if (value === undefined || value.startsWith('--')) {
+    throw new Error(`Missing value for ${name}`);
+  }
+  return value;
+}
+
 const entrypoint = process.argv[1] === undefined ? undefined : resolve(process.argv[1]);
 
 if (entrypoint === fileURLToPath(import.meta.url)) {
@@ -271,7 +282,7 @@ if (entrypoint === fileURLToPath(import.meta.url)) {
   const piDistDir = dirname(fileURLToPath(import.meta.resolve('@mariozechner/pi-coding-agent')));
   const options = {
     repoRoot,
-    outputDir: join(repoRoot, 'dist', 'standalone-sandpiper'),
+    outputDir: resolve(readOptionValue('--output-dir') ?? join(repoRoot, 'dist', 'standalone-sandpiper')),
     piPackageDir: dirname(piDistDir),
   };
 

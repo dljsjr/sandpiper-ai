@@ -3,10 +3,12 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-const executable = join(repoRoot, 'dist', 'standalone-sandpiper', 'sandpiper');
+let appBundleDir: string;
+let executable: string;
+let buildTempDir: string;
 
 function runAppHelp(cwd: string): string {
   const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-runtime-'));
@@ -32,9 +34,26 @@ function countFlagLines(output: string, flag: string): number {
 }
 
 describe('standalone Sandpiper app runtime smoke', () => {
-  beforeAll(() => {
-    execFileSync('bun', ['run', 'build:standalone-app'], { cwd: repoRoot, stdio: 'pipe' });
+  beforeAll(async () => {
+    buildTempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-runtime-build-'));
+    appBundleDir = join(buildTempDir, 'standalone-sandpiper');
+    executable = join(appBundleDir, 'sandpiper');
+
+    execFileSync(
+      'bun',
+      ['run', '--bun', 'devtools/standaloneSandpiperApp.ts', '--compile', '--output-dir', appBundleDir],
+      {
+        cwd: repoRoot,
+        stdio: 'pipe',
+      },
+    );
   }, 20_000);
+
+  afterAll(() => {
+    if (buildTempDir) {
+      rmSync(buildTempDir, { recursive: true, force: true });
+    }
+  });
 
   it('loads bundled resources and extension flags from a temp project directory', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-project-'));

@@ -1,7 +1,10 @@
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
+const standupBin = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'dist', 'sandpiper-standup');
 
 describe('cleanup command', () => {
   const testDir = join('/tmp', `test-standup-cleanup-${process.pid}`);
@@ -74,7 +77,7 @@ Session file: /path/to/dead.jsonl
 
     writeFileSync(join(testDir, '.sandpiper', 'standup.md'), standupContent);
 
-    const output = execSync(`node dist/sandpiper-standup cleanup -d ${testDir}`, {
+    const output = execSync(`node ${JSON.stringify(standupBin)} cleanup -d ${testDir}`, {
       encoding: 'utf-8',
       env: { ...process.env, SANDPIPER_SESSION_ID: aliveSessionId },
     });
@@ -107,7 +110,7 @@ Session file: /path/to/session.jsonl
 
     writeFileSync(join(testDir, '.sandpiper', 'standup.md'), standupContent);
 
-    const output = execSync(`node dist/sandpiper-standup cleanup -d ${testDir}`, {
+    const output = execSync(`node ${JSON.stringify(standupBin)} cleanup -d ${testDir}`, {
       encoding: 'utf-8',
       env: { ...process.env, SANDPIPER_SESSION_ID: sessionId },
     });
@@ -116,7 +119,7 @@ Session file: /path/to/session.jsonl
   });
 
   it('should handle missing standup file gracefully', () => {
-    const output = execSync(`node dist/sandpiper-standup cleanup -d ${testDir}`, {
+    const output = execSync(`node ${JSON.stringify(standupBin)} cleanup -d ${testDir}`, {
       encoding: 'utf-8',
     });
 
