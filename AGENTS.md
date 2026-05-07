@@ -1,111 +1,61 @@
 # Sandpiper Development Guidelines
 
-This file is repo-specific guidance for the sandpiper-ai project. For area-specific detail, read focused docs in `.sandpiper/docs/` or the subdirectory's `README.md` / `AGENTS.md`.
+This repository is the Sandpiper source tree: a package-first Bun/Node monorepo that ships Sandpiper runtime packages, Pi package adapters, Claude Code adapters, extensions, skills, prompts, themes, docs, and developer tooling.
 
-## Repository Structure
+## Start Here
 
-This repository is a **Bun/Node.js monorepo** that emits generated Pi/npm, standalone app, and Claude plugin artifacts. The repository root is a workspace/router package, not the canonical implementation owner. It intentionally retains root `pi`, `piConfig`, and `bin.sandpiper` metadata as routing/branding anchors while pointing implementation resources at provider/package-owned paths.
+- Work against a task. If no relevant task exists, create one with the `tasks` skill/CLI before making changes.
+- This is a jj repository. Use `jj`, not `git`, for version-control operations.
+- Before working in a subdirectory for the first time, read its `README.md` and `AGENTS.md` if they exist.
+- Read the relevant `.sandpiper/playbooks/*/index.md` before changing an area you have not already loaded this session.
 
-> **Maintenance note:** Update this table when adding new projects.
+## Core Invariants
 
-| Path | Type | Description |
-| --- | --- | --- |
-| `extensions/system/` | Pi Extension | Sandpiper identity, system prompt, capability guidance, reinforced guidance, migration, diagnostics |
-| `extensions/shell-relay/` | Pi Extension | Shared terminal session between user and agent |
-| `plugins/pi/extensions/` | Pi Provider Surface | Neutral Pi adapters for package/resource-owned capabilities |
-| `packages/resources/skills/sandpiper/` | First-party skills | Edit source here, not `dist/skills/` |
-| `packages/resources/skills/third-party/` | Vendored skills | Do not edit |
-| `packages/core/` | Shared Library | System prompt, migration, preflight checks, shell integration, path utilities |
-| `packages/capability-autotoon/` | Shared Library + Pi adapter | AutoTOON JSON→TOON neutral transform and Pi event adapter |
-| `packages/adapter-claude-code/` | Claude Adapter | Claude Code hooks/adapters over neutral Sandpiper capabilities |
-| `packages/cli/` | Distributable Binary | Sandpiper CLI wrapper around pi-coding-agent |
-| `packages/sandpiper-tasks-cli/` | Distributable Bundle | Task management CLI |
-| `packages/resources/prompts/` | Prompt templates | |
-| `packages/resources/themes/` | UI themes | |
-| `devtools/` | Dev-only | Build, vendoring, and development utilities |
+- Edit source, not generated artifacts. Do not hand-edit `dist/` or package `dist/` output.
+- Use Bun as the preferred runtime, package manager, and script runner.
+- Run workspace installs from the repo root.
+- Keep application code runtime-agnostic between Node and Bun unless the code is explicitly dev tooling.
+- Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
+- Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
+- Tests must not touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config).
 
-## Core Repo Invariants
+## Routing
 
-- Before working in a subdirectory for the first time, read its `README.md` and `AGENTS.md` if they exist
-- All coding work tracked against a task. Bugs get their own top-level `BUG` task. Reference task keys in commits
-- Edit **source**, not generated or assembled artifacts
-- Active agent-operational docs live in **`.sandpiper/docs/`**, historical material in **`.sandpiper/archive/`**
-- Code review docs under **`.sandpiper/reviews/`** are scratch artifacts: delete them after the review is resolved; don't commit them unless the user explicitly asks
-- Treat design docs and guidance docs as living artifacts: update in place, don't create new files when iterating on a plan or spec
-- Use **Bun** as the preferred runtime, package manager, and script runner
-- Run workspace installs from the repo root
-- Application code should stay runtime-agnostic between Node and Bun unless the code is explicitly dev tooling
+| Working on...                                                                                          | Read first                                                   |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Documentation, `README.md`, `AGENTS.md`, `.sandpiper/docs`, `.sandpiper/playbooks`, docs cleanup       | `.sandpiper/playbooks/documentation/index.md`                |
+| Build system, package metadata, `dist/`, distribution assembly, standalone app, Claude plugin artifact | `.sandpiper/playbooks/development/build-and-distribution.md` |
+| TypeScript, tests, linting, verification, code-health rules                                            | `.sandpiper/playbooks/development/typescript-and-tests.md`   |
+| Environment variables, config paths, `PI_*`, `SANDPIPER_*`                                             | `.sandpiper/playbooks/development/env-vars.md`               |
+| CLI tools, Commander commands, package `bin` entries, bundled executables                              | `.sandpiper/playbooks/development/cli.md`                    |
+| Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                          | `.sandpiper/playbooks/development/pi-extensions.md`          |
+| AutoTOON, JSON→TOON conversion, token optimization                                                     | `.sandpiper/playbooks/features/autotoon.md`                  |
+| Task management, `sandpiper-tasks`, task storage, task index                                           | `.sandpiper/playbooks/features/tasks.md`                     |
+| Shell Relay, Zellij integration, shared terminal, shell integrations                                   | `.sandpiper/playbooks/features/shell-relay.md`               |
+| Standup, session continuity, PID/liveness handling, concurrent sessions                                | `.sandpiper/playbooks/features/session-continuity.md`        |
 
-## Read-When-Needed Routing
+## Verification
 
-Read the relevant focused doc **before** working in these areas:
+- `bun check` is the lint/typecheck gate and must be clean: zero errors, zero warnings.
+- Use `bun run test:vitest -- <testpath>` for focused Vitest runs.
+- Use `bun run test` for the full Vitest gate.
+- Before claiming distribution health, run `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`.
+- Only use safe auto-fixes; no suppressions without asking.
 
-| Topic | Doc | Read when... |
-| --- | --- | --- |
-| Build system & distribution | `docs/dev/build-system.md` | Modifying build scripts, `postinstall`, `package.json`, or dist assembly |
-| Concurrent sessions | `.sandpiper/docs/specs/concurrent-sessions.md` | Working on standup CLI, PID file lifecycle, or multi-session concurrency |
-| Pi extension development | `docs/dev/pi-dev-suite/` | Creating extensions, debugging imports, working with lifecycle hooks, `getFlag`, `pi.events`, or cross-extension behavior |
-| Environment variables | `docs/dev/env-vars.md` | Reading/writing env vars or adding config-path resolution |
-| CLI development | `docs/dev/cli-development.md` | Building command-line tools with Commander or changing bundled bins |
-| AutoTOON | `.sandpiper/docs/autotoon-extension.md` | Working on JSON→TOON conversion, the autotoon extension, or token optimization |
-| Task storage & VCS churn | `docs/features/tasks/storage-guide.md` | Changing task storage topology, `.sandpiper-tasks.json`, `tasks.version_control` config, `storage init/migrate/sync/push/pull` commands, or task index persistence |
+## Repository Map
 
-## TypeScript & Architecture
+| Path                    | Purpose                                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------------- |
+| `docs/`                 | Public Sandpiper project docs: usage, concepts, contributor/maintainer guides, public reference |
+| `.sandpiper/playbooks/` | Agent-operational project guidance and routing                                                  |
+| `.sandpiper/docs/`      | Active internal specs, PRDs, design notes, and implementation plans                             |
+| `.sandpiper/archive/`   | Historical, completed, superseded, or stale docs                                                |
+| `extensions/`           | Sandpiper Pi extension source and compatibility bridges                                         |
+| `plugins/pi/`           | Neutral Pi package adapter surface                                                              |
+| `packages/`             | Built/distributed workspace packages                                                            |
+| `packages/resources/`   | Shared skills, prompts, and themes                                                              |
+| `devtools/`             | Development-only build, distribution, and vendoring utilities                                   |
 
-- Use `strict: true`
-- Do not use `any`
-- Do not use `@ts-ignore` / `@ts-expect-error` without explicit justification
-- Prefer `interface` for object shapes
-- Use `readonly` where mutation is unnecessary
-- Extension core logic in framework-independent TypeScript modules; Pi extension entrypoints are thin glue for tool registration and lifecycle wiring
-- Do not use dynamic imports except for optional dependencies
+## Public Documentation
 
-## Testing, Linting, and Verification
-
-### Testing
-
-- Use **Vitest** through package scripts; do not use bare `bun test` as a repo health signal
-- Use `bun run test:vitest -- <paths>` for focused Vitest runs and `bun run test` for the full-suite gate
-- Test-first. Reproduce bugs with a failing test before fixing
-- Emphasize real behavior over mocks
-- Treat edge cases as first-class test cases
-- Tests must **not** touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config, etc.)
-- Parameterize the **concrete resource under test**, not a generic ancestor like `homedir()`
-- Prefer existing env/config resolution seams over inventing new test-only knobs
-- Dogfood tool interfaces early; use tests to validate implementation details
-
-### Linting
-
-- Run `bun check` from the repo root — output must be clean: zero errors, zero warnings
-- Run lints as frequently as tests
-- Only use safe auto-fixes; no suppressions without asking
-
-### Verification
-
-- Verify against implementation and working examples, not docs alone
-- For review readiness, run `bun check` and the relevant Vitest gate; use `bun run test` when claiming full-suite health
-- Check real dist layout and package metadata before writing path-dependent code
-- Prefer consistency with nearby code over inventing a new local style
-
-## Paths and Serialization
-
-### Path Handling
-
-- Use `join()` to build paths
-- Use `homedir()` for home-directory paths
-- Use `resolve()` for absolute paths
-- Do not manually expand `~`
-- Match the path-handling style already used in the surrounding code
-
-### Serialization
-
-- Version serialized formats from day one; include migrations where data may evolve
-- Prefer formats that are both human-readable and machine-parseable when practical
-
-## User-Facing Documentation
-
-| Audience | Location |
-|----------|----------|
-| **Users** (features, guides) | `docs/` — [`docs/README.md`](docs/README.md) |
-| **Extension developers** | `.sandpiper/docs/pi-dev-suite/` |
-| **Maintainers** (architecture, design) | `.sandpiper/docs/` |
+Use `docs/README.md` as the public docs index and `CONTRIBUTING.md` as the contributor entrypoint. Public docs should read naturally for humans while remaining precise enough for agents to use as references.

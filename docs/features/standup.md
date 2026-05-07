@@ -1,18 +1,19 @@
-# Session Standup — Cross-Session Continuity
+# Session Standup
 
-**Coming soon.**
+Session standup keeps a compact handoff note for the next Sandpiper session. The note records what changed, what is in progress, what to do next, and anything that should survive the current context window.
 
-Standup provides cross-session context handoff, allowing the AI to maintain continuity across separate coding sessions.
+The project standup file lives at `.sandpiper/standup.md`.
 
-## What It Does
+## What standup is for
 
-<!-- TODO: Document standup feature -->
+- Orient a fresh session quickly.
+- Preserve next steps and blockers.
+- Capture important decisions without turning them into permanent policy.
+- Help concurrent sessions avoid overwriting each other's context.
 
-## Related Documentation
+Standup is session continuity, not a task tracker and not long-term documentation. Durable work items belong in `.sandpiper/tasks/`; stable project guidance belongs in docs or playbooks.
 
-- [Concurrent Sessions Design](../.sandpiper/docs/concurrent-sessions.md)
-- [Standup Skill](../../packages/resources/skills/sandpiper/standup/SKILL.md)
+## Related docs
 
----
-
-**Status**: Documentation in progress
+- [Directory layout](../concepts/directory-layout.md)
+- [Task management](tasks/README.md)

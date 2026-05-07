@@ -28,17 +28,17 @@ When you see `[TOON]` at the start of tool output, you're looking at converted d
 
 ## What Gets Converted
 
-| Tool | Example | Converted? |
-|------|---------|------------|
-| `bash` running `curl` | API response bodies | ✅ Yes (if > 256 bytes) |
-| `bash` running `jq` | Filtered JSON | ✅ Yes (if > 256 bytes) |
-| `bash` running `npm ls --json` | Dependency trees | ✅ Yes |
-| `bash` running `docker inspect` | Container metadata | ✅ Yes |
-| `bash` running `kubectl get -o json` | K8s resources | ✅ Yes |
-| `read` tool | JSON file contents | ✅ Yes |
-| `ls` / `find` / `grep` | Plain text output | ❌ No (not JSON) |
-| Any tool returning < 256 bytes JSON | Small payloads | ❌ No |
-| Any tool returning error | Error messages | ❌ No (preserved as-is) |
+| Tool                                 | Example             | Converted?              |
+| ------------------------------------ | ------------------- | ----------------------- |
+| `bash` running `curl`                | API response bodies | ✅ Yes (if > 256 bytes) |
+| `bash` running `jq`                  | Filtered JSON       | ✅ Yes (if > 256 bytes) |
+| `bash` running `npm ls --json`       | Dependency trees    | ✅ Yes                  |
+| `bash` running `docker inspect`      | Container metadata  | ✅ Yes                  |
+| `bash` running `kubectl get -o json` | K8s resources       | ✅ Yes                  |
+| `read` tool                          | JSON file contents  | ✅ Yes                  |
+| `ls` / `find` / `grep`               | Plain text output   | ❌ No (not JSON)        |
+| Any tool returning < 256 bytes JSON  | Small payloads      | ❌ No                   |
+| Any tool returning error             | Error messages      | ❌ No (preserved as-is) |
 
 ## Benefits
 
@@ -54,14 +54,9 @@ AutoTOON intercepts the `tool_result` event, converts JSON to TOON when benefici
 
 **Implementation**: `packages/capability-autotoon/src/core.ts` and `packages/capability-autotoon/src/pi-extension.ts`  
 **Legacy Pi package bridge**: `extensions/autotoon/autotoon.ts`  
-**Guidance injection**: Capability Guidance Registry (`extensions/system/capability-guidance-registry.ts`)
+**Guidance injection**: Deferred. AutoTOON currently performs conversion only.
 
 ## Related Documentation
 
 - [TOON Format Specification](https://toonformat.dev)
-- [Internal Architecture](../.sandpiper/docs/autotoon-extension.md) — Implementation details (archived)
-
----
-
-**Last updated**: 2026-05-01  
-**Pi version**: 0.67.4
+- [AutoTOON architecture](autotoon-architecture.md) — Implementation details

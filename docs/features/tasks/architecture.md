@@ -15,6 +15,7 @@ Tasks can be stored in three modes:
 ### Problem
 
 Task lifecycle operations (create, update, complete) produce significant VCS churn:
+
 - Every `task update` modifies the task file
 - History diff files accumulate in `history/` directory
 - Index file (`index.toon`) rewrites entirely on every operation
@@ -24,20 +25,21 @@ A single triage session can touch 25+ files. Normal implementation sessions prod
 ### Solution
 
 Separate task storage from code storage:
+
 - **Inline mode** — Default, no setup required
 - **Separate branch** — Isolates task churn from code history
 - **External repo** — Shared task tracking across projects
 
 ### Key Decisions
 
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-| **Task files on disk** | ✅ Yes | CLI, agent, humans interact directly |
-| **History diff files** | ✅ Yes | Append-only audit trail, survives VCS curation |
-| **Index as derived state** | ✅ Yes | Gitignored, rebuilt from disk on demand |
-| **Counter from disk scan** | ✅ Yes | Primary mechanism, index is optimization |
-| **Explicit bootstrap** | ✅ Yes | `storage init` command, not silent |
-| **Backend selection** | jj → workspace, git → worktree | Use appropriate VCS primitives |
+| Decision                   | Choice                         | Rationale                                      |
+| -------------------------- | ------------------------------ | ---------------------------------------------- |
+| **Task files on disk**     | ✅ Yes                         | CLI, agent, humans interact directly           |
+| **History diff files**     | ✅ Yes                         | Append-only audit trail, survives VCS curation |
+| **Index as derived state** | ✅ Yes                         | Gitignored, rebuilt from disk on demand        |
+| **Counter from disk scan** | ✅ Yes                         | Primary mechanism, index is optimization       |
+| **Explicit bootstrap**     | ✅ Yes                         | `storage init` command, not silent             |
+| **Backend selection**      | jj → workspace, git → worktree | Use appropriate VCS primitives                 |
 
 ## Configuration Model
 
@@ -66,40 +68,40 @@ Task storage config lives in two places:
 
 ### Fields
 
-| Field | Default | Description |
-|-------|---------|-------------|
-| `version_control.enabled` | `true` | VCS-track tasks at all |
-| `version_control.mode.branch` | `"@"` | `"@"` = inline; any other = separate branch |
-| `version_control.mode.repo` | _(omit)_ | External repo URL; omit for current repo |
-| `version_control.auto_commit` | `false` | Auto-commit to task branch after mutations |
-| `version_control.auto_push` | `false` | Auto-push after auto-commit |
+| Field                         | Default  | Description                                 |
+| ----------------------------- | -------- | ------------------------------------------- |
+| `version_control.enabled`     | `true`   | VCS-track tasks at all                      |
+| `version_control.mode.branch` | `"@"`    | `"@"` = inline; any other = separate branch |
+| `version_control.mode.repo`   | _(omit)_ | External repo URL; omit for current repo    |
+| `version_control.auto_commit` | `false`  | Auto-commit to task branch after mutations  |
+| `version_control.auto_push`   | `false`  | Auto-push after auto-commit                 |
 
 ### Configuration Matrix
 
-| `enabled` | `repo` | `branch` | Behavior |
-|-----------|--------|----------|----------|
-| `false` | — | — | Plain files, gitignored if in VCS |
-| `true` | omitted | `"@"` | Inline on current branch (default) |
-| `true` | omitted | `"tasks"` | Separate branch in current repo |
-| `true` | `"git@..."` | `"@"` | Clone external repo, use its default branch |
-| `true` | `"git@..."` | `"tasks"` | Clone external repo, use named branch |
+| `enabled` | `repo`      | `branch`  | Behavior                                    |
+| --------- | ----------- | --------- | ------------------------------------------- |
+| `false`   | —           | —         | Plain files, gitignored if in VCS           |
+| `true`    | omitted     | `"@"`     | Inline on current branch (default)          |
+| `true`    | omitted     | `"tasks"` | Separate branch in current repo             |
+| `true`    | `"git@..."` | `"@"`     | Clone external repo, use its default branch |
+| `true`    | `"git@..."` | `"tasks"` | Clone external repo, use named branch       |
 
 ## Backend Selection
 
 When `mode.branch` is not `"@"` and `mode.repo` is omitted (separate branch in current repo):
 
-| Current Repo | Backend |
-|--------------|---------|
-| Has `.jj/` | `jj workspace add` at `root()` |
-| Has `.git/` (no `.jj/`) | `git worktree add --orphan` |
-| Neither | Error (not in VCS repo) |
+| Current Repo            | Backend                        |
+| ----------------------- | ------------------------------ |
+| Has `.jj/`              | `jj workspace add` at `root()` |
+| Has `.git/` (no `.jj/`) | `git worktree add --orphan`    |
+| Neither                 | Error (not in VCS repo)        |
 
 When `mode.repo` is set (external repo):
 
-| Current Repo | Backend |
-|--------------|---------|
-| Has `.jj/` | `jj git clone --colocate` |
-| Has `.git/` (no `.jj/`) | `git clone` |
+| Current Repo            | Backend                   |
+| ----------------------- | ------------------------- |
+| Has `.jj/`              | `jj git clone --colocate` |
+| Has `.git/` (no `.jj/`) | `git clone`               |
 
 ## Bootstrap Flow
 
@@ -127,12 +129,14 @@ jj git push --bookmark sandpiper-tasks  # or git push -u origin sandpiper-tasks
 ### Index as Derived State
 
 `index.toon` is **gitignored** and rebuilt from disk on every CLI invocation if:
+
 - Index file is missing
 - Any task file mtime > index mtime
 
 ### Counter Allocation
 
 Task counter is allocated by:
+
 1. **Primary**: Scan all task files + `.moved` tombstones from disk
 2. **Optimization**: Use index counter if fresh
 
@@ -141,6 +145,7 @@ This prevents counter reuse even when index is stale.
 ### History Files
 
 History files (`history/*.md`) are retained because:
+
 - VCS history is lossy (squashing destroys intermediate states)
 - TUI/web UI need efficient task evolution rendering
 - Each history diff is self-contained, atomic
@@ -149,9 +154,3 @@ History files (`history/*.md`) are retained because:
 
 - [Feature Overview](./README.md) — User-facing guide
 - [Storage Guide](./storage-guide.md) — Operator commands
-- [Task Storage Strategy](../../.sandpiper/archive/task-storage-strategy-2026-04.md) — Original design doc (archived)
-
----
-
-**Last updated**: 2026-04-16  
-**Status**: Implemented (Phases 1–3 complete)

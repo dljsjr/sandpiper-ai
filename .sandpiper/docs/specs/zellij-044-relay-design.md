@@ -1,9 +1,10 @@
 # Zellij 0.44 Shell Relay Design Notes
 
-**Status**: ✅ **MOSTLY IMPLEMENTED** (Core features done, subscribe not wired)  
-**Implementation**: `extensions/shell-relay/`  
-**Last verified**: 2026-04-16  
-**Related tasks**: SHR-75 through SHR-79  
+- **Diátaxis mode**: Reference notes with explanatory design rationale
+- **Status**: ✅ **MOSTLY IMPLEMENTED** (Core features done, subscribe not wired)
+- **Implementation**: `extensions/shell-relay/`
+- **Last verified**: 2026-04-16
+- **Related tasks**: SHR-75 through SHR-79
 
 ---
 
@@ -27,8 +28,6 @@ See detailed status table at end of this document.
 - Borderless pinned overlays (future enhancement)
 
 ---
-
-# Zellij 0.44 Shell Relay Design Notes
 
 Research notes from the Zellij 0.44 CLI recipes and programmatic control docs.
 Reference for SHR-75 through SHR-79.
@@ -69,7 +68,9 @@ which inherits terminal dimensions from the spawning process, then immediately
 
 ```typescript
 // Spawn attach --create (inherits terminal dimensions)
-const proc = spawn('zellij', ['attach', '--create', sessionName], { stdio: 'pipe' });
+const proc = spawn("zellij", ["attach", "--create", sessionName], {
+  stdio: "pipe",
+});
 
 // Wait for pane to be available
 await waitForPane();
@@ -78,7 +79,7 @@ await waitForPane();
 execSync(`zellij --session ${session} action detach`);
 
 // Clean up the attach process (exits after detach)
-proc.kill('SIGTERM');
+proc.kill("SIGTERM");
 ```
 
 This solved SHR-85 — output is now properly formatted at full terminal width.
@@ -122,6 +123,7 @@ Produces NDJSON with `pane_update` events containing `viewport[]` and `scrollbac
 arrays, plus `pane_closed` events. Fires on every re-render.
 
 From live testing:
+
 - Bulk injections (paste/send-keys) produce ~4 events: chars, enter, output, prompt
 - Interactive typing produces one event per keystroke
 - Content is the full rendered viewport — includes prompt decorations, ANSI
@@ -156,6 +158,7 @@ zellij --session $SESSION action send-keys --pane-id $PANE_ID "Enter"
 diff the two snapshots in TypeScript to extract command output.
 
 Flow:
+
 1. `dump-screen --pane-id $PANE --full` → save as "before" snapshot
 2. `paste` command + `send-keys Enter`
 3. Wait for `prompt_ready` on signal FIFO (+ exit code)
@@ -164,6 +167,7 @@ Flow:
 6. Return extracted output + exit code to the agent
 
 Why this works:
+
 - `dump-screen --full` includes complete scrollback — no missed output
 - The diff is computed in TypeScript — never enters the LLM context window
 - stdout/stderr interleaving is fine — we care about the text, not which stream
@@ -172,12 +176,14 @@ Why this works:
   at session creation time
 
 Why not subscribe for output capture:
+
 - Subscribe gives viewport-only snapshots (lossy for long output unless --scrollback)
 - With --scrollback, every event delivers the entire buffer (wasteful)
 - Parsing command boundaries from viewport text is fragile (prompt decorations vary)
 - Subscribe is useful for real-time monitoring but not for reliable output capture
 
 Subscribe remains useful as:
+
 - Liveness/heartbeat signal
 - Real-time viewport monitoring for the shell_relay_inspect tool
 - Future: detecting interactive prompts, progress indicators, etc.
@@ -237,15 +243,14 @@ pane." Our relay already serializes commands per-pane, so this is fine.
 
 ## Implementation Status Summary
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Ghost client elimination | ✅ | No ghost-attach required |
-| `paste` + `send-keys` | ✅ | Replaces `write-chars` |
-| `--pane-id` targeting | ✅ | All actions use pane-level targeting |
-| `list-panes --json` | ✅ | Replaces dump-screen polling |
-| Attach-then-detach | ✅ | `createSessionWithDetach()` implemented |
-| `dump-screen --full` | ✅ | Used in snapshot-diff |
-| Snapshot-diff output capture | ✅ | `snapshot-diff.ts` implements |
-| Subscribe for monitoring | ❌ | Not wired up (future enhancement) |
-| Pane colors | ❌ | Not implemented (nice-to-have) |
-
+| Feature                      | Status | Notes                                   |
+| ---------------------------- | ------ | --------------------------------------- |
+| Ghost client elimination     | ✅     | No ghost-attach required                |
+| `paste` + `send-keys`        | ✅     | Replaces `write-chars`                  |
+| `--pane-id` targeting        | ✅     | All actions use pane-level targeting    |
+| `list-panes --json`          | ✅     | Replaces dump-screen polling            |
+| Attach-then-detach           | ✅     | `createSessionWithDetach()` implemented |
+| `dump-screen --full`         | ✅     | Used in snapshot-diff                   |
+| Snapshot-diff output capture | ✅     | `snapshot-diff.ts` implements           |
+| Subscribe for monitoring     | ❌     | Not wired up (future enhancement)       |
+| Pane colors                  | ❌     | Not implemented (nice-to-have)          |

@@ -1,26 +1,26 @@
 # Web Fetch Tool — PRD
 
-**Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ⏸️ **Deferred**: WEB-9–13 (NOT STARTED)  
-**Date**: 2026-03-26  
-**Implementation**: `extensions/web-fetch/`  
-**Last verified**: 2026-04-16  
+- **Diátaxis mode**: Reference spec
+- **Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ⏸️ **Deferred**: WEB-9–13 (NOT STARTED)
+- **Date**: 2026-03-26
+- **Implementation**: `extensions/web-fetch/`
+- **Last verified**: 2026-04-16
 
 ---
 
 ## Implementation Status
 
-| Feature | Status | Ticket |
-|---------|--------|--------|
-| Fetch single URL + return markdown | ✅ Complete | WEB-1 |
-| Extract page links (followLinks) | ✅ Complete | WEB-1 |
-| CSS selector targeting | ❌ Not started | WEB-9 |
+| Feature                                      | Status         | Ticket |
+| -------------------------------------------- | -------------- | ------ |
+| Fetch single URL + return markdown           | ✅ Complete    | WEB-1  |
+| Extract page links (followLinks)             | ✅ Complete    | WEB-1  |
+| CSS selector targeting                       | ❌ Not started | WEB-9  |
 | JS rendering adapter (lightpanda/Playwright) | ❌ Not started | WEB-10 |
-| Single-query web search | ❌ Not started | WEB-11 |
-| Site crawling with robots.txt | ❌ Not started | WEB-12 |
-| Browser automation | ❌ Not started | WEB-13 |
+| Single-query web search                      | ❌ Not started | WEB-11 |
+| Site crawling with robots.txt                | ❌ Not started | WEB-12 |
+| Browser automation                           | ❌ Not started | WEB-13 |
 
 ---
-
 
 **Date:** 2026-03-26
 **Ticket:** WEB-1
@@ -42,12 +42,12 @@ The agent frequently needs to read web content — documentation, READMEs, API r
 
 ### Deferred
 
-| Capability | Why deferred |
-|-----------|-------------|
-| **Site crawling** (scope 2) | Ethical concerns — LLM crawling is contentious. Would need `robots.txt` respect, conservative rate limiting. No personal need identified. |
-| **Search + research** (scope 3) | High value but latency concerns. Single-query search (API call + fetch top 3-5 results) is a natural v2. Deep research may need the background task framework (AGENT-15). |
-| **Browser automation** (scope 4) | Valuable for personal-assistant agents but not a priority for a coding agent. Punt. |
-| **JS rendering** (lightpanda) | Most sites an agent reads are SSR (docs, GitHub, npm, MDN, Stack Overflow). Deferred to v2 when we have real failure cases. Adapter interface designed to accommodate it later. |
+| Capability                       | Why deferred                                                                                                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Site crawling** (scope 2)      | Ethical concerns — LLM crawling is contentious. Would need `robots.txt` respect, conservative rate limiting. No personal need identified.                                       |
+| **Search + research** (scope 3)  | High value but latency concerns. Single-query search (API call + fetch top 3-5 results) is a natural v2. Deep research may need the background task framework (AGENT-15).       |
+| **Browser automation** (scope 4) | Valuable for personal-assistant agents but not a priority for a coding agent. Punt.                                                                                             |
+| **JS rendering** (lightpanda)    | Most sites an agent reads are SSR (docs, GitHub, npm, MDN, Stack Overflow). Deferred to v2 when we have real failure cases. Adapter interface designed to accommodate it later. |
 
 ## Architecture
 
@@ -132,6 +132,7 @@ Token efficiency. An HTML AST encoded as TOON carries per-node overhead (`type`,
 ### Why not lightpanda in the MVP?
 
 Three reasons:
+
 1. Most sites an agent reads are server-rendered or have good static HTML. The "needs JS" case is uncommon for documentation, GitHub, npm, etc.
 2. Adding lightpanda means dependency detection (is it installed?), platform support, and fallback orchestration — complexity that distracts from the core value.
 3. The content extraction pipeline (readability + turndown) is where the actual quality lives. A perfectly fetched SPA handed to the model as raw HTML is worse than a `fetch()`-only page run through proper extraction.
@@ -144,11 +145,11 @@ Security and correctness. We're parsing HTML structure, not running a web applic
 
 ## Dependencies
 
-| Package | Purpose | Justification |
-|---------|---------|---------------|
+| Package                | Purpose            | Justification                                                                 |
+| ---------------------- | ------------------ | ----------------------------------------------------------------------------- |
 | `@mozilla/readability` | Content extraction | Firefox Reader View algorithm — no reasonable way to replicate in a few lines |
-| `jsdom` | HTML → DOM parsing | Required by readability; standard DOM implementation for Node.js |
-| `turndown` | HTML → markdown | Handles all HTML element types, edge cases, and nesting correctly |
+| `jsdom`                | HTML → DOM parsing | Required by readability; standard DOM implementation for Node.js              |
+| `turndown`             | HTML → markdown    | Handles all HTML element types, edge cases, and nesting correctly             |
 
 All are pure JS, no native addons. Bundled at build time into the extension.
 

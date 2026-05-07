@@ -14,6 +14,7 @@ At startup, the Sandpiper CLI runtime performs two-phase mirroring:
 2. **SANDPIPER → PI** — Unconditionally, so Sandpiper overrides win
 
 This means:
+
 - Users can set either `SANDPIPER_OFFLINE=1` or `PI_OFFLINE=1` — both work
 - If both are set, `SANDPIPER_*` wins
 - Internal code always reads through Sandpiper-first lookup
@@ -44,14 +45,15 @@ if (process.env.PI_OFFLINE === "1") {
 
 Four `PI_*` variables are **exempt** from mirroring. Read these directly from `process.env.PI_*`:
 
-| Variable | Purpose | Why Exempt |
-|----------|---------|------------|
-| `PI_CODING_AGENT_PACKAGE` | Path to pi-coding-agent package | Sandpiper internal |
-| `PI_CODING_AGENT_VERSION` | Pi version string | Sandpiper internal |
-| `PI_PACKAGE_DIR` | Pi package directory override | Pi behavior control |
-| `PI_SKIP_VERSION_CHECK` | Suppress Pi update check | Pi behavior control |
+| Variable                  | Purpose                         | Why Exempt          |
+| ------------------------- | ------------------------------- | ------------------- |
+| `PI_CODING_AGENT_PACKAGE` | Path to pi-coding-agent package | Sandpiper internal  |
+| `PI_CODING_AGENT_VERSION` | Pi version string               | Sandpiper internal  |
+| `PI_PACKAGE_DIR`          | Pi package directory override   | Pi behavior control |
+| `PI_SKIP_VERSION_CHECK`   | Suppress Pi update check        | Pi behavior control |
 
 These control Pi runtime behavior or are Sandpiper internals. They're not mirrored because:
+
 - Sandpiper internals don't need user-facing aliases
 - Pi behavior control should use Pi namespace
 
@@ -70,21 +72,22 @@ const piPackagePath = resolveEnvVar("PI_CODING_AGENT_PACKAGE");
 When spawning subprocesses, you may need to set env vars:
 
 ```typescript
-import { spawn } from 'node:child_process';
+import { spawn } from "node:child_process";
 
 // Propagate both namespaces for subprocess compatibility
 const env = {
   ...process.env,
-  SANDPIPER_OFFLINE: '1',  // Sandpiper namespace
-  PI_OFFLINE: '1',         // Pi namespace (for backwards compat)
+  SANDPIPER_OFFLINE: "1", // Sandpiper namespace
+  PI_OFFLINE: "1", // Pi namespace (for backwards compat)
 };
 
-const proc = spawn('pi', ['--offline'], { env });
+const proc = spawn("pi", ["--offline"], { env });
 ```
 
 ### When to Set Both Namespaces
 
 Set both `SANDPIPER_*` and `PI_*` when:
+
 - Spawning Pi subprocesses (they may read either namespace)
 - Ensuring backwards compatibility with Pi-only code
 - Debugging (explicit is clearer than implicit mirroring)
@@ -94,7 +97,8 @@ Set both `SANDPIPER_*` and `PI_*` when:
 Sandpiper uses `resolveEnvVar()` for config path overrides:
 
 ```typescript
-const agentDir = resolveEnvVar("AGENT_DIR") ?? join(homedir(), ".sandpiper", "agent");
+const agentDir =
+  resolveEnvVar("AGENT_DIR") ?? join(homedir(), ".sandpiper", "agent");
 ```
 
 This allows users to override with either `SANDPIPER_AGENT_DIR` or `PI_AGENT_DIR`.
@@ -145,18 +149,18 @@ const offline = process.env.SANDPIPER_TEST_OFFLINE === "1";
 For tests that need specific env vars:
 
 ```typescript
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
-describe('offline mode', () => {
+describe("offline mode", () => {
   beforeEach(() => {
-    process.env.SANDPIPER_OFFLINE = '1';
+    process.env.SANDPIPER_OFFLINE = "1";
   });
-  
+
   afterEach(() => {
     delete process.env.SANDPIPER_OFFLINE;
   });
-  
-  it('disables network requests', () => {
+
+  it("disables network requests", () => {
     // Test with offline mode enabled
   });
 });
@@ -164,11 +168,5 @@ describe('offline mode', () => {
 
 ## Related Documentation
 
-- [Pi Dev Suite - Patterns](./pi-dev-suite/PI-DEV-PATTERNS.md) — Code organization patterns
-- [Pi Dev Suite - Sandpiper Patterns](./pi-dev-suite/PI-DEV-SANDPIPER-PATTERNS.md) — Sandpiper-specific patterns
-- [Env Vars Implementation](../packages/core/src/env.ts) — `resolveEnvVar()` source code
-
----
-
-**Last updated**: 2026-04-16  
-**Audience**: Contributors writing code that reads/writes env vars
+- [Pi extension development](./pi-extension-development.md) — Where Pi runtime behavior fits into Sandpiper
+- [Env Vars Implementation](../../packages/core/src/env.ts) — `resolveEnvVar()` source code

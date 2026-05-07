@@ -135,7 +135,6 @@ reporter: USER
 created_at: 2026-03-24T00:00:00Z
 updated_at: 2026-03-24T00:00:00Z
 ---
-
 # Task title
 
 Description and acceptance criteria here.
@@ -143,7 +142,8 @@ Description and acceptance criteria here.
 
 See [SPEC.md](../resources/skills/sandpiper/tasks/references/SPEC.md) for the full specification.
 
-## Related design docs
+## Related docs
 
-- [Task storage strategy](../../.sandpiper/docs/task-storage-strategy.md) — approved design for reducing VCS churn from task operations
-- [Task storage implementation plan](../../.sandpiper/docs/task-storage-implementation-plan.md) — phased execution plan and ticket map
+- [Task management guide](../../docs/features/tasks/README.md)
+- [Task storage modes](../../docs/features/tasks/storage-guide.md)
+- [Task storage architecture](../../docs/features/tasks/architecture.md)

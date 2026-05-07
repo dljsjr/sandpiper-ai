@@ -1,7 +1,8 @@
 # Concurrent Sessions Design
 
-**Status**: Implemented
-**Last Updated**: 2026-04-06
+- **Diátaxis mode**: Explanation
+- **Status**: Implemented
+- **Last Updated**: 2026-04-06
 
 ## Problem
 
@@ -32,11 +33,13 @@ Extension (system.ts)          CLI (sandpiper-standup)
 ```
 
 **Extension responsibilities**:
+
 - Create PID file on `session_start`
 - Remove PID file on `session_shutdown`
 - Call `sandpiper-standup read` to get cleaned context
 
 **CLI responsibilities**:
+
 - All standup file parsing and serialization
 - PID-based liveness detection
 - Section cleanup (removing dead sessions)
@@ -49,6 +52,7 @@ $XDG_STATE_HOME/sandpiper/sessions/<uuid>.pid
 ```
 
 Contents (three lines):
+
 ```
 12345
 2026-04-05T10:00:00.000Z
@@ -64,6 +68,7 @@ Fallback: `~/.local/state` when `XDG_STATE_HOME` is unset.
 ### Liveness Detection
 
 The CLI checks process liveness using `process.kill(pid, 0)`:
+
 - Success or `EPERM` → process is alive
 - `ESRCH` → process is dead
 - No PID file → session is dead
@@ -80,18 +85,23 @@ The CLI checks process liveness using `process.kill(pid, 0)`:
 Session file: ~/.sandpiper/agent/sessions/--Users-doug-git-my-project--/2026-04-01T18-12-48-013Z_c82731d3.jsonl
 
 ### Accomplished
+
 - Implemented login fix (Refs: SHR-1)
 
 ### In Progress
+
 - Rate limiting endpoint
 
 ### Next Session
+
 - Complete rate limiting middleware
 
 ### Blockers
+
 - None
 
 ### Context
+
 - Working copy has uncommitted rate limiter changes
 
 ## Session f19a4e2b (Updated: 2026-04-05T10:25:00Z)
@@ -99,12 +109,14 @@ Session file: ~/.sandpiper/agent/sessions/--Users-doug-git-my-project--/2026-04-
 Session file: ~/.sandpiper/agent/sessions/--Users-doug-git-my-project--/2026-04-05T10-20-00-000Z_f19a4e2b.jsonl
 
 ### Accomplished
+
 - Code review of login fix
 
 ...
 ```
 
 Key changes from legacy format:
+
 - One section per active session, identified by `## Session <uuid>` header
 - Each section has the same internal structure (Accomplished, In Progress, etc.)
 - File contains only alive sections (dead sections are cleaned on read/write)
@@ -119,11 +131,13 @@ The `sandpiper-standup read` command outputs two sections:
 ## Active Sessions
 
 ### Session c82731d3 (Updated: ...)
+
 ...
 
 ## Inactive Sessions
 
 ### Session f19a4e2b (Updated: ...)
+
 ...
 ```
 
@@ -144,7 +158,9 @@ writePidFile(sessionId, cwd);
 removePidFile(sessionId);
 
 // Reading standup context (shell-safe: no string interpolation)
-const standupContent = execFileSync('sandpiper-standup', ['read', '-d', cwd], { encoding: 'utf-8' });
+const standupContent = execFileSync("sandpiper-standup", ["read", "-d", cwd], {
+  encoding: "utf-8",
+});
 ```
 
 ### CLI Commands
