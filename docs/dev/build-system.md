@@ -24,6 +24,8 @@ Not all changes require a build step. Here's what to do after different types of
 | `packages/sandpiper-tasks-cli/` | `bun run build` then `postinstall.sh` | Emits bundled binary |
 | `packages/core/` | `bun run build` then `postinstall.sh` | Emits TypeScript declarations |
 | `packages/adapter-claude-code/` | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin` | Emits TypeScript declarations and bundles Claude hook scripts into the plugin artifact |
+| Focused source tests | `bun run test:vitest -- <testpath>` | Runs Vitest with `PI_PACKAGE_DIR` unset; does not rebuild distribution artifacts |
+| Full-suite review gate | `bun run test` | Builds package and distribution prerequisites, then runs the complete Vitest suite with `PI_PACKAGE_DIR` unset |
 | Distribution invariant or smoke checks | `bun run test:distribution` | Builds dist prerequisites, assembles `dist/`, verifies root neutral Pi routing, builds standalone app and Claude plugin artifacts, and runs source/distribution/standalone/plugin invariant tests |
 
 ## Build Pipeline
@@ -168,6 +170,18 @@ bash devtools/postinstall.sh
 
 These are copied, not built.
 
+### Test Gates
+
+Use the package scripts, not bare `bun test`, for repository health checks. Bare `bun test` invokes Bun's runner; Sandpiper's canonical tests use Vitest.
+
+```bash
+bun run test:vitest -- packages/core/src/startup-prompt.test.ts # focused Vitest run
+bun run test                                                   # full-suite review gate
+bun run test:distribution                                      # distribution/package smoke gate
+```
+
+`bun run test` prepares distribution prerequisites first so dist-dependent smoke tests and workspace bin shims run from a cleanly built layout. `test:vitest` intentionally skips that prep for fast focused runs. Both unset `PI_PACKAGE_DIR` before invoking Vitest so local Sandpiper/Pi session state cannot leak into tests.
+
 ### Distribution Invariant and Smoke Checks
 
 ```bash
@@ -175,6 +189,12 @@ bun run test:distribution
 ```
 
 This command prepares the generated Sandpiper Pi/npm package assembly, then runs distribution invariant tests, dogfood standalone smoke tests, standalone app-bundle smoke tests, and Claude plugin smoke tests. It verifies source-boundary rules, root/provider and generated Pi manifest resource paths, opt-in legacy package installation behavior, ecosystem package install metadata, root Pi package loading without Sandpiper identity, standalone temp-config execution, compiled app-bundle help/resource loading, Claude plugin path/resource shape, and hook adapter execution.
+
+For clean distribution certification, remove the old artifact first:
+
+```bash
+rm -rf dist && bun run test:distribution
+```
 
 ### Ecosystem Install Certification
 

@@ -97,15 +97,15 @@ bash devtools/postinstall.sh               # Reassemble dist/ (legacy Pi package
 ## Development
 
 ```bash
-bun check                  # Type-check + lint (tsc + biome)
-bun run test:distribution  # Primary package/distribution smoke gate
-bun check --write          # Auto-fix formatting
-bun check:ast-grep         # Structural code analysis
-bun run clean              # Remove node_modules, dist, caches
+bun check                         # Type-check + lint (tsc + biome)
+bun run test                      # Full Vitest gate; prepares dist and unsets PI_PACKAGE_DIR
+bun run test:vitest -- <testpath> # Focused Vitest run without distribution prep
+bun run test:distribution         # Package/distribution smoke gate
+bun check --write                 # Auto-fix formatting
+bun check:ast-grep                # Structural code analysis
+bun run clean                     # Remove node_modules, dist, caches
 
-# Run focused tests
-bun --filter sandpiper-tasks-cli test
-bun --filter shell-relay test
+# Do not use bare `bun test` as the repo health gate; it invokes Bun's runner, not Vitest.
 ```
 
 ## Configuration

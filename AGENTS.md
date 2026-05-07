@@ -64,7 +64,8 @@ Read the relevant focused doc **before** working in these areas:
 
 ### Testing
 
-- Use **Vitest**
+- Use **Vitest** through package scripts; do not use bare `bun test` as a repo health signal
+- Use `bun run test:vitest -- <paths>` for focused Vitest runs and `bun run test` for the full-suite gate
 - Test-first. Reproduce bugs with a failing test before fixing
 - Emphasize real behavior over mocks
 - Treat edge cases as first-class test cases
@@ -82,6 +83,7 @@ Read the relevant focused doc **before** working in these areas:
 ### Verification
 
 - Verify against implementation and working examples, not docs alone
+- For review readiness, run `bun check` and the relevant Vitest gate; use `bun run test` when claiming full-suite health
 - Check real dist layout and package metadata before writing path-dependent code
 - Prefer consistency with nearby code over inventing a new local style
 

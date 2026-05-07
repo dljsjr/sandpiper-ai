@@ -198,7 +198,8 @@ Sandpiper uses Commander.js for CLI argument parsing. Key conventions:
 Bun is the preferred runtime for CLI development:
 
 - Use `bun run` for scripts
-- Use `bun test` for running tests
+- Use `bun run test:vitest -- <testpath>` for focused tests and `bun run test` for the full-suite Vitest gate
+- Do not use bare `bun test` as a repo health signal; it invokes Bun's runner, not the configured Vitest suite
 - Use `bun build` for bundling (when needed)
 - Prefer Node.js built-ins over new runtime dependencies
 
