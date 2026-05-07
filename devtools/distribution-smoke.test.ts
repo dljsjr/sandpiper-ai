@@ -40,6 +40,13 @@ describe('Pi package distribution smoke', () => {
     expect(rootPackageJson).not.toHaveProperty('files');
   });
 
+  it('uses the source root as the neutral Pi install surface instead of building a generated neutral package', () => {
+    expect(rootPackageJson.scripts).not.toHaveProperty('build:neutral-pi-package');
+    expect(rootPackageJson.scripts).not.toHaveProperty('test:neutral-pi-package');
+    expect(rootPackageJson.scripts['prepare:distribution']).not.toContain('neutral-pi-package');
+    expect(rootPackageJson.scripts['test:distribution']).not.toContain('neutralPiPackage');
+  });
+
   it('generates Sandpiper Pi metadata without requiring root package Pi metadata', () => {
     const rootWithoutPiMetadata = {
       ...rootPackageJson,

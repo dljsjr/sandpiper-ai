@@ -9,7 +9,7 @@ Last verified: 2026-03-30
 - Only packages with real build outputs need build steps: `packages/cli`, `packages/sandpiper-tasks-cli`, and `packages/core`.
 - After changing extension code, skills, prompts, themes, or other packaged resources, run `bash devtools/postinstall.sh`.
 - After changing a package that emits binaries or declarations, build that package first, then run `bash devtools/postinstall.sh`.
-- `dist/` is a Pi Package assembly, not a dependency manager. `dist/package.json` declares Pi resources and the `sandpiper` bin; runtime dependencies still resolve from the workspace install.
+- `dist/` is the generated Sandpiper Pi/npm package assembly, not a dependency manager. Root `package.json` is the neutral Pi install surface; `dist/package.json` declares the Sandpiper package resources and `sandpiper` bin.
 - Runtime npm dependencies resolve from the hoisted root `node_modules/`, not from per-extension `node_modules/` inside `dist/`.
 
 ## Canonical Examples
@@ -50,12 +50,12 @@ This hoists dependencies to the root `node_modules/`. Extensions with npm depend
 
 This script assembles the final Pi Package in `dist/`:
 
-- copies extensions, skills, prompts, themes, and packages into `dist/`
+- copies extensions, package-owned shared resources, and support packages into `dist/`
 - preserves extension `src/` trees so package-local `pi.extensions` entries like `./src/index.ts` resolve in both source and dist
-- generates `dist/package.json` with the `pi` key and the `sandpiper` bin
-- symlinks pi's internal assets (themes, export templates)
+- generates `dist/package.json` with Sandpiper Pi package metadata and the `sandpiper` bin
+- symlinks Pi's internal assets (themes, export templates)
 - builds the dash CLI via mcporter
-- runs `pi package install dist/` through the wrapped Sandpiper CLI
+- optionally installs `dist/` through Sandpiper only when `SANDPIPER_INSTALL_PI_PACKAGE=1`
 
 ## Workflow
 
@@ -63,7 +63,7 @@ Typical workflow after changes:
 
 - Extension source changes in `extensions/` → run `bash devtools/postinstall.sh`
 - Package changes with real build outputs (`packages/cli`, `packages/sandpiper-tasks-cli`, `packages/core`) → run that package's `build` script, then `bash devtools/postinstall.sh`
-- Skill / prompt / theme changes → run `bash devtools/postinstall.sh`
+- Skill / prompt / theme changes under `packages/resources/` → run `bash devtools/postinstall.sh`
 
 ## Related Docs
 

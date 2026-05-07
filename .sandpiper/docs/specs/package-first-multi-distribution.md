@@ -507,7 +507,7 @@ Tasks: AGENT-90, AGENT-91, AGENT-92
 
 Create the three distribution assemblies:
 
-- neutral Pi package
+- neutral Pi install surface through the root package router
 - standalone Sandpiper app/binary
 - Claude Code plugin
 
@@ -515,7 +515,7 @@ Each distribution must have a smoke test and documented local development workfl
 
 #### AGENT-90 neutral Pi package target
 
-AGENT-90 introduces a local neutral Pi package artifact at `dist/neutral-pi-package/`. It is a transition artifact, not the final npm-published package. The goal is to prove that Pi can load Sandpiper's neutral resources without the Sandpiper identity layer.
+AGENT-90 introduced a local neutral Pi package artifact at `dist/neutral-pi-package/`. It was a transition artifact, not the final install surface. AGENT-180 retires that generated artifact now that root `package.json` routes vanilla Pi to neutral provider/package-owned resources directly. The continuing goal is to prove that Pi can load Sandpiper's neutral resources from the source root without the Sandpiper identity layer.
 
 Artifact shape:
 
@@ -537,14 +537,7 @@ AGENT-90 completion signal:
 - Sandpiper identity flags/hooks are absent: no migration flags, no install-shell-integration flag, no `before_agent_start` Sandpiper prompt hook, and no `extensions/system.ts` in the loaded extension set.
 - The artifact manifest paths are covered by the AGENT-89 distribution invariant helpers.
 
-AGENT-90 verification is anchored by:
-
-```bash
-bun run test:neutral-pi-package
-bun run test:distribution
-```
-
-`test:neutral-pi-package` builds `dist/neutral-pi-package/` and runs the focused neutral package manifest/load smoke tests. `test:distribution` includes those neutral checks along with the existing distribution invariant and standalone smoke gates.
+AGENT-180 replaces the generated-artifact verification with `devtools/rootPiPackageSmoke.test.ts`, which loads the repository root as a Pi package and asserts the neutral provider/resource paths load without Sandpiper identity flags or startup hooks. `test:distribution` includes that root neutral package smoke alongside the existing distribution invariant and standalone smoke gates.
 
 #### AGENT-91 standalone Sandpiper app bundle target
 
@@ -594,7 +587,7 @@ bun run test:distribution
 
 #### Claude Code plugin target
 
-The local Claude Code plugin artifact lives at `dist/claude-plugin/`. It is a transition artifact used to prove Claude-compatible packaging and adapter seams while the source repository uses package-owned shared resources.
+The local Claude Code plugin artifact lives at `dist/claude-plugin/`. Unlike the retired neutral Pi artifact, this generated package remains intentional: marketplace-installed Claude plugins are copied into Claude's plugin cache and must be self-contained, so package-owned shared resources are duplicated into Claude's component layout at package time.
 
 Artifact shape:
 
@@ -639,7 +632,7 @@ Completion signal:
 - `bun run build:claude-plugin` writes `dist/claude-plugin/` with the manifest, resources, helper binaries, hook configuration, and bundled hook scripts.
 - A local plugin smoke test validates Claude path rules, publishable package metadata, self-contained helper binaries, hook references, and marketplace metadata without touching real Claude user state.
 - A hook smoke test executes the bundled AutoTOON hook with a representative `PostToolUse` payload.
-- `bun run test:distribution` includes the Claude plugin checks alongside the neutral Pi package and standalone app gates.
+- `bun run test:distribution` includes the Claude plugin checks alongside the root neutral Pi package and standalone app gates.
 
 Implementation results:
 
@@ -687,7 +680,6 @@ Manual certification commands:
 bun run prepare:distribution
 npm install --ignore-scripts --package-lock=false --dry-run
 npm install --ignore-scripts --package-lock=false --dry-run --prefix dist
-npm install --ignore-scripts --package-lock=false --dry-run --prefix dist/neutral-pi-package
 bun run build:claude-plugin
 claude plugin validate .
 claude plugin validate dist/claude-plugin
@@ -861,7 +853,7 @@ AGENT-169 start-state blockers:
 | Legacy `dist/` assembly | At AGENT-169 start, `devtools/postinstall.sh` copied top-level `extensions/`, `skills/`, `prompts/`, `themes/`, and `packages/` into `dist`, then `devtools/distPackageJson.ts` copied root `piConfig` and `pi` into `dist/package.json`. AGENT-170/171 made `distPackageJson.ts` synthesize artifact-owned Pi metadata as an interim step. | Long-term `dist/` should primarily contain built Sandpiper runtime outputs/sidecars. Pi and Claude install surfaces should be root/provider/package paths unless host validation proves generated dist roots are required. |
 | Root resource directories | Top-level `skills/`, `prompts/`, and `themes/` have moved to `packages/resources/`; top-level `extensions/` remains as the legacy Pi adapter source. | Continue retiring root `extensions/` into provider/package-owned adapters; do not reintroduce top-level shared resource source directories. |
 | Standalone app bundle | `devtools/standaloneSandpiperApp.ts` copies root `extensions`, `packages/resources`, and selected packages into `dist/standalone-sandpiper/`. | Standalone app behavior already avoids root `pi` manifest loading and now consumes package-owned shared resources. |
-| Neutral Pi package | `devtools/neutralPiPackage.ts` copies neutral Pi adapters from `plugins/pi/extensions` and shared resources from `packages/resources`. Legacy top-level extension code is copied only as support for compatibility imports. | Neutral package entrypoints now use provider/package-owned manifest paths; the remaining gap is extracting shell-relay/web-fetch implementation out of top-level `extensions/`. |
+| Neutral Pi package | AGENT-180 retires the generated `devtools/neutralPiPackage.ts` transition artifact. The repository root is now the neutral Pi package router, with `pi` entries pointing to `plugins/pi/extensions` and `packages/resources`. | Root neutral loading is covered by `devtools/rootPiPackageSmoke.test.ts`; remaining package-ownership work is extracting shell-relay/web-fetch implementation out of top-level `extensions/`. |
 | Claude plugin | `devtools/claudeCodePlugin.ts` copies `packages/resources` skills/prompts/themes into Claude plugin paths and generated helper binaries from `dist/`. | Claude artifact already owns Claude-specific metadata and now consumes package-owned shared resources, but it still depends on the legacy `dist/` preparation step for helper binaries. |
 | Runtime resource discovery | `packages/cli/sandpiper_resources.ts` loads resources from `packages/resources/skills`, `packages/resources/prompts`, and `packages/resources/themes` under a supplied resource root and imports Sandpiper runtime extension factories from root `extensions/`. | Explicit resource discovery is the preferred direction; Sandpiper runtime extension imports still need package-owned adapters. |
 | Docs and repo guidance | `AGENTS.md`, `docs/dev/build-system.md`, `devtools/README.md`, `packages/README.md`, and `extensions/README.md` still describe root-level resources and legacy `postinstall.sh` assembly as normal development workflow. | Update docs only after behavior changes land so guidance matches the verified build model. |
@@ -954,6 +946,15 @@ AGENT-179 makes `sandpiper_standalone.ts` the normal Sandpiper runtime:
 - `packages/cli/bin/sandpiper` is the stable workspace bin shim for the deferred-import runtime.
 - `packages/cli/dist/sandpiper` is built from `sandpiper_standalone.ts`; `sandpiper-standalone` remains a compatibility alias over `dist/standalone/sandpiper_standalone.js`.
 - `pi_wrapper.ts` remains as temporary legacy code until generated distribution assembly is retired.
+
+#### AGENT-180 generated artifact retirement
+
+AGENT-180 retires the neutral Pi transition artifact and documents the remaining generated Claude plugin artifact:
+
+- Root `package.json` is the neutral Pi install surface; `build:neutral-pi-package`, `test:neutral-pi-package`, `devtools/neutralPiPackage.ts`, and `dist/neutral-pi-package/` are no longer part of the active build/test pipeline.
+- `devtools/rootPiPackageSmoke.test.ts` verifies source-root Pi package loading without Sandpiper identity flags, migration flags, or startup prompt hooks.
+- `dist/claude-plugin/` remains generated because installed Claude plugins must be self-contained inside Claude's plugin cache. The generator copies package-owned shared resources into Claude's component layout and keeps Claude-specific hook glue in `packages/adapter-claude-code/`.
+- `devtools/postinstall.sh` may continue deleting stale nested generated artifact directories from `dist/` so old local builds do not leak into the Sandpiper Pi/npm package.
 
 ## Task Breakdown
 
