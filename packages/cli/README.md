@@ -13,6 +13,8 @@ Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlog
 
 This path does not install Sandpiper into Pi to load its own behavior. The old `pi_wrapper.ts` remains as legacy code while distribution assembly is retired.
 
+The runtime intentionally writes `using pi-coding-agent version: <version>` to stdout before delegating to Pi. This makes the embedded Pi version visible in every Sandpiper launch and is asserted by CLI smoke tests.
+
 ## Build
 
 ```bash

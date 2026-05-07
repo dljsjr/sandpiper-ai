@@ -95,11 +95,11 @@ This script:
 2. Copies extensions and package-owned shared resources to `dist/`
 3. Preserves extension `src/` trees (so `pi.extensions` entries resolve)
 4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist
-5. Symlinks Pi's internal assets
+5. Symlinks Pi's internal assets, including `dist/dist -> .` for Pi's double-dist asset lookup
 6. Builds the Dash CLI via mcporter
 7. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`
 
-The neutral Pi install surface is the repository root itself: root `package.json` keeps its `pi` manifest routed through provider/package-owned paths (`plugins/pi/extensions` and `packages/resources/...`). Sandpiper runtime branding lives in root `piConfig` and the `sandpiper` bin, while vanilla Pi resource loading is covered by the root Pi package smoke test and must not load Sandpiper identity/system-prompt/migration/update behavior.
+The neutral Pi install surface is the repository root itself: root `package.json` intentionally keeps its `pi` manifest routed through provider/package-owned paths (`plugins/pi/extensions` and `packages/resources/...`). Sandpiper runtime branding lives in root `piConfig` and the `sandpiper` bin, while vanilla Pi resource loading is covered by the root Pi package smoke test and must not load Sandpiper identity/system-prompt/migration/update behavior. Do not remove those root router keys as part of root-assembly retirement; the retirement target is top-level implementation ownership, not the root package's routing/branding role.
 
 The standalone Sandpiper app bundle is built separately:
 
@@ -134,6 +134,8 @@ The `dist/` directory is the **Sandpiper Pi/npm package assembly**, not a depend
 - Extension build outputs (extensions load from source)
 
 **Key insight**: `dist/package.json` declares Pi resources and the `sandpiper` bin. Runtime npm dependencies resolve from the workspace install, not from `dist/`.
+
+`dist/dist -> .` is an intentional self-symlink for Pi internals that look for assets under `<PI_PACKAGE_DIR>/dist/*`. It is safe for Pi and the tested build flow, but contributors should avoid recursive walkers that follow symlinks below `dist/` unless they use a depth limit.
 
 ## Common Workflows
 

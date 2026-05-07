@@ -38,6 +38,8 @@ Server definitions live in `config/mcporter-dist.json` (for distribution builds)
 
 ## Distribution Checks
 
+`bun run test:distribution` is the package-first refactor's primary gate. It builds the generated artifacts before running the distribution, standalone, and Claude plugin smokes; `bun test` alone does not exercise this assembled layout.
+
 Run the distribution invariant and smoke gate with:
 
 ```bash
@@ -60,7 +62,7 @@ bun install
       → copy extension package.json files
       → remove stale nested generated artifacts from dist/
       → generate dist/package.json with npm-compatible package metadata and artifact-owned Pi resource metadata
-      → symlink pi internal assets
+      → symlink pi internal assets, including `dist/dist -> .` for Pi's double-dist asset lookup
       → build dash CLI via mcporter
       → create dev-mode skill binary symlinks
       → optionally run sandpiper install dist/ when SANDPIPER_INSTALL_PI_PACKAGE=1
@@ -89,6 +91,12 @@ bun run test:claude-plugin
   → verify Claude plugin metadata/resource assembly
   → exercise the AutoTOON hook package and bundled hook artifact
 ```
+
+## Recursive `dist/dist` Symlink
+
+`postinstall.sh` creates `dist/dist -> .` intentionally. Pi's internal asset lookup expects paths like `<PI_PACKAGE_DIR>/dist/modes`; when `PI_PACKAGE_DIR` is already `dist/`, the self-symlink makes that double-dist lookup resolve to `dist/modes`.
+
+Do not use recursive filesystem walkers that follow symlinks under `dist/` without a depth limit. Prefer `rg`'s default no-follow behavior, or use `find -P`/bounded `-maxdepth` when inspecting generated artifacts.
 
 ## Ecosystem Install Checks
 

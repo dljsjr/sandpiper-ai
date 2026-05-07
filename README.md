@@ -2,7 +2,7 @@
 
 A powerful pair programming coding agent built on [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Sandpiper wraps pi with opinionated extensions, skills, and customizations that create a deeply integrated development companion — one that can see your terminal, manage your tasks, and maintain context across sessions.
 
-Sandpiper is distributed as a [Pi Package](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/packages.md), which means it bundles extensions, skills, prompt templates, and themes into a single installable unit that extends pi's capabilities.
+Sandpiper is a package-first monorepo with multiple install surfaces: the normal `sandpiper` runtime, a neutral Pi package surface, and a Claude Code plugin artifact. The repository root is a router/workspace package; implementation resources live under `packages/` and provider-specific adapter directories.
 
 ## What Sandpiper Adds
 
@@ -97,12 +97,13 @@ bash devtools/postinstall.sh               # Reassemble dist/ (legacy Pi package
 ## Development
 
 ```bash
-bun check              # Type-check + lint (tsc + biome)
-bun check --write      # Auto-fix formatting
-bun check:ast-grep     # Structural code analysis
-bun run clean          # Remove node_modules, dist, caches
+bun check                  # Type-check + lint (tsc + biome)
+bun run test:distribution  # Primary package/distribution smoke gate
+bun check --write          # Auto-fix formatting
+bun check:ast-grep         # Structural code analysis
+bun run clean              # Remove node_modules, dist, caches
 
-# Run tests
+# Run focused tests
 bun --filter sandpiper-tasks-cli test
 bun --filter shell-relay test
 ```

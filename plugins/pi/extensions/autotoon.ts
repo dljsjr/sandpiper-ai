@@ -1,3 +1,4 @@
+// Thin Pi provider adapter; source logic lives in packages/capability-autotoon/.
 export {
   default,
   MAX_JSON_BYTES,

@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -8,7 +9,7 @@ const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
 describe('standalone Sandpiper compiled app bundle', () => {
   it('runs help from the app bundle without source-root path overrides', async () => {
-    const tempDir = mkdtempSync(join(repoRoot, '.tmp-standalone-app-compile-'));
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-compile-'));
 
     try {
       const executable = join(repoRoot, 'dist', 'standalone-sandpiper', 'sandpiper');
