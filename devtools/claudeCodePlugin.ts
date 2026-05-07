@@ -90,6 +90,11 @@ interface ExecutableCopyEntry {
   readonly to: readonly string[];
 }
 
+interface GeneratedFileCopyEntry {
+  readonly from: string;
+  readonly to: readonly string[];
+}
+
 interface BunBuildMessage {
   readonly message: string;
 }
@@ -146,6 +151,13 @@ const GENERATED_EXECUTABLE_COPY_ENTRIES: readonly ExecutableCopyEntry[] = [
   {
     from: 'dist/skills/sandpiper/dash/scripts/dash',
     to: ['skills/sandpiper/dash/scripts/dash', 'bin/dash'],
+  },
+];
+
+const GENERATED_SUPPORT_FILE_COPY_ENTRIES: readonly GeneratedFileCopyEntry[] = [
+  {
+    from: 'dist/skills/sandpiper/dash/scripts/dash.cjs',
+    to: ['skills/sandpiper/dash/scripts/dash.cjs', 'bin/dash.cjs'],
   },
 ];
 
@@ -207,6 +219,14 @@ async function copyExecutable(repoRoot: string, outputDir: string, entry: Execut
     await mkdir(dirname(destination), { recursive: true });
     await copyFile(join(repoRoot, entry.from), destination);
     await chmod(destination, 0o755);
+  }
+}
+
+async function copyGeneratedFile(repoRoot: string, outputDir: string, entry: GeneratedFileCopyEntry): Promise<void> {
+  for (const relativeDestination of entry.to) {
+    const destination = join(outputDir, relativeDestination);
+    await mkdir(dirname(destination), { recursive: true });
+    await copyFile(join(repoRoot, entry.from), destination);
   }
 }
 
@@ -276,6 +296,10 @@ export async function assembleClaudeCodePlugin(options: AssembleClaudeCodePlugin
 
   for (const entry of GENERATED_EXECUTABLE_COPY_ENTRIES) {
     await copyExecutable(options.repoRoot, options.outputDir, entry);
+  }
+
+  for (const entry of GENERATED_SUPPORT_FILE_COPY_ENTRIES) {
+    await copyGeneratedFile(options.repoRoot, options.outputDir, entry);
   }
 
   await mkdir(join(options.outputDir, '.claude-plugin'), { recursive: true });

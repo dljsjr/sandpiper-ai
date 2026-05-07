@@ -109,14 +109,22 @@ mkdir -p "${DIST_DIR}/config"
 printf "\tCopying mcporter configurations\n"
 rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" -ahH "${REPO_ROOT}/devtools/config/mcporter-dist.json" "${REPO_ROOT}/dist/config/mcporter.json"
 
-# dash CLI (single-file devtools script)
+# dash CLI wrapper plus CommonJS sidecar. mcporter's Node bundle currently
+# emits CommonJS; keeping it in .cjs avoids package-level CommonJS islands while
+# preserving the extensionless scripts/dash entrypoint as an ESM wrapper.
 DASH_BIN="$REPO_ROOT/dist/skills/sandpiper/dash/scripts/dash"
-# Remove stale file/symlink before rebuilding (avoids circular symlink issues)
-rm -f "$DASH_BIN"
+DASH_CJS="$REPO_ROOT/dist/skills/sandpiper/dash/scripts/dash.cjs"
+# Remove stale files/symlinks before rebuilding (avoids circular symlink issues)
+rm -f "$DASH_BIN" "$DASH_CJS"
 if ! [ -f "$DASH_BIN" ]; then
     echo "⚙ Generating dash CLI..."
     mkdir -p "$(dirname "$DASH_BIN")"
-    if (cd "${REPO_ROOT}/dist" && bun mcporter generate-cli --server dash --runtime node --bundle "$DASH_BIN" --minify); then
+    if (cd "${REPO_ROOT}/dist" && bun mcporter generate-cli --server dash --runtime node --bundle "$DASH_CJS" --minify); then
+        cat >"$DASH_BIN" <<'EOF'
+#!/usr/bin/env node
+import './dash.cjs';
+EOF
+        chmod 755 "$DASH_BIN"
         if [ -f "$REPO_ROOT"/dist/dash.ts ]; then
             rm "$REPO_ROOT"/dist/dash.ts
         fi

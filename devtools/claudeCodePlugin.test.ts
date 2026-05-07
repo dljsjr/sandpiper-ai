@@ -136,15 +136,18 @@ describe('Claude Code plugin mapping', () => {
         'skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'skills/sandpiper/standup/scripts/sandpiper-standup',
         'skills/sandpiper/dash/scripts/dash',
+        'skills/sandpiper/dash/scripts/dash.cjs',
         'bin/sandpiper-tasks',
         'bin/sandpiper-standup',
         'bin/dash',
+        'bin/dash.cjs',
       ]) {
         const path = join(outputDir, relativePath);
         expect(existsSync(path), relativePath).toBe(true);
         expect(lstatSync(path).isSymbolicLink(), relativePath).toBe(false);
       }
 
+      expect(execFileSync(join(outputDir, 'bin', 'dash'), ['--help'], { encoding: 'utf-8' })).toContain('Usage:');
       expect(npmPackDryRun(outputDir)).toContain('.claude-plugin/plugin.json');
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', '.DS_Store'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'jj-workspace', 'run_loop.log'))).toBe(false);
