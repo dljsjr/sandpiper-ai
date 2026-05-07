@@ -38,6 +38,7 @@ describe('Pi package distribution smoke', () => {
     expect(rootPackageJson.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
     expect(rootPackageJson.bin).toEqual({ sandpiper: './packages/cli/bin/sandpiper' });
     expect(rootPackageJson).not.toHaveProperty('files');
+    expect(findMissingPiManifestPaths(repoRoot, rootPackageJson)).toEqual([]);
   });
 
   it('uses the source root as the neutral Pi install surface instead of building a generated neutral package', () => {

@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
@@ -8,7 +9,7 @@ const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const executable = join(repoRoot, 'dist', 'standalone-sandpiper', 'sandpiper');
 
 function runAppHelp(cwd: string): string {
-  const tempDir = mkdtempSync(join(repoRoot, '.tmp-standalone-app-runtime-'));
+  const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-runtime-'));
 
   try {
     const agentDir = join(tempDir, 'agent');
@@ -36,7 +37,7 @@ describe('standalone Sandpiper app runtime smoke', () => {
   }, 20_000);
 
   it('loads bundled resources and extension flags from a temp project directory', () => {
-    const tempDir = mkdtempSync(join(repoRoot, '.tmp-standalone-app-project-'));
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-project-'));
 
     try {
       const projectDir = join(tempDir, 'project');

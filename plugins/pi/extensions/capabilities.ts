@@ -1,3 +1,4 @@
+// Thin Pi provider adapter; source logic lives in extensions/system/neutral-capability-extension.ts.
 import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
 import { createNeutralCapabilityExtension } from '../../../extensions/system/neutral-capability-extension.js';
 

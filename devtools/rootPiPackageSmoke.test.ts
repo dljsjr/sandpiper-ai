@@ -1,4 +1,5 @@
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -6,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 
 async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void> {
-  const tempRoot = mkdtempSync(join(repoRoot, '.tmp-root-pi-package-smoke-'));
+  const tempRoot = mkdtempSync(join(tmpdir(), 'sandpiper-root-pi-package-smoke-'));
   const agentDir = join(tempRoot, 'agent');
   const cwd = join(tempRoot, 'project');
   const previousPackageDir = process.env.PI_PACKAGE_DIR;
@@ -36,8 +37,10 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     const flags = extensionResult.extensions.flatMap((extension) => [...extension.flags.keys()]);
     const handlers = extensionResult.extensions.flatMap((extension) => [...extension.handlers.keys()]);
     const tools = extensionResult.extensions.flatMap((extension) => [...extension.tools.keys()]);
-    const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
-    const promptNames = resourceLoader.getPrompts().prompts.map((prompt) => prompt.name);
+    const skills = resourceLoader.getSkills().skills;
+    const prompts = resourceLoader.getPrompts().prompts;
+    const skillNames = skills.map((skill) => skill.name);
+    const promptNames = prompts.map((prompt) => prompt.name);
 
     expect(extensionResult.errors).toEqual([]);
     expect(loadedExtensionPaths).toEqual(
@@ -47,6 +50,9 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
         join(packageDir, 'plugins', 'pi', 'extensions', 'web-fetch.ts'),
         join(packageDir, 'plugins', 'pi', 'extensions', 'autotoon.ts'),
       ]),
+    );
+    expect(loadedExtensionPaths.every((path) => path.startsWith(join(packageDir, 'plugins', 'pi', 'extensions')))).toBe(
+      true,
     );
     expect(loadedExtensionPaths.some((path) => path.endsWith('/extensions/system.ts'))).toBe(false);
     expect(loadedExtensionPaths.some((path) => path.includes('/extensions/system/extension-factories.ts'))).toBe(false);
@@ -58,6 +64,12 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     );
     expect(skillNames).toEqual(expect.arrayContaining(['tasks', 'standup']));
     expect(promptNames).toEqual(expect.arrayContaining(['new-feature', 'code-review']));
+    expect(
+      skills.every((skill) => skill.filePath.startsWith(join(packageDir, 'packages', 'resources', 'skills'))),
+    ).toBe(true);
+    expect(
+      prompts.every((prompt) => prompt.filePath.startsWith(join(packageDir, 'packages', 'resources', 'prompts'))),
+    ).toBe(true);
   } finally {
     if (previousPackageDir === undefined) {
       delete process.env.PI_PACKAGE_DIR;

@@ -956,6 +956,14 @@ AGENT-180 retires the neutral Pi transition artifact and documents the remaining
 - `dist/claude-plugin/` remains generated because installed Claude plugins must be self-contained inside Claude's plugin cache. The generator copies package-owned shared resources into Claude's component layout and keeps Claude-specific hook glue in `packages/adapter-claude-code/`.
 - `devtools/postinstall.sh` may continue deleting stale nested generated artifact directories from `dist/` so old local builds do not leak into the Sandpiper Pi/npm package.
 
+#### AGENT-181 root-router certification
+
+AGENT-181 is the final certification pass for the corrected root-router architecture:
+
+- `devtools/distribution-smoke.test.ts` asserts the root `pi` manifest points only at provider/package-owned paths, those paths exist in the source tree, Sandpiper runtime metadata remains in `piConfig`/`bin`, and the retired neutral Pi artifact scripts are absent.
+- `devtools/rootPiPackageSmoke.test.ts` loads the source root as a Pi package and asserts every loaded extension comes from `plugins/pi/extensions`, every loaded skill/prompt comes from `packages/resources`, and Sandpiper identity flags/hooks remain absent.
+- `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution` is the final clean-layout gate before AGENT-93 stack review.
+
 ## Task Breakdown
 
 Because TCL-111 reports a bug in `sandpiper-tasks` subtask creation, this breakdown intentionally uses related top-level tasks rather than `SUBTASK` files.

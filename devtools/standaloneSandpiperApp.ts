@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { readFileSync } from 'node:fs';
 import { access, copyFile, cp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -167,9 +168,24 @@ export function createStandaloneSandpiperAppPackageJson(
 }
 
 function cssTreeBundledDataPlugin(repoRoot: string): BunBuildPlugin {
+  const cssTreeDataPath = join(repoRoot, 'node_modules', 'css-tree', 'lib', 'data.js');
+
   return {
     name: 'css-tree-bundled-data',
     setup(build) {
+      build.onLoad({ filter: /css-tree\/lib\/data\.js$/ }, () => {
+        const source = readFileSync(cssTreeDataPath, 'utf-8');
+        const bundledSource = source.replace(
+          "import { createRequire } from 'module';\nimport patch from './data-patch.js';\n\nconst require = createRequire(import.meta.url);\nconst mdnAtrules = require('mdn-data/css/at-rules.json');\nconst mdnProperties = require('mdn-data/css/properties.json');\nconst mdnSyntaxes = require('mdn-data/css/syntaxes.json');",
+          `import patch from ${JSON.stringify(join(repoRoot, 'node_modules', 'css-tree', 'data', 'patch.json'))} with { type: 'json' };\nimport mdnAtrules from ${JSON.stringify(join(repoRoot, 'node_modules', 'mdn-data', 'css', 'at-rules.json'))} with { type: 'json' };\nimport mdnProperties from ${JSON.stringify(join(repoRoot, 'node_modules', 'mdn-data', 'css', 'properties.json'))} with { type: 'json' };\nimport mdnSyntaxes from ${JSON.stringify(join(repoRoot, 'node_modules', 'mdn-data', 'css', 'syntaxes.json'))} with { type: 'json' };`,
+        );
+
+        if (bundledSource === source) {
+          throw new Error('Unable to bundle css-tree/mdn-data JSON imports for standalone app');
+        }
+
+        return { loader: 'js', contents: bundledSource };
+      });
       build.onLoad({ filter: /css-tree\/lib\/data-patch\.js$/ }, () => ({
         loader: 'js',
         contents: `import patch from ${JSON.stringify(join(repoRoot, 'node_modules', 'css-tree', 'data', 'patch.json'))} with { type: 'json' }; export default patch;`,
