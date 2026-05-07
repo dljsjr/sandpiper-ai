@@ -31,7 +31,7 @@ Development scripts and build utilities. Not distributed with the package.
 [mcporter](https://github.com/nicholasgasior/mcporter) generates standalone CLI wrappers for MCP (Model Context Protocol) servers. We use its `generate-cli` command to produce executable scripts that talk to MCP servers without requiring the user to manage server processes.
 
 Current uses:
-- **`dash`** — CLI for the [Dash](https://kapeli.com/dash) documentation browser MCP server. Built during `postinstall` and distributed with the package at `dist/skills/sandpiper/dash/scripts/dash`.
+- **`dash`** — CLI for the [Dash](https://kapeli.com/dash) documentation browser MCP server. Built during `postinstall` and distributed with the package at `dist/skills/sandpiper/dash/scripts/dash`. mcporter's Node bundle is emitted as `dash.cjs`; the extensionless `dash` entrypoint is a tiny ESM wrapper so it still works under package roots with `"type": "module"`.
 - **`ascii-motion`** — CLI for the ascii-motion MCP server (separate effort, not part of the distribution).
 
 Server definitions live in `config/mcporter-dist.json` (for distribution builds) and `config/mcporter.json` (for local development, if present).

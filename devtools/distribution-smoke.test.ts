@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -103,6 +104,16 @@ describe('Pi package distribution smoke', () => {
     } finally {
       rmSync(packageRoot, { recursive: true, force: true });
     }
+  });
+
+  it('generates a Node-compatible Dash CLI wrapper and CommonJS sidecar', () => {
+    const dashScriptsDir = join(repoRoot, 'dist', 'skills', 'sandpiper', 'dash', 'scripts');
+    const dashBin = join(dashScriptsDir, 'dash');
+    const dashSidecar = join(dashScriptsDir, 'dash.cjs');
+
+    expect(readFileSync(dashBin, 'utf-8')).toBe("#!/usr/bin/env node\nimport './dash.cjs';\n");
+    expect(readFileSync(dashSidecar, 'utf-8')).toContain('require(');
+    expect(execFileSync(dashBin, ['--help'], { encoding: 'utf-8' })).toContain('Usage:');
   });
 
   it('keeps the generated dist package manifest resolvable after distribution assembly', () => {
