@@ -55,8 +55,12 @@ find . \( -name 'dist' -type d -not -path '*/node_modules/*' -not -path './dist'
     xargs -0 -I{} sh -c 'rsync -ahH --exclude-from="$3" "$1/" "$(realpath "$2/$(dirname $1)/")"' - '{}' "${DIST_DIR}" "${SCRIPT_DIR}/postinstall-excludes.txt"
 
 rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" -ahH "${REPO_ROOT}/packages/cli/dist/" "${DIST_DIR}/"
-ln -sf "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${DIST_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
-ln -sf "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${DIST_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
+rm -f "${DIST_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+rm -f "${DIST_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
+cp "${DIST_DIR}/packages/sandpiper-tasks-cli/sandpiper-tasks" "${DIST_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+cp "${DIST_DIR}/packages/sandpiper-standup-cli/sandpiper-standup" "${DIST_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
+chmod 755 "${DIST_DIR}/skills/sandpiper/tasks/scripts/sandpiper-tasks"
+chmod 755 "${DIST_DIR}/skills/sandpiper/standup/scripts/sandpiper-standup"
 
 # Remove stale or ignored development files that rsync preserves when they
 # already exist in dist/ (excluded files are protected from --delete by default).

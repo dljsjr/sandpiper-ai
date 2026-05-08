@@ -93,8 +93,21 @@ describe('ecosystem package artifacts', () => {
     expect(existsSync(join(packageDir, 'docs', 'README.md'))).toBe(true);
     expect(existsSync(join(packageDir, '.sandpiper'))).toBe(false);
     const packedFiles = npmPackDryRun(packageDir);
-    expect(packedFiles).toContain('package.json');
-    expect(packedFiles).toContain('docs/README.md');
+    expect(packedFiles).toEqual(
+      expect.arrayContaining([
+        'package.json',
+        'sandpiper',
+        'docs/README.md',
+        'extensions/system.ts',
+        'prompts/new-feature.md',
+        'packages/resources/skills/sandpiper/tasks/SKILL.md',
+        'skills/sandpiper/tasks/SKILL.md',
+        'skills/sandpiper/tasks/scripts/sandpiper-tasks',
+        'skills/sandpiper/standup/scripts/sandpiper-standup',
+        'skills/sandpiper/dash/scripts/dash',
+        'skills/sandpiper/dash/scripts/dash.cjs',
+      ]),
+    );
     expect(packedFiles).not.toContain('.sandpiper/docs/README.md');
     expect(packedFiles).not.toContain('neutral-pi-package/package.json');
     expect(packedFiles).not.toContain('claude-plugin/.claude-plugin/plugin.json');
