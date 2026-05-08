@@ -73,8 +73,9 @@ describe('standalone Sandpiper CLI smoke', () => {
     expect(cliPackage.bin?.['sandpiper-standalone']).toBe('./bin/sandpiper-standalone');
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper'))).toBe(true);
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(true);
-    expect(cliPackage.scripts?.preinstall).toContain('build:sandpiper');
-    expect(cliPackage.scripts?.preinstall).toContain('build:standalone');
+    expect(cliPackage.scripts).not.toHaveProperty('preinstall');
+    expect(cliPackage.scripts?.build).toContain('build:sandpiper');
+    expect(cliPackage.scripts?.build).toContain('build:standalone');
   });
 
   it('runs the normal sandpiper bin through the standalone runtime', () => {

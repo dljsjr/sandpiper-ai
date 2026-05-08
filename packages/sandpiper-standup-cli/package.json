@@ -14,7 +14,6 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "mkdir -p dist && tsc --noEmit && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-standup",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-standup"
+    "build": "mkdir -p dist && tsc --noEmit && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-standup"
   }
 }

@@ -17,7 +17,6 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-tasks",
-    "preinstall": "mkdir -p dist && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-tasks"
+    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node src/index.ts --outfile ./dist/sandpiper-tasks"
   }
 }

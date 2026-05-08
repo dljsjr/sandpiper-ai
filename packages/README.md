@@ -15,10 +15,10 @@ Workspace packages — built, tested, and distributed as part of sandpiper.
 
 ## Build
 
-Each package has its own `build` script that runs `tsc` (for declarations) + `bun build` (for the bundled JS output). Packages are also built during `bun install` via `preinstall` scripts (without `tsc`, to avoid circular dependency on the TypeScript binary).
+Each package with distributable outputs has its own `build` script that runs `tsc` (for declarations) and/or `bun build` (for bundled JS output). Package builds are explicit; `bun install` installs dependencies only.
 
 ## Distribution
 
-Built outputs land in each package's `dist/` directory. The root `postinstall` script copies these into the generated Sandpiper Pi/npm package at top-level `dist/` alongside extension adapters and shared resources from `packages/resources/`.
+Built outputs land in each package's `dist/` directory. `bun run prepare:distribution` runs the Turbo-backed package build graph and then copies outputs into the generated Sandpiper Pi/npm package at top-level `dist/` alongside extension adapters and shared resources from `packages/resources/`.
 
-Packages that produce CLI binaries are symlinked into `node_modules/.bin/` by bun when listed as dependencies of the root package. For generated binaries, prefer a stable checked-in `bin/` shim as the package `bin` target; Bun resolves workspace bin links before install lifecycle scripts have produced fresh `dist/` outputs.
+Packages that produce CLI binaries are linked into `node_modules/.bin/` by Bun when listed as dependencies of the root package. For generated binaries, prefer a stable checked-in `bin/` shim as the package `bin` target so dependency installation does not require build artifacts to exist.

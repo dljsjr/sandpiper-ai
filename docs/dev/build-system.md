@@ -35,7 +35,7 @@ Turborepo orchestrates cacheable package build tasks. The root `build:packages` 
 - `sandpiper-tasks-cli`
 - `sandpiper-ai-cli`
 
-`turbo.json` defines package `build` tasks with dependency-aware ordering (`^build`) and caches package-local `dist/**` outputs. It does not replace Syncpack dependency policy, root Vitest runs, or distribution assembly. `devtools/postinstall.sh` still owns generated `dist/` assembly after package builds finish.
+`turbo.json` defines package `build` tasks with dependency-aware ordering (`^build`) and caches package-local `dist/**` outputs. It does not replace Syncpack dependency policy, root Vitest runs, or distribution assembly. `devtools/assembleDistribution.ts` owns generated `dist/` assembly after package builds finish.
 
 ## Dependency hoisting
 
@@ -61,17 +61,17 @@ Package manifests stay compatible with both Bun local development and npm instal
 
 ## Distribution assembly
 
-`devtools/postinstall.sh` assembles generated artifacts. It:
+`devtools/assembleDistribution.ts` assembles generated artifacts. It:
 
-1. Removes stale nested package artifacts from `dist/`.
-2. Copies extension source trees, shared resources, and public `docs/`.
+1. Recreates the generated `dist/` package root.
+2. Copies extension source trees, shared resources, public `docs/`, and README content.
 3. Preserves extension `src/` trees so package-local `pi.extensions` entries resolve.
 4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist.
-5. Symlinks Pi internal assets, including `dist/dist -> .` for Pi's double-dist asset lookup.
+5. Materializes Pi internal runtime assets under `dist/dist/modes` and `dist/dist/core` so npm-packed installs do not depend on symlinks.
 6. Builds the Dash CLI via mcporter.
-7. Optionally installs the legacy Sandpiper Pi package when `SANDPIPER_INSTALL_PI_PACKAGE=1`.
+7. Copies skill helper executables into packaged skill script directories.
 
-Automatic package installation is opt-in. The normal Sandpiper CLI path loads Sandpiper extensions and resources through explicit extension factories and resource discovery; it does not need `dist/` installed as a Pi package.
+Dependency installation does not build or assemble artifacts. Run `bun run prepare:distribution` explicitly when generated artifacts are needed.
 
 ## Repository root as neutral Pi surface
 
@@ -105,7 +105,7 @@ Root assembly retirement removed top-level implementation ownership; it did not 
 - bundled extension runtime output
 - nested generated package artifacts such as `claude-plugin` or standalone packages
 
-Runtime npm dependencies resolve from the workspace install. `dist/dist -> .` is an intentional self-symlink for Pi internals that look for assets under `<PI_PACKAGE_DIR>/dist/*`; avoid recursive walkers that follow symlinks below `dist/` unless they use a depth limit.
+Runtime npm dependencies resolve from the workspace install. Pi internals look for assets under `<PI_PACKAGE_DIR>/dist/*`, so the generated package materializes Pi's `modes/` and `core/` assets under `dist/dist/` before packing.
 
 ## Standalone app bundle
 
