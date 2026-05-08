@@ -1,6 +1,12 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.14/schema.json",
-  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
   "files": {
     "includes": [
       "*.ts",
@@ -10,6 +16,8 @@
       "**/*.json",
       "!node_modules",
       "!**/node_modules",
+      "!.turbo",
+      "!**/.turbo",
       "!dist",
       "!**/dist",
       "!draw-sandpiper.ts",
