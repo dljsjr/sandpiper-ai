@@ -6,12 +6,12 @@ import { readFileSync } from 'node:fs';
 import { realpath } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { main } from '@mariozechner/pi-coding-agent';
+import { main } from '@earendil-works/pi-coding-agent';
 import { findPiPackageDir } from './pi_package_dir.js';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const upstreamPiDistDir: string = await realpath(
-  dirname(fileURLToPath(import.meta.resolve('@mariozechner/pi-coding-agent'))),
+  dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent'))),
 );
 
 const upstreamPiPackageDir = dirname(upstreamPiDistDir);

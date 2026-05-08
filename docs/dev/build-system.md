@@ -38,6 +38,16 @@ linker = "hoisted"
 
 Extension dependencies resolve from the root `node_modules/`. Generated artifacts do not contain per-extension `node_modules/` directories.
 
+Package manifests stay compatible with both Bun local development and npm installation:
+
+- Do not use Bun catalog dependency protocols (`catalog:`) in package manifests.
+- The root router package uses `workspace:*` for local workspace dependencies so Bun and npm workspace commands remain monorepo-aware.
+- Workspace package manifests use npm-compatible exact versions for internal package dependencies because npm rejects nested workspace protocol specs during root installs.
+- Registry dependencies, dev dependencies, and peer dependencies use exact versions only: no wildcards, tags, caret ranges, or tilde ranges.
+- Generated package artifacts may use tested `file:` dependencies for copied support packages.
+
+`bun run check:deps` enforces source manifest policy with Syncpack. Ecosystem package tests enforce generated package policy.
+
 ## Distribution assembly
 
 `devtools/postinstall.sh` assembles generated artifacts. It:
@@ -114,7 +124,7 @@ The repository root also contains `.claude-plugin/marketplace.json`, which valid
 
 | Ecosystem path                                      | Source root                                                  | Invariant                                                                                                                      |
 | --------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| Source workspace clone                              | Repository root                                              | Root `package.json` is npm-installable for development and Pi package routing points only at provider/package-owned paths      |
+| Source workspace clone                              | Repository root                                              | Root `package.json` is npm-installable, local workspace deps use root-only `workspace:*`, registry specs are exact, and Pi package routing points only at provider/package-owned paths |
 | `pi install npm:sandpiper-ai` / `pi install <dist>` | Published/local package built from `dist/`                   | `dist/package.json` owns Sandpiper `piConfig`, Sandpiper `pi` paths, npm-compatible runtime deps, and `file:` support packages |
 | Neutral Pi local install surface                    | Repository root                                              | Root `pi` routes through neutral adapters/resources and does not load Sandpiper identity hooks                                 |
 | Claude plugin marketplace/npm install               | `.claude-plugin/marketplace.json` plus `dist/claude-plugin/` | Claude marketplace and plugin manifests validate, and plugin package metadata has author/repository/license and no `private`   |

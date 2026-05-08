@@ -1,5 +1,6 @@
 {
   "name": "sandpiper-system",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
   "pi": {
@@ -11,8 +12,8 @@
     "sandpiper-ai-core": "0.0.1"
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@mariozechner/pi-tui": "*",
-    "@sinclair/typebox": "*"
+    "@earendil-works/pi-coding-agent": "0.74.0",
+    "@sinclair/typebox": "0.34.49",
+    "@earendil-works/pi-tui": "0.74.0"
   }
 }

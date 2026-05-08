@@ -4,6 +4,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import rootPackageJson from '../package.json' with { type: 'json' };
+import cliPackageJson from '../packages/cli/package.json' with { type: 'json' };
 import { assembleStandaloneSandpiperApp, createStandaloneSandpiperAppPackageJson } from './standaloneSandpiperApp.js';
 
 const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -17,7 +18,7 @@ describe('standalone Sandpiper app assembler', () => {
       version: rootPackageJson.version,
       private: true,
       type: 'module',
-      piCodingAgentVersion: rootPackageJson.workspaces.catalogs.pi['@mariozechner/pi-coding-agent'],
+      piCodingAgentVersion: cliPackageJson.dependencies['@earendil-works/pi-coding-agent'],
       piConfig: {
         name: 'sandpiper',
         configDir: '.sandpiper',

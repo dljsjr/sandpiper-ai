@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { tryConvertJsonToToon } from './core.js';
 
 export { MAX_JSON_BYTES, MIN_JSON_BYTES, TOON_HEADER, tryConvertJsonToToon } from './core.js';

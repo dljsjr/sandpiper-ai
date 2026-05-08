@@ -19,7 +19,7 @@ describe('standalone Sandpiper resource discovery', () => {
 
       const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
       const { DefaultResourceLoader, SessionManager, createAgentSession } = await import(
-        '@mariozechner/pi-coding-agent'
+        '@earendil-works/pi-coding-agent'
       );
 
       const resourceLoader = new DefaultResourceLoader({

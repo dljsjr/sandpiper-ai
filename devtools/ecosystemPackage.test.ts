@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   findMissingFileDependencyTargets,
+  findNonExactDependencySpecs,
   findUnsupportedDependencySpecs,
   readPackageJson,
 } from './ecosystemPackage.js';
@@ -40,6 +41,7 @@ describe('ecosystem package artifacts', () => {
 
     expectRootPiManifestRoutesToProviderOwnedPaths(packageJson);
     expect(findUnsupportedDependencySpecs(repoRoot)).toEqual([]);
+    expect(findNonExactDependencySpecs(repoRoot, { localWorkspaceProtocolPackageNames: ['sandpiper-ai'] })).toEqual([]);
   });
 
   it('keeps shared resource source package-owned', () => {
@@ -54,6 +56,7 @@ describe('ecosystem package artifacts', () => {
 
   it('emits a publishable Sandpiper Pi/npm package at dist/', () => {
     const packageDir = join(repoRoot, 'dist');
+    const rootPackageJson = readPackageJson(join(repoRoot, 'package.json'));
     const packageJson = readPackageJson(join(packageDir, 'package.json'));
 
     expect(packageJson.private).toBeUndefined();
@@ -67,11 +70,7 @@ describe('ecosystem package artifacts', () => {
       'sandpiper-capability-autotoon': 'file:./packages/capability-autotoon',
       turndown: expect.any(String),
     });
-    expect(packageJson.peerDependencies).toMatchObject({
-      '@mariozechner/pi-coding-agent': '*',
-      '@mariozechner/pi-tui': '*',
-      '@sinclair/typebox': '*',
-    });
+    expect(packageJson.peerDependencies).toMatchObject(rootPackageJson.peerDependencies ?? {});
     expect(packageJson.files).toEqual([
       'config/',
       'extensions/',
@@ -85,6 +84,7 @@ describe('ecosystem package artifacts', () => {
       'themes/',
     ]);
     expect(findUnsupportedDependencySpecs(packageDir)).toEqual([]);
+    expect(findNonExactDependencySpecs(packageDir)).toEqual([]);
     expect(findMissingFileDependencyTargets(packageDir)).toEqual([]);
     expect(existsSync(join(packageDir, 'packages', 'core', 'package.json'))).toBe(true);
     expect(existsSync(join(packageDir, 'packages', 'capability-autotoon', 'package.json'))).toBe(true);

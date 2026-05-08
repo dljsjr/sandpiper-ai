@@ -102,7 +102,7 @@ Do not use recursive filesystem walkers that follow symlinks under `dist/` witho
 
 `devtools/ecosystemPackage.test.ts` is the release/install compatibility gate. It checks that:
 
-- the repository root contains no `catalog:` or `workspace:*` dependency specs and any root Pi package routing points only at provider/package-owned paths;
+- the repository root contains no `catalog:` dependency specs, uses `workspace:*` only for root local workspace dependencies, uses exact versions for registry dependency specs, and any root Pi package routing points only at provider/package-owned paths;
 - the generated Sandpiper Pi/npm package under `dist/` has npm-compatible manifests, no `private`, valid `file:` dependency targets, and no leaked scratch logs/PIDs;
 - the root `dist/` package uses a `files` whitelist so nested generated artifacts are not included by `npm pack`.
 

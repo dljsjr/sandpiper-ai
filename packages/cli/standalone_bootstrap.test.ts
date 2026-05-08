@@ -67,7 +67,7 @@ describe('standalone bootstrap', () => {
     try {
       const appDir = join(dir, 'app');
       mkdirSync(appDir, { recursive: true });
-      writeFileSync(join(appDir, 'package.json'), JSON.stringify({ piCodingAgentVersion: '0.72.0' }));
+      writeFileSync(join(appDir, 'package.json'), JSON.stringify({ piCodingAgentVersion: '0.74.0' }));
 
       const paths = resolveStandalonePaths({
         startDir: '/future-bunfs/root',

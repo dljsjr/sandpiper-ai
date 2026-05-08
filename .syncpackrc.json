@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/syncpack/schema.json",
+  "source": [
+    "package.json",
+    "devtools/package.json",
+    "extensions/*/package.json",
+    "packages/*/package.json",
+    "plugins/pi/extensions/package.json"
+  ],
+  "versionGroups": [
+    {
+      "label": "Root router uses workspace protocol for local packages",
+      "packages": ["sandpiper-ai"],
+      "dependencies": ["$LOCAL"],
+      "dependencyTypes": ["dev", "prod"],
+      "pinVersion": "workspace:*"
+    },
+    {
+      "label": "Workspace package local dependency specs stay npm-compatible",
+      "packages": ["!sandpiper-ai"],
+      "dependencies": ["$LOCAL"],
+      "dependencyTypes": ["dev", "prod"],
+      "isIgnored": true
+    }
+  ],
+  "semverGroups": [
+    {
+      "label": "Ignore root local workspace protocols",
+      "packages": ["sandpiper-ai"],
+      "dependencies": ["$LOCAL"],
+      "isIgnored": true
+    },
+    {
+      "label": "Use exact registry and package dependency versions",
+      "range": ""
+    }
+  ]
+}

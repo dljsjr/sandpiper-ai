@@ -1,6 +1,9 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
+import shellRelayPackageJson from '../extensions/shell-relay/package.json' with { type: 'json' };
+import systemPackageJson from '../extensions/system/package.json' with { type: 'json' };
+import webFetchPackageJson from '../extensions/web-fetch/package.json' with { type: 'json' };
 import autotoonPackageJson from '../packages/capability-autotoon/package.json' with { type: 'json' };
 
 export interface PiConfigJson {
@@ -26,9 +29,7 @@ export interface RootPackageJson {
   readonly author?: string | PackageAuthor;
   readonly homepage?: string;
   readonly repository?: string | PackageRepository;
-  readonly workspaces?: {
-    readonly catalogs?: Record<string, Record<string, string>>;
-  };
+  readonly peerDependencies?: Record<string, string>;
 }
 
 export interface PackageAuthor {
@@ -44,6 +45,7 @@ export interface PackageRepository {
 
 interface PackageJsonWithDependencies {
   readonly dependencies?: Record<string, string>;
+  readonly peerDependencies?: Record<string, string>;
 }
 
 export interface SupportPackageJson {
@@ -67,32 +69,32 @@ export function packageDependencyVersion(packageJson: PackageJsonWithDependencie
   return version;
 }
 
-export function catalogVersion(rootPackageJson: RootPackageJson, catalog: string, dependency: string): string {
-  const version = rootPackageJson.workspaces?.catalogs?.[catalog]?.[dependency];
+export function packagePeerDependencyVersion(packageJson: PackageJsonWithDependencies, dependency: string): string {
+  const version = packageJson.peerDependencies?.[dependency];
 
   if (version === undefined) {
-    throw new Error(`Missing catalog version for ${catalog}.${dependency}`);
+    throw new Error(`Missing package peer dependency version for ${dependency}`);
   }
 
   return version;
 }
 
-export function createPiPeerDependencies(): Record<string, string> {
+export function createPiPeerDependencies(rootPackageJson: RootPackageJson): Record<string, string> {
   return {
-    '@mariozechner/pi-coding-agent': '*',
-    '@mariozechner/pi-tui': '*',
-    '@sinclair/typebox': '*',
+    '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-coding-agent'),
+    '@earendil-works/pi-tui': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-tui'),
+    '@sinclair/typebox': packagePeerDependencyVersion(rootPackageJson, '@sinclair/typebox'),
   };
 }
 
-export function createPiRuntimeDependencies(rootPackageJson: RootPackageJson): Record<string, string> {
+export function createPiRuntimeDependencies(): Record<string, string> {
   return {
-    '@mozilla/readability': catalogVersion(rootPackageJson, 'web', '@mozilla/readability'),
+    '@mozilla/readability': packageDependencyVersion(webFetchPackageJson, '@mozilla/readability'),
     '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
-    jsdom: catalogVersion(rootPackageJson, 'web', 'jsdom'),
+    jsdom: packageDependencyVersion(webFetchPackageJson, 'jsdom'),
     'sandpiper-ai-core': 'file:./packages/core',
     'sandpiper-capability-autotoon': 'file:./packages/capability-autotoon',
-    turndown: catalogVersion(rootPackageJson, 'web', 'turndown'),
+    turndown: packageDependencyVersion(webFetchPackageJson, 'turndown'),
   };
 }
 
@@ -153,7 +155,10 @@ export function createAutotoonSupportPackageJson(rootPackageJson: RootPackageJso
       '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
     },
     peerDependencies: {
-      '@mariozechner/pi-coding-agent': '*',
+      '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
+        autotoonPackageJson,
+        '@earendil-works/pi-coding-agent',
+      ),
     },
   };
 }
@@ -167,7 +172,7 @@ export function createSystemExtensionPackageJson(rootPackageJson: RootPackageJso
     dependencies: {
       'sandpiper-ai-core': 'file:../../packages/core',
     },
-    peerDependencies: createPiPeerDependencies(),
+    peerDependencies: createPiPeerDependencies(systemPackageJson),
     pi: {
       extensions: ['./index.ts'],
     },
@@ -184,8 +189,11 @@ export function createShellRelayExtensionPackageJson(rootPackageJson: RootPackag
       'sandpiper-ai-core': 'file:../../packages/core',
     },
     peerDependencies: {
-      '@mariozechner/pi-coding-agent': '*',
-      '@sinclair/typebox': '*',
+      '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
+        shellRelayPackageJson,
+        '@earendil-works/pi-coding-agent',
+      ),
+      '@sinclair/typebox': packagePeerDependencyVersion(shellRelayPackageJson, '@sinclair/typebox'),
     },
     pi: {
       extensions: ['./src/index.ts'],
@@ -200,13 +208,16 @@ export function createWebFetchExtensionPackageJson(rootPackageJson: RootPackageJ
     type: 'module',
     description: 'Pi extension: fetch web pages and return clean markdown content',
     dependencies: {
-      '@mozilla/readability': catalogVersion(rootPackageJson, 'web', '@mozilla/readability'),
-      jsdom: catalogVersion(rootPackageJson, 'web', 'jsdom'),
-      turndown: catalogVersion(rootPackageJson, 'web', 'turndown'),
+      '@mozilla/readability': packageDependencyVersion(webFetchPackageJson, '@mozilla/readability'),
+      jsdom: packageDependencyVersion(webFetchPackageJson, 'jsdom'),
+      turndown: packageDependencyVersion(webFetchPackageJson, 'turndown'),
     },
     peerDependencies: {
-      '@mariozechner/pi-coding-agent': '*',
-      '@sinclair/typebox': '*',
+      '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
+        webFetchPackageJson,
+        '@earendil-works/pi-coding-agent',
+      ),
+      '@sinclair/typebox': packagePeerDependencyVersion(webFetchPackageJson, '@sinclair/typebox'),
     },
     pi: {
       extensions: ['./src/index.ts'],

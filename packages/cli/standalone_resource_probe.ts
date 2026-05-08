@@ -5,7 +5,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
 const EXPECTED_SKILL_NAME = 'standalone-spike';
@@ -44,7 +44,7 @@ process.env.PI_SKIP_VERSION_CHECK = '1';
 const agentDir = await mkdtemp(join(tmpdir(), 'sandpiper-standalone-resource-probe-'));
 
 try {
-  const { DefaultResourceLoader, SessionManager, createAgentSession } = await import('@mariozechner/pi-coding-agent');
+  const { DefaultResourceLoader, SessionManager, createAgentSession } = await import('@earendil-works/pi-coding-agent');
   const resourceLoader = new DefaultResourceLoader({
     cwd: repoRoot,
     agentDir,

@@ -13,8 +13,8 @@
     "@types/turndown": "5.0.6"
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@sinclair/typebox": "*"
+    "@earendil-works/pi-coding-agent": "0.74.0",
+    "@sinclair/typebox": "0.34.49"
   },
   "scripts": {
     "test": "vitest run",

@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { collectCompletedBackgroundProcessNotifications, type ProcessManager } from 'sandpiper-ai-core';
 
 export function registerBackgroundProcessContextHooks(pi: ExtensionAPI, processManager: ProcessManager): void {
