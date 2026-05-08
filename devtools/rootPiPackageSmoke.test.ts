@@ -21,7 +21,7 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     process.env.PI_PACKAGE_DIR = repoRoot;
     process.env.PI_SKIP_VERSION_CHECK = '1';
 
-    const { DefaultResourceLoader, SettingsManager } = await import('@mariozechner/pi-coding-agent');
+    const { DefaultResourceLoader, SettingsManager } = await import('@earendil-works/pi-coding-agent');
 
     const resourceLoader = new DefaultResourceLoader({
       cwd,

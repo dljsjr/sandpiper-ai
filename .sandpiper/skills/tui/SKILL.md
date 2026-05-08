@@ -112,7 +112,7 @@ pi.on('session_start', async (_event, ctx) => {
 Renders `────────────────────` (repeated `─` to full terminal width). Must be a Container child — not embeddable in text strings.
 
 ```typescript
-import { DynamicBorder } from '@mariozechner/pi-coding-agent';
+import { DynamicBorder } from '@earendil-works/pi-coding-agent';
 // Always type the color param explicitly:
 new DynamicBorder((s: string) => theme.fg('warning', s));
 ```

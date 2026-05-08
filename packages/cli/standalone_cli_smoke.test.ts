@@ -67,7 +67,7 @@ describe('standalone Sandpiper CLI smoke', () => {
     const rootPackage = readPackageJson(join(repoRoot, 'package.json'));
     const cliPackage = readPackageJson(join(repoRoot, 'packages', 'cli', 'package.json'));
 
-    expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe(rootPackage.version);
+    expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe('workspace:*');
     expect(cliPackage.bin?.sandpiper).toBe('./bin/sandpiper');
     expect(cliPackage.bin?.['sandpiper-standalone']).toBe('./bin/sandpiper-standalone');
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper'))).toBe(true);

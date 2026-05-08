@@ -7,7 +7,7 @@ rule:
   kind: import_statement
   has:
     kind: string
-    regex: "@mariozechner/pi-|@sinclair/typebox"
+    regex: "@(earendil-works|mariozechner)/pi-|@sinclair/typebox"
     stopBy: end
 severity: hint
 message: "Pi framework import — should only appear in extension entry points (index.ts)"

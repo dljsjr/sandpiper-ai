@@ -14,6 +14,8 @@ Read this before changing build scripts, package metadata, distribution assembly
 - Extensions load from source TypeScript via Pi's jiti runtime; do not add build steps for extension runtime entrypoints unless the package explicitly owns a build output.
 - Package-owned binaries/declarations must be built before distribution assembly.
 - Shared resources under `packages/resources/` are copied into generated artifacts; they are not built.
+- Keep package manifests npm-installable: no `catalog:` specs; root local workspace dependencies use `workspace:*`; package-level internal and registry dependencies use exact versions only.
+- Use `bun run check:deps` for source manifest policy and ecosystem package tests for generated artifact policy.
 - For distribution health, use `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`.
 
 ## What to Run

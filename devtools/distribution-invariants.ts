@@ -17,7 +17,7 @@ export interface ForbiddenTextMatch {
 export const HOST_NEUTRAL_CORE_FORBIDDEN_PATTERNS: readonly ForbiddenTextPattern[] = [
   { name: 'Sandpiper config reference', expression: /(?:~\/)?\.sandpiper|SANDPIPER_/ },
   { name: 'Pi config reference', expression: /(?:~\/)?\.pi|\bPI_|\bPi\b/ },
-  { name: 'Pi adapter API', expression: /@mariozechner|ExtensionAPI|ToolDefinition/ },
+  { name: 'Pi adapter API', expression: /@(earendil-works|mariozechner)|ExtensionAPI|ToolDefinition/ },
   { name: 'MCP adapter API', expression: /@modelcontextprotocol|McpServer/ },
 ];
 

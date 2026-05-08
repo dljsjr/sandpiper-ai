@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { checkForUpdates as checkForSandpiperUpdates, type UpdateInfo } from 'sandpiper-ai-core';
 import { registerDiagnosticsHooks } from './diagnostics-hooks.js';
 import { registerMigrationControls } from './migration-controls.js';

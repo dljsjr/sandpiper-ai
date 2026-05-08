@@ -11,10 +11,10 @@
     "sandpiper-standalone": "./bin/sandpiper-standalone"
   },
   "dependencies": {
-    "@mariozechner/pi-coding-agent": "0.72.0"
+    "@earendil-works/pi-coding-agent": "0.74.0"
   },
   "peerDependencies": {
-    "@silvia-odwyer/photon-node": "*"
+    "@silvia-odwyer/photon-node": "0.3.4"
   },
   "scripts": {
     "build": "mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:standalone",

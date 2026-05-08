@@ -14,6 +14,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 - Edit source, not generated artifacts. Do not hand-edit `dist/` or package `dist/` output.
 - Use Bun as the preferred runtime, package manager, and script runner.
 - Run workspace installs from the repo root.
+- Keep package manifests npm-installable: no `catalog:` specs; root local workspace dependencies use `workspace:*`; package-level internal and registry dependencies use exact versions only; verify with `bun run check:deps`.
 - Keep application code runtime-agnostic between Node and Bun unless the code is explicitly dev tooling.
 - Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.

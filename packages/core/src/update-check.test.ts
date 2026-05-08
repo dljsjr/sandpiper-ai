@@ -52,7 +52,7 @@ describe('update-check', () => {
           name: 'pi-coding-agent',
           currentVersion: '0.64.0',
           latestVersion: '0.65.0',
-          installCommand: 'bun install -g @mariozechner/pi-coding-agent',
+          installCommand: 'bun install -g @earendil-works/pi-coding-agent',
           changelogUrl: 'https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/CHANGELOG.md',
         },
       ]);

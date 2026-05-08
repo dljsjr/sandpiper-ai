@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { deriveRelaySessionName } from '../session-lifecycle.js';
 import type { RelayRuntime } from '../types.js';
 import { ZellijClient } from '../zellij.js';

@@ -2,7 +2,7 @@
 
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
 process.title = 'sandpiper-spike';
@@ -39,7 +39,7 @@ const spikeSkillRoot = join(repoRoot, 'packages', 'cli', 'fixtures', 'standalone
 process.env.PI_PACKAGE_DIR = packageDir;
 process.env.PI_SKIP_VERSION_CHECK = '1';
 
-const { main } = await import('@mariozechner/pi-coding-agent');
+const { main } = await import('@earendil-works/pi-coding-agent');
 
 await main(process.argv.slice(2), {
   extensionFactories: [createSpikeExtension(spikeSkillRoot)],

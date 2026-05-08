@@ -89,8 +89,8 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
       'skills/',
       'themes/',
     ],
-    dependencies: createPiRuntimeDependencies(rootPackageJson),
-    peerDependencies: createPiPeerDependencies(),
+    dependencies: createPiRuntimeDependencies(),
+    peerDependencies: createPiPeerDependencies(rootPackageJson),
     bin: {
       sandpiper: './sandpiper',
     },

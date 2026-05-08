@@ -33,10 +33,10 @@
     // Resolve Pi framework imports for single-file extensions that run
     // in pi's jiti environment (no package.json of their own)
     "paths": {
-      "@mariozechner/pi-coding-agent": [
-        "./node_modules/@mariozechner/pi-coding-agent"
+      "@earendil-works/pi-coding-agent": [
+        "./node_modules/@earendil-works/pi-coding-agent"
       ],
-      "@mariozechner/pi-tui": ["./node_modules/@mariozechner/pi-tui"],
+      "@earendil-works/pi-tui": ["./node_modules/@earendil-works/pi-tui"],
       "@sinclair/typebox": ["./node_modules/@sinclair/typebox"],
       "sandpiper-ai-core": ["./packages/core/src/index.ts"]
     }

@@ -17,7 +17,7 @@
     "sandpiper-capability-autotoon": "0.0.1"
   },
   "peerDependencies": {
-    "@mariozechner/pi-coding-agent": "*",
-    "@sinclair/typebox": "*"
+    "@earendil-works/pi-coding-agent": "0.74.0",
+    "@sinclair/typebox": "0.34.49"
   }
 }

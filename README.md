@@ -26,7 +26,7 @@ Sandpiper requires [pi](https://github.com/badlogic/pi-mono/tree/main/packages/c
 Install pi globally:
 
 ```bash
-npm install -g @mariozechner/pi-coding-agent
+npm install -g @earendil-works/pi-coding-agent
 ```
 
 Then clone and set up sandpiper:
@@ -93,7 +93,8 @@ bash devtools/postinstall.sh               # Reassemble dist/ (legacy Pi package
 ## Development
 
 ```bash
-bun check                         # Type-check + lint (tsc + biome)
+bun check                         # Dependency policy + type-check + lint
+bun run check:deps                # Syncpack dependency version policy
 bun run test                      # Full Vitest gate; prepares dist and unsets PI_PACKAGE_DIR
 bun run test:vitest -- <testpath> # Focused Vitest run without distribution prep
 bun run test:distribution         # Package/distribution smoke gate

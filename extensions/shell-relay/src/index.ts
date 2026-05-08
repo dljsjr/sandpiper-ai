@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { registerPreflightCheck } from 'sandpiper-ai-core';
 import { registerRelayCleanupCommand } from './commands/relay-cleanup.js';
 import { registerRelayConnectCommand } from './commands/relay-connect.js';

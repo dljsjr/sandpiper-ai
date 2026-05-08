@@ -8,7 +8,7 @@
  * Each builder returns the stub plus any captured state (registered tools,
  * event handlers, etc.) for assertion purposes.
  */
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import type { ProcessInfo, ProcessManager } from 'sandpiper-ai-core';
 import { vi } from 'vitest';
 

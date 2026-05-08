@@ -50,13 +50,13 @@ export async function checkForUpdates(
   const updates: UpdateInfo[] = [];
 
   if (env.piCodingAgentVersion) {
-    const piLatest = await checkNpmVersion('@mariozechner/pi-coding-agent', env.piCodingAgentVersion, fetchImpl);
+    const piLatest = await checkNpmVersion('@earendil-works/pi-coding-agent', env.piCodingAgentVersion, fetchImpl);
     if (piLatest) {
       updates.push({
         name: 'pi-coding-agent',
         currentVersion: env.piCodingAgentVersion,
         latestVersion: piLatest,
-        installCommand: getInstallCommand('@mariozechner/pi-coding-agent', env),
+        installCommand: getInstallCommand('@earendil-works/pi-coding-agent', env),
         changelogUrl: 'https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/CHANGELOG.md',
       });
     }

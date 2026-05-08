@@ -6,13 +6,15 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import rootJson from '../package.json' with { type: 'json' };
+import cliPackageJson from '../packages/cli/package.json' with { type: 'json' };
 
 interface RootPackageJson {
   readonly version: string;
   readonly license?: string;
-  readonly workspaces?: {
-    readonly catalogs?: Record<string, Record<string, string>>;
-  };
+}
+
+interface CliPackageJson {
+  readonly dependencies?: Record<string, string>;
 }
 
 export interface StandaloneSandpiperAppPackageJson {
@@ -138,11 +140,11 @@ async function copyIfPresent(source: string, destination: string): Promise<void>
   }
 }
 
-function catalogVersion(rootPackageJson: RootPackageJson, catalog: string, dependency: string): string {
-  const version = rootPackageJson.workspaces?.catalogs?.[catalog]?.[dependency];
+function packageDependencyVersion(packageJson: CliPackageJson, dependency: string): string {
+  const version = packageJson.dependencies?.[dependency];
 
   if (version === undefined) {
-    throw new Error(`Missing catalog version for ${catalog}.${dependency}`);
+    throw new Error(`Missing package dependency version for ${dependency}`);
   }
 
   return version;
@@ -158,7 +160,7 @@ export function createStandaloneSandpiperAppPackageJson(
     type: 'module',
     description: 'Standalone Sandpiper app bundle metadata',
     license: rootPackageJson.license,
-    piCodingAgentVersion: catalogVersion(rootPackageJson, 'pi', '@mariozechner/pi-coding-agent'),
+    piCodingAgentVersion: packageDependencyVersion(cliPackageJson, '@earendil-works/pi-coding-agent'),
     piConfig: {
       name: 'sandpiper',
       configDir: '.sandpiper',
@@ -279,7 +281,7 @@ const entrypoint = process.argv[1] === undefined ? undefined : resolve(process.a
 
 if (entrypoint === fileURLToPath(import.meta.url)) {
   const repoRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-  const piDistDir = dirname(fileURLToPath(import.meta.resolve('@mariozechner/pi-coding-agent')));
+  const piDistDir = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
   const options = {
     repoRoot,
     outputDir: resolve(readOptionValue('--output-dir') ?? join(repoRoot, 'dist', 'standalone-sandpiper')),

@@ -27,7 +27,7 @@ const positivePatternCases: readonly PositivePatternCase[] = [
     content: [
       'const sandpiperSession = process.env.SANDPIPER_SESSION_ID;',
       'const piPackageDir = process.env.PI_PACKAGE_DIR;',
-      "import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';",
+      "import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';",
       'class McpServer {}',
     ].join('\n'),
     expectedPatternNames: ['Sandpiper config reference', 'Pi config reference', 'Pi adapter API', 'MCP adapter API'],

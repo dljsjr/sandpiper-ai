@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
 import autotoon, { MIN_JSON_BYTES } from './pi-extension.js';
 

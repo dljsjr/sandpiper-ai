@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
 import type { RelayRuntime } from '../types.js';
 import { executeShellRelayTool } from './operations.js';

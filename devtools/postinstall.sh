@@ -80,7 +80,7 @@ fi
 PI_PKG_DIR=$(node -e '
   const fs = require("fs"), path = require("path");
   function find(dir) {
-    const candidate = path.join(dir, "node_modules", "@mariozechner", "pi-coding-agent");
+    const candidate = path.join(dir, "node_modules", "@earendil-works", "pi-coding-agent");
     if (fs.existsSync(path.join(candidate, "package.json"))) return candidate;
     const parent = path.dirname(dir);
     if (parent === dir) return null;
@@ -88,7 +88,7 @@ PI_PKG_DIR=$(node -e '
   }
   const result = find(process.cwd());
   if (result) console.log(result);
-  else { console.error("Could not find @mariozechner/pi-coding-agent"); process.exit(1); }
+  else { console.error("Could not find @earendil-works/pi-coding-agent"); process.exit(1); }
 ')
 
 # For dev mode (PI_PACKAGE_DIR=repo): link dist/modes -> pi/dist/modes

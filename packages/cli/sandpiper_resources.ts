@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { ExtensionAPI, ExtensionFactory } from '@mariozechner/pi-coding-agent';
+import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
 import {
   createNeutralCapabilityExtension,

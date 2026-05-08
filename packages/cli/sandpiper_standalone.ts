@@ -35,7 +35,7 @@ function resolvePiMetadata(standalonePaths: StandalonePaths): PiMetadata {
     return { packageDir: standalonePaths.packageDir, version: packageJson.piCodingAgentVersion };
   }
 
-  const upstreamPiDistDir = dirname(fileURLToPath(import.meta.resolve('@mariozechner/pi-coding-agent')));
+  const upstreamPiDistDir = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
   const upstreamPiPackageDir = dirname(upstreamPiDistDir);
   const piPackageJson = JSON.parse(readFileSync(join(upstreamPiPackageDir, 'package.json'), 'utf-8')) as {
     version: string;

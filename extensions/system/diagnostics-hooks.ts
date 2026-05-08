@@ -1,6 +1,6 @@
-import type { ExtensionAPI } from '@mariozechner/pi-coding-agent';
-import { DynamicBorder } from '@mariozechner/pi-coding-agent';
-import { Spacer, Text } from '@mariozechner/pi-tui';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { DynamicBorder } from '@earendil-works/pi-coding-agent';
+import { Spacer, Text } from '@earendil-works/pi-tui';
 import type { UpdateInfo } from 'sandpiper-ai-core';
 import * as core from 'sandpiper-ai-core';
 import { getChatContainer } from './chat-container.js';
