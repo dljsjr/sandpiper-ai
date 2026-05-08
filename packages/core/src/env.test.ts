@@ -6,7 +6,15 @@ describe('resolveEnvVar', () => {
 
   // Save and restore env vars we touch
   beforeEach(() => {
-    for (const key of ['SANDPIPER_OFFLINE', 'PI_OFFLINE', 'SANDPIPER_FOO', 'PI_FOO']) {
+    for (const key of [
+      'SANDPIPER_OFFLINE',
+      'PI_OFFLINE',
+      'SANDPIPER_FOO',
+      'PI_FOO',
+      'SANDPIPER_CODING_AGENT_PACKAGE',
+      'PI_CODING_AGENT_PACKAGE',
+      'PI_PACKAGE_DIR',
+    ]) {
       savedEnv[key] = process.env[key];
       delete process.env[key];
     }
@@ -45,6 +53,13 @@ describe('resolveEnvVar', () => {
   it('should return PI_* directly for exempt vars, skipping SANDPIPER_* lookup', () => {
     process.env.PI_PACKAGE_DIR = '/some/path';
     expect(resolveEnvVar('PACKAGE_DIR')).toBe('/some/path');
+  });
+
+  it('does not collapse distinct Pi and Sandpiper package root variables', () => {
+    process.env.SANDPIPER_CODING_AGENT_PACKAGE = '/sandpiper/package';
+    process.env.PI_CODING_AGENT_PACKAGE = '/pi/package';
+
+    expect(resolveEnvVar('CODING_AGENT_PACKAGE')).toBe('/pi/package');
   });
 
   it('should return PI_* for all exempt var names', () => {

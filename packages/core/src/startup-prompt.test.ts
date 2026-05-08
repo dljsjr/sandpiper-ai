@@ -16,6 +16,7 @@ function createDependencies(overrides: Partial<StartupPromptDependencies> = {}):
     env: {
       PI_CODING_AGENT_PACKAGE: '/pi/package',
       PI_CODING_AGENT_VERSION: '1.2.3',
+      SANDPIPER_CODING_AGENT_PACKAGE: '/sandpiper/package',
     },
     fileExists: vi.fn(() => false),
     formatActiveTaskContextForPrompt: vi.fn(() => '<active/>'),
@@ -64,6 +65,7 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"cwd":"/repo"');
     expect(prompt).toContain('"piCodingAgentPackage":"/pi/package"');
     expect(prompt).toContain('"piCodingAgentVersion":"1.2.3"');
+    expect(prompt).toContain('"sandpiperCodingAgentPackage":"/sandpiper/package"');
     expect(prompt).toContain('"projectTriggers":"<projects/>"');
     expect(prompt).toContain('"activeTaskContext":"<active/>"');
     expect(prompt).toContain('"workingCopyContext":"<working-copy/>"');

@@ -67,6 +67,12 @@ describe('system-prompt', () => {
       expect(block).toContain('/opt/pi/docs');
     });
 
+    it('includes the Sandpiper package directory path when provided', () => {
+      const block = piDocsBlock('/opt/pi', '1.0.0', '/opt/sandpiper');
+      expect(block).toContain('SANDPIPER_CODING_AGENT_PACKAGE');
+      expect(block).toContain('/opt/sandpiper');
+    });
+
     it('includes the pi version', () => {
       const block = piDocsBlock('/opt/pi', '1.0.0');
       expect(block).toContain('Pi version 1.0.0');
@@ -102,6 +108,16 @@ describe('system-prompt', () => {
       const block = systemPromptPersonaBlock({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
       expect(block).toContain('Extending The Harness');
       expect(block).toContain('/opt/pi/README.md');
+    });
+
+    it('includes Sandpiper package docs when both package roots are provided', () => {
+      const block = systemPromptPersonaBlock({
+        piCodingAgentPackage: '/opt/pi',
+        piCodingAgentVersion: '1.0.0',
+        sandpiperCodingAgentPackage: '/opt/sandpiper',
+      });
+      expect(block).toContain('SANDPIPER_CODING_AGENT_PACKAGE');
+      expect(block).toContain('/opt/sandpiper');
     });
 
     it('omits pi docs block when piCodingAgentPackage is not provided', () => {
@@ -289,11 +305,17 @@ describe('system-prompt', () => {
     it('includes pi docs block when piCodingAgentPackage is set', async () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt(
-        { cwd: '/repo', piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' },
+        {
+          cwd: '/repo',
+          piCodingAgentPackage: '/opt/pi',
+          piCodingAgentVersion: '1.0.0',
+          sandpiperCodingAgentPackage: '/opt/sandpiper',
+        },
         promptOptions,
       );
       expect(prompt).toContain('Extending The Harness');
       expect(prompt).toContain('/opt/pi/README.md');
+      expect(prompt).toContain('SANDPIPER_CODING_AGENT_PACKAGE');
     });
 
     it('omits pi docs block when piCodingAgentPackage is not set', async () => {

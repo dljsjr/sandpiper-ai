@@ -85,7 +85,11 @@ For multi-step tasks, state a brief plan:
 Strong success criteria lets you work independently and autonomously. Weak criteria ("make it work") requires constant clarification and interruptions from the user.
 `;
 
-export function piDocsBlock(piCodingAgentPackageDir: string, piCodingAgentVersion: string = '<unknown>') {
+export function piDocsBlock(
+  piCodingAgentPackageDir: string,
+  piCodingAgentVersion: string = '<unknown>',
+  sandpiperCodingAgentPackageDir?: string,
+) {
   return `## Extending The Harness
 
 One of the most powerful things about Pi (and by extension, Sandpiper) is that it is easy to extend,
@@ -105,7 +109,7 @@ consult the documentation:
 - The user global config directory is '~/.sandpiper' instead of '~/.pi'
 - The project local config directory is './.sandpiper' instead of './.pi'
 - The target Pi source/docs directory for the wrapped Pi instance can be found in the environment variable \`PI_CODING_AGENT_PACKAGE\` that Sandpiper creates
-- The version string for 'sandpiper' is separate from the version string for 'pi'; you are wrapped around Pi version ${piCodingAgentVersion}
+${sandpiperCodingAgentPackageDir ? `- The target Sandpiper package/docs directory can be found in the environment variable \`SANDPIPER_CODING_AGENT_PACKAGE\` that Sandpiper creates (${sandpiperCodingAgentPackageDir})\n` : ''}- The version string for 'sandpiper' is separate from the version string for 'pi'; you are wrapped around Pi version ${piCodingAgentVersion}
     - This is also in the environment variable \`PI_CODING_AGENT_VERSION\`, which Sandpiper creates
 - You are distributed with a good bit of functionality that the core 'pi' framework doesn't include, via bundled extensions, skills, and prompts.
 `;
@@ -137,6 +141,7 @@ export interface SandpiperSystemPromptOptions {
   readonly cwd?: string;
   readonly piCodingAgentPackage?: string;
   readonly piCodingAgentVersion?: string;
+  readonly sandpiperCodingAgentPackage?: string;
   readonly staticCapabilityGuidance?: string;
   readonly projectTriggers?: string;
   readonly activeTaskContext?: string;
@@ -175,7 +180,7 @@ Before making changes that depend on prior work:
 export function systemPromptPersonaBlock(options: SandpiperSystemPromptOptions) {
   return `[BEGIN PERSONA]
 
-${sandpiperIdentityBlock}${options.piCodingAgentPackage ? `\n${piDocsBlock(options.piCodingAgentPackage, options.piCodingAgentVersion)}` : ''}
+${sandpiperIdentityBlock}${options.piCodingAgentPackage ? `\n${piDocsBlock(options.piCodingAgentPackage, options.piCodingAgentVersion, options.sandpiperCodingAgentPackage)}` : ''}
 [END PERSONA]
 `;
 }

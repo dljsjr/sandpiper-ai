@@ -56,7 +56,7 @@ bun install
   → workspace preinstall (bun build each package)
   → bun links dependencies
   → postinstall.sh:
-      → rsync sources into dist/
+      → rsync sources and public docs into dist/
       → copy workspace dist/ outputs
       → wire skill-bundled CLIs (tasks, standup)
       → copy extension package.json files
@@ -68,7 +68,7 @@ bun install
       → optionally run sandpiper install dist/ when SANDPIPER_INSTALL_PI_PACKAGE=1
 
 bun run prepare:standalone-app
-  → copy standalone Sandpiper resources/support packages to dist/standalone-sandpiper/
+  → copy standalone Sandpiper resources/support packages and public docs to dist/standalone-sandpiper/
   → generate Sandpiper sidecar package.json without Pi resource manifest entries
   → copy Pi internal asset directories required by the app-bundle layout
 

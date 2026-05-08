@@ -79,6 +79,7 @@ describe('ecosystem package artifacts', () => {
       'dist',
       'packages/',
       'prompts/',
+      'docs/',
       'sandpiper',
       'skills/',
       'themes/',
@@ -89,8 +90,12 @@ describe('ecosystem package artifacts', () => {
     expect(existsSync(join(packageDir, 'packages', 'core', 'package.json'))).toBe(true);
     expect(existsSync(join(packageDir, 'packages', 'capability-autotoon', 'package.json'))).toBe(true);
     expect(existsSync(join(packageDir, 'extensions', 'system', 'package.json'))).toBe(true);
+    expect(existsSync(join(packageDir, 'docs', 'README.md'))).toBe(true);
+    expect(existsSync(join(packageDir, '.sandpiper'))).toBe(false);
     const packedFiles = npmPackDryRun(packageDir);
     expect(packedFiles).toContain('package.json');
+    expect(packedFiles).toContain('docs/README.md');
+    expect(packedFiles).not.toContain('.sandpiper/docs/README.md');
     expect(packedFiles).not.toContain('neutral-pi-package/package.json');
     expect(packedFiles).not.toContain('claude-plugin/.claude-plugin/plugin.json');
   });

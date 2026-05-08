@@ -7,7 +7,7 @@ Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlog
 `sandpiper_standalone.ts` is the normal `sandpiper` runtime. It:
 
 1. Resolves Sandpiper resource/package sidecar paths.
-2. Configures `PI_PACKAGE_DIR`, `PI_CODING_AGENT_PACKAGE`, `PI_CODING_AGENT_VERSION`, and mirrored `SANDPIPER_*` env vars before importing Pi.
+2. Configures `PI_PACKAGE_DIR`, `PI_CODING_AGENT_PACKAGE`, `PI_CODING_AGENT_VERSION`, `SANDPIPER_CODING_AGENT_PACKAGE`, and mirrored user-facing `SANDPIPER_*` env vars before importing Pi.
 3. Imports Pi through `deferred_pi_import.ts`.
 4. Calls `main(args, { extensionFactories })` with Sandpiper identity/capability factories and explicit resource discovery.
 

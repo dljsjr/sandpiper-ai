@@ -55,6 +55,8 @@ describe('standalone Sandpiper app assembler', () => {
       expect(existsSync(join(outputDir, 'packages', 'resources', 'themes', 'README.md'))).toBe(true);
       expect(existsSync(join(outputDir, 'packages', 'core', 'src', 'host-context.ts'))).toBe(true);
       expect(existsSync(join(outputDir, 'packages', 'capability-autotoon', 'src', 'pi-extension.ts'))).toBe(true);
+      expect(existsSync(join(outputDir, 'docs', 'README.md'))).toBe(true);
+      expect(existsSync(join(outputDir, '.sandpiper'))).toBe(false);
       expect(existsSync(join(outputDir, 'extensions', 'shell-relay', 'src', 'preflight.test.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'extensions', 'shell-relay', 'node_modules'))).toBe(false);
       expect(existsSync(join(outputDir, 'dist', 'modes', 'mode.txt'))).toBe(true);

@@ -87,6 +87,7 @@ const STANDALONE_APP_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'packages/resources', to: 'packages/resources' },
   { from: 'packages/capability-autotoon', to: 'packages/capability-autotoon' },
   { from: 'packages/core', to: 'packages/core' },
+  { from: 'docs', to: 'docs' },
 ];
 
 const ROOT_OPTIONAL_COPY_ENTRIES: readonly CopyEntry[] = [

@@ -31,6 +31,7 @@ const overridesPackageDir = findPiPackageDir(scriptDir);
 // prompting (extension authoring, doc exploration, etc.):
 process.env.PI_CODING_AGENT_PACKAGE = upstreamPiPackageDir;
 process.env.PI_CODING_AGENT_VERSION = piVersion;
+process.env.SANDPIPER_CODING_AGENT_PACKAGE = overridesPackageDir;
 //
 // Pi behavior controls — set by sandpiper to configure the pi runtime.
 // Users may also set these, but sandpiper needs to set them to meet its
@@ -47,7 +48,7 @@ const piArgs = process.argv.slice(2);
 //   - SANDPIPER_* takes precedence over PI_* when both are set
 //   - Our own code always reads SANDPIPER_* (via resolveEnvVar from core)
 //
-// The 4 explicit vars above are exempt — they must not leak into the
+// The explicit PI_* vars above are exempt — they must not leak into the
 // SANDPIPER_* namespace or be overwritten by mirroring.
 const EXEMPT_PI_VARS = new Set([
   'PI_CODING_AGENT_PACKAGE',

@@ -94,6 +94,7 @@ describe('Pi package distribution smoke', () => {
           'dist',
           'packages/',
           'prompts/',
+          'docs/',
           'sandpiper',
           'skills/',
           'themes/',

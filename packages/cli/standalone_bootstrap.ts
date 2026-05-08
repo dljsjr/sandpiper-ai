@@ -172,6 +172,11 @@ function copyIfPresent(source: string, destination: string): void {
   copyFileSync(source, destination);
 }
 
+function symlinkDirIfPresent(source: string, destination: string): void {
+  if (!existsSync(source)) return;
+  replaceWithSymlink(source, destination);
+}
+
 export function prepareStandalonePackageDir(options: PrepareStandalonePackageDirOptions): void {
   const sourcePackageJson = JSON.parse(
     readFileSync(join(options.resourceRoot, 'package.json'), 'utf-8'),
@@ -198,6 +203,7 @@ export function prepareStandalonePackageDir(options: PrepareStandalonePackageDir
 
   copyIfPresent(join(options.resourceRoot, 'README.md'), join(options.packageDir, 'README.md'));
   copyIfPresent(join(options.resourceRoot, 'CHANGELOG.md'), join(options.packageDir, 'CHANGELOG.md'));
+  symlinkDirIfPresent(join(options.resourceRoot, 'docs'), join(options.packageDir, 'docs'));
 
   replaceWithSymlink(
     join(options.resourceRoot, 'extensions', 'shell-relay', 'shell-integration'),
@@ -310,6 +316,7 @@ export function configurePiEnvironment(options: PiEnvironmentOptions, env: NodeJ
   env.PI_CODING_AGENT_VERSION = options.piVersion;
   env.PI_PACKAGE_DIR = options.packageDir;
   env.PI_SKIP_VERSION_CHECK = '1';
+  env.SANDPIPER_CODING_AGENT_PACKAGE = options.packageDir;
 }
 
 export function mirrorPiSandpiperEnvironment(env: NodeJS.ProcessEnv): void {
