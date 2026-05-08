@@ -44,6 +44,13 @@ for element in themes skills prompts; do
         "${RESOURCE_DIR}/${element}/" "${DIST_DIR}/${element}/"
 done
 
+echo "⚙ Copying public docs for distribution"
+mkdir -p "${DIST_DIR}/docs"
+rsync --exclude-from="${SCRIPT_DIR}/postinstall-excludes.txt" \
+    -ahH \
+    --delete \
+    "${REPO_ROOT}/docs/" "${DIST_DIR}/docs/"
+
 find . \( -name 'dist' -type d -not -path '*/node_modules/*' -not -path './dist' -not -path './dist/*' -not -path './packages/cli/*' -not -path './extensions/*' \) -print0 |
     xargs -0 -I{} sh -c 'rsync -ahH --exclude-from="$3" "$1/" "$(realpath "$2/$(dirname $1)/")"' - '{}' "${DIST_DIR}" "${SCRIPT_DIR}/postinstall-excludes.txt"
 

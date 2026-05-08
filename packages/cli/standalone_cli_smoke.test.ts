@@ -25,6 +25,7 @@ function standaloneEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   delete env.PI_PACKAGE_DIR;
   delete env.PI_CODING_AGENT_PACKAGE;
   delete env.PI_CODING_AGENT_VERSION;
+  delete env.SANDPIPER_CODING_AGENT_PACKAGE;
   return env;
 }
 

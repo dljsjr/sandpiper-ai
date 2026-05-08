@@ -110,6 +110,7 @@ describe('standalone bootstrap', () => {
       const packageDir = join(dir, 'package');
       const piPackageDir = join(dir, 'pi');
       mkdirSync(join(resourceRoot, 'extensions', 'shell-relay', 'shell-integration'), { recursive: true });
+      mkdirSync(join(resourceRoot, 'docs'), { recursive: true });
       mkdirSync(join(piPackageDir, 'dist', 'modes'), { recursive: true });
       mkdirSync(join(piPackageDir, 'dist', 'core'), { recursive: true });
       writeFileSync(
@@ -132,6 +133,7 @@ describe('standalone bootstrap', () => {
       expect(generated.version).toBe('1.2.3');
       expect(generated.pi).toBeUndefined();
       expect(generated.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
+      expect(existsSync(join(packageDir, 'docs'))).toBe(true);
       expect(existsSync(join(packageDir, 'extensions', 'shell-relay', 'shell-integration'))).toBe(true);
       expect(existsSync(join(packageDir, 'dist', 'modes'))).toBe(true);
       expect(existsSync(join(packageDir, 'dist', 'core'))).toBe(true);
@@ -215,6 +217,7 @@ describe('standalone bootstrap', () => {
     expect(env.PI_SKIP_VERSION_CHECK).toBe('1');
     expect(env.PI_CODING_AGENT_PACKAGE).toBe('/pi-package');
     expect(env.PI_CODING_AGENT_VERSION).toBe('0.70.2');
+    expect(env.SANDPIPER_CODING_AGENT_PACKAGE).toBe('/bundle');
   });
 
   it('mirrors user-facing Pi and Sandpiper environment variables', () => {
@@ -223,6 +226,8 @@ describe('standalone bootstrap', () => {
       PI_FOO: 'pi-value',
       SANDPIPER_FOO: 'sandpiper-value',
       SANDPIPER_BAR: 'bar-value',
+      SANDPIPER_CODING_AGENT_PACKAGE: '/sandpiper-package',
+      PI_CODING_AGENT_PACKAGE: '/pi-package',
       PI_PACKAGE_DIR: '/explicit-package-dir',
     };
 
@@ -232,6 +237,8 @@ describe('standalone bootstrap', () => {
     expect(env.PI_FOO).toBe('sandpiper-value');
     expect(env.SANDPIPER_FOO).toBe('sandpiper-value');
     expect(env.PI_BAR).toBe('bar-value');
+    expect(env.PI_CODING_AGENT_PACKAGE).toBe('/pi-package');
+    expect(env.SANDPIPER_CODING_AGENT_PACKAGE).toBe('/sandpiper-package');
     expect(env.SANDPIPER_PACKAGE_DIR).toBeUndefined();
   });
 });

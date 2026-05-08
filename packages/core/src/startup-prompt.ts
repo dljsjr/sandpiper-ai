@@ -122,6 +122,7 @@ export async function buildSandpiperStartupPrompt(
       cwd: input.cwd,
       piCodingAgentPackage: resolved.env.PI_CODING_AGENT_PACKAGE,
       piCodingAgentVersion: resolved.env.PI_CODING_AGENT_VERSION,
+      sandpiperCodingAgentPackage: resolved.env.SANDPIPER_CODING_AGENT_PACKAGE,
       projectTriggers,
       activeTaskContext,
       workingCopyContext,

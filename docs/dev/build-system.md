@@ -53,7 +53,7 @@ Package manifests stay compatible with both Bun local development and npm instal
 `devtools/postinstall.sh` assembles generated artifacts. It:
 
 1. Removes stale nested package artifacts from `dist/`.
-2. Copies extension source trees and shared resources.
+2. Copies extension source trees, shared resources, and public `docs/`.
 3. Preserves extension `src/` trees so package-local `pi.extensions` entries resolve.
 4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist.
 5. Symlinks Pi internal assets, including `dist/dist -> .` for Pi's double-dist asset lookup.
@@ -83,11 +83,13 @@ Root assembly retirement removed top-level implementation ownership; it did not 
 
 - extension source trees
 - skills, prompts, and themes copied from `packages/resources/`
+- public documentation copied from top-level `docs/`
 - package-owned binaries
 - `dist/package.json` with `pi` resource paths and the `sandpiper` bin
 
 `dist/` does not contain:
 
+- `.sandpiper/` operational state, tasks, reviews, internal playbooks, or active specs
 - `node_modules/`
 - bundled extension runtime output
 - nested generated package artifacts such as `claude-plugin` or standalone packages
@@ -100,7 +102,7 @@ Runtime npm dependencies resolve from the workspace install. `dist/dist -> .` is
 
 - a compiled `sandpiper` executable
 - Sandpiper sidecar package metadata
-- bundled resources and support packages
+- bundled resources, support packages, and public docs
 - Pi internal assets
 
 The standalone assembler bundles `css-tree` JSON/package metadata through a Bun build plugin and leaves optional `canvas` external so jsdom can treat it as unavailable instead of requiring a native sidecar.

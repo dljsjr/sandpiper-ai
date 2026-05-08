@@ -135,16 +135,17 @@ When both are set, `SANDPIPER_*` takes precedence:
 PI_OFFLINE=0 SANDPIPER_OFFLINE=1 sandpiper
 ```
 
-A small number of `PI_*` variables are used internally by sandpiper to configure the underlying pi runtime and are not mirrored to the `SANDPIPER_*` namespace:
+A small number of package/runtime variables are set automatically by sandpiper and are not normal mirrored user configuration:
 
-| Variable                  | Purpose                                             |
-| ------------------------- | --------------------------------------------------- |
-| `PI_CODING_AGENT_PACKAGE` | Path to the pi-coding-agent package                 |
-| `PI_CODING_AGENT_VERSION` | Version of the underlying pi-coding-agent           |
-| `PI_PACKAGE_DIR`          | Package directory for loading extensions and skills |
-| `PI_SKIP_VERSION_CHECK`   | Suppresses pi's built-in update check               |
+| Variable                            | Purpose                                             |
+| ----------------------------------- | --------------------------------------------------- |
+| `SANDPIPER_CODING_AGENT_PACKAGE`    | Path to the Sandpiper package root, including shipped public docs |
+| `PI_CODING_AGENT_PACKAGE`           | Path to the wrapped pi-coding-agent package         |
+| `PI_CODING_AGENT_VERSION`           | Version of the underlying pi-coding-agent           |
+| `PI_PACKAGE_DIR`                    | Package directory for loading extensions and skills |
+| `PI_SKIP_VERSION_CHECK`             | Suppresses pi's built-in update check               |
 
-These are set automatically at startup. You generally don't need to interact with them.
+`SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` intentionally point to different package roots.
 
 ## License
 

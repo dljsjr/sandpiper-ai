@@ -41,28 +41,27 @@ if (process.env.PI_OFFLINE === "1") {
 
 **Why this matters**: If you read `process.env.PI_OFFLINE` directly, you'll miss cases where the user set `SANDPIPER_OFFLINE=1`.
 
-### Exempt Variables
+### Runtime-owned Variables
 
-Four `PI_*` variables are **exempt** from mirroring. Read these directly from `process.env.PI_*`:
+The package/version variables below are set by the Sandpiper runtime and are not normal mirrored user configuration:
 
-| Variable                  | Purpose                         | Why Exempt          |
-| ------------------------- | ------------------------------- | ------------------- |
-| `PI_CODING_AGENT_PACKAGE` | Path to pi-coding-agent package | Sandpiper internal  |
-| `PI_CODING_AGENT_VERSION` | Pi version string               | Sandpiper internal  |
-| `PI_PACKAGE_DIR`          | Pi package directory override   | Pi behavior control |
-| `PI_SKIP_VERSION_CHECK`   | Suppress Pi update check        | Pi behavior control |
+| Variable | Purpose | Read with |
+| -------- | ------- | --------- |
+| `SANDPIPER_CODING_AGENT_PACKAGE` | Path to the Sandpiper package root, including shipped public docs | `process.env.SANDPIPER_CODING_AGENT_PACKAGE` |
+| `PI_CODING_AGENT_PACKAGE` | Path to the wrapped pi-coding-agent package root | `process.env.PI_CODING_AGENT_PACKAGE` |
+| `PI_CODING_AGENT_VERSION` | Pi version string | `process.env.PI_CODING_AGENT_VERSION` |
+| `PI_PACKAGE_DIR` | Pi package directory override | `process.env.PI_PACKAGE_DIR` |
+| `PI_SKIP_VERSION_CHECK` | Suppress Pi update check | `process.env.PI_SKIP_VERSION_CHECK` |
 
-These control Pi runtime behavior or are Sandpiper internals. They're not mirrored because:
-
-- Sandpiper internals don't need user-facing aliases
-- Pi behavior control should use Pi namespace
+`SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` deliberately have different meanings. Do not mirror one into the other. Use `resolveEnvVar()` for user-facing configuration such as `OFFLINE`, not for runtime-owned package roots.
 
 ```typescript
-// ✅ Correct for exempt variables
+// ✅ Correct for runtime-owned package roots
+const sandpiperPackagePath = process.env.SANDPIPER_CODING_AGENT_PACKAGE;
 const piPackagePath = process.env.PI_CODING_AGENT_PACKAGE;
 
-// ✅ Also fine (resolveEnvVar handles these gracefully)
-const piPackagePath = resolveEnvVar("PI_CODING_AGENT_PACKAGE");
+// ✅ Correct for mirrored user configuration
+const offline = resolveEnvVar("OFFLINE") === "1";
 ```
 
 ## Writing Environment Variables
