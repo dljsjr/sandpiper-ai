@@ -139,7 +139,7 @@ Session matching / update-vs-create behavior is handled by `scripts/sandpiper-st
 - **Be specific, not vague.** "Fixed fish escaping to use quote-break pattern instead of backslash" not "Fixed escaping bug."
 - **Include file paths.** The next session may not have context on what was touched.
 - **Capture decisions and rationale.** "Chose `fish_preexec` over Enter keybind because it avoids commandline manipulation" — the next session needs to know WHY, not just WHAT.
-- **Note anything fragile or surprising.** "The `dist/dist` self-symlink is intentional — it resolves pi's double-dist path expectation."
+- **Note anything fragile or surprising.** "The generated package materializes Pi runtime assets under `dist/dist/` because Pi resolves built-in assets below `<PI_PACKAGE_DIR>/dist/`."
 - **Reference tickets.** Every work item should trace back to the task tracker.
 
 ## Relationship to Other Artifacts

@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -104,11 +104,13 @@ describe('distribution source-boundary invariants', () => {
     expect(matches).toEqual([]);
   });
 
-  it('keeps legacy Pi package installation opt-in', () => {
-    const postinstallScript = readFileSync(join(repoRoot, 'devtools', 'postinstall.sh'), 'utf-8');
+  it('keeps dependency installation free of Sandpiper artifact lifecycle hooks', async () => {
+    const rootPackageJson = (await import('../package.json', { with: { type: 'json' } })).default as {
+      readonly scripts?: Record<string, string>;
+    };
 
-    expect(postinstallScript).toContain('SANDPIPER_INSTALL_PI_PACKAGE:-0');
-    expect(postinstallScript).toContain('Skipping legacy Pi package install');
+    expect(rootPackageJson.scripts).not.toHaveProperty('preinstall');
+    expect(rootPackageJson.scripts).not.toHaveProperty('postinstall');
   });
 
   it('keeps distribution smoke tests away from real user config directories', () => {

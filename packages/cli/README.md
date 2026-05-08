@@ -24,7 +24,7 @@ bun run build:standalone # build packages/cli/dist/standalone/sandpiper_standalo
 bun run copy-assets      # Copy README/CHANGELOG into dist
 ```
 
-`preinstall` builds both Bun-targeted runtime bundles and copies Pi assets.
+Builds are explicit; dependency installation does not build runtime bundles.
 
 ## Runtime Targets
 
@@ -58,7 +58,7 @@ bun run test:standalone-app
 
 `build:standalone-app` writes `dist/standalone-sandpiper/` with a compiled `sandpiper` executable, Sandpiper sidecar `package.json`, copied resources/support packages, and Pi internal assets. Its Bun build plugin bundles `css-tree`'s JSON/package metadata into the executable; `canvas` remains external so jsdom treats it as unavailable instead of requiring a native sidecar.
 
-By default the source/runtime entrypoint generates a lightweight package-metadata sidecar under `dist/standalone-package/` and points Pi at that sidecar instead of the repo root. The compiled app bundle instead resolves package metadata and resources relative to `dirname(process.execPath)`, so it does not need `SANDPIPER_STANDALONE_RESOURCE_ROOT` or `SANDPIPER_STANDALONE_PACKAGE_DIR` in normal use. Both modes preserve Sandpiper branding/config defaults without loading the legacy root Pi manifest a second time. Built-in Sandpiper extensions/resources come from explicit extension factories and `resources_discover`; source mode can still defer to a configured legacy Sandpiper package to avoid duplicate resources while package-management commands operate on normal Sandpiper global/project settings files.
+Packaged runtime bundles use the prebuilt package root when the installed package contains `sandpiper`, `docs/`, and Pi runtime assets under `dist/modes` and `dist/core`. Source-mode entrypoints can still generate a lightweight package-metadata sidecar under `dist/standalone-package/` when no prebuilt package layout exists. The compiled app bundle resolves package metadata and resources relative to `dirname(process.execPath)`, so it does not need `SANDPIPER_STANDALONE_RESOURCE_ROOT` or `SANDPIPER_STANDALONE_PACKAGE_DIR` in normal use. All modes preserve Sandpiper branding/config defaults without loading the legacy root Pi manifest a second time. Built-in Sandpiper extensions/resources come from explicit extension factories and `resources_discover`; source mode can still defer to a configured legacy Sandpiper package to avoid duplicate resources while package-management commands operate on normal Sandpiper global/project settings files.
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
@@ -75,4 +75,4 @@ Package-management commands such as `install`, `list`, `remove`, and `update` op
 
 ## Pi Asset Resolution
 
-Pi expects themes, export templates, and other assets relative to its package directory. The Sandpiper runtime configures `PI_PACKAGE_DIR` before importing Pi, and distribution assembly symlinks Pi's internal `modes/` and `core/` directories where needed.
+Pi expects themes, export templates, and other assets relative to its package directory. The Sandpiper runtime configures `PI_PACKAGE_DIR` before importing Pi, and distribution assembly materializes Pi's internal `modes/` and `core/` directories under the generated package's `dist/` directory.

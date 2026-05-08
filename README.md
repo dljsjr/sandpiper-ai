@@ -81,12 +81,12 @@ sandpiper-ai/
 
 ## Building
 
-Workspace packages with real build outputs are built automatically during `bun install` via `preinstall` scripts. To rebuild manually:
+`bun install` installs dependencies only. Build and distribution artifacts are explicit:
 
 ```bash
-bun run build:packages       # Build distributable package outputs through Turbo
-bun run build                # Build the sandpiper CLI package through Turbo
-bash devtools/postinstall.sh # Reassemble dist/ (legacy Pi package install is opt-in)
+bun run build:packages        # Build distributable package outputs through Turbo
+bun run build                 # Build the sandpiper CLI package through Turbo
+bun run prepare:distribution  # Assemble the generated dist/ package
 ```
 
 ## Development

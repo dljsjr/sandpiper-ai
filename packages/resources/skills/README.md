@@ -15,7 +15,7 @@ skills/
 │   ├── skill-review/    # Skill quality auditing
 │   ├── standup/         # Session stand-up notes
 │   └── tasks/           # Task management CLI + spec
-└── third-party/         # Vendored skills (managed via devtools/vendor.sh)
+└── third-party/         # Vendored skills (managed via devtools/vendor.ts)
     ├── pdf/             # PDF reading and manipulation
     └── skill-creator/   # Skill authoring, evals, and benchmarking
 ```

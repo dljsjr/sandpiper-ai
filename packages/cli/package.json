@@ -20,7 +20,6 @@
     "build": "mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:standalone",
     "build:sandpiper": "mkdir -p dist && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outfile ./dist/sandpiper && chmod +x ./dist/sandpiper",
     "build:standalone": "mkdir -p dist/standalone && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone",
-    "copy-assets": "bun run --target bun ./copy_pi_assets.ts",
-    "preinstall": "mkdir -p dist && bun copy-assets && bun run build:sandpiper && bun run build:standalone"
+    "copy-assets": "bun run --target bun ./copy_pi_assets.ts"
   }
 }

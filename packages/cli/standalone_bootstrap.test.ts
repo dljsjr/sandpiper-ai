@@ -83,6 +83,28 @@ describe('standalone bootstrap', () => {
     }
   });
 
+  it('uses a prebuilt package root when the packaged runtime asset layout is present', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
+    try {
+      writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
+      writeFileSync(join(dir, 'sandpiper'), '#!/usr/bin/env bun\n');
+      mkdirSync(join(dir, 'docs'), { recursive: true });
+      mkdirSync(join(dir, 'dist', 'modes'), { recursive: true });
+      mkdirSync(join(dir, 'dist', 'core'), { recursive: true });
+
+      const paths = resolveStandalonePaths({
+        startDir: dir,
+        env: {},
+      });
+
+      expect(paths.resourceRoot).toBe(dir);
+      expect(paths.packageDir).toBe(dir);
+      expect(paths.packageDirSource).toBe('prebuilt-package');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('defaults package metadata to the generated standalone package directory', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
     try {

@@ -15,7 +15,7 @@ import { dirname, join, resolve } from 'node:path';
 export interface StandalonePaths {
   readonly resourceRoot: string;
   readonly packageDir: string;
-  readonly packageDirSource: 'generated' | 'override' | 'app-bundle';
+  readonly packageDirSource: 'generated' | 'override' | 'app-bundle' | 'prebuilt-package';
 }
 
 export interface ResolveStandalonePathsOptions {
@@ -98,6 +98,16 @@ function isCompiledBunEntrypoint(options: ResolveStandalonePathsOptions): boolea
   return resolve(options.startDir).startsWith(BUN_EMBEDDED_FILESYSTEM_ROOT) || hasStandaloneAppSidecar(executablePath);
 }
 
+function hasPrebuiltPackageLayout(resourceRoot: string): boolean {
+  return (
+    existsSync(join(resourceRoot, 'sandpiper')) &&
+    existsSync(join(resourceRoot, 'package.json')) &&
+    existsSync(join(resourceRoot, 'docs')) &&
+    existsSync(join(resourceRoot, 'dist', 'modes')) &&
+    existsSync(join(resourceRoot, 'dist', 'core'))
+  );
+}
+
 function resolveDefaultStandaloneResourceRoot(options: ResolveStandalonePathsOptions): string {
   const executablePath = options.executablePath;
   if (executablePath !== undefined && isCompiledBunEntrypoint(options)) {
@@ -143,6 +153,14 @@ export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): 
       resourceRoot,
       packageDir: resourceRoot,
       packageDirSource: 'app-bundle',
+    };
+  }
+
+  if (hasPrebuiltPackageLayout(resourceRoot)) {
+    return {
+      resourceRoot,
+      packageDir: resourceRoot,
+      packageDirSource: 'prebuilt-package',
     };
   }
 

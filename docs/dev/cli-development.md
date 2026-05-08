@@ -163,7 +163,7 @@ Unit tests alone miss argument parsing bugs. E2E tests alone are slower and hard
 
 ## Build and Installation
 
-CLI packages that emit bundled binaries or type declarations need to be built before installation.
+CLI packages that emit bundled binaries or type declarations need to be built before distribution assembly. Dependency installation itself does not build Sandpiper artifacts.
 
 ### When to Build
 
@@ -175,29 +175,17 @@ Build a CLI package when:
 
 ### Build Process
 
-1. **Build the package**:
+Run the distribution preparation script:
 
-   ```bash
-   bun run build                              # Build the sandpiper CLI
-   bun --filter sandpiper-tasks-cli run build # Rebuild tasks CLI
-   bun --filter sandpiper-ai-core run build   # Rebuild core declarations
-   ```
+```bash
+bun run prepare:distribution
+```
 
-2. **Run postinstall**:
-   ```bash
-   bash devtools/postinstall.sh
-   ```
+This command runs the Turbo-backed package build graph and then `devtools/assembleDistribution.ts` assembles the generated Pi/npm package at `dist/`.
 
-The `postinstall.sh` script:
+### Why Build Then Assemble?
 
-- Copies CLI binaries to `dist/`
-- Generates `dist/package.json` with bin metadata
-- Symlinks the CLI into place
-- Skips legacy Pi package installation by default; set `SANDPIPER_INSTALL_PI_PACKAGE=1` to install `dist/` into the active agent settings
-
-### Why Two Steps?
-
-Package builds emit distributable artifacts (binaries, declarations). The postinstall script assembles those artifacts into the final Pi Package structure. Both steps are required for CLI packages.
+Package builds emit distributable artifacts (binaries, declarations). Distribution assembly copies those artifacts, resources, docs, package metadata, and Pi runtime assets into the final generated package structure. Both phases are required for CLI packages, but they are explicit build steps rather than install lifecycle hooks.
 
 ## Tools and Conventions
 

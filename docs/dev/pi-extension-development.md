@@ -41,10 +41,10 @@ Extension sources live in `extensions/`, `plugins/pi/extensions/`, and package-o
 After extension source changes, run:
 
 ```bash
-bash devtools/postinstall.sh
+bun run prepare:distribution
 ```
 
-If you changed package-owned built output, build the package first, then reassemble the distribution.
+If you changed package-owned built output, `prepare:distribution` builds the package graph first and then reassembles the distribution.
 
 See [Build system](build-system.md) for the full build and distribution workflow.
 

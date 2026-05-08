@@ -20,7 +20,7 @@ This is complementary to the skill-creator skill, which focuses on empirical tes
 
 This skill relies on `references/skill-building-guide.pdf` — Anthropic's complete guide to building skills. **Read this PDF before conducting a review.** It is the authoritative source for skill best practices, and the review dimensions below are derived from it.
 
-The PDF is downloaded automatically by `bun install` (via the `postinstall` script). If it's missing, download it manually:
+The PDF is downloaded automatically during `bun run prepare:distribution`. If it's missing from a generated artifact, download it manually:
 
 ```bash
 curl -L -o references/skill-building-guide.pdf \

@@ -8,12 +8,12 @@ For the build pipeline and generated artifact layout, see [Build system referenc
 
 | You changed...                                                          | Run                                                                                              |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Extension source under `extensions/` or `plugins/pi/extensions/`        | `bash devtools/postinstall.sh`                                                                   |
-| Skills, prompts, themes, or other resources under `packages/resources/` | `bash devtools/postinstall.sh`                                                                   |
-| `packages/core/`                                                        | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
-| `packages/cli/`                                                         | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
-| `packages/sandpiper-tasks-cli/`                                         | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
-| `packages/sandpiper-standup-cli/`                                       | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
+| Extension source under `extensions/` or `plugins/pi/extensions/`        | `bun run prepare:distribution`                                                                   |
+| Skills, prompts, themes, or other resources under `packages/resources/` | `bun run prepare:distribution`                                                                   |
+| `packages/core/`                                                        | `bun run prepare:distribution`                                                                   |
+| `packages/cli/`                                                         | `bun run prepare:distribution`                                                                   |
+| `packages/sandpiper-tasks-cli/`                                         | `bun run prepare:distribution`                                                                   |
+| `packages/sandpiper-standup-cli/`                                       | `bun run prepare:distribution`                                                                   |
 | `packages/adapter-claude-code/`                                         | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin`            |
 | Build system or package metadata                                        | `bun run prepare:distribution`, targeted tests, and the distribution gate before claiming health |
 
@@ -45,29 +45,28 @@ This prepares generated artifacts and runs distribution invariant tests, standal
 
 ## Rebuild after extension changes
 
-Extensions load from source TypeScript through Pi's jiti runtime. They do not need a package build, but generated artifacts need to be reassembled:
+Extensions load from source TypeScript through Pi's jiti runtime. They do not need an extension package build, but generated artifacts need to be reassembled:
 
 ```bash
-bash devtools/postinstall.sh
+bun run prepare:distribution
 ```
 
 ## Rebuild after package changes
 
-Packages that emit binaries or declarations need package builds first. Use the Turborepo-backed package build script, then reassemble generated artifacts:
+Packages that emit binaries or declarations need package builds first. `prepare:distribution` runs the Turborepo-backed package build graph and then assembles generated artifacts:
 
 ```bash
-bun run build:packages
-bash devtools/postinstall.sh
+bun run prepare:distribution
 ```
 
-`build:packages` runs the distributable package build graph through Turbo and caches package-local `dist/` outputs.
+`build:packages` runs the distributable package build graph through Turbo and caches package-local `dist/` outputs when you only need package builds.
 
 ## Rebuild shared resources
 
 Skills, prompts, themes, and shared resource files are copied into generated artifacts:
 
 ```bash
-bash devtools/postinstall.sh
+bun run prepare:distribution
 ```
 
 ## Smoke-test generated entrypoints
@@ -119,7 +118,7 @@ claude plugin validate dist/claude-plugin
 Run distribution assembly again:
 
 ```bash
-bash devtools/postinstall.sh
+bun run prepare:distribution
 ```
 
 Extension source trees must be copied into generated artifacts for `pi.extensions` entries to resolve.
@@ -139,6 +138,5 @@ Extensions resolve dependencies from the hoisted root `node_modules/`, not from 
 Build the package first, then reassemble generated artifacts:
 
 ```bash
-bun --filter sandpiper-tasks-cli build
-bash devtools/postinstall.sh
+bun run prepare:distribution
 ```
