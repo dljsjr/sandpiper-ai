@@ -10,10 +10,10 @@ For the build pipeline and generated artifact layout, see [Build system referenc
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Extension source under `extensions/` or `plugins/pi/extensions/`        | `bash devtools/postinstall.sh`                                                                   |
 | Skills, prompts, themes, or other resources under `packages/resources/` | `bash devtools/postinstall.sh`                                                                   |
-| `packages/core/`                                                        | `bun --filter sandpiper-ai-core build` then `bash devtools/postinstall.sh`                       |
-| `packages/cli/`                                                         | `bun --filter sandpiper-ai-cli build` then `bash devtools/postinstall.sh`                        |
-| `packages/sandpiper-tasks-cli/`                                         | `bun --filter sandpiper-tasks-cli build` then `bash devtools/postinstall.sh`                     |
-| `packages/sandpiper-standup-cli/`                                       | `bun --filter sandpiper-standup-cli build` then `bash devtools/postinstall.sh`                   |
+| `packages/core/`                                                        | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
+| `packages/cli/`                                                         | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
+| `packages/sandpiper-tasks-cli/`                                         | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
+| `packages/sandpiper-standup-cli/`                                       | `bun run build:packages` then `bash devtools/postinstall.sh`                                     |
 | `packages/adapter-claude-code/`                                         | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin`            |
 | Build system or package metadata                                        | `bun run prepare:distribution`, targeted tests, and the distribution gate before claiming health |
 
@@ -53,14 +53,14 @@ bash devtools/postinstall.sh
 
 ## Rebuild after package changes
 
-Packages that emit binaries or declarations need their own build first:
+Packages that emit binaries or declarations need package builds first. Use the Turborepo-backed package build script, then reassemble generated artifacts:
 
 ```bash
-bun --filter sandpiper-ai-cli build
+bun run build:packages
 bash devtools/postinstall.sh
 ```
 
-Use the package-specific filter for the package you changed.
+`build:packages` runs the distributable package build graph through Turbo and caches package-local `dist/` outputs.
 
 ## Rebuild shared resources
 

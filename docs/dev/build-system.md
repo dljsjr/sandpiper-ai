@@ -26,6 +26,17 @@ Only packages that emit distributable artifacts need package build steps.
 
 Extensions are not bundled as runtime entrypoints. Pi loads extension source TypeScript through jiti.
 
+## Task orchestration
+
+Turborepo orchestrates cacheable package build tasks. The root `build:packages` script runs `turbo run build` for the distributable package set used by `prepare:distribution`:
+
+- `sandpiper-ai-core`
+- `sandpiper-standup-cli`
+- `sandpiper-tasks-cli`
+- `sandpiper-ai-cli`
+
+`turbo.json` defines package `build` tasks with dependency-aware ordering (`^build`) and caches package-local `dist/**` outputs. It does not replace Syncpack dependency policy, root Vitest runs, or distribution assembly. `devtools/postinstall.sh` still owns generated `dist/` assembly after package builds finish.
+
 ## Dependency hoisting
 
 The workspace uses Bun's hoisted linker:
