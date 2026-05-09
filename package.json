@@ -61,6 +61,8 @@
     "clean": "bun devtools/clean.ts",
     "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
     "sandpiper-built": "bun ./packages/cli/dist/sandpiper",
+    "check:knip": "knip",
+    "check:knip:production": "knip --production",
     "check:deps": "syncpack lint"
   },
   "workspaces": [
@@ -87,6 +89,7 @@
     "vitest": "4.1.5",
     "syncpack": "15.0.0",
     "mcporter": "0.10.1",
+    "knip": "6.12.1",
     "turbo": "2.9.10"
   },
   "license": "MIT",
