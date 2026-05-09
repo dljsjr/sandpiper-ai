@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
+
+  // Several modules export small helpers for same-file reuse. Report helpers only when
+  // they are no longer used anywhere, not merely because they are exported from the file.
+  "ignoreExportsUsedInFile": true,
+
+  // Provided by the developer environment/mise, not by the npm dependency graph.
+  "ignoreBinaries": ["ast-grep"],
+
+  "workspaces": {
+    ".": {
+      "entry": ["package.json"],
+      "ignoreDependencies": [
+        // Used by distribution assembly through `bun mcporter`.
+        "mcporter"
+      ]
+    },
+
+    "devtools": {
+      "entry": [
+        "assembleDistribution.ts",
+        "clean.ts",
+        "vendor.ts",
+        "claudeCodePlugin.ts",
+        "standaloneSandpiperApp.ts",
+        "ascii-motion.ts"
+      ],
+      "project": ["*.ts"]
+    },
+
+    "packages/cli": {
+      "entry": ["bin/sandpiper", "sandpiper_standalone.ts"],
+      "project": ["*.ts", "bin/*"]
+    },
+
+    "plugins/pi/extensions": {
+      "entry": ["*.ts"],
+      "project": ["*.ts"]
+    }
+  }
+}
