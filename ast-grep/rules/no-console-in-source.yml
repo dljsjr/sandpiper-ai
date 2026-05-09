@@ -15,4 +15,3 @@ files:
 ignores:
   - "**/*.test.ts"
   - "**/commands/*.ts"
-  - "devtools/ascii-motion.ts"

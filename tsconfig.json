@@ -46,9 +46,6 @@
     "**/node_modules",
     "dist",
     "**/dist",
-    // Dev-only scripts that use non-standard imports or generated code
-    "draw-sandpiper.ts",
-    "devtools/ascii-motion.ts",
     // Config files
     "vitest.config.ts",
     "**/vitest.config.ts",

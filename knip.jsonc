@@ -10,33 +10,41 @@
 
   "workspaces": {
     ".": {
-      "entry": ["package.json"],
+      "entry": [
+        "package.json!",
+        "devtools/assembleDistribution.ts!",
+        "devtools/vendor.ts!",
+        "devtools/claudeCodePlugin.ts!",
+        "devtools/standaloneSandpiperApp.ts!"
+      ],
+      "project": [
+        "devtools/distPackageJson.ts!",
+        "devtools/piPackageArtifactMetadata.ts!"
+      ],
       "ignoreDependencies": [
         // Used by distribution assembly through `bun mcporter`.
         "mcporter"
       ]
     },
 
-    "devtools": {
-      "entry": [
-        "assembleDistribution.ts",
-        "clean.ts",
-        "vendor.ts",
-        "claudeCodePlugin.ts",
-        "standaloneSandpiperApp.ts",
-        "ascii-motion.ts"
-      ],
-      "project": ["*.ts"]
+    "packages/cli": {
+      "entry": ["bin/sandpiper!", "sandpiper_standalone.ts!"],
+      "project": ["*.ts!", "bin/*!"]
     },
 
-    "packages/cli": {
-      "entry": ["bin/sandpiper", "sandpiper_standalone.ts"],
-      "project": ["*.ts", "bin/*"]
+    "packages/sandpiper-tasks-cli": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts!"]
+    },
+
+    "packages/sandpiper-standup-cli": {
+      "entry": ["src/index.ts!"],
+      "project": ["src/**/*.ts!"]
     },
 
     "plugins/pi/extensions": {
-      "entry": ["*.ts"],
-      "project": ["*.ts"]
+      "entry": ["*.ts!"],
+      "project": ["*.ts!"]
     }
   }
 }

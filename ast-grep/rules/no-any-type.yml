@@ -12,7 +12,5 @@ message: "Avoid `any` type. Use `unknown` and narrow with type guards, or define
 note: "Per AGENTS.md TypeScript guidelines. biome-ignore comments for Commander generics are an approved exception."
 ignores:
   - "**/*.test.ts"
-  - "devtools/ascii-motion.ts"
-  - "draw-sandpiper.ts"
   # Commander's generic params require `any` — approved via biome-ignore in helpers.ts
   - "packages/sandpiper-tasks-cli/src/commands/**"
