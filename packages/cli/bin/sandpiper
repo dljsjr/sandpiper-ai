@@ -9,7 +9,7 @@ const builtEntrypoint = join(scriptDir, '..', 'dist', 'standalone', 'sandpiper_s
 
 if (!existsSync(builtEntrypoint)) {
   console.error(
-    'sandpiper has not been built yet. Run `bun run build:standalone` or `bun install` from the repository root.',
+    'sandpiper has not been built yet. Run `bun run build:standalone` or `bun run prepare:distribution` from the repository root.',
   );
   process.exit(1);
 }

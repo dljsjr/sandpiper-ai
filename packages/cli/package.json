@@ -7,8 +7,7 @@
     "email": "dljs.jr@dougstephenjr.com"
   },
   "bin": {
-    "sandpiper": "./bin/sandpiper",
-    "sandpiper-standalone": "./bin/sandpiper-standalone"
+    "sandpiper": "./bin/sandpiper"
   },
   "dependencies": {
     "@earendil-works/pi-coding-agent": "0.74.0"
@@ -19,7 +18,6 @@
   "scripts": {
     "build": "mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:standalone",
     "build:sandpiper": "mkdir -p dist && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outfile ./dist/sandpiper && chmod +x ./dist/sandpiper",
-    "build:standalone": "mkdir -p dist/standalone && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone",
-    "copy-assets": "bun run --target bun ./copy_pi_assets.ts"
+    "build:standalone": "mkdir -p dist/standalone && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone"
   }
 }

@@ -70,9 +70,9 @@ describe('standalone Sandpiper CLI smoke', () => {
 
     expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe('workspace:*');
     expect(cliPackage.bin?.sandpiper).toBe('./bin/sandpiper');
-    expect(cliPackage.bin?.['sandpiper-standalone']).toBe('./bin/sandpiper-standalone');
+    expect(cliPackage.bin).not.toHaveProperty('sandpiper-standalone');
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper'))).toBe(true);
-    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(true);
+    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(false);
     expect(cliPackage.scripts).not.toHaveProperty('preinstall');
     expect(cliPackage.scripts?.build).toContain('build:sandpiper');
     expect(cliPackage.scripts?.build).toContain('build:standalone');

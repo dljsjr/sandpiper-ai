@@ -11,17 +11,16 @@ Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlog
 3. Imports Pi through `deferred_pi_import.ts`.
 4. Calls `main(args, { extensionFactories })` with Sandpiper identity/capability factories and explicit resource discovery.
 
-This path does not install Sandpiper into Pi to load its own behavior. The old `pi_wrapper.ts` remains as legacy code while distribution assembly is retired.
+This path does not install Sandpiper into Pi to load its own behavior.
 
 The runtime intentionally writes `using pi-coding-agent version: <version>` to stdout before delegating to Pi. This makes the embedded Pi version visible in every Sandpiper launch and is asserted by CLI smoke tests.
 
 ## Build
 
 ```bash
-bun run build            # tsc + build sandpiper runtime + standalone alias bundle
+bun run build            # tsc + build sandpiper runtime bundles
 bun run build:sandpiper  # build packages/cli/dist/sandpiper from sandpiper_standalone.ts
 bun run build:standalone # build packages/cli/dist/standalone/sandpiper_standalone.js
-bun run copy-assets      # Copy README/CHANGELOG into dist
 ```
 
 Builds are explicit; dependency installation does not build runtime bundles.
@@ -38,15 +37,12 @@ bun run sandpiper-dev -- --help
 bun run build:sandpiper-cli
 bun run sandpiper-built -- --help
 
-# Workspace-linked bins after bun install
+# Workspace-linked bin after bun install
 ./node_modules/.bin/sandpiper --help
-./node_modules/.bin/sandpiper-standalone --help
 
 # Smoke tests
 bun run test:standalone
 ```
-
-The `sandpiper-standalone` bin remains as a compatibility alias for dogfooding, but `sandpiper` now points at the same deferred-import runtime via `packages/cli/bin/sandpiper`.
 
 The standalone app bundle is built separately:
 
@@ -68,10 +64,7 @@ Package-management commands such as `install`, `list`, `remove`, and `update` op
 |------|---------|
 | `sandpiper_standalone.ts` | Normal Sandpiper runtime entrypoint — sets sidecar package metadata before loading Pi and injects Sandpiper factories/resources |
 | `bin/sandpiper` | Stable workspace bin shim for the normal runtime |
-| `bin/sandpiper-standalone` | Compatibility alias shim for the standalone bundle |
 | `deferred_pi_import.ts` | Load-order shim so Sandpiper imports Pi only after package metadata env vars are set |
-| `pi_wrapper.ts` | Legacy wrapper retained temporarily while generated distribution assembly is retired |
-| `copy_pi_assets.ts` | Copies Sandpiper README/CHANGELOG into dist |
 
 ## Pi Asset Resolution
 

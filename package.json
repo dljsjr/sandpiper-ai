@@ -61,8 +61,6 @@
     "clean": "bun devtools/clean.ts",
     "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
     "sandpiper-built": "bun ./packages/cli/dist/sandpiper",
-    "sandpiper-standalone-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
-    "sandpiper-standalone-built": "bun ./packages/cli/dist/standalone/sandpiper_standalone.js",
     "check:deps": "syncpack lint"
   },
   "workspaces": [
