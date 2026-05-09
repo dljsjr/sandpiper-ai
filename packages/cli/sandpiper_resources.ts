@@ -32,7 +32,7 @@ export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperRe
   };
 }
 
-export function createSandpiperResourceExtension(resourcePaths: SandpiperResourcePaths): ExtensionFactory {
+function createSandpiperResourceExtension(resourcePaths: SandpiperResourcePaths): ExtensionFactory {
   return (pi: ExtensionAPI) => {
     pi.on('resources_discover', () => ({
       skillPaths: [...resourcePaths.skillPaths],
@@ -52,7 +52,7 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
   ];
 }
 
-export function createSandpiperIdentityExtensionFactories(): readonly ExtensionFactory[] {
+function createSandpiperIdentityExtensionFactories(): readonly ExtensionFactory[] {
   return [createSandpiperIdentityExtension()];
 }
 
