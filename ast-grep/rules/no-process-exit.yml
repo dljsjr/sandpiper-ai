@@ -7,4 +7,3 @@ message: "Avoid process.exit() — use process.exitCode and let the event loop d
 note: "process.exit() bypasses cleanup handlers and can leave resources open. Set process.exitCode instead."
 ignores:
   - "**/*.test.ts"
-  - "devtools/ascii-motion.ts"

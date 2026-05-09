@@ -68,8 +68,7 @@
   "workspaces": [
     "packages/*",
     "extensions/*",
-    "plugins/pi/extensions",
-    "devtools/"
+    "plugins/pi/extensions"
   ],
   "dependencies": {
     "sandpiper-ai-cli": "workspace:*",

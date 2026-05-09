@@ -29,9 +29,8 @@ Development scripts and build utilities. Not distributed with the package.
 
 Current uses:
 - **`dash`** — CLI for the [Dash](https://kapeli.com/dash) documentation browser MCP server. Built during distribution assembly and distributed with the package at `dist/skills/sandpiper/dash/scripts/dash`. mcporter's Node bundle is emitted as `dash.cjs`; the extensionless `dash` entrypoint is a tiny ESM wrapper so it still works under package roots with `"type": "module"`.
-- **`ascii-motion`** — CLI for the ascii-motion MCP server (separate effort, not part of the distribution).
 
-Server definitions live in `config/mcporter-dist.json` (for distribution builds) and `config/mcporter.json` (for local development, if present).
+Server definitions live in `config/mcporter-dist.json` for distribution builds.
 
 ## Distribution Checks
 
