@@ -60,7 +60,13 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     expect(flags).not.toContain('install-shell-integrations');
     expect(handlers).not.toContain('before_agent_start');
     expect(tools).toEqual(
-      expect.arrayContaining(['start_background_process', 'check_background_process', 'shell_relay', 'web_fetch']),
+      expect.arrayContaining([
+        'skill',
+        'start_background_process',
+        'check_background_process',
+        'shell_relay',
+        'web_fetch',
+      ]),
     );
     expect(skillNames).toEqual(expect.arrayContaining(['tasks', 'standup']));
     expect(promptNames).toEqual(expect.arrayContaining(['new-feature', 'code-review']));

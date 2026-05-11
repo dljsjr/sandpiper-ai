@@ -211,6 +211,14 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
     return;
   }
 
+  const hasLoadSkillTool = (originalPromptOptions.selectedTools || []).includes('skill');
+  const loadInstruction = hasLoadSkillTool
+    ? '- If any skill matches, call `skill` with the exact skill `name` before continuing. If multiple skills match, load all relevant skills one at a time.'
+    : '- If any skill matches, read its `SKILL.md` with the `read` tool from the exact `location` before continuing. If multiple skills match, load all relevant skills.';
+  const relativeReferenceInstruction = hasLoadSkillTool
+    ? '- Resolve skill-referenced scripts and files relative to the base directory returned by `skill`.'
+    : '- Resolve skill-referenced scripts and files relative to the directory containing `SKILL.md`.';
+
   const skillEntries = originalPromptOptions.skills.map((skillInfo) => ({
     '@_name': skillInfo.name,
     '@_location': skillInfo.filePath,
@@ -223,9 +231,9 @@ The following skills provide specialized instructions, scripts, and references f
 Skill loading rules:
 - The catalogue below is routing metadata only; it is not the skill instructions.
 - Before planning, answering, editing files, or running commands, compare the user's request, acquired context, and intended next actions against the skill descriptions.
-- If any skill matches, read its \`SKILL.md\` with the \`read\` tool from the exact \`location\` before continuing. If multiple skills match, load all relevant skills.
+${loadInstruction}
 - If later context reveals a new skill match, stop and load that skill before continuing.
-- Resolve skill-referenced scripts and files relative to the directory containing \`SKILL.md\`.
+${relativeReferenceInstruction}
 
 ${buildXml({ available_skills: { skill: skillEntries } })}
 </skills>

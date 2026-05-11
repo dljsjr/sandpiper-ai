@@ -16,7 +16,7 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 `system/` is the composed Sandpiper extension package. Generated Sandpiper Pi artifacts load it through `extensions/system/package.json`, which keeps the repository root from acting as the canonical Pi package manifest. It loads both:
 
 - Sandpiper identity/startup behavior: prompt assembly, session continuity, migration / shell-integration controls, diagnostics, and update banners.
-- Neutral system capabilities: background process tools and completion/shutdown hooks.
+- Neutral system capabilities: skill loading, background process tools, and completion/shutdown hooks.
 
 `plugins/pi/extensions/` contains the neutral Pi provider adapters. Its `capabilities.ts` entrypoint intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners. Neutral Pi package assembly loads those provider adapters instead of `system/`.
 
