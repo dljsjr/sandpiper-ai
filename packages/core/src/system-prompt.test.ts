@@ -252,6 +252,31 @@ describe('system-prompt', () => {
       expect(block).toContain('<skill name="jj" location="/skills/jj/SKILL.md">');
       expect(block).toContain('Jujutsu version control');
     });
+
+    it('renders focused skill loading rules', () => {
+      const options = createPromptOptions({
+        skills: [
+          {
+            name: 'jj',
+            description: 'Jujutsu version control',
+            filePath: '/skills/jj/SKILL.md',
+          },
+        ],
+      });
+
+      const block = skillsBlock(options)!;
+      expect(block).toContain('Skill loading rules:');
+      expect(block).toContain('The catalogue below is routing metadata only; it is not the skill instructions.');
+      expect(block).toContain("compare the user's request, acquired context, and intended next actions");
+      expect(block).toContain('read its `SKILL.md` with the `read` tool from the exact `location`');
+      expect(block).toContain('If multiple skills match, load all relevant skills.');
+      expect(block).toContain(
+        'If later context reveals a new skill match, stop and load that skill before continuing.',
+      );
+      expect(block).toContain(
+        'Resolve skill-referenced scripts and files relative to the directory containing `SKILL.md`.',
+      );
+    });
   });
 
   describe('buildSandpiperSystemPrompt', () => {

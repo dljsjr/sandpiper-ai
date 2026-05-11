@@ -220,12 +220,12 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
   return `<skills>
 The following skills provide specialized instructions, scripts, and references for specific tasks.
 
-Important:
-- Load a skill when the task matches its description, when the user asks for it, or before using a workflow or CLI that the skill governs.
-- Sandpiper currently has no dedicated skill-loading tool. To use a skill, read its \`SKILL.md\` file with the \`read\` tool.
-- Use the exact \`location\` listed in the catalog. Do not construct skill paths from skill names.
-- If a skill references scripts, commands, or other files by relative path, resolve them relative to the directory containing \`SKILL.md\`.
-- If a workflow says to use a skill-managed CLI, load the matching skill first and follow its instructions instead of reading backing files directly.
+Skill loading rules:
+- The catalogue below is routing metadata only; it is not the skill instructions.
+- Before planning, answering, editing files, or running commands, compare the user's request, acquired context, and intended next actions against the skill descriptions.
+- If any skill matches, read its \`SKILL.md\` with the \`read\` tool from the exact \`location\` before continuing. If multiple skills match, load all relevant skills.
+- If later context reveals a new skill match, stop and load that skill before continuing.
+- Resolve skill-referenced scripts and files relative to the directory containing \`SKILL.md\`.
 
 ${buildXml({ available_skills: { skill: skillEntries } })}
 </skills>
