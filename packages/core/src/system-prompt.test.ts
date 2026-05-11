@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   buildSandpiperSystemPrompt,
   formatColdStartGuidance,
@@ -10,10 +10,6 @@ import {
   systemPromptPersonaBlock,
   toolGuidanceBlock,
 } from './system-prompt.js';
-
-vi.mock('@toon-format/toon', () => ({
-  encode: vi.fn(() => 'mocked-toon'),
-}));
 
 function createPromptOptions(
   overrides: Partial<SandpiperBaseSystemPromptOptions> = {},
@@ -63,66 +59,52 @@ describe('system-prompt', () => {
   describe('piDocsBlock', () => {
     it('includes the pi package directory path', () => {
       const block = piDocsBlock('/opt/pi', '1.0.0');
-      expect(block).toContain('/opt/pi/README.md');
-      expect(block).toContain('/opt/pi/docs');
+      expect(block).toContain('<harness_docs>');
+      expect(block).toContain('Pi: `/opt/pi`');
+      expect(block).toContain('`README.md`, `docs/`, `examples/`');
     });
 
     it('includes the Sandpiper package directory path when provided', () => {
       const block = piDocsBlock('/opt/pi', '1.0.0', '/opt/sandpiper');
-      expect(block).toContain('SANDPIPER_CODING_AGENT_PACKAGE');
-      expect(block).toContain('/opt/sandpiper');
+      expect(block).toContain('Sandpiper: `/opt/sandpiper`');
     });
 
     it('includes the pi version', () => {
       const block = piDocsBlock('/opt/pi', '1.0.0');
-      expect(block).toContain('Pi version 1.0.0');
+      expect(block).toContain('Pi version: `1.0.0`');
     });
 
     it('uses <unknown> as default version', () => {
       const block = piDocsBlock('/opt/pi');
-      expect(block).toContain('Pi version <unknown>');
+      expect(block).toContain('Pi version: `<unknown>`');
     });
 
     it('includes sandpiper-specific config directory differences', () => {
       const block = piDocsBlock('/opt/pi', '1.0.0');
-      expect(block).toContain("'~/.sandpiper' instead of '~/.pi'");
-      expect(block).toContain("'./.sandpiper' instead of './.pi'");
+      expect(block).toContain('global config: `~/.sandpiper`, not `~/.pi`');
+      expect(block).toContain('project config: `.sandpiper`, not `.pi`');
     });
   });
 
   describe('systemPromptPersonaBlock', () => {
-    it('wraps identity in BEGIN/END PERSONA markers', () => {
+    it('wraps identity in persona XML tags', () => {
       const block = systemPromptPersonaBlock({});
-      expect(block).toContain('[BEGIN PERSONA]');
-      expect(block).toContain('[END PERSONA]');
+      expect(block).toContain('<persona>');
+      expect(block).toContain('</persona>');
+      expect(block).toContain('<identity>');
+      expect(block).toContain('</identity>');
     });
 
     it('includes the identity block content', () => {
       const block = systemPromptPersonaBlock({});
-      expect(block).toContain('Sandpiper');
-      expect(block).toContain('Operational Principles');
-      expect(block).toContain('Coding Guidelines');
+      expect(block).toContain('You are Sandpiper');
+      expect(block).toContain('Operating Principles');
+      expect(block).toContain('Coding Defaults');
     });
 
-    it('includes pi docs block when piCodingAgentPackage is provided', () => {
+    it('does not include harness docs', () => {
       const block = systemPromptPersonaBlock({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
-      expect(block).toContain('Extending The Harness');
-      expect(block).toContain('/opt/pi/README.md');
-    });
-
-    it('includes Sandpiper package docs when both package roots are provided', () => {
-      const block = systemPromptPersonaBlock({
-        piCodingAgentPackage: '/opt/pi',
-        piCodingAgentVersion: '1.0.0',
-        sandpiperCodingAgentPackage: '/opt/sandpiper',
-      });
-      expect(block).toContain('SANDPIPER_CODING_AGENT_PACKAGE');
-      expect(block).toContain('/opt/sandpiper');
-    });
-
-    it('omits pi docs block when piCodingAgentPackage is not provided', () => {
-      const block = systemPromptPersonaBlock({});
-      expect(block).not.toContain('Extending The Harness');
+      expect(block).not.toContain('<harness_docs>');
     });
   });
 
@@ -137,11 +119,11 @@ describe('system-prompt', () => {
       });
 
       const block = toolGuidanceBlock(options);
-      expect(block).toContain('[BEGIN TOOL INFO]');
-      expect(block).toContain('[END TOOL INFO]');
-      expect(block).toContain('## Available Tools');
-      expect(block).toContain('- read: Read file contents');
-      expect(block).toContain('- edit: Edit a file');
+      expect(block).toContain('<tools>');
+      expect(block).toContain('</tools>');
+      expect(block).toContain('<available_tools>');
+      expect(block).toContain('<tool name="read">Read file contents</tool>');
+      expect(block).toContain('<tool name="edit">Edit a file</tool>');
     });
 
     it('omits tool snippets for tools not in selectedTools', () => {
@@ -154,8 +136,8 @@ describe('system-prompt', () => {
       });
 
       const block = toolGuidanceBlock(options);
-      expect(block).toContain('- read: Read file contents');
-      expect(block).not.toContain('- edit: Edit a file');
+      expect(block).toContain('<tool name="read">Read file contents</tool>');
+      expect(block).not.toContain('<tool name="edit">Edit a file</tool>');
     });
 
     it('renders guidelines and strips "Be concise"', () => {
@@ -164,7 +146,7 @@ describe('system-prompt', () => {
       });
 
       const block = toolGuidanceBlock(options);
-      expect(block).toContain('## Guidelines:');
+      expect(block).toContain('Guidelines:');
       expect(block).toContain('- Show file paths clearly');
       expect(block).not.toContain('Be concise in your responses');
     });
@@ -179,8 +161,20 @@ describe('system-prompt', () => {
       });
 
       const block = toolGuidanceBlock(options);
-      expect(block).toContain('- read: Read file contents');
-      expect(block).not.toContain('- edit:');
+      expect(block).toContain('<tool name="read">Read file contents</tool>');
+      expect(block).not.toContain('<tool name="edit"');
+    });
+
+    it('escapes XML in tool entries', () => {
+      const options = createPromptOptions({
+        selectedTools: ['read<&'],
+        toolSnippets: {
+          'read<&': 'Read <files> & report "paths"',
+        },
+      });
+
+      const block = toolGuidanceBlock(options);
+      expect(block).toContain('<tool name="read&lt;&amp;">Read &lt;files&gt; &amp; report &quot;paths&quot;</tool>');
     });
   });
 
@@ -190,16 +184,16 @@ describe('system-prompt', () => {
       expect(injectedContextBlock(options)).toBeUndefined();
     });
 
-    it('renders context files with BEGIN/END markers', () => {
+    it('renders context files with XML tags', () => {
       const options = createPromptOptions({
         contextFiles: [{ path: 'AGENTS.md', content: '# Rules\nDo good things' }],
       });
 
       const block = injectedContextBlock(options)!;
-      expect(block).toContain('[BEGIN INJECTED CONTEXT]');
-      expect(block).toContain('[END INJECTED CONTEXT]');
-      expect(block).toContain('=== [BEGIN AGENTS.md]');
-      expect(block).toContain('=== [END AGENTS.md]');
+      expect(block).toContain('<injected_context>');
+      expect(block).toContain('</injected_context>');
+      expect(block).toContain('<context_file path="AGENTS.md">');
+      expect(block).toContain('</context_file>');
       expect(block).toContain('Do good things');
     });
 
@@ -212,8 +206,8 @@ describe('system-prompt', () => {
       });
 
       const block = injectedContextBlock(options)!;
-      expect(block).toContain('=== [BEGIN AGENTS.md]');
-      expect(block).toContain('=== [BEGIN CLAUDE.md]');
+      expect(block).toContain('<context_file path="AGENTS.md">');
+      expect(block).toContain('<context_file path="CLAUDE.md">');
     });
   });
 
@@ -223,7 +217,7 @@ describe('system-prompt', () => {
       expect(skillsBlock(options)).toBeUndefined();
     });
 
-    it('renders skills catalogue with toon encoding', () => {
+    it('renders skills catalogue as XML', () => {
       const options = createPromptOptions({
         skills: [
           {
@@ -235,33 +229,36 @@ describe('system-prompt', () => {
       });
 
       const block = skillsBlock(options)!;
-      expect(block).toContain('[BEGIN SKILLS]');
-      expect(block).toContain('[END SKILLS]');
-      expect(block).toContain('mocked-toon');
+      expect(block).toContain('<skills>');
+      expect(block).toContain('</skills>');
+      expect(block).toContain('<available_skills>');
+      expect(block).toContain('<skill name="jj" location="/skills/jj/SKILL.md">');
+      expect(block).toContain('Jujutsu version control');
     });
   });
 
   describe('buildSandpiperSystemPrompt', () => {
     it('produces a prompt with all required sections', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
+      const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo', platform: 'darwin' }, promptOptions);
 
-      expect(prompt).toContain('[BEGIN PERSONA]');
-      expect(prompt).toContain('[BEGIN TOOL INFO]');
-      expect(prompt).toContain('Current Date:');
-      expect(prompt).toContain('Current working directory: /repo');
+      expect(prompt).toContain('<persona>');
+      expect(prompt).toContain('<tools>');
+      expect(prompt).toContain('<environment>');
+      expect(prompt).toContain('<current_date>');
+      expect(prompt).toContain('<cwd>/repo</cwd>');
     });
 
     it('formats cwd with forward slashes', async () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: 'C:\\Users\\test\\repo' }, promptOptions);
-      expect(prompt).toContain('Current working directory: C:/Users/test/repo');
+      expect(prompt).toContain('<cwd>C:/Users/test/repo</cwd>');
     });
 
     it('defaults cwd to process.cwd()', async () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
-      expect(prompt).toContain('Current working directory:');
+      expect(prompt).toContain('<cwd>');
     });
 
     it('includes injected context when context files are present', async () => {
@@ -270,7 +267,7 @@ describe('system-prompt', () => {
       });
 
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).toContain('[BEGIN INJECTED CONTEXT]');
+      expect(prompt).toContain('<injected_context>');
       expect(prompt).toContain('AGENTS.md');
       expect(prompt).toContain('Do good things');
     });
@@ -278,7 +275,7 @@ describe('system-prompt', () => {
     it('omits injected context when no context files are present', async () => {
       const promptOptions = createPromptOptions({ contextFiles: [] });
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).not.toContain('[BEGIN INJECTED CONTEXT]');
+      expect(prompt).not.toContain('<injected_context>');
     });
 
     it('includes skills block when skills are present', async () => {
@@ -293,16 +290,16 @@ describe('system-prompt', () => {
       });
 
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).toContain('[BEGIN SKILLS]');
+      expect(prompt).toContain('<skills>');
     });
 
     it('omits skills block when no skills are present', async () => {
       const promptOptions = createPromptOptions({ skills: [] });
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).not.toContain('[BEGIN SKILLS]');
+      expect(prompt).not.toContain('<skills>');
     });
 
-    it('includes pi docs block when piCodingAgentPackage is set', async () => {
+    it('includes harness docs block when package roots are set', async () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt(
         {
@@ -313,15 +310,15 @@ describe('system-prompt', () => {
         },
         promptOptions,
       );
-      expect(prompt).toContain('Extending The Harness');
-      expect(prompt).toContain('/opt/pi/README.md');
-      expect(prompt).toContain('SANDPIPER_CODING_AGENT_PACKAGE');
+      expect(prompt).toContain('<harness_docs>');
+      expect(prompt).toContain('Pi: `/opt/pi`');
+      expect(prompt).toContain('Sandpiper: `/opt/sandpiper`');
     });
 
-    it('omits pi docs block when piCodingAgentPackage is not set', async () => {
+    it('omits harness docs block when package roots are not set', async () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).not.toContain('Extending The Harness');
+      expect(prompt).not.toContain('<harness_docs>');
     });
 
     it('includes user appended prompt content when appendSystemPrompt is set', async () => {
@@ -330,15 +327,15 @@ describe('system-prompt', () => {
       });
 
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).toContain('[BEGIN USER APPENDED PROMPT CONTENT]');
+      expect(prompt).toContain('<user_appended_prompt>');
       expect(prompt).toContain('Extra instructions from the user');
-      expect(prompt).toContain('[END USER APPENDED PROMPT CONTENT]');
+      expect(prompt).toContain('</user_appended_prompt>');
     });
 
     it('omits user appended prompt block when appendSystemPrompt is not set', async () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
-      expect(prompt).not.toContain('[BEGIN USER APPENDED PROMPT CONTENT]');
+      expect(prompt).not.toContain('<user_appended_prompt>');
     });
   });
 });

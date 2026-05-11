@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `extensions/system/startup-hooks.ts`
+- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`
 - **Supersedes**: archived April 2026 parsing-plan notes
 
 ## Current architecture
@@ -20,28 +20,25 @@ extensions/system/startup-hooks.ts
 
 ## Prompt sections
 
-`buildSandpiperSystemPrompt()` emits these sections in order:
+`buildSandpiperSystemPrompt()` emits XML-style sections in order:
 
-1. Sandpiper persona and coding guidance.
-2. Pi documentation paths and Sandpiper/Pi differences when `PI_CODING_AGENT_PACKAGE` is available.
-3. Tool snippets and tool guidelines derived from Pi's `systemPromptOptions`.
-4. User-appended system prompt content, if present.
-5. Injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
-6. Skills catalogue from Pi's `systemPromptOptions`, encoded as TOON.
-7. Current date and current working directory.
+1. `<persona>` — Sandpiper identity, operating principles, communication rules, and coding defaults.
+2. `<tools>` — tool snippets and tool guidelines derived from Pi's `systemPromptOptions`.
+3. `<harness_docs>` — Pi/Sandpiper documentation routing and path differences when package roots are available.
+4. `<skills>` — available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries.
+5. `<injected_context>` — injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
+6. `<user_appended_prompt>` — user-appended system prompt content, if present.
+7. `<environment>` — current date, current working directory, platform, and session-start VCS detection.
 
 ## Startup context
 
-`buildSandpiperStartupPrompt()` adds Sandpiper-specific context before calling the base prompt builder:
+`buildSandpiperStartupPrompt()` supplies stable launch metadata before calling the base prompt builder:
 
-- project triggers
-- active task context
-- working-copy summary
-- cold-start guidance
-- previous standup content
 - Pi package path and version from `PI_CODING_AGENT_PACKAGE` / `PI_CODING_AGENT_VERSION`
+- Sandpiper package path from `SANDPIPER_CODING_AGENT_PACKAGE`
+- session-start VCS detection (`jj`, `git`, `hg`, `svn`, `fossil`, `perforce`, or `none`)
 
-The expensive startup context is one-shot. `startupContextPending` and `coldStartGuidancePending` are cleared after the first prompt build for the session.
+The older one-shot startup context fields (`projectTriggers`, `activeTaskContext`, `workingCopyContext`, `coldStartGuidance`, and `standupContent`) remain in the structured options for now but are not rendered into the system prompt. Moving volatile task, standup, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
 
 ## Custom prompts
 
@@ -56,4 +53,4 @@ When the system extension is created with dump mode enabled, or when `SANDPIPER_
 - Keep prompt construction in `sandpiper-ai-core`; extension code should stay glue-only.
 - Preserve Pi-provided tool, context-file, and skill metadata instead of re-discovering it in the extension.
 - Do not parse Pi's rendered prompt string. Older notes that proposed parsing and replacing sections are archived.
-- Keep static sections before volatile startup context where practical so provider prompt caches can reuse more prefix content.
+- Keep volatile task, standup, and working-copy state out of the system prompt unless a separate design explicitly accounts for provider cache behavior.

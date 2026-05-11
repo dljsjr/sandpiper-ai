@@ -11,6 +11,7 @@ import {
   formatWorkingCopySummaryForPrompt,
 } from './startup-context.js';
 import { buildSandpiperSystemPrompt, formatColdStartGuidance, formatStandupContext } from './system-prompt.js';
+import { detectVersionControl } from './version-control.js';
 
 type BuildSystemPrompt = typeof buildSandpiperSystemPrompt;
 
@@ -26,6 +27,7 @@ export interface StartupPromptDependencies extends StandupContentDependencies {
   readonly collectProjectTriggers?: typeof collectProjectTriggers;
   readonly collectWorkingCopySummary?: typeof collectWorkingCopySummary;
   readonly env?: NodeJS.ProcessEnv;
+  readonly detectVersionControl?: typeof detectVersionControl;
   readonly formatActiveTaskContextForPrompt?: typeof formatActiveTaskContextForPrompt;
   readonly formatColdStartGuidance?: typeof formatColdStartGuidance;
   readonly formatProjectTriggersForPrompt?: typeof formatProjectTriggersForPrompt;
@@ -54,6 +56,7 @@ function resolveStartupPromptDependencies(dependencies: StartupPromptDependencie
     collectProjectTriggers,
     collectWorkingCopySummary,
     env: process.env,
+    detectVersionControl,
     formatActiveTaskContextForPrompt,
     formatColdStartGuidance,
     formatProjectTriggersForPrompt,
@@ -123,6 +126,7 @@ export async function buildSandpiperStartupPrompt(
       piCodingAgentPackage: resolved.env.PI_CODING_AGENT_PACKAGE,
       piCodingAgentVersion: resolved.env.PI_CODING_AGENT_VERSION,
       sandpiperCodingAgentPackage: resolved.env.SANDPIPER_CODING_AGENT_PACKAGE,
+      versionControl: resolved.detectVersionControl(input.cwd, { fileExists: resolved.fileExists }),
       projectTriggers,
       activeTaskContext,
       workingCopyContext,
