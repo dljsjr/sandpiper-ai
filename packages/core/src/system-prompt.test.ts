@@ -9,6 +9,7 @@ import {
   skillsBlock,
   systemPromptPersonaBlock,
   toolGuidanceBlock,
+  userProfileBlock,
 } from './system-prompt.js';
 
 function createPromptOptions(
@@ -105,6 +106,22 @@ describe('system-prompt', () => {
     it('does not include harness docs', () => {
       const block = systemPromptPersonaBlock({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
       expect(block).not.toContain('<harness_docs>');
+    });
+  });
+
+  describe('userProfileBlock', () => {
+    it('returns undefined when no user profile content is present', () => {
+      expect(userProfileBlock('')).toBeUndefined();
+      expect(userProfileBlock('  \n')).toBeUndefined();
+    });
+
+    it('renders user profile content as XML', () => {
+      const block = userProfileBlock('# User\nPrefers <clear> & direct communication')!;
+
+      expect(block).toContain('<user_profile>');
+      expect(block).toContain('</user_profile>');
+      expect(block).toContain('working preferences');
+      expect(block).toContain('<content># User\nPrefers &lt;clear&gt; &amp; direct communication</content>');
     });
   });
 
@@ -259,6 +276,23 @@ describe('system-prompt', () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).toContain('<cwd>');
+    });
+
+    it('includes user profile when provided', async () => {
+      const promptOptions = createPromptOptions();
+      const prompt = await buildSandpiperSystemPrompt(
+        { cwd: '/repo', userProfile: '# Doug\nLikes clear plans' },
+        promptOptions,
+      );
+
+      expect(prompt).toContain('<user_profile>');
+      expect(prompt).toContain('Likes clear plans');
+    });
+
+    it('omits user profile when not provided', async () => {
+      const promptOptions = createPromptOptions();
+      const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo' }, promptOptions);
+      expect(prompt).not.toContain('<user_profile>');
     });
 
     it('includes injected context when context files are present', async () => {

@@ -11,6 +11,7 @@ import {
   formatWorkingCopySummaryForPrompt,
 } from './startup-context.js';
 import { buildSandpiperSystemPrompt, formatColdStartGuidance, formatStandupContext } from './system-prompt.js';
+import { readSandpiperUserProfile } from './user-profile.js';
 import { detectVersionControl } from './version-control.js';
 
 type BuildSystemPrompt = typeof buildSandpiperSystemPrompt;
@@ -28,6 +29,7 @@ export interface StartupPromptDependencies extends StandupContentDependencies {
   readonly collectWorkingCopySummary?: typeof collectWorkingCopySummary;
   readonly env?: NodeJS.ProcessEnv;
   readonly detectVersionControl?: typeof detectVersionControl;
+  readonly readUserProfile?: typeof readSandpiperUserProfile;
   readonly formatActiveTaskContextForPrompt?: typeof formatActiveTaskContextForPrompt;
   readonly formatColdStartGuidance?: typeof formatColdStartGuidance;
   readonly formatProjectTriggersForPrompt?: typeof formatProjectTriggersForPrompt;
@@ -36,6 +38,7 @@ export interface StartupPromptDependencies extends StandupContentDependencies {
 }
 
 export interface StartupPromptInput {
+  readonly agentDir?: string;
   readonly cwd: string;
   readonly systemPromptOptions: Parameters<BuildSystemPrompt>[1];
 }
@@ -57,6 +60,7 @@ function resolveStartupPromptDependencies(dependencies: StartupPromptDependencie
     collectWorkingCopySummary,
     env: process.env,
     detectVersionControl,
+    readUserProfile: readSandpiperUserProfile,
     formatActiveTaskContextForPrompt,
     formatColdStartGuidance,
     formatProjectTriggersForPrompt,
@@ -127,6 +131,11 @@ export async function buildSandpiperStartupPrompt(
       piCodingAgentVersion: resolved.env.PI_CODING_AGENT_VERSION,
       sandpiperCodingAgentPackage: resolved.env.SANDPIPER_CODING_AGENT_PACKAGE,
       versionControl: resolved.detectVersionControl(input.cwd, { fileExists: resolved.fileExists }),
+      userProfile: resolved.readUserProfile({
+        agentDir: input.agentDir,
+        fileExists: resolved.fileExists,
+        readFile: resolved.readFile,
+      }),
       projectTriggers,
       activeTaskContext,
       workingCopyContext,

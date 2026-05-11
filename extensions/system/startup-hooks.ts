@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { type ExtensionAPI, getAgentDir } from '@earendil-works/pi-coding-agent';
 import {
   buildSandpiperStartupPrompt,
   handleSandpiperSessionShutdown,
@@ -13,6 +13,7 @@ export function registerStartupPromptHooks(
 ): void {
   pi.on('before_agent_start', async (event, ctx) => {
     const effectiveSystemPrompt = await buildSandpiperStartupPrompt(state, {
+      agentDir: getAgentDir(),
       cwd: ctx.cwd,
       systemPromptOptions: event.systemPromptOptions,
     });

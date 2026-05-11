@@ -26,6 +26,7 @@ function createDependencies(overrides: Partial<StartupPromptDependencies> = {}):
     formatStandupContext: vi.fn((content) => `<standup>${content}</standup>`),
     formatWorkingCopySummaryForPrompt: vi.fn(() => '<working-copy/>'),
     readFile: vi.fn(() => ''),
+    readUserProfile: vi.fn(() => ''),
     runStandupRead: vi.fn(() => ''),
     ...overrides,
   };
@@ -64,7 +65,7 @@ describe('startup prompt operations', () => {
 
     const prompt = await buildSandpiperStartupPrompt(
       state,
-      { cwd: '/repo', systemPromptOptions: { cwd: '/repo' } },
+      { agentDir: '/agent', cwd: '/repo', systemPromptOptions: { cwd: '/repo' } },
       dependencies,
     );
 
@@ -72,6 +73,7 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"piCodingAgentPackage":"/pi/package"');
     expect(prompt).toContain('"piCodingAgentVersion":"1.2.3"');
     expect(prompt).toContain('"sandpiperCodingAgentPackage":"/sandpiper/package"');
+    expect(prompt).toContain('"userProfile":""');
     expect(prompt).toContain('"projectTriggers":"<projects/>"');
     expect(prompt).toContain('"activeTaskContext":"<active/>"');
     expect(prompt).toContain('"workingCopyContext":"<working-copy/>"');
@@ -80,6 +82,26 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"versionControl":{"system":"jj","colocatedGit":true,"detection":"session_start"}');
     expect(state.startupContextPending).toBe(false);
     expect(state.coldStartGuidancePending).toBe(false);
+  });
+
+  it('passes the user profile into system prompt construction', async () => {
+    const state = createSystemRuntimeState();
+    const dependencies = createDependencies({
+      readUserProfile: vi.fn(() => '# User\nLikes plans'),
+    });
+
+    const prompt = await buildSandpiperStartupPrompt(
+      state,
+      { agentDir: '/agent', cwd: '/repo', systemPromptOptions: { cwd: '/repo' } },
+      dependencies,
+    );
+
+    expect(dependencies.readUserProfile).toHaveBeenCalledWith({
+      agentDir: '/agent',
+      fileExists: dependencies.fileExists,
+      readFile: dependencies.readFile,
+    });
+    expect(prompt).toContain('"userProfile":"# User\\nLikes plans"');
   });
 
   it('omits one-shot active, working-copy, and cold-start context after startup context is consumed', async () => {

@@ -15,6 +15,20 @@ Sandpiper stores global state under `~/.sandpiper` and project-local state under
 | `~/.sandpiper/shell-integrations/` | Shell integration scripts used by Shell Relay                                |
 | `~/.sandpiper/pi-acp/`             | ACP adapter state                                                            |
 
+### User profile (`USER.md`)
+
+`USER.md` is an optional Markdown file for durable, user-wide collaboration preferences. Sandpiper loads it into the system prompt at startup so agents can adapt to how you prefer to work across projects.
+
+Put stable information here, such as:
+
+- how you prefer agents to communicate and ask questions
+- coding, review, or workflow preferences that apply across repositories
+- personal context that helps agents collaborate with you effectively
+
+Do not use `USER.md` for project-specific rules; put those in the project's `AGENTS.md` or `.sandpiper/playbooks/`. Do not use it for temporary session handoff; use standup notes for that.
+
+By default the file lives at `~/.sandpiper/agent/USER.md`. If you configure a custom Sandpiper agent directory, place `USER.md` in that directory instead.
+
 ## Project `.sandpiper`
 
 Project-local data lives in `<project>/.sandpiper/`.

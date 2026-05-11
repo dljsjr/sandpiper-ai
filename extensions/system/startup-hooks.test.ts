@@ -7,6 +7,16 @@ import { registerSessionContinuityHooks, registerStartupPromptHooks } from './st
 import { createBackgroundContextProcessManagerStub, createEventStub } from './test-helpers.js';
 
 const mockBuildSandpiperStartupPrompt = vi.hoisted(() => vi.fn());
+const mockGetAgentDir = vi.hoisted(() => vi.fn(() => '/agent'));
+
+vi.mock('@earendil-works/pi-coding-agent', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@earendil-works/pi-coding-agent')>();
+  return {
+    ...actual,
+    getAgentDir: mockGetAgentDir,
+  };
+});
+
 vi.mock('sandpiper-ai-core', async (importOriginal) => {
   const actual = await importOriginal<typeof import('sandpiper-ai-core')>();
   return {
@@ -17,11 +27,17 @@ vi.mock('sandpiper-ai-core', async (importOriginal) => {
 
 describe('startup hooks', () => {
   beforeEach(() => {
+    mockGetAgentDir.mockClear();
+    mockGetAgentDir.mockReturnValue('/agent');
     mockBuildSandpiperStartupPrompt.mockImplementation(
-      async (state: { startupContextPending: boolean; coldStartGuidancePending: boolean }, input: { cwd: string }) => {
+      async (
+        state: { startupContextPending: boolean; coldStartGuidancePending: boolean },
+        input: { agentDir?: string; cwd: string },
+      ) => {
         state.startupContextPending = false;
         state.coldStartGuidancePending = false;
         return JSON.stringify({
+          agentDir: input.agentDir,
           cwd: input.cwd,
           projectTriggers: '',
           activeTaskContext: '',
@@ -56,7 +72,9 @@ describe('startup hooks', () => {
       },
     )) as { systemPrompt: string };
 
+    expect(result.systemPrompt).toContain('"agentDir":"/agent"');
     expect(result.systemPrompt).toContain('"cwd":"/repo"');
+    expect(mockGetAgentDir).toHaveBeenCalled();
     expect(result.systemPrompt).toContain('"projectTriggers":""');
     expect(result.systemPrompt).toContain('"activeTaskContext":""');
     expect(result.systemPrompt).toContain('"workingCopyContext":""');
