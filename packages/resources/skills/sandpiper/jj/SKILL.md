@@ -92,28 +92,35 @@ These are hard rules for agent sessions. Matched recovery paths for each are in 
      hunk placement, `jj split -m "msg" <paths>` for path-based splits, `jj resolve --tool :ours`
      / `:theirs` for simple conflict picks, or the scratch-and-squash pattern for anything else.
 
-2. **Prefer change IDs over commit IDs** when referencing your own in-flight work. Commit IDs churn
+2. **Prefer `jj commit -m "msg"` when finalizing current work and continuing.** Do not spell the
+   normal commit flow as `jj describe -m "msg"` followed by `jj new`; agents often describe `@`,
+   then forget or delay the `new`, so later edits mutate the just-described commit. `jj commit -m`
+   performs the describe-and-advance sequence in one command. Use `jj describe -m` only when you
+   intentionally want to rename an existing revision and keep editing it; use `jj new -m` when you
+   intentionally want a new empty child or merge commit.
+
+3. **Prefer change IDs over commit IDs** when referencing your own in-flight work. Commit IDs churn
    on every rewrite; change IDs are stable.
 
-3. **Verify after every graph restructuring.** After `rebase`, `squash`, `split`, `abandon`, `edit`,
+4. **Verify after every graph restructuring.** After `rebase`, `squash`, `split`, `abandon`, `edit`,
    or any bookmark move, run `jj log -r 'main@origin..visible_heads()'` (or equivalent) to confirm
    the shape is what you expected. Do not chain multiple restructures without verifying. Run graph-
    mutating jj commands one at a time rather than bundling several into one shell script; jj conflicts
    are recorded successfully and may not stop a script before later mutations compound the state.
 
-4. **On unexpected failure, reach for the op log, not destructive alternatives.** `jj undo` walks
+5. **On unexpected failure, reach for the op log, not destructive alternatives.** `jj undo` walks
    back the last op; `jj op restore <op-id>` jumps to a specific state. Do not run `rm -rf .jj`
    to "reset" — it wipes the op log and change IDs, leaving only the Git backing store.
 
-5. **Never force-push to `main`/`master`.** `jj git push -b <feature>` is safe (lease-checked). A
+6. **Never force-push to `main`/`master`.** `jj git push -b <feature>` is safe (lease-checked). A
    forced push to a shared trunk requires explicit user authorization.
 
-6. **Before restructuring the graph, ensure no important state lives only in the working copy.**
+7. **Before restructuring the graph, ensure no important state lives only in the working copy.**
    The working copy is a real commit, but it is ephemeral — if `@` becomes orphaned during a
-   rebase, its uncommitted diff is lost. Commit or stash (i.e. create a named descendant) before
-   restructuring ancestors.
+   rebase, its uncommitted diff is lost. Use `jj commit -m "wip: ..."` or another explicit
+   checkpoint before restructuring ancestors.
 
-7. **When `jj squash` would combine two described commits**, always pass `-m` to supply the merged
+8. **When `jj squash` would combine two described commits**, always pass `-m` to supply the merged
    description. Without `-m`, jj opens `$EDITOR` to let the caller combine the two descriptions
    manually — a hang in non-interactive contexts.
 
@@ -132,18 +139,20 @@ rule whose violation causes it.
 **Recovery:** the agent cannot recover a hung process. Escalate to the user to cancel. This is
 preventable 100% of the time; prevent rather than recover.
 
-### Orphaned working copy (violates rule 6)
+### Orphaned working copy (violates rule 7)
 
 **Symptom:** `jj log` no longer shows work that was in `@` before a restructure. `@` may be empty
 or show different content.
 **Cause:** uncommitted working-copy changes were abandoned when ancestors were rewritten.
-**Prevention:** before restructuring any ancestor of `@`, either `jj describe -m "wip: ..."` to
-name the current `@`, or `jj new -m "..."` to create a named descendant and continue there.
+**Prevention:** before restructuring any ancestor of `@`, run `jj commit -m "wip: ..."` if the
+current `@` contains work you need to preserve while continuing elsewhere. Use `jj describe -m`
+only when you intentionally want to keep editing that revision; use `jj new -m` only when the
+current `@` is already finalized and you need a new empty child.
 **Recovery:** `jj op log` shows the op where `@` was last intact. Either `jj op restore <op-id>`
 to rewind the whole repo, or `jj restore --from <change-id> -- <paths>` to pull specific files
 forward into the current `@` without rewinding other work.
 
-### Stale commit ID (violates rule 2)
+### Stale commit ID (violates rule 3)
 
 **Symptom:** `Error: Revision X doesn't exist` when referencing a previously valid commit ID.
 **Cause:** a mutation rewrote the commit; the old ID no longer resolves.
@@ -152,7 +161,7 @@ IDs survive rewrites.
 **Recovery:** re-derive current IDs with `jj log -r '<revset>'`. Substitute the change ID for the
 stale commit ID and reissue the command.
 
-### Conflict propagation through a chain (violates rule 3)
+### Conflict propagation through a chain (violates rule 4)
 
 **Symptom:** after a rebase, multiple commits appear conflicted, not only one.
 **Cause:** a conflict in an earlier commit propagates to descendants (their content is computed by
@@ -171,7 +180,7 @@ jj squash -m "..."
 Then re-check `jj log -r 'conflicts()'`. Descendants rebase onto the resolved commit; if the
 original conflict was the root cause of theirs, they become unconflicted automatically.
 
-### Stuck or mysterious state (violates rule 4)
+### Stuck or mysterious state (violates rule 5)
 
 **Symptom:** command fails unexpectedly, graph looks wrong, tests that passed now fail, or
 the repo state does not match the expected state.
@@ -219,11 +228,11 @@ jj show <rev>                               # description + diff
 ### Craft commits
 
 ```console
-jj describe -m "msg"                        # set @'s description
-jj describe -m "msg" -r <rev>               # set any rev's description
-jj new -m "msg"                             # new empty commit on top of @
-jj new <rev> -m "msg"                       # new commit on top of a specific rev
-jj commit -m "msg"                          # describe @, then start a new empty commit on top
+jj commit -m "msg"                          # agent default: finalize @, then start a new empty @
+jj describe -m "msg"                        # rename @ only; does not advance the working copy
+jj describe -m "msg" -r <rev>               # rename a specific rev; does not move @
+jj new -m "msg"                             # intentionally create a new empty commit on top of @
+jj new <rev> -m "msg"                       # new empty commit on top of a specific rev
 jj squash -m "msg"                          # fold @ into @- with merged description
 jj squash --from <a> --into <b> -m "msg"    # move changes between arbitrary commits
 jj squash --from <a> --into <b> -m "msg" <paths>   # same, scoped to specific files

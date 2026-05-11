@@ -178,13 +178,14 @@ You should see the parent branch tips feeding into the megamerge, with `@` on to
 In day-to-day use, edit files and commit as normal:
 
 ```console
-jj describe -m "wip: experimenting with combined state"
+jj commit -m "wip: experimenting with combined state"
 # ...more edits...
-jj new -m "wip: next exploration"
+jj commit -m "wip: next exploration"
 ```
 
-Every commit you make is a descendant of the megamerge. The feature branches below are
-unaffected; they stay at their tips.
+Each `jj commit -m` finalizes the current working-copy commit and advances to a fresh empty `@`.
+Every commit you make is a descendant of the megamerge. The feature branches below are unaffected;
+they stay at their tips.
 
 Running tests, dev servers, builds — all operate on the combined state. That is the value the
 megamerge delivers: the runtime behavior reflects all parent branches simultaneously.
