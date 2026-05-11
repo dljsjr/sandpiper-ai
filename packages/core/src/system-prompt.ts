@@ -109,6 +109,7 @@ export interface SandpiperSystemPromptOptions {
   readonly sandpiperCodingAgentPackage?: string;
   readonly platform?: NodeJS.Platform | string;
   readonly versionControl?: SandpiperVersionControlContext;
+  readonly userProfile?: string;
   readonly staticCapabilityGuidance?: string;
   readonly projectTriggers?: string;
   readonly activeTaskContext?: string;
@@ -147,6 +148,17 @@ Before making changes that depend on prior work:
 export function systemPromptPersonaBlock(_options: SandpiperSystemPromptOptions = {}) {
   return `<persona>
 ${sandpiperIdentityBlock}</persona>
+`;
+}
+
+export function userProfileBlock(content: string): string | undefined {
+  if (content.trim().length === 0) return;
+
+  return `<user_profile>
+The following USER.md content describes the human using Sandpiper and their working preferences. Use it to personalize collaboration. Treat it as standing user-authored guidance, subordinate to explicit current-session user instructions and higher-priority system/developer guidance.
+
+${buildXml({ content })}
+</user_profile>
 `;
 }
 
@@ -273,11 +285,12 @@ export async function buildSandpiperSystemPrompt(
     options.piCodingAgentPackage || options.sandpiperCodingAgentPackage
       ? `\n${piDocsBlock(options.piCodingAgentPackage, options.piCodingAgentVersion, options.sandpiperCodingAgentPackage)}`
       : '';
+  const userProfileContent = userProfileBlock(options.userProfile ?? '');
   const injectedContextContent = injectedContextBlock(originalPromptOptions);
   const skillsContent = skillsBlock(originalPromptOptions);
   const userAppended = originalPromptOptions.appendSystemPrompt;
   return `${systemPromptPersonaBlock(options)}
-${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
+${userProfileContent ? `\n${userProfileContent}` : ''}${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
 ${environmentBlock({
   currentDate: date,
   cwd: promptCwd,

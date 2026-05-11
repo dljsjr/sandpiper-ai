@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`
+- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`
 - **Supersedes**: archived April 2026 parsing-plan notes
 
 ## Current architecture
@@ -23,12 +23,13 @@ extensions/system/startup-hooks.ts
 `buildSandpiperSystemPrompt()` emits XML-style sections in order:
 
 1. `<persona>` — Sandpiper identity, operating principles, communication rules, and coding defaults.
-2. `<tools>` — tool snippets and tool guidelines derived from Pi's `systemPromptOptions`.
-3. `<harness_docs>` — Pi/Sandpiper documentation routing and path differences when package roots are available.
-4. `<skills>` — available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries.
-5. `<injected_context>` — injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
-6. `<user_appended_prompt>` — user-appended system prompt content, if present.
-7. `<environment>` — current date, current working directory, platform, and session-start VCS detection.
+2. `<user_profile>` — user-wide `USER.md` profile and working preferences, if present.
+3. `<tools>` — tool snippets and tool guidelines derived from Pi's `systemPromptOptions`.
+4. `<harness_docs>` — Pi/Sandpiper documentation routing and path differences when package roots are available.
+5. `<skills>` — available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries.
+6. `<injected_context>` — injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
+7. `<user_appended_prompt>` — user-appended system prompt content, if present.
+8. `<environment>` — current date, current working directory, platform, and session-start VCS detection.
 
 ## Startup context
 
@@ -36,6 +37,7 @@ extensions/system/startup-hooks.ts
 
 - Pi package path and version from `PI_CODING_AGENT_PACKAGE` / `PI_CODING_AGENT_VERSION`
 - Sandpiper package path from `SANDPIPER_CODING_AGENT_PACKAGE`
+- user profile content from `USER.md` in the agent directory resolved by Pi's `getAgentDir()`, when present
 - session-start VCS detection (`jj`, `git`, `hg`, `svn`, `fossil`, `perforce`, or `none`)
 
 The older one-shot startup context fields (`projectTriggers`, `activeTaskContext`, `workingCopyContext`, `coldStartGuidance`, and `standupContent`) remain in the structured options for now but are not rendered into the system prompt. Moving volatile task, standup, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
