@@ -13,6 +13,7 @@ function createDependencies(overrides: Partial<StartupPromptDependencies> = {}):
     collectActiveTaskContext: vi.fn(() => undefined),
     collectProjectTriggers: vi.fn(() => []),
     collectWorkingCopySummary: vi.fn(() => undefined),
+    detectVersionControl: vi.fn(() => ({ system: 'none' as const, detection: 'session_start' as const })),
     env: {
       PI_CODING_AGENT_PACKAGE: '/pi/package',
       PI_CODING_AGENT_VERSION: '1.2.3',
@@ -52,6 +53,11 @@ describe('startup prompt operations', () => {
     state.startupContextPending = true;
     state.coldStartGuidancePending = true;
     const dependencies = createDependencies({
+      detectVersionControl: vi.fn(() => ({
+        system: 'jj' as const,
+        colocatedGit: true,
+        detection: 'session_start' as const,
+      })),
       fileExists: vi.fn(() => true),
       runStandupRead: vi.fn(() => 'standup from cli'),
     });
@@ -71,6 +77,7 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"workingCopyContext":"<working-copy/>"');
     expect(prompt).toContain('"coldStartGuidance":"<cold-start/>"');
     expect(prompt).toContain('"standupContent":"<standup>standup from cli</standup>"');
+    expect(prompt).toContain('"versionControl":{"system":"jj","colocatedGit":true,"detection":"session_start"}');
     expect(state.startupContextPending).toBe(false);
     expect(state.coldStartGuidancePending).toBe(false);
   });

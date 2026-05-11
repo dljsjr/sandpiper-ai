@@ -13,6 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
+  "dependencies": {
+    "fast-xml-parser": "5.5.8"
+  },
   "author": {
     "name": "Doug Stephen",
     "email": "dljs.jr@dougstephenjr.com"

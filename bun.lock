@@ -103,6 +103,9 @@
     "packages/core": {
       "name": "sandpiper-ai-core",
       "version": "0.0.1",
+      "dependencies": {
+        "fast-xml-parser": "5.5.8",
+      },
     },
     "packages/resources": {
       "name": "sandpiper-resources",
