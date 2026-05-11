@@ -49,6 +49,19 @@ Avoid:
 
 Public docs can be useful to agents without sounding like agent instructions.
 
+## Portable Local Guidance
+
+Project-local agent guidance must be self-contained for anyone who clones this repository. Route only within this working directory or to portable external references; do not depend on machine-specific paths, user-specific agent installations, or another local checkout's agent guidance.
+
+Use portable references:
+
+- Relative paths inside this repository: `./AGENTS.md`, `.sandpiper/playbooks/...`, `docs/...`
+- Public URLs
+- Runtime-discovered package paths such as `$PI_CODING_AGENT_PACKAGE/docs`
+- Capability names without hard paths, such as "use the installed `jj` skill if available"
+
+If local guidance needs an external rule, copy or adapt the rule into this repository with portable links.
+
 ## AGENTS.md and Playbooks
 
 Keep `AGENTS.md` short and complete enough for always-loaded context. Put details in `.sandpiper/playbooks/` when guidance is conditional, procedural, path-specific, or long.
