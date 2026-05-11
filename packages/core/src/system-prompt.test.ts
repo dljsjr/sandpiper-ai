@@ -277,6 +277,31 @@ describe('system-prompt', () => {
         'Resolve skill-referenced scripts and files relative to the directory containing `SKILL.md`.',
       );
     });
+
+    it('uses skill for skill loading rules when the tool is active', () => {
+      const options = createPromptOptions({
+        selectedTools: ['read', 'skill'],
+        toolSnippets: {
+          read: 'Read file contents',
+          skill: 'Load a skill by exact name',
+        },
+        skills: [
+          {
+            name: 'jj',
+            description: 'Jujutsu version control',
+            filePath: '/skills/jj/SKILL.md',
+          },
+        ],
+      });
+
+      const block = skillsBlock(options)!;
+      expect(block).toContain('call `skill` with the exact skill `name` before continuing');
+      expect(block).toContain('load all relevant skills one at a time');
+      expect(block).toContain(
+        'Resolve skill-referenced scripts and files relative to the base directory returned by `skill`.',
+      );
+      expect(block).not.toContain('read its `SKILL.md` with the `read` tool');
+    });
   });
 
   describe('buildSandpiperSystemPrompt', () => {

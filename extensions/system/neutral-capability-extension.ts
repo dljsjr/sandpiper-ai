@@ -2,6 +2,7 @@ import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-a
 import { ProcessManager } from 'sandpiper-ai-core';
 import { registerBackgroundProcessContextHooks } from './background-process-hooks.js';
 import { registerBackgroundProcessTools } from './background-process-tools.js';
+import { registerSkillLoadingTool } from './skill-loading-tool.js';
 
 export interface NeutralCapabilityExtensionOptions {
   readonly processManager?: ProcessManager;
@@ -11,6 +12,7 @@ export function createNeutralCapabilityExtension(options: NeutralCapabilityExten
   const processManager = options.processManager ?? new ProcessManager();
 
   return (pi: ExtensionAPI) => {
+    registerSkillLoadingTool(pi);
     registerBackgroundProcessTools(pi, processManager);
     registerBackgroundProcessContextHooks(pi, processManager);
   };

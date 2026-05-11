@@ -30,7 +30,7 @@ describe('neutral capabilities extension entrypoint', () => {
 
     capabilitiesExtension(pi as ExtensionAPI);
 
-    expect(tools).toEqual(['start_background_process', 'check_background_process']);
+    expect(tools).toEqual(['skill', 'start_background_process', 'check_background_process']);
     expect(events).toEqual(['context', 'session_shutdown']);
   });
 });

@@ -47,7 +47,7 @@ describe('system extension factory split', () => {
 
     createNeutralCapabilityExtension()(pi as ExtensionAPI);
 
-    expect(tools).toEqual(['start_background_process', 'check_background_process']);
+    expect(tools).toEqual(['skill', 'start_background_process', 'check_background_process']);
     expect(events).toEqual(['context', 'session_shutdown']);
     expect(flags).toEqual([]);
   });

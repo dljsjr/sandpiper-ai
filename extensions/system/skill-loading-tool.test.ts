@@ -1,0 +1,211 @@
+import type { AgentToolResult, ExtensionAPI, SlashCommandInfo, ToolDefinition } from '@earendil-works/pi-coding-agent';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  executeLoadSkillTool,
+  registerSkillLoadingTool,
+  type SkillLoadingToolOperations,
+} from './skill-loading-tool.js';
+
+interface SkillToolTestDetails {
+  readonly name: string;
+  readonly path?: string;
+  readonly baseDir?: string;
+}
+
+type RegisteredTool = ToolDefinition;
+
+function createSkillCommand(name: string, filePath: string, description: string = `${name} skill`): SlashCommandInfo {
+  return {
+    name: `skill:${name}`,
+    description,
+    source: 'skill',
+    sourceInfo: {
+      path: filePath,
+      source: 'local',
+      scope: 'project',
+      origin: 'top-level',
+      baseDir: '/repo/.sandpiper/skills',
+    },
+  };
+}
+
+function createPromptCommand(name: string): SlashCommandInfo {
+  return {
+    name,
+    description: `${name} prompt`,
+    source: 'prompt',
+    sourceInfo: {
+      path: `/repo/.sandpiper/prompts/${name}.md`,
+      source: 'local',
+      scope: 'project',
+      origin: 'top-level',
+    },
+  };
+}
+
+function createToolRegistrationStub(commands: readonly SlashCommandInfo[]): {
+  readonly pi: Pick<ExtensionAPI, 'getCommands' | 'registerTool'>;
+  readonly tools: RegisteredTool[];
+} {
+  const tools: RegisteredTool[] = [];
+
+  return {
+    pi: {
+      getCommands: vi.fn(() => [...commands]) as ExtensionAPI['getCommands'],
+      registerTool: ((tool: RegisteredTool) => {
+        tools.push(tool);
+      }) as ExtensionAPI['registerTool'],
+    },
+    tools,
+  };
+}
+
+function createReadOperations(files: Readonly<Record<string, string>>): SkillLoadingToolOperations {
+  return {
+    readFile: vi.fn(async (path: string) => {
+      const content = files[path];
+      if (content === undefined) {
+        throw new Error(`ENOENT: ${path}`);
+      }
+      return content;
+    }),
+  };
+}
+
+function skillFile(description: string, body: string, extraFrontmatter: string = ''): string {
+  return `---\ndescription: ${JSON.stringify(description)}\n${extraFrontmatter}---\n${body}`;
+}
+
+async function executeRegisteredTool(
+  tool: RegisteredTool,
+  params: { readonly name: string },
+): Promise<AgentToolResult<SkillToolTestDetails>> {
+  return tool.execute(
+    'tool-call-id',
+    params,
+    undefined,
+    undefined,
+    {} as Parameters<RegisteredTool['execute']>[4],
+  ) as Promise<AgentToolResult<SkillToolTestDetails>>;
+}
+
+function resultText(result: AgentToolResult<SkillToolTestDetails>): string {
+  const firstContent = result.content[0];
+  if (!firstContent || firstContent.type !== 'text') {
+    throw new Error('Expected first tool result content block to be text');
+  }
+  return firstContent.text;
+}
+
+async function expectRejectedMessage(promise: Promise<unknown>): Promise<string> {
+  try {
+    await promise;
+  } catch (error) {
+    if (error instanceof Error) return error.message;
+    return String(error);
+  }
+
+  throw new Error('Expected promise to reject');
+}
+
+describe('registerSkillLoadingTool', () => {
+  it('registers skill with prompt guidance for model-driven skill loading', () => {
+    const { pi, tools } = createToolRegistrationStub([]);
+
+    registerSkillLoadingTool(pi);
+
+    expect(tools).toHaveLength(1);
+    expect(tools[0]).toMatchObject({
+      name: 'skill',
+      label: 'Skill',
+      promptSnippet: 'Load a skill by exact name and return its full instructions',
+    });
+    expect(tools[0]?.description).toContain('full instructions');
+    expect(tools[0]?.promptGuidelines).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Use the `skill` tool to load a matching skill'),
+        expect.stringContaining('as the only tool call'),
+      ]),
+    );
+  });
+
+  it('loads skill instructions from Pi-discovered skill commands', async () => {
+    const skillPath = '/repo/.sandpiper/skills/jj/SKILL.md';
+    const { pi, tools } = createToolRegistrationStub([
+      createPromptCommand('new-feature'),
+      createSkillCommand('jj', skillPath, 'Jujutsu version control'),
+    ]);
+    const operations = createReadOperations({
+      [skillPath]: skillFile('Jujutsu version control', '# Jujutsu\n\nUse jj, not git.'),
+    });
+
+    registerSkillLoadingTool(pi, operations);
+
+    const result = await executeRegisteredTool(tools[0]!, { name: 'jj' });
+
+    expect(result.details).toEqual({
+      name: 'jj',
+      path: skillPath,
+      baseDir: '/repo/.sandpiper/skills/jj',
+    });
+    const text = resultText(result);
+    expect(text).toContain(`<skill name="jj" location="${skillPath}">`);
+    expect(text).toContain('References are relative to /repo/.sandpiper/skills/jj.');
+    expect(text).toContain('# Jujutsu\n\nUse jj, not git.');
+    expect(text).not.toContain('description:');
+  });
+
+  it('accepts an accidental skill: prefix but still resolves by exact skill name', async () => {
+    const skillPath = '/repo/.sandpiper/skills/jj/SKILL.md';
+    const { pi } = createToolRegistrationStub([createSkillCommand('jj', skillPath)]);
+    const operations = createReadOperations({
+      [skillPath]: skillFile('Jujutsu version control', 'Use jj.'),
+    });
+
+    const result = await executeLoadSkillTool(pi, { name: 'skill:jj' }, operations);
+
+    expect(result.details).toMatchObject({ name: 'jj', path: skillPath });
+  });
+
+  it('reports unknown skills with only invocable skill names', async () => {
+    const jjPath = '/repo/.sandpiper/skills/jj/SKILL.md';
+    const hiddenPath = '/repo/.sandpiper/skills/hidden/SKILL.md';
+    const { pi } = createToolRegistrationStub([
+      createSkillCommand('jj', jjPath),
+      createSkillCommand('hidden', hiddenPath),
+    ]);
+    const operations = createReadOperations({
+      [jjPath]: skillFile('Jujutsu version control', 'Use jj.'),
+      [hiddenPath]: skillFile('Hidden skill', 'Hidden body.', 'disable-model-invocation: true\n'),
+    });
+
+    const message = await expectRejectedMessage(executeLoadSkillTool(pi, { name: 'missing' }, operations));
+
+    expect(message).toContain('Skill "missing" not found.');
+    expect(message).toContain('Available skills: jj');
+    expect(message).not.toContain('hidden');
+  });
+
+  it('rejects skills hidden from model invocation', async () => {
+    const skillPath = '/repo/.sandpiper/skills/hidden/SKILL.md';
+    const { pi } = createToolRegistrationStub([createSkillCommand('hidden', skillPath)]);
+    const operations = createReadOperations({
+      [skillPath]: skillFile('Hidden skill', 'Do not expose.', 'disable-model-invocation: true\n'),
+    });
+
+    await expect(executeLoadSkillTool(pi, { name: 'hidden' }, operations)).rejects.toThrow(
+      'disable-model-invocation is true',
+    );
+  });
+
+  it('returns a clear error when a discovered skill file cannot be read', async () => {
+    const skillPath = '/repo/.sandpiper/skills/broken/SKILL.md';
+    const { pi } = createToolRegistrationStub([createSkillCommand('broken', skillPath)]);
+    const operations = createReadOperations({});
+
+    const message = await expectRejectedMessage(executeLoadSkillTool(pi, { name: 'broken' }, operations));
+
+    expect(message).toContain('Failed to read skill "broken"');
+    expect(message).toContain(`ENOENT: ${skillPath}`);
+  });
+});
