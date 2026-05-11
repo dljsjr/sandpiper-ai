@@ -58,6 +58,7 @@ Clone a Git repo into a jj workspace.
 
 ### `jj new [REVSETS]...`
 Create a new empty change. Default parent: `@`.
+- Use for intentional empty children or merge commits, not as the second half of a normal agent commit flow. Prefer `jj commit -m "msg"` when finalizing current work and continuing.
 - `-m, --message <MSG>` — Set description
 - `--no-edit` — Don't make it the working copy
 - `-A, --insert-after <REVSETS>` — Insert after given commits, rebasing their children
@@ -84,12 +85,14 @@ Move working copy to parent revision. Default offset: 1.
 
 ### `jj describe [REVSETS]...` (alias: `desc`)
 Update change description. Default: `@`.
+- Does not advance the working copy. Use it when renaming a revision you intend to keep editing, not as the first half of a normal commit flow.
 - `-m, --message <MSG>` — Set description without opening editor
 - `--stdin` — Read description from stdin
 - `--editor` — Force editor open even with `--message`
 
 ### `jj commit [FILESETS]...` (alias: `ci`)
 Finalize working copy: equivalent to `jj describe` + `jj new`.
+- Agent default for the normal commit flow: it describes current `@` and advances to a fresh empty `@` in one command.
 - `-m, --message <MSG>` — Description for the finalized commit
 - `-i, --interactive` — Interactively choose what to include
 - `--tool <NAME>` — Diff editor for selection

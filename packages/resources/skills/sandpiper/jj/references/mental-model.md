@@ -139,15 +139,19 @@ it takes, to a set of commits.
 
 ## `jj commit` = `jj describe` + `jj new`
 
-This decomposition is worth internalizing because it reveals that no jj command is atomic magic —
-everything is a composition of primitives. The primitives:
+This decomposition is worth internalizing because it explains the effect of `jj commit`:
 
-- `jj describe -m "msg"` — set the description of `@`.
-- `jj new -m "msg"` — create a new empty commit on top of `@`, then `@` becomes the new commit.
+- `jj describe -m "msg"` sets the description of `@`.
+- `jj new` creates a new empty undescribed commit on top of `@`, then `@` becomes the new commit.
+  `jj new -m "msg"` is the variant for intentionally creating a described empty child or merge commit.
 
-`jj commit -m "msg"` is exactly these two in sequence: the current `@` gets "msg" as its
-description, then a new empty commit is created on top. The previous `@` is now `@-`. This matches
-the Git user's mental model of "finalize what I've written, start a new commit."
+For agents, the conclusion is **not** "run those two commands manually." Use
+`jj commit -m "msg"` when finalizing current work and continuing, because it describes the old
+`@` and advances to a fresh empty `@` in one command. If an agent runs only the `describe` half and
+forgets or delays `new`, later edits mutate the commit it just meant to finish.
+
+Use the primitives directly only when that is the actual goal: `jj describe -m` to rename a
+revision and keep editing it, or `jj new -m` to intentionally create an empty child or merge commit.
 
 Similarly:
 
@@ -259,13 +263,13 @@ This has several consequences:
    commit the new `@` and leaves the previous `@` as a named commit in the graph.
 
 3. **`@` is ephemeral in a particular sense.** It is a real commit, but it is special in that most
-   agents treat it as scratch space. The convention is: give the "real" work a description (either
-   on `@` or on `@-` via the squash workflow), keep `@` as the growing tip of scratch.
+   agents treat it as scratch space. The convention is: when the current work is ready to become a
+   real named change, use `jj commit -m "msg"` so `@` advances to a fresh scratch commit.
 
 4. **Restructuring can orphan `@`.** If a `rebase`, `abandon`, or `edit` reshapes the graph such
    that the previous `@` is no longer reachable through bookmarks or heads, its content is not
    lost (the op log retains it), but it is no longer visible in the default log. Agents should
-   commit or name the `@` state before restructuring ancestors.
+   use `jj commit -m "wip: ..."` or another explicit checkpoint before restructuring ancestors.
 
 ---
 
@@ -275,9 +279,9 @@ For Git-native users, a quick-reference table of operations:
 
 | Git | jj | Notes |
 |---|---|---|
-| `git commit -m "msg"` | `jj commit -m "msg"` | Also: `jj describe -m "msg"` to set `@`'s message without creating a new commit on top |
+| `git commit -m "msg"` | `jj commit -m "msg"` | Agent default when finalizing current work and continuing |
 | `git add -p` | `jj squash --from ... --into ... <paths>` or `jj split -m "msg" <paths>` | Works on any commit, not only the tip |
-| `git stash` | `jj new -m "wip"` | Previous work is already a commit; `jj edit <change-id>` to return |
+| `git stash` | `jj commit -m "wip: ..."` | Saves current `@` and advances to a fresh empty `@`; `jj edit <change-id>` to return |
 | `git reset --hard HEAD~1` | `jj abandon @` | Or `jj undo` if the last op was what created it |
 | `git rebase -i` | `jj rebase`, `jj squash`, `jj split` | No interactive TODO list — operate on the graph directly |
 | `git checkout <commit>` | `jj edit <change-id>` | Puts you *in* that commit to modify; `jj new <change-id>` for a fresh commit on top |

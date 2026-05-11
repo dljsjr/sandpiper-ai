@@ -142,7 +142,7 @@ jj squash --from @ --into <target-1> -m "fix: ..." path/to/foo.ts
 jj squash --from @ --into <target-2> -m "fix: ..." path/to/bar.ts
 
 # Step 4: changes that belong in a new commit stay in @
-jj describe -m "feat: new thing"
+jj commit -m "feat: new thing"
 ```
 
 ---

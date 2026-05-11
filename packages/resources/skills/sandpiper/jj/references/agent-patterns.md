@@ -42,6 +42,17 @@ is harder. jj's model permits more planning after, which maps better to how agen
 
 Commands with similar effects appear in several places. Decision rules:
 
+### Finalizing current work
+
+Use `jj commit -m "msg"` when the current working-copy commit should become a named change and
+you want to continue in a fresh empty `@`. This is the agent-safe spelling of the normal commit
+flow because the describe-and-advance sequence happens in one command.
+
+Avoid doing `jj describe -m "msg"` and then `jj new` as two separate steps for normal commits. If
+the second command is forgotten or delayed, subsequent file edits modify the just-described commit.
+Use `jj describe -m` only when the goal is to rename an existing revision and keep editing it; use
+`jj new -m` when the goal is to intentionally create an empty child or merge commit.
+
 ### Moving changes into an existing commit
 
 - **`jj squash`** — move `@` changes into `@-`. The default, lowest-cost option.
