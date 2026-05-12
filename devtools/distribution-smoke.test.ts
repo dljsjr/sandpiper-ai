@@ -87,6 +87,7 @@ describe('Pi package distribution smoke', () => {
         pi: SANDPIPER_DIST_PI_RESOURCES,
         license: rootPackageJson.license,
         files: [
+          'chunks/',
           'config/',
           'extensions/',
           'dist/',

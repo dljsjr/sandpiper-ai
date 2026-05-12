@@ -76,6 +76,13 @@ describe('standalone Sandpiper CLI smoke', () => {
     expect(cliPackage.scripts).not.toHaveProperty('preinstall');
     expect(cliPackage.scripts?.build).toContain('build:sandpiper');
     expect(cliPackage.scripts?.build).toContain('build:standalone');
+    expect(cliPackage.scripts?.['build:sandpiper']).toContain("--external '@earendil-works/*'");
+    expect(cliPackage.scripts?.['build:sandpiper']).toContain("--external '@mariozechner/*'");
+    expect(cliPackage.scripts?.['build:sandpiper']).toContain('--splitting');
+    expect(cliPackage.scripts?.['build:sandpiper']).toContain('--entry-naming sandpiper');
+    expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@earendil-works/*'");
+    expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@mariozechner/*'");
+    expect(cliPackage.scripts?.['build:standalone']).toContain('--splitting');
   });
 
   it('runs the normal sandpiper bin through the standalone runtime', () => {
@@ -91,6 +98,39 @@ describe('standalone Sandpiper CLI smoke', () => {
 
       expect(output).toContain('--migrate-pi-configs');
       expect(output).toContain('--install-shell-integrations');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  }, 15_000);
+
+  it('loads a user extension with a runtime Pi import through the built sandpiper bin', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-runtime-import-smoke-'));
+    const extensionPath = join(tempDir, 'runtime-import-extension.ts');
+
+    try {
+      writeFileSync(
+        extensionPath,
+        `import { getMarkdownTheme } from '@earendil-works/pi-coding-agent';
+
+export default function runtimeImportProbe(pi) {
+  getMarkdownTheme();
+  pi.registerFlag('runtime-import-probe', {
+    description: 'Marker flag registered after a runtime Pi import',
+    type: 'boolean',
+    default: false,
+  });
+}
+`,
+      );
+
+      const output = runSandpiperBin(
+        ['--help', '-e', extensionPath, '--no-skills', '--no-prompt-templates', '--no-themes', '--no-context-files'],
+        standaloneEnv({
+          SANDPIPER_CODING_AGENT_DIR: join(tempDir, 'agent'),
+        }),
+      );
+
+      expect(output).toContain('--runtime-import-probe');
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

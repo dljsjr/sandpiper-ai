@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:standalone",
-    "build:sandpiper": "mkdir -p dist && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outfile ./dist/sandpiper && chmod +x ./dist/sandpiper",
-    "build:standalone": "mkdir -p dist/standalone && bun build --production --minify --target=bun --external canvas --external css-tree ./sandpiper_standalone.ts --outdir ./dist/standalone"
+    "build:sandpiper": "rm -rf dist/sandpiper dist/chunks && mkdir -p dist && bun build --production --minify --target=bun --splitting --entry-naming sandpiper --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts --outdir ./dist && chmod +x ./dist/sandpiper",
+    "build:standalone": "rm -rf dist/standalone && mkdir -p dist/standalone && bun build --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts --outdir ./dist/standalone"
   }
 }

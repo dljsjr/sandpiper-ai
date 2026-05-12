@@ -73,8 +73,9 @@ configurePiEnvironment(
 mirrorPiSandpiperEnvironment(process.env);
 console.log(`using pi-coding-agent version: ${piMetadata.version}\n`);
 
-const { main } = await import('./deferred_pi_import.js');
+const { loadPiMain } = await import('./deferred_pi_import.js');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
+const main = await loadPiMain();
 
 const extensionFactories =
   standalonePaths.packageDirSource !== 'app-bundle' &&

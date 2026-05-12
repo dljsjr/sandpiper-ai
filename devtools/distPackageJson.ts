@@ -46,6 +46,7 @@ export interface DistPackageJson {
   readonly pi: PiResourceJson;
   readonly license?: string;
   readonly files: readonly [
+    'chunks/',
     'config/',
     'extensions/',
     'dist/',
@@ -82,6 +83,7 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
     pi: SANDPIPER_DIST_PI_RESOURCES,
     license: rootPackageJson.license,
     files: [
+      'chunks/',
       'config/',
       'extensions/',
       'dist/',
