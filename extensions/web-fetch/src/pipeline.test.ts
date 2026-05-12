@@ -1,7 +1,52 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { SimpleFetchAdapter } from './fetch.js';
+import { clearLlmsTxtProbeCache } from './llms-txt.js';
 import { fetchAndExtract } from './pipeline.js';
+import { WebFetchFilterType } from './types.js';
+
+const TARGETED_PAGE = `
+<html>
+<head><title>Target Test</title><meta name="description" content="Targeted extraction fixture"></head>
+<body>
+  <main>
+    <section class="intro"><h2>Intro</h2><p>Intro content should be ignored.</p></section>
+    <section id="api">
+      <h2>API</h2>
+      <p>Only API content should be returned.</p>
+      <a href="/api/ref">API Reference</a>
+    </section>
+    <section class="appendix"><h2>Appendix</h2><p>Ignored appendix content.</p></section>
+  </main>
+</body>
+</html>
+`;
+
+const SECTION_PAGE = `
+<html>
+<head><title>Section Test</title><meta name="author" content="Section Author"></head>
+<body>
+  <article>
+    <h1>Section Test Article</h1>
+    <p>Opening material should be ignored by a markdown section filter. This paragraph gives
+    readability enough content to treat the document as an article-like page.</p>
+    <h2>Overview</h2>
+    <p>Overview content should be ignored when selecting configuration.</p>
+    <p>See the <a href="/overview">overview guide</a>.</p>
+    <h2>Configuration</h2>
+    <p>Configuration content should be returned by the section filter.</p>
+    <p>See the <a href="/config/reference">configuration reference</a> for details.</p>
+    <h3>Advanced Configuration</h3>
+    <p>Nested advanced configuration content should stay inside the selected section.</p>
+    <h2><a href="#turbo-query"><code>turbo query</code> is now stable</a></h2>
+    <p>Linked heading content should be selectable using plain heading text.</p>
+    <h2>Reference</h2>
+    <p>Reference content should not be returned by the section filter.</p>
+    <p>See the <a href="/reference">reference guide</a>.</p>
+  </article>
+</body>
+</html>
+`;
 
 const ARTICLE_PAGE = `
 <html>
@@ -33,9 +78,27 @@ let baseUrl: string;
 function handler(req: IncomingMessage, res: ServerResponse) {
   const url = req.url ?? '/';
 
+  if (url === '/llms.txt') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (url === '/article') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(ARTICLE_PAGE);
+    return;
+  }
+
+  if (url === '/targeted') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(TARGETED_PAGE);
+    return;
+  }
+
+  if (url === '/sections') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(SECTION_PAGE);
     return;
   }
 
@@ -72,6 +135,10 @@ afterAll(async () => {
   });
 });
 
+beforeEach(() => {
+  clearLlmsTxtProbeCache();
+});
+
 describe('fetchAndExtract (end-to-end)', () => {
   const adapter = new SimpleFetchAdapter();
 
@@ -92,12 +159,106 @@ describe('fetchAndExtract (end-to-end)', () => {
     expect(result.content).not.toContain('Footer content');
   });
 
+  it('should include llms.txt probe metadata', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/article`);
+
+    expect(result.llmsTxt).toMatchObject({
+      checked: true,
+      exists: true,
+      status: 'found',
+      statusCode: 204,
+      url: `${baseUrl}/llms.txt`,
+    });
+  });
+
   it('should extract links when followLinks is true', async () => {
     const result = await fetchAndExtract(adapter, `${baseUrl}/article`, { followLinks: true });
     expect(result.links).toBeDefined();
     expect(result.links?.length).toBeGreaterThan(0);
     const docLink = result.links?.find((l) => l.href.includes('example.com/docs'));
     expect(docLink).toBeDefined();
+  });
+
+  it('should apply a CSS selector filter before markdown conversion', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/targeted`, {
+      filter: { type: WebFetchFilterType.CssSelector, selector: '#api' },
+    });
+
+    expect(result.title).toBe('Target Test');
+    expect(result.content).toContain('Only API content should be returned.');
+    expect(result.content).not.toContain('Intro content should be ignored.');
+    expect(result.content).not.toContain('Ignored appendix content.');
+    expect(result.filter).toEqual({ type: WebFetchFilterType.CssSelector, matched: true, matchCount: 1 });
+  });
+
+  it('should extract links from the selected CSS fragment when followLinks is true', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/targeted`, {
+      followLinks: true,
+      filter: { type: WebFetchFilterType.CssSelector, selector: '#api' },
+    });
+
+    expect(result.links).toEqual([{ text: 'API Reference', href: '/api/ref' }]);
+  });
+
+  it('should return a non-fatal message when a CSS selector matches nothing', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/targeted`, {
+      filter: { type: WebFetchFilterType.CssSelector, selector: '.missing' },
+    });
+
+    expect(result.content).toBe('No content matched CSS selector: .missing');
+    expect(result.filter).toEqual({ type: WebFetchFilterType.CssSelector, matched: false, matchCount: 0 });
+  });
+
+  it('should return a non-fatal message when a CSS selector is invalid', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/targeted`, {
+      filter: { type: WebFetchFilterType.CssSelector, selector: '[' },
+    });
+
+    expect(result.content).toContain('CSS selector filter failed:');
+    expect(result.filter).toMatchObject({ type: WebFetchFilterType.CssSelector, matched: false, matchCount: 0 });
+    expect(result.filter?.error).toBeDefined();
+  });
+
+  it('should apply a Markdown section filter after markdown conversion', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/sections`, {
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: 'Configuration' },
+    });
+
+    expect(result.title).toBe('Section Test');
+    expect(result.content).toContain('## Configuration');
+    expect(result.content).toContain('Configuration content should be returned by the section filter.');
+    expect(result.content).toContain('Nested advanced configuration content should stay inside the selected section.');
+    expect(result.content).not.toContain('Overview content should be ignored');
+    expect(result.content).not.toContain('Reference content should not be returned');
+    expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: true, matchCount: 1 });
+  });
+
+  it('should extract links from the selected Markdown section when followLinks is true', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/sections`, {
+      followLinks: true,
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: 'Configuration' },
+    });
+
+    expect(result.links).toEqual([{ text: 'configuration reference', href: `${baseUrl}/config/reference` }]);
+  });
+
+  it('should match Markdown section headings after stripping link and code markup', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/sections`, {
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: 'turbo query is now stable' },
+    });
+
+    expect(result.content).toContain('Linked heading content should be selectable using plain heading text.');
+    expect(result.content).not.toContain('Configuration content should be returned');
+    expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: true, matchCount: 1 });
+  });
+
+  it('should return a non-fatal message when a Markdown section matches nothing', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/sections`, {
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: 'Missing Section' },
+    });
+
+    expect(result.content).toBe('No content matched Markdown section: Missing Section');
+    expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: false, matchCount: 0 });
   });
 
   it('should not include links when followLinks is false/undefined', async () => {

@@ -1,9 +1,16 @@
 import { fetchAndExtract as defaultFetchAndExtract } from './pipeline.js';
-import type { FetchAdapter, WebFetchResult } from './types.js';
+import type {
+  FetchAdapter,
+  LlmsTxtProbeResult,
+  WebFetchFilterDetails,
+  WebFetchFilterSpec,
+  WebFetchResult,
+} from './types.js';
 
 export interface WebFetchToolInput {
   readonly url: string;
   readonly followLinks?: boolean;
+  readonly filter?: WebFetchFilterSpec;
 }
 
 // Mirrors Pi's text content item shape without importing Pi SDK types into the operation layer.
@@ -12,9 +19,17 @@ interface TextContent {
   readonly text: string;
 }
 
+export interface WebFetchToolDetails extends Record<string, unknown> {
+  readonly url: string;
+  readonly title?: string;
+  readonly llmsTxt?: LlmsTxtProbeResult;
+  readonly filter?: WebFetchFilterDetails;
+  readonly error?: string;
+}
+
 export interface WebFetchToolResult {
   readonly content: TextContent[];
-  readonly details: Record<string, unknown>;
+  readonly details: WebFetchToolDetails;
 }
 
 export interface WebFetchToolDependencies {
@@ -50,11 +65,16 @@ export async function executeWebFetchTool(
   const fetchAndExtract = dependencies.fetchAndExtract ?? defaultFetchAndExtract;
 
   try {
-    const result = await fetchAndExtract(adapter, input.url, { followLinks: input.followLinks });
+    const result = await fetchAndExtract(adapter, input.url, { filter: input.filter, followLinks: input.followLinks });
 
     return {
       content: [{ type: 'text', text: formatWebFetchResult(result) }],
-      details: { url: result.url, title: result.title },
+      details: {
+        url: result.url,
+        title: result.title,
+        ...(result.llmsTxt === undefined ? {} : { llmsTxt: result.llmsTxt }),
+        ...(result.filter === undefined ? {} : { filter: result.filter }),
+      },
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
