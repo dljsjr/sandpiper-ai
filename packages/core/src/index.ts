@@ -11,6 +11,7 @@ export * from './session-continuity.js';
 export * from './startup-context.js';
 export * from './startup-prompt.js';
 export * from './system-diagnostics.js';
+export * from './system-notification.js';
 export * from './system-prompt.js';
 export * from './system-startup.js';
 export * from './update-check.js';
