@@ -5,6 +5,7 @@ import shellRelayPackageJson from '../extensions/shell-relay/package.json' with 
 import systemPackageJson from '../extensions/system/package.json' with { type: 'json' };
 import webFetchPackageJson from '../extensions/web-fetch/package.json' with { type: 'json' };
 import autotoonPackageJson from '../packages/capability-autotoon/package.json' with { type: 'json' };
+import cliPackageJson from '../packages/cli/package.json' with { type: 'json' };
 
 export interface PiConfigJson {
   readonly name: string;
@@ -89,6 +90,7 @@ export function createPiPeerDependencies(rootPackageJson: RootPackageJson): Reco
 
 export function createPiRuntimeDependencies(): Record<string, string> {
   return {
+    '@earendil-works/pi-coding-agent': packageDependencyVersion(cliPackageJson, '@earendil-works/pi-coding-agent'),
     '@mozilla/readability': packageDependencyVersion(webFetchPackageJson, '@mozilla/readability'),
     '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
     jsdom: packageDependencyVersion(webFetchPackageJson, 'jsdom'),

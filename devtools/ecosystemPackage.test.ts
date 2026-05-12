@@ -108,6 +108,7 @@ describe('ecosystem package artifacts', () => {
     });
     expect(packageJson.peerDependencies).toMatchObject(rootPackageJson.peerDependencies ?? {});
     expect(packageJson.files).toEqual([
+      'chunks/',
       'config/',
       'extensions/',
       'dist/',
@@ -134,6 +135,9 @@ describe('ecosystem package artifacts', () => {
       expect.arrayContaining([
         'package.json',
         'sandpiper',
+        expect.stringMatching(/^chunks\/sandpiper_resources-.*\.js$/),
+        expect.stringMatching(/^chunks\/sandpiper_standalone-.*\.js$/),
+        expect.stringMatching(/^chunks\/deferred_pi_import-.*\.js$/),
         'sandpiper-tasks',
         'trail',
         'README.md',
