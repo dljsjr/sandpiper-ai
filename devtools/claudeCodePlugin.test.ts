@@ -133,10 +133,12 @@ describe('Claude Code plugin mapping', () => {
       }
 
       for (const relativePath of [
+        'skills/sandpiper/tasks/scripts/trail',
         'skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'skills/sandpiper/standup/scripts/sandpiper-standup',
         'skills/sandpiper/dash/scripts/dash',
         'skills/sandpiper/dash/scripts/dash.cjs',
+        'bin/trail',
         'bin/sandpiper-tasks',
         'bin/sandpiper-standup',
         'bin/dash',

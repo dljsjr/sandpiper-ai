@@ -34,7 +34,7 @@ ast-grep scan --rule ast-grep/queries/find-pi-imports.yml extensions/
 ast-grep scan --rule ast-grep/queries/find-test-assertions.yml extensions/ 2>&1 | grep -c "┌─"
 
 # Find all error throw sites
-ast-grep scan --rule ast-grep/queries/find-error-throws.yml packages/sandpiper-tasks-cli/
+ast-grep scan --rule ast-grep/queries/find-error-throws.yml packages/trail/
 
 # Find all async functions
 ast-grep scan --rule ast-grep/queries/find-async-functions.yml extensions/shell-relay/

@@ -141,8 +141,13 @@ function createClaudeRepositoryUrl(rootPackageJson: RootPackageJson): string | u
 
 const GENERATED_EXECUTABLE_COPY_ENTRIES: readonly ExecutableCopyEntry[] = [
   {
-    from: 'dist/packages/sandpiper-tasks-cli/sandpiper-tasks',
-    to: ['skills/sandpiper/tasks/scripts/sandpiper-tasks', 'bin/sandpiper-tasks'],
+    from: 'dist/packages/trail/trail',
+    to: [
+      'skills/sandpiper/tasks/scripts/trail',
+      'skills/sandpiper/tasks/scripts/sandpiper-tasks',
+      'bin/trail',
+      'bin/sandpiper-tasks',
+    ],
   },
   {
     from: 'dist/packages/sandpiper-standup-cli/sandpiper-standup',

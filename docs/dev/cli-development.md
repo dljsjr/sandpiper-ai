@@ -4,7 +4,7 @@ Guidelines for building command-line tools in the Sandpiper repository.
 
 ## Overview
 
-This document describes architectural patterns and best practices for building CLI tools with Commander.js. These guidelines apply to all CLI packages in the repository, including `packages/cli/` and `packages/sandpiper-tasks-cli/`.
+This document describes architectural patterns and best practices for building CLI tools with Commander.js. These guidelines apply to all CLI packages in the repository, including `packages/cli/` and the Trail CLI in `packages/trail/`.
 
 ## Core Principle: Separation of Concerns
 
@@ -129,7 +129,7 @@ import { execSync } from "node:child_process";
 
 describe("CLI", () => {
   it("parses arguments correctly", () => {
-    const output = execSync("bun sandpiper-tasks create --help", {
+    const output = execSync("trail task create --help", {
       encoding: "utf8",
     });
     expect(output).toContain("Create a new task");
@@ -137,7 +137,7 @@ describe("CLI", () => {
 
   it("handles invalid arguments", () => {
     expect(() => {
-      execSync("bun sandpiper-tasks create --invalid-flag", {
+      execSync("trail task create --invalid-flag", {
         encoding: "utf8",
       });
     }).toThrow();
@@ -221,8 +221,8 @@ Bun is the preferred runtime for CLI development:
 | ----------------------------------------------------------- | --------------------------------------- |
 | `packages/cli/sandpiper_standalone.ts`                      | CLI entry point for Sandpiper           |
 | `packages/cli/package.json`                                 | Package metadata with bin configuration |
-| `packages/sandpiper-tasks-cli/src/commands/project-cmd.ts`  | Commander command wiring                |
-| `packages/sandpiper-tasks-cli/src/core/project-metadata.ts` | Core implementation logic               |
+| `packages/trail/src/commands/project-cmd.ts`  | Commander command wiring                |
+| `packages/trail/src/core/project-metadata.ts` | Core implementation logic               |
 
 ## Related Documentation
 

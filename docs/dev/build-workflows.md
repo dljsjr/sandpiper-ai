@@ -12,7 +12,7 @@ For the build pipeline and generated artifact layout, see [Build system referenc
 | Skills, prompts, themes, or other resources under `packages/resources/` | `bun run prepare:distribution`                                                                   |
 | `packages/core/`                                                        | `bun run prepare:distribution`                                                                   |
 | `packages/cli/`                                                         | `bun run prepare:distribution`                                                                   |
-| `packages/sandpiper-tasks-cli/`                                         | `bun run prepare:distribution`                                                                   |
+| `packages/trail/` (`@sandpiper-ai/trail`)                 | `bun run prepare:distribution`                                                                   |
 | `packages/sandpiper-standup-cli/`                                       | `bun run prepare:distribution`                                                                   |
 | `packages/adapter-claude-code/`                                         | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin`            |
 | Build system or package metadata                                        | `bun run prepare:distribution`, targeted tests, and the distribution gate before claiming health |

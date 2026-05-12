@@ -5,10 +5,10 @@
     "": {
       "name": "sandpiper-ai",
       "dependencies": {
+        "@sandpiper-ai/trail": "workspace:*",
         "sandpiper-ai-cli": "workspace:*",
         "sandpiper-ai-core": "workspace:*",
         "sandpiper-standup-cli": "workspace:*",
-        "sandpiper-tasks-cli": "workspace:*",
       },
       "devDependencies": {
         "@biomejs/biome": "2.4.15",
@@ -59,6 +59,7 @@
       "dependencies": {
         "@mozilla/readability": "0.6.0",
         "jsdom": "29.1.1",
+        "sandpiper-ai-core": "0.0.1",
         "turndown": "7.2.4",
       },
       "devDependencies": {
@@ -67,6 +68,7 @@
       },
       "peerDependencies": {
         "@earendil-works/pi-coding-agent": "0.74.0",
+        "@earendil-works/pi-tui": "0.74.0",
         "@sinclair/typebox": "0.34.49",
       },
     },
@@ -123,11 +125,11 @@
         "sandpiper-ai-core": "0.0.1",
       },
     },
-    "packages/sandpiper-tasks-cli": {
-      "name": "sandpiper-tasks-cli",
+    "packages/trail": {
+      "name": "@sandpiper-ai/trail",
       "version": "0.0.1",
       "bin": {
-        "sandpiper-tasks": "./dist/sandpiper-tasks",
+        "trail": "./dist/trail",
       },
       "dependencies": {
         "@commander-js/extra-typings": "14.0.0",
@@ -513,6 +515,8 @@
     "@rolldown/binding-win32-x64-msvc": ["@rolldown/binding-win32-x64-msvc@1.0.0-rc.18", "", { "os": "win32", "cpu": "x64" }, "sha512-7H+3yqGgmnlDTRRhw/xpYY9J1kf4GC681nVc4GqKhExZTDrVVrV2tsOR9kso0fvgBdcTCcQShx4SLLoHgaLwhg=="],
 
     "@rolldown/pluginutils": ["@rolldown/pluginutils@1.0.0-rc.18", "", {}, "sha512-CUY5Mnhe64xQBGZEEXQ5WyZwsc1JU3vAZLIxtrsBt3LO6UOb+C8GunVKqe9sT8NeWb4lqSaoJtp2xo6GxT1MNw=="],
+
+    "@sandpiper-ai/trail": ["@sandpiper-ai/trail@workspace:packages/trail"],
 
     "@silvia-odwyer/photon-node": ["@silvia-odwyer/photon-node@0.3.4", "", {}, "sha512-bnly4BKB3KDTFxrUIcgCLbaeVVS8lrAkri1pEzskpmxu9MdfGQTy8b8EgcD83ywD3RPMsIulY8xJH5Awa+t9fA=="],
 
@@ -1165,8 +1169,6 @@
     "sandpiper-standup-cli": ["sandpiper-standup-cli@workspace:packages/sandpiper-standup-cli"],
 
     "sandpiper-system": ["sandpiper-system@workspace:extensions/system"],
-
-    "sandpiper-tasks-cli": ["sandpiper-tasks-cli@workspace:packages/sandpiper-tasks-cli"],
 
     "saxes": ["saxes@6.0.0", "", { "dependencies": { "xmlchars": "^2.2.0" } }, "sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA=="],
 

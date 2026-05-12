@@ -10,7 +10,7 @@ Workspace packages — built, tested, and distributed as part of sandpiper.
 | [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON neutral transform and Pi adapter |
 | [`adapter-claude-code/`](adapter-claude-code/) | Claude Code hooks/adapters over neutral Sandpiper capabilities |
 | [`resources/`](resources/) | Shared skills, prompts, and themes |
-| [`sandpiper-tasks-cli/`](sandpiper-tasks-cli/) | Task management CLI (markdown + YAML frontmatter) |
+| [`trail/`](trail/) | Trail task management CLI (markdown + YAML frontmatter) |
 | [`core/`](core/) | Shared core utilities |
 
 ## Build

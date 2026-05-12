@@ -29,7 +29,7 @@ Read this before changing build scripts, package metadata, distribution assembly
 | Skills, prompts, themes, or other shared resources               | `bun run prepare:distribution`                                                                                 |
 | `packages/core/`                                                 | `bun run prepare:distribution`                                                                                 |
 | `packages/cli/`                                                  | `bun run prepare:distribution`                                                                                 |
-| `packages/sandpiper-tasks-cli/`                                  | `bun run prepare:distribution`                                                                                 |
+| `packages/trail/` (`@sandpiper-ai/trail`)          | `bun run prepare:distribution`                                                                                 |
 | `packages/sandpiper-standup-cli/`                                | `bun run prepare:distribution`                                                                                 |
 | `packages/adapter-claude-code/`                                  | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin`                          |
 | Build system or package metadata                                 | `bun run prepare:distribution` and targeted tests; use `test:distribution` before claiming distribution health |

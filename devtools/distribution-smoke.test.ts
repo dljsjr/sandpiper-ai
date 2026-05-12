@@ -94,11 +94,13 @@ describe('Pi package distribution smoke', () => {
           'prompts/',
           'docs/',
           'sandpiper',
+          'sandpiper-tasks',
+          'trail',
           'README.md',
           'skills/',
           'themes/',
         ],
-        bin: { sandpiper: './sandpiper' },
+        bin: { sandpiper: './sandpiper', 'sandpiper-tasks': './sandpiper-tasks', trail: './trail' },
       });
       expect(findMissingPiManifestPaths(packageRoot, distPackageJson)).toEqual([]);
     } finally {
@@ -106,8 +108,40 @@ describe('Pi package distribution smoke', () => {
     }
   });
 
+  it('generates Trail and sandpiper-tasks compatibility task helpers', () => {
+    const taskScriptsDir = join(repoRoot, 'dist', 'skills', 'sandpiper', 'tasks', 'scripts');
+    const trailBin = join(taskScriptsDir, 'trail');
+    const sandpiperTasksBin = join(taskScriptsDir, 'sandpiper-tasks');
+
+    expect(execFileSync(trailBin, ['--help'], { encoding: 'utf-8' })).toContain('Usage: trail');
+    expect(execFileSync(sandpiperTasksBin, ['--help'], { encoding: 'utf-8' })).toContain('Usage: sandpiper-tasks');
+    expect(execFileSync(join(repoRoot, 'dist', 'trail'), ['--help'], { encoding: 'utf-8' })).toContain('Usage: trail');
+    expect(execFileSync(join(repoRoot, 'dist', 'sandpiper-tasks'), ['--help'], { encoding: 'utf-8' })).toContain(
+      'Usage: sandpiper-tasks',
+    );
+  });
+
   it('generates a Node-compatible Dash CLI wrapper and CommonJS sidecar', () => {
     const dashScriptsDir = join(repoRoot, 'dist', 'skills', 'sandpiper', 'dash', 'scripts');
+    const dashBin = join(dashScriptsDir, 'dash');
+    const dashSidecar = join(dashScriptsDir, 'dash.cjs');
+
+    expect(readFileSync(dashBin, 'utf-8')).toBe("#!/usr/bin/env node\nimport './dash.cjs';\n");
+    expect(readFileSync(dashSidecar, 'utf-8')).toContain('require(');
+    expect(execFileSync(dashBin, ['--help'], { encoding: 'utf-8' })).toContain('Usage:');
+  });
+
+  it('refreshes the source-local task skill helpers', () => {
+    const taskScriptsDir = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'scripts');
+
+    expect(execFileSync(join(taskScriptsDir, 'trail'), ['--help'], { encoding: 'utf-8' })).toContain('Usage: trail');
+    expect(execFileSync(join(taskScriptsDir, 'sandpiper-tasks'), ['--help'], { encoding: 'utf-8' })).toContain(
+      'Usage: sandpiper-tasks',
+    );
+  });
+
+  it('refreshes the source-local Dash skill helper wrapper and sidecar', () => {
+    const dashScriptsDir = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'dash', 'scripts');
     const dashBin = join(dashScriptsDir, 'dash');
     const dashSidecar = join(dashScriptsDir, 'dash.cjs');
 

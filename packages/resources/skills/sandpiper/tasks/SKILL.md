@@ -25,7 +25,7 @@ Project routing triggers (`whenToRead` fields) are **automatically injected into
 If you need the full project list with task counts (e.g., to assess project health or find the right key), run:
 
 ```bash
-scripts/sandpiper-tasks project list
+scripts/trail project list
 ```
 
 Projects with no `PROJECT.md` will appear with empty `whenToRead`. If you create a new project, you MUST provide `--name`, `--description`, and `--when-to-read`.
@@ -60,13 +60,15 @@ Bugs found while working on a task are their own top-level work items, not subta
 
 ## CLI Tool
 
-The `sandpiper-tasks` CLI is the primary interface for task operations. It is bundled at `scripts/sandpiper-tasks` relative to this skill's directory. **Resolve this path against the skill directory to get the absolute path before running commands.**
+The `trail` CLI is the primary interface for task operations. It is bundled at `scripts/trail` relative to this skill's directory. **Resolve this path against the skill directory to get the absolute path before running commands.**
+
+Sandpiper also bundles `scripts/sandpiper-tasks` as a compatibility entrypoint during the Trail migration. Prefer `scripts/trail` for new examples and workflows.
 
 ```bash
-scripts/sandpiper-tasks <command>
+scripts/trail <command>
 
 # Or with explicit directory:
-scripts/sandpiper-tasks --dir /path/to/project <command>
+scripts/trail --dir /path/to/project <command>
 ```
 
 ### Global Options
@@ -82,48 +84,48 @@ scripts/sandpiper-tasks --dir /path/to/project <command>
 ### Create a task
 
 ```bash
-scripts/sandpiper-tasks task create -p SHR -t "Implement feature X" --priority HIGH --reporter USER
-scripts/sandpiper-tasks task create -p SHR -t "Fix the bug" -k BUG --priority HIGH --reporter AGENT
-scripts/sandpiper-tasks task create -p SHR -t "Write tests" -k SUBTASK --parent SHR-1 --reporter AGENT
+scripts/trail task create -p SHR -t "Implement feature X" --priority HIGH --reporter USER
+scripts/trail task create -p SHR -t "Fix the bug" -k BUG --priority HIGH --reporter AGENT
+scripts/trail task create -p SHR -t "Write tests" -k SUBTASK --parent SHR-1 --reporter AGENT
 ```
 
 ### Pick up a task (assign to AGENT, set IN PROGRESS)
 
 ```bash
-scripts/sandpiper-tasks task pickup SHR-1
-scripts/sandpiper-tasks task pickup -p SHR --filter-status NOT_STARTED    # bulk
+scripts/trail task pickup SHR-1
+scripts/trail task pickup -p SHR --filter-status NOT_STARTED    # bulk
 ```
 
 ### Complete a task
 
 ```bash
-scripts/sandpiper-tasks task complete SHR-1                              # → NEEDS REVIEW
-scripts/sandpiper-tasks task complete SHR-1 --final --resolution DONE    # → COMPLETE
-scripts/sandpiper-tasks task complete SHR-1 --final --resolution WONTFIX # → COMPLETE (won't fix)
+scripts/trail task complete SHR-1                              # → NEEDS REVIEW
+scripts/trail task complete SHR-1 --final --resolution DONE    # → COMPLETE
+scripts/trail task complete SHR-1 --final --resolution WONTFIX # → COMPLETE (won't fix)
 ```
 
 ### Update task fields
 
 ```bash
-scripts/sandpiper-tasks task update SHR-1 --status IN_PROGRESS --assignee AGENT
-scripts/sandpiper-tasks task update SHR-1 --priority LOW
-scripts/sandpiper-tasks task update SHR-1 -t "New title"                 # rename
-scripts/sandpiper-tasks task update SHR-1 --desc "New description text"  # set description
-scripts/sandpiper-tasks task update SHR-1 --depends-on SHR-2,SHR-3       # set dependencies
-scripts/sandpiper-tasks task update SHR-1 --related ""                   # clear relationships
-scripts/sandpiper-tasks task update SHR-1 -i                             # open in $EDITOR
-scripts/sandpiper-tasks task update SHR-1 -i --status IN_PROGRESS        # pre-apply fields, then edit
-scripts/sandpiper-tasks task update -p SHR --filter-status IN_PROGRESS --assignee USER  # bulk
+scripts/trail task update SHR-1 --status IN_PROGRESS --assignee AGENT
+scripts/trail task update SHR-1 --priority LOW
+scripts/trail task update SHR-1 -t "New title"                 # rename
+scripts/trail task update SHR-1 --desc "New description text"  # set description
+scripts/trail task update SHR-1 --depends-on SHR-2,SHR-3       # set dependencies
+scripts/trail task update SHR-1 --related ""                   # clear relationships
+scripts/trail task update SHR-1 -i                             # open in $EDITOR
+scripts/trail task update SHR-1 -i --status IN_PROGRESS        # pre-apply fields, then edit
+scripts/trail task update -p SHR --filter-status IN_PROGRESS --assignee USER  # bulk
 ```
 
 ### Move tasks
 
 ```bash
-scripts/sandpiper-tasks task move SHR-1 -k BUG                           # convert TASK → BUG
-scripts/sandpiper-tasks task move SHR-3 -k TASK                           # promote SUBTASK → TASK
-scripts/sandpiper-tasks task move SHR-5 -k SUBTASK --parent SHR-1         # demote to subtask
-scripts/sandpiper-tasks task move SHR-1 -p CLI                            # move to CLI project (re-keys)
-scripts/sandpiper-tasks task move SHR-1 -p CLI -k BUG                    # move + convert in one step
+scripts/trail task move SHR-1 -k BUG                           # convert TASK → BUG
+scripts/trail task move SHR-3 -k TASK                           # promote SUBTASK → TASK
+scripts/trail task move SHR-5 -k SUBTASK --parent SHR-1         # demote to subtask
+scripts/trail task move SHR-1 -p CLI                            # move to CLI project (re-keys)
+scripts/trail task move SHR-1 -p CLI -k BUG                    # move + convert in one step
 ```
 
 Moving across projects re-keys the task and all its subtasks, creates `.moved` tombstone files, and updates all inbound references in other task files.
@@ -131,38 +133,38 @@ Moving across projects re-keys the task and all its subtasks, creates `.moved` t
 ### Query tasks
 
 ```bash
-scripts/sandpiper-tasks task list                                        # all tasks
-scripts/sandpiper-tasks task list -p SHR --top-level                     # top-level SHR tasks
-scripts/sandpiper-tasks task list -s NOT_STARTED --priority HIGH         # high priority not started
-scripts/sandpiper-tasks task list -q "FIFO"                              # full-text search
-scripts/sandpiper-tasks task show SHR-1                                  # full detail + subtasks
-scripts/sandpiper-tasks task show SHR-1 --metadata-only                  # frontmatter fields only, no body or subtasks
-scripts/sandpiper-tasks --format toon task show SHR-1 --metadata-only    # structured metadata (minimal context cost)
-scripts/sandpiper-tasks task summary                                     # status/priority breakdown
-scripts/sandpiper-tasks task summary -p SHR                              # project-scoped summary
+scripts/trail task list                                        # all tasks
+scripts/trail task list -p SHR --top-level                     # top-level SHR tasks
+scripts/trail task list -s NOT_STARTED --priority HIGH         # high priority not started
+scripts/trail task list -q "FIFO"                              # full-text search
+scripts/trail task show SHR-1                                  # full detail + subtasks
+scripts/trail task show SHR-1 --metadata-only                  # frontmatter fields only, no body or subtasks
+scripts/trail --format toon task show SHR-1 --metadata-only    # structured metadata (minimal context cost)
+scripts/trail task summary                                     # status/priority breakdown
+scripts/trail task summary -p SHR                              # project-scoped summary
 ```
 
 ### Projects
 
 ```bash
-scripts/sandpiper-tasks project list                                     # list all projects with task counts + metadata
-scripts/sandpiper-tasks --format toon project list                       # structured output with whenToRead + task counts
-scripts/sandpiper-tasks project create SHR \
+scripts/trail project list                                     # list all projects with task counts + metadata
+scripts/trail --format toon project list                       # structured output with whenToRead + task counts
+scripts/trail project create SHR \
   --name "Shell Relay" \
   --description "Zellij-based shared terminal" \
   --when-to-read "Use for relay extension work"                  # create project (all three flags required)
-scripts/sandpiper-tasks project show SHR                                 # show PROJECT.md for a project
-scripts/sandpiper-tasks project update SHR --when-to-read "New trigger"  # update metadata field(s)
-scripts/sandpiper-tasks project update SHR -i                            # open PROJECT.md in $EDITOR
+scripts/trail project show SHR                                 # show PROJECT.md for a project
+scripts/trail project update SHR --when-to-read "New trigger"  # update metadata field(s)
+scripts/trail project update SHR -i                            # open PROJECT.md in $EDITOR
 ```
 
 ### Archive completed tasks
 
 ```bash
-scripts/sandpiper-tasks task archive                                     # archive all completed tasks
-scripts/sandpiper-tasks task archive -p SHR                              # archive only SHR completed tasks
-scripts/sandpiper-tasks task archive --list                              # list already-archived tasks
-scripts/sandpiper-tasks --no-save task archive                           # dry run (show what would be archived)
+scripts/trail task archive                                     # archive all completed tasks
+scripts/trail task archive -p SHR                              # archive only SHR completed tasks
+scripts/trail task archive --list                              # list already-archived tasks
+scripts/trail --no-save task archive                           # dry run (show what would be archived)
 ```
 
 Archiving moves completed task files (and their subtask directories) to an `archive/` subdirectory within each project. Archived tasks are excluded from normal queries but preserved in full. Use `--list` to see what's been archived.
@@ -170,21 +172,21 @@ Archiving moves completed task files (and their subtask directories) to an `arch
 ### Index management
 
 ```bash
-scripts/sandpiper-tasks index update                                     # rebuild index
+scripts/trail index update                                     # rebuild index
 ```
 
 ### Structured output
 
 ```bash
-scripts/sandpiper-tasks -f json task list -p SHR --top-level             # JSON array
-scripts/sandpiper-tasks -f toon task show SHR-1                          # TOON format
-scripts/sandpiper-tasks -f raw task show SHR-1                           # raw markdown
-scripts/sandpiper-tasks --no-save task create -p SHR -t "Preview"        # dry run
+scripts/trail -f json task list -p SHR --top-level             # JSON array
+scripts/trail -f toon task show SHR-1                          # TOON format
+scripts/trail -f raw task show SHR-1                           # raw markdown
+scripts/trail --no-save task create -p SHR -t "Preview"        # dry run
 ```
 
 ## CLI-First Operations
 
-Use the `sandpiper-tasks` CLI for all task operations rather than editing files directly. The CLI maintains the index (which powers fast queries and counter management), enforces validation rules (like requiring a resolution when completing), and keeps formatting consistent. Without the CLI, it's easy to create tasks with missing fields, duplicate numbers, or stale indexes.
+Use the `trail` CLI for all task operations rather than editing files directly. The CLI maintains the index (which powers fast queries and counter management), enforces validation rules (like requiring a resolution when completing), and keeps formatting consistent. Without the CLI, it's easy to create tasks with missing fields, duplicate numbers, or stale indexes.
 
 Direct file editing is allowed — the index detects out-of-band changes — but save it for exceptional cases like bulk description edits or corruption recovery.
 
@@ -263,7 +265,7 @@ Reference task keys in commit messages: `Refs: SHR-1, SHR-2`
 ### Use structured output for scripting
 Pipe `--format json` to `jq` for scripting:
 ```bash
-scripts/sandpiper-tasks -f json task list -s IN_PROGRESS | jq '.[].key'
+scripts/trail -f json task list -s IN_PROGRESS | jq '.[].key'
 ```
 
 ### Status filter flag gotcha
@@ -271,10 +273,10 @@ scripts/sandpiper-tasks -f json task list -s IN_PROGRESS | jq '.[].key'
 
 ```bash
 # Querying
-scripts/sandpiper-tasks task list -s NEEDS_REVIEW
+scripts/trail task list -s NEEDS_REVIEW
 
 # Bulk mutation
-scripts/sandpiper-tasks task complete --final --resolution DONE --filter-status NEEDS_REVIEW
+scripts/trail task complete --final --resolution DONE --filter-status NEEDS_REVIEW
 ```
 
 ## Task Storage Modes
@@ -304,15 +306,15 @@ Once configured, bootstrap with:
 
 ```bash
 # Fresh project — initialise the separate workspace/worktree
-scripts/sandpiper-tasks --dir /path/to/project storage init
+scripts/trail --dir /path/to/project storage init
 
 # Existing project — migrate inline tasks onto the separate branch
-scripts/sandpiper-tasks --dir /path/to/project storage migrate
+scripts/trail --dir /path/to/project storage migrate
 
 # Sync with remote
-scripts/sandpiper-tasks --dir /path/to/project storage sync   # pull then push
-scripts/sandpiper-tasks --dir /path/to/project storage push
-scripts/sandpiper-tasks --dir /path/to/project storage pull
+scripts/trail --dir /path/to/project storage sync   # pull then push
+scripts/trail --dir /path/to/project storage push
+scripts/trail --dir /path/to/project storage pull
 ```
 
 After `storage init` or `storage migrate`, commit both sides:

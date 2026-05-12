@@ -345,7 +345,7 @@ When any field or the markdown body of a task is modified, the `updated_at` fiel
 
 ### 7.5 CLI-First Operations
 
-Task operations SHOULD be performed through the `sandpiper-tasks` CLI whenever possible. The CLI maintains the task index, enforces validation rules (e.g., resolution required for COMPLETE), and ensures consistent formatting.
+Task operations SHOULD be performed through the `trail` CLI whenever possible. The CLI maintains the task index, enforces validation rules (e.g., resolution required for COMPLETE), and ensures consistent formatting. Sandpiper distributions may also provide `sandpiper-tasks` as a compatibility entrypoint, but `trail` is the canonical command.
 
 Direct file editing MAY be used in exceptional circumstances (e.g., bulk body text edits, recovery from corruption, or when the CLI is unavailable), but is NOT RECOMMENDED for routine operations. The indexing system is designed to detect and incorporate out-of-band file modifications, but direct edits bypass validation and may produce inconsistent state.
 
@@ -483,7 +483,7 @@ means every `task create`, `task update`, `task pickup`, etc. modifies files tha
 in `git status` / `jj st` alongside code changes. For projects with active task usage
 this creates significant VCS churn.
 
-The `sandpiper-tasks` CLI supports three storage modes to address this:
+The `trail` CLI supports three storage modes to address this:
 
 | Mode | Description |
 |------|-------------|
@@ -567,15 +567,15 @@ Inline mode requires none.
 
 ```bash
 # Initialise the task workspace/worktree (separate-branch or external-repo mode)
-scripts/sandpiper-tasks --dir /path/to/project storage init
+scripts/trail --dir /path/to/project storage init
 
 # Migrate existing inline tasks onto the configured separate branch
-scripts/sandpiper-tasks --dir /path/to/project storage migrate
+scripts/trail --dir /path/to/project storage migrate
 
 # Sync with remote (pull then push)
-scripts/sandpiper-tasks --dir /path/to/project storage sync
-scripts/sandpiper-tasks --dir /path/to/project storage push
-scripts/sandpiper-tasks --dir /path/to/project storage pull
+scripts/trail --dir /path/to/project storage sync
+scripts/trail --dir /path/to/project storage push
+scripts/trail --dir /path/to/project storage pull
 ```
 
 `storage init` is idempotent. Running it on an already-initialised workspace is safe.
@@ -589,12 +589,12 @@ scripts/sandpiper-tasks --dir /path/to/project storage pull
 
 2. **Initialise** (for a fresh project with no existing tasks):
    ```bash
-   scripts/sandpiper-tasks --dir . storage init
+   scripts/trail --dir . storage init
    ```
 
 3. **Or migrate** (for a project with existing inline tasks):
    ```bash
-   scripts/sandpiper-tasks --dir . storage migrate
+   scripts/trail --dir . storage migrate
    ```
 
 4. **Commit both sides:**
@@ -603,7 +603,7 @@ scripts/sandpiper-tasks --dir /path/to/project storage pull
 
 5. **Verify:**
    ```bash
-   scripts/sandpiper-tasks --dir . task list
+   scripts/trail --dir . task list
    ```
 
 See `references/storage.md` for the full operator reference including repair guidance,

@@ -1,0 +1,44 @@
+{
+  "name": "@sandpiper-ai/trail",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Trail: a plaintext task tracker with Markdown files and YAML frontmatter",
+  "license": "MIT",
+  "homepage": "https://github.com/dljsjr/sandpiper-ai#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dljsjr/sandpiper-ai.git",
+    "directory": "packages/trail"
+  },
+  "keywords": [
+    "tasks",
+    "markdown",
+    "yaml-frontmatter",
+    "cli",
+    "agents"
+  ],
+  "files": [
+    "README.md",
+    "docs/",
+    "dist/trail"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "trail": "./dist/trail"
+  },
+  "dependencies": {
+    "@commander-js/extra-typings": "14.0.0",
+    "@toon-format/toon": "2.2.0",
+    "commander": "14.0.3"
+  },
+  "devDependencies": {
+    "@toon-format/cli": "2.2.0"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node src/index.ts --outfile ./dist/trail"
+  }
+}

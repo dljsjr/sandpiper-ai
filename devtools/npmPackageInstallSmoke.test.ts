@@ -82,19 +82,29 @@ describe('packed Sandpiper npm artifact', () => {
     });
 
     const packageDir = join(npmGlobalRoot(prefix), 'sandpiper-ai');
-    const binPath = join(npmGlobalBin(prefix), process.platform === 'win32' ? 'sandpiper.cmd' : 'sandpiper');
+    const binDir = npmGlobalBin(prefix);
+    const binPath = join(binDir, process.platform === 'win32' ? 'sandpiper.cmd' : 'sandpiper');
+    const trailBinPath = join(binDir, process.platform === 'win32' ? 'trail.cmd' : 'trail');
+    const compatTaskBinPath = join(binDir, process.platform === 'win32' ? 'sandpiper-tasks.cmd' : 'sandpiper-tasks');
 
     expect(existsSync(join(packageDir, 'package.json'))).toBe(true);
     expect(existsSync(join(packageDir, 'README.md'))).toBe(true);
     expect(existsSync(join(packageDir, 'docs', 'README.md'))).toBe(true);
     expect(existsSync(join(packageDir, 'dist', 'modes'))).toBe(true);
     expect(existsSync(join(packageDir, 'dist', 'core'))).toBe(true);
+    expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'))).toBe(true);
     expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'))).toBe(true);
     expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup'))).toBe(true);
     expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'dash', 'scripts', 'dash.cjs'))).toBe(true);
     expect(existsSync(join(packageDir, 'dist', 'standalone-package'))).toBe(false);
 
     makeReadOnly(packageDir);
+
+    const trailOutput = execFileSync(trailBinPath, ['--help'], { encoding: 'utf-8' });
+    const compatTaskOutput = execFileSync(compatTaskBinPath, ['--help'], { encoding: 'utf-8' });
+
+    expect(trailOutput).toContain('Usage: trail');
+    expect(compatTaskOutput).toContain('Usage: sandpiper-tasks');
 
     const output = execFileSync(binPath, ['--help', '--no-context-files'], {
       cwd: makeTempDir('sandpiper-project-'),

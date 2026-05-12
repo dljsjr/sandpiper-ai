@@ -32,7 +32,7 @@
       "project": ["*.ts!", "bin/*!"]
     },
 
-    "packages/sandpiper-tasks-cli": {
+    "packages/trail": {
       "entry": ["src/index.ts!"],
       "project": ["src/**/*.ts!"]
     },

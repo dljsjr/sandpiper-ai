@@ -54,7 +54,7 @@
     "prepare:claude-plugin": "bun run prepare:distribution && bun --bun devtools/claudeCodePlugin.ts",
     "build:claude-plugin": "bun run prepare:distribution && bun --bun devtools/claudeCodePlugin.ts --build",
     "prepare:distribution": "bun run build:packages && bun --bun devtools/assembleDistribution.ts",
-    "build:packages": "turbo run build --filter=sandpiper-ai-core --filter=sandpiper-standup-cli --filter=sandpiper-tasks-cli --filter=sandpiper-ai-cli",
+    "build:packages": "turbo run build --filter=sandpiper-ai-core --filter=sandpiper-standup-cli --filter=@sandpiper-ai/trail --filter=sandpiper-ai-cli",
     "build": "turbo run build --filter=sandpiper-ai-cli",
     "build:standalone": "bun --filter sandpiper-ai-cli build:standalone",
     "vendor": "bun --bun devtools/vendor.ts",
@@ -74,7 +74,7 @@
     "sandpiper-ai-cli": "workspace:*",
     "sandpiper-ai-core": "workspace:*",
     "sandpiper-standup-cli": "workspace:*",
-    "sandpiper-tasks-cli": "workspace:*"
+    "@sandpiper-ai/trail": "workspace:*"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "0.74.0",

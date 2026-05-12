@@ -20,7 +20,7 @@ Only packages that emit distributable artifacts need package build steps.
 | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `packages/cli/`                   | Bundled `sandpiper` runtime, standalone alias target, standalone app bundle support files, Pi assets |
 | `packages/core/`                  | TypeScript declarations and package dist artifacts                                                   |
-| `packages/sandpiper-tasks-cli/`   | Bundled `sandpiper-tasks` CLI                                                                        |
+| `packages/trail/`   | Bundled Trail CLI (`@sandpiper-ai/trail`)                                                   |
 | `packages/sandpiper-standup-cli/` | Bundled `sandpiper-standup` CLI                                                                      |
 | `packages/adapter-claude-code/`   | TypeScript declarations and Claude plugin AutoTOON hook bundle                                       |
 
@@ -32,7 +32,7 @@ Turborepo orchestrates cacheable package build tasks. The root `build:packages` 
 
 - `sandpiper-ai-core`
 - `sandpiper-standup-cli`
-- `sandpiper-tasks-cli`
+- `@sandpiper-ai/trail`
 - `sandpiper-ai-cli`
 
 `turbo.json` defines package `build` tasks with dependency-aware ordering (`^build`) and caches package-local `dist/**` outputs. It does not replace Syncpack dependency policy, root Vitest runs, or distribution assembly. `devtools/assembleDistribution.ts` owns generated `dist/` assembly after package builds finish.

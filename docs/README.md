@@ -12,7 +12,7 @@ Sandpiper is a distribution of the Pi coding agent with additional tools for sha
 
 - [AutoTOON](features/autotoon.md) - automatic JSON-to-TOON conversion for token efficiency.
 - [Shell Relay](features/shell-relay.md) - shared terminal sessions through Zellij.
-- [Task Management](features/tasks/README.md) - project task tracking with `sandpiper-tasks`.
+- [Task Management](features/tasks/README.md) - project task tracking with `trail`.
 - [Session Standup](features/standup.md) - handoff notes for continuity across sessions.
 
 ## Development
