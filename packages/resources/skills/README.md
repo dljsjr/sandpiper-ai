@@ -22,16 +22,22 @@ skills/
 
 ## First-Party Skills
 
-| Skill | Description |
-|-------|-------------|
-| `age` | Encrypt/decrypt files with the [age](https://github.com/FiloSottile/age) CLI |
-| `ast-grep` | Structural code analysis via AST matching — find patterns, run transforms |
-| `dash` | Look up documentation in [Dash.app](https://kapeli.com/dash) via MCP server |
-| `jj` | Jujutsu version control — commands, workflows, change management |
-| `projects` | Manage the cross-project directory at `~/.sandpiper/agent/projects.toon` |
-| `skill-review` | Audit skills for quality, triggering accuracy, and best practices |
-| `standup` | Write/read session stand-up notes for cross-session continuity |
-| `tasks` | Markdown-based task management with YAML frontmatter |
+| Skill          | Description                                                                  |
+| -------------- | ---------------------------------------------------------------------------- |
+| `age`          | Encrypt/decrypt files with the [age](https://github.com/FiloSottile/age) CLI |
+| `ast-grep`     | Structural code analysis via AST matching — find patterns, run transforms    |
+| `dash`         | Look up documentation in [Dash.app](https://kapeli.com/dash) via MCP server  |
+| `jj`           | Jujutsu version control — commands, workflows, change management             |
+| `projects`     | Manage the cross-project directory at `~/.sandpiper/agent/projects.toon`     |
+| `skill-review` | Audit skills for quality, triggering accuracy, and best practices            |
+| `standup`      | Write/read session stand-up notes for cross-session continuity               |
+| `tasks`        | Markdown-based task management with YAML frontmatter                         |
+
+## Using Skills
+
+At runtime, skills are listed in the agent's available-skills catalogue. The catalogue is routing metadata, not the full instructions.
+
+When a skill matches the user's request, acquired context, or the action the agent is about to take, the agent should load the skill before continuing. In Sandpiper, use the `skill` tool with the exact catalogue name. In a harness without a skill-loading tool, read the matching `SKILL.md` from the catalogue location instead.
 
 ## Skill Development
 
@@ -41,12 +47,14 @@ Two companion skills support skill authoring and quality control:
 - **`skill-review`** (sandpiper) — Qualitative structural review of existing skills. Check triggering accuracy, document structure, and adherence to best practices without running evals.
 
 For the full skill specification, see:
+
 - [Agent Skills](https://agentskills.io/home) — the standardized skill format
 - [Pi Skills Documentation](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/skills.md) — pi's implementation details
 
 ## Convention
 
 Each skill is a directory containing:
+
 - `SKILL.md` — the skill definition (name, description, guidance)
 - `scripts/` — optional companion scripts (CLIs, helpers)
 - `references/` — optional reference docs (specs, cheat sheets)

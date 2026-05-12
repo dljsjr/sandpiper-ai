@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`
+- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/skill-loading-tool.ts`
 - **Supersedes**: archived April 2026 parsing-plan notes
 
 ## Current architecture
@@ -26,10 +26,14 @@ extensions/system/startup-hooks.ts
 2. `<user_profile>` — user-wide `USER.md` profile and working preferences, if present.
 3. `<tools>` — tool snippets and tool guidelines derived from Pi's `systemPromptOptions`.
 4. `<harness_docs>` — Pi/Sandpiper documentation routing and path differences when package roots are available.
-5. `<skills>` — available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries.
+5. `<skills>` — skill-loading rules plus available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries.
 6. `<injected_context>` — injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
 7. `<user_appended_prompt>` — user-appended system prompt content, if present.
 8. `<environment>` — current date, current working directory, platform, and session-start VCS detection.
+
+## Skill loading behavior
+
+The `<skills>` section treats `<available_skills>` as routing metadata. When the `skill` tool is available, the prompt tells agents to load matching skills by exact catalogue name. When the tool is unavailable, the prompt falls back to reading the matching `SKILL.md` from the exact catalogue location. Relative scripts and references are resolved against the skill root returned by the tool, or the `SKILL.md` directory in fallback mode.
 
 ## Startup context
 
