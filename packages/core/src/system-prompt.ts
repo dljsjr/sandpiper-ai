@@ -211,11 +211,11 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
     return;
   }
 
-  const hasLoadSkillTool = (originalPromptOptions.selectedTools || []).includes('skill');
-  const loadInstruction = hasLoadSkillTool
+  const hasSkillTool = (originalPromptOptions.selectedTools || []).includes('skill');
+  const loadInstruction = hasSkillTool
     ? '- If any skill matches, call `skill` with the exact skill `name` before continuing. If multiple skills match, load all relevant skills one at a time.'
     : '- If any skill matches, read its `SKILL.md` with the `read` tool from the exact `location` before continuing. If multiple skills match, load all relevant skills.';
-  const relativeReferenceInstruction = hasLoadSkillTool
+  const relativeReferenceInstruction = hasSkillTool
     ? '- Resolve skill-referenced scripts and files relative to the base directory returned by `skill`.'
     : '- Resolve skill-referenced scripts and files relative to the directory containing `SKILL.md`.';
 

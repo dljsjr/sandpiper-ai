@@ -2,8 +2,20 @@
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "stream",
   "noUpdateNotifier": true,
+  "globalDependencies": [
+    "packages/core/src/**/*.ts",
+    "packages/core/package.json",
+    "packages/capability-autotoon/src/**/*.ts",
+    "packages/capability-autotoon/package.json"
+  ],
   "tasks": {
     "build": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.test.ts",
+        "$TURBO_ROOT$/extensions/**/*.ts",
+        "$TURBO_ROOT$/plugins/**/*.ts"
+      ],
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]
     }

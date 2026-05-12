@@ -1,15 +1,27 @@
 import type { AgentToolResult, ExtensionAPI, SlashCommandInfo, ToolDefinition } from '@earendil-works/pi-coding-agent';
-import { describe, expect, it, vi } from 'vitest';
-import {
-  executeLoadSkillTool,
-  registerSkillLoadingTool,
-  type SkillLoadingToolOperations,
-} from './skill-loading-tool.js';
+import { initTheme } from '@earendil-works/pi-coding-agent';
+import { KeybindingsManager, setKeybindings } from '@earendil-works/pi-tui';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { executeSkillTool, registerSkillLoadingTool, type SkillLoadingToolOperations } from './skill-loading-tool.js';
 
 interface SkillToolTestDetails {
   readonly name: string;
-  readonly path?: string;
-  readonly baseDir?: string;
+  readonly path: string;
+  readonly baseDir: string;
+  readonly additionalContent?: {
+    readonly references: number;
+    readonly scripts: number;
+    readonly assets: number;
+    readonly extras: number;
+    readonly truncated: boolean;
+  };
+}
+
+interface TestDirectoryEntry {
+  readonly name: string;
+  readonly isFile: () => boolean;
+  readonly isDirectory: () => boolean;
+  readonly isSymbolicLink: () => boolean;
 }
 
 type RegisteredTool = ToolDefinition;
@@ -60,8 +72,11 @@ function createToolRegistrationStub(commands: readonly SlashCommandInfo[]): {
   };
 }
 
-function createReadOperations(files: Readonly<Record<string, string>>): SkillLoadingToolOperations {
-  return {
+function createReadOperations(
+  files: Readonly<Record<string, string>>,
+  directories?: Readonly<Record<string, readonly TestDirectoryEntry[]>>,
+): SkillLoadingToolOperations {
+  const operations: SkillLoadingToolOperations = {
     readFile: vi.fn(async (path: string) => {
       const content = files[path];
       if (content === undefined) {
@@ -69,6 +84,37 @@ function createReadOperations(files: Readonly<Record<string, string>>): SkillLoa
       }
       return content;
     }),
+  };
+
+  if (!directories) return operations;
+
+  return {
+    ...operations,
+    readDir: vi.fn(async (path: string) => {
+      const entries = directories[path];
+      if (!entries) {
+        throw new Error(`ENOENT: ${path}`);
+      }
+      return entries;
+    }),
+  };
+}
+
+function fileEntry(name: string): TestDirectoryEntry {
+  return {
+    name,
+    isFile: () => true,
+    isDirectory: () => false,
+    isSymbolicLink: () => false,
+  };
+}
+
+function directoryEntry(name: string): TestDirectoryEntry {
+  return {
+    name,
+    isFile: () => false,
+    isDirectory: () => true,
+    isSymbolicLink: () => false,
   };
 }
 
@@ -97,6 +143,19 @@ function resultText(result: AgentToolResult<SkillToolTestDetails>): string {
   return firstContent.text;
 }
 
+const ansiEscapePattern = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
+
+function renderComponentText(component: { render: (width: number) => string[] }): string {
+  return component
+    .render(500)
+    .map((line) => line.replace(ansiEscapePattern, '').trimEnd())
+    .join('\n');
+}
+
+const testTheme = {
+  fg: (_color: string, text: string) => text,
+};
+
 async function expectRejectedMessage(promise: Promise<unknown>): Promise<string> {
   try {
     await promise;
@@ -109,6 +168,15 @@ async function expectRejectedMessage(promise: Promise<unknown>): Promise<string>
 }
 
 describe('registerSkillLoadingTool', () => {
+  beforeAll(() => {
+    initTheme(undefined, false);
+    setKeybindings(
+      new KeybindingsManager({
+        'app.tools.expand': { defaultKeys: 'ctrl+o', description: 'Toggle tool output' },
+      }),
+    );
+  });
+
   it('registers skill with prompt guidance for model-driven skill loading', () => {
     const { pi, tools } = createToolRegistrationStub([]);
 
@@ -155,6 +223,106 @@ describe('registerSkillLoadingTool', () => {
     expect(text).not.toContain('description:');
   });
 
+  it('surfaces additional content by enumerating well-known directories and summarizing extras', async () => {
+    const baseDir = '/repo/.sandpiper/skills/streamlit';
+    const skillPath = `${baseDir}/SKILL.md`;
+    const { pi } = createToolRegistrationStub([createSkillCommand('streamlit', skillPath)]);
+    const operations = createReadOperations(
+      {
+        [skillPath]: skillFile('Streamlit routing', '# Streamlit\n\nRoute to specialized files.'),
+      },
+      {
+        [baseDir]: [
+          fileEntry('SKILL.md'),
+          directoryEntry('assets'),
+          fileEntry('README.md'),
+          directoryEntry('references'),
+          directoryEntry('scripts'),
+          directoryEntry('templates'),
+          fileEntry('.DS_Store'),
+        ],
+        [`${baseDir}/assets`]: [fileEntry('logo.svg')],
+        [`${baseDir}/references`]: [directoryEntry('deep'), fileEntry('guide.md')],
+        [`${baseDir}/references/deep`]: [fileEntry('more.md')],
+        [`${baseDir}/scripts`]: [fileEntry('run.sh')],
+        [`${baseDir}/templates`]: [directoryEntry('app'), fileEntry('streamlit_app.py')],
+        [`${baseDir}/templates/app`]: [fileEntry('nested.py')],
+      },
+    );
+
+    const result = await executeSkillTool(pi, { name: 'streamlit' }, operations);
+
+    expect(result.details.additionalContent).toMatchObject({
+      references: 2,
+      scripts: 1,
+      assets: 1,
+      extras: 2,
+      truncated: false,
+    });
+    const text = resultText(result);
+    expect(text.indexOf('<additional_content>')).toBeLessThan(text.indexOf('<instructions>'));
+    expect(text).toContain('<additional_content>');
+    expect(text).toContain('<references count="2" truncated="false">');
+    expect(text).toContain('<reference path="references/deep/more.md" />');
+    expect(text).toContain('<reference path="references/guide.md" />');
+    expect(text).toContain('<scripts count="1" truncated="false">');
+    expect(text).toContain('<script path="scripts/run.sh" />');
+    expect(text).toContain('<assets count="1" truncated="false">');
+    expect(text).toContain('<asset path="assets/logo.svg" />');
+    expect(text).toContain('<other count="2" truncated="false">');
+    expect(text).toContain('<content path="." files="1" directories="0" truncated="false" />');
+    expect(text).toContain('<content path="templates" files="2" directories="1" truncated="false" />');
+    expect(text).not.toContain('.DS_Store');
+  });
+
+  it('renders a compact result and structured expanded view', async () => {
+    const baseDir = '/repo/.sandpiper/skills/streamlit';
+    const skillPath = `${baseDir}/SKILL.md`;
+    const { pi, tools } = createToolRegistrationStub([createSkillCommand('streamlit', skillPath)]);
+    const operations = createReadOperations(
+      {
+        [skillPath]: skillFile('Streamlit routing', '# Streamlit\n\nRoute to specialized files.'),
+      },
+      {
+        [baseDir]: [directoryEntry('references')],
+        [`${baseDir}/references`]: [fileEntry('guide.md'), fileEntry('more.md')],
+      },
+    );
+    registerSkillLoadingTool(pi, operations);
+
+    const result = await executeRegisteredTool(tools[0]!, { name: 'streamlit' });
+    const renderContext = { lastComponent: undefined, isError: false };
+
+    const compactComponent = tools[0]!.renderResult!(
+      result,
+      { expanded: false, isPartial: false },
+      testTheme as never,
+      renderContext as never,
+    );
+    const compactText = renderComponentText(compactComponent);
+    expect(compactText).toContain('[skill] streamlit');
+    expect(compactText).toContain('2 refs');
+    expect(compactText).toContain('ctrl+o to expand');
+    expect(compactText).not.toContain('# Streamlit');
+
+    const expandedComponent = tools[0]!.renderResult!(
+      result,
+      { expanded: true, isPartial: false },
+      testTheme as never,
+      renderContext as never,
+    );
+    const expandedText = renderComponentText(expandedComponent);
+    expect(expandedText).toContain('[skill] streamlit');
+    expect(expandedText).toContain(`Location: ${skillPath}`);
+    expect(expandedText).toContain(`Base dir: ${baseDir}`);
+    expect(expandedText).toContain('Additional content:');
+    expect(expandedText).toContain('references (2):');
+    expect(expandedText).toContain('references/guide.md');
+    expect(expandedText).toContain('Instructions:');
+    expect(expandedText).toContain('# Streamlit\n\nRoute to specialized files.');
+    expect(expandedText).not.toContain('<additional_content>');
+  });
+
   it('accepts an accidental skill: prefix but still resolves by exact skill name', async () => {
     const skillPath = '/repo/.sandpiper/skills/jj/SKILL.md';
     const { pi } = createToolRegistrationStub([createSkillCommand('jj', skillPath)]);
@@ -162,7 +330,7 @@ describe('registerSkillLoadingTool', () => {
       [skillPath]: skillFile('Jujutsu version control', 'Use jj.'),
     });
 
-    const result = await executeLoadSkillTool(pi, { name: 'skill:jj' }, operations);
+    const result = await executeSkillTool(pi, { name: 'skill:jj' }, operations);
 
     expect(result.details).toMatchObject({ name: 'jj', path: skillPath });
   });
@@ -179,7 +347,7 @@ describe('registerSkillLoadingTool', () => {
       [hiddenPath]: skillFile('Hidden skill', 'Hidden body.', 'disable-model-invocation: true\n'),
     });
 
-    const message = await expectRejectedMessage(executeLoadSkillTool(pi, { name: 'missing' }, operations));
+    const message = await expectRejectedMessage(executeSkillTool(pi, { name: 'missing' }, operations));
 
     expect(message).toContain('Skill "missing" not found.');
     expect(message).toContain('Available skills: jj');
@@ -193,7 +361,7 @@ describe('registerSkillLoadingTool', () => {
       [skillPath]: skillFile('Hidden skill', 'Do not expose.', 'disable-model-invocation: true\n'),
     });
 
-    await expect(executeLoadSkillTool(pi, { name: 'hidden' }, operations)).rejects.toThrow(
+    await expect(executeSkillTool(pi, { name: 'hidden' }, operations)).rejects.toThrow(
       'disable-model-invocation is true',
     );
   });
@@ -203,7 +371,7 @@ describe('registerSkillLoadingTool', () => {
     const { pi } = createToolRegistrationStub([createSkillCommand('broken', skillPath)]);
     const operations = createReadOperations({});
 
-    const message = await expectRejectedMessage(executeLoadSkillTool(pi, { name: 'broken' }, operations));
+    const message = await expectRejectedMessage(executeSkillTool(pi, { name: 'broken' }, operations));
 
     expect(message).toContain('Failed to read skill "broken"');
     expect(message).toContain(`ENOENT: ${skillPath}`);
