@@ -54,6 +54,37 @@ describe('ecosystem package artifacts', () => {
     }
   });
 
+  it('keeps the standalone Trail package ready for publishable packaging', () => {
+    const packageDir = join(repoRoot, 'packages', 'trail');
+    const packageJson = readPackageJson(join(packageDir, 'package.json'));
+
+    expect(packageJson.name).toBe('@sandpiper-ai/trail');
+    expect(packageJson.private).toBeUndefined();
+    expect(packageJson.type).toBe('module');
+    expect(packageJson.bin).toEqual({ trail: './dist/trail' });
+    expect(packageJson.files).toEqual(['README.md', 'docs/', 'dist/trail']);
+    expect(packageJson.publishConfig).toEqual({ access: 'public' });
+    expect(findUnsupportedDependencySpecs(packageDir)).toEqual([]);
+    expect(findNonExactDependencySpecs(packageDir)).toEqual([]);
+    expect(existsSync(join(packageDir, 'docs', 'README.md'))).toBe(true);
+
+    const packedFiles = npmPackDryRun(packageDir);
+    expect(packedFiles).toEqual(
+      expect.arrayContaining([
+        'package.json',
+        'README.md',
+        'docs/README.md',
+        'docs/commands.md',
+        'docs/getting-started.md',
+        'docs/storage.md',
+        'docs/task-format.md',
+        'docs/workflows.md',
+        'dist/trail',
+      ]),
+    );
+    expect(packedFiles).not.toContain('dist/sandpiper-tasks');
+  });
+
   it('emits a publishable Sandpiper Pi/npm package at dist/', () => {
     const packageDir = join(repoRoot, 'dist');
     const rootPackageJson = readPackageJson(join(repoRoot, 'package.json'));
@@ -61,8 +92,13 @@ describe('ecosystem package artifacts', () => {
 
     expect(packageJson.private).toBeUndefined();
     expect(packageJson.type).toBe('module');
-    expect(packageJson.bin).toEqual({ sandpiper: './sandpiper' });
+    expect(packageJson.bin).toEqual({
+      sandpiper: './sandpiper',
+      'sandpiper-tasks': './sandpiper-tasks',
+      trail: './trail',
+    });
     expect(packageJson.dependencies).toMatchObject({
+      '@earendil-works/pi-coding-agent': expect.any(String),
       '@mozilla/readability': expect.any(String),
       '@toon-format/toon': expect.any(String),
       jsdom: expect.any(String),
@@ -79,6 +115,8 @@ describe('ecosystem package artifacts', () => {
       'prompts/',
       'docs/',
       'sandpiper',
+      'sandpiper-tasks',
+      'trail',
       'README.md',
       'skills/',
       'themes/',
@@ -96,19 +134,24 @@ describe('ecosystem package artifacts', () => {
       expect.arrayContaining([
         'package.json',
         'sandpiper',
+        'sandpiper-tasks',
+        'trail',
         'README.md',
         'docs/README.md',
         'dist/modes/index.js',
         'dist/core/system-prompt.js',
         'extensions/system.ts',
         'prompts/new-feature.md',
+        'packages/trail/docs/README.md',
         'packages/resources/skills/sandpiper/tasks/SKILL.md',
+        'packages/resources/skills/sandpiper/tasks/scripts/trail',
         'packages/resources/skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup',
         'packages/resources/skills/sandpiper/dash/scripts/dash',
         'packages/resources/skills/sandpiper/dash/scripts/dash.cjs',
         'packages/resources/skills/sandpiper/skill-review/references/skill-building-guide.pdf',
         'skills/sandpiper/tasks/SKILL.md',
+        'skills/sandpiper/tasks/scripts/trail',
         'skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'skills/sandpiper/standup/scripts/sandpiper-standup',
         'skills/sandpiper/dash/scripts/dash',

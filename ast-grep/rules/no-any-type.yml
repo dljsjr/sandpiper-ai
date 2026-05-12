@@ -13,4 +13,4 @@ note: "Per AGENTS.md TypeScript guidelines. biome-ignore comments for Commander 
 ignores:
   - "**/*.test.ts"
   # Commander's generic params require `any` — approved via biome-ignore in helpers.ts
-  - "packages/sandpiper-tasks-cli/src/commands/**"
+  - "packages/trail/src/commands/**"

@@ -24,6 +24,7 @@ const EXCLUDED_DIR_NAMES = new Set(['node_modules', 'dist', 'cli']);
 const EXCLUDED_FILE_SUFFIXES = ['.test.ts', '.test.js', '.log', '.pid', '.tsbuildinfo'] as const;
 
 const SOURCE_SKILL_SCRIPT_PATHS = [
+  join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'),
   join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'),
   join(RESOURCE_DIR, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup'),
   join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash'),
@@ -134,9 +135,13 @@ function copyPackageBuildOutputs(): void {
 async function copySkillHelperBinaries(): Promise<void> {
   const helpers = [
     {
-      source: join(DIST_DIR, 'packages', 'sandpiper-tasks-cli', 'sandpiper-tasks'),
+      source: join(DIST_DIR, 'packages', 'trail', 'trail'),
       destinations: [
+        join(DIST_DIR, 'trail'),
+        join(DIST_DIR, 'sandpiper-tasks'),
+        join(DIST_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'),
         join(DIST_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'),
+        join(DIST_DIR, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'),
         join(DIST_DIR, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'),
       ],
     },
@@ -241,23 +246,33 @@ async function createSourceDevHelperCopies(): Promise<void> {
   console.log('⚙ Creating dev-mode skill helper copies');
   const helpers = [
     {
-      source: join(DIST_DIR, 'packages', 'sandpiper-tasks-cli', 'sandpiper-tasks'),
-      destination: join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'),
+      source: join(DIST_DIR, 'packages', 'trail', 'trail'),
+      destinations: [
+        join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'),
+        join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'),
+      ],
     },
     {
       source: join(DIST_DIR, 'packages', 'sandpiper-standup-cli', 'sandpiper-standup'),
-      destination: join(RESOURCE_DIR, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup'),
+      destinations: [join(RESOURCE_DIR, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup')],
     },
     {
       source: join(DIST_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash'),
-      destination: join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash'),
+      destinations: [join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash')],
     },
   ] as const;
 
-  for (const { source, destination } of helpers) {
-    copyFile(source, destination);
-    await makeExecutable(destination);
+  for (const { source, destinations } of helpers) {
+    for (const destination of destinations) {
+      copyFile(source, destination);
+      await makeExecutable(destination);
+    }
   }
+
+  copyFile(
+    join(DIST_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash.cjs'),
+    join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash.cjs'),
+  );
 }
 
 async function assembleDistribution(): Promise<void> {

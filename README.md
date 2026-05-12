@@ -69,7 +69,7 @@ sandpiper-ai/
 ├── packages/            # Workspace packages (built + distributed)
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
 │   ├── resources/       # Shared skills, prompts, and themes
-│   ├── sandpiper-tasks-cli/  # Task management CLI
+│   ├── trail/  # Trail task management CLI
 │   ├── sandpiper-standup-cli/ # Standup/session-continuity CLI
 │   └── core/            # Shared utilities
 ├── plugins/             # Provider install surfaces

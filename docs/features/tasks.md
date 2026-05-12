@@ -1,6 +1,6 @@
 # Task Management
 
-Sandpiper includes `sandpiper-tasks`, a markdown-based task tracker designed for project-local work. Tasks live under `.sandpiper/tasks/` and can be read by humans, agents, and normal filesystem tools.
+Sandpiper includes Trail, a markdown-based task tracker designed for project-local work. Use the `trail` CLI to manage tasks stored under `.sandpiper/tasks/`; the files can still be read by humans, agents, and normal filesystem tools.
 
 Use the task system to track work items, bugs, subtasks, status, ownership, and relationships between pieces of work.
 

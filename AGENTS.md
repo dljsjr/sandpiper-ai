@@ -31,7 +31,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 | CLI tools, Commander commands, package `bin` entries, bundled executables                              | `.sandpiper/playbooks/development/cli.md`                    |
 | Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                          | `.sandpiper/playbooks/development/pi-extensions.md`          |
 | AutoTOON, JSON→TOON conversion, token optimization                                                     | `.sandpiper/playbooks/features/autotoon.md`                  |
-| Task management, `sandpiper-tasks`, task storage, task index                                           | `.sandpiper/playbooks/features/tasks.md`                     |
+| Task management, Trail/`trail`, task storage, task index                                     | `.sandpiper/playbooks/features/tasks.md`                     |
 | Shell Relay, Zellij integration, shared terminal, shell integrations                                   | `.sandpiper/playbooks/features/shell-relay.md`               |
 | Standup, session continuity, PID/liveness handling, concurrent sessions                                | `.sandpiper/playbooks/features/session-continuity.md`        |
 

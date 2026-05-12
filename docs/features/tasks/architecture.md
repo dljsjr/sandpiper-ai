@@ -47,7 +47,7 @@ Separate task storage from code storage:
 
 Task storage config lives in two places:
 
-1. **`.sandpiper-tasks.json`** (project root) — Wins if present
+1. **`.sandpiper-tasks.json`** (project root) — Wins if present. The filename is retained for compatibility with existing Sandpiper task stores.
 2. **`.sandpiper/settings.json`** → `tasks` key — Fallback
 
 ### Configuration Schema
@@ -57,7 +57,7 @@ Task storage config lives in two places:
   "version_control": {
     "enabled": true,
     "mode": {
-      "branch": "sandpiper-tasks",
+      "branch": "trail-tasks",
       "repo": "git@github.com:user/project-tasks.git"
     },
     "auto_commit": false,
@@ -109,19 +109,19 @@ When `mode.repo` is set (external repo):
 # 1. Configure (create .sandpiper-tasks.json)
 {
   "version_control": {
-    "mode": { "branch": "sandpiper-tasks" }
+    "mode": { "branch": "trail-tasks" }
   }
 }
 
 # 2. Initialize
-bun sandpiper-tasks storage init
+trail storage init
 
 # 3. Migrate existing inline tasks (optional)
-bun sandpiper-tasks storage migrate
+trail storage migrate
 
 # 4. Push to remote (first time)
 cd .sandpiper/tasks
-jj git push --bookmark sandpiper-tasks  # or git push -u origin sandpiper-tasks
+jj git push --bookmark trail-tasks  # or git push -u origin trail-tasks
 ```
 
 ## Implementation Details
