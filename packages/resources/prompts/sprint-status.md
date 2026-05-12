@@ -3,7 +3,7 @@ description: Check task status and identify what's next
 ---
 Give me a status update on the current sprint:
 
-1. Use the **tasks** skill CLI to run `sandpiper-tasks task summary` and show the overall breakdown
+1. Use the **tasks** skill CLI to run `trail task summary` and show the overall breakdown
 2. List any `IN PROGRESS` tasks
 3. List `NOT STARTED` tasks sorted by priority
 4. Use the **standup** skill's CLI read workflow and check any active planning docs for deferred items or things we said "we'll come back to"
