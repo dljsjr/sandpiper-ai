@@ -29,7 +29,59 @@ export interface ExtractedLink {
   readonly href: string;
 }
 
+/** Supported targeted extraction filter kinds. */
+export enum WebFetchFilterType {
+  CssSelector = 'css_selector',
+  MarkdownSection = 'markdown_section',
+}
+
+/** Extract content from HTML elements matching a CSS selector. */
+export interface CssSelectorFilterSpec {
+  readonly type: WebFetchFilterType.CssSelector;
+  readonly selector: string;
+}
+
+/** Extract content from a Markdown heading section. */
+export interface MarkdownSectionFilterSpec {
+  readonly type: WebFetchFilterType.MarkdownSection;
+  readonly heading: string;
+  readonly level?: number;
+}
+
+/** Declarative filter specs accepted by the web_fetch tool. */
+export type WebFetchFilterSpec = CssSelectorFilterSpec | MarkdownSectionFilterSpec;
+
+/** Structured metadata about an applied targeted extraction filter. */
+export interface WebFetchFilterDetails {
+  readonly type: WebFetchFilterType;
+  readonly matched: boolean;
+  readonly matchCount: number;
+  readonly error?: string;
+}
+
 /** Structured output returned by the web_fetch tool. */
+export type LlmsTxtProbeStatus = 'found' | 'missing' | 'unknown';
+
+/** Supplemental llms.txt existence probe metadata. */
+export interface LlmsTxtProbeResult {
+  /** Whether a probe was attempted. */
+  readonly checked: boolean;
+  /** True when llms.txt exists, false when confidently missing, null when indeterminate. */
+  readonly exists: boolean | null;
+  /** Coarse result status for consumers that prefer strings over nullable booleans. */
+  readonly status: LlmsTxtProbeStatus;
+  /** URL that was probed or would have been probed. */
+  readonly url: string;
+  /** Timestamp for the cached probe outcome. */
+  readonly checkedAt: string;
+  /** HTTP status returned by the probe when available. */
+  readonly statusCode?: number;
+  /** Non-fatal reason for unknown/indeterminate outcomes. */
+  readonly reason?: string;
+  /** Allow header for 405 Method Not Allowed responses. */
+  readonly allow?: string;
+}
+
 export interface WebFetchResult {
   /** Final URL after redirects. */
   readonly url: string;
@@ -43,6 +95,10 @@ export interface WebFetchResult {
   readonly siteName: string;
   /** Markdown body content. */
   readonly content: string;
+  /** Supplemental llms.txt existence probe metadata. */
+  readonly llmsTxt?: LlmsTxtProbeResult;
+  /** Targeted extraction filter metadata, when a filter was applied. */
+  readonly filter?: WebFetchFilterDetails;
   /** Extracted links (when requested). */
   readonly links?: readonly ExtractedLink[];
 }

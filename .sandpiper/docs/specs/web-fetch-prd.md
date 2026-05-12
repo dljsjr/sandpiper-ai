@@ -1,10 +1,10 @@
 # Web Fetch Tool — PRD
 
 - **Diátaxis mode**: Reference spec
-- **Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ⏸️ **Deferred**: WEB-9–13 (NOT STARTED)
+- **Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ✅ `llms.txt` probing complete (WEB-14) | ✅ targeted extraction complete (WEB-15, WEB-16) | ⏸️ **Deferred**: WEB-10–13
 - **Date**: 2026-03-26
 - **Implementation**: `extensions/web-fetch/`
-- **Last verified**: 2026-04-16
+- **Last verified**: 2026-05-14
 
 ---
 
@@ -14,7 +14,9 @@
 | -------------------------------------------- | -------------- | ------ |
 | Fetch single URL + return markdown           | ✅ Complete    | WEB-1  |
 | Extract page links (followLinks)             | ✅ Complete    | WEB-1  |
-| CSS selector targeting                       | ❌ Not started | WEB-9  |
+| Passive `llms.txt` existence probing         | ✅ Complete    | WEB-14 |
+| CSS selector targeting                       | ✅ Complete    | WEB-15 |
+| Markdown section targeting                   | ✅ Complete    | WEB-16 |
 | JS rendering adapter (lightpanda/Playwright) | ❌ Not started | WEB-10 |
 | Single-query web search                      | ❌ Not started | WEB-11 |
 | Site crawling with robots.txt                | ❌ Not started | WEB-12 |
@@ -38,7 +40,7 @@ The agent frequently needs to read web content — documentation, READMEs, API r
 
 - Fetch a single URL, return structured metadata + markdown body
 - Optionally extract and return page links for the agent to decide whether to follow
-- Optionally target a specific page region via CSS selector
+- Optionally target a specific page region via a filter (CSS selector or Markdown heading section)
 
 ### Deferred
 
@@ -71,14 +73,15 @@ extensions/web-fetch/
 ### Pipeline
 
 ```
-fetch(url) → raw HTML → jsdom parse → readability extract → turndown convert → TOON envelope
+fetch(url) → raw HTML → optional filter → jsdom/readability extract → turndown convert → TOON envelope
 ```
 
 1. **`fetch(url)`** — standard Fetch API. Custom headers supported. Follows redirects.
 2. **`jsdom`** — parse HTML into a DOM. **No JS execution, no remote resource fetching** (security: we're a parser, not a browser).
-3. **`@mozilla/readability`** — extract article content. Returns structured object with title, excerpt, byline, siteName, and cleaned HTML body.
-4. **`turndown`** — convert cleaned HTML to markdown. Preserves headings, code blocks, lists, tables, links. Far more token-efficient than raw HTML.
-5. **Return** — TOON-encoded object with metadata + markdown body.
+3. **Filter (optional)** — apply targeted extraction filters before or after conversion. CSS selector filters operate on parsed HTML before readability. Markdown section filters operate on heading ranges after Turndown conversion.
+4. **`@mozilla/readability`** — extract article content when no pre-readability filter is active. Returns structured object with title, excerpt, byline, siteName, and cleaned HTML body.
+5. **`turndown`** — convert cleaned HTML to markdown. Preserves headings, code blocks, lists, tables, links. Far more token-efficient than raw HTML.
+6. **Return** — TOON-encoded object with metadata + markdown body.
 
 ### Adapter Interface
 
@@ -99,8 +102,8 @@ interface FetchAdapter {
 // Input
 {
   url: string;            // Required — the URL to fetch
-  selector?: string;      // Optional — CSS selector to extract specific content
-  followLinks?: boolean;  // Optional — extract and return page links
+  filter?: WebFetchFilter; // Optional — targeted extraction filter
+  followLinks?: boolean;   // Optional — extract and return page links
 }
 
 // Output
@@ -111,8 +114,28 @@ interface FetchAdapter {
   byline: string;         // Author (if detected)
   siteName: string;       // Site name (if detected)
   content: string;        // Markdown body
+  filter?: {              // Targeted extraction metadata (when filter is provided)
+    type: 'css_selector' | 'markdown_section';
+    matched: boolean;
+    matchCount: number;
+    error?: string;
+  };
   links?: Array<{ text: string; href: string }>;  // Extracted links (when followLinks=true)
+  llmsTxt?: {                   // Passive /llms.txt existence probe metadata
+    checked: boolean;
+    exists: boolean | null;     // null means unknown/indeterminate
+    status: 'found' | 'missing' | 'unknown';
+    url: string;
+    checkedAt: string;
+    statusCode?: number;
+    reason?: string;
+    allow?: string;
+  };
 }
+
+type WebFetchFilter =
+  | { type: 'css_selector'; selector: string }
+  | { type: 'markdown_section'; heading: string; level?: number };
 ```
 
 ## Design Decisions

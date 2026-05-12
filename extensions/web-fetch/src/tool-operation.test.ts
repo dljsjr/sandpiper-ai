@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { executeWebFetchTool, formatWebFetchResult } from './tool-operation.js';
-import type { FetchAdapter, WebFetchResult } from './types.js';
+import { type FetchAdapter, type WebFetchFilterSpec, WebFetchFilterType, type WebFetchResult } from './types.js';
 
 function createResult(overrides: Partial<WebFetchResult> = {}): WebFetchResult {
   return {
@@ -59,10 +59,50 @@ describe('executeWebFetchTool', () => {
       },
     );
 
-    expect(fetchAndExtract).toHaveBeenCalledWith(expect.anything(), 'https://example.com', { followLinks: true });
+    expect(fetchAndExtract).toHaveBeenCalledWith(expect.anything(), 'https://example.com', {
+      filter: undefined,
+      followLinks: true,
+    });
     expect(output).toEqual({
       content: [{ type: 'text', text: formatWebFetchResult(result) }],
       details: { url: 'https://example.com/final', title: 'Fetched title' },
+    });
+  });
+
+  it('passes filter specs to the extraction pipeline', async () => {
+    const result = createResult({ title: 'Filtered title' });
+    const fetchAndExtract = vi.fn(async () => result);
+    const filter: WebFetchFilterSpec = { type: WebFetchFilterType.CssSelector, selector: '#api' };
+
+    await executeWebFetchTool(createAdapter(), { url: 'https://example.com', filter }, { fetchAndExtract });
+
+    expect(fetchAndExtract).toHaveBeenCalledWith(expect.anything(), 'https://example.com', {
+      filter,
+      followLinks: undefined,
+    });
+  });
+
+  it('includes llms.txt probe metadata in tool details without adding it to visible content', async () => {
+    const result = createResult({
+      llmsTxt: {
+        checked: true,
+        exists: true,
+        status: 'found',
+        url: 'https://example.com/llms.txt',
+        checkedAt: '2026-05-13T00:00:00.000Z',
+        statusCode: 200,
+      },
+    });
+    const fetchAndExtract = vi.fn(async () => result);
+
+    const output = await executeWebFetchTool(createAdapter(), { url: 'https://example.com' }, { fetchAndExtract });
+
+    expect(output.content[0]?.text).toBe(formatWebFetchResult(result));
+    expect(output.content[0]?.text).not.toContain('llms.txt');
+    expect(output.details).toEqual({
+      url: 'https://example.com/final',
+      title: 'Example title',
+      llmsTxt: result.llmsTxt,
     });
   });
 
