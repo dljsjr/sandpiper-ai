@@ -50,6 +50,7 @@
     "vitest.config.ts",
     "**/vitest.config.ts",
     // JS output files
-    "./*.js"
+    "./*.js",
+    "**/*.cjs"
   ]
 }
