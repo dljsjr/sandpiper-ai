@@ -18,7 +18,7 @@
     "@toon-format/toon": "2.2.0"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.74.0"
+    "@earendil-works/pi-coding-agent": "0.75.3"
   },
   "scripts": {
     "build": "tsc --build",
