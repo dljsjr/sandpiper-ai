@@ -2,21 +2,83 @@
 // Intentionally single-file and not a stable API.
 // Do not extend this into the v1 architecture without first extracting core/runtime boundaries.
 
-import { mkdir, stat } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { mkdir, readdir, stat, unlink } from 'node:fs/promises';
+import * as net from 'node:net';
+import { tmpdir } from 'node:os';
+import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { tmpdir } from 'os';
+import { Type } from '@sinclair/typebox';
+import { v7 as uuidv7 } from 'uuid';
 
 const piCodingAgentResolveDir = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
 const CONFIG_DIR_NAME: string = (await import(join(piCodingAgentResolveDir, 'config.js'))).CONFIG_DIR_NAME;
-
 const XDG_RUNTIME_DIR_ENV_KEY = 'XDG_RUNTIME_DIR';
+const VERBOSE = process.env.TATTLER_DEBUG === '1';
 
-const VERBOSE = process.env['TATTLER_DEBUG'] === '1';
+// extension-global variables for now, structured state storage later
+let tattlerRuntimeDir: string;
+let ownSocketPath: string;
+let ownShortId: string;
+let server: net.Server | undefined;
+const MAX_MESSAGE_BYTES = 4096;
+
+type TattlerFormatKey = 'tattler.ack.v0' | 'tattler.error.v0' | 'tattler.agent-message.v0';
+
+declare const tattlerMessageIdBrand: unique symbol;
+type TattlerMessageId = string & {
+  readonly [tattlerMessageIdBrand]: true;
+};
+
+interface TattlerPeerSocket {
+  name: string;
+  socketPath: string;
+  shortId: string;
+}
+
+interface TattlerMessageBase {
+  readonly format: TattlerFormatKey;
+  readonly id: TattlerMessageId;
+}
+
+interface TattlerCorrelationPayload {
+  readonly correlatedMessageId?: TattlerMessageId;
+}
+
+interface TattlerAckV0Payload extends TattlerCorrelationPayload {
+  readonly correlatedMessageId: TattlerMessageId;
+}
+
+interface TattlerAckV0 extends TattlerMessageBase {
+  readonly format: 'tattler.ack.v0';
+  readonly ack: TattlerAckV0Payload;
+}
+type TattlerErrorV0Payload = {
+  readonly code: string;
+  readonly message: string;
+} & TattlerCorrelationPayload;
+
+interface TattlerErrorV0 extends TattlerMessageBase {
+  readonly format: 'tattler.error.v0';
+  readonly error: TattlerErrorV0Payload;
+}
+
+interface TattlerAgentMessageV0 extends TattlerMessageBase {
+  readonly format: 'tattler.agent-message.v0';
+  readonly from: string;
+  readonly message: string;
+}
+
+function newMessageId(): TattlerMessageId {
+  return uuidv7() as TattlerMessageId;
+}
 
 function harnessConfigName(): string {
   return CONFIG_DIR_NAME.replace(/^\./, '');
+}
+
+async function checkRuntimeDir(): Promise<boolean> {
+  return (tattlerRuntimeDir && (await stat(tattlerRuntimeDir, { throwIfNoEntry: false }))?.isDirectory()) || false;
 }
 
 async function getTmpChecked(): Promise<string> {
@@ -119,10 +181,305 @@ async function runtimeDir(): Promise<string> {
   return runtimeDir;
 }
 
-export default async function (_pi: ExtensionAPI) {
-  if (VERBOSE) {
-    console.log(`config dir name: ${CONFIG_DIR_NAME}`);
-    console.log(`harness config name: ${harnessConfigName()}`);
-    console.log(`runtime dir: ${await runtimeDir()}`);
+function* sessionShortIdGenerator(sessionUuid: string): Generator<string> {
+  const shortIdSections = [];
+  for (const match of sessionUuid.matchAll(/([^-]+)-?/g)) {
+    shortIdSections.push(match[1]);
+    yield shortIdSections.join('-');
   }
+}
+
+// Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
+async function isSocketAlive(socketPath: string): Promise<boolean> {
+  return await new Promise((resolve) => {
+    const socket = net.createConnection(socketPath);
+    const timeout = setTimeout(() => {
+      socket.destroy();
+      resolve(false);
+    }, 300);
+
+    const cleanup = (alive: boolean) => {
+      clearTimeout(timeout);
+      socket.removeAllListeners();
+      resolve(alive);
+    };
+
+    socket.once('connect', () => {
+      socket.end();
+      cleanup(true);
+    });
+    socket.once('error', () => {
+      cleanup(false);
+    });
+  });
+}
+
+async function listPeerSockets(): Promise<TattlerPeerSocket[]> {
+  if (!(await checkRuntimeDir())) {
+    return [];
+  }
+
+  const livePeers: TattlerPeerSocket[] = [];
+  for (const entry of await readdir(tattlerRuntimeDir, { withFileTypes: true })) {
+    if (!entry.isSocket()) continue;
+    const socketPath = join(tattlerRuntimeDir, entry.name);
+    if (socketPath === ownSocketPath) continue;
+    if (!(await isSocketAlive(socketPath))) continue;
+
+    const shortId = basename(entry.name, extname(entry.name));
+    livePeers.push({
+      socketPath,
+      shortId,
+      name: `session:${shortId}`,
+    });
+  }
+
+  return livePeers;
+}
+
+function handleProtocolAck(
+  pendingId: TattlerMessageId,
+  ack: TattlerAckV0,
+  resolve: (val: { messageIdAck: TattlerMessageId }) => void,
+  reject: (reason?: Error) => void,
+) {
+  if (pendingId !== ack.ack.correlatedMessageId) {
+    reject(
+      new Error(`Received unexpected ACK for message ID ${ack.ack.correlatedMessageId}, expected ID ${pendingId}`),
+    );
+    return;
+  }
+
+  resolve({ messageIdAck: ack.ack.correlatedMessageId });
+}
+
+function handleProtocolError(pendingId: TattlerMessageId, err: TattlerErrorV0, reject: (reason?: Error) => void) {
+  if (err.error.correlatedMessageId === undefined) {
+    reject(new Error(`Received protocol error:\n${JSON.stringify(err.error, null, 2)}`));
+    return;
+  }
+
+  if (pendingId !== err.error.correlatedMessageId) {
+    reject(
+      new Error(
+        `Received unexpected error correlated to ID ${err.error.correlatedMessageId}, expected ${pendingId}:\n${JSON.stringify(err.error, null, 2)}`,
+      ),
+    );
+    return;
+  }
+
+  reject(new Error(`Peer rejected message ID ${pendingId}:\n${JSON.stringify(err.error, null, 2)}`));
+}
+
+function sendAgentMessage(
+  peer: TattlerPeerSocket,
+  message: TattlerAgentMessageV0,
+): Promise<{ messageIdAck: TattlerMessageId }> {
+  let peerConnection: net.Socket | undefined;
+  return new Promise<{ messageIdAck: TattlerMessageId }>((resolve, reject) => {
+    peerConnection = net.createConnection(peer.socketPath);
+    peerConnection.setEncoding('utf8');
+
+    peerConnection.on('connect', () => {
+      if (VERBOSE) {
+        console.log(`sending message ${message.id} to ${peer.shortId}`);
+      }
+      peerConnection?.write(`${JSON.stringify(message)}\n`);
+    });
+
+    peerConnection.on('error', (err) => {
+      peerConnection?.removeAllListeners();
+      reject(err);
+    });
+
+    let ackBuffer = '';
+    peerConnection.on('data', (chunk) => {
+      ackBuffer += chunk;
+      let newlineIdx = ackBuffer.indexOf('\n');
+      while (newlineIdx !== -1) {
+        const jsonLine = ackBuffer.slice(0, newlineIdx).trim();
+        ackBuffer = ackBuffer.slice(newlineIdx + 1);
+        newlineIdx = ackBuffer.indexOf('\n');
+
+        try {
+          const protocolReply: TattlerMessageBase = JSON.parse(jsonLine);
+
+          switch (protocolReply.format) {
+            case 'tattler.ack.v0':
+              handleProtocolAck(message.id, protocolReply as TattlerAckV0, resolve, reject);
+              return;
+            case 'tattler.error.v0': {
+              handleProtocolError(message.id, protocolReply as TattlerErrorV0, reject);
+              return;
+            }
+            default: {
+              reject(
+                new Error(
+                  `Unexpected message format [${protocolReply.format}] while waiting for protocol reply for message ${message.id}`,
+                ),
+              );
+              return;
+            }
+          }
+        } catch (err) {
+          reject(new Error(`problem while parsing protocol reply for message ${message.id}: ${err}`));
+          return;
+        }
+      }
+    });
+  }).finally(() => {
+    peerConnection?.removeAllListeners();
+    peerConnection?.destroy();
+  });
+}
+
+function serverHandler(_socket: net.Socket): void {}
+
+// ============================================================================
+// Begin Pi API Integration
+// ============================================================================
+
+function registerListPeersTool(pi: ExtensionAPI) {
+  pi.registerTool({
+    name: 'list_peers',
+    label: 'List Peers',
+    description: 'List other agent peers with live sockets, which means they are candidates for receiving messages',
+    parameters: Type.Object({}),
+    async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
+      const peerSockets = await listPeerSockets();
+      if (peerSockets.length === 0) {
+        return {
+          content: [{ type: 'text', text: 'No active peers available' }],
+          details: { peers: [] },
+        };
+      }
+
+      const lines = peerSockets.map((peer) => {
+        return `- ${peer.name}         [id: ${peer.shortId}]`;
+      });
+
+      const resultText = `Peers:\n${lines.join('\n')}`;
+
+      return {
+        content: [{ type: 'text', text: resultText }],
+        details: { peerSockets },
+      };
+    },
+  });
+}
+
+function registerSendMessageTool(pi: ExtensionAPI) {
+  pi.registerTool({
+    name: 'send_peer_message',
+    label: 'Send Peer Message',
+    description: 'Send a message to a live/active peer, addressed by their ID',
+    parameters: Type.Object({
+      id: Type.String({ description: 'Target Peer ID' }),
+      message: Type.String({
+        description: `The message to send to the peer, limited in size to ${MAX_MESSAGE_BYTES} bytes`,
+      }),
+    }),
+    async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
+      // TODO: don't probe for live sockets every single time we send a message; this could add significant latency.
+      // fine for initial dogfooding though.
+      const peer = (await listPeerSockets()).find((peer) => peer.shortId === params.id);
+
+      if (!peer) {
+        const errMessage = `No live peer with id ${params.id} to receive message`;
+        return { content: [{ type: 'text', text: errMessage }], isError: true, details: { error: errMessage } };
+      }
+
+      const messageLength = Buffer.byteLength(params.message, 'utf8');
+      if (messageLength > MAX_MESSAGE_BYTES) {
+        const errMessage = `Message ${params.id} length ${messageLength} > ${MAX_MESSAGE_BYTES}         (maximum allowed message size)`;
+        return { content: [{ type: 'text', text: errMessage }], isError: true, details: { error: errMessage } };
+      }
+
+      const message: TattlerAgentMessageV0 = {
+        format: 'tattler.agent-message.v0',
+        id: newMessageId(),
+        message: params.message,
+        from: ownShortId,
+      };
+
+      try {
+        const sendResult: { messageIdAck: TattlerMessageId } = await sendAgentMessage(peer, message);
+        return {
+          content: [{ type: 'text', text: `message ${sendResult.messageIdAck} acknowledged by ${peer.name}` }],
+          details: sendResult,
+        };
+      } catch (sendErr) {
+        const errMessage = `Error sending message ${message.id}: ${sendErr}`;
+        return { content: [{ type: 'text', text: errMessage }], isError: true, details: { error: errMessage } };
+      }
+    },
+  });
+}
+
+export default async function (pi: ExtensionAPI) {
+  try {
+    tattlerRuntimeDir = await runtimeDir();
+    if (VERBOSE) {
+      console.log(`config dir name: ${CONFIG_DIR_NAME}`);
+      console.log(`harness config name: ${harnessConfigName()}`);
+      console.log(`runtime dir: ${tattlerRuntimeDir}`);
+    }
+  } catch (runtimeDirError) {
+    console.error(
+      `couldn't obtain usable runtime directory, Tattler will be unavailable for this agent session: `,
+      runtimeDirError,
+    );
+    return;
+  }
+
+  pi.on('session_start', async (_evt, ctx) => {
+    const sessionUuid = ctx.sessionManager.getSessionId();
+    for (const shortUuid of sessionShortIdGenerator(sessionUuid)) {
+      const socketPath = join(tattlerRuntimeDir, `${shortUuid}.sock`);
+      // If the socket file exists, but is dead, we unlink it so we can recreate it.
+      // If, however, it exists and is *not* dead, we grow the number of shortIdSections
+      // and try again. This is functionally equivalent to checking for UUID
+      // collision.
+      if (await stat(socketPath, { throwIfNoEntry: false })) {
+        if (await isSocketAlive(socketPath)) {
+          if (VERBOSE) {
+            console.warn(`${socketPath} already has a listening server, trying next shortUuid expansion`);
+          }
+          continue;
+        }
+        await unlink(socketPath);
+      }
+
+      try {
+        const serverDef = net.createServer(serverHandler);
+        // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
+        try {
+          await new Promise<void>((resolve, reject) => {
+            serverDef.once('error', reject);
+            serverDef.listen(socketPath, () => {
+              serverDef.removeListener('error', reject);
+              resolve();
+            });
+          });
+        } catch (netErr) {
+          serverDef.close();
+          throw netErr;
+        }
+        server = serverDef;
+        ownShortId = shortUuid;
+        ownSocketPath = socketPath;
+        break;
+      } catch (netErr) {
+        console.warn(`error creating UDS IPC server at ${socketPath}: `, netErr);
+      }
+    }
+
+    if (!server) {
+      console.error("Couldn't create IPC server, Tattler will be unavailable for this agent session");
+      return;
+    }
+
+    registerListPeersTool(pi);
+    registerSendMessageTool(pi);
+  });
 }

@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "sandpiper-ai-core": "0.0.1",
-    "sandpiper-capability-autotoon": "0.0.1"
+    "sandpiper-capability-autotoon": "0.0.1",
+    "uuid": "14.0.0"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "0.75.3",
