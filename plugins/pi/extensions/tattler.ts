@@ -33,6 +33,7 @@ let server: net.Server | undefined;
 const MAX_MESSAGE_BYTES = 4096;
 const SEND_ACK_TIMEOUT_MS = 5_000;
 const MAX_PROTOCOL_REPLY_BYTES = 2048;
+const MAX_PROTOCOL_REQUEST_BYTES = MAX_MESSAGE_BYTES + 2048;
 //#endregion
 
 // ============================================================================
@@ -74,6 +75,10 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: s
       clearTimeout(timeout);
     }
   }
+}
+
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
 //#endregion
@@ -127,6 +132,8 @@ interface TattlerAgentMessageV0 extends TattlerMessageBase {
   readonly from: string;
   readonly message: string;
 }
+
+type TattlerProtocolFrame = TattlerAckV0 | TattlerErrorV0 | TattlerAgentMessageV0;
 
 //#endregion
 
@@ -295,6 +302,87 @@ async function listPeerSockets(): Promise<TattlerPeerSocket[]> {
 
   return livePeers;
 }
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function extractMessageId(frame: unknown): TattlerMessageId | undefined {
+  if (!isRecord(frame) || typeof frame.id !== 'string' || frame.id.trim().length === 0) {
+    return undefined;
+  }
+
+  return frame.id as TattlerMessageId;
+}
+
+function requiredStringField(frame: Record<string, unknown>, fieldName: string): string {
+  const value = frame[fieldName];
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    throw new Error(`Incoming agent message missing required string field [${fieldName}]`);
+  }
+
+  return value;
+}
+
+function parseProtocolJsonLine(jsonLine: string): unknown {
+  try {
+    return JSON.parse(jsonLine) as unknown;
+  } catch (err) {
+    throw new Error(`Malformed protocol JSON: ${errorMessage(err)}`);
+  }
+}
+
+function parseIncomingAgentMessage(frame: unknown): TattlerAgentMessageV0 {
+  if (!isRecord(frame)) {
+    throw new Error('Incoming protocol frame must be a JSON object');
+  }
+
+  if (frame.format !== 'tattler.agent-message.v0') {
+    throw new Error(`Unsupported incoming protocol frame format [${String(frame.format)}]`);
+  }
+
+  const message = requiredStringField(frame, 'message');
+  const messageLength = Buffer.byteLength(message, 'utf8');
+  if (messageLength > MAX_MESSAGE_BYTES) {
+    throw new Error(`Incoming agent message length ${messageLength} > ${MAX_MESSAGE_BYTES}`);
+  }
+
+  return {
+    format: 'tattler.agent-message.v0',
+    id: requiredStringField(frame, 'id') as TattlerMessageId,
+    from: requiredStringField(frame, 'from'),
+    message,
+  };
+}
+
+function createAck(correlatedMessageId: TattlerMessageId): TattlerAckV0 {
+  return {
+    format: 'tattler.ack.v0',
+    id: newMessageId(),
+    ack: { correlatedMessageId },
+  };
+}
+
+function createProtocolError(message: string, correlatedMessageId?: TattlerMessageId): TattlerErrorV0 {
+  return {
+    format: 'tattler.error.v0',
+    id: newMessageId(),
+    error: {
+      code: 'protocol-error',
+      message,
+      ...(correlatedMessageId === undefined ? {} : { correlatedMessageId }),
+    },
+  };
+}
+
+function writeProtocolFrame(socket: net.Socket, frame: TattlerProtocolFrame): void {
+  if (socket.destroyed || !socket.writable) {
+    return;
+  }
+
+  socket.write(`${JSON.stringify(frame)}\n`);
+}
+
 function ackToSendResult(pendingId: TattlerMessageId, ack: TattlerAckV0): SendAgentMessageResult {
   if (pendingId !== ack.ack.correlatedMessageId) {
     throw new Error(`Received unexpected ACK for message ID ${ack.ack.correlatedMessageId}, expected ID ${pendingId}`);
@@ -396,7 +484,65 @@ async function sendAgentMessage(
   }
 }
 
-function serverHandler(_socket: net.Socket): void {}
+async function readIncomingFrameLine(socket: net.Socket): Promise<string | undefined> {
+  let buffer = '';
+
+  for await (const chunk of socket.iterator({ destroyOnReturn: false })) {
+    buffer += chunk;
+
+    if (Buffer.byteLength(buffer, 'utf8') > MAX_PROTOCOL_REQUEST_BYTES) {
+      throw new Error(`Incoming protocol frame exceeded ${MAX_PROTOCOL_REQUEST_BYTES} bytes`);
+    }
+
+    const newlineIdx = buffer.indexOf('\n');
+    if (newlineIdx !== -1) {
+      const line = buffer.slice(0, newlineIdx).trim();
+      if (line.length === 0) {
+        throw new Error('Incoming protocol frame was empty');
+      }
+      return line;
+    }
+  }
+
+  if (buffer.trim().length === 0) {
+    return undefined;
+  }
+
+  throw new Error('Peer ended with a partial incoming protocol frame');
+}
+
+async function serverHandler(socket: net.Socket): Promise<void> {
+  socket.setEncoding('utf8');
+  socket.on('error', (err) => {
+    if (VERBOSE) {
+      console.warn('Tattler socket error while receiving message: ', err);
+    }
+  });
+
+  try {
+    const line = await readIncomingFrameLine(socket);
+    if (line === undefined) {
+      return;
+    }
+
+    const frame = parseProtocolJsonLine(line);
+    const correlatedMessageId = extractMessageId(frame);
+
+    try {
+      const message = parseIncomingAgentMessage(frame);
+      writeProtocolFrame(socket, createAck(message.id));
+      // TAT-4 will deliver the parsed message into the agent session.
+    } catch (protocolErr) {
+      writeProtocolFrame(socket, createProtocolError(errorMessage(protocolErr), correlatedMessageId));
+    }
+  } catch (receiveErr) {
+    writeProtocolFrame(socket, createProtocolError(errorMessage(receiveErr)));
+  } finally {
+    if (!socket.destroyed) {
+      socket.end();
+    }
+  }
+}
 //#endregion
 
 //#region Pi API Integration
