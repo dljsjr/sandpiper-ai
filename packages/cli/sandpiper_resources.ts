@@ -7,6 +7,7 @@ import {
   createSandpiperIdentityExtension,
 } from '../../extensions/system/extension-factories.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
+import tattlerExtension from '../../plugins/pi/extensions/tattler.js';
 import autotoonExtension from '../capability-autotoon/src/pi-extension.js';
 
 export interface SandpiperResourcePaths {
@@ -48,6 +49,7 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
     shellRelayExtension,
     webFetchExtension,
     autotoonExtension,
+    tattlerExtension,
     createSandpiperResourceExtension(resolveSandpiperResourcePaths(resourceRoot)),
   ];
 }
