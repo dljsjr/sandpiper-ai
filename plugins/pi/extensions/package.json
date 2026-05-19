@@ -9,7 +9,8 @@
       "./capabilities.ts",
       "./shell-relay.ts",
       "./web-fetch.ts",
-      "./autotoon.ts"
+      "./autotoon.ts",
+      "./tattler.ts"
     ]
   },
   "dependencies": {
