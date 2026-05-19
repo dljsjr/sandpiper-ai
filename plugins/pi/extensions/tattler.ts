@@ -2,6 +2,7 @@
 // Intentionally single-file and not a stable API.
 // Do not extend this into the v1 architecture without first extracting core/runtime boundaries.
 
+import { once } from 'node:events';
 import { mkdir, readdir, stat, unlink } from 'node:fs/promises';
 import * as net from 'node:net';
 import { tmpdir } from 'node:os';
@@ -30,6 +31,8 @@ let server: net.Server | undefined;
 
 // socket/wire protocol constants
 const MAX_MESSAGE_BYTES = 4096;
+const SEND_ACK_TIMEOUT_MS = 5_000;
+const MAX_PROTOCOL_REPLY_BYTES = 2048;
 //#endregion
 
 // ============================================================================
@@ -54,6 +57,22 @@ function* sessionShortIdGenerator(sessionUuid: string): Generator<string> {
   for (const match of sessionUuid.matchAll(/([^-]+)-?/g)) {
     shortIdSections.push(match[1]);
     yield shortIdSections.join('-');
+  }
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+
+  const timeoutPromise = new Promise<never>((_resolve, reject) => {
+    timeout = setTimeout(() => reject(new Error(message)), timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeout !== undefined) {
+      clearTimeout(timeout);
+    }
   }
 }
 
@@ -108,6 +127,7 @@ interface TattlerAgentMessageV0 extends TattlerMessageBase {
   readonly from: string;
   readonly message: string;
 }
+
 //#endregion
 
 // ============================================================================
@@ -219,11 +239,14 @@ async function runtimeDir(): Promise<string> {
 }
 //#endregion
 
-
 // ============================================================================
 // Socket/Protocol Implementation
 // ============================================================================
 //#region Socket/Protocol Implementation
+
+interface SendAgentMessageResult {
+  readonly messageIdAck: TattlerMessageId;
+}
 
 // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
 async function isSocketAlive(socketPath: string): Promise<boolean> {
@@ -272,104 +295,108 @@ async function listPeerSockets(): Promise<TattlerPeerSocket[]> {
 
   return livePeers;
 }
-
-function handleProtocolAck(
-  pendingId: TattlerMessageId,
-  ack: TattlerAckV0,
-  resolve: (val: { messageIdAck: TattlerMessageId }) => void,
-  reject: (reason?: Error) => void,
-) {
+function ackToSendResult(pendingId: TattlerMessageId, ack: TattlerAckV0): SendAgentMessageResult {
   if (pendingId !== ack.ack.correlatedMessageId) {
-    reject(
-      new Error(`Received unexpected ACK for message ID ${ack.ack.correlatedMessageId}, expected ID ${pendingId}`),
-    );
-    return;
+    throw new Error(`Received unexpected ACK for message ID ${ack.ack.correlatedMessageId}, expected ID ${pendingId}`);
   }
 
-  resolve({ messageIdAck: ack.ack.correlatedMessageId });
+  return { messageIdAck: ack.ack.correlatedMessageId };
 }
 
-function handleProtocolError(pendingId: TattlerMessageId, err: TattlerErrorV0, reject: (reason?: Error) => void) {
+function protocolErrorToError(pendingId: TattlerMessageId, err: TattlerErrorV0): Error {
   if (err.error.correlatedMessageId === undefined) {
-    reject(new Error(`Received protocol error:\n${JSON.stringify(err.error, null, 2)}`));
-    return;
+    return new Error(`Received protocol error:\n${JSON.stringify(err.error, null, 2)}`);
   }
 
   if (pendingId !== err.error.correlatedMessageId) {
-    reject(
-      new Error(
-        `Received unexpected error correlated to ID ${err.error.correlatedMessageId}, expected ${pendingId}:\n${JSON.stringify(err.error, null, 2)}`,
-      ),
+    return new Error(
+      `Received unexpected error correlated to ID ${err.error.correlatedMessageId}, expected ${pendingId}:\n${JSON.stringify(err.error, null, 2)}`,
     );
-    return;
   }
 
-  reject(new Error(`Peer rejected message ID ${pendingId}:\n${JSON.stringify(err.error, null, 2)}`));
+  return new Error(`Peer rejected message ID ${pendingId}:\n${JSON.stringify(err.error, null, 2)}`);
 }
 
-function sendAgentMessage(
+function parseSendReplyLine(pendingId: TattlerMessageId, jsonLine: string): SendAgentMessageResult {
+  let protocolReply: TattlerMessageBase;
+  try {
+    protocolReply = JSON.parse(jsonLine) as TattlerMessageBase;
+  } catch (err) {
+    throw new Error(`Problem while parsing protocol reply for message ${pendingId}: ${err}`);
+  }
+
+  switch (protocolReply.format) {
+    case 'tattler.ack.v0':
+      return ackToSendResult(pendingId, protocolReply as TattlerAckV0);
+
+    case 'tattler.error.v0':
+      throw protocolErrorToError(pendingId, protocolReply as TattlerErrorV0);
+
+    default:
+      throw new Error(
+        `Unexpected message format [${protocolReply.format}] while waiting for protocol reply for message ${pendingId}`,
+      );
+  }
+}
+
+async function readProtocolReplyLine(
+  socket: net.Socket,
+  peer: TattlerPeerSocket,
+  messageId: TattlerMessageId,
+): Promise<string> {
+  let buffer = '';
+
+  for await (const chunk of socket) {
+    buffer += chunk;
+
+    if (Buffer.byteLength(buffer, 'utf8') > MAX_PROTOCOL_REPLY_BYTES) {
+      throw new Error(`Protocol reply from ${peer.name} exceeded ${MAX_PROTOCOL_REPLY_BYTES} bytes`);
+    }
+
+    const newlineIdx = buffer.indexOf('\n');
+    if (newlineIdx !== -1) {
+      return buffer.slice(0, newlineIdx).trim();
+    }
+  }
+
+  if (buffer.trim().length > 0) {
+    throw new Error(`Peer ${peer.name} ended with a partial protocol reply for message ${messageId}`);
+  }
+
+  throw new Error(`Peer ${peer.name} ended before acknowledging message ${messageId}`);
+}
+
+async function sendAgentMessage(
   peer: TattlerPeerSocket,
   message: TattlerAgentMessageV0,
-): Promise<{ messageIdAck: TattlerMessageId }> {
-  let peerConnection: net.Socket | undefined;
-  return new Promise<{ messageIdAck: TattlerMessageId }>((resolve, reject) => {
-    peerConnection = net.createConnection(peer.socketPath);
-    peerConnection.setEncoding('utf8');
+): Promise<SendAgentMessageResult> {
+  const peerConnection = new net.Socket();
+  peerConnection.setEncoding('utf8');
+  try {
+    const connectPromise = once(peerConnection, 'connect');
+    peerConnection.connect(peer.socketPath);
 
-    peerConnection.on('connect', () => {
-      if (VERBOSE) {
-        console.log(`sending message ${message.id} to ${peer.shortId}`);
-      }
-      peerConnection?.write(`${JSON.stringify(message)}\n`);
-    });
+    await withTimeout(connectPromise, SEND_ACK_TIMEOUT_MS, `Timed out connecting to ${peer.name}`);
 
-    peerConnection.on('error', (err) => {
-      peerConnection?.removeAllListeners();
-      reject(err);
-    });
+    const replyLinePromise = withTimeout(
+      readProtocolReplyLine(peerConnection, peer, message.id),
+      SEND_ACK_TIMEOUT_MS,
+      `Timed out waiting for ACK from ${peer.name} for message ${message.id}`,
+    );
 
-    let ackBuffer = '';
-    peerConnection.on('data', (chunk) => {
-      ackBuffer += chunk;
-      let newlineIdx = ackBuffer.indexOf('\n');
-      while (newlineIdx !== -1) {
-        const jsonLine = ackBuffer.slice(0, newlineIdx).trim();
-        ackBuffer = ackBuffer.slice(newlineIdx + 1);
-        newlineIdx = ackBuffer.indexOf('\n');
+    if (VERBOSE) {
+      console.log(`sending message ${message.id} to ${peer.shortId}`);
+    }
+    peerConnection.write(`${JSON.stringify(message)}\n`);
 
-        try {
-          const protocolReply: TattlerMessageBase = JSON.parse(jsonLine);
-
-          switch (protocolReply.format) {
-            case 'tattler.ack.v0':
-              handleProtocolAck(message.id, protocolReply as TattlerAckV0, resolve, reject);
-              return;
-            case 'tattler.error.v0': {
-              handleProtocolError(message.id, protocolReply as TattlerErrorV0, reject);
-              return;
-            }
-            default: {
-              reject(
-                new Error(
-                  `Unexpected message format [${protocolReply.format}] while waiting for protocol reply for message ${message.id}`,
-                ),
-              );
-              return;
-            }
-          }
-        } catch (err) {
-          reject(new Error(`problem while parsing protocol reply for message ${message.id}: ${err}`));
-          return;
-        }
-      }
-    });
-  }).finally(() => {
-    peerConnection?.removeAllListeners();
-    peerConnection?.destroy();
-  });
+    const replyLine = await replyLinePromise;
+    return parseSendReplyLine(message.id, replyLine);
+  } finally {
+    peerConnection.destroy();
+  }
 }
 
-function serverHandler(_socket: net.Socket): void { }
+function serverHandler(_socket: net.Socket): void {}
 //#endregion
 
 //#region Pi API Integration
@@ -441,7 +468,7 @@ function registerSendMessageTool(pi: ExtensionAPI) {
       };
 
       try {
-        const sendResult: { messageIdAck: TattlerMessageId } = await sendAgentMessage(peer, message);
+        const sendResult: SendAgentMessageResult = await sendAgentMessage(peer, message);
         return {
           content: [{ type: 'text', text: `message ${sendResult.messageIdAck} acknowledged by ${peer.name}` }],
           details: sendResult,
