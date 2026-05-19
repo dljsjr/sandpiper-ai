@@ -11,18 +11,58 @@ import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
 import { v7 as uuidv7 } from 'uuid';
 
-const piCodingAgentResolveDir = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
-const CONFIG_DIR_NAME: string = (await import(join(piCodingAgentResolveDir, 'config.js'))).CONFIG_DIR_NAME;
-const XDG_RUNTIME_DIR_ENV_KEY = 'XDG_RUNTIME_DIR';
+// ============================================================================
+// Constants
+// ============================================================================
+//#region Constants
 const VERBOSE = process.env.TATTLER_DEBUG === '1';
+
+// runtime directory constants
+const __PI_CODING_AGENT_RESOLVE_DIR = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
+const CONFIG_DIR_NAME: string = (await import(join(__PI_CODING_AGENT_RESOLVE_DIR, 'config.js'))).CONFIG_DIR_NAME;
+const XDG_RUNTIME_DIR_ENV_KEY = 'XDG_RUNTIME_DIR';
 
 // extension-global variables for now, structured state storage later
 let tattlerRuntimeDir: string;
 let ownSocketPath: string;
 let ownShortId: string;
 let server: net.Server | undefined;
-const MAX_MESSAGE_BYTES = 4096;
 
+// socket/wire protocol constants
+const MAX_MESSAGE_BYTES = 4096;
+//#endregion
+
+// ============================================================================
+// General Utilities/Helpers
+// ============================================================================
+//#region General Utilities/Helpers
+async function firstDefined<T>(candidates: Array<() => Promise<T>>): Promise<T> {
+  for (const candidate of candidates) {
+    try {
+      return await candidate();
+    } catch (candidateError) {
+      if (VERBOSE) {
+        console.warn('Encountered error while attempting to find suitable runtime dir: ', candidateError);
+      }
+    }
+  }
+  throw new Error("Couldn't locate a usable runtime directory base!");
+}
+
+function* sessionShortIdGenerator(sessionUuid: string): Generator<string> {
+  const shortIdSections = [];
+  for (const match of sessionUuid.matchAll(/([^-]+)-?/g)) {
+    shortIdSections.push(match[1]);
+    yield shortIdSections.join('-');
+  }
+}
+
+//#endregion
+
+// ============================================================================
+// Message Formats
+// ============================================================================
+//#region Message Formats
 type TattlerFormatKey = 'tattler.ack.v0' | 'tattler.error.v0' | 'tattler.agent-message.v0';
 
 declare const tattlerMessageIdBrand: unique symbol;
@@ -68,11 +108,21 @@ interface TattlerAgentMessageV0 extends TattlerMessageBase {
   readonly from: string;
   readonly message: string;
 }
+//#endregion
 
+// ============================================================================
+// Message Helpers
+// ============================================================================
+//#region Message Helper Utils
 function newMessageId(): TattlerMessageId {
   return uuidv7() as TattlerMessageId;
 }
+//#endregion
 
+// ============================================================================
+// Runtime Directory Helpers
+// ============================================================================
+//#region Runtime Directory Helpers
 function harnessConfigName(): string {
   return CONFIG_DIR_NAME.replace(/^\./, '');
 }
@@ -145,19 +195,6 @@ async function linuxRuntimeBasedir(): Promise<string> {
   }
 }
 
-async function firstDefined<T>(candidates: Array<() => Promise<T>>): Promise<T> {
-  for (const candidate of candidates) {
-    try {
-      return await candidate();
-    } catch (candidateError) {
-      if (VERBOSE) {
-        console.warn('Encountered error while attempting to find suitable runtime dir: ', candidateError);
-      }
-    }
-  }
-  throw new Error("Couldn't locate a usable runtime directory base!");
-}
-
 // `XDG_RUNTIME_DIR` is the only XDG basedir spec member that doesn't have a default fallback.
 // It does provide guidance on how to fall back, though.
 // To be a "good citizen" various OS's, we have decided on the following policy for selecting
@@ -180,14 +217,13 @@ async function runtimeDir(): Promise<string> {
   await mkdir(runtimeDir, { recursive: true, mode: 0o700 });
   return runtimeDir;
 }
+//#endregion
 
-function* sessionShortIdGenerator(sessionUuid: string): Generator<string> {
-  const shortIdSections = [];
-  for (const match of sessionUuid.matchAll(/([^-]+)-?/g)) {
-    shortIdSections.push(match[1]);
-    yield shortIdSections.join('-');
-  }
-}
+
+// ============================================================================
+// Socket/Protocol Implementation
+// ============================================================================
+//#region Socket/Protocol Implementation
 
 // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
 async function isSocketAlive(socketPath: string): Promise<boolean> {
@@ -333,8 +369,10 @@ function sendAgentMessage(
   });
 }
 
-function serverHandler(_socket: net.Socket): void {}
+function serverHandler(_socket: net.Socket): void { }
+//#endregion
 
+//#region Pi API Integration
 // ============================================================================
 // Begin Pi API Integration
 // ============================================================================
@@ -415,7 +453,12 @@ function registerSendMessageTool(pi: ExtensionAPI) {
     },
   });
 }
+//#endregion
 
+//#region Extension Factory
+// ============================================================================
+// Extension Factory
+// ============================================================================
 export default async function (pi: ExtensionAPI) {
   try {
     tattlerRuntimeDir = await runtimeDir();
@@ -483,3 +526,4 @@ export default async function (pi: ExtensionAPI) {
     registerSendMessageTool(pi);
   });
 }
+//#endregion
