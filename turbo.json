@@ -17,7 +17,7 @@
         "$TURBO_ROOT$/plugins/**/*.ts"
       ],
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**", "**/*.map"]
     }
   }
 }
