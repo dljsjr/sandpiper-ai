@@ -6,6 +6,7 @@ import type { WebFetchToolInput, WebFetchToolResult } from './tool-operation.js'
 import { type FetchAdapter, WebFetchFilterType } from './types.js';
 
 interface RegisteredWebFetchTool {
+  readonly promptSnippet?: string;
   execute(toolCallId: string, params: WebFetchToolInput): Promise<WebFetchToolResult>;
 }
 
@@ -16,6 +17,17 @@ function createAdapter(): FetchAdapter {
 }
 
 describe('web-fetch extension', () => {
+  it('opts into the available-tools system prompt list', async () => {
+    const pi = {
+      registerTool: vi.fn(),
+    } as unknown as ExtensionAPI;
+
+    await init(pi, { adapter: createAdapter() });
+
+    const registeredTool = vi.mocked(pi.registerTool).mock.calls[0]?.[0] as RegisteredWebFetchTool | undefined;
+    expect(registeredTool?.promptSnippet).toBe('Fetch a web page and return clean markdown content');
+  });
+
   it('registers both CSS selector and Markdown section filter schemas', async () => {
     const pi = {
       registerTool: vi.fn(),
