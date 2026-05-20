@@ -34,6 +34,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
       'Optionally target part of a page with a filter. ' +
       'Returns structured metadata (title, excerpt, byline) plus the page ' +
       'content converted to token-efficient markdown.',
+    promptSnippet: 'Fetch a web page and return clean markdown content',
     parameters: Type.Object({
       url: Type.String({ description: 'The URL to fetch' }),
       followLinks: Type.Optional(
