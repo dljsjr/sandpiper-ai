@@ -103,7 +103,7 @@ This solved SHR-85 — output is now properly formatted at full terminal width.
   "exit_status": null,
   "is_held": false,
   "pane_command": "bash",
-  "pane_cwd": "/home/user/project",
+  "pane_cwd": "<project-dir>",
   "tab_id": 0,
   "tab_name": "Tab #1"
 }
