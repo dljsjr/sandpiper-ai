@@ -3,6 +3,7 @@ export enum SystemNotificationSourceType {
   Extension = 'extension',
   Harness = 'harness',
   Adapter = 'adapter',
+  PeerMessage = 'peer',
 }
 
 export enum SystemNotificationDelivery {
@@ -15,6 +16,7 @@ export interface SystemNotificationAttributes {
   readonly sourceType: SystemNotificationSourceType;
   readonly sourceId: string;
   readonly deliverAs?: SystemNotificationDelivery;
+  readonly triggerTurn?: boolean;
 }
 
 export interface SystemNotificationInstructions {
@@ -53,7 +55,7 @@ type SystemNotificationDeliveryWireValue = 'steer' | 'followUp' | 'nextTurn';
 export interface SystemNotificationSender {
   sendMessage(
     message: SystemNotificationMessage,
-    options: { readonly deliverAs: SystemNotificationDeliveryWireValue },
+    options: { readonly deliverAs: SystemNotificationDeliveryWireValue; readonly triggerTurn?: boolean },
   ): unknown;
 }
 
@@ -217,5 +219,6 @@ export function sendSystemNotification(
 ): unknown {
   return sender.sendMessage(createSystemNotificationMessage(notification), {
     deliverAs: deliveryWireValue(notification.deliverAs ?? SystemNotificationDelivery.Steer),
+    triggerTurn: notification.triggerTurn,
   });
 }

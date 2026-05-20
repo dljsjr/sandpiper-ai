@@ -132,4 +132,47 @@ describe('system notifications', () => {
 
     expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'followUp' });
   });
+
+  it('sends message without triggerTurn by default', () => {
+    const sender = { sendMessage: vi.fn() };
+
+    sendSystemNotification(sender, {
+      sourceType: SystemNotificationSourceType.Harness,
+      sourceId: 'background_process',
+      instructions: 'Process completed.',
+      deliverAs: SystemNotificationDelivery.FollowUp,
+    });
+
+    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), {
+      deliverAs: 'followUp',
+    });
+  });
+
+  it('supports explicit requests to wake agent with triggerTurn', () => {
+    const sender = { sendMessage: vi.fn() };
+
+    sendSystemNotification(sender, {
+      sourceType: SystemNotificationSourceType.Harness,
+      sourceId: 'background_process',
+      instructions: 'Process completed.',
+      deliverAs: SystemNotificationDelivery.FollowUp,
+      triggerTurn: true,
+    });
+
+    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'followUp', triggerTurn: true });
+  });
+
+  it('supports explicit requests to suppress waking the agent with triggerTurn', () => {
+    const sender = { sendMessage: vi.fn() };
+
+    sendSystemNotification(sender, {
+      sourceType: SystemNotificationSourceType.Harness,
+      sourceId: 'background_process',
+      instructions: 'Process completed.',
+      deliverAs: SystemNotificationDelivery.FollowUp,
+      triggerTurn: false,
+    });
+
+    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'followUp', triggerTurn: false });
+  });
 });
