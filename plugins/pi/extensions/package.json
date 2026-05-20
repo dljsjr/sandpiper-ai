@@ -16,10 +16,15 @@
   "dependencies": {
     "sandpiper-ai-core": "0.0.1",
     "sandpiper-capability-autotoon": "0.0.1",
+    "sanitize-filename": "1.6.4",
+    "tmp": "0.2.5",
     "uuid": "14.0.0"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "0.75.3",
     "@sinclair/typebox": "0.34.49"
+  },
+  "devDependencies": {
+    "@types/tmp": "0.2.6"
   }
 }

@@ -3,20 +3,28 @@
 // Do not extend this into the v1 architecture without first extracting core/runtime boundaries.
 
 import { once } from 'node:events';
-import { mkdir, readdir, stat, unlink } from 'node:fs/promises';
+import { appendFile, mkdir, readdir, readFile, stat, unlink } from 'node:fs/promises';
 import * as net from 'node:net';
 import { tmpdir } from 'node:os';
 import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import type { CustomEntry, ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { Type } from '@sinclair/typebox';
+import { type SystemNotificationSender, SystemNotificationSourceType, sendSystemNotification } from 'sandpiper-ai-core';
+import sanitize from 'sanitize-filename';
 import { v7 as uuidv7 } from 'uuid';
+
+// we have to use `require` here because `tmp` is old, and relies on
+// an explicit reference to `module.exports` in its code.
+const tmp = require('tmp');
 
 // ============================================================================
 // Constants
 // ============================================================================
 //#region Constants
 const VERBOSE = process.env.TATTLER_DEBUG === '1';
+
+const TATTLER_ID_ENTRY_KEY = 'tattler-id';
 
 // runtime directory constants
 const __PI_CODING_AGENT_RESOLVE_DIR = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
@@ -25,8 +33,7 @@ const XDG_RUNTIME_DIR_ENV_KEY = 'XDG_RUNTIME_DIR';
 
 // extension-global variables for now, structured state storage later
 let tattlerRuntimeDir: string;
-let ownSocketPath: string;
-let ownShortId: string;
+let ownIdentity: TattlerIdentityV0;
 let server: net.Server | undefined;
 
 // socket/wire protocol constants
@@ -87,22 +94,24 @@ function errorMessage(err: unknown): string {
 // Message Formats
 // ============================================================================
 //#region Message Formats
-type TattlerFormatKey = 'tattler.ack.v0' | 'tattler.error.v0' | 'tattler.agent-message.v0';
+
+const TattlerProtocolFormat: unique symbol = Symbol('TattlerProtocolFormat');
+type TattlerFormatKey = 'tattler.identity.v0' | 'tattler.ack.v0' | 'tattler.error.v0' | 'tattler.agent-message.v0';
 
 declare const tattlerMessageIdBrand: unique symbol;
 type TattlerMessageId = string & {
   readonly [tattlerMessageIdBrand]: true;
 };
 
-interface TattlerPeerSocket {
+interface TattlerMessageBase<K extends TattlerFormatKey> {
+  readonly [TattlerProtocolFormat]: K;
+  readonly id: TattlerMessageId;
+}
+
+interface TattlerIdentityV0 extends TattlerMessageBase<'tattler.identity.v0'> {
   name: string;
   socketPath: string;
   shortId: string;
-}
-
-interface TattlerMessageBase {
-  readonly format: TattlerFormatKey;
-  readonly id: TattlerMessageId;
 }
 
 interface TattlerCorrelationPayload {
@@ -113,8 +122,7 @@ interface TattlerAckV0Payload extends TattlerCorrelationPayload {
   readonly correlatedMessageId: TattlerMessageId;
 }
 
-interface TattlerAckV0 extends TattlerMessageBase {
-  readonly format: 'tattler.ack.v0';
+interface TattlerAckV0 extends TattlerMessageBase<'tattler.ack.v0'> {
   readonly ack: TattlerAckV0Payload;
 }
 type TattlerErrorV0Payload = {
@@ -122,13 +130,11 @@ type TattlerErrorV0Payload = {
   readonly message: string;
 } & TattlerCorrelationPayload;
 
-interface TattlerErrorV0 extends TattlerMessageBase {
-  readonly format: 'tattler.error.v0';
+interface TattlerErrorV0 extends TattlerMessageBase<'tattler.error.v0'> {
   readonly error: TattlerErrorV0Payload;
 }
 
-interface TattlerAgentMessageV0 extends TattlerMessageBase {
-  readonly format: 'tattler.agent-message.v0';
+interface TattlerAgentMessageV0 extends TattlerMessageBase<'tattler.agent-message.v0'> {
   readonly from: string;
   readonly message: string;
 }
@@ -145,6 +151,27 @@ function newMessageId(): TattlerMessageId {
   return uuidv7() as TattlerMessageId;
 }
 //#endregion
+
+type MessageProps<T extends TattlerMessageBase<TattlerFormatKey>> = Omit<T, typeof TattlerProtocolFormat | 'id'> &
+  Partial<Pick<T, 'id'>>;
+
+function buildMessage<K extends TattlerFormatKey, T extends TattlerMessageBase<K>>(
+  formatKey: K,
+  props: MessageProps<T>,
+): T {
+  const { id: maybeId, ...remainingProps } = { ...props };
+
+  return {
+    [TattlerProtocolFormat]: formatKey,
+    id: maybeId || newMessageId(),
+    ...remainingProps,
+  } as T;
+}
+
+function serializeToJsonl<K extends TattlerFormatKey, T extends TattlerMessageBase<K>>(message: T): string {
+  const outObj = { ...message, format: message[TattlerProtocolFormat] };
+  return `${JSON.stringify(outObj)}\n`;
+}
 
 // ============================================================================
 // Runtime Directory Helpers
@@ -280,24 +307,73 @@ async function isSocketAlive(socketPath: string): Promise<boolean> {
   });
 }
 
-async function listPeerSockets(): Promise<TattlerPeerSocket[]> {
+async function identityFromIdFile(identityFile: string): Promise<TattlerIdentityV0 | undefined> {
+  const fileStat = await stat(identityFile, { throwIfNoEntry: false });
+  if (!fileStat) {
+    return;
+  }
+
+  const fromJson: unknown = JSON.parse(await readFile(identityFile, { encoding: 'utf8' }));
+
+  if (
+    fromJson &&
+    typeof fromJson === 'object' &&
+    Object.hasOwn(fromJson, 'name') &&
+    Object.hasOwn(fromJson, 'socketPath') &&
+    Object.hasOwn(fromJson, 'shortId')
+  ) {
+    const jsonMessageProps = fromJson as MessageProps<TattlerIdentityV0>;
+    const sockStat = await stat(jsonMessageProps.socketPath, { throwIfNoEntry: false });
+    if (sockStat?.isSocket() && (await isSocketAlive(jsonMessageProps.socketPath))) {
+      return buildMessage('tattler.identity.v0', jsonMessageProps);
+    }
+  }
+}
+
+async function identityFromSocket(socketPath: string): Promise<TattlerIdentityV0 | undefined> {
+  if (!(await isSocketAlive(socketPath))) return;
+
+  const shortId = basename(socketPath, extname(socketPath));
+  return buildMessage('tattler.identity.v0', {
+    socketPath,
+    shortId,
+    name: `session:${shortId}`,
+  });
+}
+
+async function listPeerSockets(): Promise<TattlerIdentityV0[]> {
   if (!(await checkRuntimeDir())) {
     return [];
   }
 
-  const livePeers: TattlerPeerSocket[] = [];
-  for (const entry of await readdir(tattlerRuntimeDir, { withFileTypes: true })) {
-    if (!entry.isSocket()) continue;
-    const socketPath = join(tattlerRuntimeDir, entry.name);
-    if (socketPath === ownSocketPath) continue;
-    if (!(await isSocketAlive(socketPath))) continue;
+  const livePeers: TattlerIdentityV0[] = [];
 
-    const shortId = basename(entry.name, extname(entry.name));
-    livePeers.push({
-      socketPath,
-      shortId,
-      name: `session:${shortId}`,
-    });
+  const socketFiles = new Set<string>();
+  const identityFiles = new Set<string>();
+  for (const entry of await readdir(tattlerRuntimeDir, { withFileTypes: true })) {
+    if (entry.isSocket()) {
+      const socketPath = join(tattlerRuntimeDir, entry.name);
+      if (socketPath !== ownIdentity.socketPath) {
+        socketFiles.add(socketPath);
+      }
+    } else if (extname(entry.name) === '.id') {
+      identityFiles.add(join(tattlerRuntimeDir, entry.name));
+    }
+  }
+
+  for (const idFile of identityFiles) {
+    const id = await identityFromIdFile(idFile);
+    if (id) {
+      socketFiles.delete(id.socketPath);
+      livePeers.push(id);
+    }
+  }
+
+  for (const socketPath of socketFiles) {
+    const id = await identityFromSocket(socketPath);
+    if (id) {
+      livePeers.push(id);
+    }
   }
 
   return livePeers;
@@ -347,32 +423,27 @@ function parseIncomingAgentMessage(frame: unknown): TattlerAgentMessageV0 {
     throw new Error(`Incoming agent message length ${messageLength} > ${MAX_MESSAGE_BYTES}`);
   }
 
-  return {
-    format: 'tattler.agent-message.v0',
+  return buildMessage('tattler.agent-message.v0', {
     id: requiredStringField(frame, 'id') as TattlerMessageId,
     from: requiredStringField(frame, 'from'),
     message,
-  };
+  });
 }
 
 function createAck(correlatedMessageId: TattlerMessageId): TattlerAckV0 {
-  return {
-    format: 'tattler.ack.v0',
-    id: newMessageId(),
+  return buildMessage('tattler.ack.v0', {
     ack: { correlatedMessageId },
-  };
+  });
 }
 
 function createProtocolError(message: string, correlatedMessageId?: TattlerMessageId): TattlerErrorV0 {
-  return {
-    format: 'tattler.error.v0',
-    id: newMessageId(),
+  return buildMessage('tattler.error.v0', {
     error: {
       code: 'protocol-error',
       message,
       ...(correlatedMessageId === undefined ? {} : { correlatedMessageId }),
     },
-  };
+  });
 }
 
 function writeProtocolFrame(socket: net.Socket, frame: TattlerProtocolFrame): void {
@@ -380,7 +451,7 @@ function writeProtocolFrame(socket: net.Socket, frame: TattlerProtocolFrame): vo
     return;
   }
 
-  socket.write(`${JSON.stringify(frame)}\n`);
+  socket.write(serializeToJsonl(frame));
 }
 
 function ackToSendResult(pendingId: TattlerMessageId, ack: TattlerAckV0): SendAgentMessageResult {
@@ -406,14 +477,21 @@ function protocolErrorToError(pendingId: TattlerMessageId, err: TattlerErrorV0):
 }
 
 function parseSendReplyLine(pendingId: TattlerMessageId, jsonLine: string): SendAgentMessageResult {
-  let protocolReply: TattlerMessageBase;
+  let protocolReply: TattlerMessageBase<TattlerFormatKey>;
   try {
-    protocolReply = JSON.parse(jsonLine) as TattlerMessageBase;
+    const protocolReplyRaw: unknown & {
+      format?: TattlerFormatKey;
+    } = JSON.parse(jsonLine);
+    if (protocolReplyRaw.format === undefined) {
+      throw new Error('missing format key');
+    }
+    const { format, ...props } = { ...protocolReplyRaw };
+    protocolReply = buildMessage(format as TattlerFormatKey, props);
   } catch (err) {
     throw new Error(`Problem while parsing protocol reply for message ${pendingId}: ${err}`);
   }
 
-  switch (protocolReply.format) {
+  switch (protocolReply[TattlerProtocolFormat]) {
     case 'tattler.ack.v0':
       return ackToSendResult(pendingId, protocolReply as TattlerAckV0);
 
@@ -422,14 +500,14 @@ function parseSendReplyLine(pendingId: TattlerMessageId, jsonLine: string): Send
 
     default:
       throw new Error(
-        `Unexpected message format [${protocolReply.format}] while waiting for protocol reply for message ${pendingId}`,
+        `Unexpected message format [${protocolReply[TattlerProtocolFormat]}] while waiting for protocol reply for message ${pendingId}`,
       );
   }
 }
 
 async function readProtocolReplyLine(
   socket: net.Socket,
-  peer: TattlerPeerSocket,
+  peer: TattlerIdentityV0,
   messageId: TattlerMessageId,
 ): Promise<string> {
   let buffer = '';
@@ -455,7 +533,7 @@ async function readProtocolReplyLine(
 }
 
 async function sendAgentMessage(
-  peer: TattlerPeerSocket,
+  peer: TattlerIdentityV0,
   message: TattlerAgentMessageV0,
 ): Promise<SendAgentMessageResult> {
   const peerConnection = new net.Socket();
@@ -475,7 +553,7 @@ async function sendAgentMessage(
     if (VERBOSE) {
       console.log(`sending message ${message.id} to ${peer.shortId}`);
     }
-    peerConnection.write(`${JSON.stringify(message)}\n`);
+    peerConnection.write(serializeToJsonl(message));
 
     const replyLine = await replyLinePromise;
     return parseSendReplyLine(message.id, replyLine);
@@ -511,7 +589,7 @@ async function readIncomingFrameLine(socket: net.Socket): Promise<string | undef
   throw new Error('Peer ended with a partial incoming protocol frame');
 }
 
-async function serverHandler(socket: net.Socket): Promise<void> {
+async function serverHandler(socket: net.Socket, sender?: SystemNotificationSender): Promise<void> {
   socket.setEncoding('utf8');
   socket.on('error', (err) => {
     if (VERBOSE) {
@@ -531,7 +609,31 @@ async function serverHandler(socket: net.Socket): Promise<void> {
     try {
       const message = parseIncomingAgentMessage(frame);
       writeProtocolFrame(socket, createAck(message.id));
-      // TAT-4 will deliver the parsed message into the agent session.
+      if (sender) {
+        const instructions = `This is a remote message from another coding agent. You are the primary audience for the message. The identity of the agent who sent the message is encoded in the 'from' field.
+- You are not obligated to respond to a message. The tattler protocol provides basic ACK/ERR semantics. Only respond if the originating message warrants substantive discussion.
+- If the message warrants a response to the originating agent, you can use the 'list_peers' and 'send_peer_message' tools to send a message in response.
+- The user cannot see any of this message content by default. If this message contains information the user should see, summarize or quote the relevant parts explicitly.
+- If you are working autonomously as part of an agent team on a shared workload, and this is a message related to that coordination, you do not
+need to surface anything to the user.
+- Otherwise, if it makes sense to surface the contents of the message to the user, you can do so. Provide a human-facing summary or framing; don't surface the raw XML.
+- If you are working on something, and the contents of the message contains information that indicates you may want to replan or restructure your
+current work, you should do so.
+- If you are working interactively/non-autonomously and the message requires you to pivot in a non-trivial way, discuss with the user.
+`;
+        const systemNotification = {
+          sourceType: SystemNotificationSourceType.PeerMessage,
+          sourceId: 'tattler',
+          instructions,
+          triggerTurn: true,
+          data: {
+            from: message.from,
+            message: message.message,
+            messageId: message.id,
+          },
+        };
+        sendSystemNotification(sender, systemNotification);
+      }
     } catch (protocolErr) {
       writeProtocolFrame(socket, createProtocolError(errorMessage(protocolErr), correlatedMessageId));
     }
@@ -542,6 +644,13 @@ async function serverHandler(socket: net.Socket): Promise<void> {
       socket.end();
     }
   }
+}
+
+function createServerWithNotificationSender(sender: SystemNotificationSender): net.Server {
+  const handler = async (socket: net.Socket) => {
+    return serverHandler(socket, sender);
+  };
+  return net.createServer(handler);
 }
 //#endregion
 
@@ -606,12 +715,12 @@ function registerSendMessageTool(pi: ExtensionAPI) {
         return { content: [{ type: 'text', text: errMessage }], isError: true, details: { error: errMessage } };
       }
 
-      const message: TattlerAgentMessageV0 = {
-        format: 'tattler.agent-message.v0',
-        id: newMessageId(),
+      // TODO(TAT-7) shortId is a local session locator, not a stable agent identity. Useful for v0, replace it
+      // with stable agent identity once the agent directory is implemented
+      const message: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
         message: params.message,
-        from: ownShortId,
-      };
+        from: ownIdentity.name,
+      });
 
       try {
         const sendResult: SendAgentMessageResult = await sendAgentMessage(peer, message);
@@ -648,10 +757,36 @@ export default async function (pi: ExtensionAPI) {
     return;
   }
 
-  pi.on('session_start', async (_evt, ctx) => {
+  pi.registerFlag('tattler-id', {
+    description: `Use the given string for this session's Tattler ID instead of \`session:<shortUuid>\`.
+The ID is persisted in the non-transcript session store via \`appendEntry\`. This flag is ignored if \`--resume\`
+is used to resume an existing session.
+      `,
+    type: 'string',
+  });
+
+  pi.on('session_start', async (evt, ctx) => {
     const sessionUuid = ctx.sessionManager.getSessionId();
-    for (const shortUuid of sessionShortIdGenerator(sessionUuid)) {
-      const socketPath = join(tattlerRuntimeDir, `${shortUuid}.sock`);
+    const existingTattlerId = ctx.sessionManager
+      .getEntries()
+      .toReversed()
+      .find(
+        (entry) =>
+          entry.type === 'custom' && entry.customType === TATTLER_ID_ENTRY_KEY && typeof entry.data === 'string',
+      );
+
+    const flagTattlerId =
+      (evt.reason === 'startup' || evt.reason === 'new') && !existingTattlerId
+        ? (pi.getFlag('tattler-id') as string)
+        : undefined;
+
+    const tattlerIdOverride =
+      existingTattlerId && existingTattlerId.type === 'custom'
+        ? (existingTattlerId as CustomEntry<string>).data
+        : flagTattlerId;
+
+    for (const shortId of sessionShortIdGenerator(sessionUuid)) {
+      const socketPath = join(tattlerRuntimeDir, `${shortId}.sock`);
       // If the socket file exists, but is dead, we unlink it so we can recreate it.
       // If, however, it exists and is *not* dead, we grow the number of shortIdSections
       // and try again. This is functionally equivalent to checking for UUID
@@ -667,7 +802,7 @@ export default async function (pi: ExtensionAPI) {
       }
 
       try {
-        const serverDef = net.createServer(serverHandler);
+        const serverDef = createServerWithNotificationSender(pi);
         // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
         try {
           await new Promise<void>((resolve, reject) => {
@@ -682,8 +817,14 @@ export default async function (pi: ExtensionAPI) {
           throw netErr;
         }
         server = serverDef;
-        ownShortId = shortUuid;
-        ownSocketPath = socketPath;
+        ownIdentity = buildMessage('tattler.identity.v0', {
+          name: tattlerIdOverride ? tattlerIdOverride : `session:${shortId}`,
+          shortId: shortId,
+          socketPath,
+        });
+        if (existingTattlerId === undefined) {
+          pi.appendEntry(TATTLER_ID_ENTRY_KEY, ownIdentity.name);
+        }
         break;
       } catch (netErr) {
         console.warn(`error creating UDS IPC server at ${socketPath}: `, netErr);
@@ -695,8 +836,26 @@ export default async function (pi: ExtensionAPI) {
       return;
     }
 
+    tmp.setGracefulCleanup();
+    const fileSanitizedIdentity = sanitize(ownIdentity.name);
+    const idTmpFile = tmp.fileSync({
+      name: `${fileSanitizedIdentity}.id`,
+      tmpdir: dirname(tattlerRuntimeDir),
+      dir: basename(tattlerRuntimeDir),
+      mode: 0o644,
+      discardDescriptor: true,
+    });
+
+    await appendFile(idTmpFile.name, serializeToJsonl(ownIdentity));
+
     registerListPeersTool(pi);
     registerSendMessageTool(pi);
+  });
+
+  pi.on('session_shutdown', (_evt, _ctx) => {
+    if (server) {
+      server.close();
+    }
   });
 }
 //#endregion
