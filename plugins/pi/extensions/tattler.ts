@@ -3,11 +3,11 @@
 // Do not extend this into the v1 architecture without first extracting core/runtime boundaries.
 
 import { once } from 'node:events';
+import { readFileSync } from 'node:fs';
 import { appendFile, mkdir, readdir, readFile, stat, unlink } from 'node:fs/promises';
 import * as net from 'node:net';
 import { tmpdir } from 'node:os';
 import { basename, dirname, extname, join, normalize } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { StringEnum } from '@earendil-works/pi-ai';
 import type { CustomEntry, ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { type SystemNotificationSender, SystemNotificationSourceType, sendSystemNotification } from 'sandpiper-ai-core';
@@ -28,9 +28,11 @@ const VERBOSE = process.env.TATTLER_DEBUG === '1';
 const TATTLER_ID_ENTRY_KEY = 'tattler-id';
 
 // runtime directory constants
-const __PI_CODING_AGENT_RESOLVE_DIR = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
-const CONFIG_DIR_NAME: string = (await import(join(__PI_CODING_AGENT_RESOLVE_DIR, 'config.js'))).CONFIG_DIR_NAME;
+const TATTLER_RUNTIME_NAMESPACE_ENV_KEY = 'TATTLER_RUNTIME_NAMESPACE';
+const PI_PACKAGE_DIR_ENV_KEY = 'PI_PACKAGE_DIR';
 const XDG_RUNTIME_DIR_ENV_KEY = 'XDG_RUNTIME_DIR';
+const DEFAULT_RUNTIME_NAMESPACE = 'pi';
+const NON_HARNESS_PROCESS_TITLES = new Set(['bun', 'node', 'npm', 'pnpm', 'yarn', 'vitest', 'tsx', 'ts-node']);
 
 // extension-global variables for now, structured state storage later
 let tattlerRuntimeDir: string;
@@ -190,8 +192,70 @@ function serializeToJsonl<K extends TattlerFormatKey, T extends TattlerMessageBa
 // Runtime Directory Helpers
 // ============================================================================
 //#region Runtime Directory Helpers
+interface PiConfigMetadata {
+  readonly configDir?: string;
+  readonly name?: string;
+}
+
+function normalizeRuntimeNamespace(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const namespace = sanitize(trimmed.replace(/^\.+/, ''));
+  return namespace.length > 0 ? namespace : undefined;
+}
+
+function namespaceFromConfigDir(configDir: string | undefined): string | undefined {
+  const dirName = configDir === undefined ? undefined : basename(configDir);
+  return normalizeRuntimeNamespace(dirName);
+}
+
+function readPiConfigMetadata(packageDir: string | undefined): PiConfigMetadata | undefined {
+  if (!packageDir?.trim()) {
+    return undefined;
+  }
+
+  try {
+    const packageJson = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8')) as unknown;
+    if (!isRecord(packageJson) || !isRecord(packageJson.piConfig)) {
+      return undefined;
+    }
+
+    return {
+      configDir: typeof packageJson.piConfig.configDir === 'string' ? packageJson.piConfig.configDir : undefined,
+      name: typeof packageJson.piConfig.name === 'string' ? packageJson.piConfig.name : undefined,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+function namespaceFromProcessTitle(): string | undefined {
+  const title = basename(process.title).trim();
+  if (!title || /\s/.test(title)) {
+    return undefined;
+  }
+
+  const namespace = normalizeRuntimeNamespace(title);
+  if (namespace === undefined || NON_HARNESS_PROCESS_TITLES.has(namespace)) {
+    return undefined;
+  }
+
+  return namespace;
+}
+
 function harnessConfigName(): string {
-  return CONFIG_DIR_NAME.replace(/^\./, '');
+  const packagePiConfig = readPiConfigMetadata(process.env[PI_PACKAGE_DIR_ENV_KEY]);
+
+  return (
+    normalizeRuntimeNamespace(process.env[TATTLER_RUNTIME_NAMESPACE_ENV_KEY]) ??
+    namespaceFromConfigDir(packagePiConfig?.configDir) ??
+    normalizeRuntimeNamespace(packagePiConfig?.name) ??
+    namespaceFromProcessTitle() ??
+    DEFAULT_RUNTIME_NAMESPACE
+  );
 }
 
 async function checkRuntimeDir(): Promise<boolean> {
@@ -793,8 +857,7 @@ export default async function (pi: ExtensionAPI) {
   try {
     tattlerRuntimeDir = await runtimeDir();
     if (VERBOSE) {
-      console.log(`config dir name: ${CONFIG_DIR_NAME}`);
-      console.log(`harness config name: ${harnessConfigName()}`);
+      console.log(`runtime namespace: ${harnessConfigName()}`);
       console.log(`runtime dir: ${tattlerRuntimeDir}`);
     }
   } catch (runtimeDirError) {
