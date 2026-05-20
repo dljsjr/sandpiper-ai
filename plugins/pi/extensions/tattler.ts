@@ -9,9 +9,9 @@ import { tmpdir } from 'node:os';
 import { basename, dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CustomEntry, ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { Type } from '@sinclair/typebox';
 import { type SystemNotificationSender, SystemNotificationSourceType, sendSystemNotification } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
+import { Type } from 'typebox';
 import { v7 as uuidv7 } from 'uuid';
 
 // we have to use `require` here because `tmp` is old, and relies on
