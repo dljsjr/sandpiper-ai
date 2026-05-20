@@ -15,10 +15,10 @@
     }
   },
   "dependencies": {
-    "@toon-format/toon": "2.2.0"
+    "@toon-format/toon": "2.3.0"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.75.3"
+    "@earendil-works/pi-coding-agent": "0.75.4"
   },
   "scripts": {
     "build": "tsc --build",
