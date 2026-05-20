@@ -6,8 +6,9 @@ import { once } from 'node:events';
 import { appendFile, mkdir, readdir, readFile, stat, unlink } from 'node:fs/promises';
 import * as net from 'node:net';
 import { tmpdir } from 'node:os';
-import { basename, dirname, extname, join } from 'node:path';
+import { basename, dirname, extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { StringEnum } from '@earendil-works/pi-ai';
 import type { CustomEntry, ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { type SystemNotificationSender, SystemNotificationSourceType, sendSystemNotification } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
@@ -108,6 +109,8 @@ interface TattlerMessageBase<K extends TattlerFormatKey> {
   readonly id: TattlerMessageId;
 }
 
+// v0 invariant: every persisted identity property is an addressable route key.
+// Revisit for TAT-7 once identity grows non-routing metadata.
 interface TattlerIdentityV0 extends TattlerMessageBase<'tattler.identity.v0'> {
   name: string;
   socketPath: string;
@@ -152,12 +155,15 @@ function newMessageId(): TattlerMessageId {
 }
 //#endregion
 
-type MessageProps<T extends TattlerMessageBase<TattlerFormatKey>> = Omit<T, typeof TattlerProtocolFormat | 'id'> &
+type MessageProps<K extends TattlerFormatKey, T extends TattlerMessageBase<K>> = Omit<
+  T,
+  typeof TattlerProtocolFormat | 'id'
+> &
   Partial<Pick<T, 'id'>>;
 
 function buildMessage<K extends TattlerFormatKey, T extends TattlerMessageBase<K>>(
   formatKey: K,
-  props: MessageProps<T>,
+  props: MessageProps<K, T>,
 ): T {
   const { id: maybeId, ...remainingProps } = { ...props };
 
@@ -166,6 +172,13 @@ function buildMessage<K extends TattlerFormatKey, T extends TattlerMessageBase<K
     id: maybeId || newMessageId(),
     ...remainingProps,
   } as T;
+}
+
+function stripProtocolFrame<K extends TattlerFormatKey, T extends TattlerMessageBase<K>>(
+  message: T,
+): MessageProps<K, T> {
+  const { id, [TattlerProtocolFormat]: K, ...base } = { ...message };
+  return base;
 }
 
 function serializeToJsonl<K extends TattlerFormatKey, T extends TattlerMessageBase<K>>(message: T): string {
@@ -313,20 +326,24 @@ async function identityFromIdFile(identityFile: string): Promise<TattlerIdentity
     return;
   }
 
-  const fromJson: unknown = JSON.parse(await readFile(identityFile, { encoding: 'utf8' }));
+  try {
+    const fromJson: unknown = JSON.parse(await readFile(identityFile, { encoding: 'utf8' }));
 
-  if (
-    fromJson &&
-    typeof fromJson === 'object' &&
-    Object.hasOwn(fromJson, 'name') &&
-    Object.hasOwn(fromJson, 'socketPath') &&
-    Object.hasOwn(fromJson, 'shortId')
-  ) {
-    const jsonMessageProps = fromJson as MessageProps<TattlerIdentityV0>;
-    const sockStat = await stat(jsonMessageProps.socketPath, { throwIfNoEntry: false });
-    if (sockStat?.isSocket() && (await isSocketAlive(jsonMessageProps.socketPath))) {
-      return buildMessage('tattler.identity.v0', jsonMessageProps);
+    if (
+      fromJson &&
+      typeof fromJson === 'object' &&
+      Object.hasOwn(fromJson, 'name') &&
+      Object.hasOwn(fromJson, 'socketPath') &&
+      Object.hasOwn(fromJson, 'shortId')
+    ) {
+      const jsonMessageProps = fromJson as MessageProps<'tattler.identity.v0', TattlerIdentityV0>;
+      const sockStat = await stat(jsonMessageProps.socketPath, { throwIfNoEntry: false });
+      if (sockStat?.isSocket() && (await isSocketAlive(jsonMessageProps.socketPath))) {
+        return buildMessage('tattler.identity.v0', jsonMessageProps);
+      }
     }
+  } catch (err) {
+    console.warn(`error processing identity file ${identityFile} (skipping file): `, err);
   }
 }
 
@@ -351,13 +368,13 @@ async function listPeerSockets(): Promise<TattlerIdentityV0[]> {
   const socketFiles = new Set<string>();
   const identityFiles = new Set<string>();
   for (const entry of await readdir(tattlerRuntimeDir, { withFileTypes: true })) {
+    const normalizedEntryPath = normalize(join(tattlerRuntimeDir, entry.name));
     if (entry.isSocket()) {
-      const socketPath = join(tattlerRuntimeDir, entry.name);
-      if (socketPath !== ownIdentity.socketPath) {
-        socketFiles.add(socketPath);
+      if (normalizedEntryPath !== ownIdentity.socketPath) {
+        socketFiles.add(normalizedEntryPath);
       }
     } else if (extname(entry.name) === '.id') {
-      identityFiles.add(join(tattlerRuntimeDir, entry.name));
+      identityFiles.add(normalizedEntryPath);
     }
   }
 
@@ -658,11 +675,16 @@ function createServerWithNotificationSender(sender: SystemNotificationSender): n
 // ============================================================================
 // Begin Pi API Integration
 // ============================================================================
-
 function registerListPeersTool(pi: ExtensionAPI) {
   pi.registerTool({
     name: 'list_peers',
     label: 'List Peers',
+    promptSnippet:
+      'Lists routing information for other Tattler participants with active endpoints for Tattler messages',
+    promptGuidelines: [
+      "Use `list_peers` when you need to send a message to another Tattler participant, but you don't know their name/identity/socket information.",
+      'If you are sending a reply to another message, try sending directly with the `name` address type first to save time. `list_peers` is your fallback.',
+    ],
     description: 'List other agent peers with live sockets, which means they are candidates for receiving messages',
     parameters: Type.Object({}),
     async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
@@ -675,7 +697,7 @@ function registerListPeersTool(pi: ExtensionAPI) {
       }
 
       const lines = peerSockets.map((peer) => {
-        return `- ${peer.name}         [id: ${peer.shortId}]`;
+        return `- ${peer.name}         [shortId: ${peer.shortId}]`;
       });
 
       const resultText = `Peers:\n${lines.join('\n')}`;
@@ -688,21 +710,47 @@ function registerListPeersTool(pi: ExtensionAPI) {
   });
 }
 
+// v0 dogfood shortcut: every identity property is routable so identity-shape
+// changes automatically show up in the tool schema. The production agent
+// directory should define an explicit, versioned routing surface.
+const __IdentityTemplate: MessageProps<'tattler.identity.v0', TattlerIdentityV0> = stripProtocolFrame(
+  buildMessage('tattler.identity.v0', {
+    name: '',
+    socketPath: '',
+    shortId: '',
+  }),
+);
+
+const TattlerAddressType = StringEnum(Object.keys(__IdentityTemplate), {
+  description:
+    'Tag indicating how to use the provided `id` to route the message to its desired recipient. Defaults to `name`',
+  default: 'name',
+});
+
 function registerSendMessageTool(pi: ExtensionAPI) {
   pi.registerTool({
     name: 'send_peer_message',
     label: 'Send Peer Message',
-    description: 'Send a message to a live/active peer, addressed by their ID',
+    description: 'Send a message to a live/active peer',
+    promptSnippet:
+      'Send a message to another Tattler participant. Use `addressType` to control how the `id` property should be interpreted',
+    promptGuidelines: [
+      'Use `send_peer_message` directly without consulting `list_peers` if you know any of the shortId, name, or UDS socket path for your recipient',
+    ],
     parameters: Type.Object({
-      id: Type.String({ description: 'Target Peer ID' }),
+      addressType: Type.Optional(TattlerAddressType),
+      id: Type.String({ description: 'Target Peer ID (generalized by address type)' }),
       message: Type.String({
         description: `The message to send to the peer, limited in size to ${MAX_MESSAGE_BYTES} bytes`,
       }),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
+      const addressType = (params.addressType || 'name') as keyof TattlerIdentityV0;
       // TODO: don't probe for live sockets every single time we send a message; this could add significant latency.
       // fine for initial dogfooding though.
-      const peer = (await listPeerSockets()).find((peer) => peer.shortId === params.id);
+      const peer = (await listPeerSockets()).find(
+        (peer) => Object.hasOwn(peer, addressType) && peer[addressType] === params.id,
+      );
 
       if (!peer) {
         const errMessage = `No live peer with id ${params.id} to receive message`;
@@ -786,7 +834,7 @@ is used to resume an existing session.
         : flagTattlerId;
 
     for (const shortId of sessionShortIdGenerator(sessionUuid)) {
-      const socketPath = join(tattlerRuntimeDir, `${shortId}.sock`);
+      const socketPath = normalize(join(tattlerRuntimeDir, `${shortId}.sock`));
       // If the socket file exists, but is dead, we unlink it so we can recreate it.
       // If, however, it exists and is *not* dead, we grow the number of shortIdSections
       // and try again. This is functionally equivalent to checking for UUID
