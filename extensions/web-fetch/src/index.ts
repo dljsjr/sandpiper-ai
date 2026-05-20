@@ -4,8 +4,8 @@
  */
 
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { Type } from '@sinclair/typebox';
 import { SystemNotificationSourceType, sendSystemNotification } from 'sandpiper-ai-core';
+import { Type } from 'typebox';
 import { SimpleFetchAdapter } from './fetch.js';
 import {
   executeWebFetchTool as defaultExecuteWebFetchTool,

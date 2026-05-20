@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { Type } from '@sinclair/typebox';
 import { checkBackgroundProcess, type ProcessManager, startBackgroundProcess } from 'sandpiper-ai-core';
+import { Type } from 'typebox';
 
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.registerTool({

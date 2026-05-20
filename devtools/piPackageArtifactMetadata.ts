@@ -84,7 +84,7 @@ export function createPiPeerDependencies(rootPackageJson: RootPackageJson): Reco
   return {
     '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-coding-agent'),
     '@earendil-works/pi-tui': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-tui'),
-    '@sinclair/typebox': packagePeerDependencyVersion(rootPackageJson, '@sinclair/typebox'),
+    typebox: packagePeerDependencyVersion(rootPackageJson, 'typebox'),
   };
 }
 
@@ -195,7 +195,7 @@ export function createShellRelayExtensionPackageJson(rootPackageJson: RootPackag
         shellRelayPackageJson,
         '@earendil-works/pi-coding-agent',
       ),
-      '@sinclair/typebox': packagePeerDependencyVersion(shellRelayPackageJson, '@sinclair/typebox'),
+      typebox: packagePeerDependencyVersion(shellRelayPackageJson, 'typebox'),
     },
     pi: {
       extensions: ['./src/index.ts'],
@@ -219,7 +219,7 @@ export function createWebFetchExtensionPackageJson(rootPackageJson: RootPackageJ
         webFetchPackageJson,
         '@earendil-works/pi-coding-agent',
       ),
-      '@sinclair/typebox': packagePeerDependencyVersion(webFetchPackageJson, '@sinclair/typebox'),
+      typebox: packagePeerDependencyVersion(webFetchPackageJson, 'typebox'),
     },
     pi: {
       extensions: ['./src/index.ts'],

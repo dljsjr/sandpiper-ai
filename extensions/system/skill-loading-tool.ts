@@ -10,7 +10,7 @@ import type {
 } from '@earendil-works/pi-coding-agent';
 import { keyHint, parseFrontmatter } from '@earendil-works/pi-coding-agent';
 import { Text } from '@earendil-works/pi-tui';
-import { Type } from '@sinclair/typebox';
+import { Type } from 'typebox';
 
 const SKILL_COMMAND_PREFIX = 'skill:';
 const SKILL_FILE_NAME = 'SKILL.md';
