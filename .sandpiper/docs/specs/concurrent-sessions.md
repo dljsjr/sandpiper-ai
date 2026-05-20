@@ -56,7 +56,7 @@ Contents (three lines):
 ```
 12345
 2026-04-05T10:00:00.000Z
-/Users/doug/git/my-project
+<project-dir>
 ```
 
 - Line 1: OS process ID
@@ -82,7 +82,7 @@ The CLI checks process liveness using `process.kill(pid, 0)`:
 
 ## Session c82731d3 (Updated: 2026-04-05T10:30:00Z)
 
-Session file: ~/.sandpiper/agent/sessions/--Users-doug-git-my-project--/2026-04-01T18-12-48-013Z_c82731d3.jsonl
+Session file: ~/.sandpiper/agent/sessions/--project-dir--/2026-04-01T18-12-48-013Z_c82731d3.jsonl
 
 ### Accomplished
 
@@ -106,7 +106,7 @@ Session file: ~/.sandpiper/agent/sessions/--Users-doug-git-my-project--/2026-04-
 
 ## Session f19a4e2b (Updated: 2026-04-05T10:25:00Z)
 
-Session file: ~/.sandpiper/agent/sessions/--Users-doug-git-my-project--/2026-04-05T10-20-00-000Z_f19a4e2b.jsonl
+Session file: ~/.sandpiper/agent/sessions/--project-dir--/2026-04-05T10-20-00-000Z_f19a4e2b.jsonl
 
 ### Accomplished
 
