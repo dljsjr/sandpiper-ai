@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Compatibility bridge to packages/capability-autotoon",
+  "description": "AutoTOON Pi extension — JSON to TOON conversion on tool results",
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "0.75.4"
+  },
   "pi": {
     "extensions": [
       "./autotoon.ts"
