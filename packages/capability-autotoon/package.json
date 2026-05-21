@@ -3,22 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "description": "Host-neutral AutoTOON JSON to TOON conversion plus Pi adapter",
+  "description": "Host-neutral AutoTOON JSON to TOON conversion",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
-    },
-    "./pi-extension": {
-      "types": "./dist/pi-extension.d.ts",
-      "default": "./src/pi-extension.ts"
     }
   },
   "dependencies": {
     "@toon-format/toon": "2.3.0"
-  },
-  "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.75.4"
   },
   "scripts": {
     "build": "tsc --build",

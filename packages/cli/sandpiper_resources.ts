@@ -1,14 +1,14 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
+import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
 import {
   createNeutralCapabilityExtension,
   createSandpiperIdentityExtension,
 } from '../../extensions/system/extension-factories.js';
+import tattlerExtension from '../../extensions/tattler.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
-import tattlerExtension from '../../plugins/pi/extensions/tattler.js';
-import autotoonExtension from '../capability-autotoon/src/pi-extension.js';
 
 export interface SandpiperResourcePaths {
   readonly skillPaths: readonly string[];

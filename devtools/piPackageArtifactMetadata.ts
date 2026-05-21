@@ -1,11 +1,13 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
+import autotoonExtensionPackageJson from '../extensions/autotoon/package.json' with { type: 'json' };
 import shellRelayPackageJson from '../extensions/shell-relay/package.json' with { type: 'json' };
 import systemPackageJson from '../extensions/system/package.json' with { type: 'json' };
 import webFetchPackageJson from '../extensions/web-fetch/package.json' with { type: 'json' };
 import autotoonPackageJson from '../packages/capability-autotoon/package.json' with { type: 'json' };
 import cliPackageJson from '../packages/cli/package.json' with { type: 'json' };
+import tattlerPluginPackageJson from '../plugins/pi/extensions/package.json' with { type: 'json' };
 
 export interface PiConfigJson {
   readonly name: string;
@@ -90,6 +92,7 @@ export function createPiPeerDependencies(rootPackageJson: RootPackageJson): Reco
 
 export function createPiRuntimeDependencies(): Record<string, string> {
   return {
+    '@earendil-works/pi-ai': packagePeerDependencyVersion(tattlerPluginPackageJson, '@earendil-works/pi-ai'),
     '@earendil-works/pi-coding-agent': packageDependencyVersion(cliPackageJson, '@earendil-works/pi-coding-agent'),
     '@mozilla/readability': packageDependencyVersion(webFetchPackageJson, '@mozilla/readability'),
     '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
@@ -142,25 +145,15 @@ export function createAutotoonSupportPackageJson(rootPackageJson: RootPackageJso
     name: 'sandpiper-capability-autotoon',
     version: rootPackageJson.version,
     type: 'module',
-    description: 'Host-neutral AutoTOON JSON to TOON conversion plus Pi adapter',
+    description: 'Host-neutral AutoTOON JSON to TOON conversion',
     exports: {
       '.': {
         types: './dist/index.d.ts',
         default: './src/index.ts',
       },
-      './pi-extension': {
-        types: './dist/pi-extension.d.ts',
-        default: './src/pi-extension.ts',
-      },
     },
     dependencies: {
       '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
-    },
-    peerDependencies: {
-      '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
-        autotoonPackageJson,
-        '@earendil-works/pi-coding-agent',
-      ),
     },
   };
 }
@@ -232,9 +225,15 @@ export function createAutotoonExtensionPackageJson(rootPackageJson: RootPackageJ
     name: 'autotoon',
     version: rootPackageJson.version,
     type: 'module',
-    description: 'Compatibility bridge to packages/capability-autotoon',
+    description: 'AutoTOON Pi extension — JSON to TOON conversion on tool results',
     dependencies: {
       'sandpiper-capability-autotoon': 'file:../../packages/capability-autotoon',
+    },
+    peerDependencies: {
+      '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
+        autotoonExtensionPackageJson,
+        '@earendil-works/pi-coding-agent',
+      ),
     },
     pi: {
       extensions: ['./autotoon.ts'],
