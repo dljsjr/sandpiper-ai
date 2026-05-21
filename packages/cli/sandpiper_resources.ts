@@ -7,7 +7,7 @@ import {
   createNeutralCapabilityExtension,
   createSandpiperIdentityExtension,
 } from '../../extensions/system/extension-factories.js';
-import tattlerExtension from '../../extensions/tattler.js';
+import tattlerExtension from '../../extensions/tattler/index.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
 
 export interface SandpiperResourcePaths {
