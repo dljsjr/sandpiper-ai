@@ -25,6 +25,7 @@ export function registerStartupPromptHooks(
       console.error('system prompt:\n', effectiveSystemPrompt);
       ctx.shutdown();
     }
+
     return {
       systemPrompt: effectiveSystemPrompt,
     };
