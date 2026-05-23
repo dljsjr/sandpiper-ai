@@ -3,9 +3,11 @@ import { describe, expect, test } from 'vitest';
 import {
   announceChorusReady,
   emitChorusRoomDelivery,
+  emitChorusRoomPostReceived,
   onChorusReady,
   onChorusReadyRequest,
   onChorusRoomDelivery,
+  onChorusRoomPostReceived,
   onChorusRoomPostRequest,
   onListPeersRequest,
   requestChorusReady,
@@ -131,6 +133,20 @@ describe('Chorus Pi event-bus contracts', () => {
     await expect(requestChorusRoomPost(consumer, { roomId: roomId('chorus-dev'), message: 'ship it' })).rejects.toThrow(
       'broker unavailable',
     );
+  });
+
+  test('uses broadcast events for received room posts', () => {
+    const { producer, consumer } = fakeExtensionPair();
+    const post = createChorusRoomPost(roomId('chorus-dev'), 'Piper', broker, 'hello everyone');
+    const seen: string[] = [];
+
+    onChorusRoomPostReceived(consumer, (event) => {
+      seen.push(`${event.roomId}:${event.from}:${event.message}:${event.broker.socketPath}`);
+    });
+
+    emitChorusRoomPostReceived(producer, post);
+
+    expect(seen).toEqual(['chorus-dev:Piper:hello everyone:/tmp/tattler/broker.sock']);
   });
 
   test('uses broadcast events for room deliveries', () => {

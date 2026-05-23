@@ -7,22 +7,28 @@ import {
   sendSystemNotification,
   withTimeout,
 } from 'sandpiper-ai-core';
+import { emitChorusRoomDelivery, emitChorusRoomPostReceived, type HasPiEventBus } from './tattler-pi-events';
 import {
+  type ChorusRoomDeliveryV0,
+  type ChorusRoomPostV0,
   createAck,
   createProtocolError,
   extractMessageId,
   MAX_PROTOCOL_REPLY_BYTES,
   MAX_PROTOCOL_REQUEST_BYTES,
-  parseIncomingAgentMessage,
+  parseIncomingPayloadFrame,
   parseProtocolJsonLine,
   parseSendReplyLine,
+  protocolFormat,
   SEND_ACK_TIMEOUT_MS,
   type SendAgentMessageResult,
   serializeToJsonl,
   type TattlerAgentMessageV0,
   type TattlerIdentityV0,
+  type TattlerIncomingPayloadFrame,
   type TattlerMessageId,
   type TattlerProtocolFrame,
+  type TattlerSendableFrame,
 } from './tattler-protocol';
 
 // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
@@ -50,7 +56,62 @@ export async function isSocketAlive(socketPath: string): Promise<boolean> {
   });
 }
 
-async function serverHandler(socket: net.Socket, sender?: SystemNotificationSender): Promise<void> {
+type TattlerIpcRuntime = SystemNotificationSender & HasPiEventBus;
+
+function sendAgentMessageNotification(sender: SystemNotificationSender, message: TattlerAgentMessageV0): void {
+  const instructions = `This is a remote message from another coding agent. You are the primary audience for the message. The identity of the agent who sent the message is encoded in the 'from' field.
+- You are not obligated to respond to a message. The tattler protocol provides basic ACK/ERR semantics. Only respond if the originating message warrants substantive discussion.
+- If the message warrants a response to the originating agent, you can use the 'list_peers' and 'send_peer_message' tools to send a message in response.
+- The user cannot see any of this message content by default. If this message contains information the user should see, summarize or quote the relevant parts explicitly.
+- If you are working autonomously as part of an agent team on a shared workload, and this is a message related to that coordination, you do not
+need to surface anything to the user.
+- Otherwise, if it makes sense to surface the contents of the message to the user, you can do so. Provide a human-facing summary or framing; don't surface the raw XML.
+- If you are working on something, and the contents of the message contains information that indicates you may want to replan or restructure your
+current work, you should do so.
+- If you are working interactively/non-autonomously and the message requires you to pivot in a non-trivial way, discuss with the user.
+`;
+  const systemNotification = {
+    sourceType: SystemNotificationSourceType.PeerMessage,
+    sourceId: 'tattler',
+    instructions,
+    triggerTurn: true,
+    data: {
+      from: message.from,
+      message: message.message,
+      messageId: message.id,
+    },
+  };
+  sendSystemNotification(sender, systemNotification);
+}
+
+function dispatchIncomingPayloadFrame(
+  runtime: TattlerIpcRuntime | undefined,
+  message: TattlerIncomingPayloadFrame,
+): void {
+  if (!runtime) {
+    return;
+  }
+
+  try {
+    switch (protocolFormat(message)) {
+      case 'tattler.agent-message.v0':
+        sendAgentMessageNotification(runtime, message as TattlerAgentMessageV0);
+        return;
+
+      case 'chorus.room-post.v0':
+        emitChorusRoomPostReceived(runtime, message as ChorusRoomPostV0);
+        return;
+
+      case 'chorus.room-delivery.v0':
+        emitChorusRoomDelivery(runtime, message as ChorusRoomDeliveryV0);
+        return;
+    }
+  } catch (dispatchErr) {
+    console.error('Tattler socket error while dispatching message: ', dispatchErr);
+  }
+}
+
+async function serverHandler(socket: net.Socket, runtime?: TattlerIpcRuntime): Promise<void> {
   socket.setEncoding('utf8');
   socket.on('error', (err) => {
     console.error('Tattler socket error while receiving message: ', err);
@@ -66,33 +127,9 @@ async function serverHandler(socket: net.Socket, sender?: SystemNotificationSend
     const correlatedMessageId = extractMessageId(frame);
 
     try {
-      const message = parseIncomingAgentMessage(frame);
+      const message = parseIncomingPayloadFrame(frame);
       writeProtocolFrame(socket, createAck(message.id));
-      if (sender) {
-        const instructions = `This is a remote message from another coding agent. You are the primary audience for the message. The identity of the agent who sent the message is encoded in the 'from' field.
-- You are not obligated to respond to a message. The tattler protocol provides basic ACK/ERR semantics. Only respond if the originating message warrants substantive discussion.
-- If the message warrants a response to the originating agent, you can use the 'list_peers' and 'send_peer_message' tools to send a message in response.
-- The user cannot see any of this message content by default. If this message contains information the user should see, summarize or quote the relevant parts explicitly.
-- If you are working autonomously as part of an agent team on a shared workload, and this is a message related to that coordination, you do not
-need to surface anything to the user.
-- Otherwise, if it makes sense to surface the contents of the message to the user, you can do so. Provide a human-facing summary or framing; don't surface the raw XML.
-- If you are working on something, and the contents of the message contains information that indicates you may want to replan or restructure your
-current work, you should do so.
-- If you are working interactively/non-autonomously and the message requires you to pivot in a non-trivial way, discuss with the user.
-`;
-        const systemNotification = {
-          sourceType: SystemNotificationSourceType.PeerMessage,
-          sourceId: 'tattler',
-          instructions,
-          triggerTurn: true,
-          data: {
-            from: message.from,
-            message: message.message,
-            messageId: message.id,
-          },
-        };
-        sendSystemNotification(sender, systemNotification);
-      }
+      dispatchIncomingPayloadFrame(runtime, message);
     } catch (protocolErr) {
       writeProtocolFrame(socket, createProtocolError(errorMessage(protocolErr), correlatedMessageId));
     }
@@ -105,7 +142,7 @@ current work, you should do so.
   }
 }
 
-export function createServerWithNotificationSender(sender: SystemNotificationSender): net.Server {
+export function createServerWithNotificationSender(sender: TattlerIpcRuntime): net.Server {
   const handler = async (socket: net.Socket) => {
     return serverHandler(socket, sender);
   };
@@ -139,9 +176,9 @@ async function readIncomingFrameLine(socket: net.Socket): Promise<string | undef
   throw new Error('Peer ended with a partial incoming protocol frame');
 }
 
-export async function sendAgentMessage(
+export async function sendPayloadFrame(
   peer: TattlerIdentityV0,
-  message: TattlerAgentMessageV0,
+  message: TattlerSendableFrame,
 ): Promise<SendAgentMessageResult> {
   const peerConnection = new net.Socket();
   peerConnection.setEncoding('utf8');
@@ -164,6 +201,13 @@ export async function sendAgentMessage(
   } finally {
     peerConnection.destroy();
   }
+}
+
+export async function sendAgentMessage(
+  peer: TattlerIdentityV0,
+  message: TattlerAgentMessageV0,
+): Promise<SendAgentMessageResult> {
+  return sendPayloadFrame(peer, message);
 }
 
 async function readProtocolReplyLine(
