@@ -1,141 +1,309 @@
-// Chorus — multi-agent broadcast editor extension.
-// Submits the current prompt to the local agent AND a selected set of live
-// Tattler peers simultaneously.
-//
-// /chorus  — toggle broadcast mode (opens peer picker when enabling).
-// Footer indicator: "◉ chorus (N peers)" while active.
-
-import type { KeybindingsManager } from '@earendil-works/pi-coding-agent';
-import { CustomEditor, DynamicBorder, type ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { randomUUID } from 'node:crypto';
+import { stat, unlink } from 'node:fs/promises';
+import type * as net from 'node:net';
+import { dirname, join, normalize } from 'node:path';
+import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
+import sanitize from 'sanitize-filename';
+import { Type } from 'typebox';
+import { type ChorusRoomBroker, createChorusRoomBroker, createChorusRoomDeliveryFrame } from './chorus/chorus-runtime';
 import {
-  Container,
-  type EditorTheme,
-  Key,
-  matchesKey,
-  Spacer,
-  Text,
-  type TUI,
-  truncateToWidth,
-} from '@earendil-works/pi-tui';
-import { requestListPeers, requestOwnIdentity } from './tattler/tattler-pi-events';
-import type { TattlerIdentityV0 } from './tattler/tattler-protocol';
+  choosePeers,
+  clearChorusRoomUi,
+  registerChorusMessageRenderer,
+  sendChorusMessageToChat,
+  setChorusRoomUi,
+} from './chorus/chorus-ui';
+import { createServerWithNotificationSender, isSocketAlive, sendPayloadFrame } from './tattler/tattler-ipc';
+import {
+  onChorusRoomDelivery,
+  onChorusRoomPostReceived,
+  onChorusRoomPostRequest,
+  requestListPeers,
+  requestOwnIdentity,
+} from './tattler/tattler-pi-events';
+import {
+  buildMessage,
+  type ChorusReplyRouteV0,
+  type ChorusRoomDeliveryV0,
+  type ChorusRoomId,
+  type ChorusRoomPostV0,
+  roomId,
+  type TattlerIdentityV0,
+  type TattlerMessageId,
+} from './tattler/tattler-protocol';
 
-// ── Protocol surface ──────────────────────────────────────────────────────────
-// Intentionally red until tattler-protocol.ts is extracted from tattler.ts.
-// Required exports:
-//   export function sendUserPrompt(peer: TattlerIdentityV0, prompt: string, from: string): Promise<void>
+interface BrokerEndpoint {
+  readonly route: ChorusReplyRouteV0;
+  readonly server: net.Server;
+  readonly socketPath: string;
+}
 
-// stubs until we're done implementing the new wire type
-declare function sendUserPrompt(peer: TattlerIdentityV0, prompt: string, from: string): Promise<void>;
+interface ActiveChorusRoom {
+  readonly broker: ChorusRoomBroker;
+  readonly endpoint: BrokerEndpoint;
+  readonly peers: readonly TattlerIdentityV0[];
+  requestRender?: () => void;
+}
 
-// ── Peer multi-select component ───────────────────────────────────────────────
+let activeRoom: ActiveChorusRoom | undefined;
+let eventUnsubscribers: Array<() => void> = [];
+let ownIdentityRequest: Promise<TattlerIdentityV0> | undefined;
 
-class PeerPicker {
-  private items: Array<{ peer: TattlerIdentityV0; checked: boolean }>;
-  private cursor = 0;
-  private cachedWidth?: number;
-  private cachedLines?: string[];
-
-  onConfirm?: (selected: TattlerIdentityV0[]) => void;
-  onCancel?: () => void;
-
-  constructor(peers: TattlerIdentityV0[]) {
-    this.items = peers.map((peer) => ({ peer, checked: false }));
+function clearEventListeners(): void {
+  for (const unsubscribe of eventUnsubscribers.splice(0)) {
+    unsubscribe();
   }
+}
 
-  handleInput(data: string): void {
-    if (matchesKey(data, Key.up)) {
-      this.cursor = Math.max(0, this.cursor - 1);
-    } else if (matchesKey(data, Key.down)) {
-      this.cursor = Math.min(this.items.length - 1, this.cursor + 1);
-    } else if (matchesKey(data, Key.space)) {
-      const item = this.items[this.cursor];
-      if (item) item.checked = !item.checked;
-    } else if (matchesKey(data, Key.enter)) {
-      this.onConfirm?.(this.items.filter((i) => i.checked).map((i) => i.peer));
-      return;
-    } else if (matchesKey(data, Key.escape)) {
-      this.onCancel?.();
-      return;
+async function stopActiveRoom(): Promise<void> {
+  const room = activeRoom;
+  activeRoom = undefined;
+  if (!room) return;
+
+  await closeServer(room.endpoint.server);
+  await unlink(room.endpoint.socketPath).catch(() => undefined);
+}
+
+async function closeServer(server: net.Server): Promise<void> {
+  await new Promise<void>((resolve) => {
+    server.close(() => resolve());
+  });
+}
+
+async function resolveOwnIdentity(pi: ExtensionAPI): Promise<TattlerIdentityV0 | undefined> {
+  ownIdentityRequest ??= requestOwnIdentity(pi);
+  try {
+    return await ownIdentityRequest;
+  } catch (err) {
+    ownIdentityRequest = undefined;
+    console.warn('Chorus could not resolve local Tattler identity: ', err);
+    return undefined;
+  }
+}
+
+function brokerRouteToPeer(route: ChorusReplyRouteV0): TattlerIdentityV0 {
+  return buildMessage('tattler.identity.v0', {
+    name: route.name,
+    shortId: route.shortId,
+    socketPath: route.socketPath,
+  });
+}
+
+function roomSocketPath(ownIdentity: TattlerIdentityV0, room: ChorusRoomId): string {
+  const safeRoom = sanitize(room) || 'room';
+  return normalize(
+    join(dirname(ownIdentity.socketPath), `${ownIdentity.shortId}-chorus-${safeRoom}-${randomUUID()}.sock`),
+  );
+}
+
+async function createBrokerEndpoint(
+  pi: ExtensionAPI,
+  ownIdentity: TattlerIdentityV0,
+  room: ChorusRoomId,
+): Promise<BrokerEndpoint> {
+  const socketPath = roomSocketPath(ownIdentity, room);
+  if (await stat(socketPath, { throwIfNoEntry: false })) {
+    if (await isSocketAlive(socketPath)) {
+      throw new Error(`Chorus broker socket already exists and is alive: ${socketPath}`);
     }
-    this.invalidate();
+    await unlink(socketPath);
   }
 
-  render(width: number): string[] {
-    if (this.cachedLines && this.cachedWidth === width) return this.cachedLines;
-    this.cachedLines = this.items.map((item, i) => {
-      const mark = item.checked ? '◉' : '○';
-      const arrow = i === this.cursor ? '▶' : ' ';
-      return truncateToWidth(`${arrow} ${mark} ${item.peer.name}`, width);
+  const server = createServerWithNotificationSender(pi);
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once('error', reject);
+      server.listen(socketPath, () => {
+        server.removeListener('error', reject);
+        resolve();
+      });
     });
-    this.cachedWidth = width;
-    return this.cachedLines;
+  } catch (err) {
+    server.close();
+    throw err;
   }
 
-  invalidate(): void {
-    this.cachedWidth = undefined;
-    this.cachedLines = undefined;
-  }
+  return {
+    route: {
+      name: `chorus:${room}:${ownIdentity.name}`,
+      shortId: `chorus-${ownIdentity.shortId}`,
+      socketPath,
+    },
+    server,
+    socketPath,
+  };
 }
 
-// ── Broadcast editor ──────────────────────────────────────────────────────────
+async function openRoom(
+  pi: ExtensionAPI,
+  ctx: ExtensionCommandContext,
+  ownIdentity: TattlerIdentityV0,
+  room: ChorusRoomId,
+  peers: readonly TattlerIdentityV0[],
+): Promise<void> {
+  await stopActiveRoom();
+  const endpoint = await createBrokerEndpoint(pi, ownIdentity, room);
+  const broker = createChorusRoomBroker({
+    roomId: room,
+    ownIdentity,
+    brokerRoute: endpoint.route,
+    peers,
+    sendFrame: sendPayloadFrame,
+    onUpdate: () => activeRoom?.requestRender?.(),
+  });
 
-class BroadcastEditor extends CustomEditor {
-  private peers: TattlerIdentityV0[] = [];
-  private ownName: string;
-
-  constructor(tui: TUI, theme: EditorTheme, keybindings: KeybindingsManager, ownName: string) {
-    super(tui, theme, keybindings);
-    this.ownName = ownName;
-  }
-
-  setPeers(peers: TattlerIdentityV0[]): void {
-    this.peers = [...peers];
-  }
-
-  override handleInput(data: string): void {
-    if (matchesKey(data, Key.enter) && !this.disableSubmit && this.peers.length > 0) {
-      const prompt = this.getText();
-      if (prompt.trim().length > 0) {
-        for (const peer of this.peers) {
-          sendUserPrompt(peer, prompt, this.ownName).catch(() => {});
-        }
+  activeRoom = { broker, endpoint, peers };
+  setChorusRoomUi({
+    pi,
+    ctx,
+    room,
+    broker,
+    peers,
+    onRenderReady: (requestRender) => {
+      if (activeRoom?.broker === broker) {
+        activeRoom.requestRender = requestRender;
       }
-    }
-    super.handleInput(data);
-  }
-
-  override render(width: number): string[] {
-    const lines = super.render(width);
-    if (lines.length === 0 || this.peers.length === 0) return lines;
-    const label = ` ◉ chorus (${this.peers.length}) `;
-    const last = lines.length - 1;
-    const lastLine = lines[last];
-    if (lastLine === undefined) return lines;
-    lines[last] = truncateToWidth(lastLine, width - label.length, '') + label;
-    return lines;
-  }
+    },
+  });
 }
 
-// ── Extension state ───────────────────────────────────────────────────────────
-
-let activePeers: TattlerIdentityV0[] = [];
-
-function isActive(): boolean {
-  return activePeers.length > 0;
+async function closeRoomUi(ctx: ExtensionCommandContext): Promise<void> {
+  await stopActiveRoom();
+  clearChorusRoomUi(ctx);
 }
 
-// ── Extension factory ─────────────────────────────────────────────────────────
+async function handleRoomPostReceived(pi: ExtensionAPI, post: ChorusRoomPostV0): Promise<void> {
+  activeRoom?.broker.recordRoomPost(post);
+  const ownIdentity = await resolveOwnIdentity(pi);
+  if (ownIdentity && post.from === ownIdentity.name) {
+    return;
+  }
 
-export default async function (pi: ExtensionAPI) {
+  sendChorusMessageToChat(pi, {
+    roomId: post.roomId,
+    from: post.from,
+    message: post.message,
+    postId: post.id,
+    broker: post.broker,
+  });
+}
+
+async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDeliveryV0): Promise<void> {
+  const room = activeRoom;
+  if (!room) {
+    return;
+  }
+
+  const recorded = room.broker.recordDelivery(delivery);
+  if (!recorded || delivery.from === room.broker.ownIdentity.name) {
+    return;
+  }
+
+  sendChorusMessageToChat(pi, {
+    roomId: delivery.roomId,
+    from: delivery.from,
+    message: delivery.message,
+    postId: delivery.postId,
+    broker: room.broker.brokerRoute,
+  });
+}
+
+function registerChorusReplyTool(pi: ExtensionAPI): void {
+  pi.registerTool({
+    name: 'send_chorus_reply',
+    label: 'Send Chorus Reply',
+    description: 'Reply to a Chorus room message through the broker route embedded in that message',
+    promptSnippet:
+      'Send a reply to a Chorus room via the provided broker route. Use this instead of a plain Tattler DM for Chorus replies.',
+    promptGuidelines: [
+      'Use this when a visible Chorus room message asks for a substantive reply.',
+      'Copy roomId, postId, and broker route fields from the Chorus message metadata in context.',
+      'Do not use send_peer_message for Chorus room replies unless the user explicitly asks for a direct Tattler DM.',
+    ],
+    parameters: Type.Object({
+      roomId: Type.String({ description: 'Chorus room ID from the incoming Chorus message' }),
+      postId: Type.String({ description: 'Original Chorus room post ID being replied to' }),
+      brokerName: Type.String({ description: 'Broker route name from the incoming Chorus message' }),
+      brokerShortId: Type.String({ description: 'Broker route shortId from the incoming Chorus message' }),
+      brokerSocketPath: Type.String({ description: 'Broker route socketPath from the incoming Chorus message' }),
+      message: Type.String({ description: 'Reply text to send to the Chorus room broker' }),
+    }),
+    async execute(_toolCallId, params) {
+      let deliveryId = params.postId as TattlerMessageId;
+      try {
+        const ownIdentity = await requestOwnIdentity(pi);
+        const delivery = createChorusRoomDeliveryFrame(
+          roomId(params.roomId),
+          ownIdentity.name,
+          params.postId,
+          params.message,
+        );
+        deliveryId = delivery.id;
+        const brokerPeer = brokerRouteToPeer({
+          name: params.brokerName,
+          shortId: params.brokerShortId,
+          socketPath: params.brokerSocketPath,
+        });
+        const sendResult = await sendPayloadFrame(brokerPeer, delivery);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Chorus reply ${sendResult.messageIdAck} acknowledged by broker ${params.brokerName}`,
+            },
+          ],
+          details: sendResult,
+        };
+      } catch (err) {
+        const errMessage = `Error sending Chorus reply ${deliveryId}: ${err instanceof Error ? err.message : String(err)}`;
+        return {
+          content: [{ type: 'text', text: errMessage }],
+          isError: true,
+          details: { messageIdAck: deliveryId, error: errMessage },
+        };
+      }
+    },
+  });
+}
+
+export default function (pi: ExtensionAPI) {
+  void stopActiveRoom();
+  clearEventListeners();
+  registerChorusMessageRenderer(pi);
+  registerChorusReplyTool(pi);
+
+  eventUnsubscribers = [
+    onChorusRoomPostRequest(pi, (request) => {
+      if (!activeRoom || request.roomId !== activeRoom.broker.roomId) {
+        throw new Error(`No active Chorus broker for room ${request.roomId}`);
+      }
+      return activeRoom.broker.postLocalMessage(request.message);
+    }),
+    onChorusRoomPostReceived(pi, (post) => {
+      void handleRoomPostReceived(pi, post);
+    }),
+    onChorusRoomDelivery(pi, (delivery) => {
+      void handleRoomDelivery(pi, delivery);
+    }),
+  ];
+
   pi.registerCommand('chorus', {
-    description: 'Toggle multi-agent broadcast mode (opens peer picker when enabling)',
+    description: 'Open or close an ephemeral Chorus room backed by a local Tattler broker',
     handler: async (_args, ctx) => {
-      if (isActive()) {
-        activePeers = [];
-        ctx.ui.setEditorComponent(undefined);
-        ctx.ui.setStatus('chorus', undefined);
-        ctx.ui.notify('Chorus: broadcast disabled', 'info');
+      if (activeRoom) {
+        await closeRoomUi(ctx);
+        ctx.ui.notify('Chorus: room closed', 'info');
+        return;
+      }
+
+      const roomInput = await ctx.ui.input('Chorus room ID:', 'chorus-dev');
+      if (!roomInput) return;
+
+      let selectedRoom: ChorusRoomId;
+      try {
+        selectedRoom = roomId(roomInput);
+      } catch (err) {
+        ctx.ui.notify(`Chorus: ${err instanceof Error ? err.message : String(err)}`, 'error');
         return;
       }
 
@@ -143,6 +311,8 @@ export default async function (pi: ExtensionAPI) {
       let peers: TattlerIdentityV0[];
       try {
         [ownIdentity, peers] = await Promise.all([requestOwnIdentity(pi), requestListPeers(pi)]);
+        ownIdentityRequest = Promise.resolve(ownIdentity);
+        peers = peers.filter((peer) => peer.socketPath !== ownIdentity.socketPath);
       } catch {
         ctx.ui.notify('Chorus: Tattler identity or peer discovery unavailable', 'error');
         return;
@@ -153,51 +323,28 @@ export default async function (pi: ExtensionAPI) {
         return;
       }
 
-      const selected = await ctx.ui.custom<TattlerIdentityV0[] | null>(
-        (tui, theme, _kb, done) => {
-          const container = new Container();
-          container.addChild(new DynamicBorder((s: string) => theme.fg('accent', s)));
-          container.addChild(new Text(theme.fg('accent', theme.bold('Chorus — select broadcast peers')), 1, 0));
-          container.addChild(new Spacer(1));
-
-          const picker = new PeerPicker(peers);
-          picker.onConfirm = (sel) => done(sel.length > 0 ? sel : null);
-          picker.onCancel = () => done(null);
-          container.addChild(picker);
-
-          container.addChild(new Spacer(1));
-          container.addChild(
-            new Text(theme.fg('dim', '↑↓ navigate  ·  space toggle  ·  enter confirm  ·  esc cancel'), 1, 0),
-          );
-          container.addChild(new DynamicBorder((s: string) => theme.fg('accent', s)));
-
-          return {
-            render: (w) => container.render(w),
-            invalidate: () => container.invalidate(),
-            handleInput: (d) => {
-              picker.handleInput(d);
-              tui.requestRender();
-            },
-          };
-        },
-        { overlay: true },
-      );
-
-      if (!selected || selected.length === 0) {
-        ctx.ui.notify('Chorus: no peers selected, broadcast not enabled', 'info');
+      const selectedPeers = await choosePeers(ctx, peers);
+      if (!selectedPeers || selectedPeers.length === 0) {
+        ctx.ui.notify('Chorus: no peers selected, room not opened', 'info');
         return;
       }
 
-      activePeers = selected;
-
-      ctx.ui.setEditorComponent((tui, theme, keybindings) => {
-        const editor = new BroadcastEditor(tui, theme, keybindings, ownIdentity.name);
-        editor.setPeers(activePeers);
-        return editor;
-      });
-
-      ctx.ui.setStatus('chorus', ctx.ui.theme.fg('accent', `◉ chorus (${activePeers.length} peers)`));
-      ctx.ui.notify(`Chorus: broadcasting to ${activePeers.length} peer${activePeers.length === 1 ? '' : 's'}`, 'info');
+      try {
+        await openRoom(pi, ctx, ownIdentity, selectedRoom, selectedPeers);
+        ctx.ui.notify(
+          `Chorus: opened #${selectedRoom} with ${selectedPeers.length} peer${selectedPeers.length === 1 ? '' : 's'}`,
+          'info',
+        );
+      } catch (err) {
+        await closeRoomUi(ctx);
+        ctx.ui.notify(`Chorus: failed to open room — ${err instanceof Error ? err.message : String(err)}`, 'error');
+      }
     },
+  });
+
+  pi.on('session_shutdown', () => {
+    clearEventListeners();
+    ownIdentityRequest = undefined;
+    void stopActiveRoom();
   });
 }

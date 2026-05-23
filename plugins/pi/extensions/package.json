@@ -10,7 +10,8 @@
       "./shell-relay.ts",
       "./web-fetch.ts",
       "./autotoon.ts",
-      "./tattler.ts"
+      "./tattler.ts",
+      "./chorus.ts"
     ]
   },
   "dependencies": {
@@ -23,6 +24,7 @@
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "0.75.4",
     "@earendil-works/pi-ai": "0.75.4",
+    "@earendil-works/pi-tui": "0.75.4",
     "typebox": "1.1.38"
   },
   "devDependencies": {

@@ -7,5 +7,6 @@ Thin Pi adapters for neutral Sandpiper capabilities. These files are provider-su
 - `web-fetch.ts` exposes the web fetch tool extension from `extensions/web-fetch/`.
 - `autotoon.ts` exposes the AutoTOON Pi lifecycle adapter from `packages/capability-autotoon/`.
 - `tattler.ts` is currently in "v0"/PoC in its lifecycle; it's the first pass implementation of inter-agent messaging facilities.
+- `chorus.ts` exposes the ephemeral Tattler-backed multi-agent room extension.
 
 Do not add Sandpiper identity, migration, startup prompt, diagnostics, or update behavior here.
