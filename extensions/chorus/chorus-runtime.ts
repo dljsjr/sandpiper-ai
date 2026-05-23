@@ -49,6 +49,20 @@ export interface ChorusIncomingMessageDetails {
   readonly broker: ChorusReplyRouteV0;
 }
 
+export interface ChorusReplyOptions {
+  readonly activeBroker?: ChorusRoomBroker;
+  readonly roomId: ChorusRoomId;
+  readonly from: string;
+  readonly postId: TattlerMessageId | string;
+  readonly broker: ChorusReplyRouteV0;
+  readonly message: string;
+  readonly sendFrame: (peer: TattlerIdentityV0, frame: TattlerSendableFrame) => Promise<SendAgentMessageResult>;
+}
+
+export type ChorusReplyResult =
+  | { readonly kind: 'local-post'; readonly postId: TattlerMessageId }
+  | { readonly kind: 'remote-delivery'; readonly messageIdAck: TattlerMessageId };
+
 export function createChorusRoomDeliveryFrame(
   room: ChorusRoomId,
   from: string,
@@ -178,6 +192,34 @@ export class ChorusRoomBroker {
 
 export function createChorusRoomBroker(options: ChorusRoomBrokerOptions): ChorusRoomBroker {
   return new ChorusRoomBroker(options);
+}
+
+export async function sendChorusReply(options: ChorusReplyOptions): Promise<ChorusReplyResult> {
+  if (isLocalBrokerReply(options)) {
+    return { kind: 'local-post', ...options.activeBroker.postLocalMessage(options.message) };
+  }
+
+  const delivery = createChorusRoomDeliveryFrame(options.roomId, options.from, options.postId, options.message);
+  const sendResult = await options.sendFrame(brokerRouteToPeer(options.broker), delivery);
+  return { kind: 'remote-delivery', messageIdAck: sendResult.messageIdAck };
+}
+
+function isLocalBrokerReply(options: ChorusReplyOptions): options is ChorusReplyOptions & {
+  readonly activeBroker: ChorusRoomBroker;
+} {
+  return (
+    options.activeBroker !== undefined &&
+    options.roomId === options.activeBroker.roomId &&
+    options.broker.socketPath === options.activeBroker.brokerRoute.socketPath
+  );
+}
+
+export function brokerRouteToPeer(route: ChorusReplyRouteV0): TattlerIdentityV0 {
+  return buildMessage('tattler.identity.v0', {
+    name: route.name,
+    shortId: route.shortId,
+    socketPath: route.socketPath,
+  });
 }
 
 export function createChorusUserMessageContent(details: ChorusIncomingMessageDetails): string {
