@@ -81,6 +81,26 @@ describe('task subcommands (happy paths)', () => {
     expect(result.stdout).toContain('AGENT-1');
   });
 
+  it('list filters conventional assignee values case-insensitively', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'AGENT' });
+
+    const result = await runTaskCommand(rootDir, ['list', '-a', 'agent']);
+
+    expect(result.stdout).toContain('AGENT-1');
+    expect(result.stdout).not.toContain('AGENT-2');
+  });
+
+  it('list filters by freeform assignee values', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' });
+
+    const result = await runTaskCommand(rootDir, ['list', '-a', 'Doug Stephen']);
+
+    expect(result.stdout).toContain('AGENT-1');
+    expect(result.stdout).not.toContain('AGENT-2');
+  });
+
   it('show', async () => {
     const { rootDir } = setupTasksDir();
     const result = await runTaskCommand(rootDir, ['show', 'AGENT-1']);
@@ -93,10 +113,66 @@ describe('task subcommands (happy paths)', () => {
     expect(result.stdout).toContain('Total: 2 tasks');
   });
 
+  it('summary includes freeform assignee values', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' });
+
+    const result = await runTaskCommand(rootDir, ['summary']);
+
+    expect(result.stdout).toContain('Doug Stephen: 1');
+  });
+
   it('create', async () => {
     const { rootDir } = setupTasksDir();
     const result = await runTaskCommand(rootDir, ['create', '-p', 'AGENT', '-t', 'Created from test']);
     expect(result.stdout).toContain('Created AGENT-3: Created from test');
+  });
+
+  it('create rejects multi-line titles before writing task files', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const result = await runTaskCommand(rootDir, [
+      'create',
+      '-p',
+      'AGENT',
+      '-t',
+      'Injected title"\nstatus: COMPLETE\nignore: "',
+    ]);
+
+    expect(result.stderr).toContain('title must be a single-line string');
+    expect(result.exitCode).toBe(1);
+    expect(existsSync(join(tasksDir, 'AGENT', 'AGENT-3.md'))).toBe(false);
+  });
+
+  it('create canonicalizes conventional reporter values case-insensitively', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const result = await runTaskCommand(rootDir, [
+      'create',
+      '-p',
+      'AGENT',
+      '-t',
+      'Created with conventional reporter',
+      '--reporter',
+      'agent',
+    ]);
+
+    expect(result.stdout).toContain('Created AGENT-3: Created with conventional reporter');
+    expect(readFileSync(join(tasksDir, 'AGENT', 'AGENT-3.md'), 'utf-8')).toContain('reporter: AGENT');
+  });
+
+  it('create preserves freeform reporter values', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const result = await runTaskCommand(rootDir, [
+      'create',
+      '-p',
+      'AGENT',
+      '-t',
+      'Created with freeform reporter',
+      '--reporter',
+      'Piper (Librarian)',
+    ]);
+
+    expect(result.stdout).toContain('Created AGENT-3: Created with freeform reporter');
+    expect(readFileSync(join(tasksDir, 'AGENT', 'AGENT-3.md'), 'utf-8')).toContain('reporter: "Piper (Librarian)"');
   });
 
   it('create with description', async () => {
@@ -251,6 +327,20 @@ describe('task subcommands (happy paths)', () => {
     expect(result.stdout).toContain('Updated 2 tasks.');
   });
 
+  it('update rejects multi-line titles without modifying the task', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const result = await runTaskCommand(rootDir, [
+      'update',
+      'AGENT-1',
+      '--title',
+      'Bad title"\nstatus: COMPLETE\nignore: "',
+    ]);
+
+    expect(result.stderr).toContain('title must be a single-line string');
+    expect(result.exitCode).toBe(1);
+    expect(readFileSync(join(tasksDir, 'AGENT', 'AGENT-1.md'), 'utf-8')).toContain('status: NOT STARTED');
+  });
+
   it('update', async () => {
     const { rootDir } = setupTasksDir();
     const result = await runTaskCommand(rootDir, ['update', 'AGENT-1', '--status', 'IN_PROGRESS']);
@@ -261,6 +351,14 @@ describe('task subcommands (happy paths)', () => {
     const { rootDir } = setupTasksDir();
     const result = await runTaskCommand(rootDir, ['pickup', 'AGENT-1']);
     expect(result.stdout).toContain('Picked up 1 task.');
+  });
+
+  it('pickup accepts a freeform assignee', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const result = await runTaskCommand(rootDir, ['pickup', 'AGENT-1', '--assignee', 'Doug Stephen']);
+
+    expect(result.stdout).toContain('Picked up 1 task.');
+    expect(readFileSync(join(tasksDir, 'AGENT', 'AGENT-1.md'), 'utf-8')).toContain('assignee: "Doug Stephen"');
   });
 
   it('pickup search supports regex backend', async () => {

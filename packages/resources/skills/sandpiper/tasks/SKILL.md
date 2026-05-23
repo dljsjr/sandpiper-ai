@@ -35,7 +35,7 @@ Projects with no `PROJECT.md` will appear with empty `whenToRead`. If you create
 ### Starting a new feature
 
 1. Create a task: `task create -p SHR -t "Implement feature X" --priority HIGH --reporter USER`
-2. Pick it up: `task pickup SHR-1`
+2. Pick it up: `task pickup SHR-1` (or `task pickup SHR-1 --assignee "Piper"` for a named assignee)
 3. If the work breaks down into steps, create subtasks: `task create -p SHR -t "Write parser" -k SUBTASK --parent SHR-1 --reporter AGENT`
 4. Work, committing with `Refs: SHR-1` in commit messages
 
@@ -89,10 +89,11 @@ scripts/trail task create -p SHR -t "Fix the bug" -k BUG --priority HIGH --repor
 scripts/trail task create -p SHR -t "Write tests" -k SUBTASK --parent SHR-1 --reporter AGENT
 ```
 
-### Pick up a task (assign to AGENT, set IN PROGRESS)
+### Pick up a task (assign and set IN PROGRESS)
 
 ```bash
-scripts/trail task pickup SHR-1
+scripts/trail task pickup SHR-1                                # assignee defaults to AGENT
+scripts/trail task pickup SHR-1 --assignee "Piper"              # named/freeform assignee
 scripts/trail task pickup -p SHR --filter-status NOT_STARTED    # bulk
 ```
 
@@ -205,14 +206,17 @@ Tasks are never deleted — they're completed with a resolution. This preserves 
 - `WONTFIX` — task is no longer valid or will not be addressed
 - Resolution is required when completing a task (`--final` flag)
 
-## Assignee Conventions
+## Assignee and Reporter Conventions
 
-- `UNASSIGNED` — no one is working on this
-- `USER` — the user is working on this
-- `AGENT` — the agent is working on this
-- When the user asks you to create a task, set `--reporter USER`
-- When you surface a work item yourself, set `--reporter AGENT`
-- When you pick up a task: `task pickup <key>`
+Task titles, assignees, and reporters are non-empty, single-line strings. `assignee` and `reporter` are freeform; Trail canonicalizes the conventional tokens `UNASSIGNED`, `USER`, and `AGENT` case-insensitively while preserving other names verbatim.
+
+- `UNASSIGNED` — no one is working on this (assignee only)
+- `USER` — the user is working on or reported this
+- `AGENT` — an agent is working on or reported this
+- Use named assignees/reporters when useful for multi-agent work, e.g. `--assignee "Piper"` or `--reporter "Huginn"`.
+- When the user asks you to create a task, set `--reporter USER` unless they request a specific reporter.
+- When you surface a work item yourself, set `--reporter AGENT` or your agent name.
+- When you pick up a task: `task pickup <key>` or `task pickup <key> --assignee "<name>"`.
 - When you finish a task: `task complete <key>` (for review) or `task complete <key> --final --resolution DONE`
 
 ## Activity Log

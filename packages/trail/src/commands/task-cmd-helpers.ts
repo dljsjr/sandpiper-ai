@@ -2,7 +2,12 @@ import { readFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import type { Command } from '@commander-js/extra-typings';
 import { replaceDescription } from '../core/description.js';
-import { parseFrontmatter, taskFromFrontmatter } from '../core/frontmatter.js';
+import {
+  normalizeAssigneeInput,
+  normalizeReporterInput,
+  parseFrontmatter,
+  taskFromFrontmatter,
+} from '../core/frontmatter.js';
 import { applyFieldUpdates } from '../core/mutate.js';
 import { formatRawOutput, formatTasksOutput } from '../core/output.js';
 import type { TaskFilter } from '../core/query.js';
@@ -50,11 +55,11 @@ export function normalizeStatus(input: string): TaskStatus {
 export function buildFieldsFromOptions(opts: UpdateOptions): Record<string, unknown> {
   const fields: Record<string, unknown> = {};
   if (opts.status) fields.status = normalizeStatus(opts.status);
-  if (opts.assignee) fields.assignee = opts.assignee.toUpperCase();
+  if (opts.assignee !== undefined) fields.assignee = normalizeAssigneeInput(opts.assignee);
   if (opts.priority) fields.priority = opts.priority.toUpperCase();
   if (opts.resolution) fields.resolution = opts.resolution.toUpperCase();
   if (opts.title) fields.title = opts.title;
-  if (opts.reporter) fields.reporter = opts.reporter.toUpperCase();
+  if (opts.reporter !== undefined) fields.reporter = normalizeReporterInput(opts.reporter);
   if (opts.desc !== undefined) fields.description = opts.desc;
   if (opts.dependsOn !== undefined) {
     fields.dependsOn = opts.dependsOn ? opts.dependsOn.split(',').map((s) => s.trim()) : [];

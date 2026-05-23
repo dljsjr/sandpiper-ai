@@ -2,7 +2,13 @@ import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { appendActivityEntry, type FieldChange } from './activity-log.js';
 import { extractDescription, replaceDescription } from './description.js';
-import { parseFrontmatter } from './frontmatter.js';
+import {
+  formatFrontmatterScalar,
+  normalizeAssigneeInput,
+  normalizeReporterInput,
+  normalizeTitleInput,
+  parseFrontmatter,
+} from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { writeDiff } from './history.js';
 import { readProjectCounter } from './index-update.js';
@@ -14,13 +20,15 @@ import type { TaskAssignee, TaskKind, TaskPriority, TaskReporter, TaskResolution
  */
 export function renderTaskContent(opts: CreateTaskOptions): string {
   const ts = new Date().toISOString();
+  const title = normalizeTitleInput(opts.title);
+  const reporter = normalizeReporterInput(opts.reporter);
   const fmLines: string[] = [
-    `title: "${opts.title}"`,
+    `title: ${formatFrontmatterScalar(title)}`,
     'status: NOT STARTED',
     `kind: ${opts.kind}`,
     `priority: ${opts.priority}`,
-    'assignee: UNASSIGNED',
-    `reporter: ${opts.reporter}`,
+    `assignee: ${formatFrontmatterScalar(normalizeAssigneeInput('UNASSIGNED'))}`,
+    `reporter: ${formatFrontmatterScalar(reporter)}`,
     `created_at: ${ts}`,
     `updated_at: ${ts}`,
   ];
@@ -39,7 +47,7 @@ export function renderTaskContent(opts: CreateTaskOptions): string {
   }
 
   const description = opts.description !== undefined ? `${opts.description.replace(/\s*$/, '')}\n` : '';
-  return `---\n${fmLines.join('\n')}\n---\n\n# ${opts.title}\n\n${description}`;
+  return `---\n${fmLines.join('\n')}\n---\n\n# ${title}\n\n${description}`;
 }
 
 // ─── Project Operations ──────────────────────────────────────────
@@ -84,6 +92,7 @@ export function createTask(tasksDir: string, opts: CreateTaskOptions): CreateTas
   if (opts.parent) {
     validateParentKey(opts.project, opts.parent);
   }
+  const content = renderTaskContent(opts);
 
   // Ensure project directory exists
   const projectDir = join(tasksDir, opts.project);
@@ -109,7 +118,6 @@ export function createTask(tasksDir: string, opts: CreateTaskOptions): CreateTas
     taskPath = join(projectDir, `${key}.md`);
   }
 
-  const content = renderTaskContent(opts);
   writeFileAtomic(taskPath, content);
 
   return { key, path: taskPath };
@@ -178,6 +186,22 @@ export interface InternalUpdateFields extends UpdateFields {
   readonly kind?: TaskKind;
 }
 
+function normalizeUpdateFields(fields: UpdateFields): UpdateFields {
+  return {
+    ...fields,
+    ...(fields.title !== undefined ? { title: normalizeTitleInput(fields.title) } : {}),
+    ...(fields.assignee !== undefined ? { assignee: normalizeAssigneeInput(fields.assignee) } : {}),
+    ...(fields.reporter !== undefined ? { reporter: normalizeReporterInput(fields.reporter) } : {}),
+  };
+}
+
+function normalizeInternalUpdateFields(fields: InternalUpdateFields): InternalUpdateFields {
+  return {
+    ...normalizeUpdateFields(fields),
+    ...(fields.kind !== undefined ? { kind: fields.kind } : {}),
+  };
+}
+
 /**
  * Apply public task field updates to a task file's content string (in memory).
  * Returns the modified content without writing to disk.
@@ -192,43 +216,44 @@ export function applyFieldUpdates(content: string, fields: UpdateFields): string
  * kind mutations explicit and type-checked.
  */
 export function applyInternalFieldUpdates(content: string, fields: InternalUpdateFields): string {
+  const normalizedFields = normalizeInternalUpdateFields(fields);
   let result = content;
 
-  if (fields.status !== undefined) {
-    result = result.replace(/^status: .+$/m, `status: ${fields.status}`);
+  if (normalizedFields.status !== undefined) {
+    result = result.replace(/^status: .+$/m, `status: ${normalizedFields.status}`);
   }
-  if (fields.assignee !== undefined) {
-    result = result.replace(/^assignee: .+$/m, `assignee: ${fields.assignee}`);
+  if (normalizedFields.assignee !== undefined) {
+    result = result.replace(/^assignee: .+$/m, `assignee: ${formatFrontmatterScalar(normalizedFields.assignee)}`);
   }
-  if (fields.priority !== undefined) {
-    result = result.replace(/^priority: .+$/m, `priority: ${fields.priority}`);
+  if (normalizedFields.priority !== undefined) {
+    result = result.replace(/^priority: .+$/m, `priority: ${normalizedFields.priority}`);
   }
-  if (fields.kind !== undefined) {
-    result = result.replace(/^kind: .+$/m, `kind: ${fields.kind}`);
+  if (normalizedFields.kind !== undefined) {
+    result = result.replace(/^kind: .+$/m, `kind: ${normalizedFields.kind}`);
   }
-  if (fields.resolution !== undefined) {
+  if (normalizedFields.resolution !== undefined) {
     if (/^resolution: /m.test(result)) {
-      result = result.replace(/^resolution: .+$/m, `resolution: ${fields.resolution}`);
+      result = result.replace(/^resolution: .+$/m, `resolution: ${normalizedFields.resolution}`);
     } else {
-      result = result.replace(/^(status: .+)$/m, `$1\nresolution: ${fields.resolution}`);
+      result = result.replace(/^(status: .+)$/m, `$1\nresolution: ${normalizedFields.resolution}`);
     }
   }
-  if (fields.title !== undefined) {
-    result = result.replace(/^title: .+$/m, `title: "${fields.title}"`);
+  if (normalizedFields.title !== undefined) {
+    result = result.replace(/^title: .+$/m, `title: ${formatFrontmatterScalar(normalizedFields.title)}`);
     // Also update the H1 heading in the body
-    result = result.replace(/^# .+$/m, `# ${fields.title}`);
+    result = result.replace(/^# .+$/m, `# ${normalizedFields.title}`);
   }
-  if (fields.reporter !== undefined) {
-    result = result.replace(/^reporter: .+$/m, `reporter: ${fields.reporter}`);
+  if (normalizedFields.reporter !== undefined) {
+    result = result.replace(/^reporter: .+$/m, `reporter: ${formatFrontmatterScalar(normalizedFields.reporter)}`);
   }
-  if (fields.dependsOn !== undefined) {
-    result = replaceArrayField(result, 'depends_on', fields.dependsOn);
+  if (normalizedFields.dependsOn !== undefined) {
+    result = replaceArrayField(result, 'depends_on', normalizedFields.dependsOn);
   }
-  if (fields.blockedBy !== undefined) {
-    result = replaceArrayField(result, 'blocked_by', fields.blockedBy);
+  if (normalizedFields.blockedBy !== undefined) {
+    result = replaceArrayField(result, 'blocked_by', normalizedFields.blockedBy);
   }
-  if (fields.related !== undefined) {
-    result = replaceArrayField(result, 'related', fields.related);
+  if (normalizedFields.related !== undefined) {
+    result = replaceArrayField(result, 'related', normalizedFields.related);
   }
 
   const ts = new Date().toISOString();
@@ -264,7 +289,8 @@ function replaceArrayField(content: string, fieldName: string, values: readonly 
  * Validates that COMPLETE status requires a resolution.
  */
 export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
-  if (fields.status === 'COMPLETE' && !fields.resolution) {
+  const normalizedFields = normalizeUpdateFields(fields);
+  if (normalizedFields.status === 'COMPLETE' && !normalizedFields.resolution) {
     throw new Error(
       'Setting status to COMPLETE requires a resolution. ' + 'Use resolution: DONE or resolution: WONTFIX.',
     );
@@ -273,13 +299,13 @@ export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
   const originalContent = readFileSync(taskPath, 'utf-8');
   const originalFm = parseFrontmatter(originalContent);
 
-  let content = applyFieldUpdates(originalContent, fields);
-  if (fields.description !== undefined) {
-    content = replaceDescription(content, fields.description);
+  let content = applyFieldUpdates(originalContent, normalizedFields);
+  if (normalizedFields.description !== undefined) {
+    content = replaceDescription(content, normalizedFields.description);
   }
 
   // Compute field changes for the activity log
-  const changes = computeChanges(originalFm, fields, originalContent);
+  const changes = computeChanges(originalFm, normalizedFields, originalContent);
   const timestamp = new Date().toISOString();
   if (changes.length > 0) {
     content = appendActivityEntry(content, changes);
@@ -397,8 +423,8 @@ function computeChanges(
 
 // ─── Convenience Mutations ───────────────────────────────────────
 
-export function pickupTask(taskPath: string): void {
-  updateTaskFields(taskPath, { status: 'IN PROGRESS', assignee: 'AGENT' });
+export function pickupTask(taskPath: string, assignee: TaskAssignee = 'AGENT'): void {
+  updateTaskFields(taskPath, { status: 'IN PROGRESS', assignee });
 }
 
 export function completeTask(taskPath: string, final = false, resolution?: TaskResolution): void {
