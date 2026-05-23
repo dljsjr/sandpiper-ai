@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
+import chorusExtension from '../../extensions/chorus.js';
 import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
 import {
   createNeutralCapabilityExtension,
@@ -50,6 +51,7 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
     webFetchExtension,
     autotoonExtension,
     tattlerExtension,
+    chorusExtension,
     createSandpiperResourceExtension(resolveSandpiperResourcePaths(resourceRoot)),
   ];
 }

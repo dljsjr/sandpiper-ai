@@ -12,23 +12,32 @@ import {
 function createExtensionCapture(): {
   readonly pi: Pick<
     ExtensionAPI,
-    'appendEntry' | 'events' | 'getFlag' | 'on' | 'registerCommand' | 'registerFlag' | 'registerTool'
+    | 'appendEntry'
+    | 'events'
+    | 'getFlag'
+    | 'on'
+    | 'registerCommand'
+    | 'registerFlag'
+    | 'registerMessageRenderer'
+    | 'registerTool'
   >;
   readonly commands: string[];
   readonly events: string[];
   readonly flags: string[];
+  readonly renderers: string[];
   readonly tools: string[];
 } {
   const commands: string[] = [];
   const events: string[] = [];
   const flags: string[] = [];
+  const renderers: string[] = [];
   const tools: string[] = [];
 
   return {
     pi: {
       appendEntry: vi.fn() as ExtensionAPI['appendEntry'],
       events: {
-        on: vi.fn(),
+        on: vi.fn(() => vi.fn()),
         emit: vi.fn(),
       } as unknown as ExtensionAPI['events'],
       getFlag: vi.fn(() => false) as ExtensionAPI['getFlag'],
@@ -41,6 +50,9 @@ function createExtensionCapture(): {
       registerFlag: ((name: string) => {
         flags.push(name);
       }) as ExtensionAPI['registerFlag'],
+      registerMessageRenderer: ((customType: string) => {
+        renderers.push(customType);
+      }) as ExtensionAPI['registerMessageRenderer'],
       registerTool: ((tool: { readonly name: string }) => {
         tools.push(tool.name);
       }) as ExtensionAPI['registerTool'],
@@ -48,6 +60,7 @@ function createExtensionCapture(): {
     commands,
     events,
     flags,
+    renderers,
     tools,
   };
 }
@@ -90,10 +103,15 @@ describe('Sandpiper resource adapter', () => {
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {
-    const { commands, events, flags, tools } = applyFactories(createNeutralCapabilityExtensionFactories('/repo'));
+    const { commands, events, flags, renderers, tools } = applyFactories(
+      createNeutralCapabilityExtensionFactories('/repo'),
+    );
 
     expect(tools).toEqual(expect.arrayContaining(['skill', 'start_background_process', 'check_background_process']));
     expect(tools).toEqual(expect.arrayContaining(['shell_relay', 'shell_relay_inspect', 'web_fetch']));
+    expect(tools).toContain('send_chorus_reply');
+    expect(commands).toContain('chorus');
+    expect(renderers).toContain('chorus-room-message');
     expect(commands).not.toContain('migrate-pi');
     expect(events).not.toContain('before_agent_start');
     expect(flags).not.toContain('migrate-pi-configs');
