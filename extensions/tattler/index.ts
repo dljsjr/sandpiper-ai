@@ -12,6 +12,7 @@ import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
 import { createServerWithNotificationSender, isSocketAlive, sendAgentMessage } from './tattler-ipc';
+import { onListPeersRequest, onOwnIdentityRequest } from './tattler-pi-events';
 import {
   buildMessage,
   MAX_MESSAGE_BYTES,
@@ -31,6 +32,13 @@ const tmp = require('tmp');
 
 // extension-global variable for now
 let server: net.Server | undefined;
+let eventResponderUnsubscribers: Array<() => void> = [];
+
+function clearEventResponders(): void {
+  for (const unsubscribe of eventResponderUnsubscribers.splice(0)) {
+    unsubscribe();
+  }
+}
 
 //#region Pi API Integration
 // ============================================================================
@@ -172,6 +180,8 @@ is used to resume an existing session.
   });
 
   pi.on('session_start', async (evt, ctx) => {
+    clearEventResponders();
+
     const sessionUuid = ctx.sessionManager.getSessionId();
     const existingTattlerId = ctx.sessionManager
       .getEntries()
@@ -251,11 +261,16 @@ is used to resume an existing session.
 
     await appendFile(idTmpFile.name, serializeToJsonl(ownIdentity));
 
+    eventResponderUnsubscribers = [
+      onListPeersRequest(pi, () => listPeerSockets(tattlerRuntimeDir, ownIdentity)),
+      onOwnIdentityRequest(pi, () => ownIdentity),
+    ];
     registerListPeersTool(tattlerRuntimeDir, ownIdentity, pi);
     registerSendMessageTool(tattlerRuntimeDir, ownIdentity, pi);
   });
 
   pi.on('session_shutdown', (_evt, _ctx) => {
+    clearEventResponders();
     if (server) {
       server.close();
     }

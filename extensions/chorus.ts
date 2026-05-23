@@ -128,80 +128,76 @@ function isActive(): boolean {
 // ── Extension factory ─────────────────────────────────────────────────────────
 
 export default async function (pi: ExtensionAPI) {
-  await requestOwnIdentity(pi).then((ownIdentity) => {
-    pi.registerCommand('chorus', {
-      description: 'Toggle multi-agent broadcast mode (opens peer picker when enabling)',
-      handler: async (_args, ctx) => {
-        if (isActive()) {
-          activePeers = [];
-          ctx.ui.setEditorComponent(undefined);
-          ctx.ui.setStatus('chorus', undefined);
-          ctx.ui.notify('Chorus: broadcast disabled', 'info');
-          return;
-        }
+  pi.registerCommand('chorus', {
+    description: 'Toggle multi-agent broadcast mode (opens peer picker when enabling)',
+    handler: async (_args, ctx) => {
+      if (isActive()) {
+        activePeers = [];
+        ctx.ui.setEditorComponent(undefined);
+        ctx.ui.setStatus('chorus', undefined);
+        ctx.ui.notify('Chorus: broadcast disabled', 'info');
+        return;
+      }
 
-        let peers: TattlerIdentityV0[];
-        try {
-          peers = await requestListPeers(pi);
-        } catch {
-          ctx.ui.notify('Chorus: failed to list peers', 'error');
-          return;
-        }
+      let ownIdentity: TattlerIdentityV0;
+      let peers: TattlerIdentityV0[];
+      try {
+        [ownIdentity, peers] = await Promise.all([requestOwnIdentity(pi), requestListPeers(pi)]);
+      } catch {
+        ctx.ui.notify('Chorus: Tattler identity or peer discovery unavailable', 'error');
+        return;
+      }
 
-        if (peers.length === 0) {
-          ctx.ui.notify('Chorus: no live peers available', 'warning');
-          return;
-        }
+      if (peers.length === 0) {
+        ctx.ui.notify('Chorus: no live peers available', 'warning');
+        return;
+      }
 
-        const selected = await ctx.ui.custom<TattlerIdentityV0[] | null>(
-          (tui, theme, _kb, done) => {
-            const container = new Container();
-            container.addChild(new DynamicBorder((s: string) => theme.fg('accent', s)));
-            container.addChild(new Text(theme.fg('accent', theme.bold('Chorus — select broadcast peers')), 1, 0));
-            container.addChild(new Spacer(1));
+      const selected = await ctx.ui.custom<TattlerIdentityV0[] | null>(
+        (tui, theme, _kb, done) => {
+          const container = new Container();
+          container.addChild(new DynamicBorder((s: string) => theme.fg('accent', s)));
+          container.addChild(new Text(theme.fg('accent', theme.bold('Chorus — select broadcast peers')), 1, 0));
+          container.addChild(new Spacer(1));
 
-            const picker = new PeerPicker(peers);
-            picker.onConfirm = (sel) => done(sel.length > 0 ? sel : null);
-            picker.onCancel = () => done(null);
-            container.addChild(picker);
+          const picker = new PeerPicker(peers);
+          picker.onConfirm = (sel) => done(sel.length > 0 ? sel : null);
+          picker.onCancel = () => done(null);
+          container.addChild(picker);
 
-            container.addChild(new Spacer(1));
-            container.addChild(
-              new Text(theme.fg('dim', '↑↓ navigate  ·  space toggle  ·  enter confirm  ·  esc cancel'), 1, 0),
-            );
-            container.addChild(new DynamicBorder((s: string) => theme.fg('accent', s)));
+          container.addChild(new Spacer(1));
+          container.addChild(
+            new Text(theme.fg('dim', '↑↓ navigate  ·  space toggle  ·  enter confirm  ·  esc cancel'), 1, 0),
+          );
+          container.addChild(new DynamicBorder((s: string) => theme.fg('accent', s)));
 
-            return {
-              render: (w) => container.render(w),
-              invalidate: () => container.invalidate(),
-              handleInput: (d) => {
-                picker.handleInput(d);
-                tui.requestRender();
-              },
-            };
-          },
-          { overlay: true },
-        );
+          return {
+            render: (w) => container.render(w),
+            invalidate: () => container.invalidate(),
+            handleInput: (d) => {
+              picker.handleInput(d);
+              tui.requestRender();
+            },
+          };
+        },
+        { overlay: true },
+      );
 
-        if (!selected || selected.length === 0) {
-          ctx.ui.notify('Chorus: no peers selected, broadcast not enabled', 'info');
-          return;
-        }
+      if (!selected || selected.length === 0) {
+        ctx.ui.notify('Chorus: no peers selected, broadcast not enabled', 'info');
+        return;
+      }
 
-        activePeers = selected;
+      activePeers = selected;
 
-        ctx.ui.setEditorComponent((tui, theme, keybindings) => {
-          const editor = new BroadcastEditor(tui, theme, keybindings, ownIdentity.name);
-          editor.setPeers(activePeers);
-          return editor;
-        });
+      ctx.ui.setEditorComponent((tui, theme, keybindings) => {
+        const editor = new BroadcastEditor(tui, theme, keybindings, ownIdentity.name);
+        editor.setPeers(activePeers);
+        return editor;
+      });
 
-        ctx.ui.setStatus('chorus', ctx.ui.theme.fg('accent', `◉ chorus (${activePeers.length} peers)`));
-        ctx.ui.notify(
-          `Chorus: broadcasting to ${activePeers.length} peer${activePeers.length === 1 ? '' : 's'}`,
-          'info',
-        );
-      },
-    });
+      ctx.ui.setStatus('chorus', ctx.ui.theme.fg('accent', `◉ chorus (${activePeers.length} peers)`));
+      ctx.ui.notify(`Chorus: broadcasting to ${activePeers.length} peer${activePeers.length === 1 ? '' : 's'}`, 'info');
+    },
   });
 }
