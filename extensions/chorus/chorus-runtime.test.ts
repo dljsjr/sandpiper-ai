@@ -50,24 +50,65 @@ describe('Chorus broker runtime', () => {
     });
   });
 
-  test('records received room posts and deliveries that match the active room', () => {
+  test('uses configured local author name for messages typed in the room UI', async () => {
+    const sent: Array<{ peer: TattlerIdentityV0; frame: TattlerSendableFrame }> = [];
+    const broker = createChorusRoomBroker({
+      roomId: roomId('chorus-dev'),
+      ownIdentity: identity('Piper'),
+      localAuthorName: 'Doug',
+      brokerRoute: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
+      peers: [identity('Huginn')],
+      sendFrame: async (peer, frame) => {
+        sent.push({ peer, frame });
+        return { messageIdAck: frame.id };
+      },
+    });
+
+    broker.postLocalMessage('human-authored message');
+    await broker.waitForIdle();
+
+    expect(broker.entries).toMatchObject([
+      { from: 'Doug', message: 'human-authored message', self: true, status: 'acked' },
+    ]);
+    expect(sent[0]?.frame).toMatchObject({
+      from: 'Doug',
+      message: 'human-authored message',
+      broker: { socketPath: '/tmp/chorus-dev.sock' },
+    });
+  });
+
+  test('records received room posts and rebroadcasts participant deliveries to the rest of the room', async () => {
+    const sent: Array<{ peer: TattlerIdentityV0; frame: TattlerSendableFrame }> = [];
     const broker = createChorusRoomBroker({
       roomId: roomId('chorus-dev'),
       ownIdentity: identity('Piper'),
       brokerRoute: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
-      peers: [],
-      sendFrame: async (_peer, frame) => ({ messageIdAck: frame.id }),
+      peers: [identity('Huginn'), identity('Muninn'), identity('Steward')],
+      sendFrame: async (peer, frame) => {
+        sent.push({ peer, frame });
+        return { messageIdAck: frame.id };
+      },
     });
     const post = createChorusRoomPost(roomId('chorus-dev'), 'Huginn', broker.brokerRoute, 'remote post');
-    const delivery = createChorusRoomDeliveryFrame(roomId('chorus-dev'), 'Muninn', post.id, 'reply note');
+    const delivery = createChorusRoomDeliveryFrame(roomId('chorus-dev'), 'Huginn', post.id, 'reply note');
 
     expect(broker.recordRoomPost(post)).toBe(true);
-    expect(broker.recordDelivery(delivery)).toBe(true);
+    const deliveryResult = broker.acceptDelivery(delivery);
+    await broker.waitForIdle();
 
+    expect(deliveryResult?.postId).toEqual(broker.entries[1]?.id);
     expect(broker.entries).toMatchObject([
       { from: 'Huginn', message: 'remote post', self: false, status: 'received' },
-      { from: 'Muninn', message: 'reply note', self: false, postId: post.id },
+      { from: 'Huginn', message: 'reply note', self: false, postId: post.id, status: 'acked' },
     ]);
+    expect(sent.map(({ peer }) => peer.name)).toEqual(['Muninn', 'Steward']);
+    for (const { frame } of sent) {
+      expect(frame).toMatchObject({
+        from: 'Huginn',
+        message: 'reply note',
+        broker: { socketPath: '/tmp/chorus-dev.sock' },
+      });
+    }
   });
 
   test('routes local broker replies through local post fanout instead of sending to self', async () => {
@@ -75,6 +116,7 @@ describe('Chorus broker runtime', () => {
     const broker = createChorusRoomBroker({
       roomId: roomId('chorus-dev'),
       ownIdentity: identity('Piper'),
+      localAuthorName: 'Doug',
       brokerRoute: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
       peers: [identity('Huginn')],
       sendFrame: async (peer, frame) => {

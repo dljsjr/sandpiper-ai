@@ -92,6 +92,22 @@ function roomSocketPath(ownIdentity: TattlerIdentityV0, room: ChorusRoomId): str
   );
 }
 
+function defaultLocalAuthorName(ownIdentity: TattlerIdentityV0): string {
+  return process.env.USER || process.env.USERNAME || ownIdentity.name;
+}
+
+function localAuthorName(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new Error('Chorus display name must be a non-empty string');
+  }
+  if (trimmed.includes('\n') || trimmed.includes('\r')) {
+    throw new Error('Chorus display name must be a single line');
+  }
+
+  return trimmed;
+}
+
 async function createBrokerEndpoint(
   pi: ExtensionAPI,
   ownIdentity: TattlerIdentityV0,
@@ -136,12 +152,14 @@ async function openRoom(
   ownIdentity: TattlerIdentityV0,
   room: ChorusRoomId,
   peers: readonly TattlerIdentityV0[],
+  authorName: string,
 ): Promise<void> {
   await stopActiveRoom();
   const endpoint = await createBrokerEndpoint(pi, ownIdentity, room);
   const broker = createChorusRoomBroker({
     roomId: room,
     ownIdentity,
+    localAuthorName: authorName,
     brokerRoute: endpoint.route,
     peers,
     sendFrame: sendPayloadFrame,
@@ -190,8 +208,8 @@ async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDelivery
     return;
   }
 
-  const recorded = room.broker.recordDelivery(delivery);
-  if (!recorded || delivery.from === room.broker.ownIdentity.name) {
+  const accepted = room.broker.acceptDelivery(delivery);
+  if (!accepted || room.broker.isLocalAuthor(delivery.from)) {
     return;
   }
 
@@ -199,7 +217,7 @@ async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDelivery
     roomId: delivery.roomId,
     from: delivery.from,
     message: delivery.message,
-    postId: delivery.postId,
+    postId: accepted.postId,
     broker: room.broker.brokerRoute,
   });
 }
@@ -336,6 +354,20 @@ export default function (pi: ExtensionAPI) {
         return;
       }
 
+      const authorInput = await ctx.ui.input(
+        'Chorus display name for your messages:',
+        defaultLocalAuthorName(ownIdentity),
+      );
+      if (!authorInput) return;
+
+      let authorName: string;
+      try {
+        authorName = localAuthorName(authorInput);
+      } catch (err) {
+        ctx.ui.notify(`Chorus: ${err instanceof Error ? err.message : String(err)}`, 'error');
+        return;
+      }
+
       const selectedPeers = await choosePeers(ctx, peers);
       if (!selectedPeers || selectedPeers.length === 0) {
         ctx.ui.notify('Chorus: no peers selected, room not opened', 'info');
@@ -343,9 +375,9 @@ export default function (pi: ExtensionAPI) {
       }
 
       try {
-        await openRoom(pi, ctx, ownIdentity, selectedRoom, selectedPeers);
+        await openRoom(pi, ctx, ownIdentity, selectedRoom, selectedPeers, authorName);
         ctx.ui.notify(
-          `Chorus: opened #${selectedRoom} with ${selectedPeers.length} peer${selectedPeers.length === 1 ? '' : 's'}`,
+          `Chorus: opened #${selectedRoom} as ${authorName} with ${selectedPeers.length} peer${selectedPeers.length === 1 ? '' : 's'}`,
           'info',
         );
       } catch (err) {
