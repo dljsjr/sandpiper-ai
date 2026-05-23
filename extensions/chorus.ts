@@ -262,7 +262,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
           content: [
             {
               type: 'text',
-              text: `Chorus reply ${result.messageIdAck} acknowledged by broker ${params.brokerName}`,
+              text: `Chorus reply ${result.messageIdAck} received transport ACK from broker route ${params.brokerName}`,
             },
           ],
           details: result,
