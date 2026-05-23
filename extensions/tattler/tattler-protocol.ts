@@ -18,11 +18,18 @@ export type TattlerFormatKey =
   | 'tattler.identity.v0'
   | 'tattler.ack.v0'
   | 'tattler.error.v0'
-  | 'tattler.agent-message.v0';
+  | 'tattler.agent-message.v0'
+  | 'chorus.room-post.v0'
+  | 'chorus.room-delivery.v0';
 
 declare const tattlerMessageIdBrand: unique symbol;
 export type TattlerMessageId = string & {
   readonly [tattlerMessageIdBrand]: true;
+};
+
+declare const chorusRoomIdBrand: unique symbol;
+export type ChorusRoomId = string & {
+  readonly [chorusRoomIdBrand]: true;
 };
 
 export interface TattlerMessageBase<K extends TattlerFormatKey> {
@@ -64,7 +71,30 @@ export interface TattlerAgentMessageV0 extends TattlerMessageBase<'tattler.agent
   readonly message: string;
 }
 
-export type TattlerProtocolFrame = TattlerAckV0 | TattlerErrorV0 | TattlerAgentMessageV0;
+export interface ChorusReplyRouteV0 {
+  readonly name: string;
+  readonly socketPath: string;
+  readonly shortId: string;
+}
+
+export interface ChorusRoomPostV0 extends TattlerMessageBase<'chorus.room-post.v0'> {
+  readonly roomId: ChorusRoomId;
+  /** User-facing sender label. Replies route to `broker`, not this display string. */
+  readonly from: string;
+  readonly broker: ChorusReplyRouteV0;
+  readonly message: string;
+}
+
+export interface ChorusRoomDeliveryV0 extends TattlerMessageBase<'chorus.room-delivery.v0'> {
+  readonly roomId: ChorusRoomId;
+  readonly from: string;
+  readonly message: string;
+  readonly postId: TattlerMessageId;
+}
+
+export type TattlerSendableFrame = TattlerAgentMessageV0 | ChorusRoomPostV0 | ChorusRoomDeliveryV0;
+export type TattlerIncomingPayloadFrame = TattlerSendableFrame;
+export type TattlerProtocolFrame = TattlerAckV0 | TattlerErrorV0 | TattlerIncomingPayloadFrame;
 
 //#endregion
 
@@ -74,6 +104,18 @@ export type TattlerProtocolFrame = TattlerAckV0 | TattlerErrorV0 | TattlerAgentM
 //#region Message Helper Utils
 function newMessageId(): TattlerMessageId {
   return uuidv7() as TattlerMessageId;
+}
+
+export function roomId(value: string): ChorusRoomId {
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    throw new Error('Chorus room ID must be a non-empty string');
+  }
+  if (trimmed !== value) {
+    throw new Error('Chorus room ID must not contain surrounding whitespace');
+  }
+
+  return value as ChorusRoomId;
 }
 
 export type MessageProps<K extends TattlerFormatKey, T extends TattlerMessageBase<K>> = Omit<
@@ -106,6 +148,29 @@ export function serializeToJsonl<K extends TattlerFormatKey, T extends TattlerMe
   const outObj = { ...message, format: message[TattlerProtocolFormat] };
   return `${JSON.stringify(outObj)}\n`;
 }
+
+export function createChorusRoomPost(
+  room: ChorusRoomId,
+  from: string,
+  broker: ChorusReplyRouteV0,
+  message: string,
+): ChorusRoomPostV0 {
+  return buildMessage('chorus.room-post.v0', {
+    roomId: room,
+    from,
+    broker,
+    message,
+  });
+}
+
+export function createChorusRoomDelivery(post: ChorusRoomPostV0): ChorusRoomDeliveryV0 {
+  return buildMessage('chorus.room-delivery.v0', {
+    roomId: post.roomId,
+    from: post.from,
+    message: post.message,
+    postId: post.id,
+  });
+}
 //#endregion
 
 // ============================================================================
@@ -134,6 +199,33 @@ function requiredStringField(frame: Record<string, unknown>, fieldName: string):
   return value;
 }
 
+function requiredMessageField(frame: Record<string, unknown>): string {
+  const message = requiredStringField(frame, 'message');
+  const messageLength = Buffer.byteLength(message, 'utf8');
+  if (messageLength > MAX_MESSAGE_BYTES) {
+    throw new Error(`Incoming message length ${messageLength} > ${MAX_MESSAGE_BYTES}`);
+  }
+
+  return message;
+}
+
+function requiredRoomIdField(frame: Record<string, unknown>): ChorusRoomId {
+  return roomId(requiredStringField(frame, 'roomId'));
+}
+
+function requiredReplyRouteField(frame: Record<string, unknown>, fieldName: string): ChorusReplyRouteV0 {
+  const value = frame[fieldName];
+  if (!isRecord(value)) {
+    throw new Error(`Incoming room message missing required reply route field [${fieldName}]`);
+  }
+
+  return {
+    name: requiredStringField(value, 'name'),
+    socketPath: requiredStringField(value, 'socketPath'),
+    shortId: requiredStringField(value, 'shortId'),
+  };
+}
+
 export function parseProtocolJsonLine(jsonLine: string): unknown {
   try {
     return JSON.parse(jsonLine) as unknown;
@@ -151,17 +243,67 @@ export function parseIncomingAgentMessage(frame: unknown): TattlerAgentMessageV0
     throw new Error(`Unsupported incoming protocol frame format [${String(frame.format)}]`);
   }
 
-  const message = requiredStringField(frame, 'message');
-  const messageLength = Buffer.byteLength(message, 'utf8');
-  if (messageLength > MAX_MESSAGE_BYTES) {
-    throw new Error(`Incoming agent message length ${messageLength} > ${MAX_MESSAGE_BYTES}`);
-  }
-
   return buildMessage('tattler.agent-message.v0', {
     id: requiredStringField(frame, 'id') as TattlerMessageId,
     from: requiredStringField(frame, 'from'),
-    message,
+    message: requiredMessageField(frame),
   });
+}
+
+export function parseIncomingChorusRoomPost(frame: unknown): ChorusRoomPostV0 {
+  if (!isRecord(frame)) {
+    throw new Error('Incoming protocol frame must be a JSON object');
+  }
+
+  if (frame.format !== 'chorus.room-post.v0') {
+    throw new Error(`Unsupported incoming protocol frame format [${String(frame.format)}]`);
+  }
+
+  return buildMessage('chorus.room-post.v0', {
+    id: requiredStringField(frame, 'id') as TattlerMessageId,
+    roomId: requiredRoomIdField(frame),
+    from: requiredStringField(frame, 'from'),
+    broker: requiredReplyRouteField(frame, 'broker'),
+    message: requiredMessageField(frame),
+  });
+}
+
+export function parseIncomingChorusRoomDelivery(frame: unknown): ChorusRoomDeliveryV0 {
+  if (!isRecord(frame)) {
+    throw new Error('Incoming protocol frame must be a JSON object');
+  }
+
+  if (frame.format !== 'chorus.room-delivery.v0') {
+    throw new Error(`Unsupported incoming protocol frame format [${String(frame.format)}]`);
+  }
+
+  return buildMessage('chorus.room-delivery.v0', {
+    id: requiredStringField(frame, 'id') as TattlerMessageId,
+    roomId: requiredRoomIdField(frame),
+    from: requiredStringField(frame, 'from'),
+    message: requiredMessageField(frame),
+    postId: requiredStringField(frame, 'postId') as TattlerMessageId,
+  });
+}
+
+export function parseIncomingPayloadFrame(frame: unknown): TattlerIncomingPayloadFrame {
+  if (!isRecord(frame)) {
+    throw new Error('Incoming protocol frame must be a JSON object');
+  }
+
+  switch (frame.format) {
+    case 'tattler.agent-message.v0':
+      return parseIncomingAgentMessage(frame);
+
+    case 'chorus.room-post.v0':
+      return parseIncomingChorusRoomPost(frame);
+
+    case 'chorus.room-delivery.v0':
+      return parseIncomingChorusRoomDelivery(frame);
+
+    default:
+      throw new Error(`Unsupported incoming protocol frame format [${String(frame.format)}]`);
+  }
 }
 
 export function createAck(correlatedMessageId: TattlerMessageId): TattlerAckV0 {
