@@ -1,5 +1,5 @@
 import { Command } from '@commander-js/extra-typings';
-import { parseFrontmatter } from '../core/frontmatter.js';
+import { normalizeReporterInput, parseFrontmatter } from '../core/frontmatter.js';
 import { createTask, renderTaskContent } from '../core/mutate.js';
 import type { TaskKind, TaskPriority, TaskReporter } from '../core/types.js';
 import { emitMutationResult, getOutputFormat, getTasksDir, shouldSave, withErrorHandling } from './helpers.js';
@@ -10,7 +10,7 @@ export const taskCreateCommand = new Command('create')
   .requiredOption('-t, --title <title>', 'Task title')
   .option('-k, --kind <kind>', 'Kind: TASK, BUG, SUBTASK', 'TASK')
   .option('--priority <priority>', 'Priority: LOW, MEDIUM, HIGH', 'MEDIUM')
-  .option('--reporter <reporter>', 'Reporter: USER, AGENT', 'USER')
+  .option('--reporter <reporter>', 'Reporter (freeform; defaults to USER)', 'USER')
   .option('--parent <key>', 'Parent task key (required for SUBTASK)')
   .option('--depends-on <keys>', 'Comma-separated task keys this depends on')
   .option('--blocked-by <keys>', 'Comma-separated task keys blocking this')
@@ -23,7 +23,7 @@ export const taskCreateCommand = new Command('create')
         kind: opts.kind.toUpperCase() as TaskKind,
         priority: opts.priority.toUpperCase() as TaskPriority,
         title: opts.title,
-        reporter: opts.reporter.toUpperCase() as TaskReporter,
+        reporter: normalizeReporterInput(opts.reporter) as TaskReporter,
         parent: opts.parent?.toUpperCase(),
         dependsOn: opts.dependsOn?.split(',').map((s: string) => s.trim()),
         blockedBy: opts.blockedBy?.split(',').map((s: string) => s.trim()),

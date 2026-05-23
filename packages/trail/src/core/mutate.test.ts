@@ -173,6 +173,92 @@ describe('createTask', () => {
     expect(existsSync(join(tasksDir, 'BAR'))).toBe(true);
   });
 
+  it('should preserve safe freeform title values', () => {
+    const result = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Title "quoted": okay',
+      reporter: 'USER',
+    });
+
+    const content = readFileSync(result.path, 'utf-8');
+    const fm = readTaskFrontmatter(result.path);
+    expect(content).toContain('title: "Title \\"quoted\\": okay"');
+    expect(fm.title).toBe('Title "quoted": okay');
+  });
+
+  it('should reject empty and multi-line title values', () => {
+    expect(() =>
+      createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: '   ',
+        reporter: 'USER',
+      }),
+    ).toThrow('title must be non-empty');
+
+    expect(() =>
+      createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Injected title"\nstatus: COMPLETE\nignore: "',
+        reporter: 'USER',
+      }),
+    ).toThrow('title must be a single-line string');
+  });
+
+  it('should preserve safe freeform reporter values', () => {
+    const result = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Freeform reporter',
+      reporter: 'Piper "Librarian": Docs',
+    });
+
+    const content = readFileSync(result.path, 'utf-8');
+    const fm = readTaskFrontmatter(result.path);
+    expect(content).toContain('reporter: "Piper \\"Librarian\\": Docs"');
+    expect(fm.reporter).toBe('Piper "Librarian": Docs');
+  });
+
+  it('should canonicalize conventional reporter values case-insensitively', () => {
+    const result = createTask(tasksDir, {
+      project: 'FOO',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Canonical reporter',
+      reporter: 'agent',
+    });
+
+    expect(readTaskFrontmatter(result.path).reporter).toBe('AGENT');
+  });
+
+  it('should reject empty and multi-line reporter values', () => {
+    expect(() =>
+      createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Blank reporter',
+        reporter: '   ',
+      }),
+    ).toThrow('reporter must be non-empty');
+
+    expect(() =>
+      createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Injected reporter',
+        reporter: 'Piper\nstatus: COMPLETE',
+      }),
+    ).toThrow('reporter must be a single-line string');
+  });
+
   it('should include optional relationship fields', () => {
     createTask(tasksDir, {
       project: 'FOO',
@@ -288,10 +374,62 @@ describe('updateTaskFields', () => {
     expect(content).toContain('# New title');
   });
 
+  it('should escape safe freeform title updates', () => {
+    updateTaskFields(taskPath, { title: 'New "quoted": title' });
+    const fm = readTaskFrontmatter(taskPath);
+    const content = readFileSync(taskPath, 'utf-8');
+    expect(content).toContain('title: "New \\"quoted\\": title"');
+    expect(content).toContain('# New "quoted": title');
+    expect(fm.title).toBe('New "quoted": title');
+  });
+
+  it('should reject empty and multi-line title updates without modifying the task', () => {
+    expect(() => updateTaskFields(taskPath, { title: '' })).toThrow('title must be non-empty');
+    expect(() => updateTaskFields(taskPath, { title: 'Bad title"\nstatus: COMPLETE\nignore: "' })).toThrow(
+      'title must be a single-line string',
+    );
+
+    const fm = readTaskFrontmatter(taskPath);
+    expect(fm.title).toBe('Original');
+    expect(fm.status).toBe('NOT STARTED');
+  });
+
   it('should update reporter', () => {
     updateTaskFields(taskPath, { reporter: 'AGENT' });
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.reporter).toBe('AGENT');
+  });
+
+  it('should preserve safe freeform assignee and reporter updates', () => {
+    updateTaskFields(taskPath, {
+      assignee: 'Doug "Reviewer": Staff',
+      reporter: 'Piper (Librarian)',
+    });
+
+    const content = readFileSync(taskPath, 'utf-8');
+    const fm = readTaskFrontmatter(taskPath);
+    expect(content).toContain('assignee: "Doug \\"Reviewer\\": Staff"');
+    expect(content).toContain('reporter: "Piper (Librarian)"');
+    expect(fm.assignee).toBe('Doug "Reviewer": Staff');
+    expect(fm.reporter).toBe('Piper (Librarian)');
+  });
+
+  it('should canonicalize conventional assignee and reporter updates case-insensitively', () => {
+    updateTaskFields(taskPath, { assignee: 'agent', reporter: 'user' });
+    const fm = readTaskFrontmatter(taskPath);
+    expect(fm.assignee).toBe('AGENT');
+    expect(fm.reporter).toBe('USER');
+  });
+
+  it('should reject empty and multi-line assignee/reporter updates without modifying the task', () => {
+    expect(() => updateTaskFields(taskPath, { assignee: '' })).toThrow('assignee must be non-empty');
+    expect(() => updateTaskFields(taskPath, { reporter: 'Piper\nstatus: COMPLETE' })).toThrow(
+      'reporter must be a single-line string',
+    );
+
+    const fm = readTaskFrontmatter(taskPath);
+    expect(fm.status).toBe('NOT STARTED');
+    expect(fm.reporter).toBe('USER');
   });
 
   it('should add depends_on', () => {

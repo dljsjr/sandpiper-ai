@@ -83,7 +83,17 @@ export function formatSummary(tasks: readonly Task[]): string {
 }
 
 function formatCounts(counts: Record<string, number>, order?: readonly string[]): string[] {
-  const keys = order ? order.filter((k) => (counts[k] ?? 0) > 0) : Object.keys(counts).sort();
+  if (!order) {
+    return Object.keys(counts)
+      .sort()
+      .map((k) => `  ${k}: ${counts[k]}`);
+  }
 
-  return keys.map((k) => `  ${k}: ${counts[k]}`);
+  const ordered = order.filter((k) => (counts[k] ?? 0) > 0);
+  const orderedSet = new Set(order);
+  const remaining = Object.keys(counts)
+    .filter((k) => !orderedSet.has(k) && (counts[k] ?? 0) > 0)
+    .sort();
+
+  return [...ordered, ...remaining].map((k) => `  ${k}: ${counts[k]}`);
 }

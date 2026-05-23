@@ -1,6 +1,9 @@
 import { projectFromKey } from './patterns.js';
 import type { Task, TaskAssignee, TaskKind, TaskPriority, TaskReporter, TaskResolution, TaskStatus } from './types.js';
 
+const CONVENTIONAL_ASSIGNEES = ['UNASSIGNED', 'USER', 'AGENT'] as const;
+const CONVENTIONAL_REPORTERS = ['USER', 'AGENT'] as const;
+
 /**
  * Convert parsed frontmatter + a task key into a Task object.
  * This is the single canonical place for this mapping.
@@ -69,24 +72,60 @@ function parsePriority(value: string | string[] | undefined): TaskPriority {
 }
 
 function parseAssignee(value: string | string[] | undefined): TaskAssignee {
-  switch (value) {
-    case 'UNASSIGNED':
-    case 'USER':
-    case 'AGENT':
-      return value;
-    default:
-      return 'UNASSIGNED';
-  }
+  return parsePersonField(value, 'assignee', CONVENTIONAL_ASSIGNEES, 'UNASSIGNED');
 }
 
 function parseReporter(value: string | string[] | undefined): TaskReporter {
-  switch (value) {
-    case 'USER':
-    case 'AGENT':
-      return value;
-    default:
-      return 'USER';
+  return parsePersonField(value, 'reporter', CONVENTIONAL_REPORTERS, 'USER');
+}
+
+export function normalizeTitleInput(value: string): string {
+  return normalizeNonEmptySingleLineInput(value, 'title');
+}
+
+export function normalizeAssigneeInput(value: string): TaskAssignee {
+  return normalizePersonInput(value, 'assignee', CONVENTIONAL_ASSIGNEES);
+}
+
+export function normalizeReporterInput(value: string): TaskReporter {
+  return normalizePersonInput(value, 'reporter', CONVENTIONAL_REPORTERS);
+}
+
+export function formatFrontmatterScalar(value: string): string {
+  return /^[A-Z0-9_-]+$/.test(value) ? value : JSON.stringify(value);
+}
+
+function parsePersonField(
+  value: string | string[] | undefined,
+  fieldName: string,
+  conventionalValues: readonly string[],
+  fallback: string,
+): string {
+  if (typeof value !== 'string') return fallback;
+  try {
+    return normalizePersonInput(value, fieldName, conventionalValues);
+  } catch {
+    return fallback;
   }
+}
+
+function normalizePersonInput(value: string, fieldName: string, conventionalValues: readonly string[]): string {
+  const trimmed = normalizeNonEmptySingleLineInput(value, fieldName);
+  const upper = trimmed.toUpperCase();
+  return conventionalValues.includes(upper) ? upper : trimmed;
+}
+
+function normalizeNonEmptySingleLineInput(value: string, fieldName: string): string {
+  if (/[\r\n]/.test(value)) {
+    throw new Error(`${fieldName} must be a single-line string.`);
+  }
+
+  const trimmed = value.trim();
+  if (trimmed === '') {
+    throw new Error(`${fieldName} must be non-empty.`);
+  }
+
+  return trimmed;
 }
 
 function parseResolution(value: string | string[] | undefined): TaskResolution | undefined {
@@ -97,6 +136,19 @@ function parseResolution(value: string | string[] | undefined): TaskResolution |
     default:
       return undefined;
   }
+}
+
+function parseScalarValue(value: string): string {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    try {
+      const parsed = JSON.parse(value) as unknown;
+      if (typeof parsed === 'string') return parsed;
+    } catch {
+      // Fall through to legacy quote stripping below.
+    }
+    return value.replace(/^"(.*)"$/, '$1');
+  }
+  return value;
 }
 
 /**
@@ -155,13 +207,16 @@ export function parseFrontmatter(content: string): Record<string, string | strin
       const key = kvMatch[1] ?? '';
       const value = (kvMatch[2] ?? '').trim();
 
+      if (Object.hasOwn(result, key)) {
+        continue;
+      }
+
       if (value === '') {
         // Empty value — could be the start of an array
         currentArrayKey = key;
         currentArray = [];
       } else {
-        // Strip surrounding quotes if present
-        result[key] = value.replace(/^"(.*)"$/, '$1');
+        result[key] = parseScalarValue(value);
       }
     }
   }

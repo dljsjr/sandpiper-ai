@@ -227,12 +227,12 @@ Every task file MUST include the following frontmatter fields:
 
 | Field | Type | Allowed Values | Description |
 |-------|------|----------------|-------------|
-| `title` | string | Free text | Short summary of the task. MUST also appear as the level-1 heading in the markdown body. |
+| `title` | string | Free text; non-empty single-line | Short summary of the task. MUST also appear as the level-1 heading in the markdown body. |
 | `status` | enum | `NOT STARTED`, `IN PROGRESS`, `NEEDS REVIEW`, `COMPLETE` | Current status of the task. |
 | `kind` | enum | `BUG`, `TASK`, `SUBTASK` | The type of work item. |
 | `priority` | enum | `LOW`, `MEDIUM`, `HIGH` | Relative priority of the task. |
-| `assignee` | string | `UNASSIGNED`, `USER`, `AGENT` | Who is currently working on the task. |
-| `reporter` | string | `USER`, `AGENT` | Who surfaced the work item and created the task. |
+| `assignee` | string | Free text; `UNASSIGNED`, `USER`, and `AGENT` are conventional values | Who is currently working on the task. |
+| `reporter` | string | Free text; `USER` and `AGENT` are conventional values | Who surfaced the work item and created the task. |
 | `created_at` | string (ISO 8601) | e.g., `2026-03-20T15:00:00Z` | Timestamp when the task was created. MUST be set once at creation and MUST NOT be modified. |
 | `updated_at` | string (ISO 8601) | e.g., `2026-03-20T16:30:00Z` | Timestamp of the most recent modification. MUST be updated whenever any field or the body is changed. |
 
@@ -263,14 +263,20 @@ A task file MAY include the following additional frontmatter fields:
 
 #### `assignee`
 
+The assignee is a freeform, non-empty, single-line string naming the person, agent, team, or role currently working on the task. Conventional values are canonicalized case-insensitively and include:
+
 - `UNASSIGNED` — No one is currently working on this task.
 - `USER` — The user is working on this task.
 - `AGENT` — The agent is working on this task.
 
 #### `reporter`
 
-- `USER` — The user surfaced this work item. If the user asks the agent to create a task, the reporter is `USER`.
+The reporter is a freeform, non-empty, single-line string naming who surfaced the work item. Conventional values are canonicalized case-insensitively and include:
+
+- `USER` — The user surfaced this work item. If the user asks the agent to create a task, the reporter is usually `USER`.
 - `AGENT` — The agent identified this work item independently (e.g., discovered a bug during implementation, identified missing requirements).
+
+Trail MUST reject empty or multi-line `title`, `assignee`, and `reporter` values on create/update. When serializing freeform values, Trail MUST quote or escape them as YAML scalars so the value cannot introduce additional frontmatter keys.
 
 #### `depends_on` vs `blocked_by`
 
@@ -327,7 +333,7 @@ NOT STARTED → IN PROGRESS → NEEDS REVIEW → COMPLETE
 ```
 
 The `assignee` field SHOULD be updated in conjunction with status changes:
-- When picking up a task: set `assignee` to `AGENT` or `USER`, set `status` to `IN PROGRESS`.
+- When picking up a task: set `assignee` to whoever is doing the work (`AGENT` and `USER` are conventional values), set `status` to `IN PROGRESS`.
 - When finishing work: set `status` to `NEEDS REVIEW`.
 - When the user confirms completion: set `status` to `COMPLETE`.
 

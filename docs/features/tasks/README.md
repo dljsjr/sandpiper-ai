@@ -18,7 +18,7 @@ The CLI allocates the next task key, writes the task file, and updates the index
 trail task pickup AGENT-123
 ```
 
-Picking up a task sets it to `IN_PROGRESS` and assigns it to `AGENT`.
+Picking up a task sets it to `IN_PROGRESS` and assigns it to `AGENT` by default. Use `--assignee "Name"` to record a named owner.
 
 ## List and inspect tasks
 

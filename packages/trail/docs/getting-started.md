@@ -77,10 +77,16 @@ The task starts as `NOT STARTED` and is assigned to `UNASSIGNED`.
 
 ## 5. Pick up the task
 
-Picking up a task marks it as in progress and assigns it to `AGENT`:
+Picking up a task marks it as in progress and assigns it to `AGENT` by default:
 
 ```bash
 trail task pickup DEMO-1
+```
+
+Use `--assignee` when you want a named owner:
+
+```bash
+trail task pickup DEMO-1 --assignee "Piper"
 ```
 
 Check the result:

@@ -73,12 +73,12 @@ Show progress while large files import.
 
 | Field        | Required | Values or format                         | Description                         |
 | ------------ | -------- | ---------------------------------------- | ----------------------------------- |
-| `title`      | Yes      | String                                   | Human-readable title.               |
+| `title`      | Yes      | Non-empty, single-line string           | Human-readable title.               |
 | `status`     | Yes      | `NOT STARTED`, `IN PROGRESS`, `NEEDS REVIEW`, `COMPLETE` | Current lifecycle state. |
 | `kind`       | Yes      | `TASK`, `BUG`, `SUBTASK`                 | Work item type.                     |
 | `priority`   | Yes      | `LOW`, `MEDIUM`, `HIGH`                  | Relative priority.                  |
-| `assignee`   | Yes      | `UNASSIGNED`, `USER`, `AGENT`            | Current owner.                      |
-| `reporter`   | Yes      | `USER`, `AGENT`                          | Who reported or requested the work. |
+| `assignee`   | Yes      | Freeform string; `UNASSIGNED`, `USER`, and `AGENT` are conventional | Current owner.                      |
+| `reporter`   | Yes      | Freeform string; `USER` and `AGENT` are conventional | Who reported or requested the work. |
 | `created_at` | Yes      | ISO-8601 timestamp                       | Creation time.                      |
 | `updated_at` | Yes      | ISO-8601 timestamp                       | Last update time.                   |
 | `resolution` | When complete | `DONE`, `WONTFIX`                    | Completion result.                  |
@@ -87,6 +87,8 @@ Show progress while large files import.
 | `related`    | No       | List of task keys                        | Related work items.                 |
 
 Trail accepts status filter names such as `NOT_STARTED` in CLI options and writes human-readable status values such as `NOT STARTED` in frontmatter.
+
+`title`, `assignee`, and `reporter` must be non-empty, single-line strings. Conventional assignee/reporter tokens are canonicalized case-insensitively (`agent` becomes `AGENT`), while other names are preserved. Trail quotes and escapes freeform values in frontmatter when needed.
 
 ## Kinds and hierarchy
 

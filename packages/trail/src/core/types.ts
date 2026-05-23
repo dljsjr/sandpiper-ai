@@ -11,8 +11,8 @@
 export type TaskStatus = 'NOT STARTED' | 'IN PROGRESS' | 'NEEDS REVIEW' | 'COMPLETE';
 export type TaskKind = 'TASK' | 'BUG' | 'SUBTASK';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
-export type TaskAssignee = 'UNASSIGNED' | 'USER' | 'AGENT';
-export type TaskReporter = 'USER' | 'AGENT';
+export type TaskAssignee = string;
+export type TaskReporter = string;
 
 /** Resolution value — required when status is COMPLETE. */
 export type TaskResolution = 'DONE' | 'WONTFIX';

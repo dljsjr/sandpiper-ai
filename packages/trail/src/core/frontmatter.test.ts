@@ -26,6 +26,27 @@ title: "Quoted title"
     expect(fm.title).toBe('Quoted title');
   });
 
+  it('should unescape JSON-compatible double-quoted values', () => {
+    const content = `---
+title: "Quoted \\"title\\""
+---
+`;
+    const fm = parseFrontmatter(content);
+    expect(fm.title).toBe('Quoted "title"');
+  });
+
+  it('should keep the first value when frontmatter contains duplicate keys', () => {
+    const content = `---
+title: "Duplicate test"
+status: NOT STARTED
+reporter: Piper
+status: COMPLETE
+---
+`;
+    const fm = parseFrontmatter(content);
+    expect(fm.status).toBe('NOT STARTED');
+  });
+
   it('should parse arrays with dash syntax', () => {
     const content = `---
 title: Task
@@ -121,21 +142,39 @@ describe('taskFromFrontmatter', () => {
     });
   });
 
+  it('preserves freeform assignee and reporter values', () => {
+    const task = taskFromFrontmatter('TCL-124', {
+      title: 'Freeform people fields',
+      assignee: 'Doug Stephen',
+      reporter: 'Piper (Librarian)',
+    });
+
+    expect(task.assignee).toBe('Doug Stephen');
+    expect(task.reporter).toBe('Piper (Librarian)');
+  });
+
+  it('canonicalizes conventional assignee and reporter values case-insensitively', () => {
+    const task = taskFromFrontmatter('TCL-125', {
+      title: 'Canonical people fields',
+      assignee: 'agent',
+      reporter: 'user',
+    });
+
+    expect(task.assignee).toBe('AGENT');
+    expect(task.reporter).toBe('USER');
+  });
+
   it('falls back to default enum values for malformed frontmatter', () => {
     const task = taskFromFrontmatter('TCL-124', {
       status: 'BOGUS',
       kind: 'FEATURE',
       priority: 'URGENT',
-      assignee: 'NOBODY',
-      reporter: 'ROBOT',
       resolution: 'MAYBE',
     });
 
     expect(task.status).toBe('NOT STARTED');
     expect(task.kind).toBe('TASK');
     expect(task.priority).toBe('MEDIUM');
-    expect(task.assignee).toBe('UNASSIGNED');
-    expect(task.reporter).toBe('USER');
     expect(task.resolution).toBeUndefined();
   });
 });

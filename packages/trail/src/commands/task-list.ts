@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { Command } from '@commander-js/extra-typings';
 import { formatTaskLine } from '../core/format.js';
+import { normalizeAssigneeInput } from '../core/frontmatter.js';
 import { formatRawOutput, formatTasksOutput } from '../core/output.js';
 import type { SortField, TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
@@ -15,7 +16,7 @@ export const taskListCommand = new Command('list')
   .option('-s, --status <status>', 'Filter by status (NOT_STARTED, IN_PROGRESS, NEEDS_REVIEW, COMPLETE)')
   .option('-k, --kind <kind>', 'Filter by kind (TASK, BUG, SUBTASK)')
   .option('--priority <priority>', 'Filter by priority (LOW, MEDIUM, HIGH)')
-  .option('-a, --assignee <assignee>', 'Filter by assignee (UNASSIGNED, USER, AGENT)')
+  .option('-a, --assignee <assignee>', 'Filter by assignee')
   .option('--parent <key>', 'Filter subtasks of a specific parent')
   .option('--top-level', 'Show only top-level tasks (no subtasks)')
   .option('--subtasks-only', 'Show only subtasks')
@@ -49,7 +50,7 @@ export const taskListCommand = new Command('list')
         ...(opts.status ? { status: normalizeStatus(opts.status) } : {}),
         ...(opts.kind ? { kind: opts.kind.toUpperCase() as TaskKind } : {}),
         ...(opts.priority ? { priority: opts.priority.toUpperCase() as TaskPriority } : {}),
-        ...(opts.assignee ? { assignee: opts.assignee.toUpperCase() as TaskAssignee } : {}),
+        ...(opts.assignee !== undefined ? { assignee: normalizeAssigneeInput(opts.assignee) as TaskAssignee } : {}),
         ...(opts.parent ? { parent: opts.parent } : {}),
         ...(opts.topLevel ? { isSubtask: false } : {}),
         ...(opts.subtasksOnly ? { isSubtask: true } : {}),

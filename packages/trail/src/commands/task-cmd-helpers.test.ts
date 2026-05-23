@@ -53,10 +53,10 @@ describe('task-cmd-helpers', () => {
   it('normalizes status values and parses update option fields', () => {
     const fields = buildFieldsFromOptions({
       status: 'in_progress',
-      assignee: 'agent',
+      assignee: 'Doug Stephen',
       priority: 'high',
       resolution: 'done',
-      reporter: 'user',
+      reporter: 'Piper (Librarian)',
       dependsOn: 'AGENT-1, AGENT-2',
       blockedBy: '',
       related: 'TCL-1',
@@ -66,10 +66,10 @@ describe('task-cmd-helpers', () => {
     expect(normalizeStatus('needs_review')).toBe('NEEDS REVIEW');
     expect(fields).toMatchObject({
       status: 'IN PROGRESS',
-      assignee: 'AGENT',
+      assignee: 'Doug Stephen',
       priority: 'HIGH',
       resolution: 'DONE',
-      reporter: 'USER',
+      reporter: 'Piper (Librarian)',
       description: 'updated description',
       dependsOn: ['AGENT-1', 'AGENT-2'],
       blockedBy: [],

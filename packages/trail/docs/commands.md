@@ -45,10 +45,10 @@ trail task create [options]
 | Option                  | Description                                      |
 | ----------------------- | ------------------------------------------------ |
 | `-p, --project <key>`   | Project key, such as `APP`.                      |
-| `-t, --title <title>`   | Task title.                                      |
+| `-t, --title <title>`   | Non-empty, single-line task title.               |
 | `-k, --kind <kind>`     | `TASK`, `BUG`, or `SUBTASK`; default is `TASK`.  |
 | `--priority <priority>` | `LOW`, `MEDIUM`, or `HIGH`; default is `MEDIUM`. |
-| `--reporter <reporter>` | `USER` or `AGENT`; default is `USER`.            |
+| `--reporter <reporter>` | Freeform reporter string; default is `USER`.     |
 | `--parent <key>`        | Parent task key; required for `SUBTASK`.         |
 | `--depends-on <keys>`   | Comma-separated dependency keys.                 |
 | `--blocked-by <keys>`   | Comma-separated blocking task keys.              |
@@ -118,11 +118,11 @@ trail task update [options] [key]
 | Option                      | Description                                      |
 | --------------------------- | ------------------------------------------------ |
 | `-s, --status <status>`     | Set status.                                      |
-| `-a, --assignee <assignee>` | Set assignee.                                    |
+| `-a, --assignee <assignee>` | Set assignee to a freeform string.               |
 | `--priority <priority>`     | Set priority.                                    |
 | `--resolution <resolution>` | Set `DONE` or `WONTFIX`.                         |
-| `-t, --title <title>`       | Set title.                                       |
-| `--reporter <reporter>`     | Set `USER` or `AGENT`.                           |
+| `-t, --title <title>`       | Set non-empty, single-line title.                |
+| `--reporter <reporter>`     | Set reporter to a freeform string.               |
 | `--depends-on <keys>`       | Set dependencies; pass an empty string to clear. |
 | `--blocked-by <keys>`       | Set blockers; pass an empty string to clear.     |
 | `--related <keys>`          | Set related keys; pass an empty string to clear. |
@@ -136,13 +136,17 @@ trail task update [options] [key]
 
 ### `trail task pickup`
 
-Sets task status to `IN PROGRESS` and assignee to `AGENT`.
+Sets task status to `IN PROGRESS` and assigns the task. The assignee defaults to `AGENT`.
 
 ```text
 trail task pickup [options] [key]
 ```
 
-Supports the same bulk filters as `task update`: `--project`, `--filter-status`, `--search`, `--regex`, and `--ripgrep`.
+| Option                      | Description                                  |
+| --------------------------- | -------------------------------------------- |
+| `-a, --assignee <assignee>` | Freeform assignee string; default is `AGENT`. |
+
+Also supports the same bulk filters as `task update`: `--project`, `--filter-status`, `--search`, `--regex`, and `--ripgrep`.
 
 ### `trail task complete`
 

@@ -180,7 +180,7 @@ Set scalar fields:
 
 ```bash
 trail task update APP-12 --status IN_PROGRESS
-trail task update APP-12 --assignee USER
+trail task update APP-12 --assignee "Doug Stephen"
 trail task update APP-12 --priority LOW
 trail task update APP-12 -t "Import progress UI"
 ```
