@@ -10,6 +10,7 @@ import {
   createChorusRoomBroker,
   createChorusRoomDeliveryFrame,
   createChorusUserMessageContent,
+  sendChorusReply,
 } from './chorus-runtime';
 
 function identity(name: string, socketPath = `/tmp/${name}.sock`): TattlerIdentityV0 {
@@ -67,6 +68,42 @@ describe('Chorus broker runtime', () => {
       { from: 'Huginn', message: 'remote post', self: false, status: 'received' },
       { from: 'Muninn', message: 'reply note', self: false, postId: post.id },
     ]);
+  });
+
+  test('routes local broker replies through local post fanout instead of sending to self', async () => {
+    const sent: Array<{ peer: TattlerIdentityV0; frame: TattlerSendableFrame }> = [];
+    const broker = createChorusRoomBroker({
+      roomId: roomId('chorus-dev'),
+      ownIdentity: identity('Piper'),
+      brokerRoute: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
+      peers: [identity('Huginn')],
+      sendFrame: async (peer, frame) => {
+        sent.push({ peer, frame });
+        return { messageIdAck: frame.id };
+      },
+    });
+
+    const result = await sendChorusReply({
+      activeBroker: broker,
+      roomId: roomId('chorus-dev'),
+      from: 'Piper',
+      postId: 'remote-post',
+      broker: broker.brokerRoute,
+      message: 'local reply',
+      sendFrame: async () => {
+        throw new Error('remote send path should not be used for the active local broker');
+      },
+    });
+    await broker.waitForIdle();
+
+    expect(result).toMatchObject({ kind: 'local-post', postId: broker.entries[0]?.id });
+    expect(sent).toHaveLength(1);
+    expect(sent[0]?.peer.name).toBe('Huginn');
+    expect(sent[0]?.frame).toMatchObject({
+      from: 'Piper',
+      message: 'local reply',
+      broker: { socketPath: '/tmp/chorus-dev.sock' },
+    });
   });
 
   test('builds model-facing Chorus message content with broker route metadata', () => {

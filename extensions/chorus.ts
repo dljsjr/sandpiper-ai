@@ -5,7 +5,12 @@ import { dirname, join, normalize } from 'node:path';
 import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
-import { type ChorusRoomBroker, createChorusRoomBroker, createChorusRoomDeliveryFrame } from './chorus/chorus-runtime';
+import {
+  type ChorusReplyResult,
+  type ChorusRoomBroker,
+  createChorusRoomBroker,
+  sendChorusReply,
+} from './chorus/chorus-runtime';
 import {
   choosePeers,
   clearChorusRoomUi,
@@ -22,7 +27,6 @@ import {
   requestOwnIdentity,
 } from './tattler/tattler-pi-events';
 import {
-  buildMessage,
   type ChorusReplyRouteV0,
   type ChorusRoomDeliveryV0,
   type ChorusRoomId,
@@ -79,14 +83,6 @@ async function resolveOwnIdentity(pi: ExtensionAPI): Promise<TattlerIdentityV0 |
     console.warn('Chorus could not resolve local Tattler identity: ', err);
     return undefined;
   }
-}
-
-function brokerRouteToPeer(route: ChorusReplyRouteV0): TattlerIdentityV0 {
-  return buildMessage('tattler.identity.v0', {
-    name: route.name,
-    shortId: route.shortId,
-    socketPath: route.socketPath,
-  });
 }
 
 function roomSocketPath(ownIdentity: TattlerIdentityV0, room: ChorusRoomId): string {
@@ -208,8 +204,21 @@ async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDelivery
   });
 }
 
+const SendChorusReplyParameters = Type.Object({
+  roomId: Type.String({ description: 'Chorus room ID from the incoming Chorus message' }),
+  postId: Type.String({ description: 'Original Chorus room post ID being replied to' }),
+  brokerName: Type.String({ description: 'Broker route name from the incoming Chorus message' }),
+  brokerShortId: Type.String({ description: 'Broker route shortId from the incoming Chorus message' }),
+  brokerSocketPath: Type.String({ description: 'Broker route socketPath from the incoming Chorus message' }),
+  message: Type.String({ description: 'Reply text to send to the Chorus room broker' }),
+});
+
+type ChorusReplyToolDetails =
+  | ChorusReplyResult
+  | { readonly kind: 'error'; readonly messageIdAck: TattlerMessageId; readonly error: string };
+
 function registerChorusReplyTool(pi: ExtensionAPI): void {
-  pi.registerTool({
+  pi.registerTool<typeof SendChorusReplyParameters, ChorusReplyToolDetails>({
     name: 'send_chorus_reply',
     label: 'Send Chorus Reply',
     description: 'Reply to a Chorus room message through the broker route embedded in that message',
@@ -220,46 +229,50 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
       'Copy roomId, postId, and broker route fields from the Chorus message metadata in context.',
       'Do not use send_peer_message for Chorus room replies unless the user explicitly asks for a direct Tattler DM.',
     ],
-    parameters: Type.Object({
-      roomId: Type.String({ description: 'Chorus room ID from the incoming Chorus message' }),
-      postId: Type.String({ description: 'Original Chorus room post ID being replied to' }),
-      brokerName: Type.String({ description: 'Broker route name from the incoming Chorus message' }),
-      brokerShortId: Type.String({ description: 'Broker route shortId from the incoming Chorus message' }),
-      brokerSocketPath: Type.String({ description: 'Broker route socketPath from the incoming Chorus message' }),
-      message: Type.String({ description: 'Reply text to send to the Chorus room broker' }),
-    }),
+    parameters: SendChorusReplyParameters,
     async execute(_toolCallId, params) {
       let deliveryId = params.postId as TattlerMessageId;
       try {
         const ownIdentity = await requestOwnIdentity(pi);
-        const delivery = createChorusRoomDeliveryFrame(
-          roomId(params.roomId),
-          ownIdentity.name,
-          params.postId,
-          params.message,
-        );
-        deliveryId = delivery.id;
-        const brokerPeer = brokerRouteToPeer({
+        const selectedRoom = roomId(params.roomId);
+        const broker = {
           name: params.brokerName,
           shortId: params.brokerShortId,
           socketPath: params.brokerSocketPath,
+        };
+        const result = await sendChorusReply({
+          activeBroker: activeRoom?.broker,
+          roomId: selectedRoom,
+          from: ownIdentity.name,
+          postId: params.postId,
+          broker,
+          message: params.message,
+          sendFrame: sendPayloadFrame,
         });
-        const sendResult = await sendPayloadFrame(brokerPeer, delivery);
+        if (result.kind === 'local-post') {
+          deliveryId = result.postId;
+          return {
+            content: [{ type: 'text', text: `Chorus reply posted locally through broker as ${result.postId}` }],
+            details: result,
+          };
+        }
+
+        deliveryId = result.messageIdAck;
         return {
           content: [
             {
               type: 'text',
-              text: `Chorus reply ${sendResult.messageIdAck} acknowledged by broker ${params.brokerName}`,
+              text: `Chorus reply ${result.messageIdAck} acknowledged by broker ${params.brokerName}`,
             },
           ],
-          details: sendResult,
+          details: result,
         };
       } catch (err) {
         const errMessage = `Error sending Chorus reply ${deliveryId}: ${err instanceof Error ? err.message : String(err)}`;
         return {
           content: [{ type: 'text', text: errMessage }],
           isError: true,
-          details: { messageIdAck: deliveryId, error: errMessage },
+          details: { kind: 'error', messageIdAck: deliveryId, error: errMessage },
         };
       }
     },
