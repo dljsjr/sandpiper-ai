@@ -17,7 +17,7 @@ interface PiEventBusLike {
   emit(channel: string, data: unknown): void;
 }
 
-interface HasPiEventBus {
+export interface HasPiEventBus {
   readonly events: PiEventBusLike;
 }
 
@@ -34,6 +34,7 @@ const ChorusPiEventBusKey = {
   ready: 'chorus:ready',
   readyRequest: 'chorus:request:ready',
   roomPost: 'chorus:request:roomPost',
+  roomPostReceived: 'chorus:event:roomPostReceived',
   roomDelivery: 'chorus:event:roomDelivery',
 } as const;
 
@@ -63,6 +64,7 @@ export interface ChorusRoomPostResponse {
   readonly postId: TattlerMessageId;
 }
 
+export type ChorusRoomPostReceivedHandler = (post: ChorusRoomPostV0) => void;
 export type ChorusRoomDeliveryHandler = (delivery: ChorusRoomDeliveryV0) => void;
 
 function request<T>(eventKey: string, pi: HasPiEventBus, options: EventRequestOptions = {}): Promise<T> {
@@ -204,6 +206,16 @@ export function onChorusRoomPostRequest(
       .then(reply, (err: unknown) => {
         reject(err instanceof Error ? err : new Error(String(err)));
       });
+  });
+}
+
+export function emitChorusRoomPostReceived(pi: HasPiEventBus, post: ChorusRoomPostV0): void {
+  pi.events.emit(ChorusPiEventBusKey.roomPostReceived, post);
+}
+
+export function onChorusRoomPostReceived(pi: HasPiEventBus, handler: ChorusRoomPostReceivedHandler): () => void {
+  return pi.events.on(ChorusPiEventBusKey.roomPostReceived, (post) => {
+    handler(post as ChorusRoomPostV0);
   });
 }
 

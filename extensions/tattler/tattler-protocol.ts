@@ -149,6 +149,10 @@ export function serializeToJsonl<K extends TattlerFormatKey, T extends TattlerMe
   return `${JSON.stringify(outObj)}\n`;
 }
 
+export function protocolFormat<K extends TattlerFormatKey>(message: TattlerMessageBase<K>): K {
+  return message[TattlerProtocolFormat];
+}
+
 export function createChorusRoomPost(
   room: ChorusRoomId,
   from: string,
