@@ -86,7 +86,7 @@ class ChorusRoomTranscript implements Component {
     const lines = [
       this.theme.fg(
         'accent',
-        `◉ Chorus #${this.broker.roomId} (${this.peers.length} peer${this.peers.length === 1 ? '' : 's'})`,
+        `◉ Chorus #${this.broker.roomId} as ${this.broker.localAuthorName} (${this.peers.length} peer${this.peers.length === 1 ? '' : 's'})`,
       ),
     ];
 

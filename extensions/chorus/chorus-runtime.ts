@@ -35,6 +35,7 @@ export interface ChorusTranscriptEntry {
 export interface ChorusRoomBrokerOptions {
   readonly roomId: ChorusRoomId;
   readonly ownIdentity: TattlerIdentityV0;
+  readonly localAuthorName?: string;
   readonly brokerRoute: ChorusReplyRouteV0;
   readonly peers: readonly TattlerIdentityV0[];
   readonly sendFrame: (peer: TattlerIdentityV0, frame: TattlerSendableFrame) => Promise<SendAgentMessageResult>;
@@ -81,6 +82,7 @@ export function createChorusRoomDeliveryFrame(
 export class ChorusRoomBroker {
   readonly roomId: ChorusRoomId;
   readonly ownIdentity: TattlerIdentityV0;
+  readonly localAuthorName: string;
   readonly brokerRoute: ChorusReplyRouteV0;
   readonly peers: readonly TattlerIdentityV0[];
   readonly entries: ChorusTranscriptEntry[] = [];
@@ -91,6 +93,7 @@ export class ChorusRoomBroker {
   constructor(options: ChorusRoomBrokerOptions) {
     this.roomId = options.roomId;
     this.ownIdentity = options.ownIdentity;
+    this.localAuthorName = options.localAuthorName ?? options.ownIdentity.name;
     this.brokerRoute = options.brokerRoute;
     this.peers = options.peers;
     this.sendFrame = options.sendFrame;
@@ -98,22 +101,11 @@ export class ChorusRoomBroker {
   }
 
   postLocalMessage(message: string): ChorusRoomPostResult {
-    assertMessageSize(message);
-    const post = createChorusRoomPost(this.roomId, this.ownIdentity.name, this.brokerRoute, message);
-    const entry: ChorusTranscriptEntry = {
-      id: post.id,
-      roomId: post.roomId,
-      from: post.from,
-      message: post.message,
-      self: true,
-      status: this.peers.length === 0 ? 'acked' : 'pending',
-      peerStatuses: new Map(this.peers.map((peer) => [peer.name, 'pending'])),
-    };
-    this.entries.push(entry);
-    this.notifyUpdated();
-    this.pendingFanout = this.pendingFanout.then(() => this.fanOut(post, entry));
+    return this.postAuthoredMessage(this.localAuthorName, message);
+  }
 
-    return { postId: post.id };
+  postAuthoredMessage(from: string, message: string): ChorusRoomPostResult {
+    return this.postRoomMessage(from, message, this.peers, this.isLocalAuthor(from));
   }
 
   recordRoomPost(post: ReturnType<typeof createChorusRoomPost>): boolean {
@@ -127,7 +119,7 @@ export class ChorusRoomBroker {
       from: post.from,
       message: post.message,
       broker: post.broker,
-      self: post.from === this.ownIdentity.name,
+      self: this.isLocalAuthor(post.from),
       status: 'received',
       peerStatuses: new Map(),
     });
@@ -135,39 +127,70 @@ export class ChorusRoomBroker {
     return true;
   }
 
-  recordDelivery(delivery: ChorusRoomDeliveryV0): boolean {
+  acceptDelivery(delivery: ChorusRoomDeliveryV0): ChorusRoomPostResult | undefined {
     if (delivery.roomId !== this.roomId) {
-      return false;
+      return;
     }
 
-    this.entries.push({
-      id: delivery.id,
-      roomId: delivery.roomId,
-      from: delivery.from,
-      message: delivery.message,
-      postId: delivery.postId,
-      self: delivery.from === this.ownIdentity.name,
-      status: 'received',
-      peerStatuses: new Map(),
-    });
-    this.notifyUpdated();
-    return true;
+    const recipients = this.peers.filter((peer) => peer.name !== delivery.from);
+    return this.postRoomMessage(
+      delivery.from,
+      delivery.message,
+      recipients,
+      this.isLocalAuthor(delivery.from),
+      delivery.postId,
+    );
+  }
+
+  isLocalAuthor(from: string): boolean {
+    return from === this.localAuthorName || from === this.ownIdentity.name;
   }
 
   async waitForIdle(): Promise<void> {
     await this.pendingFanout;
   }
 
-  private async fanOut(frame: TattlerSendableFrame, entry: ChorusTranscriptEntry): Promise<void> {
+  private postRoomMessage(
+    from: string,
+    message: string,
+    recipients: readonly TattlerIdentityV0[],
+    self: boolean,
+    postId?: TattlerMessageId,
+  ): ChorusRoomPostResult {
+    assertMessageSize(message);
+    const post = createChorusRoomPost(this.roomId, from, this.brokerRoute, message);
+    const entry: ChorusTranscriptEntry = {
+      id: post.id,
+      roomId: post.roomId,
+      from: post.from,
+      message: post.message,
+      postId,
+      broker: post.broker,
+      self,
+      status: recipients.length === 0 ? 'acked' : 'pending',
+      peerStatuses: new Map(recipients.map((peer) => [peer.name, 'pending'])),
+    };
+    this.entries.push(entry);
+    this.notifyUpdated();
+    this.pendingFanout = this.pendingFanout.then(() => this.fanOut(post, entry, recipients));
+
+    return { postId: post.id };
+  }
+
+  private async fanOut(
+    frame: TattlerSendableFrame,
+    entry: ChorusTranscriptEntry,
+    recipients: readonly TattlerIdentityV0[],
+  ): Promise<void> {
     const results = await Promise.allSettled(
-      this.peers.map(async (peer) => {
+      recipients.map(async (peer) => {
         await this.sendFrame(peer, frame);
         entry.peerStatuses.set(peer.name, 'acked');
       }),
     );
 
     for (const [index, result] of results.entries()) {
-      const peer = this.peers[index];
+      const peer = recipients[index];
       if (peer && result.status === 'rejected') {
         entry.peerStatuses.set(peer.name, 'failed');
         console.warn(
@@ -196,7 +219,7 @@ export function createChorusRoomBroker(options: ChorusRoomBrokerOptions): Chorus
 
 export async function sendChorusReply(options: ChorusReplyOptions): Promise<ChorusReplyResult> {
   if (isLocalBrokerReply(options)) {
-    return { kind: 'local-post', ...options.activeBroker.postLocalMessage(options.message) };
+    return { kind: 'local-post', ...options.activeBroker.postAuthoredMessage(options.from, options.message) };
   }
 
   const delivery = createChorusRoomDeliveryFrame(options.roomId, options.from, options.postId, options.message);
