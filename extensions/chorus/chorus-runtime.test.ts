@@ -219,6 +219,8 @@ describe('Chorus broker runtime', () => {
     expect(content).toContain('roomId="chorus-dev"');
     expect(content).toContain('brokerSocketPath="/tmp/chorus-dev.sock"');
     expect(content).toContain('room participant');
+    expect(content).toContain('Do not reply to every room message');
+    expect(content).toContain('use the done tool');
     expect(content).toContain('reply note');
   });
 });
