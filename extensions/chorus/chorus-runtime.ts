@@ -257,7 +257,7 @@ export function isChorusBrokerAuthor(from: string, broker: ChorusReplyRouteV0): 
 
 export function createChorusUserMessageContent(details: ChorusIncomingMessageDetails): string {
   return `<chorus_room_message roomId="${escapeXml(details.roomId)}" postId="${escapeXml(details.postId)}" from="${escapeXml(details.from)}" brokerName="${escapeXml(details.broker.name)}" brokerShortId="${escapeXml(details.broker.shortId)}" brokerSocketPath="${escapeXml(details.broker.socketPath)}">
-<instructions>This is a Chorus room message from a room participant. Do not reply to every room message. Reply only if you are directly addressed, own the relevant work lane, have new information, or silence would block progress. If you reply substantively, use the send_chorus_reply tool with this roomId, postId, and broker route. If no reply is needed, use the done tool instead of writing a courtesy acknowledgement. Do not reply with a plain Tattler DM.</instructions>
+<instructions>This is a Chorus room message from a room participant. Do not reply to every room message. Reply only if you are directly addressed, own the relevant work lane, have new information, or silence would block progress. If you reply substantively, use the send_chorus_reply tool with this roomId, postId, and broker route. If no reply is needed and no other work remains for this turn, use the done tool instead of writing a courtesy acknowledgement. Do not reply with a plain Tattler DM.</instructions>
 <message>${escapeXml(details.message)}</message>
 </chorus_room_message>`;
 }

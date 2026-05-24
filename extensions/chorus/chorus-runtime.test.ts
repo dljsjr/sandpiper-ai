@@ -220,6 +220,7 @@ describe('Chorus broker runtime', () => {
     expect(content).toContain('brokerSocketPath="/tmp/chorus-dev.sock"');
     expect(content).toContain('room participant');
     expect(content).toContain('Do not reply to every room message');
+    expect(content).toContain('no other work remains for this turn');
     expect(content).toContain('use the done tool');
     expect(content).toContain('reply note');
   });
