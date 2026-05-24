@@ -27,7 +27,7 @@ export function registerTurnControlTool(pi: ExtensionAPI): void {
     renderResult: () => emptyToolRenderComponent,
     async execute() {
       return {
-        content: [],
+        content: [{ type: 'text', text: '(no response needed)' }],
         details: {},
         terminate: true,
       };
