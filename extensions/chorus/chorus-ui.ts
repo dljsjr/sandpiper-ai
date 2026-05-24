@@ -11,6 +11,8 @@ import {
   Text,
   type TUI,
   truncateToWidth,
+  visibleWidth,
+  wrapTextWithAnsi,
 } from '@earendil-works/pi-tui';
 import { requestChorusRoomPost } from '../tattler/tattler-pi-events';
 import type { ChorusRoomId, TattlerIdentityV0 } from '../tattler/tattler-protocol';
@@ -18,11 +20,13 @@ import {
   CHORUS_MESSAGE_CUSTOM_TYPE,
   type ChorusIncomingMessageDetails,
   type ChorusRoomBroker,
+  type ChorusTranscriptEntry,
   createChorusUserMessageContent,
 } from './chorus-runtime';
 
 const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
 const LITERAL_SLASH_PREFIX = '//';
+const CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4;
 
 interface ThemeLike {
   fg(color: 'accent' | 'dim' | 'muted' | 'success', text: string): string;
@@ -106,6 +110,45 @@ class PeerPicker implements Component {
   }
 }
 
+export function formatChorusTranscriptEntryLines(
+  entry: ChorusTranscriptEntry,
+  width: number,
+  theme: ThemeLike,
+): string[] {
+  const tagColor = entry.self ? 'success' : 'accent';
+  const tag = theme.fg(tagColor, `[${entry.from}]`);
+  const status = entry.self ? theme.fg('dim', ` ${entry.status}`) : '';
+  const firstPrefix = `${tag}${status} `;
+  const continuationPrefix = ' '.repeat(visibleWidth(`[${entry.from}]${entry.self ? ` ${entry.status}` : ''} `));
+  const renderedLines: string[] = [];
+
+  for (const [lineIndex, line] of entry.message.split(/\r?\n/).entries()) {
+    const content = line.length === 0 ? theme.fg('dim', '␤') : line;
+    const initialPrefix = lineIndex === 0 ? firstPrefix : continuationPrefix;
+    const contentWidth = Math.max(1, width - visibleWidth(initialPrefix));
+    const wrappedLines = wrapTextWithAnsi(content, contentWidth);
+
+    for (const [wrapIndex, wrappedLine] of wrappedLines.entries()) {
+      const prefix = lineIndex === 0 && wrapIndex === 0 ? firstPrefix : continuationPrefix;
+      renderedLines.push(truncateToWidth(`${prefix}${wrappedLine}`, width));
+    }
+  }
+
+  if (renderedLines.length <= CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT) {
+    return renderedLines;
+  }
+
+  const visibleLines = renderedLines.slice(0, CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT - 1);
+  const hiddenLineCount = renderedLines.length - visibleLines.length;
+  visibleLines.push(
+    truncateToWidth(
+      `${continuationPrefix}${theme.fg('dim', `… ${hiddenLineCount} more line${hiddenLineCount === 1 ? '' : 's'}`)}`,
+      width,
+    ),
+  );
+  return visibleLines;
+}
+
 class ChorusRoomTranscript implements Component {
   constructor(
     private readonly broker: ChorusRoomBroker,
@@ -128,9 +171,7 @@ class ChorusRoomTranscript implements Component {
     }
 
     for (const entry of entries) {
-      const tagColor = entry.self ? 'success' : 'accent';
-      const status = entry.self ? this.theme.fg('dim', ` ${entry.status}`) : '';
-      lines.push(truncateToWidth(`${this.theme.fg(tagColor, `[${entry.from}]`)}${status} ${entry.message}`, width));
+      lines.push(...formatChorusTranscriptEntryLines(entry, width, this.theme));
     }
 
     return lines;
