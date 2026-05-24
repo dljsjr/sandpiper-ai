@@ -4,6 +4,7 @@ import {
   type ChorusReplyRouteV0,
   type ChorusRoomDeliveryV0,
   type ChorusRoomId,
+  type ChorusRoomPostV0,
   createChorusRoomPost,
   MAX_MESSAGE_BYTES,
   type SendAgentMessageResult,
@@ -40,6 +41,7 @@ export interface ChorusRoomBrokerOptions {
   readonly peers: readonly TattlerIdentityV0[];
   readonly sendFrame: (peer: TattlerIdentityV0, frame: TattlerSendableFrame) => Promise<SendAgentMessageResult>;
   readonly onUpdate?: () => void;
+  readonly onLocalParticipantMessage?: (post: ChorusRoomPostV0) => void;
 }
 
 export interface ChorusIncomingMessageDetails {
@@ -88,6 +90,7 @@ export class ChorusRoomBroker {
   readonly entries: ChorusTranscriptEntry[] = [];
   private readonly sendFrame: ChorusRoomBrokerOptions['sendFrame'];
   private readonly onUpdate?: () => void;
+  private readonly onLocalParticipantMessage?: (post: ChorusRoomPostV0) => void;
   private pendingFanout = Promise.resolve();
 
   constructor(options: ChorusRoomBrokerOptions) {
@@ -98,14 +101,17 @@ export class ChorusRoomBroker {
     this.peers = options.peers;
     this.sendFrame = options.sendFrame;
     this.onUpdate = options.onUpdate;
+    this.onLocalParticipantMessage = options.onLocalParticipantMessage;
   }
 
   postLocalMessage(message: string): ChorusRoomPostResult {
-    return this.postAuthoredMessage(this.localAuthorName, message);
+    const { post, result } = this.postRoomMessage(this.localAuthorName, message, this.peers, true);
+    this.onLocalParticipantMessage?.(post);
+    return result;
   }
 
   postAuthoredMessage(from: string, message: string): ChorusRoomPostResult {
-    return this.postRoomMessage(from, message, this.peers, this.isLocalAuthor(from));
+    return this.postRoomMessage(from, message, this.peers, this.isLocalAuthor(from)).result;
   }
 
   recordRoomPost(post: ReturnType<typeof createChorusRoomPost>): boolean {
@@ -139,7 +145,7 @@ export class ChorusRoomBroker {
       recipients,
       this.isLocalAuthor(delivery.from),
       delivery.postId,
-    );
+    ).result;
   }
 
   isLocalAuthor(from: string): boolean {
@@ -156,7 +162,7 @@ export class ChorusRoomBroker {
     recipients: readonly TattlerIdentityV0[],
     self: boolean,
     postId?: TattlerMessageId,
-  ): ChorusRoomPostResult {
+  ): { readonly result: ChorusRoomPostResult; readonly post: ChorusRoomPostV0 } {
     assertMessageSize(message);
     const post = createChorusRoomPost(this.roomId, from, this.brokerRoute, message);
     const entry: ChorusTranscriptEntry = {
@@ -174,7 +180,7 @@ export class ChorusRoomBroker {
     this.notifyUpdated();
     this.pendingFanout = this.pendingFanout.then(() => this.fanOut(post, entry, recipients));
 
-    return { postId: post.id };
+    return { result: { postId: post.id }, post };
   }
 
   private async fanOut(
@@ -251,7 +257,7 @@ export function isChorusBrokerAuthor(from: string, broker: ChorusReplyRouteV0): 
 
 export function createChorusUserMessageContent(details: ChorusIncomingMessageDetails): string {
   return `<chorus_room_message roomId="${escapeXml(details.roomId)}" postId="${escapeXml(details.postId)}" from="${escapeXml(details.from)}" brokerName="${escapeXml(details.broker.name)}" brokerShortId="${escapeXml(details.broker.shortId)}" brokerSocketPath="${escapeXml(details.broker.socketPath)}">
-<instructions>This is a Chorus room message from another agent. If you reply substantively, use the send_chorus_reply tool with this roomId, postId, and broker route. Do not reply with a plain Tattler DM.</instructions>
+<instructions>This is a Chorus room message from a room participant. If you reply substantively, use the send_chorus_reply tool with this roomId, postId, and broker route. Do not reply with a plain Tattler DM.</instructions>
 <message>${escapeXml(details.message)}</message>
 </chorus_room_message>`;
 }

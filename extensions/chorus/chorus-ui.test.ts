@@ -13,6 +13,11 @@ describe('Chorus room UI helpers', () => {
     });
   });
 
+  test('passes slash commands through to the app while the room editor is active', () => {
+    expect(parseChorusEditorSubmission('/chorus')).toEqual({ kind: 'app-command', command: '/chorus' });
+    expect(parseChorusEditorSubmission('/clear')).toEqual({ kind: 'app-command', command: '/clear' });
+  });
+
   test('ignores empty submissions', () => {
     expect(parseChorusEditorSubmission('   ')).toEqual({ kind: 'empty' });
     expect(parseChorusEditorSubmission('/agent   ')).toEqual({ kind: 'empty' });
