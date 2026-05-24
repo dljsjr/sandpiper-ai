@@ -24,6 +24,7 @@ import {
 const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
 const DIRECT_AGENT_COMMAND = '/agent';
 const DIRECT_AGENT_PREFIX = `${DIRECT_AGENT_COMMAND} `;
+const LITERAL_SLASH_PREFIX = '//';
 
 interface ThemeLike {
   fg(color: 'accent' | 'dim' | 'muted' | 'success', text: string): string;
@@ -46,6 +47,11 @@ export function parseChorusEditorSubmission(rawText: string): ChorusEditorSubmis
   const text = rawText.trim();
   if (text.length === 0) {
     return { kind: 'empty' };
+  }
+
+  if (text.startsWith(LITERAL_SLASH_PREFIX)) {
+    const message = text.slice(1).trim();
+    return message.length === 0 ? { kind: 'empty' } : { kind: 'room', message };
   }
 
   if (text === DIRECT_AGENT_COMMAND) {
@@ -190,7 +196,7 @@ class ChorusRoomEditor extends CustomEditor {
 
   override render(width: number): string[] {
     const lines = super.render(width);
-    const label = ` #${this.room} · /agent `;
+    const label = ` #${this.room} · /agent · // `;
     const last = lines.length - 1;
     const lastLine = lines[last];
     if (lastLine === undefined) return lines;
