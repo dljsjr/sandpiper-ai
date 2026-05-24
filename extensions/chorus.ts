@@ -266,6 +266,22 @@ type ChorusReplyToolDetails =
   | ChorusReplyResult
   | { readonly kind: 'error'; readonly messageIdAck: TattlerMessageId; readonly error: string };
 
+function registerChorusAgentCommand(pi: ExtensionAPI): void {
+  pi.registerCommand('agent', {
+    description: 'Send a direct prompt to the local agent while the Chorus room editor is active',
+    handler: async (args, ctx) => {
+      const message = args.trim();
+      if (message.length === 0) {
+        ctx.ui.notify('Usage: /agent <message>', 'warning');
+        return;
+      }
+
+      pi.sendUserMessage(message, { deliverAs: 'steer' });
+      ctx.ui.notify('Chorus: sent direct prompt to local agent', 'info');
+    },
+  });
+}
+
 function registerChorusReplyTool(pi: ExtensionAPI): void {
   pi.registerTool<typeof SendChorusReplyParameters, ChorusReplyToolDetails>({
     name: 'send_chorus_reply',
@@ -322,6 +338,7 @@ export default function (pi: ExtensionAPI) {
   void stopActiveRoom();
   clearEventListeners();
   registerChorusMessageRenderer(pi);
+  registerChorusAgentCommand(pi);
   registerChorusReplyTool(pi);
 
   eventUnsubscribers = [
