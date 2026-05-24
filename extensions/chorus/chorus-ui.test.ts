@@ -6,10 +6,10 @@ describe('Chorus room UI helpers', () => {
     expect(parseChorusEditorSubmission(' hello room ')).toEqual({ kind: 'room', message: 'hello room' });
   });
 
-  test('parses /agent submissions as local-agent prompts', () => {
+  test('passes /agent submissions through to the registered app command', () => {
     expect(parseChorusEditorSubmission('/agent talk to the local agent')).toEqual({
-      kind: 'local-agent',
-      message: 'talk to the local agent',
+      kind: 'app-command',
+      command: '/agent talk to the local agent',
     });
   });
 
@@ -19,6 +19,7 @@ describe('Chorus room UI helpers', () => {
       message: '/agent talk to the room',
     });
     expect(parseChorusEditorSubmission('//chorus')).toEqual({ kind: 'room', message: '/chorus' });
+    expect(parseChorusEditorSubmission('//')).toEqual({ kind: 'room', message: '/' });
   });
 
   test('passes slash commands through to the app while the room editor is active', () => {
@@ -28,6 +29,5 @@ describe('Chorus room UI helpers', () => {
 
   test('ignores empty submissions', () => {
     expect(parseChorusEditorSubmission('   ')).toEqual({ kind: 'empty' });
-    expect(parseChorusEditorSubmission('/agent   ')).toEqual({ kind: 'empty' });
   });
 });

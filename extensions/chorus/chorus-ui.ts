@@ -22,8 +22,6 @@ import {
 } from './chorus-runtime';
 
 const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
-const DIRECT_AGENT_COMMAND = '/agent';
-const DIRECT_AGENT_PREFIX = `${DIRECT_AGENT_COMMAND} `;
 const LITERAL_SLASH_PREFIX = '//';
 
 interface ThemeLike {
@@ -40,7 +38,6 @@ interface SendChorusMessageOptions {
 type ChorusEditorSubmission =
   | { readonly kind: 'empty' }
   | { readonly kind: 'room'; readonly message: string }
-  | { readonly kind: 'local-agent'; readonly message: string }
   | { readonly kind: 'app-command'; readonly command: string };
 
 export function parseChorusEditorSubmission(rawText: string): ChorusEditorSubmission {
@@ -52,15 +49,6 @@ export function parseChorusEditorSubmission(rawText: string): ChorusEditorSubmis
   if (text.startsWith(LITERAL_SLASH_PREFIX)) {
     const message = text.slice(1).trim();
     return message.length === 0 ? { kind: 'empty' } : { kind: 'room', message };
-  }
-
-  if (text === DIRECT_AGENT_COMMAND) {
-    return { kind: 'empty' };
-  }
-
-  if (text.startsWith(DIRECT_AGENT_PREFIX)) {
-    const message = text.slice(DIRECT_AGENT_PREFIX.length).trim();
-    return message.length === 0 ? { kind: 'empty' } : { kind: 'local-agent', message };
   }
 
   if (text.startsWith('/')) {
@@ -176,11 +164,6 @@ class ChorusRoomEditor extends CustomEditor {
 
       this.addToHistory(text.trim());
       this.setText('');
-      if (submission.kind === 'local-agent') {
-        this.pi.sendUserMessage(submission.message, { deliverAs: 'steer' });
-        this.notify('Chorus: sent direct prompt to local agent', 'info');
-        return;
-      }
 
       void requestChorusRoomPost(this.pi, { roomId: this.room, message: submission.message }).catch((err: unknown) => {
         this.notify(
