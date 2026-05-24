@@ -4,6 +4,7 @@ import { registerBackgroundProcessContextHooks } from './background-process-hook
 import { registerBackgroundProcessTools } from './background-process-tools.js';
 import { registerContextManagementHooks } from './context-management.js';
 import { registerSkillLoadingTool } from './skill-loading-tool.js';
+import { registerTurnControlTool } from './turn-control-tool.js';
 
 export interface NeutralCapabilityExtensionOptions {
   readonly processManager?: ProcessManager;
@@ -14,6 +15,7 @@ export function createNeutralCapabilityExtension(options: NeutralCapabilityExten
 
   return (pi: ExtensionAPI) => {
     registerSkillLoadingTool(pi);
+    registerTurnControlTool(pi);
     registerContextManagementHooks(pi);
     registerBackgroundProcessTools(pi, processManager);
     registerBackgroundProcessContextHooks(pi, processManager);
