@@ -245,6 +245,10 @@ export function brokerRouteToPeer(route: ChorusReplyRouteV0): TattlerIdentityV0 
   });
 }
 
+export function isChorusBrokerAuthor(from: string, broker: ChorusReplyRouteV0): boolean {
+  return from === broker.name || from === broker.shortId;
+}
+
 export function createChorusUserMessageContent(details: ChorusIncomingMessageDetails): string {
   return `<chorus_room_message roomId="${escapeXml(details.roomId)}" postId="${escapeXml(details.postId)}" from="${escapeXml(details.from)}" brokerName="${escapeXml(details.broker.name)}" brokerShortId="${escapeXml(details.broker.shortId)}" brokerSocketPath="${escapeXml(details.broker.socketPath)}">
 <instructions>This is a Chorus room message from another agent. If you reply substantively, use the send_chorus_reply tool with this roomId, postId, and broker route. Do not reply with a plain Tattler DM.</instructions>

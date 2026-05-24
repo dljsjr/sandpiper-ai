@@ -21,10 +21,42 @@ import {
   createChorusUserMessageContent,
 } from './chorus-runtime';
 
+const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
+const DIRECT_AGENT_COMMAND = '/agent';
+const DIRECT_AGENT_PREFIX = `${DIRECT_AGENT_COMMAND} `;
+
 interface ThemeLike {
   fg(color: 'accent' | 'dim' | 'muted' | 'success', text: string): string;
   bg(color: 'customMessageBg', text: string): string;
   bold(text: string): string;
+}
+
+interface SendChorusMessageOptions {
+  readonly triggerTurn?: boolean;
+  readonly modelVisible?: boolean;
+}
+
+type ChorusEditorSubmission =
+  | { readonly kind: 'empty' }
+  | { readonly kind: 'room'; readonly message: string }
+  | { readonly kind: 'local-agent'; readonly message: string };
+
+export function parseChorusEditorSubmission(rawText: string): ChorusEditorSubmission {
+  const text = rawText.trim();
+  if (text.length === 0) {
+    return { kind: 'empty' };
+  }
+
+  if (text === DIRECT_AGENT_COMMAND) {
+    return { kind: 'empty' };
+  }
+
+  if (text.startsWith(DIRECT_AGENT_PREFIX)) {
+    const message = text.slice(DIRECT_AGENT_PREFIX.length).trim();
+    return message.length === 0 ? { kind: 'empty' } : { kind: 'local-agent', message };
+  }
+
+  return { kind: 'room', message: text };
 }
 
 class PeerPicker implements Component {
@@ -90,7 +122,7 @@ class ChorusRoomTranscript implements Component {
       ),
     ];
 
-    const entries = this.broker.entries.slice(-8);
+    const entries = this.broker.entries.slice(-CHORUS_TRANSCRIPT_ENTRY_LIMIT);
     if (entries.length === 0) {
       lines.push(this.theme.fg('dim', 'No room messages yet. Type below and press enter to post to the room.'));
       return lines.map((line) => truncateToWidth(line, width));
@@ -122,17 +154,24 @@ class ChorusRoomEditor extends CustomEditor {
 
   override handleInput(data: string): void {
     if (matchesKey(data, Key.enter) && !this.disableSubmit) {
-      const text = this.getExpandedText().trim();
-      if (text.length > 0) {
-        this.addToHistory(text);
-        this.setText('');
-        void requestChorusRoomPost(this.pi, { roomId: this.room, message: text }).catch((err: unknown) => {
-          this.notify(
-            `Chorus: failed to post room message — ${err instanceof Error ? err.message : String(err)}`,
-            'error',
-          );
-        });
+      const text = this.getExpandedText();
+      const submission = parseChorusEditorSubmission(text);
+      if (submission.kind === 'empty') return;
+
+      this.addToHistory(text.trim());
+      this.setText('');
+      if (submission.kind === 'local-agent') {
+        this.pi.sendUserMessage(submission.message, { deliverAs: 'steer' });
+        this.notify('Chorus: sent direct prompt to local agent', 'info');
+        return;
       }
+
+      void requestChorusRoomPost(this.pi, { roomId: this.room, message: submission.message }).catch((err: unknown) => {
+        this.notify(
+          `Chorus: failed to post room message — ${err instanceof Error ? err.message : String(err)}`,
+          'error',
+        );
+      });
       return;
     }
 
@@ -141,7 +180,7 @@ class ChorusRoomEditor extends CustomEditor {
 
   override render(width: number): string[] {
     const lines = super.render(width);
-    const label = ` #${this.room} `;
+    const label = ` #${this.room} · /agent `;
     const last = lines.length - 1;
     const lastLine = lines[last];
     if (lastLine === undefined) return lines;
@@ -163,15 +202,19 @@ export function registerChorusMessageRenderer(pi: ExtensionAPI): void {
   });
 }
 
-export function sendChorusMessageToChat(pi: ExtensionAPI, details: ChorusIncomingMessageDetails): void {
+export function sendChorusMessageToChat(
+  pi: ExtensionAPI,
+  details: ChorusIncomingMessageDetails,
+  options: SendChorusMessageOptions = {},
+): void {
   pi.sendMessage<ChorusIncomingMessageDetails>(
     {
       customType: CHORUS_MESSAGE_CUSTOM_TYPE,
-      content: createChorusUserMessageContent(details),
+      content: (options.modelVisible ?? true) ? createChorusUserMessageContent(details) : '',
       display: true,
       details,
     },
-    { triggerTurn: true, deliverAs: 'steer' },
+    { triggerTurn: options.triggerTurn ?? true, deliverAs: 'steer' },
   );
 }
 

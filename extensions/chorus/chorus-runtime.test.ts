@@ -10,6 +10,7 @@ import {
   createChorusRoomBroker,
   createChorusRoomDeliveryFrame,
   createChorusUserMessageContent,
+  isChorusBrokerAuthor,
   sendChorusReply,
 } from './chorus-runtime';
 
@@ -146,6 +147,15 @@ describe('Chorus broker runtime', () => {
       message: 'local reply',
       broker: { socketPath: '/tmp/chorus-dev.sock' },
     });
+  });
+
+  test('distinguishes broker route authors from local participant authors', () => {
+    const broker = { name: 'chorus:chorus-dev:Piper', shortId: 'chorus-piper', socketPath: '/tmp/chorus-dev.sock' };
+
+    expect(isChorusBrokerAuthor('chorus:chorus-dev:Piper', broker)).toBe(true);
+    expect(isChorusBrokerAuthor('chorus-piper', broker)).toBe(true);
+    expect(isChorusBrokerAuthor('Piper', broker)).toBe(false);
+    expect(isChorusBrokerAuthor('Doug', broker)).toBe(false);
   });
 
   test('builds model-facing Chorus message content with broker route metadata', () => {
