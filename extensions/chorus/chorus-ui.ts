@@ -39,7 +39,8 @@ interface SendChorusMessageOptions {
 type ChorusEditorSubmission =
   | { readonly kind: 'empty' }
   | { readonly kind: 'room'; readonly message: string }
-  | { readonly kind: 'local-agent'; readonly message: string };
+  | { readonly kind: 'local-agent'; readonly message: string }
+  | { readonly kind: 'app-command'; readonly command: string };
 
 export function parseChorusEditorSubmission(rawText: string): ChorusEditorSubmission {
   const text = rawText.trim();
@@ -54,6 +55,10 @@ export function parseChorusEditorSubmission(rawText: string): ChorusEditorSubmis
   if (text.startsWith(DIRECT_AGENT_PREFIX)) {
     const message = text.slice(DIRECT_AGENT_PREFIX.length).trim();
     return message.length === 0 ? { kind: 'empty' } : { kind: 'local-agent', message };
+  }
+
+  if (text.startsWith('/')) {
+    return { kind: 'app-command', command: text };
   }
 
   return { kind: 'room', message: text };
@@ -157,6 +162,11 @@ class ChorusRoomEditor extends CustomEditor {
       const text = this.getExpandedText();
       const submission = parseChorusEditorSubmission(text);
       if (submission.kind === 'empty') return;
+      if (submission.kind === 'app-command') {
+        this.setText('');
+        void this.onSubmit?.(submission.command);
+        return;
+      }
 
       this.addToHistory(text.trim());
       this.setText('');

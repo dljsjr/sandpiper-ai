@@ -112,6 +112,53 @@ describe('Chorus broker runtime', () => {
     }
   });
 
+  test('notifies the local participant when the room UI posts a human-authored message', async () => {
+    const localPosts: TattlerSendableFrame[] = [];
+    const broker = createChorusRoomBroker({
+      roomId: roomId('chorus-dev'),
+      ownIdentity: identity('Piper'),
+      localAuthorName: 'Doug',
+      brokerRoute: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
+      peers: [identity('Huginn')],
+      sendFrame: async (_peer, frame) => ({ messageIdAck: frame.id }),
+      onLocalParticipantMessage: (post) => {
+        localPosts.push(post);
+      },
+    });
+
+    const result = broker.postLocalMessage('human-authored room note');
+    await broker.waitForIdle();
+
+    expect(localPosts).toHaveLength(1);
+    expect(localPosts[0]).toMatchObject({
+      id: result.postId,
+      roomId: 'chorus-dev',
+      from: 'Doug',
+      message: 'human-authored room note',
+      broker: { socketPath: '/tmp/chorus-dev.sock' },
+    });
+  });
+
+  test('does not notify the originating local agent for agent-authored broker replies', async () => {
+    const localPosts: TattlerSendableFrame[] = [];
+    const broker = createChorusRoomBroker({
+      roomId: roomId('chorus-dev'),
+      ownIdentity: identity('Piper'),
+      localAuthorName: 'Doug',
+      brokerRoute: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
+      peers: [identity('Huginn')],
+      sendFrame: async (_peer, frame) => ({ messageIdAck: frame.id }),
+      onLocalParticipantMessage: (post) => {
+        localPosts.push(post);
+      },
+    });
+
+    broker.postAuthoredMessage('Piper', 'agent-authored room reply');
+    await broker.waitForIdle();
+
+    expect(localPosts).toEqual([]);
+  });
+
   test('routes local broker replies through local post fanout instead of sending to self', async () => {
     const sent: Array<{ peer: TattlerIdentityV0; frame: TattlerSendableFrame }> = [];
     const broker = createChorusRoomBroker({
@@ -171,6 +218,7 @@ describe('Chorus broker runtime', () => {
     expect(content).toContain('<chorus_room_message');
     expect(content).toContain('roomId="chorus-dev"');
     expect(content).toContain('brokerSocketPath="/tmp/chorus-dev.sock"');
+    expect(content).toContain('room participant');
     expect(content).toContain('reply note');
   });
 });

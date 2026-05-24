@@ -3,7 +3,7 @@ import { stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { dirname, join, normalize } from 'node:path';
 import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
-import { type Component, Text } from '@earendil-works/pi-tui';
+import type { Component } from '@earendil-works/pi-tui';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import {
@@ -171,6 +171,15 @@ async function openRoom(
     peers,
     sendFrame: sendPayloadFrame,
     onUpdate: () => activeRoom?.requestRender?.(),
+    onLocalParticipantMessage: (post) => {
+      sendChorusMessageToChat(pi, {
+        roomId: post.roomId,
+        from: post.from,
+        message: post.message,
+        postId: post.id,
+        broker: post.broker,
+      });
+    },
   });
 
   activeRoom = { broker, endpoint, peers };
@@ -272,12 +281,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
     parameters: SendChorusReplyParameters,
     renderShell: 'self',
     renderCall: () => emptyToolRenderComponent,
-    renderResult: (result, _options, _theme, context) => {
-      if (!context.isError) {
-        return emptyToolRenderComponent;
-      }
-      return new Text(result.content.map((item) => (item.type === 'text' ? item.text : '[image]')).join('\n'));
-    },
+    renderResult: () => emptyToolRenderComponent,
     async execute(_toolCallId, params) {
       let deliveryId = params.postId as TattlerMessageId;
       try {
@@ -301,7 +305,6 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
         return {
           content: [{ type: 'text', text: 'Chorus reply sent. Do not summarize this tool result.' }],
           details: result,
-          terminate: true,
         };
       } catch (err) {
         const errMessage = `Error sending Chorus reply ${deliveryId}: ${err instanceof Error ? err.message : String(err)}`;
