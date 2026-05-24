@@ -34,3 +34,32 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
 - Latest code verification before dogfood: focused Vitest for Tattler IPC/protocol/pi-events + Chorus runtime + resource adapter = 30/30 pass; full `bun check` pass; changed-file Biome/lizard clean; no `as any`/TS suppressions/conflict markers.
 - Full `bun run test` was attempted by Librarian and had pre-existing/unrelated failures in neutral capability tests expecting no `turn_end` and Trail auto-commit tests hitting 1Password git signing in temp repos; no Chorus-attributable failures.
 - Current jj work before task/standup commit: empty child `uuzszrlk` / `0940789a` on top of `mlyuyklx 5e513758`.
+
+## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-24T15:40:21.780Z)
+
+Session file: /Users/doug.stephen/.sandpiper/agent/identities/Huginn/sessions/2026-05-22T22-12-53-366Z_019e51bf-9ff6-7044-897e-24ff87b27adb.jsonl
+
+### Accomplished
+- Scout-reviewed Chorus follow-up `mlyuyklx` / `5e513758` (`feat(chorus): broadcast participant room messages`) in `/Users/doug.stephen/git/sandpiper-ai`; no dogfood blockers found.
+- Reran focused Vitest (30/30), full `bun check`, lizard over changed/related source files, and escape-hatch/conflict-marker/stale-ACK wording scans.
+- Confirmed live Chorus dogfood in `test-room`: Doug/Librarian/Piper/Muninn/Huginn all exchanged model-visible room messages, and replies used `send_chorus_reply` through the embedded broker route with transport ACKs.
+- Confirmed participant replies are broker-rebroadcast to room peers, not merely broker-local visible.
+- Captured Doug’s post-dogfood follow-up notes; Piper and Muninn agree they are polish/hardening, not MVP blockers.
+
+### In Progress
+- Multi-agent Chorus vertical-slice dogfood appears healthy from Scout’s side.
+- No active Scout blocker remains for current MVP path.
+
+### Next Session
+- If dogfood continues, watch for non-echo failures rather than continuing confirmation spam.
+- Track/verify the known v0 caveat: display/sender matching is string-name based, so use unique display names in dogfood; v1 should separate stable participant route/id from display name.
+- Follow-ups from dogfood: show 12 room transcript messages; refine self/broker suppression so broker echo is excluded but self-agent participant posts can render; make `send_chorus_reply` quiet/no-display or much less noisy; add a way for the broker-owning session to talk directly to its local agent while Chorus editor owns input.
+- Return to VCG CORE-1606 source-accuracy review when Chorus work is parked.
+
+### Blockers
+- None for Chorus dogfood from Scout’s side.
+
+### Context
+- Latest reviewed stack head: `mlyuyklx` / `5e513758`; empty child was `uuzszrlk` / `0940789a` when checked.
+- Live broker route observed: `chorus:test-room:Librarian`, socket `/var/folders/w3/8k60ll_93jb9xmnblzmzgbkh0000gn/T/sandpiper/019e51bf-chorus-test-room-39c3b916-90c6-4a3e-86e4-01918de44158.sock`.
+- Scout stopped echo-ACKing routine confirmations after enough evidence accumulated; only reply again if there is a new finding/question.
