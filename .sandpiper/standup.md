@@ -1,6 +1,6 @@
 # Session Stand-Up
 
-## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T15:47:32.222Z)
+## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T15:51:56.910Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-05-21T17-47-07-171Z_019e4ba5-f223-7d87-935d-a43a8a8f71e9.jsonl
 
@@ -13,25 +13,26 @@ Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen
   - Broker-originated messages are identified by broker route name/shortId via `isChorusBrokerAuthor()`; local agent identity is no longer treated as broker noise for suppression.
   - Self-agent room posts are rendered locally with `triggerTurn: false` and `modelVisible: false`, avoiding a self-reply loop while preserving visible room history.
   - `send_chorus_reply` success results are silent (`content: []`, self-rendered empty tool component); failures still render error text.
-  - Successful `send_chorus_reply` calls now locally render the sender’s own Chorus room message as a custom room message, because the broker excludes the sender from rebroadcast.
+  - Successful `send_chorus_reply` calls locally render the sender’s own Chorus room message as display-only/model-invisible, because the broker excludes the sender from rebroadcast.
   - Chorus editor supports `/agent <message>` to send a direct prompt to the local/broker-owning agent without closing the room.
   - Added `extensions/chorus/chorus-ui.test.ts` and runtime helper test coverage.
 - Marked `TAT-23` through `TAT-27` as NEEDS REVIEW after implementation.
+- Librarian and Muninn/Steward reviewed `nxzvxuzx` / `761a4366`; both reported no blockers.
 
 ### In Progress
-- Await review/dogfood of the post-dogfood polish slice `nxzvxuzx` / `761a4366`.
+- Post-dogfood polish slice `nxzvxuzx` / `761a4366` is awaiting Doug/owner acceptance; peer review found no blockers.
 
 ### Next Session
 - Smoke `/reload` and retry Chorus after polish if possible, specifically verifying: `send_chorus_reply` no longer shows tool-result spam; self-agent messages render as room messages; `/agent <message>` reaches the local agent while the room editor stays open; transcript shows 12 entries.
 - If polish is accepted, move `TAT-23` and subtasks final/complete as appropriate, then decide whether `TAT-15` can be finalized.
-- Keep v1 caveats separate: `delivery.from` is trusted/unauthenticated; transport ACK is not semantic room acceptance; durable rooms and authenticated broker identities remain future work.
+- Keep v1/hardening caveats separate: `delivery.from` is trusted/unauthenticated; transport ACK is not semantic room acceptance; durable rooms and authenticated broker identities remain future work; broker-author suppression can be spoofed by a participant display name matching broker route name/shortId; `/agent ` is reserved in the Chorus editor and may need an escape convention for literal room messages starting with that prefix.
 
 ### Blockers
-- None known after focused Vitest and `bun check`.
+- None known after focused Vitest and `bun check`; peer review found no blockers.
 
 ### Context
 - Latest verification after polish: focused Vitest for Tattler IPC/protocol/pi-events + Chorus runtime/UI + resource adapter = 34/34 pass; full `bun check` pass; changed-file Biome clean; lizard no threshold warnings; no `as any`/TS suppressions/conflict markers.
-- Current jj stack head after code commit is empty child `pkoymkps` / `4cc790cc`; parent `nxzvxuzx 761a4366 feat(chorus): polish post-dogfood room UX`; prior dogfood record `uuzszrlk 2c323733`; prior core MVP `mlyuyklx 5e513758`.
+- Current jj stack head after code commit is empty child `wyozlpuu` / `81b00e23`; parent `pkoymkps 056a671b chore: update chorus standup`; code slice `nxzvxuzx 761a4366 feat(chorus): polish post-dogfood room UX`; prior dogfood record `uuzszrlk 2c323733`; prior core MVP `mlyuyklx 5e513758`.
 
 ## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-24T15:40:21.780Z)
 

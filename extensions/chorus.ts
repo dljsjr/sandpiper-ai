@@ -297,21 +297,12 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
           message: params.message,
           sendFrame: sendPayloadFrame,
         });
-        const renderedPostId = result.kind === 'local-post' ? result.postId : result.messageIdAck;
-        deliveryId = renderedPostId;
-        sendChorusMessageToChat(
-          pi,
-          {
-            roomId: selectedRoom,
-            from: ownIdentity.name,
-            message: params.message,
-            postId: renderedPostId,
-            broker,
-          },
-          { triggerTurn: false, modelVisible: false },
-        );
-
-        return { content: [], details: result };
+        deliveryId = result.kind === 'local-post' ? result.postId : result.messageIdAck;
+        return {
+          content: [{ type: 'text', text: 'Chorus reply sent. Do not summarize this tool result.' }],
+          details: result,
+          terminate: true,
+        };
       } catch (err) {
         const errMessage = `Error sending Chorus reply ${deliveryId}: ${err instanceof Error ? err.message : String(err)}`;
         return {
