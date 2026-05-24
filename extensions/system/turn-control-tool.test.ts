@@ -27,11 +27,15 @@ describe('turn control tool', () => {
     expect(tool.promptGuidelines?.join('\n')).toContain('call it by itself');
   });
 
-  test('terminates the current turn without content or rendering', async () => {
+  test('terminates the current turn with provider-safe content and no rendering', async () => {
     const tool = captureTool();
     const result = await tool.execute('tool-call-id', {}, undefined, undefined, {} as ExtensionContext);
 
-    expect(result).toEqual({ content: [], details: {}, terminate: true });
+    expect(result).toEqual({
+      content: [{ type: 'text', text: '(no response needed)' }],
+      details: {},
+      terminate: true,
+    });
     expect(tool.renderCall?.({}, {} as never, {} as never).render(80)).toEqual([]);
     expect(tool.renderResult?.(result, {} as never, {} as never, {} as never).render(80)).toEqual([]);
   });
