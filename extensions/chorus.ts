@@ -3,12 +3,14 @@ import { stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { dirname, join, normalize } from 'node:path';
 import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
+import { type Component, Text } from '@earendil-works/pi-tui';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import {
   type ChorusReplyResult,
   type ChorusRoomBroker,
   createChorusRoomBroker,
+  isChorusBrokerAuthor,
   sendChorusReply,
 } from './chorus/chorus-runtime';
 import {
@@ -52,6 +54,11 @@ interface ActiveChorusRoom {
 let activeRoom: ActiveChorusRoom | undefined;
 let eventUnsubscribers: Array<() => void> = [];
 let ownIdentityRequest: Promise<TattlerIdentityV0> | undefined;
+
+const emptyToolRenderComponent: Component = {
+  render: () => [],
+  invalidate: () => undefined,
+};
 
 function clearEventListeners(): void {
   for (const unsubscribe of eventUnsubscribers.splice(0)) {
@@ -188,18 +195,25 @@ async function closeRoomUi(ctx: ExtensionCommandContext): Promise<void> {
 
 async function handleRoomPostReceived(pi: ExtensionAPI, post: ChorusRoomPostV0): Promise<void> {
   activeRoom?.broker.recordRoomPost(post);
-  const ownIdentity = await resolveOwnIdentity(pi);
-  if (ownIdentity && post.from === ownIdentity.name) {
+  if (isChorusBrokerAuthor(post.from, post.broker)) {
     return;
   }
 
-  sendChorusMessageToChat(pi, {
-    roomId: post.roomId,
-    from: post.from,
-    message: post.message,
-    postId: post.id,
-    broker: post.broker,
-  });
+  const ownIdentity = await resolveOwnIdentity(pi);
+  sendChorusMessageToChat(
+    pi,
+    {
+      roomId: post.roomId,
+      from: post.from,
+      message: post.message,
+      postId: post.id,
+      broker: post.broker,
+    },
+    {
+      triggerTurn: !(ownIdentity && post.from === ownIdentity.name),
+      modelVisible: !(ownIdentity && post.from === ownIdentity.name),
+    },
+  );
 }
 
 async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDeliveryV0): Promise<void> {
@@ -209,17 +223,25 @@ async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDelivery
   }
 
   const accepted = room.broker.acceptDelivery(delivery);
-  if (!accepted || room.broker.isLocalAuthor(delivery.from)) {
+  if (!accepted || isChorusBrokerAuthor(delivery.from, room.broker.brokerRoute)) {
     return;
   }
 
-  sendChorusMessageToChat(pi, {
-    roomId: delivery.roomId,
-    from: delivery.from,
-    message: delivery.message,
-    postId: accepted.postId,
-    broker: room.broker.brokerRoute,
-  });
+  const ownIdentity = await resolveOwnIdentity(pi);
+  sendChorusMessageToChat(
+    pi,
+    {
+      roomId: delivery.roomId,
+      from: delivery.from,
+      message: delivery.message,
+      postId: accepted.postId,
+      broker: room.broker.brokerRoute,
+    },
+    {
+      triggerTurn: !(ownIdentity && delivery.from === ownIdentity.name),
+      modelVisible: !(ownIdentity && delivery.from === ownIdentity.name),
+    },
+  );
 }
 
 const SendChorusReplyParameters = Type.Object({
@@ -248,6 +270,14 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
       'Do not use send_peer_message for Chorus room replies unless the user explicitly asks for a direct Tattler DM.',
     ],
     parameters: SendChorusReplyParameters,
+    renderShell: 'self',
+    renderCall: () => emptyToolRenderComponent,
+    renderResult: (result, _options, _theme, context) => {
+      if (!context.isError) {
+        return emptyToolRenderComponent;
+      }
+      return new Text(result.content.map((item) => (item.type === 'text' ? item.text : '[image]')).join('\n'));
+    },
     async execute(_toolCallId, params) {
       let deliveryId = params.postId as TattlerMessageId;
       try {
@@ -267,24 +297,21 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
           message: params.message,
           sendFrame: sendPayloadFrame,
         });
-        if (result.kind === 'local-post') {
-          deliveryId = result.postId;
-          return {
-            content: [{ type: 'text', text: `Chorus reply posted locally through broker as ${result.postId}` }],
-            details: result,
-          };
-        }
+        const renderedPostId = result.kind === 'local-post' ? result.postId : result.messageIdAck;
+        deliveryId = renderedPostId;
+        sendChorusMessageToChat(
+          pi,
+          {
+            roomId: selectedRoom,
+            from: ownIdentity.name,
+            message: params.message,
+            postId: renderedPostId,
+            broker,
+          },
+          { triggerTurn: false, modelVisible: false },
+        );
 
-        deliveryId = result.messageIdAck;
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Chorus reply ${result.messageIdAck} received transport ACK from broker route ${params.brokerName}`,
-            },
-          ],
-          details: result,
-        };
+        return { content: [], details: result };
       } catch (err) {
         const errMessage = `Error sending Chorus reply ${deliveryId}: ${err instanceof Error ? err.message : String(err)}`;
         return {
