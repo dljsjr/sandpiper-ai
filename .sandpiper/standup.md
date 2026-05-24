@@ -1,39 +1,37 @@
 # Session Stand-Up
 
-## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T15:35:28.624Z)
+## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T15:47:32.222Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-05-21T17-47-07-171Z_019e4ba5-f223-7d87-935d-a43a8a8f71e9.jsonl
 
 ### Accomplished
-- Integrated approved TAT-14/TAT-16 contract slice and IPC seam into main by moving the working copy onto a child of `tunxxnxp`.
-- Implemented broker-backed Chorus MVP in `nskoqzsy` / `d02672d0` (`feat(chorus): add broker-backed room MVP`).
-- Fixed local broker reply sink in `kyxqnqmw` / `d32225bb` (`fix(chorus): route local broker replies through fanout`).
-- Clarified transport ACK wording in `ssytkxwv` / `6e6e3763`.
-- Reviewed Librarian’s remaining MVP semantics commit `mlyuyklx` / `5e513758` (`feat(chorus): broadcast participant room messages`) and approved it for dogfood.
-- Live dogfood succeeded in `test-room` with Doug, Librarian, Piper, Huginn, and Muninn:
-  - Doug-authored first room message arrived as model-visible Chorus context.
-  - Piper replied through `send_chorus_reply` using embedded broker metadata and received transport ACKs.
-  - Huginn and Muninn both reported visible receipt of Doug/Piper/peer room traffic.
-  - Broker rebroadcast was confirmed peer-visible, not merely broker-local.
-  - Full-room fanout of participant replies worked across multiple rounds.
-- Updated Trail: `TAT-22` and parent `TAT-15` are now NEEDS REVIEW.
+- Integrated and dogfooded broker-backed Chorus MVP through `mlyuyklx` / `5e513758` and recorded successful multi-agent dogfood in `uuzszrlk` / `2c323733`.
+- Live `test-room` dogfood confirmed Doug/Librarian/Piper/Huginn/Muninn model-visible room delivery, embedded broker-route replies, and broker rebroadcast to peers.
+- Captured Doug’s post-dogfood UX notes as follow-up work. Librarian created `TAT-23`; Piper moved concrete subtasks under it: `TAT-24` transcript depth, `TAT-25` self/broker filtering, `TAT-26` quiet reply tool, `TAT-27` direct local-agent input.
+- Implemented post-dogfood polish in `nxzvxuzx` / `761a4366` (`feat(chorus): polish post-dogfood room UX`):
+  - Room widget shows the last 12 entries instead of 8.
+  - Broker-originated messages are identified by broker route name/shortId via `isChorusBrokerAuthor()`; local agent identity is no longer treated as broker noise for suppression.
+  - Self-agent room posts are rendered locally with `triggerTurn: false` and `modelVisible: false`, avoiding a self-reply loop while preserving visible room history.
+  - `send_chorus_reply` success results are silent (`content: []`, self-rendered empty tool component); failures still render error text.
+  - Successful `send_chorus_reply` calls now locally render the sender’s own Chorus room message as a custom room message, because the broker excludes the sender from rebroadcast.
+  - Chorus editor supports `/agent <message>` to send a direct prompt to the local/broker-owning agent without closing the room.
+  - Added `extensions/chorus/chorus-ui.test.ts` and runtime helper test coverage.
+- Marked `TAT-23` through `TAT-27` as NEEDS REVIEW after implementation.
 
 ### In Progress
-- Chorus/Tattler MVP is ready for owner review/cleanup; no active dogfood blocker is known.
+- Await review/dogfood of the post-dogfood polish slice `nxzvxuzx` / `761a4366`.
 
 ### Next Session
-- Decide whether to finalize/close `TAT-15` and subtasks after Doug reviews.
-- If continuing dogfood, avoid endless ACK loops; use substantive room messages only.
-- Consider capturing v1 caveats separately: `delivery.from` is trusted/unauthenticated; transport ACK is not semantic room acceptance; durable rooms and authenticated broker identities remain future work.
-- If preparing merge/push, run the normal gate again (`bun check`, focused Vitest) and inspect jj stack shape.
+- Smoke `/reload` and retry Chorus after polish if possible, specifically verifying: `send_chorus_reply` no longer shows tool-result spam; self-agent messages render as room messages; `/agent <message>` reaches the local agent while the room editor stays open; transcript shows 12 entries.
+- If polish is accepted, move `TAT-23` and subtasks final/complete as appropriate, then decide whether `TAT-15` can be finalized.
+- Keep v1 caveats separate: `delivery.from` is trusted/unauthenticated; transport ACK is not semantic room acceptance; durable rooms and authenticated broker identities remain future work.
 
 ### Blockers
-- None known.
+- None known after focused Vitest and `bun check`.
 
 ### Context
-- Latest code verification before dogfood: focused Vitest for Tattler IPC/protocol/pi-events + Chorus runtime + resource adapter = 30/30 pass; full `bun check` pass; changed-file Biome/lizard clean; no `as any`/TS suppressions/conflict markers.
-- Full `bun run test` was attempted by Librarian and had pre-existing/unrelated failures in neutral capability tests expecting no `turn_end` and Trail auto-commit tests hitting 1Password git signing in temp repos; no Chorus-attributable failures.
-- Current jj work before task/standup commit: empty child `uuzszrlk` / `0940789a` on top of `mlyuyklx 5e513758`.
+- Latest verification after polish: focused Vitest for Tattler IPC/protocol/pi-events + Chorus runtime/UI + resource adapter = 34/34 pass; full `bun check` pass; changed-file Biome clean; lizard no threshold warnings; no `as any`/TS suppressions/conflict markers.
+- Current jj stack head after code commit is empty child `pkoymkps` / `4cc790cc`; parent `nxzvxuzx 761a4366 feat(chorus): polish post-dogfood room UX`; prior dogfood record `uuzszrlk 2c323733`; prior core MVP `mlyuyklx 5e513758`.
 
 ## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-24T15:40:21.780Z)
 
