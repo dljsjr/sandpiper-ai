@@ -50,6 +50,7 @@ export interface ChorusIncomingMessageDetails {
   readonly message: string;
   readonly postId: TattlerMessageId;
   readonly broker: ChorusReplyRouteV0;
+  readonly self?: boolean;
 }
 
 export interface ChorusReplyOptions {

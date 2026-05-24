@@ -1,12 +1,28 @@
 import { describe, expect, test } from 'vitest';
-import { roomId, type TattlerMessageId } from '../tattler/tattler-protocol';
-import type { ChorusTranscriptEntry } from './chorus-runtime';
-import { formatChorusTranscriptEntryLines, parseChorusEditorSubmission } from './chorus-ui';
+import { type ChorusReplyRouteV0, roomId, type TattlerMessageId } from '../tattler/tattler-protocol';
+import type { ChorusIncomingMessageDetails, ChorusTranscriptEntry } from './chorus-runtime';
+import {
+  createChorusMessageComponent,
+  formatChorusTranscriptEntryLines,
+  parseChorusEditorSubmission,
+} from './chorus-ui';
 
-const theme = {
+const plainTheme = {
   fg: (_color: 'accent' | 'dim' | 'muted' | 'success', text: string) => text,
-  bg: (_color: 'customMessageBg', text: string) => text,
+  bg: (_color: 'customMessageBg' | 'toolSuccessBg', text: string) => text,
   bold: (text: string) => text,
+};
+
+const markerTheme = {
+  fg: (color: 'accent' | 'dim' | 'muted' | 'success', text: string) => `<fg:${color}>${text}</fg:${color}>`,
+  bg: (color: 'customMessageBg' | 'toolSuccessBg', text: string) => `<bg:${color}>${text}</bg:${color}>`,
+  bold: (text: string) => `<bold>${text}</bold>`,
+};
+
+const broker: ChorusReplyRouteV0 = {
+  name: 'chorus:chorus-dev',
+  shortId: 'chorus-dev',
+  socketPath: '/tmp/chorus.sock',
 };
 
 function transcriptEntry(message: string, options: Partial<ChorusTranscriptEntry> = {}): ChorusTranscriptEntry {
@@ -18,6 +34,17 @@ function transcriptEntry(message: string, options: Partial<ChorusTranscriptEntry
     self: false,
     status: 'received',
     peerStatuses: new Map(),
+    ...options,
+  };
+}
+
+function messageDetails(options: Partial<ChorusIncomingMessageDetails> = {}): ChorusIncomingMessageDetails {
+  return {
+    roomId: roomId('chorus-dev'),
+    from: 'Huginn',
+    message: 'remote note',
+    postId: 'post-2' as TattlerMessageId,
+    broker,
     ...options,
   };
 }
@@ -52,19 +79,32 @@ describe('Chorus room UI helpers', () => {
     expect(parseChorusEditorSubmission('   ')).toEqual({ kind: 'empty' });
   });
 
-  test('renders multiline transcript entries as separate indented rows', () => {
-    expect(formatChorusTranscriptEntryLines(transcriptEntry('hello\nworld'), 80, theme)).toEqual([
+  test('renders multiline transcript entries as separate flush-left rows', () => {
+    expect(formatChorusTranscriptEntryLines(transcriptEntry('hello\nworld'), 80, plainTheme)).toEqual([
       '[Doug] hello',
-      '       world',
+      'world',
     ]);
   });
 
   test('renders blank transcript lines without embedding raw newlines', () => {
-    expect(formatChorusTranscriptEntryLines(transcriptEntry('\nhello\n'), 80, theme)).toEqual([
+    expect(formatChorusTranscriptEntryLines(transcriptEntry('\nhello\n'), 80, plainTheme)).toEqual([
       '[Doug] ␤',
-      '       hello',
-      '       ␤',
+      'hello',
+      '␤',
     ]);
+  });
+
+  test('wraps long transcript entries flush-left regardless of sender length', () => {
+    const message = 'alpha beta gamma delta epsilon zeta';
+
+    expect(formatChorusTranscriptEntryLines(transcriptEntry(message, { from: 'Al' }), 20, plainTheme)).toEqual([
+      '[Al] alpha beta',
+      'gamma delta epsilon',
+      'zeta',
+    ]);
+    expect(
+      formatChorusTranscriptEntryLines(transcriptEntry(message, { from: 'LongDisplayName' }), 20, plainTheme),
+    ).toEqual(['[LongDisplayName]', 'alpha beta gamma', 'delta epsilon zeta']);
   });
 
   test('wraps and caps long multiline transcript entries', () => {
@@ -72,13 +112,25 @@ describe('Chorus room UI helpers', () => {
       formatChorusTranscriptEntryLines(
         transcriptEntry('alpha beta gamma delta epsilon zeta eta theta iota kappa\nsecond line\nthird line'),
         30,
-        theme,
+        plainTheme,
       ),
-    ).toEqual([
-      '[Doug] alpha beta gamma delta',
-      '       epsilon zeta eta theta',
-      '       iota kappa',
-      '       … 2 more lines',
-    ]);
+    ).toEqual(['[Doug] alpha beta gamma delta', 'epsilon zeta eta theta iota', 'kappa', '… 2 more lines']);
+  });
+
+  test('styles self chat messages with self tag color and background', () => {
+    const lines = createChorusMessageComponent(
+      messageDetails({ from: 'Piper', message: 'self-authored note', self: true }),
+      markerTheme,
+    ).render(80);
+
+    expect(lines.join('\n')).toContain('<fg:success>[Piper]</fg:success>');
+    expect(lines.join('\n')).toContain('<bg:toolSuccessBg>');
+  });
+
+  test('styles non-self chat messages with default room tag color and background', () => {
+    const lines = createChorusMessageComponent(messageDetails(), markerTheme).render(80);
+
+    expect(lines.join('\n')).toContain('<fg:accent>[Huginn]</fg:accent>');
+    expect(lines.join('\n')).toContain('<bg:customMessageBg>');
   });
 });

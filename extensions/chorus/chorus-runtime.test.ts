@@ -139,7 +139,7 @@ describe('Chorus broker runtime', () => {
     });
   });
 
-  test('does not notify the originating local agent for agent-authored broker replies', async () => {
+  test('does not notify the local participant synchronously for agent-authored broker replies', async () => {
     const localPosts: TattlerSendableFrame[] = [];
     const broker = createChorusRoomBroker({
       roomId: roomId('chorus-dev'),
