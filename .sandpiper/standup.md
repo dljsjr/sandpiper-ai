@@ -1,65 +1,63 @@
 # Session Stand-Up
 
-## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T17:42:51.133Z)
+## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T17:58:16.239Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-05-21T17-47-07-171Z_019e4ba5-f223-7d87-935d-a43a8a8f71e9.jsonl
 
 ### Accomplished
-- Reviewed Piper’s `osrvxsxo` / `fe18be6c` (`fix(chorus): deliver local room posts to owner agent`): no blockers from this session. Verification here: focused Vitest 37/37, full `bun check`, lizard clean, marker/TS escape scans clean.
-- Live `test-time` smoke after `osrvxsxo` succeeded: Doug’s local room message reached broker-owner model context; Piper/Muninn/Huginn replies used embedded broker routes; quiet reply path did not show tool spam or terminate agents.
-- Recorded final smoke in `oppwllpw` / `79f84c92` (`chore: record chorus final smoke`). `TAT-23`, `TAT-26`, and `TAT-28` were marked NEEDS REVIEW after smoke.
-- Consensus: keep `/agent <message>` (or equivalent) as the scoped local-agent escape hatch while Chorus owns the editor; slash passthrough solves app commands but not direct local-agent prompts.
-- Doug asked for two follow-ups: implement slash literal escape convention and investigate whether agents can be forced not to emit assistant text after `send_chorus_reply`.
-- Piper/Librarian is implementing slash literal escape convention; do not edit over that lane.
-- Created/picked up `TAT-29`: `Investigate suppressing assistant follow-up after Chorus replies`.
+- Reviewed Piper’s slash escape and registered `/agent` slices: `nksywrlm` / `243a74ca` (`feat(chorus): support literal slash room messages`) and `tuwrwlly` / `032bc236` (`feat(chorus): register local agent escape command`). No blockers. Verification here: focused Vitest subset 17/17, full `bun check`, lizard clean.
+- Piper reported full verification for those slices: focused Vitest 40/40, full `bun check`, lizard clean.
+- Created/picked up `TAT-29`: investigate suppressing assistant follow-up after Chorus replies. Initial conclusion: prompt-only is soft; hidden renderer/non-empty tool result reduces UI noise but cannot enforce no assistant text; `terminate:true` is the only current enforceable loop knob but is too blunt when baked into `send_chorus_reply`; a true solution likely needs either a dedicated explicit `done`/`finish_turn` tool or harness/agent-loop support for scoped post-tool continuation suppression.
+- Created `TAT-30`: make `/agent` escape hatch discoverable. Piper implemented it as a registered `/agent` command plus Chorus editor passthrough. Remaining caveat: `/agent` is globally visible and may need state-aware wording later.
+- Doug opened next fixes in Chorus room `more-chorus-fixes`; tracked them:
+  - `TAT-31` BUG: Fix Chorus multiline room message rendering. Assigned to Librarian.
+  - `TAT-32` TASK: Design general quiet completion tool for no-assistant-message turns. Assigned to Librarian.
+  - `TAT-33` TASK: Brainstorm Chorus reply storm and context growth controls. Assigned to AGENT.
+- Added descriptions to TAT-31/32/33 capturing Doug/Muninn/Huginn guidance.
 
 ### In Progress
-- Read-only TAT-29 harness feasibility investigation started.
-- Initial internals read:
-  - `node_modules/@earendil-works/pi-agent-core/dist/agent-loop.js` shows tool `terminate:true` makes `hasMoreToolCalls = !executedToolBatch.terminate`; `shouldTerminateToolBatch()` returns true only when every finalized tool result has `terminate === true`.
-  - After tool execution, tool results are always appended as `toolResult` messages and `turn_end` is emitted. Then `shouldStopAfterTurn` is consulted; if false, pending steering messages are processed and/or follow-up messages may continue.
-  - `terminate:true` is therefore a blunt “don’t continue the inner tool-call loop after this batch” control, not a safe “suppress just the assistant narration but preserve workflow” solution; live dogfood already showed it can halt useful work.
-  - Previous finding from Huginn: during streaming, `sendCustomMessage` sends any `pi.sendMessage` to `agent.steer(appMessage)` unless `deliverAs:'followUp'`; `triggerTurn:false` only applies in non-streaming branch; custom messages convert to user messages regardless of display/empty content.
-- Need continue reading `agent-session.js` around `_installAgentToolHooks`, tool_result extension event wiring, `sendUserMessage`/`sendCustomMessage`, and any `shouldStopAfterTurn`/`prepareNextTurn` ownership surface.
+- Librarian/Piper is taking `TAT-31` and `TAT-32`; do not edit over that lane unless asked.
+- Piper/this session owns `TAT-33` brainstorm.
+- Current working copy has task/standup changes only as of this checkpoint; code work for TAT-31/32 should be in Librarian’s lane.
 
 ### Next Session
-- Continue TAT-29 read-only investigation unless Doug redirects.
-- Answer feasibility question explicitly: prompt-only is soft; hidden renderer/non-empty tool result reduces UI noise but does not guarantee no assistant text; `terminate:true` suppresses continuation too bluntly; likely options are (a) accept soft prompting, (b) add a harness/agent-loop flag such as `suppressAssistantContinuation` / tool-only finalization for designated tools, or (c) host-side event policy after `tool_result` that prevents a post-tool assistant request while preserving future queued work.
-- Watch for Piper’s slash literal escape patch and review it if asked.
-- If accepted later, finalize `TAT-23`, `TAT-26`, `TAT-28`; keep `TAT-29` open until the harness feasibility answer is captured.
+- For TAT-31 review: newline rendering should be fixed in the room widget renderer, not protocol. Preserve raw message text, split/sanitize for display, indent continuation rows under sender tag, cap/truncate long multiline content. Regression tests should include `hello\nworld`, leading/trailing blank lines, and long wrapped multiline content.
+- For TAT-32: avoid naming the tool `ignore`; prefer `done`, `finish_turn`, or `no_response_needed`. It should be generic/system-owned, no params, no rendered output, probably returns `terminate:true`, with strict guidance: only use after requested visible action already happened elsewhere or explicit no-response-needed instruction; never for normal requests, uncertainty, errors, or remaining work. Need verify batching semantics so it doesn’t repeat the `send_chorus_reply` regression.
+- For TAT-33: start with social/protocol-light controls, not transport suppression: Chorus notification guidance should say agents reply only if directly addressed, they own a lane, have new information, need to answer a question, or silence would block progress. Consider `@name`, `@all`, broker/owner summaries, and quiet/observe participant mode later. Full turn-taking/election is larger design.
+- Continue hidden Tattler for coordination if Chorus is under active modification or behaving noisily.
 
 ### Blockers
-- No current blocker for MVP smoke; open design question TAT-29 remains.
+- None for current clean slices, but context is high; resume from this standup if compacted.
 
 ### Context
-- Current jj before this checkpoint: empty child `nksywrlm` / `07f6c1cd` on top of `oppwllpw 79f84c92 chore: record chorus final smoke`, `osrvxsxo fe18be6c fix(chorus): deliver local room posts to owner agent`, and earlier Chorus stack.
-- Use Chorus only if live room is behaving; hidden Tattler remains safer for coordination if Chorus work is actively changing.
+- Current jj stack before this checkpoint: empty child `utwzlwsy` / `8b85860e` on top of `xxynxsnw 8e4a1963` (silent-reply investigation checkpoint), `tuwrwlly 032bc236`, `nksywrlm 243a74ca`, `oppwllpw 79f84c92`, `osrvxsxo fe18be6c`, and earlier Chorus stack.
+- Pi internals read so far: `agent-loop.js` always appends finalized tool results as `toolResult` messages; `terminate:true` only stops the inner tool-call/continuation loop when every tool result in the batch has terminate true. `agent-session.js` shows streaming `sendCustomMessage` queues custom messages to `agent.steer()` unless `deliverAs:'followUp'`; `triggerTurn:false` only matters when not streaming.
 
-## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-24T17:44:10.604Z)
+## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-24T17:58:04.185Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/identities/Huginn/sessions/2026-05-22T22-12-53-366Z_019e51bf-9ff6-7044-897e-24ff87b27adb.jsonl
 
 ### Accomplished
-- Scout-reviewed Chorus stack through `osrvxsxo` / `fe18be6c`; no blockers found.
-- Reran focused Vitest 37/37, full `bun check`, lizard, and scans.
-- Live-tested `test-time`: broker-owner visibility and quiet reply behavior looked healthy; no termination regression observed from Huginn side.
-- Confirmed `/agent <message>` is still needed as local-agent escape hatch while Chorus editor owns input.
-- Captured nuance: `/agent` is editor-local parser syntax, not a registered Pi slash command, so it will not appear in slash-command list/autocomplete.
+- Scout-reviewed latest Chorus slices through `tuwrwlly` / `032bc236`; no blockers found.
+- Captured latest `more-chorus-fixes` design/input from Doug: multiline chat-log rendering bug, generic quiet/done tool idea, and reply-storm/context blow-up problem.
+- Updated Huginn checkpoint with current review verdicts and next-review lenses.
 
 ### In Progress
-- Piper/Librarian is implementing literal slash escape convention and inspecting Pi/harness behavior for safe tool-only Chorus replies.
-- Huginn is standing by as read-only Scout/reviewer.
+- Piper/Librarian is taking the next slice: multiline room transcript rendering first, test-first.
+- Then likely inspect/implement a general `done`/quiet/no-response tool and brainstorm reply-throttling.
+- Huginn is read-only Scout/reviewer; avoid extra Chorus ACK noise unless there is a real finding/question.
 
 ### Next Session
-- Review literal slash escape slice when it lands.
-- Check `/agent` discoverability solution: editor hint/help/autocomplete or command/help registration if feasible. Keep semantics as editor escape hatch, not ordinary app command.
-- For no-assistant-message Chorus replies, verify actual Pi/harness semantics before approving: prompt-only is insufficient; `terminate:true` caused live regression; `pi.sendMessage` during streaming steers even with `triggerTurn:false`.
+- Review multiline rendering fix with focus on preserving raw protocol text and fixing only widget rendering: split/sanitize lines, continuation indentation, blank-line behavior, long multiline cap/truncation, and tests.
+- For generic quiet tool, avoid `ignore` naming if possible; require narrow guidance. It should only terminate the current follow-up after another requested visible action already happened or when no assistant response is explicitly requested.
+- For reply storms, prefer v0 participation norms/addressing before transport suppression: agents reply only when directly addressed, lane-owning, adding new info, answering a question, or preventing a block.
 - Return to VCG CORE-1606 source-accuracy review when Chorus is parked.
 
 ### Blockers
-- No current Scout blockers for `osrvxsxo`; open design question remains around enforcing tool-only/no-assistant Chorus replies safely.
+- No current Scout blockers on latest reviewed Chorus slices.
+- Open design questions: safe quiet/done tool semantics and reply-storm controls.
 
 ### Context
-- Latest healthy stack: `osrvxsxo fe18be6c` over prior Chorus MVP/polish stack.
-- Latest live room: `test-time`, broker route `chorus:test-time:Librarian`.
-- Hardening: literal slash escape, `/agent` discoverability, broker route display-name spoof caveat, hidden error UI vs model-visible error result, lifecycle cleanup polish.
+- Latest reviewed slices: `osrvxsxo`, `nksywrlm`, `tuwrwlly`; all Scout-clear.
+- New room: `more-chorus-fixes`, broker `chorus:more-chorus-fixes:Librarian`.
+- Multiline bug is product rendering, not protocol mutation: preserve raw message bodies.
