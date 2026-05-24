@@ -15,7 +15,7 @@ import {
   wrapTextWithAnsi,
 } from '@earendil-works/pi-tui';
 import { requestChorusRoomPost } from '../tattler/tattler-pi-events';
-import type { ChorusRoomId, TattlerIdentityV0 } from '../tattler/tattler-protocol';
+import { type ChorusRoomId, roomId, type TattlerIdentityV0, type TattlerMessageId } from '../tattler/tattler-protocol';
 import {
   CHORUS_MESSAGE_CUSTOM_TYPE,
   type ChorusIncomingMessageDetails,
@@ -30,7 +30,7 @@ const CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4;
 
 interface ThemeLike {
   fg(color: 'accent' | 'dim' | 'muted' | 'success', text: string): string;
-  bg(color: 'customMessageBg', text: string): string;
+  bg(color: 'customMessageBg' | 'toolSuccessBg', text: string): string;
   bold(text: string): string;
 }
 
@@ -110,6 +110,31 @@ class PeerPicker implements Component {
   }
 }
 
+function wrapTranscriptLine(prefix: string, content: string, width: number): string[] {
+  const contentWidth = width - visibleWidth(prefix);
+  if (prefix.length > 0 && contentWidth < 8) {
+    return [
+      truncateToWidth(prefix.trimEnd(), width),
+      ...wrapTextWithAnsi(content, width).map((line) => truncateToWidth(line, width)),
+    ];
+  }
+
+  return wrapTextWithAnsi(`${prefix}${content}`, width).map((line) => truncateToWidth(line, width));
+}
+
+function capTranscriptEntryLines(lines: string[], width: number, theme: ThemeLike): string[] {
+  if (lines.length <= CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT) {
+    return lines;
+  }
+
+  const visibleLines = lines.slice(0, CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT - 1);
+  const hiddenLineCount = lines.length - visibleLines.length;
+  visibleLines.push(
+    truncateToWidth(theme.fg('dim', `… ${hiddenLineCount} more line${hiddenLineCount === 1 ? '' : 's'}`), width),
+  );
+  return visibleLines;
+}
+
 export function formatChorusTranscriptEntryLines(
   entry: ChorusTranscriptEntry,
   width: number,
@@ -119,34 +144,12 @@ export function formatChorusTranscriptEntryLines(
   const tag = theme.fg(tagColor, `[${entry.from}]`);
   const status = entry.self ? theme.fg('dim', ` ${entry.status}`) : '';
   const firstPrefix = `${tag}${status} `;
-  const continuationPrefix = ' '.repeat(visibleWidth(`[${entry.from}]${entry.self ? ` ${entry.status}` : ''} `));
-  const renderedLines: string[] = [];
-
-  for (const [lineIndex, line] of entry.message.split(/\r?\n/).entries()) {
+  const renderedLines = entry.message.split(/\r?\n/).flatMap((line, index) => {
     const content = line.length === 0 ? theme.fg('dim', '␤') : line;
-    const initialPrefix = lineIndex === 0 ? firstPrefix : continuationPrefix;
-    const contentWidth = Math.max(1, width - visibleWidth(initialPrefix));
-    const wrappedLines = wrapTextWithAnsi(content, contentWidth);
+    return wrapTranscriptLine(index === 0 ? firstPrefix : '', content, width);
+  });
 
-    for (const [wrapIndex, wrappedLine] of wrappedLines.entries()) {
-      const prefix = lineIndex === 0 && wrapIndex === 0 ? firstPrefix : continuationPrefix;
-      renderedLines.push(truncateToWidth(`${prefix}${wrappedLine}`, width));
-    }
-  }
-
-  if (renderedLines.length <= CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT) {
-    return renderedLines;
-  }
-
-  const visibleLines = renderedLines.slice(0, CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT - 1);
-  const hiddenLineCount = renderedLines.length - visibleLines.length;
-  visibleLines.push(
-    truncateToWidth(
-      `${continuationPrefix}${theme.fg('dim', `… ${hiddenLineCount} more line${hiddenLineCount === 1 ? '' : 's'}`)}`,
-      width,
-    ),
-  );
-  return visibleLines;
+  return capTranscriptEntryLines(renderedLines, width, theme);
 }
 
 class ChorusRoomTranscript implements Component {
@@ -229,16 +232,33 @@ class ChorusRoomEditor extends CustomEditor {
   }
 }
 
+export function createChorusMessageComponent(details: ChorusIncomingMessageDetails, theme: ThemeLike): Component {
+  const room = ` #${details.roomId}`;
+  const tagColor = details.self ? 'success' : 'accent';
+  const backgroundColor = details.self ? 'toolSuccessBg' : 'customMessageBg';
+  const badge = `${theme.bold(theme.fg(tagColor, `[${details.from}]`))}${theme.fg('muted', room)}`;
+  const box = new Box(1, 1, (text) => theme.bg(backgroundColor, text));
+  box.addChild(new Text(`${badge}\n${details.message}`, 0, 0));
+  return box;
+}
+
 export function registerChorusMessageRenderer(pi: ExtensionAPI): void {
   pi.registerMessageRenderer<ChorusIncomingMessageDetails>(CHORUS_MESSAGE_CUSTOM_TYPE, (message, _options, theme) => {
     const details = message.details;
-    const from = details?.from ?? 'unknown';
-    const content = details?.message ?? (typeof message.content === 'string' ? message.content : '');
-    const room = details?.roomId ? ` #${details.roomId}` : '';
-    const badge = `${theme.bold(theme.fg('accent', `[${from}]`))}${theme.fg('muted', room)}`;
-    const box = new Box(1, 1, (text) => theme.bg('customMessageBg', text));
-    box.addChild(new Text(`${badge}\n${content}`, 0, 0));
-    return box;
+    if (details) {
+      return createChorusMessageComponent(details, theme as ThemeLike);
+    }
+
+    return createChorusMessageComponent(
+      {
+        roomId: roomId('unknown'),
+        from: 'unknown',
+        message: typeof message.content === 'string' ? message.content : '',
+        postId: 'unknown' as TattlerMessageId,
+        broker: { name: 'unknown', shortId: 'unknown', socketPath: '' },
+      },
+      theme as ThemeLike,
+    );
   });
 }
 

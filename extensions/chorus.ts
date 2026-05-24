@@ -2,11 +2,12 @@ import { randomUUID } from 'node:crypto';
 import { stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { dirname, join, normalize } from 'node:path';
-import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from '@earendil-works/pi-coding-agent';
 import type { Component } from '@earendil-works/pi-tui';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import {
+  type ChorusIncomingMessageDetails,
   type ChorusReplyResult,
   type ChorusRoomBroker,
   createChorusRoomBroker,
@@ -54,6 +55,8 @@ interface ActiveChorusRoom {
 let activeRoom: ActiveChorusRoom | undefined;
 let eventUnsubscribers: Array<() => void> = [];
 let ownIdentityRequest: Promise<TattlerIdentityV0> | undefined;
+
+const SELF_CHAT_IDLE_RETRY_MS = 25;
 
 const emptyToolRenderComponent: Component = {
   render: () => [],
@@ -172,13 +175,19 @@ async function openRoom(
     sendFrame: sendPayloadFrame,
     onUpdate: () => activeRoom?.requestRender?.(),
     onLocalParticipantMessage: (post) => {
-      sendChorusMessageToChat(pi, {
-        roomId: post.roomId,
-        from: post.from,
-        message: post.message,
-        postId: post.id,
-        broker: post.broker,
-      });
+      const self = post.from === ownIdentity.name;
+      sendChorusMessageToChat(
+        pi,
+        {
+          roomId: post.roomId,
+          from: post.from,
+          message: post.message,
+          postId: post.id,
+          broker: post.broker,
+          self,
+        },
+        { triggerTurn: !self, modelVisible: !self },
+      );
     },
   });
 
@@ -202,6 +211,30 @@ async function closeRoomUi(ctx: ExtensionCommandContext): Promise<void> {
   clearChorusRoomUi(ctx);
 }
 
+export function sendChorusSelfMessageToChatWhenIdle(
+  pi: ExtensionAPI,
+  ctx: Pick<ExtensionContext, 'isIdle'>,
+  details: ChorusIncomingMessageDetails,
+): void {
+  const flush = (): void => {
+    let isIdle: boolean;
+    try {
+      isIdle = ctx.isIdle();
+    } catch {
+      return;
+    }
+
+    if (!isIdle) {
+      setTimeout(flush, SELF_CHAT_IDLE_RETRY_MS);
+      return;
+    }
+
+    sendChorusMessageToChat(pi, details, { triggerTurn: false, modelVisible: false });
+  };
+
+  setTimeout(flush, 0);
+}
+
 async function handleRoomPostReceived(pi: ExtensionAPI, post: ChorusRoomPostV0): Promise<void> {
   activeRoom?.broker.recordRoomPost(post);
   if (isChorusBrokerAuthor(post.from, post.broker)) {
@@ -217,6 +250,7 @@ async function handleRoomPostReceived(pi: ExtensionAPI, post: ChorusRoomPostV0):
       message: post.message,
       postId: post.id,
       broker: post.broker,
+      self: ownIdentity ? post.from === ownIdentity.name : false,
     },
     {
       triggerTurn: !(ownIdentity && post.from === ownIdentity.name),
@@ -245,6 +279,7 @@ async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDelivery
       message: delivery.message,
       postId: accepted.postId,
       broker: room.broker.brokerRoute,
+      self: ownIdentity ? delivery.from === ownIdentity.name : false,
     },
     {
       triggerTurn: !(ownIdentity && delivery.from === ownIdentity.name),
@@ -298,7 +333,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
     renderShell: 'self',
     renderCall: () => emptyToolRenderComponent,
     renderResult: () => emptyToolRenderComponent,
-    async execute(_toolCallId, params) {
+    async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       let deliveryId = params.postId as TattlerMessageId;
       try {
         const ownIdentity = await requestOwnIdentity(pi);
@@ -318,6 +353,16 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
           sendFrame: sendPayloadFrame,
         });
         deliveryId = result.kind === 'local-post' ? result.postId : result.messageIdAck;
+        if (result.kind === 'local-post') {
+          sendChorusSelfMessageToChatWhenIdle(pi, ctx, {
+            roomId: selectedRoom,
+            from: ownIdentity.name,
+            message: params.message,
+            postId: result.postId,
+            broker,
+            self: true,
+          });
+        }
         return {
           content: [{ type: 'text', text: 'Chorus reply sent. Do not summarize this tool result.' }],
           details: result,
