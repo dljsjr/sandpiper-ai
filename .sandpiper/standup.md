@@ -1,63 +1,71 @@
 # Session Stand-Up
 
-## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-24T17:58:16.239Z)
+## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-25T14:56:37.086Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-05-21T17-47-07-171Z_019e4ba5-f223-7d87-935d-a43a8a8f71e9.jsonl
 
 ### Accomplished
-- Reviewed Piper’s slash escape and registered `/agent` slices: `nksywrlm` / `243a74ca` (`feat(chorus): support literal slash room messages`) and `tuwrwlly` / `032bc236` (`feat(chorus): register local agent escape command`). No blockers. Verification here: focused Vitest subset 17/17, full `bun check`, lizard clean.
-- Piper reported full verification for those slices: focused Vitest 40/40, full `bun check`, lizard clean.
-- Created/picked up `TAT-29`: investigate suppressing assistant follow-up after Chorus replies. Initial conclusion: prompt-only is soft; hidden renderer/non-empty tool result reduces UI noise but cannot enforce no assistant text; `terminate:true` is the only current enforceable loop knob but is too blunt when baked into `send_chorus_reply`; a true solution likely needs either a dedicated explicit `done`/`finish_turn` tool or harness/agent-loop support for scoped post-tool continuation suppression.
-- Created `TAT-30`: make `/agent` escape hatch discoverable. Piper implemented it as a registered `/agent` command plus Chorus editor passthrough. Remaining caveat: `/agent` is globally visible and may need state-aware wording later.
-- Doug opened next fixes in Chorus room `more-chorus-fixes`; tracked them:
-  - `TAT-31` BUG: Fix Chorus multiline room message rendering. Assigned to Librarian.
-  - `TAT-32` TASK: Design general quiet completion tool for no-assistant-message turns. Assigned to Librarian.
-  - `TAT-33` TASK: Brainstorm Chorus reply storm and context growth controls. Assigned to AGENT.
-- Added descriptions to TAT-31/32/33 capturing Doug/Muninn/Huginn guidance.
+- Final Chorus cosmetic slice landed and was reviewed clean:
+  - `wpmzmzty` / `121f5b0d` — `fix(chorus): render self room messages distinctly`.
+  - Scope: self/local-agent Chorus messages render in Pi chat with distinct success tag/background; widget transcript wrapped rows are flush-left; agent-authored local broker self echoes are deferred until `ctx.isIdle()` to avoid tool-time steer.
+  - This session re-reviewed amended commit read-only: focused Vitest 22/22, full `bun check`, lizard clean, scans clean; no blockers.
+- Reload smoke in Chorus room `final-exams-pt2` exercised new rendering. Normal participant check-ins worked; Piper/Librarian recovered from a gummed upstream websocket and checked in.
+- Doug surfaced a new lifecycle/render bug: while Piper was hung mid-turn, incoming Chorus messages did not render in the main Pi chat until/unless the turn boundary delivered custom messages.
+- Split investigation results across agents:
+  - Piper/Librarian inspected `$SANDPIPER_SESSION_FILE`: hung-period Chorus posts were persisted as `custom_message` entries with `customType:"chorus-room-message"`, `display:true`, full XML content, and details. Evidence points to visual/live-render delay, not transport loss.
+  - Source/docs read here and by Huginn/Muninn: `pi.appendEntry()` is extension-private persistence only (`appendCustomEntry`), no LLM context, no `message_start`/`message_end`, no custom renderer path.
+  - `pi.sendMessage()` / `sendCustomMessage()` is the only documented custom-message render path; when idle with `triggerTurn:false` it appends to agent state/session and emits render events immediately, but while streaming it queues via `agent.steer()`/`followUp()` and waits for agent-loop delivery.
+  - `registerMessageRenderer()` is documented for messages sent via `pi.sendMessage()`, not arbitrary custom entries.
+  - `ctx.ui.setWidget`, `notify`, and `setStatus` are immediate UI surfaces but not main-chat transcript entries.
+- Created follow-up tasks:
+  - `TAT-34` BUG: Decouple Chorus visual rendering from model-visible message injection.
+  - `TAT-35` TASK: Design Pi display-only message API for live extension transcript entries.
 
 ### In Progress
-- Librarian/Piper is taking `TAT-31` and `TAT-32`; do not edit over that lane unless asked.
-- Piper/this session owns `TAT-33` brainstorm.
-- Current working copy has task/standup changes only as of this checkpoint; code work for TAT-31/32 should be in Librarian’s lane.
+- `TAT-34`/`TAT-35` investigation/design. Current conclusion: existing Pi extension APIs do not provide “render chat transcript entry immediately, but inject model-visible context separately later.”
+- No code changes for TAT-34/35 yet in this session; only task/standup updates.
 
 ### Next Session
-- For TAT-31 review: newline rendering should be fixed in the room widget renderer, not protocol. Preserve raw message text, split/sanitize for display, indent continuation rows under sender tag, cap/truncate long multiline content. Regression tests should include `hello\nworld`, leading/trailing blank lines, and long wrapped multiline content.
-- For TAT-32: avoid naming the tool `ignore`; prefer `done`, `finish_turn`, or `no_response_needed`. It should be generic/system-owned, no params, no rendered output, probably returns `terminate:true`, with strict guidance: only use after requested visible action already happened elsewhere or explicit no-response-needed instruction; never for normal requests, uncertainty, errors, or remaining work. Need verify batching semantics so it doesn’t repeat the `send_chorus_reply` regression.
-- For TAT-33: start with social/protocol-light controls, not transport suppression: Chorus notification guidance should say agents reply only if directly addressed, they own a lane, have new information, need to answer a question, or silence would block progress. Consider `@name`, `@all`, broker/owner summaries, and quiet/observe participant mode later. Full turn-taking/election is larger design.
-- Continue hidden Tattler for coordination if Chorus is under active modification or behaving noisily.
+- Start by checking `jj status` and reading this standup.
+- For TAT-34/TAT-35, likely design direction:
+  - Add a host/API path such as `sendDisplayMessage` / `appendDisplayMessage` for immediate rendered transcript entries that do not enter LLM context.
+  - Keep model-visible Chorus context as a separate hidden `custom_message`/message injection path that can queue normally for turn boundaries.
+  - Avoid repurposing `appendEntry` as-is; its current contract is extension state persistence and rendering it would blur state records vs visible transcript events.
+  - Consider stable caller-provided keys/details for dedupe, e.g. `chorus:<postId>` or `details.postId`.
+  - Failure semantics: visual delivery should be best-effort and persist if rendered; model delivery may be delayed/fail independently but should eventually enter next model context unless deduped/suppressed.
+- If reviewing implementation, ensure immediate display path emits the same UI event/render path as custom messages without mutating `agent.state.messages` or `buildSessionContext()`.
+- Existing task statuses after earlier slices: TAT-29/TAT-30/TAT-31/TAT-32/TAT-33 and TAT-23 are NEEDS REVIEW; TAT-34/TAT-35 are IN PROGRESS.
 
 ### Blockers
-- None for current clean slices, but context is high; resume from this standup if compacted.
+- Need Pi host/API support or sanctioned direct chat-render bridge; `extensions.md` confirms no existing first-class display-only transcript API.
 
 ### Context
-- Current jj stack before this checkpoint: empty child `utwzlwsy` / `8b85860e` on top of `xxynxsnw 8e4a1963` (silent-reply investigation checkpoint), `tuwrwlly 032bc236`, `nksywrlm 243a74ca`, `oppwllpw 79f84c92`, `osrvxsxo fe18be6c`, and earlier Chorus stack.
-- Pi internals read so far: `agent-loop.js` always appends finalized tool results as `toolResult` messages; `terminate:true` only stops the inner tool-call/continuation loop when every tool result in the batch has terminate true. `agent-session.js` shows streaming `sendCustomMessage` queues custom messages to `agent.steer()` unless `deliverAs:'followUp'`; `triggerTurn:false` only matters when not streaming.
+- Current jj state before this checkpoint: working copy `kzkknknl` on top of `wpmzmzty 121f5b0d`; `.sandpiper/standup.md` was already modified, and creating/updating TAT-34/TAT-35 added task file changes.
+- Keep using Chorus participation rules: reply only when addressed/own lane/new info/silence blocks; use `done` for no-op turns.
 
-## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-24T17:58:04.185Z)
+## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-25T14:55:06.511Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/identities/Huginn/sessions/2026-05-22T22-12-53-366Z_019e51bf-9ff6-7044-897e-24ff87b27adb.jsonl
 
 ### Accomplished
-- Scout-reviewed latest Chorus slices through `tuwrwlly` / `032bc236`; no blockers found.
-- Captured latest `more-chorus-fixes` design/input from Doug: multiline chat-log rendering bug, generic quiet/done tool idea, and reply-storm/context blow-up problem.
-- Updated Huginn checkpoint with current review verdicts and next-review lenses.
+- Live-smoked amended final cosmetic slice in `final-exams-pt2`; Huginn replied to Doug’s check-in request and used `done` for non-actionable follow-ups.
+- Investigated Doug’s new observation: when Piper was hung mid-turn, incoming Chorus messages did not render live until later/turn boundary.
+- Collated source/API facts: `pi.appendEntry()` is extension-private `custom` persistence only, no live renderer/event path; renderable custom messages are `CustomMessageEntry` via `pi.sendMessage()`, which currently also participates in LLM context.
+- Piper confirmed hung-period messages persisted in its session JSONL as `custom_message` entries, so likely visual/live-render delay rather than transport drop.
 
 ### In Progress
-- Piper/Librarian is taking the next slice: multiline room transcript rendering first, test-first.
-- Then likely inspect/implement a general `done`/quiet/no-response tool and brainstorm reply-throttling.
-- Huginn is read-only Scout/reviewer; avoid extra Chorus ACK noise unless there is a real finding/question.
+- Open design follow-up: decouple visible display from model-visible custom message injection for Chorus/live room traffic.
+- Huginn remains Scout/collator; Piper/Muninn contributed source/UX slices.
 
 ### Next Session
-- Review multiline rendering fix with focus on preserving raw protocol text and fixing only widget rendering: split/sanitize lines, continuation indentation, blank-line behavior, long multiline cap/truncation, and tests.
-- For generic quiet tool, avoid `ignore` naming if possible; require narrow guidance. It should only terminate the current follow-up after another requested visible action already happened or when no assistant response is explicitly requested.
-- For reply storms, prefer v0 participation norms/addressing before transport suppression: agents reply only when directly addressed, lane-owning, adding new info, answering a question, or preventing a block.
+- If implementing, prefer new host/API path like `appendDisplayMessage` / `sendDisplayMessage`: render/persist visible custom message immediately, ignored by LLM context.
+- Keep separate hidden/model-visible `custom_message` queued through normal context semantics; dedupe via caller-provided key such as `chorus:<postId>`.
+- Do not repurpose `pi.appendEntry()` as-is; its contract is extension-private state persistence.
 - Return to VCG CORE-1606 source-accuracy review when Chorus is parked.
 
-### Blockers
-- No current Scout blockers on latest reviewed Chorus slices.
-- Open design questions: safe quiet/done tool semantics and reply-storm controls.
+### Blockers / Findings
+- No code blocker currently, but new design issue: `pi.sendMessage` couples live rendering to model injection and queues while streaming, so hung turns can hide incoming Chorus traffic visually.
 
 ### Context
-- Latest reviewed slices: `osrvxsxo`, `nksywrlm`, `tuwrwlly`; all Scout-clear.
-- New room: `more-chorus-fixes`, broker `chorus:more-chorus-fixes:Librarian`.
-- Multiline bug is product rendering, not protocol mutation: preserve raw message bodies.
+- Latest Scout-clear slices: `mnpqnnsn`, `lzkywlvt` + `utxmwlyn`, `pwpzxpkv`, amended `wpmzmzty` / `121f5b0d`.
+- Latest room: `final-exams-pt2`.
