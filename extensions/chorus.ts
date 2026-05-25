@@ -28,6 +28,7 @@ import {
   onChorusRoomPostRequest,
   requestListPeers,
   requestOwnIdentity,
+  requestTattlerPendingMessageQueue,
 } from './tattler/tattler-pi-events';
 import {
   type ChorusReplyRouteV0,
@@ -57,6 +58,12 @@ let eventUnsubscribers: Array<() => void> = [];
 let ownIdentityRequest: Promise<TattlerIdentityV0> | undefined;
 
 const SELF_CHAT_IDLE_RETRY_MS = 25;
+const TATTLER_PENDING_QUEUE_TIMEOUT_MS = 50;
+
+interface SendChorusMessageOptions {
+  readonly triggerTurn?: boolean;
+  readonly modelVisible?: boolean;
+}
 
 const emptyToolRenderComponent: Component = {
   render: () => [],
@@ -176,7 +183,7 @@ async function openRoom(
     onUpdate: () => activeRoom?.requestRender?.(),
     onLocalParticipantMessage: (post) => {
       const self = post.from === ownIdentity.name;
-      sendChorusMessageToChat(
+      void sendChorusMessageToChatOrQueue(
         pi,
         {
           roomId: post.roomId,
@@ -211,6 +218,40 @@ async function closeRoomUi(ctx: ExtensionCommandContext): Promise<void> {
   clearChorusRoomUi(ctx);
 }
 
+export async function sendChorusMessageToChatOrQueue(
+  pi: ExtensionAPI,
+  details: ChorusIncomingMessageDetails,
+  options: SendChorusMessageOptions = {},
+): Promise<void> {
+  const modelVisible = options.modelVisible ?? true;
+  if (modelVisible) {
+    try {
+      const queueResult = await requestTattlerPendingMessageQueue(
+        pi,
+        {
+          kind: 'chorus.room-message.v0',
+          id: details.postId,
+          roomId: details.roomId,
+          from: details.from,
+          message: details.message,
+          postId: details.postId,
+          broker: details.broker,
+          self: details.self,
+          visible: true,
+        },
+        { timeoutMs: TATTLER_PENDING_QUEUE_TIMEOUT_MS },
+      );
+      if (queueResult.queued) {
+        return;
+      }
+    } catch {
+      // If Tattler has no pending-inbox responder, preserve the existing direct delivery behavior.
+    }
+  }
+
+  sendChorusMessageToChat(pi, details, options);
+}
+
 export function sendChorusSelfMessageToChatWhenIdle(
   pi: ExtensionAPI,
   ctx: Pick<ExtensionContext, 'isIdle'>,
@@ -242,7 +283,7 @@ async function handleRoomPostReceived(pi: ExtensionAPI, post: ChorusRoomPostV0):
   }
 
   const ownIdentity = await resolveOwnIdentity(pi);
-  sendChorusMessageToChat(
+  await sendChorusMessageToChatOrQueue(
     pi,
     {
       roomId: post.roomId,
@@ -271,7 +312,7 @@ async function handleRoomDelivery(pi: ExtensionAPI, delivery: ChorusRoomDelivery
   }
 
   const ownIdentity = await resolveOwnIdentity(pi);
-  sendChorusMessageToChat(
+  await sendChorusMessageToChatOrQueue(
     pi,
     {
       roomId: delivery.roomId,

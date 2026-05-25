@@ -6,13 +6,15 @@ import { appendFile, stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { basename, dirname, join, normalize } from 'node:path';
 import { StringEnum } from '@earendil-works/pi-ai';
-import type { CustomEntry, ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import type { CustomEntry, ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
 import { sessionShortIdGenerator } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
+import { createTattlerPendingInbox } from './tattler-inbox';
+import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
 import { createServerWithNotificationSender, isSocketAlive, sendAgentMessage } from './tattler-ipc';
-import { onListPeersRequest, onOwnIdentityRequest } from './tattler-pi-events';
+import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueRequest } from './tattler-pi-events';
 import {
   buildMessage,
   MAX_MESSAGE_BYTES,
@@ -159,6 +161,10 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
 // Extension Factory
 // ============================================================================
 export default async function (pi: ExtensionAPI) {
+  const pendingInbox = createTattlerPendingInbox();
+  let activeContext: Pick<ExtensionContext, 'isIdle'> | undefined;
+  registerTattlerPendingInboxHooks(pi, pendingInbox);
+
   let tattlerRuntimeDir: string;
   let ownIdentity: TattlerIdentityV0;
   try {
@@ -181,6 +187,7 @@ is used to resume an existing session.
 
   pi.on('session_start', async (evt, ctx) => {
     clearEventResponders();
+    activeContext = ctx;
 
     const sessionUuid = ctx.sessionManager.getSessionId();
     const existingTattlerId = ctx.sessionManager
@@ -215,7 +222,12 @@ is used to resume an existing session.
       }
 
       try {
-        const serverDef = createServerWithNotificationSender(pi);
+        const serverDef = createServerWithNotificationSender({
+          events: pi.events,
+          sendMessage: pi.sendMessage.bind(pi),
+          pendingInbox,
+          isIdle: () => activeContext?.isIdle() ?? true,
+        });
         // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
         try {
           await new Promise<void>((resolve, reject) => {
@@ -264,6 +276,13 @@ is used to resume an existing session.
     eventResponderUnsubscribers = [
       onListPeersRequest(pi, () => listPeerSockets(tattlerRuntimeDir, ownIdentity)),
       onOwnIdentityRequest(pi, () => ownIdentity),
+      onTattlerPendingMessageQueueRequest(pi, (message) => {
+        if (activeContext?.isIdle() !== false) {
+          return { queued: false };
+        }
+
+        return { queued: true, ...pendingInbox.enqueue(message) };
+      }),
     ];
     registerListPeersTool(tattlerRuntimeDir, ownIdentity, pi);
     registerSendMessageTool(tattlerRuntimeDir, ownIdentity, pi);
@@ -271,6 +290,7 @@ is used to resume an existing session.
 
   pi.on('session_shutdown', (_evt, _ctx) => {
     clearEventResponders();
+    activeContext = undefined;
     if (server) {
       server.close();
     }

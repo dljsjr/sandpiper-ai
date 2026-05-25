@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createEventBus } from '@earendil-works/pi-coding-agent';
 import { afterEach, describe, expect, test } from 'vitest';
+import { createTattlerPendingInbox } from './tattler-inbox';
 import { createServerWithNotificationSender, sendAgentMessage, sendPayloadFrame } from './tattler-ipc';
 import { onChorusRoomDelivery, onChorusRoomPostReceived } from './tattler-pi-events';
 import {
@@ -27,11 +28,14 @@ interface SentSystemNotification {
   readonly options: { readonly deliverAs: string; readonly triggerTurn?: boolean };
 }
 
-function fakeRuntime() {
+function fakeRuntime(options: { readonly idle?: boolean } = {}) {
   const notifications: SentSystemNotification[] = [];
+  const pendingInbox = createTattlerPendingInbox();
   return {
     events: createEventBus(),
     notifications,
+    pendingInbox,
+    isIdle: () => options.idle ?? true,
     sendMessage(message: SentSystemNotification['message'], options: SentSystemNotification['options']) {
       notifications.push({ message, options });
     },
@@ -118,6 +122,26 @@ describe('Tattler IPC payload frames', () => {
       messageId: message.id,
     });
     expect(runtime.notifications[0]?.options.triggerTurn).toBe(true);
+  });
+
+  test('ACKs agent messages while busy and keeps them in the pending inbox instead of steering Pi', async () => {
+    const runtime = fakeRuntime({ idle: false });
+    const { peer } = await listen(runtime);
+    const message: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
+      from: 'Piper',
+      message: 'pause and read this later',
+    });
+
+    await expect(sendAgentMessage(peer, message)).resolves.toEqual({ messageIdAck: message.id });
+
+    expect(runtime.notifications).toHaveLength(0);
+    expect(runtime.pendingInbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
+    expect(runtime.pendingInbox.snapshot()[0]?.message).toMatchObject({
+      kind: 'tattler.agent-message.v0',
+      id: message.id,
+      from: 'Piper',
+      message: 'pause and read this later',
+    });
   });
 
   test('ACKs room posts and emits the local room-post received event', async () => {

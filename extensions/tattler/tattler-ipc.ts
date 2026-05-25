@@ -7,6 +7,7 @@ import {
   sendSystemNotification,
   withTimeout,
 } from 'sandpiper-ai-core';
+import type { TattlerPendingInbox } from './tattler-inbox';
 import { emitChorusRoomDelivery, emitChorusRoomPostReceived, type HasPiEventBus } from './tattler-pi-events';
 import {
   type ChorusRoomDeliveryV0,
@@ -56,7 +57,11 @@ export async function isSocketAlive(socketPath: string): Promise<boolean> {
   });
 }
 
-type TattlerIpcRuntime = SystemNotificationSender & HasPiEventBus;
+type TattlerIpcRuntime = SystemNotificationSender &
+  HasPiEventBus & {
+    readonly pendingInbox?: TattlerPendingInbox;
+    isIdle?(): boolean;
+  };
 
 function sendAgentMessageNotification(sender: SystemNotificationSender, message: TattlerAgentMessageV0): void {
   const instructions = `This is a remote message from another coding agent. You are the primary audience for the message. The identity of the agent who sent the message is encoded in the 'from' field.
@@ -94,9 +99,16 @@ function dispatchIncomingPayloadFrame(
 
   try {
     switch (protocolFormat(message)) {
-      case 'tattler.agent-message.v0':
-        sendAgentMessageNotification(runtime, message as TattlerAgentMessageV0);
+      case 'tattler.agent-message.v0': {
+        const agentMessage = message as TattlerAgentMessageV0;
+        if (runtime.pendingInbox && runtime.isIdle?.() === false) {
+          runtime.pendingInbox.enqueueAgentMessage(agentMessage);
+          return;
+        }
+
+        sendAgentMessageNotification(runtime, agentMessage);
         return;
+      }
 
       case 'chorus.room-post.v0':
         emitChorusRoomPostReceived(runtime, message as ChorusRoomPostV0);

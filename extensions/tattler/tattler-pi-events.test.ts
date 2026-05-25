@@ -10,9 +10,11 @@ import {
   onChorusRoomPostReceived,
   onChorusRoomPostRequest,
   onListPeersRequest,
+  onTattlerPendingMessageQueueRequest,
   requestChorusReady,
   requestChorusRoomPost,
   requestListPeers,
+  requestTattlerPendingMessageQueue,
   roomPostToDelivery,
 } from './tattler-pi-events';
 import {
@@ -103,6 +105,31 @@ describe('Chorus Pi event-bus contracts', () => {
     await expect(requestListPeers(consumer, { timeoutMs: 1 })).rejects.toThrow(
       'Timed out waiting for event response on tattler:request:listPeers',
     );
+  });
+
+  test('uses callback replies for Tattler pending message queue requests', async () => {
+    const { producer, consumer } = fakeExtensionPair();
+    const pendingMessage = {
+      kind: 'chorus.room-message.v0' as const,
+      id: 'delivery-1' as TattlerMessageId,
+      roomId: roomId('chorus-dev'),
+      from: 'Piper',
+      message: 'busy-time note',
+      postId: 'post-1' as TattlerMessageId,
+      broker,
+      visible: true,
+    };
+
+    onTattlerPendingMessageQueueRequest(producer, (message) => {
+      expect(message).toEqual(pendingMessage);
+      return { queued: true, accepted: true, key: 'chorus.room-message.v0:chorus-dev:post-1' };
+    });
+
+    await expect(requestTattlerPendingMessageQueue(consumer, pendingMessage)).resolves.toEqual({
+      queued: true,
+      accepted: true,
+      key: 'chorus.room-message.v0:chorus-dev:post-1',
+    });
   });
 
   test('uses callback replies for room posts so concurrent callers receive their own accepted post id', async () => {

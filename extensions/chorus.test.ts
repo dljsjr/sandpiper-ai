@@ -1,6 +1,7 @@
 import { createEventBus, type ExtensionAPI, type ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
 import { describe, expect, test, vi } from 'vitest';
-import chorusExtension, { sendChorusSelfMessageToChatWhenIdle } from './chorus';
+import chorusExtension, { sendChorusMessageToChatOrQueue, sendChorusSelfMessageToChatWhenIdle } from './chorus';
+import { onTattlerPendingMessageQueueRequest } from './tattler/tattler-pi-events';
 import { roomId, type TattlerMessageId } from './tattler/tattler-protocol';
 
 type RegisteredCommand = {
@@ -53,6 +54,39 @@ describe('Chorus extension commands', () => {
 
     expect(pi.sendUserMessage).not.toHaveBeenCalled();
     expect(notify).toHaveBeenCalledWith('Usage: /agent <message>', 'warning');
+  });
+
+  test('queues model-visible Chorus messages through Tattler when the agent is busy', async () => {
+    const { pi } = fakePi();
+    const seenMessages: unknown[] = [];
+    onTattlerPendingMessageQueueRequest(pi, (message) => {
+      seenMessages.push(message);
+      return { queued: true, accepted: true, key: 'chorus.room-message.v0:chorus-dev:post-1' };
+    });
+
+    await sendChorusMessageToChatOrQueue(
+      pi,
+      {
+        roomId: roomId('chorus-dev'),
+        from: 'Piper',
+        message: 'busy-room note',
+        postId: 'post-1' as TattlerMessageId,
+        broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+      },
+      { triggerTurn: true, modelVisible: true },
+    );
+
+    expect(pi.sendMessage).not.toHaveBeenCalled();
+    expect(seenMessages).toEqual([
+      expect.objectContaining({
+        kind: 'chorus.room-message.v0',
+        roomId: 'chorus-dev',
+        from: 'Piper',
+        message: 'busy-room note',
+        postId: 'post-1',
+        visible: true,
+      }),
+    ]);
   });
 
   test('defers display-only self chat messages until the agent is idle', async () => {
