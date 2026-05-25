@@ -62,6 +62,7 @@ type TattlerIpcRuntime = SystemNotificationSender &
     readonly pendingInbox?: TattlerPendingInbox;
     isIdle?(): boolean;
     persistPendingInboxSnapshot?(): void;
+    notifyPendingInbox?(): void;
   };
 
 function sendAgentMessageNotification(sender: SystemNotificationSender, message: TattlerAgentMessageV0): void {
@@ -103,9 +104,13 @@ function dispatchIncomingPayloadFrame(
       case 'tattler.agent-message.v0': {
         const agentMessage = message as TattlerAgentMessageV0;
         if (runtime.pendingInbox && runtime.isIdle?.() === false) {
+          const wasEmpty = runtime.pendingInbox.counts().total === 0;
           const enqueueResult = runtime.pendingInbox.enqueueAgentMessage(agentMessage);
           if (enqueueResult.accepted) {
             runtime.persistPendingInboxSnapshot?.();
+            if (wasEmpty) {
+              runtime.notifyPendingInbox?.();
+            }
           }
           return;
         }

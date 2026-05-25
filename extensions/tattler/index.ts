@@ -7,7 +7,12 @@ import type * as net from 'node:net';
 import { basename, dirname, join, normalize } from 'node:path';
 import { StringEnum } from '@earendil-works/pi-ai';
 import type { CustomEntry, ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
-import { sessionShortIdGenerator } from 'sandpiper-ai-core';
+import {
+  SystemNotificationDelivery,
+  SystemNotificationSourceType,
+  sendSystemNotification,
+  sessionShortIdGenerator,
+} from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
@@ -169,8 +174,27 @@ export default async function (pi: ExtensionAPI) {
   registerTattlerPendingInboxHooks(pi, pendingInbox);
   registerTattlerPendingBatchRenderer(pi);
   registerTattlerReceiveTool(pi, pendingInbox, { isIdle: () => activeContext?.isIdle() ?? true });
+  let pendingInboxNotified = false;
   const persistPendingInboxSnapshot = (): void => {
     pi.appendEntry(TATTLER_PENDING_INBOX_ENTRY_KEY, createTattlerPendingInboxSnapshot(pendingInbox));
+  };
+  const notifyPendingInbox = (): void => {
+    if (pendingInboxNotified) {
+      return;
+    }
+
+    pendingInboxNotified = true;
+    sendSystemNotification(pi, {
+      sourceType: SystemNotificationSourceType.PeerMessage,
+      sourceId: 'tattler-pending-inbox',
+      deliverAs: SystemNotificationDelivery.Steer,
+      triggerTurn: false,
+      instructions:
+        'Pending Tattler/Chorus messages arrived while you were busy. If these messages may affect your current work, call the tattler_receive tool by itself to end this turn and receive them as a batch. This cue is best-effort; the pending inbox is the source of truth.',
+      data: {
+        pendingMessageCount: pendingInbox.counts().total,
+      },
+    });
   };
 
   let tattlerRuntimeDir: string;
@@ -196,6 +220,7 @@ is used to resume an existing session.
   pi.on('session_start', async (evt, ctx) => {
     clearEventResponders();
     pendingInbox.clear();
+    pendingInboxNotified = false;
     restoreTattlerPendingInboxFromSession(pendingInbox, ctx.sessionManager.getEntries());
     activeContext = ctx;
 
@@ -238,6 +263,7 @@ is used to resume an existing session.
           pendingInbox,
           isIdle: () => activeContext?.isIdle() ?? true,
           persistPendingInboxSnapshot,
+          notifyPendingInbox,
         });
         // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
         try {
@@ -292,9 +318,13 @@ is used to resume an existing session.
           return { queued: false };
         }
 
+        const wasEmpty = pendingInbox.counts().total === 0;
         const enqueueResult = pendingInbox.enqueue(message);
         if (enqueueResult.accepted) {
           persistPendingInboxSnapshot();
+          if (wasEmpty) {
+            notifyPendingInbox();
+          }
         }
 
         return { queued: true, ...enqueueResult };
@@ -307,6 +337,7 @@ is used to resume an existing session.
   pi.on('session_shutdown', (_evt, _ctx) => {
     clearEventResponders();
     pendingInbox.clear();
+    pendingInboxNotified = false;
     activeContext = undefined;
     if (server) {
       server.close();
