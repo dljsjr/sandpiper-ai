@@ -190,10 +190,7 @@ export function createTattlerPendingBatchMessage(batch: TattlerPendingBatch): Ta
   return {
     customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
     content: createTattlerPendingBatchContent(batch),
-    // Until the batch renderer lands, keep the batch hidden. Raw batch content is
-    // canonical model context and may include hidden Tattler DMs alongside
-    // visible Chorus messages; default custom-message rendering must not expose it.
-    display: false,
+    display: messages.some((message) => message.visible),
     details: {
       kind: 'batch',
       batchId: batch.batchId,

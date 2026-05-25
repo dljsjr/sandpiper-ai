@@ -33,7 +33,7 @@ describe('Tattler pending inbox', () => {
     expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 0, total: 0 });
   });
 
-  test('keeps mixed visible and hidden batches hidden until a renderer can filter UI content', () => {
+  test('marks mixed batches displayable while keeping model content canonical', () => {
     const inbox = createTattlerPendingInbox();
     const hiddenMessage: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
       id: 'hidden-1' as TattlerMessageId,
@@ -54,7 +54,7 @@ describe('Tattler pending inbox', () => {
 
     const drain = drainPendingInboxToBatch(inbox);
 
-    expect(drain?.message.display).toBe(false);
+    expect(drain?.message.display).toBe(true);
     expect(drain?.message.content).toContain('hidden coordination note');
     expect(drain?.message.content).toContain('visible room note');
     expect(drain?.message.details.messages).toHaveLength(2);
