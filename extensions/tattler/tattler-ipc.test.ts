@@ -4,7 +4,7 @@ import * as net from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createEventBus } from '@earendil-works/pi-coding-agent';
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createTattlerPendingInbox } from './tattler-inbox';
 import { createServerWithNotificationSender, sendAgentMessage, sendPayloadFrame } from './tattler-ipc';
 import { onChorusRoomDelivery, onChorusRoomPostReceived } from './tattler-pi-events';
@@ -28,13 +28,14 @@ interface SentSystemNotification {
   readonly options: { readonly deliverAs: string; readonly triggerTurn?: boolean };
 }
 
-function fakeRuntime(options: { readonly idle?: boolean } = {}) {
+function fakeRuntime(options: { readonly idle?: boolean; readonly persistPendingInboxSnapshot?: () => void } = {}) {
   const notifications: SentSystemNotification[] = [];
   const pendingInbox = createTattlerPendingInbox();
   return {
     events: createEventBus(),
     notifications,
     pendingInbox,
+    persistPendingInboxSnapshot: options.persistPendingInboxSnapshot,
     isIdle: () => options.idle ?? true,
     sendMessage(message: SentSystemNotification['message'], options: SentSystemNotification['options']) {
       notifications.push({ message, options });
@@ -125,7 +126,8 @@ describe('Tattler IPC payload frames', () => {
   });
 
   test('ACKs agent messages while busy and keeps them in the pending inbox instead of steering Pi', async () => {
-    const runtime = fakeRuntime({ idle: false });
+    const persistPendingInboxSnapshot = vi.fn();
+    const runtime = fakeRuntime({ idle: false, persistPendingInboxSnapshot });
     const { peer } = await listen(runtime);
     const message: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
       from: 'Piper',
@@ -142,6 +144,7 @@ describe('Tattler IPC payload frames', () => {
       from: 'Piper',
       message: 'pause and read this later',
     });
+    expect(persistPendingInboxSnapshot).toHaveBeenCalledTimes(1);
   });
 
   test('ACKs room posts and emits the local room-post received event', async () => {

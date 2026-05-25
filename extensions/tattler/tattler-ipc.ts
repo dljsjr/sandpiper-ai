@@ -61,6 +61,7 @@ type TattlerIpcRuntime = SystemNotificationSender &
   HasPiEventBus & {
     readonly pendingInbox?: TattlerPendingInbox;
     isIdle?(): boolean;
+    persistPendingInboxSnapshot?(): void;
   };
 
 function sendAgentMessageNotification(sender: SystemNotificationSender, message: TattlerAgentMessageV0): void {
@@ -102,7 +103,10 @@ function dispatchIncomingPayloadFrame(
       case 'tattler.agent-message.v0': {
         const agentMessage = message as TattlerAgentMessageV0;
         if (runtime.pendingInbox && runtime.isIdle?.() === false) {
-          runtime.pendingInbox.enqueueAgentMessage(agentMessage);
+          const enqueueResult = runtime.pendingInbox.enqueueAgentMessage(agentMessage);
+          if (enqueueResult.accepted) {
+            runtime.persistPendingInboxSnapshot?.();
+          }
           return;
         }
 
