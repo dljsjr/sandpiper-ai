@@ -187,6 +187,7 @@ is used to resume an existing session.
 
   pi.on('session_start', async (evt, ctx) => {
     clearEventResponders();
+    pendingInbox.clear();
     activeContext = ctx;
 
     const sessionUuid = ctx.sessionManager.getSessionId();
@@ -290,6 +291,7 @@ is used to resume an existing session.
 
   pi.on('session_shutdown', (_evt, _ctx) => {
     clearEventResponders();
+    pendingInbox.clear();
     activeContext = undefined;
     if (server) {
       server.close();

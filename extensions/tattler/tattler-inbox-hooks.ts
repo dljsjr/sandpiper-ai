@@ -7,6 +7,8 @@ import {
 } from './tattler-inbox';
 
 export function registerTattlerPendingInboxHooks(pi: Pick<ExtensionAPI, 'on'>, inbox: TattlerPendingInbox): void {
+  const handedToTurnBatchIds = new Set<string>();
+
   pi.on('before_agent_start', () => {
     const drain = drainPendingInboxToBatch(inbox);
     if (!drain) {
@@ -14,6 +16,7 @@ export function registerTattlerPendingInboxHooks(pi: Pick<ExtensionAPI, 'on'>, i
     }
 
     drain.markHandedToTurn();
+    handedToTurnBatchIds.add(drain.batch.batchId);
     return { message: drain.message };
   });
 
@@ -28,5 +31,13 @@ export function registerTattlerPendingInboxHooks(pi: Pick<ExtensionAPI, 'on'>, i
     }
 
     inbox.markBatchDelivered(details.batchId);
+    handedToTurnBatchIds.delete(details.batchId);
+  });
+
+  pi.on('agent_end', () => {
+    for (const batchId of handedToTurnBatchIds) {
+      inbox.releaseBatch(batchId);
+    }
+    handedToTurnBatchIds.clear();
   });
 }

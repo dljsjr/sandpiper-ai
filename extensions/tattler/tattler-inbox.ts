@@ -78,6 +78,11 @@ export class TattlerPendingInbox {
   private readonly items = new Map<string, TattlerPendingInboxItem>();
   private nextSequence = 0;
 
+  clear(): void {
+    this.items.clear();
+    this.nextSequence = 0;
+  }
+
   enqueueAgentMessage(message: TattlerAgentMessageV0): TattlerPendingEnqueueResult {
     return this.enqueue({
       kind: 'tattler.agent-message.v0',
@@ -185,7 +190,10 @@ export function createTattlerPendingBatchMessage(batch: TattlerPendingBatch): Ta
   return {
     customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
     content: createTattlerPendingBatchContent(batch),
-    display: messages.some((message) => message.visible),
+    // Until the batch renderer lands, keep the batch hidden. Raw batch content is
+    // canonical model context and may include hidden Tattler DMs alongside
+    // visible Chorus messages; default custom-message rendering must not expose it.
+    display: false,
     details: {
       kind: 'batch',
       batchId: batch.batchId,
