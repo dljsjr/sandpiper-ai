@@ -114,8 +114,14 @@ describe('Tattler pending batch renderer', () => {
       plainTheme,
     );
 
-    const rendered = component?.render(80).join('\n') ?? '';
-    expect(rendered).toContain('<customMessageBg>');
+    const renderedLines = component?.render(80) ?? [];
+    const rendered = renderedLines.join('\n');
+    const paddedBlankLine = `<customMessageBg>${' '.repeat(80)}</customMessageBg>`;
+    expect(renderedLines[0]).toBe(paddedBlankLine);
+    expect(renderedLines[3]).toBe(paddedBlankLine);
+    expect(renderedLines[4]).toBe('');
+    expect(renderedLines[5]).toBe(paddedBlankLine);
+    expect(renderedLines[8]).toBe(paddedBlankLine);
     expect(rendered).toContain('[Piper] #chorus-dev');
     expect(rendered).toContain('visible room note');
     expect(rendered).toContain('[Librarian] #chorus-dev');
