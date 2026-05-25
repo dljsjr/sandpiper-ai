@@ -40,7 +40,7 @@ export function registerTattlerPendingBatchRenderer(pi: Pick<ExtensionAPI, 'regi
     TATTLER_PENDING_BATCH_CUSTOM_TYPE,
     (message, _options, theme) => {
       const details = message.details;
-      if (details?.kind !== 'batch') {
+      if (details?.kind !== 'batch' || !Array.isArray(details.messages)) {
         return emptyComponent;
       }
 
