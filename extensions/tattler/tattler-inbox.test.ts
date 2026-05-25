@@ -57,6 +57,16 @@ describe('Tattler pending inbox', () => {
     expect(drain?.message.display).toBe(true);
     expect(drain?.message.content).toContain('hidden coordination note');
     expect(drain?.message.content).toContain('visible room note');
+    expect(drain?.message.content).toContain(
+      '<reply_policy audience="room" visibility="visible" tool="send_chorus_reply">',
+    );
+    expect(drain?.message.content).toContain(
+      '<reply_contract audience="room" visibility="visible" tool="send_chorus_reply">',
+    );
+    expect(drain?.message.content).toContain(
+      'The send_chorus_reply message field is the room message other participants will read.',
+    );
+    expect(drain?.message.content).toContain('Write that field in your own SELF/identity voice');
     expect(drain?.message.details.messages).toHaveLength(2);
   });
 

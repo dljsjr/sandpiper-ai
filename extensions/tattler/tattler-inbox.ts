@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { ChorusReplyRouteV0, ChorusRoomId, TattlerAgentMessageV0, TattlerMessageId } from './tattler-protocol';
+import { chorusReplyContractXml, chorusReplyPolicyXml } from './tattler-reply-contract';
 
 export const TATTLER_PENDING_BATCH_CUSTOM_TYPE = 'tattler:pending-batch';
 export const TATTLER_PENDING_INBOX_ENTRY_KEY = 'tattler:pending-inbox';
@@ -249,7 +250,9 @@ function formatPendingMessageContent(message: TattlerPendingMessage, level: numb
     case 'chorus.room-message.v0':
       return [
         `${prefix}<chorus_room_message roomId="${escapeXml(message.roomId)}" postId="${escapeXml(message.postId)}" from="${escapeXml(message.from)}" brokerName="${escapeXml(message.broker.name)}" brokerShortId="${escapeXml(message.broker.shortId)}" brokerSocketPath="${escapeXml(message.broker.socketPath)}">`,
-        `${prefix}  <instructions>This is a Chorus room message from a room participant. Do not reply to every room message. Reply only if you are directly addressed, own the relevant work lane, have new information, or silence would block progress. If you reply substantively, use the send_chorus_reply tool with this roomId, postId, and broker route. If no reply is needed and no other work remains for this turn, use the done tool instead of writing a courtesy acknowledgement. Do not reply with a plain Tattler DM.</instructions>`,
+        `${prefix}  <source>This is a Chorus room message from a room participant.</source>`,
+        chorusReplyPolicyXml(`${prefix}  `),
+        chorusReplyContractXml(`${prefix}  `),
         `${prefix}  <message>${escapeXml(message.message)}</message>`,
         `${prefix}</chorus_room_message>`,
       ];
