@@ -63,9 +63,12 @@ function renderChorusMessage(message: TattlerPendingChorusMessage, width: number
     return wrapTextWithAnsi(text, width).map((wrapped) => truncateToWidth(wrapped, width));
   });
 
-  return [truncateToWidth(badge, width), ...messageLines].map((line) =>
+  const blankLine = theme.bg(backgroundColor, ' '.repeat(Math.max(0, width)));
+  const contentLines = [truncateToWidth(badge, width), ...messageLines].map((line) =>
     theme.bg(backgroundColor, padLineToWidth(line, width)),
   );
+
+  return [blankLine, ...contentLines, blankLine];
 }
 
 function padLineToWidth(line: string, width: number): string {
