@@ -1,47 +1,42 @@
 # Session Stand-Up
 
-## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-25T21:40:50.356Z)
+## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-25T21:59:47.017Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-05-21T17-47-07-171Z_019e4ba5-f223-7d87-935d-a43a8a8f71e9.jsonl
 
 ### Accomplished
-- Reload/smoke of Tattler/Chorus queue recovery succeeded.
-- Observed live in Chorus smoke room `final-final-exam-v2-draft-copy.docx`:
-  - payload-free pending cue arrived while busy;
-  - agents called `tattler_receive` alone;
-  - synthetic `tattler_pending_message_batch` turns arrived, not fake Doug/user prompts;
-  - Chorus broker route metadata survived in batched messages;
-  - replies from batch context worked via `send_chorus_reply`;
-  - second busy burst after drain produced a new cue, confirming cue dedupe reset works.
-- Smoke verdict from Piper/Librarian, Huginn, Muninn, and Sandpiper Dev: queue recovery passes.
-- UI defect found: `tattler_receive` tool call/background styling is missing because the call/result renderers are quiet/empty. Tracked as `TAT-60`; duplicate `TAT-61` closed WONTFIX.
-- Doug made a follow-up architecture decision: idle single-message delivery and busy batch delivery should use the same custom message type/struct/renderer. The one-message idle case should be represented as a batch with one item.
-- Created `TAT-62`: Unify idle and batched Tattler/Chorus custom message type.
+- Post-reload smoke started after Muninn/Huginn approved reload readiness.
+- Reload state reported by Huginn: clean worktree at empty `@` `omrqsusp`; parent `sxrpyyxq a017f56b feat(tattler): unify inbound message batches`; full `bun run check` passing after TAT-62.
+- Post-reload room: `the most final of all exams`.
+- Doug sent “reloaded, test message ahoy”. Sandpiper Dev received it as a one-element `tattler_pending_message_batch`, not legacy `chorus-room-message`, with broker route metadata intact, and replied via `send_chorus_reply`. This validates canonical batch path after reload.
+- Another payload-free pending cue arrived post-reload and Sandpiper Dev called `tattler_receive` by itself.
+- TAT-62 (`feat(tattler): unify inbound message batches`) was reviewed by Sandpiper Dev and Muninn and marked final DONE by Huginn. Key caveat: top-level model text still says messages “arrived while you were busy,” which is now semantically stale for idle/direct one-message delivery; non-blocking wording cleanup.
+- TAT-60 remains NEEDS REVIEW / visually smoke. TAT-62 fixed the batch/custom-message background path; if the original missing color was specifically the quiet `tattler_receive` tool-call row, a small tool-row renderer tweak may still be needed.
+- TAT-64 canonical follow-up for delayed Chat Container rendering/latency instrumentation. Duplicate TAT-65 was closed WONTFIX.
+- TAT-66 canonical follow-up for multi-agent delegation/decision ownership protocol to avoid duplicate ticket creation and duplicate slice claims.
 
 ### In Progress
-- Queue recovery stack is smoke-passed and ready for integrated review/cleanup.
-- `TAT-62` is the next architectural refactor to reduce custom-message divergence.
+- Continue post-reload smoke after compaction/restart if needed.
+- Await any next pending batch after the post-reload `tattler_receive` call.
 
 ### Next Session
-- Check `jj status`; latest checkpoint before this standup was `wzplkoxy 860068ef`, then working copy should be a clean empty child after this checkpoint.
-- If continuing implementation, prioritize:
-  1. `TAT-62`: converge idle `chorus-room-message` and busy `tattler:pending-batch` into one canonical Tattler/Chorus message-batch custom type. Use `content` as canonical model-facing concatenated XML/text; use `details: {kind:"batch", batchId, messages:[...]}` even for one message; renderer handles all visible rendering and filters hidden DMs.
-  2. `TAT-60`: style `tattler_receive` call background while preserving quiet result semantics. This may simplify after TAT-62.
-  3. `TAT-39`: broker-owned participant/audience metadata.
-  4. TAT-44 validator hardening: validate persisted batch details elements and Chorus broker route string fields.
-- For final queue-recovery wrap-up, mark `TAT-36` integrated review complete after any desired review pass.
-
-### Non-blocking Follow-ups
-- `TAT-39`: participant/audience metadata.
-- `TAT-60`: missing `tattler_receive` call/background styling.
-- `TAT-62`: canonicalize message custom type across idle/busy paths.
-- TAT-44 validator hardening: malformed persisted runtime data checks.
+- Check `jj status`. Expected clean empty child after `sxrpyyxq a017f56b` plus checkpoint commits.
+- Continue/review smoke observations:
+  1. canonical one-message batch after reload works (already observed by Sandpiper Dev);
+  2. pending cue after reload still payload-free;
+  3. `tattler_receive` after reload triggers synthetic batch without fake user prompt;
+  4. visually inspect whether batch message background is fixed and whether `tattler_receive` tool-call row still lacks background.
+- If coding next:
+  - TAT-60: confirm/fix quiet tool-call row styling if still missing.
+  - TAT-64: instrument cue/tool/agent_end/sendMessage/message_start/message_end/render timing to separate model deferral from scheduling/render lag.
+  - TAT-66: design delegation/ownership protocol.
+  - TAT-39: participant/audience metadata.
+  - TAT-44 hardening: validate persisted details message elements and Chorus broker route fields.
 
 ### Context
-- Final reviewed/smoke-passed queue-recovery stack includes through:
-  - `ukqlnoyk a5dd149f fix(tattler): reset pending cue after drain`
-  - prior queue commits listed in previous standup.
-- Smoke room observations confirm core path works; hidden direct Tattler DM mixed with visible Chorus and reload/no-dup were not fully live-smoked by Sandpiper Dev, but covered/partially covered by tests and review notes.
+- Queue recovery smoke before reload passed: payload-free cues, `tattler_receive`, synthetic batches, broker metadata, second/third cue reset all worked.
+- TAT-62 unified idle and busy delivery on `tattler:pending-batch`; idle direct Tattler and Chorus now emit one-element batches, and renderer owns visible styling/filtering.
+- Important current open point: top-level batch instructions may now need wording generalized beyond “arrived while busy.”
 
 ## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-25T15:07:57.319Z)
 
