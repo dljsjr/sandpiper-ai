@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { createTattlerPendingInbox } from './tattler-inbox';
-import { buildMessage, type TattlerAgentMessageV0, type TattlerMessageId } from './tattler-protocol';
+import { createTattlerPendingInbox, drainPendingInboxToBatch } from './tattler-inbox';
+import { buildMessage, roomId, type TattlerAgentMessageV0, type TattlerMessageId } from './tattler-protocol';
 
 describe('Tattler pending inbox', () => {
   test('dedupes pending messages and clears them only after delivery is marked', () => {
@@ -31,5 +31,43 @@ describe('Tattler pending inbox', () => {
 
     inbox.markBatchDelivered(batch!.batchId);
     expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 0, total: 0 });
+  });
+
+  test('keeps mixed visible and hidden batches hidden until a renderer can filter UI content', () => {
+    const inbox = createTattlerPendingInbox();
+    const hiddenMessage: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
+      id: 'hidden-1' as TattlerMessageId,
+      from: 'Muninn',
+      message: 'hidden coordination note',
+    });
+    inbox.enqueueAgentMessage(hiddenMessage);
+    inbox.enqueue({
+      kind: 'chorus.room-message.v0',
+      id: 'delivery-1' as TattlerMessageId,
+      roomId: roomId('chorus-dev'),
+      from: 'Piper',
+      message: 'visible room note',
+      postId: 'post-1' as TattlerMessageId,
+      broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+      visible: true,
+    });
+
+    const drain = drainPendingInboxToBatch(inbox);
+
+    expect(drain?.message.display).toBe(false);
+    expect(drain?.message.content).toContain('hidden coordination note');
+    expect(drain?.message.content).toContain('visible room note');
+    expect(drain?.message.details.messages).toHaveLength(2);
+  });
+
+  test('clears session-scoped pending state and sequence numbers', () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'old session' }));
+
+    inbox.clear();
+
+    expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 0, total: 0 });
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'new session' }));
+    expect(inbox.snapshot()[0]?.sequence).toBe(0);
   });
 });
