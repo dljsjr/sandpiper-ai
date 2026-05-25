@@ -28,7 +28,13 @@ interface SentSystemNotification {
   readonly options: { readonly deliverAs: string; readonly triggerTurn?: boolean };
 }
 
-function fakeRuntime(options: { readonly idle?: boolean; readonly persistPendingInboxSnapshot?: () => void } = {}) {
+function fakeRuntime(
+  options: {
+    readonly idle?: boolean;
+    readonly persistPendingInboxSnapshot?: () => void;
+    readonly notifyPendingInbox?: () => void;
+  } = {},
+) {
   const notifications: SentSystemNotification[] = [];
   const pendingInbox = createTattlerPendingInbox();
   return {
@@ -36,6 +42,7 @@ function fakeRuntime(options: { readonly idle?: boolean; readonly persistPending
     notifications,
     pendingInbox,
     persistPendingInboxSnapshot: options.persistPendingInboxSnapshot,
+    notifyPendingInbox: options.notifyPendingInbox,
     isIdle: () => options.idle ?? true,
     sendMessage(message: SentSystemNotification['message'], options: SentSystemNotification['options']) {
       notifications.push({ message, options });
@@ -145,6 +152,34 @@ describe('Tattler IPC payload frames', () => {
       message: 'pause and read this later',
     });
     expect(persistPendingInboxSnapshot).toHaveBeenCalledTimes(1);
+  });
+
+  test('nudges once when the first busy agent message makes the pending inbox non-empty', async () => {
+    const notifyPendingInbox = vi.fn();
+    const runtime = fakeRuntime({ idle: false, notifyPendingInbox });
+    const { peer } = await listen(runtime);
+
+    await expect(
+      sendAgentMessage(
+        peer,
+        buildMessage('tattler.agent-message.v0', {
+          from: 'Piper',
+          message: 'first pending note',
+        }),
+      ),
+    ).resolves.toMatchObject({ messageIdAck: expect.any(String) });
+    await expect(
+      sendAgentMessage(
+        peer,
+        buildMessage('tattler.agent-message.v0', {
+          from: 'Muninn',
+          message: 'second pending note',
+        }),
+      ),
+    ).resolves.toMatchObject({ messageIdAck: expect.any(String) });
+
+    expect(runtime.pendingInbox.counts()).toEqual({ pending: 2, reserved: 0, handedToTurn: 0, total: 2 });
+    expect(notifyPendingInbox).toHaveBeenCalledTimes(1);
   });
 
   test('ACKs room posts and emits the local room-post received event', async () => {
