@@ -11,8 +11,9 @@ import { sessionShortIdGenerator } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
-import { createTattlerPendingInbox } from './tattler-inbox';
+import { createTattlerPendingInbox, TATTLER_PENDING_INBOX_ENTRY_KEY } from './tattler-inbox';
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
+import { createTattlerPendingInboxSnapshot, restoreTattlerPendingInboxFromSession } from './tattler-inbox-persistence';
 import { registerTattlerPendingBatchRenderer } from './tattler-inbox-renderer';
 import { createServerWithNotificationSender, isSocketAlive, sendAgentMessage } from './tattler-ipc';
 import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueRequest } from './tattler-pi-events';
@@ -166,6 +167,9 @@ export default async function (pi: ExtensionAPI) {
   let activeContext: Pick<ExtensionContext, 'isIdle'> | undefined;
   registerTattlerPendingInboxHooks(pi, pendingInbox);
   registerTattlerPendingBatchRenderer(pi);
+  const persistPendingInboxSnapshot = (): void => {
+    pi.appendEntry(TATTLER_PENDING_INBOX_ENTRY_KEY, createTattlerPendingInboxSnapshot(pendingInbox));
+  };
 
   let tattlerRuntimeDir: string;
   let ownIdentity: TattlerIdentityV0;
@@ -190,6 +194,7 @@ is used to resume an existing session.
   pi.on('session_start', async (evt, ctx) => {
     clearEventResponders();
     pendingInbox.clear();
+    restoreTattlerPendingInboxFromSession(pendingInbox, ctx.sessionManager.getEntries());
     activeContext = ctx;
 
     const sessionUuid = ctx.sessionManager.getSessionId();
@@ -230,6 +235,7 @@ is used to resume an existing session.
           sendMessage: pi.sendMessage.bind(pi),
           pendingInbox,
           isIdle: () => activeContext?.isIdle() ?? true,
+          persistPendingInboxSnapshot,
         });
         // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
         try {
@@ -284,7 +290,12 @@ is used to resume an existing session.
           return { queued: false };
         }
 
-        return { queued: true, ...pendingInbox.enqueue(message) };
+        const enqueueResult = pendingInbox.enqueue(message);
+        if (enqueueResult.accepted) {
+          persistPendingInboxSnapshot();
+        }
+
+        return { queued: true, ...enqueueResult };
       }),
     ];
     registerListPeersTool(tattlerRuntimeDir, ownIdentity, pi);
