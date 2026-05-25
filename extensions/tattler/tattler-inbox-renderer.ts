@@ -58,20 +58,25 @@ function renderChorusMessage(message: TattlerPendingChorusMessage, width: number
   const tagColor = message.self ? 'success' : 'accent';
   const backgroundColor = message.self ? 'toolSuccessBg' : 'customMessageBg';
   const badge = `${theme.bold(theme.fg(tagColor, `[${message.from}]`))}${theme.fg('muted', ` #${message.roomId}`)}`;
+  const contentWidth = Math.max(0, width - 2);
   const messageLines = message.message.split(/\r?\n/).flatMap((line) => {
     const text = line.length === 0 ? '␤' : line;
-    return wrapTextWithAnsi(text, width).map((wrapped) => truncateToWidth(wrapped, width));
+    return wrapTextWithAnsi(text, contentWidth).map((wrapped) => truncateToWidth(wrapped, contentWidth));
   });
 
   const blankLine = theme.bg(backgroundColor, ' '.repeat(Math.max(0, width)));
-  const contentLines = [truncateToWidth(badge, width), ...messageLines].map((line) =>
-    theme.bg(backgroundColor, padLineToWidth(line, width)),
+  const contentLines = [truncateToWidth(badge, contentWidth), ...messageLines].map((line) =>
+    theme.bg(backgroundColor, padContentLineToWidth(line, width)),
   );
 
   return [blankLine, ...contentLines, blankLine];
 }
 
-function padLineToWidth(line: string, width: number): string {
-  const padding = Math.max(0, width - visibleWidth(line));
-  return `${line}${' '.repeat(padding)}`;
+function padContentLineToWidth(line: string, width: number): string {
+  if (width <= 0) {
+    return '';
+  }
+
+  const rightPadding = Math.max(1, width - visibleWidth(line) - 1);
+  return ` ${line}${' '.repeat(rightPadding)}`;
 }
