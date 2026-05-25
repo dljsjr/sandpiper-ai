@@ -17,6 +17,7 @@ import {
 import {
   choosePeers,
   clearChorusRoomUi,
+  createChorusMessageComponent,
   registerChorusMessageRenderer,
   sendChorusMessageToChat,
   setChorusRoomUi,
@@ -341,8 +342,14 @@ const SendChorusReplyParameters = Type.Object({
   }),
 });
 
+type ChorusSentMessageDetails = ChorusIncomingMessageDetails & { readonly self: true; readonly status: 'sent' };
+
+type ChorusReplyToolSuccessDetails = ChorusReplyResult & {
+  readonly sentMessage: ChorusSentMessageDetails;
+};
+
 type ChorusReplyToolDetails =
-  | ChorusReplyResult
+  | ChorusReplyToolSuccessDetails
   | { readonly kind: 'error'; readonly messageIdAck: TattlerMessageId; readonly error: string };
 
 function registerChorusAgentCommand(pi: ExtensionAPI): void {
@@ -377,8 +384,18 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
     parameters: SendChorusReplyParameters,
     renderShell: 'self',
     renderCall: () => emptyToolRenderComponent,
-    renderResult: () => emptyToolRenderComponent,
-    async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
+    renderResult: (result, _options, theme) => {
+      const details = result.details;
+      if (!details || details.kind === 'error' || !('sentMessage' in details)) {
+        return emptyToolRenderComponent;
+      }
+
+      return createChorusMessageComponent(
+        details.sentMessage,
+        theme as Parameters<typeof createChorusMessageComponent>[1],
+      );
+    },
+    async execute(_toolCallId, params) {
       let deliveryId = params.postId as TattlerMessageId;
       try {
         const ownIdentity = await requestOwnIdentity(pi);
@@ -398,19 +415,18 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
           sendFrame: sendPayloadFrame,
         });
         deliveryId = result.kind === 'local-post' ? result.postId : result.messageIdAck;
-        if (result.kind === 'local-post') {
-          sendChorusSelfMessageToChatWhenIdle(pi, ctx, {
-            roomId: selectedRoom,
-            from: ownIdentity.name,
-            message: params.message,
-            postId: result.postId,
-            broker,
-            self: true,
-          });
-        }
+        const sentMessage: ChorusSentMessageDetails = {
+          roomId: selectedRoom,
+          from: ownIdentity.name,
+          message: params.message,
+          postId: deliveryId,
+          broker,
+          self: true,
+          status: 'sent',
+        };
         return {
           content: [{ type: 'text', text: 'Chorus reply sent. Do not summarize this tool result.' }],
-          details: result,
+          details: { ...result, sentMessage },
         };
       } catch (err) {
         const errMessage = `Error sending Chorus reply ${deliveryId}: ${err instanceof Error ? err.message : String(err)}`;
