@@ -1,5 +1,5 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 import { createTattlerPendingInbox } from './tattler-inbox';
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
 import { buildMessage } from './tattler-protocol';
@@ -23,8 +23,9 @@ describe('Tattler pending inbox hooks', () => {
     const inbox = createTattlerPendingInbox();
     inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Muninn', message: 'review note' }));
     const { pi, handlers } = captureEventHandlers();
+    const onPendingInboxEmpty = vi.fn();
 
-    registerTattlerPendingInboxHooks(pi as ExtensionAPI, inbox);
+    registerTattlerPendingInboxHooks(pi as ExtensionAPI, inbox, { onPendingInboxEmpty });
 
     const handler = handlers.get('before_agent_start');
     expect(handler).toBeDefined();
@@ -55,14 +56,16 @@ describe('Tattler pending inbox hooks', () => {
     });
 
     expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 0, total: 0 });
+    expect(onPendingInboxEmpty).toHaveBeenCalledTimes(1);
   });
 
   test('releases handed-to-turn batches on agent_end when no matching message_end arrived', async () => {
     const inbox = createTattlerPendingInbox();
     inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'recover me' }));
     const { pi, handlers } = captureEventHandlers();
+    const onPendingInboxEmpty = vi.fn();
 
-    registerTattlerPendingInboxHooks(pi as ExtensionAPI, inbox);
+    registerTattlerPendingInboxHooks(pi as ExtensionAPI, inbox, { onPendingInboxEmpty });
 
     const beforeAgentStart = handlers.get('before_agent_start');
     expect(beforeAgentStart).toBeDefined();
@@ -74,5 +77,6 @@ describe('Tattler pending inbox hooks', () => {
     agentEnd?.({ messages: [] });
 
     expect(inbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
+    expect(onPendingInboxEmpty).not.toHaveBeenCalled();
   });
 });

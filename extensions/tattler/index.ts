@@ -7,12 +7,7 @@ import type * as net from 'node:net';
 import { basename, dirname, join, normalize } from 'node:path';
 import { StringEnum } from '@earendil-works/pi-ai';
 import type { CustomEntry, ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
-import {
-  SystemNotificationDelivery,
-  SystemNotificationSourceType,
-  sendSystemNotification,
-  sessionShortIdGenerator,
-} from 'sandpiper-ai-core';
+import { sessionShortIdGenerator } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
@@ -21,6 +16,7 @@ import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
 import { createTattlerPendingInboxSnapshot, restoreTattlerPendingInboxFromSession } from './tattler-inbox-persistence';
 import { registerTattlerPendingBatchRenderer } from './tattler-inbox-renderer';
 import { createServerWithNotificationSender, isSocketAlive, sendAgentMessage } from './tattler-ipc';
+import { createTattlerPendingInboxNotifier } from './tattler-pending-cue';
 import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueRequest } from './tattler-pi-events';
 import {
   buildMessage,
@@ -171,31 +167,16 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
 export default async function (pi: ExtensionAPI) {
   const pendingInbox = createTattlerPendingInbox();
   let activeContext: Pick<ExtensionContext, 'isIdle'> | undefined;
-  registerTattlerPendingInboxHooks(pi, pendingInbox);
+  const pendingInboxNotifier = createTattlerPendingInboxNotifier(pi, () => pendingInbox.counts().total);
+  registerTattlerPendingInboxHooks(pi, pendingInbox, {
+    onPendingInboxEmpty: pendingInboxNotifier.reset,
+  });
   registerTattlerPendingBatchRenderer(pi);
   registerTattlerReceiveTool(pi, pendingInbox, { isIdle: () => activeContext?.isIdle() ?? true });
-  let pendingInboxNotified = false;
   const persistPendingInboxSnapshot = (): void => {
     pi.appendEntry(TATTLER_PENDING_INBOX_ENTRY_KEY, createTattlerPendingInboxSnapshot(pendingInbox));
   };
-  const notifyPendingInbox = (): void => {
-    if (pendingInboxNotified) {
-      return;
-    }
-
-    pendingInboxNotified = true;
-    sendSystemNotification(pi, {
-      sourceType: SystemNotificationSourceType.PeerMessage,
-      sourceId: 'tattler-pending-inbox',
-      deliverAs: SystemNotificationDelivery.Steer,
-      triggerTurn: false,
-      instructions:
-        'Pending Tattler/Chorus messages arrived while you were busy. If these messages may affect your current work, call the tattler_receive tool by itself to end this turn and receive them as a batch. This cue is best-effort; the pending inbox is the source of truth.',
-      data: {
-        pendingMessageCount: pendingInbox.counts().total,
-      },
-    });
-  };
+  const notifyPendingInbox = pendingInboxNotifier.notify;
 
   let tattlerRuntimeDir: string;
   let ownIdentity: TattlerIdentityV0;
@@ -220,7 +201,7 @@ is used to resume an existing session.
   pi.on('session_start', async (evt, ctx) => {
     clearEventResponders();
     pendingInbox.clear();
-    pendingInboxNotified = false;
+    pendingInboxNotifier.reset();
     restoreTattlerPendingInboxFromSession(pendingInbox, ctx.sessionManager.getEntries());
     activeContext = ctx;
 
@@ -337,7 +318,7 @@ is used to resume an existing session.
   pi.on('session_shutdown', (_evt, _ctx) => {
     clearEventResponders();
     pendingInbox.clear();
-    pendingInboxNotified = false;
+    pendingInboxNotifier.reset();
     activeContext = undefined;
     if (server) {
       server.close();
