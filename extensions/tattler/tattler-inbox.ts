@@ -84,13 +84,7 @@ export class TattlerPendingInbox {
   }
 
   enqueueAgentMessage(message: TattlerAgentMessageV0): TattlerPendingEnqueueResult {
-    return this.enqueue({
-      kind: 'tattler.agent-message.v0',
-      id: message.id,
-      from: message.from,
-      message: message.message,
-      visible: false,
-    });
+    return this.enqueue(createTattlerPendingAgentMessage(message));
   }
 
   enqueue(message: TattlerPendingMessage): TattlerPendingEnqueueResult {
@@ -170,6 +164,16 @@ export function createTattlerPendingInbox(): TattlerPendingInbox {
   return new TattlerPendingInbox();
 }
 
+export function createTattlerPendingAgentMessage(message: TattlerAgentMessageV0): TattlerPendingAgentMessage {
+  return {
+    kind: 'tattler.agent-message.v0',
+    id: message.id,
+    from: message.from,
+    message: message.message,
+    visible: false,
+  };
+}
+
 export function drainPendingInboxToBatch(inbox: TattlerPendingInbox): TattlerPendingInboxDrain | undefined {
   const batch = inbox.reserveBatch();
   if (!batch) {
@@ -186,14 +190,24 @@ export function drainPendingInboxToBatch(inbox: TattlerPendingInbox): TattlerPen
 }
 
 export function createTattlerPendingBatchMessage(batch: TattlerPendingBatch): TattlerPendingBatchCustomMessage {
-  const messages = batch.items.map((item) => item.message);
+  return createTattlerPendingBatchMessageFromMessages(
+    batch.items.map((item) => item.message),
+    { batchId: batch.batchId },
+  );
+}
+
+export function createTattlerPendingBatchMessageFromMessages(
+  messages: readonly TattlerPendingMessage[],
+  options: { readonly batchId?: string; readonly modelVisible?: boolean } = {},
+): TattlerPendingBatchCustomMessage {
+  const batchId = options.batchId ?? `tattler-batch-${randomUUID()}`;
   return {
     customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-    content: createTattlerPendingBatchContent(batch),
+    content: options.modelVisible === false ? '' : createTattlerPendingBatchContent(batchId, messages),
     display: messages.some((message) => message.visible),
     details: {
       kind: 'batch',
-      batchId: batch.batchId,
+      batchId,
       messages,
     },
   };
@@ -208,14 +222,14 @@ export function pendingMessageKey(message: TattlerPendingMessage): string {
   }
 }
 
-function createTattlerPendingBatchContent(batch: TattlerPendingBatch): string {
+function createTattlerPendingBatchContent(batchId: string, messages: readonly TattlerPendingMessage[]): string {
   const lines = [
-    `<tattler_pending_message_batch batchId="${escapeXml(batch.batchId)}" count="${batch.items.length}">`,
+    `<tattler_pending_message_batch batchId="${escapeXml(batchId)}" count="${messages.length}">`,
     '  <instructions>These Tattler/Chorus messages arrived while you were busy. Process them in arrival order. Respond only when a message warrants a substantive reply; do not acknowledge every message.</instructions>',
   ];
 
-  for (const item of batch.items) {
-    lines.push(...formatPendingMessageContent(item.message, 1));
+  for (const message of messages) {
+    lines.push(...formatPendingMessageContent(message, 1));
   }
 
   lines.push('</tattler_pending_message_batch>');

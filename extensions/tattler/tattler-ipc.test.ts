@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createEventBus } from '@earendil-works/pi-coding-agent';
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { createTattlerPendingInbox } from './tattler-inbox';
+import { createTattlerPendingInbox, type TattlerPendingBatchCustomMessage } from './tattler-inbox';
 import { createServerWithNotificationSender, sendAgentMessage, sendPayloadFrame } from './tattler-ipc';
 import { onChorusRoomDelivery, onChorusRoomPostReceived } from './tattler-pi-events';
 import {
@@ -19,13 +19,9 @@ import {
   type TattlerIdentityV0,
 } from './tattler-protocol';
 
-interface SentSystemNotification {
-  readonly message: {
-    readonly details: {
-      readonly data?: Record<string, unknown>;
-    };
-  };
-  readonly options: { readonly deliverAs: string; readonly triggerTurn?: boolean };
+interface SentMessage {
+  readonly message: TattlerPendingBatchCustomMessage;
+  readonly options: { readonly deliverAs: 'steer'; readonly triggerTurn?: boolean };
 }
 
 function fakeRuntime(
@@ -35,7 +31,7 @@ function fakeRuntime(
     readonly notifyPendingInbox?: () => void;
   } = {},
 ) {
-  const notifications: SentSystemNotification[] = [];
+  const notifications: SentMessage[] = [];
   const pendingInbox = createTattlerPendingInbox();
   return {
     events: createEventBus(),
@@ -44,7 +40,7 @@ function fakeRuntime(
     persistPendingInboxSnapshot: options.persistPendingInboxSnapshot,
     notifyPendingInbox: options.notifyPendingInbox,
     isIdle: () => options.idle ?? true,
-    sendMessage(message: SentSystemNotification['message'], options: SentSystemNotification['options']) {
+    sendMessage(message: SentMessage['message'], options: SentMessage['options']) {
       notifications.push({ message, options });
     },
   };
@@ -113,7 +109,7 @@ describe('Tattler IPC payload frames', () => {
     shortId: 'broker',
   };
 
-  test('preserves agent-message ACK and notification behavior through the existing sendAgentMessage API', async () => {
+  test('preserves agent-message ACK and emits idle messages as single-message batches', async () => {
     const runtime = fakeRuntime();
     const { peer } = await listen(runtime);
     const message: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
@@ -124,12 +120,25 @@ describe('Tattler IPC payload frames', () => {
     await expect(sendAgentMessage(peer, message)).resolves.toEqual({ messageIdAck: message.id });
 
     expect(runtime.notifications).toHaveLength(1);
-    expect(runtime.notifications[0]?.message.details.data).toMatchObject({
-      from: 'Piper',
-      message: 'hello',
-      messageId: message.id,
+    expect(runtime.notifications[0]?.message).toMatchObject({
+      customType: 'tattler:pending-batch',
+      display: false,
+      details: {
+        kind: 'batch',
+        messages: [
+          {
+            kind: 'tattler.agent-message.v0',
+            id: message.id,
+            from: 'Piper',
+            message: 'hello',
+            visible: false,
+          },
+        ],
+      },
     });
-    expect(runtime.notifications[0]?.options.triggerTurn).toBe(true);
+    expect(runtime.notifications[0]?.message.content).toContain('<tattler_pending_message_batch');
+    expect(runtime.notifications[0]?.message.content).toContain('<tattler_agent_message');
+    expect(runtime.notifications[0]?.options).toEqual({ triggerTurn: true, deliverAs: 'steer' });
   });
 
   test('ACKs agent messages while busy and keeps them in the pending inbox instead of steering Pi', async () => {

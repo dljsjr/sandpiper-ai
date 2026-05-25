@@ -1,6 +1,7 @@
 import { createEventBus, type ExtensionAPI, type ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
 import { describe, expect, test, vi } from 'vitest';
 import chorusExtension, { sendChorusMessageToChatOrQueue, sendChorusSelfMessageToChatWhenIdle } from './chorus';
+import { TATTLER_PENDING_BATCH_CUSTOM_TYPE } from './tattler/tattler-inbox';
 import { onTattlerPendingMessageQueueRequest } from './tattler/tattler-pi-events';
 import { roomId, type TattlerMessageId } from './tattler/tattler-protocol';
 
@@ -89,6 +90,45 @@ describe('Chorus extension commands', () => {
     ]);
   });
 
+  test('emits model-visible idle Chorus messages as one-element Tattler batches', async () => {
+    const { pi } = fakePi();
+    onTattlerPendingMessageQueueRequest(pi, () => ({ queued: false }));
+
+    await sendChorusMessageToChatOrQueue(
+      pi,
+      {
+        roomId: roomId('chorus-dev'),
+        from: 'Piper',
+        message: 'idle-room note',
+        postId: 'post-1' as TattlerMessageId,
+        broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+      },
+      { triggerTurn: true, modelVisible: true },
+    );
+
+    expect(pi.sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+        content: expect.stringContaining('count="1"'),
+        display: true,
+        details: expect.objectContaining({
+          kind: 'batch',
+          messages: [
+            expect.objectContaining({
+              kind: 'chorus.room-message.v0',
+              roomId: 'chorus-dev',
+              from: 'Piper',
+              message: 'idle-room note',
+              postId: 'post-1',
+              visible: true,
+            }),
+          ],
+        }),
+      }),
+      { triggerTurn: true, deliverAs: 'steer' },
+    );
+  });
+
   test('defers display-only self chat messages until the agent is idle', async () => {
     vi.useFakeTimers();
     try {
@@ -117,10 +157,13 @@ describe('Chorus extension commands', () => {
 
       expect(pi.sendMessage).toHaveBeenCalledWith(
         expect.objectContaining({
-          customType: 'chorus-room-message',
+          customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
           content: '',
           display: true,
-          details: expect.objectContaining({ from: 'Piper', message: 'local reply', self: true }),
+          details: expect.objectContaining({
+            kind: 'batch',
+            messages: [expect.objectContaining({ from: 'Piper', message: 'local reply', self: true, visible: true })],
+          }),
         }),
         { triggerTurn: false, deliverAs: 'steer' },
       );
