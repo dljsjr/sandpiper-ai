@@ -218,8 +218,13 @@ describe('Chorus broker runtime', () => {
     expect(content).toContain('<chorus_room_message');
     expect(content).toContain('roomId="chorus-dev"');
     expect(content).toContain('brokerSocketPath="/tmp/chorus-dev.sock"');
-    expect(content).toContain('room participant');
-    expect(content).toContain('Do not reply to every room message');
+    expect(content).toContain('<reply_policy audience="room" visibility="visible" tool="send_chorus_reply">');
+    expect(content).toContain(
+      'Reply only if you are directly addressed, own the relevant work lane, have new information, or silence would block progress.',
+    );
+    expect(content).toContain('<reply_contract audience="room" visibility="visible" tool="send_chorus_reply">');
+    expect(content).toContain('The send_chorus_reply message field is the room message other participants will read.');
+    expect(content).toContain('Write that field in your own SELF/identity voice');
     expect(content).toContain('no other work remains for this turn');
     expect(content).toContain('use the done tool');
     expect(content).toContain('reply note');

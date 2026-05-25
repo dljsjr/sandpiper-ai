@@ -10,8 +10,21 @@ type RegisteredCommand = {
   readonly handler: (args: string, ctx: ExtensionCommandContext) => Promise<void>;
 };
 
+type RegisteredTool = {
+  readonly name: string;
+  readonly promptGuidelines?: readonly string[];
+  readonly parameters?: {
+    readonly properties?: {
+      readonly message?: {
+        readonly description?: string;
+      };
+    };
+  };
+};
+
 function fakePi() {
   const commands = new Map<string, RegisteredCommand>();
+  const tools: RegisteredTool[] = [];
   const pi = {
     events: createEventBus(),
     on: vi.fn(),
@@ -19,15 +32,32 @@ function fakePi() {
       commands.set(name, command);
     }),
     registerMessageRenderer: vi.fn(),
-    registerTool: vi.fn(),
+    registerTool: vi.fn((tool: RegisteredTool) => {
+      tools.push(tool);
+    }),
     sendMessage: vi.fn(),
     sendUserMessage: vi.fn(),
   } as unknown as ExtensionAPI;
 
-  return { pi, commands };
+  return { pi, commands, tools };
 }
 
 describe('Chorus extension commands', () => {
+  test('registers reply tool guidance that treats the message as room-visible authored prose', () => {
+    const { pi, tools } = fakePi();
+    chorusExtension(pi);
+
+    const tool = tools.find((registeredTool) => registeredTool.name === 'send_chorus_reply');
+
+    expect(tool?.promptGuidelines).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('room message other participants will read'),
+        expect.stringContaining('own SELF/identity voice'),
+      ]),
+    );
+    expect(tool?.parameters?.properties?.message?.description).toContain('SELF/identity voice');
+  });
+
   test('registers /agent as a discoverable local-agent escape hatch', async () => {
     const { pi, commands } = fakePi();
     chorusExtension(pi);

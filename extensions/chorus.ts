@@ -335,7 +335,10 @@ const SendChorusReplyParameters = Type.Object({
   brokerName: Type.String({ description: 'Broker route name from the incoming Chorus message' }),
   brokerShortId: Type.String({ description: 'Broker route shortId from the incoming Chorus message' }),
   brokerSocketPath: Type.String({ description: 'Broker route socketPath from the incoming Chorus message' }),
-  message: Type.String({ description: 'Reply text to send to the Chorus room broker' }),
+  message: Type.String({
+    description:
+      'The room-visible reply text to send through the Chorus broker; write it in your own SELF/identity voice.',
+  }),
 });
 
 type ChorusReplyToolDetails =
@@ -369,6 +372,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
       'Use this when a visible Chorus room message asks for a substantive reply.',
       'Copy roomId, postId, and broker route fields from the Chorus message metadata in context.',
       'Do not use send_peer_message for Chorus room replies unless the user explicitly asks for a direct Tattler DM.',
+      'The tool message field is the actual room message other participants will read; write it in your own SELF/identity voice, not as generic tool or status prose.',
     ],
     parameters: SendChorusReplyParameters,
     renderShell: 'self',
