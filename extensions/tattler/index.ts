@@ -13,6 +13,7 @@ import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
 import { createTattlerPendingInbox } from './tattler-inbox';
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
+import { registerTattlerPendingBatchRenderer } from './tattler-inbox-renderer';
 import { createServerWithNotificationSender, isSocketAlive, sendAgentMessage } from './tattler-ipc';
 import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueRequest } from './tattler-pi-events';
 import {
@@ -164,6 +165,7 @@ export default async function (pi: ExtensionAPI) {
   const pendingInbox = createTattlerPendingInbox();
   let activeContext: Pick<ExtensionContext, 'isIdle'> | undefined;
   registerTattlerPendingInboxHooks(pi, pendingInbox);
+  registerTattlerPendingBatchRenderer(pi);
 
   let tattlerRuntimeDir: string;
   let ownIdentity: TattlerIdentityV0;
