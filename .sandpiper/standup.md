@@ -1,45 +1,33 @@
 # Session Stand-Up
 
-## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-25T19:08:19.216Z)
+## Session 019e4ba5-f223-7d87-935d-a43a8a8f71e9 (Updated: 2026-05-25T19:16:02.145Z)
 
 Session file: /Users/doug.stephen/.sandpiper/agent/sessions/--Users-doug.stephen-git-sandpiper-ai--/2026-05-21T17-47-07-171Z_019e4ba5-f223-7d87-935d-a43a8a8f71e9.jsonl
 
 ### Accomplished
-- Chorus/Tattler hardening design has converged after final dogfood.
-- Agreed problem split:
-  1. interim Tattler/Chorus messages can be serialized or lost if routed through Pi steer/followUp while an agent is busy;
-  2. main chat rendering is transcript/model-injection coupled, while Chorus widget can be live room surface;
-  3. abort before queued custom messages drain can be data/context loss, not just UI.
-- Agreed no-upstream architecture:
-  - Tattler owns a durable pending inbox for inbound messages while busy.
-  - `before_agent_start` is the universal durable drain point for any next agent turn.
-  - `tattler_receive` is a cooperative model-initiated early-yield tool, not the only correctness path.
-  - Chorus uses the Tattler inbox/batch machinery and remains the visible room consumer.
-  - Batch custom message uses model-facing `content` plus structured renderer-only `details.messages[]` so a single durable custom_message can render as individual message blocks.
-  - Avoid `context` hook as default because it is provider-payload-only and cache/replay hostile.
-  - Keep semantic Chorus room reply affordance; do not collapse visible room replies into raw `send_peer_message`.
-  - Add broker-owned participant/audience metadata to Chorus room messages.
-- Created/updated tasks: `TAT-34` through `TAT-39`, with `TAT-36` pending inbox batching, `TAT-37` abort/context verification, `TAT-38` `tattler_receive`, and `TAT-39` participant metadata.
-- Latest agreed lanes:
-  - Piper/Librarian: IA/work plan + Trail breakdown/subtasks/assignments.
-  - Huginn: source exploration/refactor points/Pi API boundaries.
-  - Muninn + Sandpiper Dev: read-only architecture/code review as work lands.
+- Corrected the synthetic receive design after Huginn source read and Doug UX concern.
+- Important Pi nuance: `before_agent_start` only runs through normal prompt / `sendUserMessage()` paths. `pi.sendMessage(customMessage, { triggerTurn:true })` calls `_runAgentPrompt(appMessage)` directly and bypasses `before_agent_start`.
+- `sendUserMessage` is rejected for synthetic receive because it renders as Doug/user, which is misleading.
+- Revised invariant: the shared drain helper/schema is universal, not `before_agent_start` itself.
+  - User-resume path: `before_agent_start` calls `drainPendingInboxToBatch()` and returns the canonical batch custom message alongside the user prompt.
+  - Cooperative receive path: `tattler_receive` sets receive flag + `terminate:true`; `agent_end` waits until idle; then calls the same helper and `pi.sendMessage(batchCustomMessage, { triggerTurn:true })`.
+  - Both paths persist normal `custom_message` entries and share content/details/batchId/dedupe semantics.
+- This preserves extension-authored durable context without fake user-authored rendering.
 
 ### In Progress
-- Await Piper IA/work plan and Huginn exploration output.
-- Sandpiper Dev role here: review plans/diffs for architecture, public Pi API boundaries, queue/data-loss semantics, tool-surface restraint, and task coherence. Do not implement unless asked.
+- Await Piper IA/work plan and Huginn seam map finalization before coding.
+- Sandpiper Dev review lane remains active/read-only.
 
 ### Next Session
-- Check `jj status`; current working copy has unrelated `extensions/system/startup-hooks.ts` WIP. Do not mix it into Chorus/Tattler commits.
-- Review Piper’s IA/work plan and Huginn’s code/Pi exploration when they arrive.
-- Review against key invariants: Tattler pending inbox source of truth; `before_agent_start` durable drain; `tattler_receive` cooperative interruption; widget/live display vs transcript/context split; broker-owned participant snapshots; no private Pi internals unless explicitly accepted; no tool sprawl.
+- Check `jj status`; unrelated `extensions/system/startup-hooks.ts` WIP should still be preserved and not mixed.
+- Review plans/diffs against updated invariant: shared drain helper/schema; `before_agent_start` for real user prompt recovery; `sendMessage(triggerTurn:true)` for synthetic custom-message receive turn; no `sendUserMessage` synthetic receive.
+- Ensure tests cover both paths and prove they create equivalent canonical batch custom messages.
 
 ### Blockers
-- None for planning/review. Implementation still needs careful tests around before_agent_start persistence, abort recovery, duplicate delivery, renderer batches, and participant metadata.
+- None; this is a design correction to avoid misleading user-message semantics.
 
 ### Context
-- Latest checkpoint commits: `vqqmrqyr b79be6e6`, `vmwvtptr b6d5758f`, `vumrkktz 7830375a`.
-- Current working copy before this checkpoint had only unrelated `extensions/system/startup-hooks.ts` WIP.
+- Latest checkpoint before this one: `qvonuqsw 5ba123db chore: checkpoint tattler implementation lanes` and `vumrkktz 7830375a` participant metadata checkpoint.
 
 ## Session 019e51bf-9ff6-7044-897e-24ff87b27adb (Updated: 2026-05-25T15:07:57.319Z)
 
