@@ -52,6 +52,7 @@ export interface ChorusIncomingMessageDetails {
   readonly postId: TattlerMessageId;
   readonly broker: ChorusReplyRouteV0;
   readonly self?: boolean;
+  readonly status?: 'sent' | 'acked';
 }
 
 export interface ChorusReplyOptions {

@@ -239,7 +239,8 @@ export function createChorusMessageComponent(details: ChorusIncomingMessageDetai
   const room = ` #${details.roomId}`;
   const tagColor = details.self ? 'success' : 'accent';
   const backgroundColor = details.self ? 'toolSuccessBg' : 'customMessageBg';
-  const badge = `${theme.bold(theme.fg(tagColor, `[${details.from}]`))}${theme.fg('muted', room)}`;
+  const status = details.status ? theme.fg('dim', ` ${details.status}`) : '';
+  const badge = `${theme.bold(theme.fg(tagColor, `[${details.from}]`))}${status}${theme.fg('muted', room)}`;
   const box = new Box(1, 1, (text) => theme.bg(backgroundColor, text));
   box.addChild(new Text(`${badge}\n${details.message}`, 0, 0));
   return box;

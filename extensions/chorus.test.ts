@@ -10,6 +10,12 @@ type RegisteredCommand = {
   readonly handler: (args: string, ctx: ExtensionCommandContext) => Promise<void>;
 };
 
+type ToolRenderTheme = {
+  fg: (color: 'accent' | 'dim' | 'muted' | 'success', text: string) => string;
+  bg: (color: 'customMessageBg' | 'toolSuccessBg', text: string) => string;
+  bold: (text: string) => string;
+};
+
 type RegisteredTool = {
   readonly name: string;
   readonly promptGuidelines?: readonly string[];
@@ -20,6 +26,18 @@ type RegisteredTool = {
       };
     };
   };
+  readonly renderResult?: (
+    result: { readonly content: Array<{ readonly type: 'text'; readonly text: string }>; readonly details?: unknown },
+    options: { readonly expanded: boolean; readonly isPartial: boolean },
+    theme: ToolRenderTheme,
+    context: unknown,
+  ) => { render(width: number): string[] };
+};
+
+const markerTheme: ToolRenderTheme = {
+  fg: (color, text) => `<fg:${color}>${text}</fg:${color}>`,
+  bg: (color, text) => `<bg:${color}>${text}</bg:${color}>`,
+  bold: (text) => `<bold>${text}</bold>`,
 };
 
 function fakePi() {
@@ -56,6 +74,58 @@ describe('Chorus extension commands', () => {
       ]),
     );
     expect(tool?.parameters?.properties?.message?.description).toContain('SELF/identity voice');
+  });
+
+  test('renders successful replies as local sent receipts', () => {
+    const { pi, tools } = fakePi();
+    chorusExtension(pi);
+
+    const tool = tools.find((registeredTool) => registeredTool.name === 'send_chorus_reply');
+    const component = tool?.renderResult?.(
+      {
+        content: [{ type: 'text', text: 'Chorus reply sent. Do not summarize this tool result.' }],
+        details: {
+          kind: 'remote-delivery',
+          messageIdAck: 'reply-1',
+          sentMessage: {
+            roomId: roomId('chorus-dev'),
+            from: 'Piper',
+            message: 'local reply',
+            postId: 'reply-1' as TattlerMessageId,
+            broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+            self: true,
+            status: 'sent',
+          },
+        },
+      },
+      { expanded: false, isPartial: false },
+      markerTheme,
+      {},
+    );
+
+    const rendered = component?.render(80).join('\n');
+    expect(rendered).toContain('<fg:success>[Piper]</fg:success>');
+    expect(rendered).toContain('<fg:dim> sent</fg:dim>');
+    expect(rendered).toContain('local reply');
+    expect(rendered).toContain('<bg:toolSuccessBg>');
+  });
+
+  test('renders older successful reply results as empty components', () => {
+    const { pi, tools } = fakePi();
+    chorusExtension(pi);
+
+    const tool = tools.find((registeredTool) => registeredTool.name === 'send_chorus_reply');
+    const component = tool?.renderResult?.(
+      {
+        content: [{ type: 'text', text: 'Chorus reply sent. Do not summarize this tool result.' }],
+        details: { kind: 'remote-delivery', messageIdAck: 'reply-1' },
+      },
+      { expanded: false, isPartial: false },
+      markerTheme,
+      {},
+    );
+
+    expect(component?.render(80)).toEqual([]);
   });
 
   test('registers /agent as a discoverable local-agent escape hatch', async () => {

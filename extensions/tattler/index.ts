@@ -110,6 +110,8 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
     promptSnippet:
       'Send a message to another Tattler participant. Use `addressType` to control how the `id` property should be interpreted',
     promptGuidelines: [
+      'When using tools that send messages, populate the message body as if you were generating a response to a user prompt.',
+      'Do not fall back to a robotic personality just because you are using a tool instead of chatting directly. Messages MUST utilize ALL personality and identity instructions you have been given.',
       'Use `send_peer_message` directly without consulting `list_peers` if you know any of the shortId, name, or UDS socket path for your recipient',
     ],
     parameters: Type.Object({
