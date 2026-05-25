@@ -1,3 +1,4 @@
+import type { TattlerPendingEnqueueResult, TattlerPendingMessage } from './tattler-inbox';
 import type {
   ChorusRoomDeliveryV0,
   ChorusRoomId,
@@ -28,6 +29,7 @@ type EventReject = (error: Error) => void;
 const TattlerPiEventBusKey = {
   listPeers: 'tattler:request:listPeers',
   ownIdentity: 'tattler:request:ownIdentity',
+  pendingMessageQueue: 'tattler:request:pendingMessageQueue',
 } as const;
 
 const ChorusPiEventBusKey = {
@@ -48,6 +50,14 @@ interface EventRequest<TResponse> {
 }
 
 interface ChorusRoomPostEventRequest extends ChorusRoomPostRequest, EventRequest<ChorusRoomPostResponse> {}
+
+export type TattlerPendingMessageQueueResponse =
+  | ({ readonly queued: true } & TattlerPendingEnqueueResult)
+  | { readonly queued: false };
+
+interface TattlerPendingMessageQueueEventRequest extends EventRequest<TattlerPendingMessageQueueResponse> {
+  readonly message: TattlerPendingMessage;
+}
 
 export interface ChorusReadyEvent {
   /** Monotonic generation for this extension-runtime registration. */
@@ -134,6 +144,58 @@ export async function requestOwnIdentity(pi: HasPiEventBus, options?: EventReque
 export function onOwnIdentityRequest(pi: HasPiEventBus, handler: () => Awaitable<TattlerIdentityV0>): () => void {
   return pi.events.on(TattlerPiEventBusKey.ownIdentity, (data) => {
     respond(data, handler);
+  });
+}
+
+export async function requestTattlerPendingMessageQueue(
+  pi: HasPiEventBus,
+  message: TattlerPendingMessage,
+  options?: EventRequestOptions,
+): Promise<TattlerPendingMessageQueueResponse> {
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_EVENT_REQUEST_TIMEOUT_MS;
+
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      reject(new Error(`Timed out waiting for event response on ${TattlerPiEventBusKey.pendingMessageQueue}`));
+    }, timeoutMs);
+
+    const finish = (complete: () => void): void => {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      clearTimeout(timeout);
+      complete();
+    };
+
+    pi.events.emit(TattlerPiEventBusKey.pendingMessageQueue, {
+      message,
+      reply: (response: TattlerPendingMessageQueueResponse) => finish(() => resolve(response)),
+      reject: (error: Error) => finish(() => reject(error)),
+    } satisfies TattlerPendingMessageQueueEventRequest);
+  });
+}
+
+export function onTattlerPendingMessageQueueRequest(
+  pi: HasPiEventBus,
+  handler: (message: TattlerPendingMessage) => Awaitable<TattlerPendingMessageQueueResponse>,
+): () => void {
+  return pi.events.on(TattlerPiEventBusKey.pendingMessageQueue, (data) => {
+    if (!isEventRequest<TattlerPendingMessageQueueResponse>(data)) {
+      return;
+    }
+
+    const { message, reply, reject } = data as TattlerPendingMessageQueueEventRequest;
+    void Promise.resolve()
+      .then(() => handler(message))
+      .then(reply, (err: unknown) => {
+        reject(err instanceof Error ? err : new Error(String(err)));
+      });
   });
 }
 
