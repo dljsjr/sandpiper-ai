@@ -6,7 +6,15 @@ import {
   type TattlerPendingInbox,
 } from './tattler-inbox';
 
-export function registerTattlerPendingInboxHooks(pi: Pick<ExtensionAPI, 'on'>, inbox: TattlerPendingInbox): void {
+interface TattlerPendingInboxHookOptions {
+  onPendingInboxEmpty?(): void;
+}
+
+export function registerTattlerPendingInboxHooks(
+  pi: Pick<ExtensionAPI, 'on'>,
+  inbox: TattlerPendingInbox,
+  options: TattlerPendingInboxHookOptions = {},
+): void {
   const handedToTurnBatchIds = new Set<string>();
 
   pi.on('before_agent_start', () => {
@@ -32,6 +40,7 @@ export function registerTattlerPendingInboxHooks(pi: Pick<ExtensionAPI, 'on'>, i
 
     inbox.markBatchDelivered(details.batchId);
     handedToTurnBatchIds.delete(details.batchId);
+    notifyIfEmpty();
   });
 
   pi.on('agent_end', () => {
@@ -39,5 +48,12 @@ export function registerTattlerPendingInboxHooks(pi: Pick<ExtensionAPI, 'on'>, i
       inbox.releaseBatch(batchId);
     }
     handedToTurnBatchIds.clear();
+    notifyIfEmpty();
   });
+
+  function notifyIfEmpty(): void {
+    if (inbox.counts().total === 0) {
+      options.onPendingInboxEmpty?.();
+    }
+  }
 }
