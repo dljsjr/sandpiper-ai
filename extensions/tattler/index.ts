@@ -28,6 +28,7 @@ import {
   type TattlerAgentMessageV0,
   type TattlerIdentityV0,
 } from './tattler-protocol';
+import { registerTattlerReceiveTool } from './tattler-receive';
 import { runtimeDir } from './tattler-runtime-dir';
 
 // we have to use `require` here because `tmp` is old, and relies on
@@ -167,6 +168,7 @@ export default async function (pi: ExtensionAPI) {
   let activeContext: Pick<ExtensionContext, 'isIdle'> | undefined;
   registerTattlerPendingInboxHooks(pi, pendingInbox);
   registerTattlerPendingBatchRenderer(pi);
+  registerTattlerReceiveTool(pi, pendingInbox, { isIdle: () => activeContext?.isIdle() ?? true });
   const persistPendingInboxSnapshot = (): void => {
     pi.appendEntry(TATTLER_PENDING_INBOX_ENTRY_KEY, createTattlerPendingInboxSnapshot(pendingInbox));
   };
