@@ -1,6 +1,6 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import type { Component } from '@earendil-works/pi-tui';
-import { truncateToWidth, wrapTextWithAnsi } from '@earendil-works/pi-tui';
+import { truncateToWidth, visibleWidth, wrapTextWithAnsi } from '@earendil-works/pi-tui';
 import {
   TATTLER_PENDING_BATCH_CUSTOM_TYPE,
   type TattlerPendingBatchDetails,
@@ -9,7 +9,8 @@ import {
 } from './tattler-inbox';
 
 interface ThemeLike {
-  fg(color: 'accent' | 'muted', text: string): string;
+  fg(color: 'accent' | 'muted' | 'success', text: string): string;
+  bg(color: 'customMessageBg' | 'toolSuccessBg', text: string): string;
   bold(text: string): string;
 }
 
@@ -54,11 +55,20 @@ function isVisibleChorusMessage(message: TattlerPendingMessage): message is Tatt
 }
 
 function renderChorusMessage(message: TattlerPendingChorusMessage, width: number, theme: ThemeLike): string[] {
-  const badge = `${theme.bold(theme.fg('accent', `[${message.from}]`))}${theme.fg('muted', ` #${message.roomId}`)}`;
+  const tagColor = message.self ? 'success' : 'accent';
+  const backgroundColor = message.self ? 'toolSuccessBg' : 'customMessageBg';
+  const badge = `${theme.bold(theme.fg(tagColor, `[${message.from}]`))}${theme.fg('muted', ` #${message.roomId}`)}`;
   const messageLines = message.message.split(/\r?\n/).flatMap((line) => {
     const text = line.length === 0 ? '␤' : line;
     return wrapTextWithAnsi(text, width).map((wrapped) => truncateToWidth(wrapped, width));
   });
 
-  return [truncateToWidth(badge, width), ...messageLines];
+  return [truncateToWidth(badge, width), ...messageLines].map((line) =>
+    theme.bg(backgroundColor, padLineToWidth(line, width)),
+  );
+}
+
+function padLineToWidth(line: string, width: number): string {
+  const padding = Math.max(0, width - visibleWidth(line));
+  return `${line}${' '.repeat(padding)}`;
 }

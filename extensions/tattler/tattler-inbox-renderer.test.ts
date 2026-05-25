@@ -43,6 +43,7 @@ function captureRenderer(): { readonly pi: Pick<ExtensionAPI, 'registerMessageRe
 
 const plainTheme = {
   fg: (_color: string, text: string) => text,
+  bg: (color: string, text: string) => `<${color}>${text}</${color}>`,
   bold: (text: string) => text,
 };
 
@@ -114,6 +115,7 @@ describe('Tattler pending batch renderer', () => {
     );
 
     const rendered = component?.render(80).join('\n') ?? '';
+    expect(rendered).toContain('<customMessageBg>');
     expect(rendered).toContain('[Piper] #chorus-dev');
     expect(rendered).toContain('visible room note');
     expect(rendered).toContain('[Librarian] #chorus-dev');

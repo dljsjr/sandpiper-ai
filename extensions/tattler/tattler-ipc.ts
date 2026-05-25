@@ -1,13 +1,12 @@
 import { once } from 'node:events';
 import * as net from 'node:net';
+import { errorMessage, withTimeout } from 'sandpiper-ai-core';
 import {
-  errorMessage,
-  type SystemNotificationSender,
-  SystemNotificationSourceType,
-  sendSystemNotification,
-  withTimeout,
-} from 'sandpiper-ai-core';
-import type { TattlerPendingInbox } from './tattler-inbox';
+  createTattlerPendingAgentMessage,
+  createTattlerPendingBatchMessageFromMessages,
+  type TattlerPendingBatchCustomMessage,
+  type TattlerPendingInbox,
+} from './tattler-inbox';
 import { emitChorusRoomDelivery, emitChorusRoomPostReceived, type HasPiEventBus } from './tattler-pi-events';
 import {
   type ChorusRoomDeliveryV0,
@@ -57,7 +56,14 @@ export async function isSocketAlive(socketPath: string): Promise<boolean> {
   });
 }
 
-type TattlerIpcRuntime = SystemNotificationSender &
+type TattlerMessageSender = {
+  sendMessage(
+    message: TattlerPendingBatchCustomMessage,
+    options: { readonly deliverAs: 'steer'; readonly triggerTurn?: boolean },
+  ): unknown;
+};
+
+type TattlerIpcRuntime = TattlerMessageSender &
   HasPiEventBus & {
     readonly pendingInbox?: TattlerPendingInbox;
     isIdle?(): boolean;
@@ -65,30 +71,11 @@ type TattlerIpcRuntime = SystemNotificationSender &
     notifyPendingInbox?(): void;
   };
 
-function sendAgentMessageNotification(sender: SystemNotificationSender, message: TattlerAgentMessageV0): void {
-  const instructions = `This is a remote message from another coding agent. You are the primary audience for the message. The identity of the agent who sent the message is encoded in the 'from' field.
-- You are not obligated to respond to a message. The tattler protocol provides basic ACK/ERR semantics. Only respond if the originating message warrants substantive discussion.
-- If the message warrants a response to the originating agent, you can use the 'list_peers' and 'send_peer_message' tools to send a message in response.
-- The user cannot see any of this message content by default. If this message contains information the user should see, summarize or quote the relevant parts explicitly.
-- If you are working autonomously as part of an agent team on a shared workload, and this is a message related to that coordination, you do not
-need to surface anything to the user.
-- Otherwise, if it makes sense to surface the contents of the message to the user, you can do so. Provide a human-facing summary or framing; don't surface the raw XML.
-- If you are working on something, and the contents of the message contains information that indicates you may want to replan or restructure your
-current work, you should do so.
-- If you are working interactively/non-autonomously and the message requires you to pivot in a non-trivial way, discuss with the user.
-`;
-  const systemNotification = {
-    sourceType: SystemNotificationSourceType.PeerMessage,
-    sourceId: 'tattler',
-    instructions,
+function sendAgentMessageBatch(sender: TattlerMessageSender, message: TattlerAgentMessageV0): void {
+  sender.sendMessage(createTattlerPendingBatchMessageFromMessages([createTattlerPendingAgentMessage(message)]), {
     triggerTurn: true,
-    data: {
-      from: message.from,
-      message: message.message,
-      messageId: message.id,
-    },
-  };
-  sendSystemNotification(sender, systemNotification);
+    deliverAs: 'steer',
+  });
 }
 
 function dispatchIncomingPayloadFrame(
@@ -115,7 +102,7 @@ function dispatchIncomingPayloadFrame(
           return;
         }
 
-        sendAgentMessageNotification(runtime, agentMessage);
+        sendAgentMessageBatch(runtime, agentMessage);
         return;
       }
 

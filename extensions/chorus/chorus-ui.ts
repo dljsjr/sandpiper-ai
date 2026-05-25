@@ -14,6 +14,10 @@ import {
   visibleWidth,
   wrapTextWithAnsi,
 } from '@earendil-works/pi-tui';
+import {
+  createTattlerPendingBatchMessageFromMessages,
+  type TattlerPendingChorusMessage,
+} from '../tattler/tattler-inbox';
 import { requestChorusRoomPost } from '../tattler/tattler-pi-events';
 import { type ChorusRoomId, roomId, type TattlerIdentityV0, type TattlerMessageId } from '../tattler/tattler-protocol';
 import {
@@ -21,7 +25,6 @@ import {
   type ChorusIncomingMessageDetails,
   type ChorusRoomBroker,
   type ChorusTranscriptEntry,
-  createChorusUserMessageContent,
 } from './chorus-runtime';
 
 const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
@@ -267,15 +270,26 @@ export function sendChorusMessageToChat(
   details: ChorusIncomingMessageDetails,
   options: SendChorusMessageOptions = {},
 ): void {
-  pi.sendMessage<ChorusIncomingMessageDetails>(
-    {
-      customType: CHORUS_MESSAGE_CUSTOM_TYPE,
-      content: (options.modelVisible ?? true) ? createChorusUserMessageContent(details) : '',
-      display: true,
-      details,
-    },
+  pi.sendMessage(
+    createTattlerPendingBatchMessageFromMessages([createPendingChorusMessage(details)], {
+      modelVisible: options.modelVisible ?? true,
+    }),
     { triggerTurn: options.triggerTurn ?? true, deliverAs: 'steer' },
   );
+}
+
+function createPendingChorusMessage(details: ChorusIncomingMessageDetails): TattlerPendingChorusMessage {
+  return {
+    kind: 'chorus.room-message.v0',
+    id: details.postId,
+    roomId: details.roomId,
+    from: details.from,
+    message: details.message,
+    postId: details.postId,
+    broker: details.broker,
+    self: details.self,
+    visible: true,
+  };
 }
 
 export interface ChorusRoomUiOptions {
