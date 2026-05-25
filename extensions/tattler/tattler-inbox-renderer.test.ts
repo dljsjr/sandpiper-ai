@@ -47,6 +47,26 @@ const plainTheme = {
 };
 
 describe('Tattler pending batch renderer', () => {
+  test('renders malformed batch details as empty instead of throwing or falling back to raw content', () => {
+    const capture = captureRenderer();
+    registerTattlerPendingBatchRenderer(capture.pi);
+
+    const component = capture.renderer?.(
+      {
+        role: 'custom',
+        customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+        content: 'raw content must not render',
+        display: true,
+        details: { kind: 'batch' } as unknown as TattlerPendingBatchDetails,
+        timestamp: Date.now(),
+      },
+      { expanded: false },
+      plainTheme,
+    );
+
+    expect(component?.render(80)).toEqual([]);
+  });
+
   test('renders visible Chorus messages as separate blocks without hidden Tattler messages', () => {
     const inbox = createTattlerPendingInbox();
     const hiddenMessage: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', {
