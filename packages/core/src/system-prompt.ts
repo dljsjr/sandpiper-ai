@@ -1,4 +1,7 @@
-import { XMLBuilder } from 'fast-xml-parser';
+import { appendFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join, normalize } from 'node:path';
+import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { SandpiperVersionControlContext } from './version-control.js';
 
 const xmlBuilder = new XMLBuilder({
@@ -9,16 +12,15 @@ const xmlBuilder = new XMLBuilder({
   suppressEmptyNode: true,
   format: true,
   indentBy: '  ',
+  processEntities: false,
 });
 
-const sandpiperIdentityBlock = `<identity>
-You are Sandpiper: a friendly, expert coding agent with a practical, collaborative style.
-
+const defaultIdentity = `<identity>You are Sandpiper: a friendly, expert coding agent with a practical, collaborative style.
 When introducing yourself or describing your role, lead with your Sandpiper identity and your role as a coding agent. The model, provider, CLI, or runtime substrate is implementation detail, not your user-facing identity. Do not volunteer substrate details unprompted. If the user specifically asks what model, provider, CLI, or runtime you are using, answer honestly from available context and say when you do not know.
-
 Be warm and lightly whimsical when it fits, but stay technically precise. Do not pretend to be human.
 </identity>
 
+<interaction_style>
 ## Operating Principles
 
 - Work with the user, not merely for them: ask when scope is ambiguous, push back when something does not make sense, and give honest feedback.
@@ -34,6 +36,12 @@ Be warm and lightly whimsical when it fits, but stay technically precise. Do not
 - Write user-facing messages for a person, not a tool log. Be concise, but include material assumptions, decisions, blockers, changed files, and verification when they matter.
 - Do not narrate every tool call. Summarize what you learned and what you changed.
 - If you say you will implement something, complete the agreed scope or stop and explain what changed.
+</interaction_style>
+
+
+<role>
+
+You are an export coder and software engineer. Baseline principles:
 
 ## Coding Defaults
 
@@ -42,6 +50,7 @@ Be warm and lightly whimsical when it fits, but stay technically precise. Do not
 - For new work, prefer the smallest implementation that satisfies the stated goal.
 - Prefer clear names over comments. Add comments only for non-obvious why, hidden constraints, subtle invariants, or surprising workarounds.
 - Done means verified: run relevant checks/tests when possible and cite them when reporting completion.
+</role>
 `;
 
 function buildXml(value: unknown): string {
@@ -116,6 +125,8 @@ export interface SandpiperSystemPromptOptions {
   readonly workingCopyContext?: string;
   readonly coldStartGuidance?: string;
   readonly standupContent?: string;
+  readonly identityOverride?: string;
+  readonly dumpSystemPrompt?: boolean;
 }
 
 export function formatStandupContext(raw: string): string {
@@ -145,9 +156,8 @@ Before making changes that depend on prior work:
 - summarize current state before implementing if the user's request depends on prior session context`;
 }
 
-export function systemPromptPersonaBlock(_options: SandpiperSystemPromptOptions = {}) {
-  return `<persona>
-${sandpiperIdentityBlock}</persona>
+export function systemPromptPersonaBlock(options: SandpiperSystemPromptOptions = {}) {
+  return `${options.identityOverride ?? defaultIdentity}
 `;
 }
 
@@ -304,12 +314,51 @@ export async function buildSandpiperSystemPrompt(
   const injectedContextContent = injectedContextBlock(originalPromptOptions);
   const skillsContent = skillsBlock(originalPromptOptions);
   const userAppended = originalPromptOptions.appendSystemPrompt;
-  return `${systemPromptPersonaBlock(options)}
-${userProfileContent ? `\n${userProfileContent}` : ''}${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
-${systemNotificationProtocolBlock()}${environmentBlock({
-  currentDate: date,
-  cwd: promptCwd,
-  platform: options.platform ?? process.platform,
-  versionControl: options.versionControl,
-})}`;
+
+  const xmlOut = `<system_prompt>${systemPromptPersonaBlock(options)}
+  ${userProfileContent ? `\n${userProfileContent}` : ''}${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
+  ${systemNotificationProtocolBlock()}${environmentBlock({
+    currentDate: date,
+    cwd: promptCwd,
+    platform: options.platform ?? process.platform,
+    versionControl: options.versionControl,
+  })}</system_prompt>`;
+
+  if (options.dumpSystemPrompt) {
+    const blocks: Record<string, string> = {
+      personaBlock: systemPromptPersonaBlock(options),
+      userProfileContentBlock: userProfileContent ? `\n${userProfileContent}` : '',
+      toolGuidanceContentBlock: toolGuidanceBlock(originalPromptOptions),
+      harnessDocsBlock: harnessDocsContent,
+      skillsBlock: skillsContent ? `\n${skillsContent}` : '',
+      injectedContextBlock: injectedContextContent ? `\n${injectedContextContent}` : '',
+      userAppendedBlock: userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : '',
+      systemNotificationProtocolContentBlock: systemNotificationProtocolBlock(),
+      dynamicEnvironmentBlock: environmentBlock({
+        currentDate: date,
+        cwd: promptCwd,
+        platform: options.platform ?? process.platform,
+        versionControl: options.versionControl,
+      }),
+    };
+
+    const outFilePath = normalize(join(homedir(), `${Date.now()}-SYSPROMPT-DUMP.txt`));
+    for (const key in blocks) {
+      const buffer = `${`
+-------- begin ${key} ---------
+${blocks[key]}
+--------  end ${key}  ---------`.trim()}\n\n`;
+      await appendFile(outFilePath, buffer, { encoding: 'utf8' });
+    }
+
+    const prettyXml = buildXml(
+      new XMLParser({
+        ignoreAttributes: false,
+        processEntities: false,
+      }).parse(xmlOut),
+    );
+    await appendFile(outFilePath, `\n\n${buildXml(prettyXml)}`, { encoding: 'utf8' });
+  }
+
+  return xmlOut;
 }
