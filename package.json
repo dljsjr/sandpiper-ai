@@ -71,10 +71,11 @@
     "plugins/pi/extensions"
   ],
   "dependencies": {
+    "@sandpiper-ai/trail": "workspace:*",
+    "better-sqlite3": "12.10.0",
     "sandpiper-ai-cli": "workspace:*",
     "sandpiper-ai-core": "workspace:*",
-    "sandpiper-standup-cli": "workspace:*",
-    "@sandpiper-ai/trail": "workspace:*"
+    "sandpiper-standup-cli": "workspace:*"
   },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "0.75.5",
@@ -83,6 +84,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
+    "@types/better-sqlite3": "7.6.12",
     "@types/node": "25.9.1",
     "typescript": "6.0.3",
     "vitest": "4.1.7",

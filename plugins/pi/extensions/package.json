@@ -15,6 +15,7 @@
     ]
   },
   "dependencies": {
+    "better-sqlite3": "12.10.0",
     "sandpiper-ai-core": "0.0.1",
     "sandpiper-capability-autotoon": "0.0.1",
     "sanitize-filename": "1.6.4",
