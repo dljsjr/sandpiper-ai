@@ -96,6 +96,7 @@ export function createPiRuntimeDependencies(): Record<string, string> {
     '@earendil-works/pi-coding-agent': packageDependencyVersion(cliPackageJson, '@earendil-works/pi-coding-agent'),
     '@mozilla/readability': packageDependencyVersion(webFetchPackageJson, '@mozilla/readability'),
     '@toon-format/toon': packageDependencyVersion(autotoonPackageJson, '@toon-format/toon'),
+    'better-sqlite3': packageDependencyVersion(tattlerPluginPackageJson, 'better-sqlite3'),
     jsdom: packageDependencyVersion(webFetchPackageJson, 'jsdom'),
     'sandpiper-ai-core': 'file:./packages/core',
     'sandpiper-capability-autotoon': 'file:./packages/capability-autotoon',
