@@ -98,6 +98,7 @@ export interface SandpiperPromptSkill {
   readonly name: string;
   readonly description: string;
   readonly filePath: string;
+  readonly disableModelInvocation?: boolean;
 }
 
 export interface SandpiperBaseSystemPromptOptions {
@@ -221,6 +222,12 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
     return;
   }
 
+  const visibleSkills = originalPromptOptions.skills.filter((skill) => !skill.disableModelInvocation);
+
+  if (visibleSkills.length === 0) {
+    return;
+  }
+
   const hasSkillTool = (originalPromptOptions.selectedTools || []).includes('skill');
   const loadInstruction = hasSkillTool
     ? '- If any skill matches, call `skill` with the exact skill `name` before continuing. If multiple skills match, load all relevant skills one at a time.'
@@ -229,7 +236,7 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
     ? '- Resolve skill-referenced scripts and files relative to the base directory returned by `skill`.'
     : '- Resolve skill-referenced scripts and files relative to the directory containing `SKILL.md`.';
 
-  const skillEntries = originalPromptOptions.skills.map((skillInfo) => ({
+  const skillEntries = visibleSkills.map((skillInfo) => ({
     '@_name': skillInfo.name,
     '@_location': skillInfo.filePath,
     '#text': skillInfo.description,
