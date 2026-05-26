@@ -80,3 +80,32 @@ Session file: /Users/doug.stephen/.sandpiper/agent/identities/Huginn/sessions/20
 ### Context
 - Latest Scout-clear slices: `mnpqnnsn`, `lzkywlvt` + `utxmwlyn`, `pwpzxpkv`, amended `wpmzmzty` / `121f5b0d`.
 - Latest room: `final-exams-pt2`.
+
+## Session 019e51bf-b822-7883-9760-95f872e756d1 (Updated: 2026-05-25T22:47:06.919Z)
+
+Session file: /Users/doug.stephen/.sandpiper/agent/identities/Piper/sessions/2026-05-22T22-12-59-554Z_019e51bf-b822-7883-9760-95f872e756d1.jsonl
+
+### Accomplished
+- Completed and dogfooded the Tattler/Chorus queue-recovery stack through live reload smoke.
+- Core path validated: payload-free pending cue → `tattler_receive` called alone → synthetic `tattler_pending_message_batch` custom-message turn → broker route metadata intact → room replies work from batch context → repeated busy bursts cue again after drain.
+- Landed/reviewed key commits through `rylstlsy` / `69f2d3fc` (`fix(tattler): add horizontal card padding`) after earlier stack commits for pending inbox, renderer, persistence, receive tool, cue reset, unified inbound batch envelope, and card padding.
+- Marked `TAT-38` and `TAT-60` COMPLETE; `TAT-36` remains NEEDS REVIEW as the integrated queue-recovery umbrella.
+- Filed/updated follow-ups: `TAT-39` participant/audience metadata, `TAT-44` validator hardening, `TAT-64` delayed render instrumentation, `TAT-66` multi-agent delegation/ownership protocol.
+- Post-mortem identity reflection completed; Piper updated `SELF.md`, `CHECKPOINT.md`, and `memory/patterns.md` with the “sharp librarian” direction plus Owner/Lens/Scribe and duplicate-agreement patterns.
+
+### In Progress
+- Chorus post-mortem discussion about workflow, individuality, roles, and operational design.
+- `TAT-36` integrated queue-recovery umbrella awaiting final review/closure after the now-completed slices.
+
+### Next Session
+- If continuing Sandpiper: close/review `TAT-36`, decide whether to tackle `TAT-39`, `TAT-44` hardening, `TAT-64`, or `TAT-66` next.
+- If returning to VCG: resume from `~/git/@vultr/@core/.sandpiper/docs/core-1606-engineering-work-plan.md` and VCG tasks; VCG source-accuracy review remains pending/not incorporated.
+- For multi-agent rooms, explicitly name Owner / Lens / Scribe before mutating shared state to avoid duplicate tickets/slice claims.
+
+### Blockers
+- None for queue-recovery reload/dogfood. Remaining issues are follow-ups, not reload blockers.
+
+### Context
+- The canonical Tattler/Chorus inbound delivery envelope is now `tattler:pending-batch` for both idle/direct one-message delivery and busy/drained multi-message delivery.
+- `content` is the model/debug/compaction source of truth; `details.messages[]` is renderer/debug structure.
+- Cue is discoverability only; pending inbox/batch delivery is correctness.

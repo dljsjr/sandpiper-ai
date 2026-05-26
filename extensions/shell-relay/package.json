@@ -7,7 +7,7 @@
     "sandpiper-ai-core": "0.0.1"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.75.4",
+    "@earendil-works/pi-coding-agent": "0.75.5",
     "typebox": "1.1.38"
   },
   "scripts": {
