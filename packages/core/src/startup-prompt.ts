@@ -39,8 +39,10 @@ export interface StartupPromptDependencies extends StandupContentDependencies {
 
 export interface StartupPromptInput {
   readonly agentDir?: string;
+  readonly identityContent?: string;
   readonly cwd: string;
   readonly systemPromptOptions: Parameters<BuildSystemPrompt>[1];
+  readonly dumpSystemPrompt?: boolean;
 }
 
 type ResolvedStartupPromptDependencies = Required<StartupPromptDependencies>;
@@ -141,6 +143,8 @@ export async function buildSandpiperStartupPrompt(
       workingCopyContext,
       coldStartGuidance,
       standupContent: resolved.formatStandupContext(readSandpiperStandupContent(input.cwd, resolved)),
+      identityOverride: input.identityContent,
+      dumpSystemPrompt: input.dumpSystemPrompt,
     },
     input.systemPromptOptions,
   );
