@@ -1,6 +1,6 @@
 import type { Dirent } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
-import { dirname, join, relative, sep } from 'node:path';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import type {
   AgentToolResult,
   ExtensionAPI,
@@ -29,12 +29,18 @@ type SkillRenderTheme = Pick<Theme, 'fg'>;
 const EXPAND_KEYBINDING: Parameters<typeof keyHint>[0] = 'app.tools.expand';
 
 interface SkillToolFrontmatter {
+  readonly name?: unknown;
+  readonly description?: unknown;
   readonly 'disable-model-invocation'?: boolean;
   readonly [key: string]: unknown;
 }
 
+type SkillToolSource = 'catalog' | 'filesystem';
+
 interface SkillToolParams {
-  readonly name: string;
+  readonly source?: SkillToolSource;
+  readonly name?: string;
+  readonly path?: string;
 }
 
 interface SkillToolDetails {
@@ -115,10 +121,21 @@ function formatAvailableSkills(names: readonly string[]): string {
   return names.length > 0 ? names.join(', ') : '(none)';
 }
 
-function parseSkillContent(rawContent: string): { readonly disabled: boolean; readonly body: string } {
+function optionalFrontmatterString(value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : undefined;
+}
+
+function parseSkillContent(rawContent: string): {
+  readonly name?: string;
+  readonly description?: string;
+  readonly disabled: boolean;
+  readonly body: string;
+} {
   const { frontmatter, body } = parseFrontmatter<SkillToolFrontmatter>(rawContent);
 
   return {
+    name: optionalFrontmatterString(frontmatter.name),
+    description: optionalFrontmatterString(frontmatter.description),
     disabled: frontmatter['disable-model-invocation'] === true,
     body: body.trim(),
   };
@@ -378,6 +395,11 @@ function formatSkillLabel(name: string, theme: SkillRenderTheme): string {
 }
 
 function formatSkillNameFromArgs(args: SkillToolParams): string {
+  if (args.source === 'filesystem') {
+    const path = typeof args.path === 'string' ? args.path.trim() : '';
+    return path.length > 0 ? path : '...';
+  }
+
   const name = typeof args.name === 'string' ? normalizeRequestedSkillName(args.name) : '';
   return name.length > 0 ? name : '...';
 }
@@ -466,12 +488,53 @@ function formatSkillExpandedResult(result: AgentToolResult<SkillToolDetails>, th
   ].join('\n');
 }
 
-export async function executeSkillTool(
+async function readSkillFile(
+  operations: SkillLoadingToolOperations,
+  skillNameOrPath: string,
+  filePath: string,
+): Promise<string> {
+  try {
+    return await operations.readFile(filePath);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw createSkillToolError(`Failed to read skill "${skillNameOrPath}" from ${filePath}: ${message}`);
+  }
+}
+
+async function formatSkillToolResult(
+  name: string,
+  filePath: string,
+  baseDir: string,
+  parsed: ReturnType<typeof parseSkillContent>,
+  operations: SkillLoadingToolOperations,
+): Promise<AgentToolResult<SkillToolDetails>> {
+  if (parsed.disabled) {
+    throw createSkillToolError(
+      `Skill "${name}" cannot be loaded by the model because disable-model-invocation is true.`,
+    );
+  }
+
+  const additionalContent = await buildAdditionalContentIndex(operations, baseDir);
+  const additionalContentText = additionalContent ? `${formatAdditionalContentIndex(additionalContent)}\n\n` : '';
+  const text = `<skill name="${escapeXmlAttribute(name)}" location="${escapeXmlAttribute(filePath)}">\n${additionalContentText}<instructions>\nReferences are relative to ${baseDir}.\n\n${parsed.body}\n</instructions>\n</skill>`;
+
+  return {
+    content: [{ type: 'text', text }],
+    details: {
+      name,
+      path: filePath,
+      baseDir,
+      additionalContent: describeAdditionalContent(additionalContent),
+    },
+  };
+}
+
+async function executeCatalogSkillTool(
   pi: Pick<ExtensionAPI, 'getCommands'>,
   params: SkillToolParams,
-  operations: SkillLoadingToolOperations = defaultOperations,
+  operations: SkillLoadingToolOperations,
 ): Promise<AgentToolResult<SkillToolDetails>> {
-  const requestedName = normalizeRequestedSkillName(params.name);
+  const requestedName = typeof params.name === 'string' ? normalizeRequestedSkillName(params.name) : '';
   const skillCommands = pi
     .getCommands()
     .map(toSkillCommand)
@@ -488,35 +551,62 @@ export async function executeSkillTool(
     throw createSkillToolError(`Skill "${requestedName}" not found.`, availableSkills);
   }
 
-  let rawContent: string;
-  try {
-    rawContent = await operations.readFile(skillCommand.filePath);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    throw createSkillToolError(`Failed to read skill "${requestedName}" from ${skillCommand.filePath}: ${message}`);
+  const rawContent = await readSkillFile(operations, requestedName, skillCommand.filePath);
+  const parsed = parseSkillContent(rawContent);
+  return formatSkillToolResult(
+    requestedName,
+    skillCommand.filePath,
+    dirname(skillCommand.filePath),
+    parsed,
+    operations,
+  );
+}
+
+function resolveFilesystemSkillTarget(target: string): { readonly filePath: string; readonly baseDir: string } {
+  const resolvedTarget = resolve(target);
+
+  if (basename(resolvedTarget) === SKILL_FILE_NAME) {
+    return { filePath: resolvedTarget, baseDir: dirname(resolvedTarget) };
   }
 
+  return { filePath: join(resolvedTarget, SKILL_FILE_NAME), baseDir: resolvedTarget };
+}
+
+async function executeFilesystemSkillTool(
+  params: SkillToolParams,
+  operations: SkillLoadingToolOperations,
+): Promise<AgentToolResult<SkillToolDetails>> {
+  const requestedPath = typeof params.path === 'string' ? params.path.trim() : '';
+  if (requestedPath.length === 0) {
+    throw createSkillToolError('Parameter "path" must be a non-empty filesystem path.');
+  }
+
+  const { filePath, baseDir } = resolveFilesystemSkillTarget(requestedPath);
+  const rawContent = await readSkillFile(operations, filePath, filePath);
   const parsed = parseSkillContent(rawContent);
-  if (parsed.disabled) {
+  const name = parsed.name ?? basename(baseDir);
+
+  if (!parsed.description) {
     throw createSkillToolError(
-      `Skill "${requestedName}" cannot be loaded by the model because disable-model-invocation is true.`,
+      `Filesystem skill "${name}" from ${filePath} cannot be loaded because description is missing.`,
     );
   }
 
-  const baseDir = dirname(skillCommand.filePath);
-  const additionalContent = await buildAdditionalContentIndex(operations, baseDir);
-  const additionalContentText = additionalContent ? `${formatAdditionalContentIndex(additionalContent)}\n\n` : '';
-  const text = `<skill name="${escapeXmlAttribute(requestedName)}" location="${escapeXmlAttribute(skillCommand.filePath)}">\n${additionalContentText}<instructions>\nReferences are relative to ${baseDir}.\n\n${parsed.body}\n</instructions>\n</skill>`;
+  return formatSkillToolResult(name, filePath, baseDir, parsed, operations);
+}
 
-  return {
-    content: [{ type: 'text', text }],
-    details: {
-      name: requestedName,
-      path: skillCommand.filePath,
-      baseDir,
-      additionalContent: describeAdditionalContent(additionalContent),
-    },
-  };
+export async function executeSkillTool(
+  pi: Pick<ExtensionAPI, 'getCommands'>,
+  params: SkillToolParams,
+  operations: SkillLoadingToolOperations = defaultOperations,
+): Promise<AgentToolResult<SkillToolDetails>> {
+  const source = params.source ?? 'catalog';
+
+  if (source === 'filesystem') {
+    return executeFilesystemSkillTool(params, operations);
+  }
+
+  return executeCatalogSkillTool(pi, params, operations);
 }
 
 export function registerSkillLoadingTool(
@@ -524,24 +614,39 @@ export function registerSkillLoadingTool(
   operations: SkillLoadingToolOperations = defaultOperations,
 ): void {
   const parameters = Type.Object({
-    name: Type.String({
-      description: 'Exact skill name from <available_skills>. Do not include arguments or a filesystem path.',
-      minLength: 1,
-    }),
+    source: Type.Optional(
+      Type.Union([Type.Literal('catalog'), Type.Literal('filesystem')], {
+        description: 'Skill resolution source. Defaults to catalog.',
+      }),
+    ),
+    name: Type.Optional(
+      Type.String({
+        description: 'Exact skill name from <available_skills>. Required when source is catalog.',
+        minLength: 1,
+      }),
+    ),
+    path: Type.Optional(
+      Type.String({
+        description:
+          'Explicit filesystem path to SKILL.md or a directory containing SKILL.md. Required when source is filesystem.',
+        minLength: 1,
+      }),
+    ),
   });
 
   const tool: ToolDefinition<typeof parameters, SkillToolDetails> = {
     name: 'skill',
     label: 'Skill',
     description:
-      'Load a skill by exact name and return its full instructions. ' +
-      'Use this for skills listed in <available_skills>; the catalog is routing metadata only, ' +
-      'while this tool returns the actual SKILL.md instructions.',
-    promptSnippet: 'Load a skill by exact name and return its full instructions',
+      'Load a skill by name from the catalogue, or from an explicit filesystem path when the user asks for a non-catalogued skill. ' +
+      'The catalog is routing metadata only; this tool returns the actual SKILL.md instructions.',
+    promptSnippet: 'Load a skill by name or explicit filesystem path and return its full instructions',
     promptGuidelines: [
       'Use the `skill` tool to load a matching skill from <available_skills> before planning, answering, editing files, or running commands.',
-      'When loading a skill, call the `skill` tool with the exact skill name as the only tool call in that assistant turn; then follow the returned instructions.',
-      'Use skill names exactly as listed in <available_skills>; do not invent names or pass filesystem paths as the `name` parameter.',
+      'When loading a catalog skill, call the `skill` tool with the exact skill name as the only tool call in that assistant turn; then follow the returned instructions.',
+      'Use skill names exactly as listed in <available_skills>; do not invent catalog skill names.',
+      'Use `source="filesystem"` only when the user explicitly asks to load a non-catalogued skill from a filesystem path.',
+      'Skills with `disable-model-invocation: true` cannot be loaded by this tool from any source.',
       'When a loaded skill references relative files or scripts, resolve them relative to the base directory returned by the `skill` tool.',
       'In skill tool results, <additional_content> enumerates references, scripts, and assets while summarizing extra content; path "." means the skill root.',
     ],

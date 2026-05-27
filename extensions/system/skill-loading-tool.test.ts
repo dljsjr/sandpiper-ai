@@ -17,6 +17,12 @@ interface SkillToolTestDetails {
   };
 }
 
+interface SkillToolTestParams {
+  readonly source?: 'catalog' | 'filesystem';
+  readonly name?: string;
+  readonly path?: string;
+}
+
 interface TestDirectoryEntry {
   readonly name: string;
   readonly isFile: () => boolean;
@@ -124,7 +130,7 @@ function skillFile(description: string, body: string, extraFrontmatter: string =
 
 async function executeRegisteredTool(
   tool: RegisteredTool,
-  params: { readonly name: string },
+  params: SkillToolTestParams,
 ): Promise<AgentToolResult<SkillToolTestDetails>> {
   return tool.execute(
     'tool-call-id',
@@ -186,9 +192,9 @@ describe('registerSkillLoadingTool', () => {
     expect(tools[0]).toMatchObject({
       name: 'skill',
       label: 'Skill',
-      promptSnippet: 'Load a skill by exact name and return its full instructions',
+      promptSnippet: 'Load a skill by name or explicit filesystem path and return its full instructions',
     });
-    expect(tools[0]?.description).toContain('full instructions');
+    expect(tools[0]?.description).toContain('SKILL.md instructions');
     expect(tools[0]?.promptGuidelines).toEqual(
       expect.arrayContaining([
         expect.stringContaining('Use the `skill` tool to load a matching skill'),
@@ -333,6 +339,62 @@ describe('registerSkillLoadingTool', () => {
     const result = await executeSkillTool(pi, { name: 'skill:jj' }, operations);
 
     expect(result.details).toMatchObject({ name: 'jj', path: skillPath });
+  });
+
+  it('loads a filesystem skill from an explicit SKILL.md path without catalog lookup', async () => {
+    const skillPath = '/repo/on-demand-skills/streamlit/SKILL.md';
+    const { pi } = createToolRegistrationStub([]);
+    const operations = createReadOperations({
+      [skillPath]: `---\nname: streamlit\ndescription: Streamlit routing\n---\n# Streamlit\n\nUse this when explicitly requested.`,
+    });
+
+    const result = await executeSkillTool(pi, { source: 'filesystem', path: skillPath }, operations);
+
+    expect(pi.getCommands).not.toHaveBeenCalled();
+    expect(result.details).toEqual({
+      name: 'streamlit',
+      path: skillPath,
+      baseDir: '/repo/on-demand-skills/streamlit',
+    });
+    const text = resultText(result);
+    expect(text).toContain(`<skill name="streamlit" location="${skillPath}">`);
+    expect(text).toContain('References are relative to /repo/on-demand-skills/streamlit.');
+    expect(text).toContain('# Streamlit\n\nUse this when explicitly requested.');
+  });
+
+  it('loads a filesystem skill from a directory containing SKILL.md', async () => {
+    const skillDir = '/repo/on-demand-skills/streamlit';
+    const skillPath = `${skillDir}/SKILL.md`;
+    const { pi } = createToolRegistrationStub([]);
+    const operations = createReadOperations({
+      [skillPath]: skillFile('Streamlit routing', '# Streamlit'),
+    });
+
+    const result = await executeSkillTool(pi, { source: 'filesystem', path: skillDir }, operations);
+
+    expect(result.details).toMatchObject({ name: 'streamlit', path: skillPath, baseDir: skillDir });
+  });
+
+  it('rejects filesystem skills hidden from model invocation', async () => {
+    const skillPath = '/repo/on-demand-skills/hidden/SKILL.md';
+    const { pi } = createToolRegistrationStub([]);
+    const operations = createReadOperations({
+      [skillPath]: skillFile('Hidden skill', 'Do not expose.', 'disable-model-invocation: true\n'),
+    });
+
+    await expect(executeSkillTool(pi, { source: 'filesystem', path: skillPath }, operations)).rejects.toThrow(
+      'disable-model-invocation is true',
+    );
+  });
+
+  it('requires an explicit filesystem path for filesystem skill loading', async () => {
+    const { pi } = createToolRegistrationStub([]);
+
+    const message = await expectRejectedMessage(
+      executeSkillTool(pi, { source: 'filesystem' }, createReadOperations({})),
+    );
+
+    expect(message).toContain('Parameter "path" must be a non-empty filesystem path.');
   });
 
   it('reports unknown skills with only invocable skill names', async () => {
