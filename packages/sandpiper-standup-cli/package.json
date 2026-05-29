@@ -7,8 +7,8 @@
     "sandpiper-standup": "./dist/sandpiper-standup"
   },
   "dependencies": {
-    "@commander-js/extra-typings": "14.0.0",
-    "commander": "14.0.3",
+    "@commander-js/extra-typings": "15.0.0",
+    "commander": "15.0.0",
     "sandpiper-ai-core": "0.0.1"
   },
   "scripts": {
