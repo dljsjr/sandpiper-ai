@@ -12,8 +12,8 @@
     "sandpiper-ai-core": "0.0.1"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.75.5",
-    "typebox": "1.1.38",
-    "@earendil-works/pi-tui": "0.75.5"
+    "@earendil-works/pi-coding-agent": "0.77.0",
+    "typebox": "1.1.39",
+    "@earendil-works/pi-tui": "0.77.0"
   }
 }

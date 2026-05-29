@@ -19,14 +19,14 @@
     "sandpiper-ai-core": "0.0.1",
     "sandpiper-capability-autotoon": "0.0.1",
     "sanitize-filename": "1.6.4",
-    "tmp": "0.2.5",
+    "tmp": "0.2.7",
     "uuid": "14.0.0"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.75.5",
-    "@earendil-works/pi-ai": "0.75.5",
-    "@earendil-works/pi-tui": "0.75.5",
-    "typebox": "1.1.38"
+    "@earendil-works/pi-coding-agent": "0.77.0",
+    "@earendil-works/pi-ai": "0.77.0",
+    "@earendil-works/pi-tui": "0.77.0",
+    "typebox": "1.1.39"
   },
   "devDependencies": {
     "@types/tmp": "0.2.6"
