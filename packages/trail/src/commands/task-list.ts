@@ -77,15 +77,17 @@ export const taskListCommand = new Command('list')
         return;
       }
 
-      if (result.length === 0) {
+      const visibleResult = addHiddenParentContext(result, tasks);
+
+      if (visibleResult.length === 0) {
         console.log('No tasks found matching the given filters.');
         return;
       }
 
-      for (const task of result) {
+      for (const task of visibleResult) {
         console.log(formatTaskLine(task));
       }
-      console.log(`\n${result.length} task${result.length !== 1 ? 's' : ''}`);
+      console.log(`\n${visibleResult.length} task${visibleResult.length !== 1 ? 's' : ''}`);
     });
   });
 
@@ -108,4 +110,36 @@ function sortBySearchRank(tasks: readonly Task[], keyOrder: readonly string[]): 
   return [...tasks].sort(
     (left, right) => (rank.get(left.key) ?? Number.MAX_SAFE_INTEGER) - (rank.get(right.key) ?? Number.MAX_SAFE_INTEGER),
   );
+}
+
+function addHiddenParentContext(tasks: readonly Task[], allTasks: readonly Task[]): readonly Task[] {
+  const taskByKey = new Map(allTasks.map((task) => [task.key, task]));
+  const visibleKeys = new Set(tasks.map((task) => task.key));
+  const emittedKeys = new Set<string>();
+  const displayed: Task[] = [];
+
+  for (const task of tasks) {
+    if (emittedKeys.has(task.key)) continue;
+
+    if (!task.parent || visibleKeys.has(task.parent)) {
+      displayed.push(task);
+      emittedKeys.add(task.key);
+      continue;
+    }
+
+    const parent = taskByKey.get(task.parent);
+    if (parent && !emittedKeys.has(parent.key)) {
+      displayed.push(parent);
+      emittedKeys.add(parent.key);
+    }
+
+    for (const sibling of tasks) {
+      if (sibling.parent === task.parent && !emittedKeys.has(sibling.key)) {
+        displayed.push(sibling);
+        emittedKeys.add(sibling.key);
+      }
+    }
+  }
+
+  return displayed;
 }
