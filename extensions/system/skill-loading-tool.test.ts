@@ -1,8 +1,17 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { AgentToolResult, ExtensionAPI, SlashCommandInfo, ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { initTheme } from '@earendil-works/pi-coding-agent';
 import { KeybindingsManager, setKeybindings } from '@earendil-works/pi-tui';
+import Database from 'better-sqlite3';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { executeSkillTool, registerSkillLoadingTool, type SkillLoadingToolOperations } from './skill-loading-tool.js';
+import {
+  executeSkillTool,
+  recordSkillActivationCount,
+  registerSkillLoadingTool,
+  type SkillLoadingToolOperations,
+} from './skill-loading-tool.js';
 
 interface SkillToolTestDetails {
   readonly name: string;
@@ -209,9 +218,13 @@ describe('registerSkillLoadingTool', () => {
       createPromptCommand('new-feature'),
       createSkillCommand('jj', skillPath, 'Jujutsu version control'),
     ]);
-    const operations = createReadOperations({
-      [skillPath]: skillFile('Jujutsu version control', '# Jujutsu\n\nUse jj, not git.'),
-    });
+    const recordSkillActivation = vi.fn();
+    const operations = {
+      ...createReadOperations({
+        [skillPath]: skillFile('Jujutsu version control', '# Jujutsu\n\nUse jj, not git.'),
+      }),
+      recordSkillActivation,
+    } satisfies SkillLoadingToolOperations;
 
     registerSkillLoadingTool(pi, operations);
 
@@ -222,6 +235,7 @@ describe('registerSkillLoadingTool', () => {
       path: skillPath,
       baseDir: '/repo/.sandpiper/skills/jj',
     });
+    expect(recordSkillActivation).toHaveBeenCalledWith({ name: 'jj', source: 'catalog' });
     const text = resultText(result);
     expect(text).toContain(`<skill name="jj" location="${skillPath}">`);
     expect(text).toContain('References are relative to /repo/.sandpiper/skills/jj.');
@@ -339,6 +353,86 @@ describe('registerSkillLoadingTool', () => {
     const result = await executeSkillTool(pi, { name: 'skill:jj' }, operations);
 
     expect(result.details).toMatchObject({ name: 'jj', path: skillPath });
+  });
+
+  it('increments skill activation counts in sqlite', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-skill-metrics-'));
+    const dbPath = join(tempDir, 'skill_metrics.sqlite3');
+    try {
+      recordSkillActivationCount({ name: 'jj', source: 'catalog' }, dbPath);
+      recordSkillActivationCount({ name: 'jj', source: 'catalog' }, dbPath);
+      recordSkillActivationCount({ name: 'tui', source: 'filesystem' }, dbPath);
+
+      const database = new Database(dbPath, { readonly: true });
+      try {
+        expect(
+          database
+            .prepare('SELECT skill_name, source, count FROM skill_activation_counts ORDER BY skill_name, source')
+            .all(),
+        ).toEqual([
+          { skill_name: 'jj', source: 'catalog', count: 2 },
+          { skill_name: 'tui', source: 'filesystem', count: 1 },
+        ]);
+      } finally {
+        database.close();
+      }
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('records successful filesystem skill activations', async () => {
+    const skillPath = '/outside/custom/SKILL.md';
+    const operations = {
+      ...createReadOperations({
+        [skillPath]: skillFile('Custom local skill', '# Custom\n\nLocal instructions.', 'name: custom-local\n'),
+      }),
+      recordSkillActivation: vi.fn(),
+    } satisfies SkillLoadingToolOperations;
+
+    await executeSkillTool({ getCommands: () => [] }, { source: 'filesystem', path: skillPath }, operations);
+
+    expect(operations.recordSkillActivation).toHaveBeenCalledWith({ name: 'custom-local', source: 'filesystem' });
+  });
+
+  it('does not let metrics failures break skill loading', async () => {
+    const skillPath = '/repo/.sandpiper/skills/jj/SKILL.md';
+    const operations = {
+      ...createReadOperations({
+        [skillPath]: skillFile('Jujutsu version control', '# Jujutsu\n\nUse jj, not git.'),
+      }),
+      recordSkillActivation: vi.fn(() => {
+        throw new Error('database is locked');
+      }),
+    } satisfies SkillLoadingToolOperations;
+
+    const result = await executeSkillTool(
+      { getCommands: () => [createSkillCommand('jj', skillPath, 'Jujutsu version control')] },
+      { name: 'jj' },
+      operations,
+    );
+
+    expect(result.details.name).toBe('jj');
+  });
+
+  it('does not record failed skill loads', async () => {
+    const skillPath = '/repo/.sandpiper/skills/disabled/SKILL.md';
+    const operations = {
+      ...createReadOperations({
+        [skillPath]: skillFile('Disabled skill', '# Disabled', 'disable-model-invocation: true\n'),
+      }),
+      recordSkillActivation: vi.fn(),
+    } satisfies SkillLoadingToolOperations;
+
+    await expectRejectedMessage(
+      executeSkillTool(
+        { getCommands: () => [createSkillCommand('disabled', skillPath, 'Disabled skill')] },
+        { name: 'disabled' },
+        operations,
+      ),
+    );
+
+    expect(operations.recordSkillActivation).not.toHaveBeenCalled();
   });
 
   it('loads a filesystem skill from an explicit SKILL.md path without catalog lookup', async () => {
