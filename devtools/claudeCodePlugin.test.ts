@@ -122,7 +122,9 @@ describe('Claude Code plugin mapping', () => {
       for (const relativePath of [
         'skills/sandpiper/tasks/SKILL.md',
         'skills/sandpiper/standup/SKILL.md',
-        'skills/third-party/pdf/SKILL.md',
+        'skills/on_demand/third-party/pdf/SKILL.md',
+        'skills/on_demand/third-party/skill-creator/SKILL.md',
+        'skills/on_demand/sandpiper/skill-review/SKILL.md',
         'commands/new-feature.md',
         'hooks/hooks.json',
         'package.json',
@@ -155,6 +157,8 @@ describe('Claude Code plugin mapping', () => {
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'jj-workspace', 'run_loop.log'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'SKILL.test.ts'))).toBe(false);
       expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'tasks', 'node_modules'))).toBe(false);
+      expect(existsSync(join(outputDir, 'skills', 'third-party', 'pdf', 'SKILL.md'))).toBe(false);
+      expect(existsSync(join(outputDir, 'skills', 'sandpiper', 'skill-review', 'SKILL.md'))).toBe(false);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

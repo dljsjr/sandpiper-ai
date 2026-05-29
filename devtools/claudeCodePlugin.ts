@@ -120,6 +120,7 @@ declare const Bun: BunRuntime;
 const CLAUDE_PLUGIN_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'packages/resources/skills/sandpiper', to: 'skills/sandpiper' },
   { from: 'packages/resources/skills/third-party', to: 'skills/third-party' },
+  { from: 'packages/resources/skills/on_demand', to: 'skills/on_demand' },
   { from: 'packages/resources/prompts', to: 'commands' },
   { from: 'packages/resources/themes', to: 'themes' },
 ];
