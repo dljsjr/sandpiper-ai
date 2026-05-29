@@ -89,12 +89,12 @@ describe('system-prompt', () => {
   });
 
   describe('systemPromptPersonaBlock', () => {
-    it('wraps identity in persona XML tags', () => {
+    it('renders identity and operating guidance fragments', () => {
       const block = systemPromptPersonaBlock({});
-      expect(block).toContain('<persona>');
-      expect(block).toContain('</persona>');
       expect(block).toContain('<identity>');
       expect(block).toContain('</identity>');
+      expect(block).toContain('<interaction_style>');
+      expect(block).toContain('<role>');
     });
 
     it('includes the identity block content', () => {
@@ -122,7 +122,7 @@ describe('system-prompt', () => {
       expect(block).toContain('<user_profile>');
       expect(block).toContain('</user_profile>');
       expect(block).toContain('working preferences');
-      expect(block).toContain('<content># User\nPrefers &lt;clear&gt; &amp; direct communication</content>');
+      expect(block).toContain('<content># User\nPrefers <clear> & direct communication</content>');
     });
   });
 
@@ -183,7 +183,7 @@ describe('system-prompt', () => {
       expect(block).not.toContain('<tool name="edit"');
     });
 
-    it('escapes XML in tool entries', () => {
+    it('renders tool entries with raw prompt text', () => {
       const options = createPromptOptions({
         selectedTools: ['read<&'],
         toolSnippets: {
@@ -192,7 +192,8 @@ describe('system-prompt', () => {
       });
 
       const block = toolGuidanceBlock(options);
-      expect(block).toContain('<tool name="read&lt;&amp;">Read &lt;files&gt; &amp; report &quot;paths&quot;</tool>');
+      expect(block).toContain('<tool name="read<&">');
+      expect(block).toContain('Read <files> & report "paths"');
     });
   });
 
@@ -321,7 +322,7 @@ describe('system-prompt', () => {
       const promptOptions = createPromptOptions();
       const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo', platform: 'darwin' }, promptOptions);
 
-      expect(prompt).toContain('<persona>');
+      expect(prompt).toContain('<identity>');
       expect(prompt).toContain('<tools>');
       expect(prompt).toContain('<system_notification_protocol>');
       expect(prompt).toContain('<environment>');

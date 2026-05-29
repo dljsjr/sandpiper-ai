@@ -44,16 +44,18 @@ export function createToolRegistrationStub(): {
 
 // ─── Event handler stubs ─────────────────────────────────────────
 
-export function createEventStub(): {
-  pi: Pick<ExtensionAPI, 'on'>;
+export function createEventStub(flags: Record<string, boolean | string | undefined> = {}): {
+  pi: Pick<ExtensionAPI, 'getFlag' | 'on' | 'registerFlag'>;
   handlers: Map<string, AnyHandler>;
 } {
   const handlers = new Map<string, AnyHandler>();
   return {
     pi: {
+      getFlag: ((name: string) => flags[name]) as ExtensionAPI['getFlag'],
       on: ((event: string, handler: AnyHandler) => {
         handlers.set(event, handler);
       }) as ExtensionAPI['on'],
+      registerFlag: vi.fn() as ExtensionAPI['registerFlag'],
     },
     handlers,
   };

@@ -35,7 +35,6 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     const extensionResult = resourceLoader.getExtensions();
     const loadedExtensionPaths = extensionResult.extensions.map((extension) => extension.resolvedPath);
     const flags = extensionResult.extensions.flatMap((extension) => [...extension.flags.keys()]);
-    const handlers = extensionResult.extensions.flatMap((extension) => [...extension.handlers.keys()]);
     const tools = extensionResult.extensions.flatMap((extension) => [...extension.tools.keys()]);
     const skills = resourceLoader.getSkills().skills;
     const prompts = resourceLoader.getPrompts().prompts;
@@ -56,9 +55,9 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     );
     expect(loadedExtensionPaths.some((path) => path.endsWith('/extensions/system.ts'))).toBe(false);
     expect(loadedExtensionPaths.some((path) => path.includes('/extensions/system/extension-factories.ts'))).toBe(false);
+    expect(flags).not.toContain('identity');
     expect(flags).not.toContain('migrate-pi-configs');
     expect(flags).not.toContain('install-shell-integrations');
-    expect(handlers).not.toContain('before_agent_start');
     expect(tools).toEqual(
       expect.arrayContaining([
         'skill',

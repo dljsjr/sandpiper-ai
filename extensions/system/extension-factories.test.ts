@@ -65,6 +65,7 @@ describe('system extension factory split', () => {
       'symlink-config',
       'pi-configs-global',
       'pi-configs-local',
+      'identity',
     ]);
     expect(events).toEqual([
       'session_start',
