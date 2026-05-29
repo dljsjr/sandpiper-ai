@@ -109,7 +109,6 @@ describe('ecosystem package artifacts', () => {
     expect(packageJson.peerDependencies).toMatchObject(rootPackageJson.peerDependencies ?? {});
     expect(packageJson.files).toEqual([
       'chunks/',
-      'config/',
       'extensions/',
       'dist/',
       'packages/',
@@ -151,15 +150,11 @@ describe('ecosystem package artifacts', () => {
         'packages/resources/skills/sandpiper/tasks/scripts/trail',
         'packages/resources/skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup',
-        'packages/resources/skills/sandpiper/dash/scripts/dash',
-        'packages/resources/skills/sandpiper/dash/scripts/dash.cjs',
         'packages/resources/skills/on_demand/sandpiper/skill-review/references/skill-building-guide.pdf',
         'skills/sandpiper/tasks/SKILL.md',
         'skills/sandpiper/tasks/scripts/trail',
         'skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'skills/sandpiper/standup/scripts/sandpiper-standup',
-        'skills/sandpiper/dash/scripts/dash',
-        'skills/sandpiper/dash/scripts/dash.cjs',
         'skills/on_demand/sandpiper/skill-review/references/skill-building-guide.pdf',
         'skills/on_demand/third-party/pdf/SKILL.md',
         'skills/on_demand/third-party/skill-creator/SKILL.md',

@@ -90,7 +90,6 @@ describe('Pi package distribution smoke', () => {
         license: rootPackageJson.license,
         files: [
           'chunks/',
-          'config/',
           'extensions/',
           'dist/',
           'packages/',
@@ -124,16 +123,6 @@ describe('Pi package distribution smoke', () => {
     );
   });
 
-  it('generates a Node-compatible Dash CLI wrapper and CommonJS sidecar', () => {
-    const dashScriptsDir = join(repoRoot, 'dist', 'skills', 'sandpiper', 'dash', 'scripts');
-    const dashBin = join(dashScriptsDir, 'dash');
-    const dashSidecar = join(dashScriptsDir, 'dash.cjs');
-
-    expect(readFileSync(dashBin, 'utf-8')).toBe("#!/usr/bin/env node\nimport './dash.cjs';\n");
-    expect(readFileSync(dashSidecar, 'utf-8')).toContain('require(');
-    expect(execFileSync(dashBin, ['--help'], { encoding: 'utf-8' })).toContain('Usage:');
-  });
-
   it('refreshes the source-local task skill helpers', () => {
     const taskScriptsDir = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'scripts');
 
@@ -141,16 +130,6 @@ describe('Pi package distribution smoke', () => {
     expect(execFileSync(join(taskScriptsDir, 'sandpiper-tasks'), ['--help'], { encoding: 'utf-8' })).toContain(
       'Usage: sandpiper-tasks',
     );
-  });
-
-  it('refreshes the source-local Dash skill helper wrapper and sidecar', () => {
-    const dashScriptsDir = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'dash', 'scripts');
-    const dashBin = join(dashScriptsDir, 'dash');
-    const dashSidecar = join(dashScriptsDir, 'dash.cjs');
-
-    expect(readFileSync(dashBin, 'utf-8')).toBe("#!/usr/bin/env node\nimport './dash.cjs';\n");
-    expect(readFileSync(dashSidecar, 'utf-8')).toContain('require(');
-    expect(execFileSync(dashBin, ['--help'], { encoding: 'utf-8' })).toContain('Usage:');
   });
 
   it('keeps the generated dist package manifest resolvable after distribution assembly', () => {

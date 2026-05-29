@@ -68,8 +68,7 @@ Package manifests stay compatible with both Bun local development and npm instal
 3. Preserves extension `src/` trees so package-local `pi.extensions` entries resolve.
 4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist.
 5. Materializes Pi internal runtime assets under `dist/dist/modes` and `dist/dist/core` so npm-packed installs do not depend on symlinks.
-6. Builds the Dash CLI via mcporter.
-7. Copies skill helper executables into packaged skill script directories.
+6. Copies skill helper executables into packaged skill script directories.
 
 Dependency installation does not build or assemble artifacts. Run `bun run prepare:distribution` explicitly when generated artifacts are needed.
 

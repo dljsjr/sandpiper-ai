@@ -21,7 +21,6 @@ Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills are s
 | ---------- | ---------------------------------------------------------------------------- |
 | `age`      | Encrypt/decrypt files with the [age](https://github.com/FiloSottile/age) CLI |
 | `ast-grep` | Structural code analysis via AST matching — find patterns, run transforms    |
-| `dash`     | Look up documentation in [Dash.app](https://kapeli.com/dash) via MCP server  |
 | `jj`       | Jujutsu version control — commands, workflows, change management             |
 | `projects` | Manage the cross-project directory at `~/.sandpiper/agent/projects.toon`     |
 | `standup`  | Write/read session stand-up notes for cross-session continuity               |

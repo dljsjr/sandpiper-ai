@@ -154,18 +154,9 @@ const GENERATED_EXECUTABLE_COPY_ENTRIES: readonly ExecutableCopyEntry[] = [
     from: 'dist/packages/sandpiper-standup-cli/sandpiper-standup',
     to: ['skills/sandpiper/standup/scripts/sandpiper-standup', 'bin/sandpiper-standup'],
   },
-  {
-    from: 'dist/skills/sandpiper/dash/scripts/dash',
-    to: ['skills/sandpiper/dash/scripts/dash', 'bin/dash'],
-  },
 ];
 
-const GENERATED_SUPPORT_FILE_COPY_ENTRIES: readonly GeneratedFileCopyEntry[] = [
-  {
-    from: 'dist/skills/sandpiper/dash/scripts/dash.cjs',
-    to: ['skills/sandpiper/dash/scripts/dash.cjs', 'bin/dash.cjs'],
-  },
-];
+const GENERATED_SUPPORT_FILE_COPY_ENTRIES: readonly GeneratedFileCopyEntry[] = [];
 
 function shouldPruneArtifactPath(path: string): boolean {
   const name = basename(path);

@@ -95,7 +95,7 @@ describe('packed Sandpiper npm artifact', () => {
     expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'))).toBe(true);
     expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'))).toBe(true);
     expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup'))).toBe(true);
-    expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'dash', 'scripts', 'dash.cjs'))).toBe(true);
+    expect(existsSync(join(packageDir, 'skills', 'sandpiper', 'dash'))).toBe(false);
     expect(existsSync(join(packageDir, 'dist', 'standalone-package'))).toBe(false);
 
     makeReadOnly(packageDir);

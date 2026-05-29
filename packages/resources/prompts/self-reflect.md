@@ -40,7 +40,7 @@ For each reviewed skill, answer:
 
 Common under-trigger patterns to check explicitly:
 
-- API/library/framework/CLI/config-format uncertainty → docs lookup skills such as **dash**
+- API/library/framework/CLI/config-format uncertainty → look up the relevant documentation rather than guessing
 - version control operations, commits, bookmarks, rebases, abandon/drop, operation-log recovery → **jj**
 - tasks, backlog, status, tickets, follow-up work → **tasks**
 - self-reflection involving skills → **skill-review** and possibly **skill-creator**
@@ -48,7 +48,7 @@ Common under-trigger patterns to check explicitly:
 - cleanup, simplification, restructuring → **refactoring**
 - tests-first work or bug reproduction → **test-driven-development**
 - PDF handling → **pdf**
-- GitHub/GitLab URLs or CLI work → **gh** / **glab**
+- GitHub/GitLab URLs or CLI work → use the relevant forge CLI when available
 
 For project-local skills: fix issues directly. For package-provided skills: note the finding and suggest it to the user instead of editing installed package files.
 
