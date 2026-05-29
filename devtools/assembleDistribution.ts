@@ -1,6 +1,5 @@
 #!/usr/bin/env bun
 
-import { execFileSync } from 'node:child_process';
 import { cpSync, existsSync, lstatSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { chmod } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
@@ -27,7 +26,6 @@ const SOURCE_SKILL_SCRIPT_PATHS = [
   join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'trail'),
   join(RESOURCE_DIR, 'skills', 'sandpiper', 'tasks', 'scripts', 'sandpiper-tasks'),
   join(RESOURCE_DIR, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup'),
-  join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash'),
 ] as const;
 
 function remove(path: string): void {
@@ -183,43 +181,6 @@ function copyPiRuntimeAssets(): void {
   copyTree(join(piPackageDir, 'dist', 'core'), join(DIST_DIR, 'dist', 'core'));
 }
 
-function copyConfiguration(): void {
-  console.log('⚙ Copying configurations');
-  copyFile(join(REPO_ROOT, 'devtools', 'config', 'mcporter-dist.json'), join(DIST_DIR, 'config', 'mcporter.json'));
-}
-
-function runMcporterDashBuild(dashSidecar: string): void {
-  execFileSync(
-    'bun',
-    ['mcporter', 'generate-cli', '--server', 'dash', '--runtime', 'node', '--bundle', dashSidecar, '--minify'],
-    {
-      cwd: DIST_DIR,
-      stdio: 'inherit',
-    },
-  );
-}
-
-async function buildDashCli(): Promise<void> {
-  const topLevelDashScriptsDir = join(DIST_DIR, 'skills', 'sandpiper', 'dash', 'scripts');
-  const topLevelDashBin = join(topLevelDashScriptsDir, 'dash');
-  const topLevelDashSidecar = join(topLevelDashScriptsDir, 'dash.cjs');
-
-  console.log('⚙ Generating dash CLI...');
-  ensureDir(topLevelDashScriptsDir);
-  remove(topLevelDashBin);
-  remove(topLevelDashSidecar);
-  runMcporterDashBuild(topLevelDashSidecar);
-  writeFileSync(topLevelDashBin, "#!/usr/bin/env node\nimport './dash.cjs';\n");
-  await makeExecutable(topLevelDashBin);
-  remove(join(DIST_DIR, 'dash.ts'));
-
-  const packageDashScriptsDir = join(DIST_DIR, 'packages', 'resources', 'skills', 'sandpiper', 'dash', 'scripts');
-  copyFile(topLevelDashBin, join(packageDashScriptsDir, 'dash'));
-  copyFile(topLevelDashSidecar, join(packageDashScriptsDir, 'dash.cjs'));
-  await makeExecutable(join(packageDashScriptsDir, 'dash'));
-  console.log(`✓ Generated dash CLI → ${topLevelDashBin}`);
-}
-
 async function ensureSkillReviewGuide(): Promise<void> {
   const guideRelativePath = join(
     'skills',
@@ -263,10 +224,6 @@ async function createSourceDevHelperCopies(): Promise<void> {
       source: join(DIST_DIR, 'packages', 'sandpiper-standup-cli', 'sandpiper-standup'),
       destinations: [join(RESOURCE_DIR, 'skills', 'sandpiper', 'standup', 'scripts', 'sandpiper-standup')],
     },
-    {
-      source: join(DIST_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash'),
-      destinations: [join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash')],
-    },
   ] as const;
 
   for (const { source, destinations } of helpers) {
@@ -275,11 +232,6 @@ async function createSourceDevHelperCopies(): Promise<void> {
       await makeExecutable(destination);
     }
   }
-
-  copyFile(
-    join(DIST_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash.cjs'),
-    join(RESOURCE_DIR, 'skills', 'sandpiper', 'dash', 'scripts', 'dash.cjs'),
-  );
 }
 
 async function assembleDistribution(): Promise<void> {
@@ -294,8 +246,6 @@ async function assembleDistribution(): Promise<void> {
   console.log('✓ Generated distribution package.json');
 
   copyPiRuntimeAssets();
-  copyConfiguration();
-  await buildDashCli();
   await ensureSkillReviewGuide();
   await createSourceDevHelperCopies();
 }

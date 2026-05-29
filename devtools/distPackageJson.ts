@@ -47,7 +47,6 @@ export interface DistPackageJson {
   readonly license?: string;
   readonly files: readonly [
     'chunks/',
-    'config/',
     'extensions/',
     'dist/',
     'packages/',
@@ -84,7 +83,6 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
     license: rootPackageJson.license,
     files: [
       'chunks/',
-      'config/',
       'extensions/',
       'dist/',
       'packages/',

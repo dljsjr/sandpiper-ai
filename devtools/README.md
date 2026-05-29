@@ -6,7 +6,7 @@ Development scripts and build utilities. Not distributed with the package.
 
 | Script | Purpose |
 |--------|---------|
-| `assembleDistribution.ts` | Assembles the generated `dist/` Sandpiper Pi/npm package with copied resources, package outputs, Pi runtime assets, Dash helper CLI, and npm metadata |
+| `assembleDistribution.ts` | Assembles the generated `dist/` Sandpiper Pi/npm package with copied resources, package outputs, Pi runtime assets, helper CLIs, and npm metadata |
 | `vendor.ts` | Downloads vendored third-party skills from `vendor.txt` |
 | `distPackageJson.ts` | Generates `dist/package.json` with artifact-owned Sandpiper `piConfig` + `pi` resource paths |
 | `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
@@ -20,17 +20,7 @@ Development scripts and build utilities. Not distributed with the package.
 
 | File | Purpose |
 |------|---------|
-| `config/mcporter-dist.json` | mcporter server definitions for CLI generation |
 | `vendor.txt` | Third-party skill sources for vendoring |
-
-## mcporter
-
-[mcporter](https://github.com/nicholasgasior/mcporter) generates standalone CLI wrappers for MCP (Model Context Protocol) servers. We use its `generate-cli` command to produce executable scripts that talk to MCP servers without requiring the user to manage server processes.
-
-Current uses:
-- **`dash`** — CLI for the [Dash](https://kapeli.com/dash) documentation browser MCP server. Built during distribution assembly and distributed with the package at `dist/skills/sandpiper/dash/scripts/dash`. mcporter's Node bundle is emitted as `dash.cjs`; the extensionless `dash` entrypoint is a tiny ESM wrapper so it still works under package roots with `"type": "module"`.
-
-Server definitions live in `config/mcporter-dist.json` for distribution builds.
 
 ## Distribution Checks
 
@@ -46,7 +36,7 @@ This prepares the generated Sandpiper Pi/npm package at `dist/`, verifies source
 
 ## Build Flow
 
-```
+```text
 bun install
   → install dependencies only
 
@@ -58,7 +48,6 @@ bun run prepare:distribution
       → copy extension package.json files
       → generate dist/package.json with npm-compatible package metadata and artifact-owned Pi resource metadata
       → materialize Pi runtime assets under dist/dist/core and dist/dist/modes
-      → build dash CLI via mcporter
       → create dev-mode skill helper copies in packages/resources
 
 bun run prepare:standalone-app
@@ -88,15 +77,4 @@ bun run test:claude-plugin
 
 ## Pi Runtime Assets
 
-Pi's config helpers look for built-in TUI themes and export templates under `<PI_PACKAGE_DIR>/dist/*`. The generated Sandpiper npm package sets `PI_PACKAGE_DIR` to the installed package root, so distribution assembly materializes Pi's `core/` and `modes/` assets under `dist/dist/` before packing. Do not replace these directories with symlinks; `npm pack` may drop symlinked publish-critical assets.
-
-## Ecosystem Install Checks
-
-`devtools/ecosystemPackage.test.ts` and `devtools/npmPackageInstallSmoke.test.ts` are the release/install compatibility gates. They check that:
-
-- the repository root contains no `catalog:` dependency specs, uses `workspace:*` only for root local workspace dependencies, uses exact versions for registry dependency specs, and any root Pi package routing points only at provider/package-owned paths;
-- the generated Sandpiper Pi/npm package under `dist/` has npm-compatible manifests, no `private`, valid `file:` dependency targets, no leaked scratch logs/PIDs, and all publish-critical runtime files included by `npm pack`;
-- an npm-packed artifact installs globally with lifecycle scripts disabled and runs from a read-only package directory;
-- the root `dist/` package uses a `files` whitelist so nested generated artifacts are not included by `npm pack`.
-
-`devtools/claudeCodePlugin.test.ts` covers Claude's side of the same gate: the generated plugin package metadata is publishable, `.claude-plugin/plugin.json` and root `.claude-plugin/marketplace.json` validate with the Claude CLI when available, and `npm pack --dry-run` includes the plugin manifest.
+Sandpiper's generated package includes selected Pi runtime internals under `dist/dist/` because npm-installed packages cannot rely on workspace symlinks. Distribution tests assert these paths exist and that package manifests resolve without reaching back into the source tree.
