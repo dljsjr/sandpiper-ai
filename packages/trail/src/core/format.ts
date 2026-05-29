@@ -5,7 +5,7 @@ import type { Task } from './types.js';
  */
 export function formatTaskLine(task: Task): string {
   const indent = task.parent ? '    ' : '  ';
-  const kindTag = task.kind === 'SUBTASK' ? 'SUBTASK' : task.kind;
+  const kindTag = task.kind === 'SUBTASK' && task.parent ? `SUBTASK, Parent: ${task.parent}` : task.kind;
   return `${indent}[${task.priority}] ${task.key} (${kindTag}): ${task.title} [${task.status}] ${task.assignee !== 'UNASSIGNED' ? `@${task.assignee}` : ''}`.trimEnd();
 }
 

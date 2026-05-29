@@ -91,6 +91,66 @@ describe('task subcommands (happy paths)', () => {
     expect(result.stdout).not.toContain('AGENT-2');
   });
 
+  it('list surfaces filtered subtasks under their non-matching parent', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const hiddenParent = createTask(tasksDir, {
+      project: 'AGENT',
+      kind: 'TASK',
+      priority: 'HIGH',
+      title: 'Hidden in-progress parent',
+      reporter: 'USER',
+    });
+    const firstChild = createTask(tasksDir, {
+      project: 'AGENT',
+      kind: 'SUBTASK',
+      priority: 'HIGH',
+      title: 'First child',
+      reporter: 'USER',
+      parent: hiddenParent.key,
+    });
+    const secondChild = createTask(tasksDir, {
+      project: 'AGENT',
+      kind: 'SUBTASK',
+      priority: 'HIGH',
+      title: 'Second child',
+      reporter: 'USER',
+      parent: hiddenParent.key,
+    });
+    updateTaskFields(join(tasksDir, 'AGENT', `${hiddenParent.key}.md`), { status: 'IN PROGRESS' });
+
+    const result = await runTaskCommand(rootDir, ['list', '-s', 'NOT_STARTED', '--sort', 'key']);
+
+    expect(result.stdout).toContain(`[HIGH] ${hiddenParent.key} (TASK): Hidden in-progress parent [IN PROGRESS]`);
+    expect(result.stdout).toContain(`[HIGH] ${firstChild.key} (SUBTASK, Parent: ${hiddenParent.key}): First child`);
+    expect(result.stdout).toContain(`[HIGH] ${secondChild.key} (SUBTASK, Parent: ${hiddenParent.key}): Second child`);
+    expect(result.stdout.match(new RegExp(`${hiddenParent.key} \\(TASK\\)`, 'g'))).toHaveLength(1);
+    expect(result.stdout.indexOf(hiddenParent.key)).toBeLessThan(result.stdout.indexOf(firstChild.key));
+    expect(result.stdout.indexOf(hiddenParent.key)).toBeLessThan(result.stdout.indexOf(secondChild.key));
+  });
+
+  it('list keeps subtasks visible when explicitly filtering to subtasks', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const parent = createTask(tasksDir, {
+      project: 'AGENT',
+      kind: 'TASK',
+      priority: 'HIGH',
+      title: 'Parent task',
+      reporter: 'USER',
+    });
+    const child = createTask(tasksDir, {
+      project: 'AGENT',
+      kind: 'SUBTASK',
+      priority: 'HIGH',
+      title: 'Explicit subtask result',
+      reporter: 'USER',
+      parent: parent.key,
+    });
+
+    const result = await runTaskCommand(rootDir, ['list', '-k', 'SUBTASK']);
+
+    expect(result.stdout).toContain(child.key);
+  });
+
   it('list filters by freeform assignee values', async () => {
     const { rootDir, tasksDir } = setupTasksDir();
     updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' });
