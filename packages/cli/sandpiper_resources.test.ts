@@ -103,9 +103,7 @@ describe('Sandpiper resource adapter', () => {
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {
-    const { commands, events, flags, renderers, tools } = applyFactories(
-      createNeutralCapabilityExtensionFactories('/repo'),
-    );
+    const { commands, flags, renderers, tools } = applyFactories(createNeutralCapabilityExtensionFactories('/repo'));
 
     expect(tools).toEqual(expect.arrayContaining(['skill', 'start_background_process', 'check_background_process']));
     expect(tools).toEqual(expect.arrayContaining(['shell_relay', 'shell_relay_inspect', 'web_fetch']));
@@ -113,7 +111,7 @@ describe('Sandpiper resource adapter', () => {
     expect(commands).toContain('chorus');
     expect(renderers).toContain('chorus-room-message');
     expect(commands).not.toContain('migrate-pi');
-    expect(events).not.toContain('before_agent_start');
+    expect(flags).not.toContain('identity');
     expect(flags).not.toContain('migrate-pi-configs');
     expect(flags).not.toContain('install-shell-integrations');
   });

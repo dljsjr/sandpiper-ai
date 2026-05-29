@@ -143,7 +143,7 @@ async function executeRegisteredTool(
 
 function resultText(result: AgentToolResult<SkillToolTestDetails>): string {
   const firstContent = result.content[0];
-  if (!firstContent || firstContent.type !== 'text') {
+  if (firstContent?.type !== 'text') {
     throw new Error('Expected first tool result content block to be text');
   }
   return firstContent.text;
