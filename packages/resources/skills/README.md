@@ -17,24 +17,29 @@ Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills are s
 
 ## Hot First-Party Skills
 
-| Skill      | Description                                                                  |
-| ---------- | ---------------------------------------------------------------------------- |
-| `age`      | Encrypt/decrypt files with the [age](https://github.com/FiloSottile/age) CLI |
-| `ast-grep` | Structural code analysis via AST matching — find patterns, run transforms    |
-| `jj`       | Jujutsu version control — commands, workflows, change management             |
-| `projects` | Manage the cross-project directory at `~/.sandpiper/agent/projects.toon`     |
-| `standup`  | Write/read session stand-up notes for cross-session continuity               |
-| `tasks`    | Markdown-based task management with YAML frontmatter                         |
+| Skill                        | Description                                                      |
+| ---------------------------- | ---------------------------------------------------------------- |
+| `code-review`                | Review diffs, PRs, code quality, and code health                 |
+| `jj`                         | Jujutsu version control — commands, workflows, change management |
+| `mutation-testing`           | Mutation testing setup, interpretation, and quality gates        |
+| `projects`                   | Manage the cross-project directory                               |
+| `refactoring`                | Metrics-guided code cleanup and complexity reduction             |
+| `standup`                    | Write/read session stand-up notes for cross-session continuity   |
+| `tasks`                      | Markdown-based task management with YAML frontmatter             |
+| `test-driven-development`    | TDD/BDD workflow guidance and testing discipline                 |
 
 ## On-Demand Skills
 
 These skills are useful enough to distribute, but too niche or too expensive to keep in the hot catalogue by default.
 
-| Skill           | Location                         | Description                                                                  |
-| --------------- | -------------------------------- | ---------------------------------------------------------------------------- |
-| `skill-review`  | `on_demand/sandpiper/`           | Audit skills for quality, triggering accuracy, and best practices            |
-| `pdf`           | `on_demand/third-party/`         | PDF reading, extraction, manipulation, form filling, and OCR workflows        |
-| `skill-creator` | `on_demand/third-party/`         | Skill authoring, evals, benchmarking, and empirical description optimization |
+| Skill           | Location                 | Description                                                                  |
+| --------------- | ------------------------ | ---------------------------------------------------------------------------- |
+| `age`           | `on_demand/sandpiper/`   | Encrypt/decrypt files with the age CLI                                       |
+| `ast-grep`      | `on_demand/sandpiper/`   | Structural code search and codemods when AST-aware setup earns its keep      |
+| `skill-review`  | `on_demand/sandpiper/`   | Audit skills for quality, triggering accuracy, and best practices            |
+| `toon`          | `on_demand/sandpiper/`   | Convert structured data between JSON and TOON                                |
+| `pdf`           | `on_demand/third-party/` | PDF reading, extraction, manipulation, form filling, and OCR workflows        |
+| `skill-creator` | `on_demand/third-party/` | Skill authoring, evals, benchmarking, and empirical description optimization |
 
 ## Using Skills
 

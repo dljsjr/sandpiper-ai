@@ -69,7 +69,7 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     );
     expect(skillNames).toEqual(expect.arrayContaining(['tasks', 'standup']));
     expect(skillNames).not.toEqual(
-      expect.arrayContaining(['dash', 'gh', 'glab', 'pdf', 'skill-creator', 'skill-review']),
+      expect.arrayContaining(['age', 'ast-grep', 'dash', 'gh', 'glab', 'pdf', 'skill-creator', 'skill-review', 'toon']),
     );
     expect(promptNames).toEqual(expect.arrayContaining(['new-feature', 'code-review']));
     expect(
