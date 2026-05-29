@@ -1,5 +1,7 @@
 import type { Dirent } from 'node:fs';
+import { mkdirSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import type {
   AgentToolResult,
@@ -10,6 +12,7 @@ import type {
 } from '@earendil-works/pi-coding-agent';
 import { keyHint, parseFrontmatter } from '@earendil-works/pi-coding-agent';
 import { Text } from '@earendil-works/pi-tui';
+import Database from 'better-sqlite3';
 import { Type } from 'typebox';
 
 const SKILL_COMMAND_PREFIX = 'skill:';
@@ -23,6 +26,8 @@ const WELL_KNOWN_CONTENT_SECTIONS = [
   { directory: 'scripts', sectionTag: 'scripts', itemTag: 'script' },
   { directory: 'assets', sectionTag: 'assets', itemTag: 'asset' },
 ] as const;
+
+const SKILL_METRICS_DB_PATH = join(homedir(), '.sandpiper', 'agent', 'skill_metrics.sqlite3');
 
 type SkillRenderTheme = Pick<Theme, 'fg'>;
 
@@ -91,15 +96,65 @@ interface AdditionalContentIndex {
   readonly extras: readonly ExtraContentSummary[];
 }
 
+export interface SkillActivationEvent {
+  readonly name: string;
+  readonly source: SkillToolSource;
+}
+
 export interface SkillLoadingToolOperations {
   readonly readFile: (path: string) => Promise<string>;
   readonly readDir?: (path: string) => Promise<readonly DirectoryEntry[]>;
+  readonly recordSkillActivation?: (event: SkillActivationEvent) => Promise<void> | void;
 }
 
 const defaultOperations: SkillLoadingToolOperations = {
   readFile: (path) => readFile(path, 'utf-8'),
   readDir: (path) => readdir(path, { withFileTypes: true }) as Promise<readonly Dirent[]>,
+  recordSkillActivation: recordSkillActivationCount,
 };
+
+export function recordSkillActivationCount(event: SkillActivationEvent, dbPath = SKILL_METRICS_DB_PATH): void {
+  mkdirSync(dirname(dbPath), { recursive: true });
+
+  const database = new Database(dbPath);
+  try {
+    database.exec(`
+      CREATE TABLE IF NOT EXISTS skill_activation_counts (
+        skill_name TEXT NOT NULL,
+        source TEXT NOT NULL,
+        count INTEGER NOT NULL DEFAULT 0,
+        first_seen_at TEXT NOT NULL,
+        last_seen_at TEXT NOT NULL,
+        PRIMARY KEY (skill_name, source)
+      );
+    `);
+
+    const now = new Date().toISOString();
+    database
+      .prepare(`
+        INSERT INTO skill_activation_counts (skill_name, source, count, first_seen_at, last_seen_at)
+        VALUES (?, ?, 1, ?, ?)
+        ON CONFLICT(skill_name, source) DO UPDATE SET
+          count = count + 1,
+          last_seen_at = excluded.last_seen_at
+      `)
+      .run(event.name, event.source, now, now);
+  } finally {
+    database.close();
+  }
+}
+
+async function recordSkillActivationSafely(
+  operations: SkillLoadingToolOperations,
+  event: SkillActivationEvent,
+): Promise<void> {
+  try {
+    await operations.recordSkillActivation?.(event);
+  } catch {
+    // Skill metrics are diagnostic only. A locked, missing, or corrupt metrics
+    // database must never block the model from loading instructions it needs.
+  }
+}
 
 function normalizeRequestedSkillName(name: string): string {
   const trimmed = name.trim();
@@ -601,12 +656,13 @@ export async function executeSkillTool(
   operations: SkillLoadingToolOperations = defaultOperations,
 ): Promise<AgentToolResult<SkillToolDetails>> {
   const source = params.source ?? 'catalog';
+  const result =
+    source === 'filesystem'
+      ? await executeFilesystemSkillTool(params, operations)
+      : await executeCatalogSkillTool(pi, params, operations);
 
-  if (source === 'filesystem') {
-    return executeFilesystemSkillTool(params, operations);
-  }
-
-  return executeCatalogSkillTool(pi, params, operations);
+  await recordSkillActivationSafely(operations, { name: result.details.name, source });
+  return result;
 }
 
 export function registerSkillLoadingTool(
