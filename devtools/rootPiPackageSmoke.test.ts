@@ -68,6 +68,7 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
       ]),
     );
     expect(skillNames).toEqual(expect.arrayContaining(['tasks', 'standup']));
+    expect(skillNames).not.toEqual(expect.arrayContaining(['pdf', 'skill-creator', 'skill-review']));
     expect(promptNames).toEqual(expect.arrayContaining(['new-feature', 'code-review']));
     expect(
       skills.every((skill) => skill.filePath.startsWith(join(packageDir, 'packages', 'resources', 'skills'))),

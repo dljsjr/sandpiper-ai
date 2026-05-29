@@ -221,7 +221,14 @@ async function buildDashCli(): Promise<void> {
 }
 
 async function ensureSkillReviewGuide(): Promise<void> {
-  const guideRelativePath = join('skills', 'sandpiper', 'skill-review', 'references', 'skill-building-guide.pdf');
+  const guideRelativePath = join(
+    'skills',
+    'on_demand',
+    'sandpiper',
+    'skill-review',
+    'references',
+    'skill-building-guide.pdf',
+  );
   const guidePaths = [
     join(DIST_DIR, guideRelativePath),
     join(DIST_DIR, 'packages', 'resources', guideRelativePath),

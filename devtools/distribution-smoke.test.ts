@@ -36,6 +36,7 @@ describe('Pi package distribution smoke', () => {
       prompts: ['./packages/resources/prompts'],
       themes: ['./packages/resources/themes'],
     });
+    expect(rootPackageJson.pi.skills).not.toContain('./packages/resources/skills/on_demand');
     expect(rootPackageJson.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
     expect(rootPackageJson.bin).toEqual({ sandpiper: './packages/cli/bin/sandpiper' });
     expect(rootPackageJson).not.toHaveProperty('files');
@@ -75,6 +76,7 @@ describe('Pi package distribution smoke', () => {
       const distPackageJson = createDistPackageJson(rootPackageJson);
       materializePiManifestPaths(packageRoot, distPackageJson);
 
+      expect(distPackageJson.pi.skills).not.toContain('./skills/on_demand');
       expect(distPackageJson).toMatchObject({
         name: rootPackageJson.name,
         version: rootPackageJson.version,
