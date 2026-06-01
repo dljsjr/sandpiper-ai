@@ -62,6 +62,8 @@ Use portable references:
 
 If local guidance needs an external rule, copy or adapt the rule into this repository with portable links.
 
+When mentioning optional capabilities that may exist in a particular agent session, such as YAAMS-backed memory tools, write capability-conditioned guidance. Persistent identity agents may have extra memory/persistence mechanisms; ephemeral and expert agents may not. Project-local guidance in this repo must remain usable without them.
+
 ## AGENTS.md and Playbooks
 
 Keep `AGENTS.md` short and complete enough for always-loaded context. Put details in `.sandpiper/playbooks/` when guidance is conditional, procedural, path-specific, or long.

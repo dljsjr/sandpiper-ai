@@ -19,6 +19,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 - Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
 - Tests must not touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config).
+- YAAMS is adjacent tooling, not part of this monorepo yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; built-in continuity remains standup, tasks, inbox, and session logs until an integration lands.
 
 ## Routing
 
@@ -31,7 +32,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 | CLI tools, Commander commands, package `bin` entries, bundled executables                              | `.sandpiper/playbooks/development/cli.md`                    |
 | Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                          | `.sandpiper/playbooks/development/pi-extensions.md`          |
 | AutoTOON, JSON→TOON conversion, token optimization                                                     | `.sandpiper/playbooks/features/autotoon.md`                  |
-| Task management, Trail/`trail`, task storage, task index                                     | `.sandpiper/playbooks/features/tasks.md`                     |
+| Task management, Trail/`trail`, task storage, task index                                               | `.sandpiper/playbooks/features/tasks.md`                     |
 | Shell Relay, Zellij integration, shared terminal, shell integrations                                   | `.sandpiper/playbooks/features/shell-relay.md`               |
 | Standup, session continuity, PID/liveness handling, concurrent sessions                                | `.sandpiper/playbooks/features/session-continuity.md`        |
 
