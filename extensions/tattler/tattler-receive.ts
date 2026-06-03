@@ -28,9 +28,8 @@ export function registerTattlerReceiveTool(
     description: 'Yield the current turn so pending Tattler/Chorus messages can be delivered as a batch.',
     promptSnippet: 'Cooperatively receive pending Tattler/Chorus messages when they may affect current work.',
     promptGuidelines: [
-      'Call tattler_receive only when pending Tattler/Chorus messages may affect the current work.',
+      'Call tattler_receive only when pending Tattler/Chorus messages may affect the current work; do not use it as an acknowledgement.',
       'Call tattler_receive by itself, not alongside other tools; it terminates the current turn so pending messages can be delivered cleanly.',
-      'Do not use tattler_receive as an acknowledgement; use it only to create a clean receive boundary.',
     ],
     parameters: Type.Object({}),
     executionMode: 'sequential',

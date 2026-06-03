@@ -50,16 +50,16 @@ function clearEventResponders(): void {
 // ============================================================================
 // Begin Pi API Integration
 // ============================================================================
+const TATTLER_ROUTING_PROMPT_GUIDELINE =
+  'Use send_peer_message directly when you know the recipient name, shortId, or socket path; use list_peers only when routing is unknown.';
+
 function registerListPeersTool(tattlerRuntimeDir: string, ownIdentity: TattlerIdentityV0, pi: ExtensionAPI) {
   pi.registerTool({
     name: 'list_peers',
     label: 'List Peers',
     promptSnippet:
       'Lists routing information for other Tattler participants with active endpoints for Tattler messages',
-    promptGuidelines: [
-      "Use `list_peers` when you need to send a message to another Tattler participant, but you don't know their name/identity/socket information.",
-      'If you are sending a reply to another message, try sending directly with the `name` address type first to save time. `list_peers` is your fallback.',
-    ],
+    promptGuidelines: [TATTLER_ROUTING_PROMPT_GUIDELINE],
     description: 'List other agent peers with live sockets, which means they are candidates for receiving messages',
     parameters: Type.Object({}),
     async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
@@ -109,16 +109,12 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
     description: 'Send a message to a live/active peer',
     promptSnippet:
       'Send a message to another Tattler participant. Use `addressType` to control how the `id` property should be interpreted',
-    promptGuidelines: [
-      'When using tools that send messages, populate the message body as if you were generating a response to a user prompt.',
-      'Do not fall back to a robotic personality just because you are using a tool instead of chatting directly. Messages MUST utilize ALL personality and identity instructions you have been given.',
-      'Use `send_peer_message` directly without consulting `list_peers` if you know any of the shortId, name, or UDS socket path for your recipient',
-    ],
+    promptGuidelines: [TATTLER_ROUTING_PROMPT_GUIDELINE],
     parameters: Type.Object({
       addressType: Type.Optional(TattlerAddressType),
       id: Type.String({ description: 'Target Peer ID (generalized by address type)' }),
       message: Type.String({
-        description: `The message to send to the peer, limited in size to ${MAX_MESSAGE_BYTES} bytes`,
+        description: `The authored message to send to the peer, written as your own response prose and limited to ${MAX_MESSAGE_BYTES} bytes`,
       }),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {

@@ -158,15 +158,22 @@ describe('system-prompt', () => {
       expect(block).not.toContain('<tool name="edit">Edit a file</tool>');
     });
 
-    it('renders guidelines and strips "Be concise"', () => {
+    it('renders normalized guidelines and strips "Be concise"', () => {
       const options = createPromptOptions({
-        promptGuidelines: ['Be concise in your responses', 'Show file paths clearly when working with files'],
+        promptGuidelines: [
+          'Be concise in your responses',
+          '  Show file paths clearly when working with files  ',
+          'Show file paths clearly when working with files',
+          '',
+        ],
       });
 
       const block = toolGuidanceBlock(options);
       expect(block).toContain('Guidelines:');
       expect(block).toContain('- Show file paths clearly');
+      expect(block.match(/Show file paths clearly/g)).toHaveLength(1);
       expect(block).not.toContain('Be concise in your responses');
+      expect(block).not.toContain('-   Show');
     });
 
     it('omits empty tool snippets', () => {
