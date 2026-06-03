@@ -105,7 +105,7 @@ function copyDistributionRoots(): void {
     copyTree(join(REPO_ROOT, element), join(DIST_DIR, element));
   }
 
-  for (const element of ['themes', 'skills', 'prompts'] as const) {
+  for (const element of ['themes', 'skills', 'skills-on-demand', 'prompts'] as const) {
     console.log(`⚙ Copying ${element} resources for distribution`);
     copyTree(join(RESOURCE_DIR, element), join(DIST_DIR, element));
   }
@@ -183,8 +183,7 @@ function copyPiRuntimeAssets(): void {
 
 async function ensureSkillReviewGuide(): Promise<void> {
   const guideRelativePath = join(
-    'skills',
-    'on_demand',
+    'skills-on-demand',
     'sandpiper',
     'skill-review',
     'references',

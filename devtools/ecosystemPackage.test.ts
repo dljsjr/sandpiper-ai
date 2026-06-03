@@ -119,6 +119,7 @@ describe('ecosystem package artifacts', () => {
       'trail',
       'README.md',
       'skills/',
+      'skills-on-demand/',
       'themes/',
     ]);
     expect(findUnsupportedDependencySpecs(packageDir)).toEqual([]);
@@ -150,14 +151,14 @@ describe('ecosystem package artifacts', () => {
         'packages/resources/skills/sandpiper/tasks/scripts/trail',
         'packages/resources/skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup',
-        'packages/resources/skills/on_demand/sandpiper/skill-review/references/skill-building-guide.pdf',
+        'packages/resources/skills-on-demand/sandpiper/skill-review/references/skill-building-guide.pdf',
         'skills/sandpiper/tasks/SKILL.md',
         'skills/sandpiper/tasks/scripts/trail',
         'skills/sandpiper/tasks/scripts/sandpiper-tasks',
         'skills/sandpiper/standup/scripts/sandpiper-standup',
-        'skills/on_demand/sandpiper/skill-review/references/skill-building-guide.pdf',
-        'skills/on_demand/third-party/pdf/SKILL.md',
-        'skills/on_demand/third-party/skill-creator/SKILL.md',
+        'skills-on-demand/sandpiper/skill-review/references/skill-building-guide.pdf',
+        'skills-on-demand/third-party/pdf/SKILL.md',
+        'skills-on-demand/third-party/skill-creator/SKILL.md',
       ]),
     );
     expect(packedFiles).not.toContain('.sandpiper/docs/README.md');

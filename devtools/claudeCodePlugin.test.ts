@@ -122,9 +122,9 @@ describe('Claude Code plugin mapping', () => {
       for (const relativePath of [
         'skills/sandpiper/tasks/SKILL.md',
         'skills/sandpiper/standup/SKILL.md',
-        'skills/on_demand/third-party/pdf/SKILL.md',
-        'skills/on_demand/third-party/skill-creator/SKILL.md',
-        'skills/on_demand/sandpiper/skill-review/SKILL.md',
+        'skills-on-demand/third-party/pdf/SKILL.md',
+        'skills-on-demand/third-party/skill-creator/SKILL.md',
+        'skills-on-demand/sandpiper/skill-review/SKILL.md',
         'commands/new-feature.md',
         'hooks/hooks.json',
         'package.json',
