@@ -136,8 +136,8 @@ describe('Tattler IPC payload frames', () => {
         ],
       },
     });
-    expect(runtime.notifications[0]?.message.content).toContain('<tattler_pending_message_batch');
-    expect(runtime.notifications[0]?.message.content).toContain('<tattler_agent_message');
+    expect(runtime.notifications[0]?.message.content).toContain('<tattler_inbox pending="1" visibility="hidden">');
+    expect(runtime.notifications[0]?.message.content).toContain('<message from="Piper"');
     expect(runtime.notifications[0]?.options).toEqual({ triggerTurn: true, deliverAs: 'steer' });
   });
 

@@ -12,7 +12,6 @@ import {
   type TattlerMessageId,
   type TattlerSendableFrame,
 } from '../tattler/tattler-protocol';
-import { chorusReplyContractXml, chorusReplyPolicyXml } from '../tattler/tattler-reply-contract';
 
 export const CHORUS_MESSAGE_CUSTOM_TYPE = 'chorus-room-message';
 
@@ -259,12 +258,9 @@ export function isChorusBrokerAuthor(from: string, broker: ChorusReplyRouteV0): 
 }
 
 export function createChorusUserMessageContent(details: ChorusIncomingMessageDetails): string {
-  return `<chorus_room_message roomId="${escapeXml(details.roomId)}" postId="${escapeXml(details.postId)}" from="${escapeXml(details.from)}" brokerName="${escapeXml(details.broker.name)}" brokerShortId="${escapeXml(details.broker.shortId)}" brokerSocketPath="${escapeXml(details.broker.socketPath)}">
-<source>This is a Chorus room message from a room participant.</source>
-${chorusReplyPolicyXml()}
-${chorusReplyContractXml()}
-<message>${escapeXml(details.message)}</message>
-</chorus_room_message>`;
+  return `<chorus_inbox roomId="${escapeXml(details.roomId)}" pending="1" visibility="visible" replyTool="send_chorus_reply">
+  <message from="${escapeXml(details.from)}" postId="${escapeXml(details.postId)}" brokerName="${escapeXml(details.broker.name)}" brokerShortId="${escapeXml(details.broker.shortId)}" brokerSocketPath="${escapeXml(details.broker.socketPath)}">${escapeXml(details.message)}</message>
+</chorus_inbox>`;
 }
 
 export function assertMessageSize(message: string): void {

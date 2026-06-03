@@ -69,6 +69,10 @@ describe('Chorus extension commands', () => {
 
     expect(tool?.promptGuidelines).toEqual(
       expect.arrayContaining([
+        expect.stringContaining(
+          'Use send_chorus_reply only when a visible Chorus room message warrants a substantive reply',
+        ),
+        expect.stringContaining('use done if no reply is needed and no other work remains'),
         expect.stringContaining('room message other participants will read'),
         expect.stringContaining('own SELF/identity voice'),
       ]),
@@ -209,7 +213,7 @@ describe('Chorus extension commands', () => {
     expect(pi.sendMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-        content: expect.stringContaining('count="1"'),
+        content: expect.stringContaining('pending="1"'),
         display: true,
         details: expect.objectContaining({
           kind: 'batch',

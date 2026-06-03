@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 import type { ChorusReplyRouteV0, ChorusRoomId, TattlerAgentMessageV0, TattlerMessageId } from './tattler-protocol';
-import { chorusReplyContractXml, chorusReplyPolicyXml } from './tattler-reply-contract';
 
 export const TATTLER_PENDING_BATCH_CUSTOM_TYPE = 'tattler:pending-batch';
 export const TATTLER_PENDING_INBOX_ENTRY_KEY = 'tattler:pending-inbox';
@@ -204,7 +203,7 @@ export function createTattlerPendingBatchMessageFromMessages(
   const batchId = options.batchId ?? `tattler-batch-${randomUUID()}`;
   return {
     customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-    content: options.modelVisible === false ? '' : createTattlerPendingBatchContent(batchId, messages),
+    content: options.modelVisible === false ? '' : createTattlerPendingBatchContent(messages),
     display: messages.some((message) => message.visible),
     details: {
       kind: 'batch',
@@ -223,40 +222,61 @@ export function pendingMessageKey(message: TattlerPendingMessage): string {
   }
 }
 
-function createTattlerPendingBatchContent(batchId: string, messages: readonly TattlerPendingMessage[]): string {
-  const lines = [
-    `<tattler_pending_message_batch batchId="${escapeXml(batchId)}" count="${messages.length}">`,
-    '  <instructions>These Tattler/Chorus messages arrived while you were busy. Process them in arrival order. Respond only when a message warrants a substantive reply; do not acknowledge every message.</instructions>',
-  ];
+function createTattlerPendingBatchContent(messages: readonly TattlerPendingMessage[]): string {
+  const lines: string[] = [];
+  let index = 0;
 
-  for (const message of messages) {
-    lines.push(...formatPendingMessageContent(message, 1));
+  while (index < messages.length) {
+    const message = messages[index];
+    if (!message) break;
+
+    if (message.kind === 'tattler.agent-message.v0') {
+      const group: TattlerPendingAgentMessage[] = [];
+      while (index < messages.length) {
+        const candidate = messages[index];
+        if (candidate?.kind !== 'tattler.agent-message.v0') break;
+        group.push(candidate);
+        index++;
+      }
+      lines.push(...formatTattlerInbox(group));
+      continue;
+    }
+
+    const room = message.roomId;
+    const group: TattlerPendingChorusMessage[] = [];
+    while (index < messages.length) {
+      const candidate = messages[index];
+      if (candidate?.kind !== 'chorus.room-message.v0' || candidate.roomId !== room) break;
+      group.push(candidate);
+      index++;
+    }
+    lines.push(...formatChorusInbox(room, group));
   }
 
-  lines.push('</tattler_pending_message_batch>');
   return lines.join('\n');
 }
 
-function formatPendingMessageContent(message: TattlerPendingMessage, level: number): string[] {
-  const prefix = '  '.repeat(level);
-  switch (message.kind) {
-    case 'tattler.agent-message.v0':
-      return [
-        `${prefix}<tattler_agent_message id="${escapeXml(message.id)}" from="${escapeXml(message.from)}">`,
-        `${prefix}  <instructions>This is a hidden coordination message from another coding agent. The user cannot see it unless you explicitly summarize it.</instructions>`,
-        `${prefix}  <message>${escapeXml(message.message)}</message>`,
-        `${prefix}</tattler_agent_message>`,
-      ];
-    case 'chorus.room-message.v0':
-      return [
-        `${prefix}<chorus_room_message roomId="${escapeXml(message.roomId)}" postId="${escapeXml(message.postId)}" from="${escapeXml(message.from)}" brokerName="${escapeXml(message.broker.name)}" brokerShortId="${escapeXml(message.broker.shortId)}" brokerSocketPath="${escapeXml(message.broker.socketPath)}">`,
-        `${prefix}  <source>This is a Chorus room message from a room participant.</source>`,
-        chorusReplyPolicyXml(`${prefix}  `),
-        chorusReplyContractXml(`${prefix}  `),
-        `${prefix}  <message>${escapeXml(message.message)}</message>`,
-        `${prefix}</chorus_room_message>`,
-      ];
-  }
+function formatTattlerInbox(messages: readonly TattlerPendingAgentMessage[]): string[] {
+  return [
+    `<tattler_inbox pending="${messages.length}" visibility="hidden">`,
+    ...messages.map(
+      (message) =>
+        `  <message from="${escapeXml(message.from)}" id="${escapeXml(message.id)}">${escapeXml(message.message)}</message>`,
+    ),
+    '</tattler_inbox>',
+  ];
+}
+
+function formatChorusInbox(room: ChorusRoomId, messages: readonly TattlerPendingChorusMessage[]): string[] {
+  return [
+    `<chorus_inbox roomId="${escapeXml(room)}" pending="${messages.length}" visibility="visible" replyTool="send_chorus_reply">`,
+    ...messages.map(formatChorusInboxMessage),
+    '</chorus_inbox>',
+  ];
+}
+
+function formatChorusInboxMessage(message: TattlerPendingChorusMessage): string {
+  return `  <message from="${escapeXml(message.from)}" postId="${escapeXml(message.postId)}" brokerName="${escapeXml(message.broker.name)}" brokerShortId="${escapeXml(message.broker.shortId)}" brokerSocketPath="${escapeXml(message.broker.socketPath)}">${escapeXml(message.message)}</message>`;
 }
 
 function bySequence(a: TattlerPendingInboxItem, b: TattlerPendingInboxItem): number {
