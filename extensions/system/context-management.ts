@@ -67,12 +67,13 @@ If you switch away from work to capture context, resume your original work after
     if (!alerted && ctxUsage?.percent && ctxUsage.percent >= CONTEXT_USAGE_ALERT_THRESHOLD) {
       contextNotificationInstructions = `
 <alert>
-Context usage is above 80%. Adjust your plan and do any checkpointing or continuity preserving work now before compaction or overflow.
-If you switch away from work to capture context, resume your original work afterwords. Do not worry about the compaction boundary once you have continuity captured.
-  - checkpoint active work,
-  - write durable facts/decisions/patterns to memory,
-  - update project docs/tasks if shared truth changed.
-  - consider other key files (SELF, AGENTS, etc) as well
+Context usage is above 80%. Stop current work and capture continuity now — compaction is imminent.
+
+  1. Call memory_write for every decision, preference, pattern, or fact from this session not yet in YAAMS. Do this first.
+  2. Checkpoint active work (standup / CHECKPOINT.md).
+  3. Update project docs and tasks if shared truth changed.
+
+Resume only after step 1 is complete.
 </alert>
 `.trim();
       alerted = true;

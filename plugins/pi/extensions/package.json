@@ -23,10 +23,10 @@
     "uuid": "14.0.0"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.78.0",
-    "@earendil-works/pi-ai": "0.78.0",
-    "@earendil-works/pi-tui": "0.78.0",
-    "typebox": "1.1.39"
+    "@earendil-works/pi-coding-agent": "0.78.1",
+    "@earendil-works/pi-ai": "0.78.1",
+    "@earendil-works/pi-tui": "0.78.1",
+    "typebox": "1.2.2"
   },
   "devDependencies": {
     "@types/tmp": "0.2.6"
