@@ -28,17 +28,21 @@ export interface CapturedTool {
 }
 
 export function createToolRegistrationStub(): {
-  pi: Pick<ExtensionAPI, 'registerTool'>;
+  pi: Pick<ExtensionAPI, 'registerTool' | 'sendMessage'>;
   tools: CapturedTool[];
+  sendMessage: ReturnType<typeof vi.fn>;
 } {
   const tools: CapturedTool[] = [];
+  const sendMessage = vi.fn();
   return {
     pi: {
       registerTool: ((tool: CapturedTool) => {
         tools.push(tool);
       }) as ExtensionAPI['registerTool'],
+      sendMessage: sendMessage as ExtensionAPI['sendMessage'],
     },
     tools,
+    sendMessage,
   };
 }
 
@@ -150,17 +154,10 @@ export function createProcessManagerStub(
   };
 }
 
-export function createBackgroundContextProcessManagerStub(
-  overrides: {
-    getCompletedUnacknowledged?: () => unknown[];
-    acknowledge?: (id: string) => void;
-    killAll?: () => void;
-  } = {},
-): Pick<ProcessManager, 'getCompletedUnacknowledged' | 'acknowledge' | 'killAll'> {
+export function createBackgroundLifecycleProcessManagerStub(
+  overrides: { killAll?: () => void } = {},
+): Pick<ProcessManager, 'killAll'> {
   return {
-    getCompletedUnacknowledged: (overrides.getCompletedUnacknowledged ??
-      vi.fn(() => [])) as ProcessManager['getCompletedUnacknowledged'],
-    acknowledge: (overrides.acknowledge ?? vi.fn()) as ProcessManager['acknowledge'],
     killAll: (overrides.killAll ?? vi.fn()) as ProcessManager['killAll'],
   };
 }

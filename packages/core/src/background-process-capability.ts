@@ -33,11 +33,6 @@ export type CheckBackgroundProcessResult =
     }
   | { readonly found: false; readonly id: string };
 
-export interface CompletedBackgroundProcessNotification {
-  readonly id: string;
-  readonly exitCode: number | null;
-}
-
 export function startBackgroundProcess(
   processManager: ProcessManager,
   request: StartBackgroundProcessRequest,
@@ -77,16 +72,4 @@ export function checkBackgroundProcess(
       ? { text: process.readStderr(readOptions), lineCount: process.stderrLineCount }
       : undefined,
   };
-}
-
-export function collectCompletedBackgroundProcessNotifications(
-  processManager: ProcessManager,
-): readonly CompletedBackgroundProcessNotification[] {
-  const completed = processManager.getCompletedUnacknowledged();
-
-  for (const process of completed) {
-    processManager.acknowledge(process.id);
-  }
-
-  return completed.map((process) => ({ id: process.id, exitCode: process.exitCode }));
 }

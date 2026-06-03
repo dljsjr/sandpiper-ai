@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import {
-  checkBackgroundProcess,
-  collectCompletedBackgroundProcessNotifications,
-  startBackgroundProcess,
-} from './background-process-capability.js';
+import { checkBackgroundProcess, startBackgroundProcess } from './background-process-capability.js';
 import { ProcessManager } from './process-manager.js';
 
 interface WaitForOptions {
@@ -102,13 +98,5 @@ describe('background process capability operations', () => {
     const result = checkBackgroundProcess(processManager, { id: 'missing' });
 
     expect(result).toEqual({ found: false, id: 'missing' });
-  });
-
-  it('collects completed process notifications once', async () => {
-    const started = processManager.spawn({ id: 'done', command: 'bash', args: ['-c', 'exit 7'] });
-    await waitFor(() => expect(started.running).toBe(false), { timeout: 2000 });
-
-    expect(collectCompletedBackgroundProcessNotifications(processManager)).toEqual([{ id: 'done', exitCode: 7 }]);
-    expect(collectCompletedBackgroundProcessNotifications(processManager)).toEqual([]);
   });
 });

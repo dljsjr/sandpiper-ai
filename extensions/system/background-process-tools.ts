@@ -1,6 +1,16 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { checkBackgroundProcess, type ProcessManager, startBackgroundProcess } from 'sandpiper-ai-core';
+import {
+  checkBackgroundProcess,
+  type ProcessManager,
+  SystemNotificationDelivery,
+  SystemNotificationSourceType,
+  sendSystemNotification,
+  startBackgroundProcess,
+} from 'sandpiper-ai-core';
 import { Type } from 'typebox';
+
+const BACKGROUND_PROCESS_COMPLETION_INSTRUCTIONS =
+  'A background process started with start_background_process completed. Use check_background_process if you need its final output before continuing.';
 
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.registerTool({
@@ -45,6 +55,19 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
           isError: true,
         };
       }
+
+      processManager.get(result.process.id)?.onExit((exitCode, exitSignal) => {
+        sendSystemNotification(pi, {
+          sourceType: SystemNotificationSourceType.Tool,
+          sourceId: 'background_process',
+          deliverAs: SystemNotificationDelivery.Steer,
+          triggerTurn: true,
+          instructions: BACKGROUND_PROCESS_COMPLETION_INSTRUCTIONS,
+          data: {
+            process: { id: result.process.id, exitCode, exitSignal },
+          },
+        });
+      });
 
       return {
         content: [

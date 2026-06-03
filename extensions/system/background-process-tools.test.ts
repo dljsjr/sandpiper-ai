@@ -1,3 +1,4 @@
+import { SANDPIPER_SYSTEM_NOTIFICATION_CUSTOM_TYPE } from 'sandpiper-ai-core';
 import { describe, expect, it, vi } from 'vitest';
 import { registerBackgroundProcessTools } from './background-process-tools.js';
 import { createProcessManagerStub, createToolRegistrationStub } from './test-helpers.js';
@@ -38,6 +39,58 @@ describe('registerBackgroundProcessTools', () => {
     });
     expect(result.isError).toBeUndefined();
     expect(result.details).toMatchObject({ id: 'dev-server', pid: 4242, status: 'running' });
+  });
+
+  it('sends a steering notification that wakes the agent when a started process exits', async () => {
+    const { pi, tools, sendMessage } = createToolRegistrationStub();
+    let exitHandler: ((code: number | null, signal: string | null) => void) | undefined;
+    const managedProcess = {
+      info: { id: 'dev-server', pid: 4242, running: true, exitCode: null, exitSignal: null },
+      onExit: vi.fn((handler: (code: number | null, signal: string | null) => void) => {
+        exitHandler = handler;
+      }),
+    };
+    const processManager = createProcessManagerStub({
+      spawn: vi.fn(() => managedProcess),
+      get: vi.fn(() => managedProcess),
+    });
+
+    registerBackgroundProcessTools(
+      pi as Parameters<typeof registerBackgroundProcessTools>[0],
+      processManager as Parameters<typeof registerBackgroundProcessTools>[1],
+    );
+
+    const startTool = tools.find((tool) => tool.name === 'start_background_process');
+    if (!startTool) {
+      throw new Error('start_background_process not registered');
+    }
+
+    await startTool.execute(
+      'tool-call-id',
+      { id: 'dev-server', command: 'bun', args: ['run', 'dev'] },
+      undefined,
+      undefined,
+      { cwd: '/repo' },
+    );
+    exitHandler?.(0, null);
+
+    expect(managedProcess.onExit).toHaveBeenCalledOnce();
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customType: SANDPIPER_SYSTEM_NOTIFICATION_CUSTOM_TYPE,
+        display: false,
+        details: {
+          sourceType: 'tool',
+          sourceId: 'background_process',
+          instructions:
+            'A background process started with start_background_process completed. Use check_background_process if you need its final output before continuing.',
+          data: {
+            process: { id: 'dev-server', exitCode: 0, exitSignal: null },
+          },
+        },
+      }),
+      { deliverAs: 'steer', triggerTurn: true },
+    );
   });
 
   it('returns errors for spawn failures and missing process lookups', async () => {
