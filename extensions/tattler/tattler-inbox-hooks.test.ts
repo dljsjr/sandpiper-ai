@@ -39,8 +39,8 @@ describe('Tattler pending inbox hooks', () => {
       display: false,
       details: { kind: 'batch', messages: [expect.objectContaining({ from: 'Muninn', message: 'review note' })] },
     });
-    expect(result?.message?.content).toContain('<tattler_pending_message_batch');
-    expect(result?.message?.content).toContain('<tattler_agent_message');
+    expect(result?.message?.content).toContain('<tattler_inbox pending="1" visibility="hidden">');
+    expect(result?.message?.content).toContain('<message from="Muninn"');
     expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 1, total: 1 });
 
     const messageEnd = handlers.get('message_end');

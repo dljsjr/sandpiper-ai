@@ -55,19 +55,55 @@ describe('Tattler pending inbox', () => {
     const drain = drainPendingInboxToBatch(inbox);
 
     expect(drain?.message.display).toBe(true);
-    expect(drain?.message.content).toContain('hidden coordination note');
-    expect(drain?.message.content).toContain('visible room note');
+    expect(drain?.message.content).toContain('<tattler_inbox pending="1" visibility="hidden">');
+    expect(drain?.message.content).toContain('<message from="Muninn" id="hidden-1">hidden coordination note</message>');
     expect(drain?.message.content).toContain(
-      '<reply_policy audience="room" visibility="visible" tool="send_chorus_reply">',
+      '<chorus_inbox roomId="chorus-dev" pending="1" visibility="visible" replyTool="send_chorus_reply">',
     );
     expect(drain?.message.content).toContain(
-      '<reply_contract audience="room" visibility="visible" tool="send_chorus_reply">',
+      '<message from="Piper" postId="post-1" brokerName="chorus:chorus-dev" brokerShortId="chorus-dev" brokerSocketPath="/tmp/chorus.sock">visible room note</message>',
     );
-    expect(drain?.message.content).toContain(
-      'The send_chorus_reply message field is the room message other participants will read.',
-    );
-    expect(drain?.message.content).toContain('Write that field in your own SELF/identity voice');
+    expect(drain?.message.content).not.toContain('reply_policy');
+    expect(drain?.message.content).not.toContain('reply_contract');
+    expect(drain?.message.content).not.toContain('<instructions>');
+    expect(drain?.message.content).not.toContain('<tattler_pending_message_batch');
+    expect(drain?.message.content).not.toContain('<tattler_agent_message');
+    expect(drain?.message.content).not.toContain('<chorus_room_message');
     expect(drain?.message.details.messages).toHaveLength(2);
+  });
+
+  test('escapes slim envelope content and coalesces consecutive Chorus room messages', () => {
+    const inbox = createTattlerPendingInbox();
+    const broker = { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus&dev.sock' };
+    inbox.enqueue({
+      kind: 'chorus.room-message.v0',
+      id: 'delivery-1' as TattlerMessageId,
+      roomId: roomId('chorus-dev'),
+      from: 'Piper',
+      message: 'first </message> & <tag attr="x">',
+      postId: 'post-1' as TattlerMessageId,
+      broker,
+      visible: true,
+    });
+    inbox.enqueue({
+      kind: 'chorus.room-message.v0',
+      id: 'delivery-2' as TattlerMessageId,
+      roomId: roomId('chorus-dev'),
+      from: 'Huginn',
+      message: 'second note',
+      postId: 'post-2' as TattlerMessageId,
+      broker,
+      visible: true,
+    });
+
+    const drain = drainPendingInboxToBatch(inbox);
+
+    expect(drain?.message.content).toContain(
+      '<chorus_inbox roomId="chorus-dev" pending="2" visibility="visible" replyTool="send_chorus_reply">',
+    );
+    expect(drain?.message.content).toContain('brokerSocketPath="/tmp/chorus&amp;dev.sock"');
+    expect(drain?.message.content).toContain('first &lt;/message&gt; &amp; &lt;tag attr=&quot;x&quot;&gt;');
+    expect(drain?.message.content).toContain('second note');
   });
 
   test('clears session-scoped pending state and sequence numbers', () => {

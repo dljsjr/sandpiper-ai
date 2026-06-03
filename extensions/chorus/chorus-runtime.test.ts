@@ -205,8 +205,13 @@ describe('Chorus broker runtime', () => {
     expect(isChorusBrokerAuthor('Doug', broker)).toBe(false);
   });
 
-  test('builds model-facing Chorus message content with broker route metadata', () => {
-    const frame = createChorusRoomDeliveryFrame(roomId('chorus-dev'), 'Huginn', 'original-post', 'reply note');
+  test('builds slim model-facing Chorus message content with current reply route metadata', () => {
+    const frame = createChorusRoomDeliveryFrame(
+      roomId('chorus-dev'),
+      'Huginn',
+      'original-post',
+      'reply </message> & <note attr="x">',
+    );
     const content = createChorusUserMessageContent({
       roomId: frame.roomId,
       from: frame.from,
@@ -215,18 +220,15 @@ describe('Chorus broker runtime', () => {
       broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
     });
 
-    expect(content).toContain('<chorus_room_message');
-    expect(content).toContain('roomId="chorus-dev"');
-    expect(content).toContain('brokerSocketPath="/tmp/chorus-dev.sock"');
-    expect(content).toContain('<reply_policy audience="room" visibility="visible" tool="send_chorus_reply">');
     expect(content).toContain(
-      'Reply only if you are directly addressed, own the relevant work lane, have new information, or silence would block progress.',
+      '<chorus_inbox roomId="chorus-dev" pending="1" visibility="visible" replyTool="send_chorus_reply">',
     );
-    expect(content).toContain('<reply_contract audience="room" visibility="visible" tool="send_chorus_reply">');
-    expect(content).toContain('The send_chorus_reply message field is the room message other participants will read.');
-    expect(content).toContain('Write that field in your own SELF/identity voice');
-    expect(content).toContain('no other work remains for this turn');
-    expect(content).toContain('use the done tool');
-    expect(content).toContain('reply note');
+    expect(content).toContain(
+      '<message from="Huginn" postId="original-post" brokerName="chorus:chorus-dev" brokerShortId="chorus-dev" brokerSocketPath="/tmp/chorus-dev.sock">reply &lt;/message&gt; &amp; &lt;note attr=&quot;x&quot;&gt;</message>',
+    );
+    expect(content).not.toContain('<chorus_room_message');
+    expect(content).not.toContain('<source>');
+    expect(content).not.toContain('reply_policy');
+    expect(content).not.toContain('reply_contract');
   });
 });

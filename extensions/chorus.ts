@@ -376,7 +376,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
     promptSnippet:
       'Send a reply to a Chorus room via the provided broker route. Use this instead of a plain Tattler DM for Chorus replies.',
     promptGuidelines: [
-      'Use this when a visible Chorus room message asks for a substantive reply.',
+      'Use send_chorus_reply only when a visible Chorus room message warrants a substantive reply; use done if no reply is needed and no other work remains for the turn.',
       'Copy roomId, postId, and broker route fields from the Chorus message metadata in context.',
       'Do not use send_peer_message for Chorus room replies unless the user explicitly asks for a direct Tattler DM.',
       'The tool message field is the actual room message other participants will read; write it in your own SELF/identity voice, not as generic tool or status prose.',
