@@ -703,8 +703,6 @@ export function registerSkillLoadingTool(
       'Use skill names exactly as listed in <available_skills>; do not invent catalog skill names.',
       'Use `source="filesystem"` only when the user explicitly asks to load a non-catalogued skill from a filesystem path.',
       'Skills with `disable-model-invocation: true` cannot be loaded by this tool from any source.',
-      'When a loaded skill references relative files or scripts, resolve them relative to the base directory returned by the `skill` tool.',
-      'In skill tool results, <additional_content> enumerates references, scripts, and assets while summarizing extra content; path "." means the skill root.',
     ],
     parameters,
     renderCall(args, theme, context) {

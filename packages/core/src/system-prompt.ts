@@ -173,6 +173,22 @@ ${buildXml({ content })}
 `;
 }
 
+function normalizePromptGuidelines(guidelines: readonly string[]): readonly string[] {
+  const seen = new Set<string>();
+  const normalized: string[] = [];
+
+  for (const guideline of guidelines) {
+    const trimmed = guideline.trim();
+    if (trimmed.length === 0 || trimmed.match('Be concise in your responses')) continue;
+    if (seen.has(trimmed)) continue;
+
+    seen.add(trimmed);
+    normalized.push(trimmed);
+  }
+
+  return normalized;
+}
+
 export function toolGuidanceBlock(originalPromptOptions: SandpiperBaseSystemPromptOptions) {
   const selectedTools = originalPromptOptions.selectedTools || [];
   const toolSnippets = originalPromptOptions.toolSnippets || {};
@@ -184,8 +200,7 @@ export function toolGuidanceBlock(originalPromptOptions: SandpiperBaseSystemProm
     }));
   const availableToolsBlock = buildXml({ available_tools: toolEntries.length > 0 ? { tool: toolEntries } : '' });
 
-  const guidelinesBlock = (originalPromptOptions.promptGuidelines || [])
-    .filter((guideline) => !guideline.match('Be concise in your responses'))
+  const guidelinesBlock = normalizePromptGuidelines(originalPromptOptions.promptGuidelines || [])
     .map((guideline) => `- ${guideline}`)
     .join('\n');
   const guidelinesSection = guidelinesBlock.length > 0 ? `\n\nGuidelines:\n${guidelinesBlock}` : '';

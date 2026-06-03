@@ -12,6 +12,9 @@ import { Type } from 'typebox';
 const BACKGROUND_PROCESS_COMPLETION_INSTRUCTIONS =
   'A background process started with start_background_process completed. Use check_background_process if you need its final output before continuing.';
 
+const BACKGROUND_PROCESS_POLLING_GUIDELINE =
+  'After starting a background process, do not immediately poll in a sleep loop; keep working and check occasionally with check_background_process when output or status is needed.';
+
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.registerTool({
     name: 'start_background_process',
@@ -23,16 +26,20 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       'Use for any executable you would normally background with "&", such as "bun run dev", dev servers, file watchers, build watchers, or any long-running command that should run while you continue working. ',
     promptSnippet: 'Start a long-running background process (builds, dev servers, file watchers)',
     promptGuidelines: [
-      'STRICTLY PREFER start_background_process over nohup, "&", or manually backgrounding jobs with bash.',
-      "start_background_process is NOT a shell — do NOT use '&&', '|', '>', or other shell syntax. Use bash -c '...' only if you genuinely need compound shell syntax.",
-      'Do *NOT* use "cd && ..." with start_background_process. Use the cwd parameter.',
-      'The `cwd` parameter MUST be an absolute, *resolved* path; e.g. no `~`, environment variables, or anything that requires a shell to expand',
-      'When using start_background_process, do not immediately start polling it or its output files with "sleep ... && ...". This defeats the point. Continue working on other things with the user.',
+      'Prefer start_background_process over nohup, "&", or manually backgrounding jobs with bash.',
+      BACKGROUND_PROCESS_POLLING_GUIDELINE,
     ],
     parameters: Type.Object({
       id: Type.String({ description: 'Unique identifier for this process (used to check/kill it later)' }),
-      command: Type.String({ description: 'Executable command to run' }),
-      args: Type.Optional(Type.Array(Type.String(), { description: 'Command arguments' })),
+      command: Type.String({
+        description:
+          "Executable command to run. This is not a shell: do not include '&&', '|', '>', '&', or other shell syntax; use args for arguments, or use bash -c only when compound shell syntax is genuinely required.",
+      }),
+      args: Type.Optional(
+        Type.Array(Type.String(), {
+          description: 'Command arguments. Pass each argument separately instead of shell-joining them.',
+        }),
+      ),
       cwd: Type.Optional(
         Type.String({
           description:
@@ -88,11 +95,7 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       'Check the status of a background process. By default returns only status and exit code (no output, low context cost). ' +
       'Set include_stdout/include_stderr to true to retrieve buffered output. Use tail_lines to limit output volume.',
     promptSnippet: 'Poll background process status and buffered output',
-    promptGuidelines: [
-      'Use check_background_process to monitor processes started with start_background_process.',
-      'By default, only status and exit code are returned (low context cost). Set include_stdout/include_stderr to read buffered output. Use tail_lines to limit volume.',
-      'Do not poll in a tight loop with sleeps. Check occasionally while doing other work.',
-    ],
+    promptGuidelines: [BACKGROUND_PROCESS_POLLING_GUIDELINE],
     parameters: Type.Object({
       id: Type.String({ description: 'Process ID to check' }),
       include_stdout: Type.Optional(Type.Boolean({ description: 'Include buffered stdout (default: false)' })),

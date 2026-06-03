@@ -14,10 +14,8 @@ export function registerStartRelayTool(pi: ExtensionAPI, runtime: RelayRuntime):
       'interact with the terminal in real time.',
     promptSnippet: "Execute commands in the user's shared terminal (inherits auth, env, functions)",
     promptGuidelines: [
-      "Use shell_relay instead of bash when the command requires the user's session state (e.g., 1Password auth, shell functions, non-exported env vars).",
-      "Use bash for general-purpose commands that don't need session state — it's faster and simpler.",
-      'shell_relay executes in a visible Zellij pane — the user can see all commands and output in real time.',
-      'The shared terminal is fully collaborative — the user may run commands between your invocations.',
+      "Reserve shell_relay for commands that genuinely need the user's live shell/session state (1Password auth, interactive shell functions, non-exported env). Needing to chain commands or run something long-running is not such a reason: use start_background_process plus check_background_process for long work, and bash for general commands, even when shell_relay could run them.",
+      'shell_relay executes in a visible shared terminal pane; the user can see commands and output in real time.',
     ],
     parameters: Type.Object({
       command: Type.String({

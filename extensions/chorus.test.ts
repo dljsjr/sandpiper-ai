@@ -61,22 +61,17 @@ function fakePi() {
 }
 
 describe('Chorus extension commands', () => {
-  test('registers reply tool guidance that treats the message as room-visible authored prose', () => {
+  test('registers reply tool guidance without duplicating the message voice contract', () => {
     const { pi, tools } = fakePi();
     chorusExtension(pi);
 
     const tool = tools.find((registeredTool) => registeredTool.name === 'send_chorus_reply');
 
-    expect(tool?.promptGuidelines).toEqual(
-      expect.arrayContaining([
-        expect.stringContaining(
-          'Use send_chorus_reply only when a visible Chorus room message warrants a substantive reply',
-        ),
-        expect.stringContaining('use done if no reply is needed and no other work remains'),
-        expect.stringContaining('room message other participants will read'),
-        expect.stringContaining('own SELF/identity voice'),
-      ]),
-    );
+    const guidelines = tool?.promptGuidelines?.join('\n') ?? '';
+    expect(guidelines).toContain('Use send_chorus_reply only when a visible Chorus room message warrants');
+    expect(guidelines).toContain('direct Tattler DM');
+    expect(guidelines).toContain('Use done if no reply is needed and no other work remains');
+    expect(guidelines).not.toContain('own SELF/identity voice');
     expect(tool?.parameters?.properties?.message?.description).toContain('SELF/identity voice');
   });
 
