@@ -10,7 +10,7 @@
     "sandpiper": "./bin/sandpiper"
   },
   "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.78.0"
+    "@earendil-works/pi-coding-agent": "0.78.1"
   },
   "peerDependencies": {
     "@silvia-odwyer/photon-node": "0.3.4"
