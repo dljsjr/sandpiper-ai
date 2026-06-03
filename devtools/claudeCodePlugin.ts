@@ -51,6 +51,7 @@ export interface ClaudePluginPackageJson {
     'commands/',
     'hooks/',
     'skills/',
+    'skills-on-demand/',
     'themes/',
     'README.md',
     'LICENSE',
@@ -120,7 +121,7 @@ declare const Bun: BunRuntime;
 const CLAUDE_PLUGIN_COPY_ENTRIES: readonly CopyEntry[] = [
   { from: 'packages/resources/skills/sandpiper', to: 'skills/sandpiper' },
   { from: 'packages/resources/skills/third-party', to: 'skills/third-party' },
-  { from: 'packages/resources/skills/on_demand', to: 'skills/on_demand' },
+  { from: 'packages/resources/skills-on-demand', to: 'skills-on-demand' },
   { from: 'packages/resources/prompts', to: 'commands' },
   { from: 'packages/resources/themes', to: 'themes' },
 ];
@@ -255,7 +256,17 @@ export function createClaudePluginPackageJson(rootPackageJson: RootPackageJson):
     repository: normalizePackageRepository(rootPackageJson.repository),
     license: rootPackageJson.license,
     keywords: ['sandpiper', 'claude-code', 'claude-plugin', 'hooks'],
-    files: ['.claude-plugin/', 'bin/', 'commands/', 'hooks/', 'skills/', 'themes/', 'README.md', 'LICENSE'],
+    files: [
+      '.claude-plugin/',
+      'bin/',
+      'commands/',
+      'hooks/',
+      'skills/',
+      'skills-on-demand/',
+      'themes/',
+      'README.md',
+      'LICENSE',
+    ],
   };
 }
 

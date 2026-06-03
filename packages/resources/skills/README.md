@@ -5,10 +5,11 @@ Agent skills — structured guidance documents with optional companion scripts t
 ## Layout
 
 ```text
-skills/
-├── sandpiper/           # First-party hot skills (included in runtime catalog)
-├── third-party/         # Vendored hot skills (included in runtime catalog)
-└── on_demand/           # Shipped skills that are not auto-discovered
+resources/
+├── skills/              # Hot skills included in runtime catalog
+│   ├── sandpiper/       # First-party hot skills
+│   └── third-party/     # Vendored hot skills
+└── skills-on-demand/    # Shipped skills that are not auto-discovered
     ├── sandpiper/       # First-party on-demand skills
     └── third-party/     # Vendored on-demand skills
 ```
@@ -32,14 +33,14 @@ Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills are s
 
 These skills are useful enough to distribute, but too niche or too expensive to keep in the hot catalogue by default.
 
-| Skill           | Location                 | Description                                                                  |
-| --------------- | ------------------------ | ---------------------------------------------------------------------------- |
-| `age`           | `on_demand/sandpiper/`   | Encrypt/decrypt files with the age CLI                                       |
-| `ast-grep`      | `on_demand/sandpiper/`   | Structural code search and codemods when AST-aware setup earns its keep      |
-| `skill-review`  | `on_demand/sandpiper/`   | Audit skills for quality, triggering accuracy, and best practices            |
-| `toon`          | `on_demand/sandpiper/`   | Convert structured data between JSON and TOON                                |
-| `pdf`           | `on_demand/third-party/` | PDF reading, extraction, manipulation, form filling, and OCR workflows        |
-| `skill-creator` | `on_demand/third-party/` | Skill authoring, evals, benchmarking, and empirical description optimization |
+| Skill           | Location                           | Description                                                                  |
+| --------------- | ---------------------------------- | ---------------------------------------------------------------------------- |
+| `age`           | `../skills-on-demand/sandpiper/`   | Encrypt/decrypt files with the age CLI                                       |
+| `ast-grep`      | `../skills-on-demand/sandpiper/`   | Structural code search and codemods when AST-aware setup earns its keep      |
+| `skill-review`  | `../skills-on-demand/sandpiper/`   | Audit skills for quality, triggering accuracy, and best practices            |
+| `toon`          | `../skills-on-demand/sandpiper/`   | Convert structured data between JSON and TOON                                |
+| `pdf`           | `../skills-on-demand/third-party/` | PDF reading, extraction, manipulation, form filling, and OCR workflows        |
+| `skill-creator` | `../skills-on-demand/third-party/` | Skill authoring, evals, benchmarking, and empirical description optimization |
 
 ## Using Skills
 

@@ -57,6 +57,7 @@ export interface DistPackageJson {
     'trail',
     'README.md',
     'skills/',
+    'skills-on-demand/',
     'themes/',
   ];
   readonly dependencies: Record<string, string>;
@@ -93,6 +94,7 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
       'trail',
       'README.md',
       'skills/',
+      'skills-on-demand/',
       'themes/',
     ],
     dependencies: createPiRuntimeDependencies(),

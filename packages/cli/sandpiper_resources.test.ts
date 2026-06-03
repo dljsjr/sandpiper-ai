@@ -81,7 +81,7 @@ describe('Sandpiper resource adapter', () => {
       join('/repo', 'packages', 'resources', 'skills', 'sandpiper'),
       join('/repo', 'packages', 'resources', 'skills', 'third-party'),
     ]);
-    expect(paths.skillPaths).not.toContain(join('/repo', 'packages', 'resources', 'skills', 'on_demand'));
+    expect(paths.skillPaths).not.toContain(join('/repo', 'packages', 'resources', 'skills-on-demand'));
     expect(paths.promptPaths).toEqual([join('/repo', 'packages', 'resources', 'prompts')]);
     expect(paths.themePaths).toEqual([join('/repo', 'packages', 'resources', 'themes')]);
   });
@@ -96,7 +96,7 @@ describe('Sandpiper resource adapter', () => {
       const paths = resolveSandpiperResourcePaths(dir);
 
       expect(paths.skillPaths).toEqual([join(dir, 'skills', 'sandpiper'), join(dir, 'skills', 'third-party')]);
-      expect(paths.skillPaths).not.toContain(join(dir, 'skills', 'on_demand'));
+      expect(paths.skillPaths).not.toContain(join(dir, 'skills-on-demand'));
       expect(paths.promptPaths).toEqual([join(dir, 'prompts')]);
       expect(paths.themePaths).toEqual([join(dir, 'themes')]);
     } finally {
