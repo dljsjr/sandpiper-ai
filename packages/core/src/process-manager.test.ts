@@ -200,30 +200,6 @@ describe('ProcessManager', () => {
     });
   });
 
-  // ─── acknowledgment ────────────────────────────────────────────
-
-  describe('acknowledgment', () => {
-    it('should report completed unacknowledged processes', async () => {
-      const proc = pm.spawn({ id: 'test', command: 'true' });
-      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      const unacked = pm.getCompletedUnacknowledged();
-      expect(unacked).toHaveLength(1);
-      expect(unacked[0]?.id).toBe('test');
-    });
-
-    it('should not report acknowledged processes', async () => {
-      const proc = pm.spawn({ id: 'test', command: 'true' });
-      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      pm.acknowledge('test');
-      expect(pm.getCompletedUnacknowledged()).toHaveLength(0);
-    });
-
-    it('should not report running processes', () => {
-      pm.spawn({ id: 'test', command: 'sleep', args: ['60'] });
-      expect(pm.getCompletedUnacknowledged()).toHaveLength(0);
-    });
-  });
-
   // ─── info ──────────────────────────────────────────────────────
 
   describe('info', () => {

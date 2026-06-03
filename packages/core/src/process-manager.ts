@@ -5,8 +5,7 @@
  * and exit tracking. Framework-independent — no pi/sandpiper imports.
  *
  * Consumers register callbacks for stdout/stderr/exit events and can read
- * buffered output on demand. The manager tracks which completed processes
- * have been acknowledged (for notification deduplication).
+ * buffered output on demand.
  */
 
 import { type ChildProcess, spawn as nodeSpawn, type SpawnOptionsWithoutStdio } from 'node:child_process';
@@ -209,7 +208,6 @@ export class ManagedProcess {
 
 export class ProcessManager {
   private processes = new Map<string, ManagedProcess>();
-  private acknowledged = new Set<string>();
 
   /** Spawn a new managed process. Throws if the ID is already in use. */
   spawn(options: SpawnOptions): ManagedProcess {
@@ -243,21 +241,10 @@ export class ProcessManager {
   /** Remove a process from tracking (after it has exited). */
   remove(id: string): void {
     this.processes.delete(id);
-    this.acknowledged.delete(id);
   }
 
   /** List all managed processes. */
   list(): readonly ProcessInfo[] {
     return [...this.processes.values()].map((p) => p.info);
-  }
-
-  /** Get completed processes that haven't been acknowledged. */
-  getCompletedUnacknowledged(): readonly ManagedProcess[] {
-    return [...this.processes.values()].filter((p) => !p.running && !this.acknowledged.has(p.id));
-  }
-
-  /** Mark a completed process as acknowledged (prevents repeat notifications). */
-  acknowledge(id: string): void {
-    this.acknowledged.add(id);
   }
 }

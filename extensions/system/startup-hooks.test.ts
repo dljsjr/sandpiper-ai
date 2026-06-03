@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { registerBackgroundProcessContextHooks } from './background-process-hooks.js';
+import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
 import { createSystemRuntimeState } from './runtime.js';
 import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
-import { createBackgroundContextProcessManagerStub, createEventStub } from './test-helpers.js';
+import { createBackgroundLifecycleProcessManagerStub, createEventStub } from './test-helpers.js';
 
 const mockBuildSandpiperStartupPrompt = vi.hoisted(() => vi.fn());
 const mockGetAgentDir = vi.hoisted(() => vi.fn(() => '/agent'));
@@ -149,33 +149,22 @@ describe('startup hooks', () => {
     expect(state.coldStartGuidancePending).toBe(false);
   });
 
-  it('emits background process completion context and kills all on shutdown', async () => {
+  it('kills all background processes on shutdown without registering completion context hooks', async () => {
     const { pi, handlers } = createEventStub();
-    const acknowledge = vi.fn();
     const killAll = vi.fn();
-    const processManager = createBackgroundContextProcessManagerStub({
-      getCompletedUnacknowledged: vi.fn(() => [{ id: 'build', exitCode: 1 }]),
-      acknowledge,
-      killAll,
-    });
+    const processManager = createBackgroundLifecycleProcessManagerStub({ killAll });
 
-    registerBackgroundProcessContextHooks(
-      pi as Parameters<typeof registerBackgroundProcessContextHooks>[0],
-      processManager as Parameters<typeof registerBackgroundProcessContextHooks>[1],
+    registerBackgroundProcessLifecycleHooks(
+      pi as Parameters<typeof registerBackgroundProcessLifecycleHooks>[0],
+      processManager as Parameters<typeof registerBackgroundProcessLifecycleHooks>[1],
     );
 
-    const onContext = handlers.get('context');
     const onShutdown = handlers.get('session_shutdown');
-    if (!onContext || !onShutdown) {
-      throw new Error('background process hooks not registered');
+    if (!onShutdown) {
+      throw new Error('background process lifecycle hook not registered');
     }
 
-    const contextResult = (await onContext({ messages: [] }, {})) as {
-      messages: Array<{ content: Array<{ text: string }> }>;
-    };
-
-    expect(contextResult.messages[0]?.content[0]?.text).toContain('Background process "build" exited with code 1.');
-    expect(acknowledge).toHaveBeenCalledWith('build');
+    expect(handlers.has('context')).toBe(false);
 
     await onShutdown({}, {});
     expect(killAll).toHaveBeenCalled();
