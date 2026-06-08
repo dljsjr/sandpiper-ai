@@ -54,11 +54,6 @@ export function registerContextManagementHooks(pi: ExtensionAPI) {
       contextNotificationInstructions = `
 <warning>
 Context usage is above 50%. Start thinking about taking a break to capture any information/memory you want to preserve before compaction hits.
-If you switch away from work to capture context, resume your original work afterwords. Do not worry about the compaction boundary once you have continuity captured.
-  - checkpoint active work,
-  - write durable facts/decisions/patterns to memory,
-  - update project docs/tasks if shared truth changed.
-  - consider other key files (SELF, AGENTS, etc) as well
 </warning>
 `.trim();
       warned = true;
@@ -73,7 +68,7 @@ Context usage is above 80%. Stop current work and capture continuity now — com
   2. Checkpoint active work (standup / CHECKPOINT.md).
   3. Update project docs and tasks if shared truth changed.
 
-Resume only after step 1 is complete.
+Resume your original work once you've finished.
 </alert>
 `.trim();
       alerted = true;
