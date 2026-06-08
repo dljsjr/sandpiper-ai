@@ -14,7 +14,7 @@ vi.mock('./config-resolver.js', async (importOriginal) => {
 import { resolveBraveKey, selectSearchAdapter } from './adapter-selection.js';
 import { BraveSearchAdapter } from './brave-adapter.js';
 import { readSettingsKey } from './config-resolver.js';
-import { DdgSearchAdapter } from './ddg-adapter.js';
+import { ParallelMcpSearchAdapter } from './parallel-adapter.js';
 
 const mockReadSettings = vi.mocked(readSettingsKey);
 const savedEnvKey = process.env.BRAVE_API_KEY;
@@ -68,8 +68,8 @@ describe('selectSearchAdapter', () => {
     expect(selectSearchAdapter()).toBeInstanceOf(BraveSearchAdapter);
   });
 
-  it('falls back to DDG when no key is configured', () => {
+  it('falls back to Parallel (free, no-key) when no key is configured', () => {
     mockReadSettings.mockReturnValue(undefined);
-    expect(selectSearchAdapter()).toBeInstanceOf(DdgSearchAdapter);
+    expect(selectSearchAdapter()).toBeInstanceOf(ParallelMcpSearchAdapter);
   });
 });
