@@ -1,0 +1,47 @@
+/**
+ * Search-provider selection.
+ *
+ * Resolution order for the active SearchAdapter:
+ *   1. An explicitly injected adapter (tests / overrides) wins.
+ *   2. Brave, if a Brave API key resolves (keyed, primary).
+ *   3. Fallback adapter (no-key) for when no key is configured.
+ *
+ * The Brave key is read from `BRAVE_API_KEY` (env) or `braveApiKey` (settings.json) and
+ * resolved through the config-resolver, so it supports literals, `$VAR`, and `!cmd`
+ * (e.g. `!op read 'op://Personal/.../credential'`) — the secret never lands in a file.
+ */
+
+import { BraveSearchAdapter } from './brave-adapter.js';
+import { readSettingsKey, resolveConfigValue } from './config-resolver.js';
+import { DdgSearchAdapter } from './ddg-adapter.js';
+import type { SearchAdapter } from './types.js';
+
+/** Resolve a Brave API key from env or settings.json, supporting literal / $VAR / !cmd forms. */
+export function resolveBraveKey(): string | undefined {
+  const envValue = process.env.BRAVE_API_KEY;
+  if (envValue) {
+    const resolved = resolveConfigValue(envValue);
+    if (resolved) return resolved;
+  }
+
+  const settingsValue = readSettingsKey('braveApiKey');
+  if (typeof settingsValue === 'string') {
+    const resolved = resolveConfigValue(settingsValue);
+    if (resolved) return resolved;
+  }
+
+  return undefined;
+}
+
+/**
+ * Pick the search adapter to use. Brave when a key is available; otherwise the no-key fallback.
+ * DDG is the current fallback (it CAPTCHA-fails cleanly); a Parallel free adapter can slot here later.
+ */
+export function selectSearchAdapter(explicit?: SearchAdapter): SearchAdapter {
+  if (explicit) return explicit;
+
+  const braveKey = resolveBraveKey();
+  if (braveKey) return new BraveSearchAdapter(braveKey);
+
+  return new DdgSearchAdapter();
+}

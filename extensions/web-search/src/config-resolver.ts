@@ -16,7 +16,7 @@
  * This file is the general-purpose path for "I want Pi's secret-resolver UX."
  */
 
-import { execFileSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
 // ---------------------------------------------------------------------------
@@ -27,20 +27,21 @@ const commandCache = new Map<string, string>();
 
 function resolveCommand(value: string): string | undefined {
   const cached = commandCache.get(value);
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) return cached || undefined;
 
   try {
-    // Split on whitespace so execFileSync doesn't need a shell.
-    const [cmd, ...args] = value.split(/\s+/);
-    if (!cmd) return undefined;
-    const stdout = execFileSync(cmd, args, {
+    // Run through the shell (matching Pi's resolveConfigValue) so quoted args and
+    // pipes work — e.g. `op read 'op://Personal/.../credential'`. The command comes
+    // from the user's own config, so a shell is appropriate here.
+    const stdout = execSync(value, {
       encoding: 'utf-8',
       timeout: 10_000,
       maxBuffer: 64 * 1024,
+      stdio: ['ignore', 'pipe', 'ignore'],
     });
     const result = stdout.trim();
     commandCache.set(value, result);
-    return result;
+    return result || undefined;
   } catch {
     commandCache.set(value, '');
     return undefined;

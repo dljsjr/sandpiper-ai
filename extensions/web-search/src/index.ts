@@ -6,7 +6,7 @@
 
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
-import { DdgSearchAdapter } from './ddg-adapter.js';
+import { selectSearchAdapter } from './adapter-selection.js';
 import {
   PARAM_COUNT_DESC,
   PARAM_QUERY_DESC,
@@ -19,13 +19,13 @@ import { executeWebSearchTool as defaultExecuteWebSearchTool, type WebSearchTool
 import { MAX_RESULT_COUNT, type SearchAdapter } from './types.js';
 
 interface WebSearchExtensionDependencies {
-  /** Override the search provider. Defaults to DuckDuckGo. */
+  /** Override the search provider. Defaults to Brave when a key resolves, else the no-key fallback. */
   readonly adapter?: SearchAdapter;
   readonly executeWebSearchTool?: typeof defaultExecuteWebSearchTool;
 }
 
 export default async function init(pi: ExtensionAPI, dependencies: WebSearchExtensionDependencies = {}) {
-  const adapter = dependencies.adapter ?? new DdgSearchAdapter();
+  const adapter = selectSearchAdapter(dependencies.adapter);
   const executeWebSearchTool = dependencies.executeWebSearchTool ?? defaultExecuteWebSearchTool;
 
   pi.registerTool({
