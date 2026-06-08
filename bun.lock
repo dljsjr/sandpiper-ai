@@ -76,6 +76,22 @@
         "typebox": "1.2.2",
       },
     },
+    "extensions/web-search": {
+      "name": "web-search",
+      "version": "0.0.1",
+      "dependencies": {
+        "jsdom": "29.1.1",
+        "sandpiper-ai-core": "0.0.1",
+      },
+      "devDependencies": {
+        "@types/jsdom": "28.0.3",
+      },
+      "peerDependencies": {
+        "@earendil-works/pi-coding-agent": "0.78.0",
+        "@earendil-works/pi-tui": "0.78.0",
+        "typebox": "1.1.39",
+      },
+    },
     "packages/adapter-claude-code": {
       "name": "sandpiper-adapter-claude-code",
       "version": "0.0.1",
@@ -1125,6 +1141,8 @@
     "walk-up-path": ["walk-up-path@4.0.0", "", {}, "sha512-3hu+tD8YzSLGuFYtPRb48vdhKMi0KQV5sn+uWr8+7dMEq/2G/dtLrdDinkLjqq5TIbIBjYJ4Ax/n3YiaW7QM8A=="],
 
     "web-fetch": ["web-fetch@workspace:extensions/web-fetch"],
+
+    "web-search": ["web-search@workspace:extensions/web-search"],
 
     "web-streams-polyfill": ["web-streams-polyfill@3.3.3", "", {}, "sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw=="],
 
