@@ -1,0 +1,27 @@
+{
+  "name": "web-search",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Pi extension: search the web and return top results (title, URL, snippet)",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "jsdom": "29.1.1",
+    "sandpiper-ai-core": "0.0.1"
+  },
+  "devDependencies": {
+    "@types/jsdom": "28.0.3"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "0.78.0",
+    "@earendil-works/pi-tui": "0.78.0",
+    "typebox": "1.1.39"
+  },
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  }
+}

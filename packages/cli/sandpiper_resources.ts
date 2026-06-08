@@ -10,6 +10,7 @@ import {
 } from '../../extensions/system/extension-factories.js';
 import tattlerExtension from '../../extensions/tattler/index.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
+import webSearchExtension from '../../extensions/web-search/src/index.js';
 
 export interface SandpiperResourcePaths {
   readonly skillPaths: readonly string[];
@@ -49,6 +50,7 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
     createNeutralCapabilityExtension(),
     shellRelayExtension,
     webFetchExtension,
+    webSearchExtension,
     autotoonExtension,
     tattlerExtension,
     chorusExtension,
