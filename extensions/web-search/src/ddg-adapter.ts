@@ -148,9 +148,9 @@ export class DdgSearchAdapter implements SearchAdapter {
 
       if (isBotChallenge(doc)) {
         throw new Error(
-          'DuckDuckGo returned a CAPTCHA challenge. ' +
-            'This adapter cannot search without a Brave API key or a different search provider. ' +
-            'Set SEARCH_API_KEY=brave:<key> or configure a Brave key in settings.json.',
+          'DuckDuckGo returned a CAPTCHA challenge and cannot return results. ' +
+            'Configure a Brave key under "web-search": { "braveApiKey": "..." } in settings.json ' +
+            '(e.g. "!op read \'op://...\'"), or set the BRAVE_API_KEY env var.',
         );
       }
 

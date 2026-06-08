@@ -24,10 +24,21 @@ export function resolveBraveKey(): string | undefined {
     if (resolved) return resolved;
   }
 
-  const settingsValue = readSettingsKey('braveApiKey');
-  if (typeof settingsValue === 'string') {
-    const resolved = resolveConfigValue(settingsValue);
-    if (resolved) return resolved;
+  // settings.json: namespaced `web-search.braveApiKey` (or camelCase `webSearch`),
+  // with a top-level `braveApiKey` fallback. The value may be a literal, $VAR, or
+  // !cmd (e.g. !op read 'op://...').
+  const nsBraveKey = (ns: unknown): unknown =>
+    ns && typeof ns === 'object' ? (ns as Record<string, unknown>).braveApiKey : undefined;
+  const candidates: unknown[] = [
+    nsBraveKey(readSettingsKey('web-search')),
+    nsBraveKey(readSettingsKey('webSearch')),
+    readSettingsKey('braveApiKey'),
+  ];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string') {
+      const resolved = resolveConfigValue(candidate);
+      if (resolved) return resolved;
+    }
   }
 
   return undefined;

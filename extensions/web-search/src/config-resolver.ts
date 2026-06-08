@@ -18,6 +18,7 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
+import { getAgentDir } from '@earendil-works/pi-coding-agent';
 
 // ---------------------------------------------------------------------------
 // Shell-command cache
@@ -90,19 +91,32 @@ export function resolveConfigValue(config: string | undefined): string | undefin
 // Settings.json helpers
 // ---------------------------------------------------------------------------
 
-/** Paths to check, in priority order (project wins over global). */
-const SETTINGS_PATHS = ['.sandpiper/settings.json', '~/.sandpiper/settings.json'];
+/**
+ * Settings.json locations to check, in priority order (project wins over global).
+ * Global lives at the agent dir: SANDPIPER_CODING_AGENT_DIR or ~/.sandpiper/agent
+ * (NOT ~/.sandpiper). Project-local is .sandpiper/settings.json relative to cwd.
+ */
+function settingsPaths(): string[] {
+  // Project-local first (cwd), then the global agent-dir settings. Pi's getAgentDir()
+  // resolves the correct dir (~/.sandpiper/agent, honoring SANDPIPER_CODING_AGENT_DIR and
+  // branding) — the canonical source rather than a hand-rolled home path.
+  const paths: string[] = [`${process.cwd()}/.sandpiper/settings.json`];
+  try {
+    const dir = getAgentDir();
+    if (dir) paths.push(`${dir}/settings.json`);
+  } catch {
+    // getAgentDir unavailable (e.g. Pi config not initialized in a bare test context) — project-local only.
+  }
+  return paths;
+}
 
 /**
  * Read a key from the nearest sandpiper settings.json.
- * Checks project-local first, then global. Returns undefined when neither exists
- * or the key is missing.
+ * Checks project-local first, then the global agent-dir settings. Returns undefined
+ * when neither exists or the key is missing.
  */
 export function readSettingsKey(key: string): unknown | undefined {
-  const homedir = process.env.HOME ?? '';
-  for (const relative of SETTINGS_PATHS) {
-    const resolved = relative.startsWith('~') ? relative.replace('~', homedir) : relative;
-    const fullPath = resolved.startsWith('/') ? resolved : `${process.cwd()}/${resolved}`;
+  for (const fullPath of settingsPaths()) {
     if (!existsSync(fullPath)) continue;
     try {
       const raw = readFileSync(fullPath, 'utf-8');
