@@ -22,6 +22,7 @@ Sandpiper is a distribution of the Pi coding agent with additional tools for sha
 - [CLI development](dev/cli-development.md) - Commander patterns and bundled CLI packages.
 - [Environment variables](dev/env-vars.md) - `SANDPIPER_*` / `PI_*` mirroring and config lookup.
 - [Pi extension development](dev/pi-extension-development.md) - how Sandpiper uses Pi extension surfaces and where to check Pi API docs.
+- [Cross-extension prompt contributions](dev/prompt-contributions.md) - lifecycle-based coordination for extensions contributing system prompt content.
 
 ## Task system
 

@@ -13,6 +13,7 @@ import {
   TOOL_DESCRIPTION,
   TOOL_LABEL,
   TOOL_NAME,
+  TOOL_PROMPT_GUIDELINES,
   TOOL_PROMPT_SNIPPET,
 } from './tool-metadata.js';
 import { executeWebSearchTool as defaultExecuteWebSearchTool, type WebSearchToolDetails } from './tool-operation.js';
@@ -33,6 +34,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebSearchExte
     label: TOOL_LABEL,
     description: TOOL_DESCRIPTION,
     promptSnippet: TOOL_PROMPT_SNIPPET,
+    promptGuidelines: TOOL_PROMPT_GUIDELINES,
     parameters: Type.Object({
       query: Type.String({ description: PARAM_QUERY_DESC }),
       count: Type.Optional(Type.Integer({ description: PARAM_COUNT_DESC, minimum: 1, maximum: MAX_RESULT_COUNT })),
