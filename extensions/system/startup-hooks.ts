@@ -6,6 +6,11 @@ import {
   handleSandpiperSessionShutdown,
   handleSandpiperSessionStart,
 } from 'sandpiper-ai-core';
+import {
+  applyPromptContributions,
+  SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL,
+  SandpiperPromptContributionCollector,
+} from './prompt-contributions.js';
 import type { SystemRuntimeState } from './runtime.js';
 
 export function registerStartupPromptHooks(
@@ -13,9 +18,29 @@ export function registerStartupPromptHooks(
   state: SystemRuntimeState,
   dumpSystemPrompt?: boolean,
 ): void {
+  const promptContributions = new SandpiperPromptContributionCollector();
+  let unsubscribePromptContributions: (() => void) | undefined;
+
+  const resetPromptContributionListener = () => {
+    unsubscribePromptContributions?.();
+    unsubscribePromptContributions = undefined;
+    promptContributions.reset();
+  };
+
   pi.registerFlag('identity', {
     type: 'string',
     description: 'Content or markdown file that replaces the <identity>...</identity> block in the system prompt',
+  });
+
+  pi.on('session_start', () => {
+    resetPromptContributionListener();
+    unsubscribePromptContributions = pi.events.on(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, (payload) => {
+      promptContributions.add(payload);
+    });
+  });
+
+  pi.on('session_shutdown', () => {
+    resetPromptContributionListener();
   });
 
   pi.on('before_agent_start', async (event, ctx) => {
@@ -44,14 +69,17 @@ export function registerStartupPromptHooks(
     if (effectiveSystemPrompt === undefined) {
       return;
     }
+    const resolvedContributions = await promptContributions.resolve();
+    const finalSystemPrompt = applyPromptContributions(effectiveSystemPrompt, resolvedContributions);
+
     if (dumpSystemPrompt) {
       // console.error('base prompt:\n', event.systemPrompt);
-      console.error('system prompt:\n', effectiveSystemPrompt);
+      console.error('system prompt:\n', finalSystemPrompt);
       ctx.shutdown();
     }
 
     return {
-      systemPrompt: effectiveSystemPrompt,
+      systemPrompt: finalSystemPrompt,
     };
   });
 }
