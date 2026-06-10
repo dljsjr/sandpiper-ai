@@ -22,126 +22,191 @@ export interface MoveResult {
   readonly reKeyMap: ReadonlyMap<string, string>;
 }
 
+interface CurrentTaskState {
+  readonly project: string;
+  readonly path: string;
+  readonly content: string;
+  readonly kind: TaskKind;
+  readonly parent?: string;
+}
+
+interface MoveTarget {
+  readonly project: string;
+  readonly kind: TaskKind;
+  readonly parent?: string;
+}
+
+interface MovePlan {
+  readonly target: MoveTarget;
+  readonly subtasks: ReadonlyMap<string, string>;
+  readonly crossProject: boolean;
+  readonly newKey: string;
+  readonly newPath: string;
+  readonly reKeyMap: ReadonlyMap<string, string>;
+}
+
 /**
  * Move a task: change project, kind, or parent.
  * Handles re-keying, file moves, subtask reparenting, tombstones, and reference updates.
  */
 export function moveTask(tasksDir: string, key: string, opts: MoveOptions): MoveResult {
-  // Resolve current location and metadata
-  const currentProject = projectFromKey(key);
-  const currentPath = resolveTaskFile(tasksDir, key);
-  const content = readFileSync(currentPath, 'utf-8');
-  const currentFm = parseFrontmatter(content);
-  const currentKind = (currentFm.kind as TaskKind | undefined) ?? 'TASK';
-  const currentParent = resolveParentFromPath(tasksDir, currentPath, currentProject);
+  const current = readCurrentTask(tasksDir, key);
+  const target = resolveMoveTarget(current, opts);
+  validateMoveTarget(tasksDir, current, target);
 
-  const targetProject = opts.project ?? currentProject;
-  const targetKind = opts.kind ?? currentKind;
-  const targetParent = opts.parent ?? (targetKind === 'SUBTASK' ? currentParent : undefined);
-
-  // Validation
-  if (targetKind === 'SUBTASK' && !targetParent) {
-    throw new Error('Moving to SUBTASK requires --parent.');
-  }
-  if (targetKind === 'SUBTASK' && targetParent) {
-    validateParentIsTopLevel(tasksDir, targetParent, targetProject);
-  }
-  if (currentKind === 'SUBTASK' && targetKind === 'SUBTASK' && targetProject !== currentProject) {
-    throw new Error('Cannot move a subtask to another project without promoting it to TASK or BUG.');
-  }
-
-  const crossProject = targetProject !== currentProject;
-  const reKeyMap = new Map<string, string>();
-
-  // Collect subtasks that must move with this task
-  const subtasks = collectSubtasks(tasksDir, key, currentProject);
-
-  // Determine new key — use a local counter to avoid re-reading stale state
-  let newKey: string;
-  if (crossProject) {
-    let nextNum = getBaseCounter(tasksDir, targetProject);
-    newKey = `${targetProject}-${nextNum++}`;
-    reKeyMap.set(key, newKey);
-    for (const subKey of subtasks.keys()) {
-      const newSubKey = `${targetProject}-${nextNum++}`;
-      reKeyMap.set(subKey, newSubKey);
-    }
-    // Persist the final counter value
-    persistCounter(tasksDir, targetProject, nextNum);
-  } else {
-    newKey = key;
-  }
-
-  // Determine new path
-  const newPath = resolveNewPath(
-    tasksDir,
-    newKey,
-    targetProject,
-    targetKind,
-    targetParent,
-    crossProject ? reKeyMap : undefined,
-  );
-
-  // Update the task file content
-  let newContent = content;
-  if (targetKind !== currentKind) {
-    newContent = applyInternalFieldUpdates(newContent, { kind: targetKind });
-  }
-  if (crossProject) {
-    // Update key references within the file itself (title stays, key is filename-derived)
-  }
-
-  // Write to new location
-  mkdirSync(join(newPath, '..'), { recursive: true });
-  writeFileAtomic(newPath, newContent);
-
-  // Move subtasks
-  if (targetKind === 'SUBTASK' && targetParent) {
-    // Subtasks of this task become subtasks of the new parent
-    moveSubtasks(tasksDir, subtasks, targetProject, targetParent, crossProject ? reKeyMap : undefined);
-  } else if (crossProject) {
-    // Subtasks follow to new project under the new key
-    moveSubtasks(tasksDir, subtasks, targetProject, newKey, reKeyMap);
-  } else if (targetKind !== 'SUBTASK' && currentKind === 'SUBTASK') {
-    // Promoting subtask — subtasks stay as-is (subtasks can't have subtasks, so none to move)
-  }
-
-  // Clean up old file (if it moved)
-  if (currentPath !== newPath) {
-    rmSync(currentPath, { force: true });
-    // Clean up empty subtask directory
-    cleanEmptyDir(join(currentPath, '..'));
-    // Clean up old subtask directory if the task had subtasks
-    const oldSubDir = join(tasksDir, currentProject, key);
-    if (existsSync(oldSubDir)) {
-      cleanEmptyDir(oldSubDir);
-    }
-  }
-
-  // Write tombstones for cross-project moves
-  if (crossProject) {
-    for (const [oldK, newK] of reKeyMap) {
-      const oldProject = projectFromKey(oldK);
-      const tombstone = join(tasksDir, oldProject, `${oldK}.moved`);
-      writeFileAtomic(tombstone, `${newK}\n`);
-    }
-  }
-
-  // Update inbound references in all task files
-  if (reKeyMap.size > 0) {
-    updateAllReferences(tasksDir, reKeyMap);
-  }
+  const plan = planMove(tasksDir, key, current, target);
+  writeMovedTaskFile(plan.newPath, applyMoveFieldUpdates(current.content, current.kind, target.kind));
+  moveSubtasksForPlan(tasksDir, plan);
+  removeOriginalTaskFiles(tasksDir, key, current, plan.newPath);
+  writeMoveTombstones(tasksDir, plan.reKeyMap);
+  updateInboundReferences(tasksDir, plan.reKeyMap);
 
   return {
     oldKey: key,
-    newKey,
-    oldPath: currentPath,
-    newPath,
-    reKeyMap,
+    newKey: plan.newKey,
+    oldPath: current.path,
+    newPath: plan.newPath,
+    reKeyMap: plan.reKeyMap,
   };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────
+
+function readCurrentTask(tasksDir: string, key: string): CurrentTaskState {
+  const project = projectFromKey(key);
+  const path = resolveTaskFile(tasksDir, key);
+  const content = readFileSync(path, 'utf-8');
+  const frontmatter = parseFrontmatter(content);
+
+  return {
+    project,
+    path,
+    content,
+    kind: (frontmatter.kind as TaskKind | undefined) ?? 'TASK',
+    parent: resolveParentFromPath(tasksDir, path, project),
+  };
+}
+
+function resolveMoveTarget(current: CurrentTaskState, opts: MoveOptions): MoveTarget {
+  const kind = opts.kind ?? current.kind;
+
+  return {
+    project: opts.project ?? current.project,
+    kind,
+    parent: opts.parent ?? (kind === 'SUBTASK' ? current.parent : undefined),
+  };
+}
+
+function validateMoveTarget(tasksDir: string, current: CurrentTaskState, target: MoveTarget): void {
+  if (target.kind === 'SUBTASK' && !target.parent) {
+    throw new Error('Moving to SUBTASK requires --parent.');
+  }
+  if (target.kind === 'SUBTASK' && target.parent) {
+    validateParentIsTopLevel(tasksDir, target.parent, target.project);
+  }
+  if (current.kind === 'SUBTASK' && target.kind === 'SUBTASK' && target.project !== current.project) {
+    throw new Error('Cannot move a subtask to another project without promoting it to TASK or BUG.');
+  }
+}
+
+function planMove(tasksDir: string, key: string, current: CurrentTaskState, target: MoveTarget): MovePlan {
+  const crossProject = target.project !== current.project;
+  const subtasks = collectSubtasks(tasksDir, key, current.project);
+  const { newKey, reKeyMap } = allocateMoveKeys(tasksDir, key, target.project, crossProject, subtasks);
+
+  return {
+    target,
+    subtasks,
+    crossProject,
+    newKey,
+    newPath: resolveNewPath(tasksDir, newKey, target, crossProject ? reKeyMap : undefined),
+    reKeyMap,
+  };
+}
+
+function allocateMoveKeys(
+  tasksDir: string,
+  key: string,
+  targetProject: string,
+  crossProject: boolean,
+  subtasks: ReadonlyMap<string, string>,
+): { readonly newKey: string; readonly reKeyMap: ReadonlyMap<string, string> } {
+  const reKeyMap = new Map<string, string>();
+  if (!crossProject) {
+    return { newKey: key, reKeyMap };
+  }
+
+  let nextNum = getBaseCounter(tasksDir, targetProject);
+  const newKey = `${targetProject}-${nextNum++}`;
+  reKeyMap.set(key, newKey);
+
+  for (const subKey of subtasks.keys()) {
+    const newSubKey = `${targetProject}-${nextNum++}`;
+    reKeyMap.set(subKey, newSubKey);
+  }
+
+  persistCounter(tasksDir, targetProject, nextNum);
+  return { newKey, reKeyMap };
+}
+
+function applyMoveFieldUpdates(content: string, currentKind: TaskKind, targetKind: TaskKind): string {
+  if (targetKind === currentKind) {
+    return content;
+  }
+  return applyInternalFieldUpdates(content, { kind: targetKind });
+}
+
+function writeMovedTaskFile(newPath: string, content: string): void {
+  mkdirSync(join(newPath, '..'), { recursive: true });
+  writeFileAtomic(newPath, content);
+}
+
+function moveSubtasksForPlan(tasksDir: string, plan: MovePlan): void {
+  if (plan.target.kind === 'SUBTASK' && plan.target.parent) {
+    // Subtasks of this task become subtasks of the new parent.
+    moveSubtasks(
+      tasksDir,
+      plan.subtasks,
+      plan.target.project,
+      plan.target.parent,
+      plan.crossProject ? plan.reKeyMap : undefined,
+    );
+    return;
+  }
+
+  if (plan.crossProject) {
+    // Subtasks follow to the new project under the re-keyed parent.
+    moveSubtasks(tasksDir, plan.subtasks, plan.target.project, plan.newKey, plan.reKeyMap);
+  }
+}
+
+function removeOriginalTaskFiles(tasksDir: string, key: string, current: CurrentTaskState, newPath: string): void {
+  if (current.path === newPath) {
+    return;
+  }
+
+  rmSync(current.path, { force: true });
+  cleanEmptyDir(join(current.path, '..'));
+
+  const oldSubDir = join(tasksDir, current.project, key);
+  if (existsSync(oldSubDir)) {
+    cleanEmptyDir(oldSubDir);
+  }
+}
+
+function writeMoveTombstones(tasksDir: string, reKeyMap: ReadonlyMap<string, string>): void {
+  for (const [oldKey, newKey] of reKeyMap) {
+    const oldProject = projectFromKey(oldKey);
+    const tombstone = join(tasksDir, oldProject, `${oldKey}.moved`);
+    writeFileAtomic(tombstone, `${newKey}\n`);
+  }
+}
+
+function updateInboundReferences(tasksDir: string, reKeyMap: ReadonlyMap<string, string>): void {
+  if (reKeyMap.size > 0) {
+    updateAllReferences(tasksDir, reKeyMap);
+  }
+}
 
 function resolveParentFromPath(tasksDir: string, taskPath: string, project: string): string | undefined {
   const projectDir = join(tasksDir, project);
@@ -207,16 +272,14 @@ function persistCounter(tasksDir: string, project: string, nextNum: number): voi
 function resolveNewPath(
   tasksDir: string,
   newKey: string,
-  project: string,
-  kind: TaskKind,
-  parent: string | undefined,
+  target: MoveTarget,
   reKeyMap: ReadonlyMap<string, string> | undefined,
 ): string {
-  const projectDir = join(tasksDir, project);
+  const projectDir = join(tasksDir, target.project);
 
-  if (kind === 'SUBTASK' && parent) {
+  if (target.kind === 'SUBTASK' && target.parent) {
     // Resolve parent key (may have been re-keyed)
-    const resolvedParent = reKeyMap?.get(parent) ?? parent;
+    const resolvedParent = reKeyMap?.get(target.parent) ?? target.parent;
     return join(projectDir, resolvedParent, `${newKey}.md`);
   }
 
@@ -225,7 +288,7 @@ function resolveNewPath(
 
 function moveSubtasks(
   tasksDir: string,
-  subtasks: Map<string, string>,
+  subtasks: ReadonlyMap<string, string>,
   targetProject: string,
   newParentKey: string,
   reKeyMap: ReadonlyMap<string, string> | undefined,
