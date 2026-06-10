@@ -141,6 +141,30 @@ If contributor content genuinely needs to change mid-session (e.g., after a memo
 
 The `acknowledge()` callback enables harness-agnostic fallback: when the Sandpiper collector accepts a contribution, it calls `acknowledge()`, and the contributing extension knows to skip its own `before_agent_start` mutation. If no collector acknowledges (e.g., running in plain Pi), the extension falls back to direct `before_agent_start` append — the legacy behavior. This is the detection mechanism for "collector is present" that was previously unresolved.
 
+### Verifying prompt contributions in live agents
+
+If a contribution block is correctly assembled in `before_agent_start`, it is visible in the agent's context. An agent that cannot see a contribution block does not have it — do not rationalize missing blocks as self-introspection unreliability.
+
+For verification, use:
+- `YAAMS_BOOTSTRAP_DEBUG_FILE` — pi-yaams writes the computed block (or skip reason) to this file
+- `SANDPIPER_DUMP_SYSTEM_PROMPT` — Sandpiper dumps the final assembled prompt and exits
+- A `before_provider_request` hook that captures the actual provider payload — this is the strongest proof, since it shows the exact bytes sent to the model
+
+### Known delivery gap: `sendCustomMessage` + `triggerTurn` bypasses `before_agent_start`
+
+`emitBeforeAgentStart` is called **only** in `AgentSession.prompt()` — the interactive user-input path. Two turn-start APIs behave differently:
+
+- **`sendUserMessage`** (`pi.sendUserMessage`) routes through `prompt()` → **does call `emitBeforeAgentStart`** — not affected.
+- **`sendCustomMessage`** (`pi.sendMessage`) with `triggerTurn: true` routes through `_runAgentPrompt` → `agent.continue()` → **never calls `emitBeforeAgentStart`** — affected, regardless of `deliverAs`.
+
+So for any programmatically-started turn via `pi.sendMessage({ triggerTurn: true })`, the `before_agent_start` system prompt rewrite (including the entire Sandpiper identity rebuild and all prompt contributions) is skipped. `agent.state.systemPrompt` stays at `_baseSystemPrompt`, and all providers send the base prompt. This affects Tattler (delivers via `pi.sendMessage` with `triggerTurn`) and parts of Chorus (mixed paths). Interactive turns and `pi.sendUserMessage` are unaffected.
+
+The fix is not in any provider bridge. Two directions:
+1. Make `sendCustomMessage`/triggerTurn paths run `emitBeforeAgentStart` like `prompt()` does.
+2. Apply the Sandpiper rebuild + contributions to the **base** system prompt at `session_start` (after `resources_discover`), so every turn-entry path inherits it — no per-turn `before_agent_start` dependency. This is prefix-cache-friendly by construction. Note: the post-`resources_discover` base prompt rebuild is gated on resource-path discovery; this gate must be lifted so contributions are resolved regardless of whether any skill/prompt/theme paths were found.
+
+The CC bridge `begin_turn` drift handling (described above) is a separate improvement but was not the live root cause.
+
 ## See also
 
 - [Pi extension development](pi-extension-development.md) — Sandpiper extension surfaces and Pi API reference

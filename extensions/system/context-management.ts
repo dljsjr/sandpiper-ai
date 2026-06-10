@@ -79,6 +79,8 @@ Resume your original work once you've finished.
       sourceId: 'system',
       instructions: contextNotificationInstructions,
       data: contextNotificationData,
+      deliverAs: 'nextTurn',
+      triggerTurn: false
     };
 
     if (notification.instructions) {
