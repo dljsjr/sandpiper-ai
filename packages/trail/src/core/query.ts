@@ -153,33 +153,92 @@ export function getBlocked(tasks: readonly Task[], key: string): readonly Task[]
 
 // ─── Internals ───────────────────────────────────────────────────
 
+type ScalarFilterKey = 'project' | 'status' | 'kind' | 'priority' | 'assignee' | 'reporter';
+type RelationFilterKey = 'dependsOn' | 'blockedBy' | 'relatedTo';
+type TaskRelationKey = 'dependsOn' | 'blockedBy' | 'related';
+
+const SCALAR_FILTERS: ReadonlyArray<{ readonly filterKey: ScalarFilterKey; readonly taskKey: ScalarFilterKey }> = [
+  { filterKey: 'project', taskKey: 'project' },
+  { filterKey: 'status', taskKey: 'status' },
+  { filterKey: 'kind', taskKey: 'kind' },
+  { filterKey: 'priority', taskKey: 'priority' },
+  { filterKey: 'assignee', taskKey: 'assignee' },
+  { filterKey: 'reporter', taskKey: 'reporter' },
+];
+
+const RELATION_FILTERS: ReadonlyArray<{
+  readonly filterKey: RelationFilterKey;
+  readonly taskKey: TaskRelationKey;
+}> = [
+  { filterKey: 'dependsOn', taskKey: 'dependsOn' },
+  { filterKey: 'blockedBy', taskKey: 'blockedBy' },
+  { filterKey: 'relatedTo', taskKey: 'related' },
+];
+
 function matchesFilter(task: Task, filter: TaskFilter): boolean {
-  if (filter.keys !== undefined && !filter.keys.has(task.key)) return false;
-  if (filter.project !== undefined && !matchesValue(task.project, filter.project)) return false;
-  if (filter.status !== undefined && !matchesValue(task.status, filter.status)) return false;
-  if (filter.kind !== undefined && !matchesValue(task.kind, filter.kind)) return false;
-  if (filter.priority !== undefined && !matchesValue(task.priority, filter.priority)) return false;
-  if (filter.assignee !== undefined && !matchesValue(task.assignee, filter.assignee)) return false;
-  if (filter.reporter !== undefined && !matchesValue(task.reporter, filter.reporter)) return false;
-
-  if (filter.resolution !== undefined && !matchesValue(task.resolution, filter.resolution)) return false;
-
-  if (filter.parent !== undefined && task.parent !== filter.parent) return false;
-
-  if (filter.isSubtask === true && task.parent === undefined) return false;
-  if (filter.isSubtask === false && task.parent !== undefined) return false;
-
-  if (filter.dependsOn !== undefined && !task.dependsOn.includes(filter.dependsOn)) return false;
-  if (filter.blockedBy !== undefined && !task.blockedBy.includes(filter.blockedBy)) return false;
-  if (filter.relatedTo !== undefined && !task.related.includes(filter.relatedTo)) return false;
-
-  if (filter.linkedTo !== undefined) {
-    const key = filter.linkedTo;
-    const linked = task.dependsOn.includes(key) || task.blockedBy.includes(key) || task.related.includes(key);
-    if (!linked) return false;
-  }
+  if (!matchesKeySet(task, filter)) return false;
+  if (!matchesScalarFilters(task, filter)) return false;
+  if (!matchesResolutionFilter(task, filter)) return false;
+  if (!matchesParentFilter(task, filter)) return false;
+  if (!matchesSubtaskFilter(task, filter)) return false;
+  if (!matchesRelationFilters(task, filter)) return false;
+  if (!matchesLinkedFilter(task, filter)) return false;
 
   return true;
+}
+
+function matchesKeySet(task: Task, filter: TaskFilter): boolean {
+  return filter.keys === undefined || filter.keys.has(task.key);
+}
+
+function matchesScalarFilters(task: Task, filter: TaskFilter): boolean {
+  for (const { filterKey, taskKey } of SCALAR_FILTERS) {
+    if (!matchesOptionalStringValue(task[taskKey], filter[filterKey])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function matchesResolutionFilter(task: Task, filter: TaskFilter): boolean {
+  if (filter.resolution === undefined) {
+    return true;
+  }
+  return task.resolution !== undefined && matchesValue(task.resolution, filter.resolution);
+}
+
+function matchesParentFilter(task: Task, filter: TaskFilter): boolean {
+  return filter.parent === undefined || task.parent === filter.parent;
+}
+
+function matchesSubtaskFilter(task: Task, filter: TaskFilter): boolean {
+  if (filter.isSubtask === undefined) {
+    return true;
+  }
+  return filter.isSubtask ? task.parent !== undefined : task.parent === undefined;
+}
+
+function matchesRelationFilters(task: Task, filter: TaskFilter): boolean {
+  for (const { filterKey, taskKey } of RELATION_FILTERS) {
+    const key = filter[filterKey];
+    if (key !== undefined && !task[taskKey].includes(key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function matchesLinkedFilter(task: Task, filter: TaskFilter): boolean {
+  if (filter.linkedTo === undefined) {
+    return true;
+  }
+
+  const key = filter.linkedTo;
+  return task.dependsOn.includes(key) || task.blockedBy.includes(key) || task.related.includes(key);
+}
+
+function matchesOptionalStringValue(value: string, filterValue: string | readonly string[] | undefined): boolean {
+  return filterValue === undefined || matchesValue(value, filterValue);
 }
 
 function matchesValue<T>(value: T, filterValue: T | readonly T[]): boolean {
