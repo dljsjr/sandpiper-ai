@@ -202,6 +202,22 @@ function normalizeInternalUpdateFields(fields: InternalUpdateFields): InternalUp
   };
 }
 
+type ScalarUpdateKey = 'status' | 'assignee' | 'priority' | 'kind' | 'reporter';
+type ScalarChangeKey = 'status' | 'assignee' | 'priority' | 'reporter' | 'title' | 'resolution';
+type ArrayUpdateKey = 'dependsOn' | 'blockedBy' | 'related';
+
+const FRONTMATTER_SCALAR_UPDATES: ReadonlyArray<{
+  readonly key: ScalarUpdateKey;
+  readonly fmKey: string;
+  readonly format: (value: NonNullable<InternalUpdateFields[ScalarUpdateKey]>) => string;
+}> = [
+  { key: 'status', fmKey: 'status', format: (value) => value },
+  { key: 'assignee', fmKey: 'assignee', format: formatFrontmatterScalar },
+  { key: 'priority', fmKey: 'priority', format: (value) => value },
+  { key: 'kind', fmKey: 'kind', format: (value) => value },
+  { key: 'reporter', fmKey: 'reporter', format: formatFrontmatterScalar },
+];
+
 /**
  * Apply public task field updates to a task file's content string (in memory).
  * Returns the modified content without writing to disk.
@@ -217,49 +233,64 @@ export function applyFieldUpdates(content: string, fields: UpdateFields): string
  */
 export function applyInternalFieldUpdates(content: string, fields: InternalUpdateFields): string {
   const normalizedFields = normalizeInternalUpdateFields(fields);
+  let result = applyScalarFieldUpdates(content, normalizedFields);
+  result = applyResolutionUpdate(result, normalizedFields.resolution);
+  result = applyTitleUpdate(result, normalizedFields.title);
+  result = applyArrayFieldUpdates(result, normalizedFields);
+  return touchUpdatedAt(result);
+}
+
+function applyScalarFieldUpdates(content: string, fields: InternalUpdateFields): string {
   let result = content;
 
-  if (normalizedFields.status !== undefined) {
-    result = result.replace(/^status: .+$/m, `status: ${normalizedFields.status}`);
-  }
-  if (normalizedFields.assignee !== undefined) {
-    result = result.replace(/^assignee: .+$/m, `assignee: ${formatFrontmatterScalar(normalizedFields.assignee)}`);
-  }
-  if (normalizedFields.priority !== undefined) {
-    result = result.replace(/^priority: .+$/m, `priority: ${normalizedFields.priority}`);
-  }
-  if (normalizedFields.kind !== undefined) {
-    result = result.replace(/^kind: .+$/m, `kind: ${normalizedFields.kind}`);
-  }
-  if (normalizedFields.resolution !== undefined) {
-    if (/^resolution: /m.test(result)) {
-      result = result.replace(/^resolution: .+$/m, `resolution: ${normalizedFields.resolution}`);
-    } else {
-      result = result.replace(/^(status: .+)$/m, `$1\nresolution: ${normalizedFields.resolution}`);
+  for (const { key, fmKey, format } of FRONTMATTER_SCALAR_UPDATES) {
+    const value = fields[key];
+    if (value !== undefined) {
+      result = replaceScalarField(result, fmKey, format(value));
     }
   }
-  if (normalizedFields.title !== undefined) {
-    result = result.replace(/^title: .+$/m, `title: ${formatFrontmatterScalar(normalizedFields.title)}`);
-    // Also update the H1 heading in the body
-    result = result.replace(/^# .+$/m, `# ${normalizedFields.title}`);
-  }
-  if (normalizedFields.reporter !== undefined) {
-    result = result.replace(/^reporter: .+$/m, `reporter: ${formatFrontmatterScalar(normalizedFields.reporter)}`);
-  }
-  if (normalizedFields.dependsOn !== undefined) {
-    result = replaceArrayField(result, 'depends_on', normalizedFields.dependsOn);
-  }
-  if (normalizedFields.blockedBy !== undefined) {
-    result = replaceArrayField(result, 'blocked_by', normalizedFields.blockedBy);
-  }
-  if (normalizedFields.related !== undefined) {
-    result = replaceArrayField(result, 'related', normalizedFields.related);
-  }
-
-  const ts = new Date().toISOString();
-  result = result.replace(/^updated_at: .+$/m, `updated_at: ${ts}`);
 
   return result;
+}
+
+function applyResolutionUpdate(content: string, resolution: TaskResolution | undefined): string {
+  if (resolution === undefined) {
+    return content;
+  }
+  if (/^resolution: /m.test(content)) {
+    return replaceScalarField(content, 'resolution', resolution);
+  }
+  return content.replace(/^(status: .+)$/m, `$1\nresolution: ${resolution}`);
+}
+
+function applyTitleUpdate(content: string, title: string | undefined): string {
+  if (title === undefined) {
+    return content;
+  }
+
+  return replaceScalarField(content, 'title', formatFrontmatterScalar(title)).replace(/^# .+$/m, `# ${title}`);
+}
+
+function applyArrayFieldUpdates(content: string, fields: InternalUpdateFields): string {
+  let result = content;
+
+  for (const { key, fmKey } of ARRAY_FIELD_MAPPINGS) {
+    const value = fields[key];
+    if (value !== undefined) {
+      result = replaceArrayField(result, fmKey, value);
+    }
+  }
+
+  return result;
+}
+
+function replaceScalarField(content: string, fieldName: string, value: string): string {
+  return content.replace(new RegExp(`^${fieldName}: .+$`, 'm'), `${fieldName}: ${value}`);
+}
+
+function touchUpdatedAt(content: string): string {
+  const ts = new Date().toISOString();
+  return replaceScalarField(content, 'updated_at', ts);
 }
 
 /**
@@ -323,7 +354,7 @@ export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
   }
 }
 
-const SIMPLE_FIELD_MAPPINGS: Array<{ key: keyof UpdateFields; fmKey: string }> = [
+const SIMPLE_FIELD_MAPPINGS: ReadonlyArray<{ readonly key: ScalarChangeKey; readonly fmKey: string }> = [
   { key: 'status', fmKey: 'status' },
   { key: 'assignee', fmKey: 'assignee' },
   { key: 'priority', fmKey: 'priority' },
@@ -332,7 +363,7 @@ const SIMPLE_FIELD_MAPPINGS: Array<{ key: keyof UpdateFields; fmKey: string }> =
   { key: 'resolution', fmKey: 'resolution' },
 ];
 
-const ARRAY_FIELD_MAPPINGS: Array<{ key: keyof UpdateFields; fmKey: string }> = [
+const ARRAY_FIELD_MAPPINGS: ReadonlyArray<{ readonly key: ArrayUpdateKey; readonly fmKey: string }> = [
   { key: 'dependsOn', fmKey: 'depends_on' },
   { key: 'blockedBy', fmKey: 'blocked_by' },
   { key: 'related', fmKey: 'related' },
@@ -367,6 +398,37 @@ function formatArrayFieldChange(
   return { field, from: oldDisplay, to: newDisplay };
 }
 
+function formatDescriptionFieldChange(
+  originalContent: string,
+  newDescription: string | undefined,
+): FieldChange | undefined {
+  if (newDescription === undefined) {
+    return undefined;
+  }
+
+  const oldLines = countDescriptionLines(extractDescription(originalContent).trim());
+  const newLines = countDescriptionLines(newDescription.trim());
+
+  if (oldLines === 0 && newLines > 0) {
+    return { field: 'description', from: undefined, to: `added (${formatLineCount(newLines)})` };
+  }
+  if (newLines === 0 && oldLines > 0) {
+    return { field: 'description', from: formatLineCount(oldLines), to: 'cleared' };
+  }
+  if (oldLines !== newLines) {
+    return { field: 'description', from: formatLineCount(oldLines), to: `updated (${formatLineCount(newLines)})` };
+  }
+  return { field: 'description', from: undefined, to: 'updated' };
+}
+
+function countDescriptionLines(description: string): number {
+  return description === '' ? 0 : description.split('\n').length;
+}
+
+function formatLineCount(count: number): string {
+  return `${count} line${count !== 1 ? 's' : ''}`;
+}
+
 /**
  * Compute the list of field changes for the activity log.
  */
@@ -388,23 +450,9 @@ function computeChanges(
     }
   }
 
-  // Description: log line count delta for a sense of magnitude
-  if (fields.description !== undefined) {
-    const oldDesc = extractDescription(originalContent).trim();
-    const newDesc = fields.description.trim();
-    const oldLines = oldDesc === '' ? 0 : oldDesc.split('\n').length;
-    const newLines = newDesc === '' ? 0 : newDesc.split('\n').length;
-    const pl = (n: number) => `${n} line${n !== 1 ? 's' : ''}`;
-
-    if (oldLines === 0 && newLines > 0) {
-      changes.push({ field: 'description', from: undefined, to: `added (${pl(newLines)})` });
-    } else if (newLines === 0 && oldLines > 0) {
-      changes.push({ field: 'description', from: pl(oldLines), to: 'cleared' });
-    } else if (oldLines !== newLines) {
-      changes.push({ field: 'description', from: pl(oldLines), to: `updated (${pl(newLines)})` });
-    } else {
-      changes.push({ field: 'description', from: undefined, to: 'updated' });
-    }
+  const descriptionChange = formatDescriptionFieldChange(originalContent, fields.description);
+  if (descriptionChange) {
+    changes.push(descriptionChange);
   }
 
   for (const { key, fmKey } of ARRAY_FIELD_MAPPINGS) {
