@@ -12,10 +12,6 @@ export interface RelaySetupContext {
   readonly ui: Pick<RelayUi, 'setStatus'>;
 }
 
-export interface RelayCommandContext {
-  readonly ui: RelayUi;
-}
-
 export interface RelaySessionContext {
   readonly ui: Pick<RelayUi, 'setStatus'>;
   readonly sessionManager: {

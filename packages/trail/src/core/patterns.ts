@@ -20,13 +20,6 @@ export function projectFromKey(key: string): string {
   return key.slice(0, dash);
 }
 
-/** Extract the task number from a task key. */
-export function numberFromKey(key: string): number {
-  const dash = key.indexOf('-');
-  if (dash === -1) throw new Error(`Invalid task key: ${key}`);
-  return Number.parseInt(key.slice(dash + 1), 10);
-}
-
 /**
  * Resolve a task key to its file path on disk.
  * Searches the project root and subtask directories.

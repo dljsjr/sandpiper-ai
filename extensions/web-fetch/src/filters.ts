@@ -41,8 +41,6 @@ export type MarkdownFilterFunc = (
   context: WebFetchFilterContext,
 ) => MarkdownDocument | Promise<MarkdownDocument>;
 
-export type HtmlFilter = HtmlFilterFunc | HtmlFilterObject;
-export type MarkdownFilter = MarkdownFilterFunc | MarkdownFilterObject;
 export type WebFetchFilter = HtmlFilterObject | MarkdownFilterObject;
 
 function stripMarkdownLinks(text: string): string {
