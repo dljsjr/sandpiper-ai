@@ -2,15 +2,15 @@
 name: code-review
 description: >
   Use this skill whenever performing a code review, reviewing a pull request, reviewing a diff,
-  auditing code quality, or assessing code health. Triggers include: any mention of "code review",
-  "review this", "review my code", "PR review", "pull request", "look over this code", "audit",
-  "what do you think of this code", "is this code good", "check my code", requests to review
-  a diff or changeset, or when asked to evaluate code someone else wrote. Also trigger when the
-  user pastes code and asks for feedback, opinions, or improvements. This skill provides a
-  structured, evidence-backed review workflow that combines quantitative tool analysis with
-  qualitative human-style review. Always consult this skill before reviewing non-trivial code —
-  it prevents the common failure modes of purely subjective reviews (bikeshedding, style-as-substance,
-  missing structural issues).
+  auditing code quality, or assessing code health. Triggers include: "code review", "review this",
+  "review my code", "PR review", "pull request", "look over this code", "audit", "AI slop",
+  "agent-authored code", "what do you think of this code", "is this code good", "check my code",
+  requests to review a diff or changeset, or when asked to evaluate code someone else wrote. Also
+  trigger when the user pastes code and asks for feedback, opinions, or improvements. This skill
+  provides a structured, evidence-backed review workflow combining quantitative tool analysis with
+  qualitative review. Always consult this skill before reviewing non-trivial code — it prevents
+  subjective review failures: bikeshedding, style-as-substance, rubber-stamping green tests, and
+  missing structural issues such as Modular Mirage, wrong abstraction, and convention-blind code.
 ---
 
 # Code Review
@@ -25,18 +25,18 @@ code that is merely unfamiliar and code that is genuinely problematic.
 
 After reading this file, read the appropriate reference for the code being reviewed:
 
-| Language | Reference file | When to read |
-|----------|---------------|--------------|
-| TypeScript / JavaScript | `references/typescript.md` | Any .ts, .tsx, .js, .jsx files |
-| Python | `references/python.md` | Any .py files |
-| Rust | `references/rust.md` | Any .rs files |
-| Go | `references/go.md` | Any .go files |
-| C / C++ | `references/c-cpp.md` | Any .c, .cpp, .h, .hpp files |
-| Swift | `references/swift.md` | Any .swift files |
-| Ruby | `references/ruby.md` | Any .rb files |
-| Java / Kotlin | `references/java-kotlin.md` | Any .java, .kt, .kts files |
-| Lua | `references/lua.md` | Any .lua files, Neovim plugins, Love2D, OpenResty, embedded scripting |
-| PHP | `references/php.md` | Any .php files, Laravel, Symfony, WordPress |
+| Language                | Reference file              | When to read                                                          |
+| ----------------------- | --------------------------- | --------------------------------------------------------------------- |
+| TypeScript / JavaScript | `references/typescript.md`  | Any .ts, .tsx, .js, .jsx files                                        |
+| Python                  | `references/python.md`      | Any .py files                                                         |
+| Rust                    | `references/rust.md`        | Any .rs files                                                         |
+| Go                      | `references/go.md`          | Any .go files                                                         |
+| C / C++                 | `references/c-cpp.md`       | Any .c, .cpp, .h, .hpp files                                          |
+| Swift                   | `references/swift.md`       | Any .swift files                                                      |
+| Ruby                    | `references/ruby.md`        | Any .rb files                                                         |
+| Java / Kotlin           | `references/java-kotlin.md` | Any .java, .kt, .kts files                                            |
+| Lua                     | `references/lua.md`         | Any .lua files, Neovim plugins, Love2D, OpenResty, embedded scripting |
+| PHP                     | `references/php.md`         | Any .php files, Laravel, Symfony, WordPress                           |
 
 ---
 
@@ -63,6 +63,7 @@ use Mode B. If unclear, ask.
 ### Step 1: Understand Intent
 
 Before looking at code, answer these questions:
+
 - What is this change trying to accomplish? (Read the PR description, commit message,
   or ask the user.)
 - What is the expected scope? (Is this a bug fix, feature, refactor, or cleanup?)
@@ -71,6 +72,8 @@ Before looking at code, answer these questions:
 Do NOT start reviewing line-by-line before understanding intent. This is the most
 common code review mistake — it leads to commenting on choices that make sense in
 context but look odd in isolation.
+
+**Agent-authored diff calibration:** Green tests do not mean clean design. If a diff is AI- or agent-authored, use a higher prior for hidden readability, logic, and correctness issues. Start with the largest and most complex changed files, then check whether the change fits the local idiom rather than abstract “best practice.”
 
 ### Step 2: Measure the Delta
 
@@ -110,16 +113,18 @@ bunx @toon-format/cli report.json --encode --keyFolding safe -o report.toon
 ```
 
 **What to look for in the delta:**
+
 - Did any function's CC increase above 15?
-- Did any function grow beyond 60 lines?
+- Did any function grow beyond 60 lines without remaining a clear linear crux flow?
 - Did nesting depth increase beyond 3-4 levels?
-- Was duplication introduced?
+- Was duplication introduced, especially a third copy or a diverged clone?
 - Did the change add more code than necessary for the stated goal?
 - Did linter warnings increase?
 - Did ast-grep find new structural anti-patterns (type escapes, silent catches, etc.)?
+- Does the diff show the agent machine signature: Long Method bloat, God Class centralization, redundant inline implementation, Modular Mirage, over-commenting, speculative generality, or convention-blind structure?
 
 The ratchet principle applies: changes should not degrade any health metric without
-strong justification.
+strong justification. Metrics guide attention; they do not decide the review by themselves.
 
 ### Step 3: Correctness Review
 
@@ -127,6 +132,7 @@ Now read the actual code. This is the part that requires judgment, not tooling.
 Check in this order:
 
 **3a. Logic correctness:**
+
 - Does the code actually do what the intent says it should?
 - Are there off-by-one errors, boundary conditions, or edge cases missed?
 - Are there race conditions or ordering assumptions?
@@ -134,6 +140,7 @@ Check in this order:
 - Are there implicit assumptions that could break?
 
 **3b. Security:**
+
 - Is user input validated and sanitized?
 - Are there injection risks (SQL, command, template)?
 - Are secrets or credentials hardcoded or logged?
@@ -142,15 +149,18 @@ Check in this order:
 - Are cryptographic operations using secure defaults?
 
 **3c. Data integrity:**
+
 - Can this change corrupt or lose data?
 - Are database operations atomic where they should be?
 - Are there partial-failure scenarios that leave state inconsistent?
 - Is input validation happening at the right boundary?
 
 **3d. Error handling:**
+
 - Are all error paths handled?
 - Are errors propagated with useful context (not swallowed)?
 - Is there appropriate fallback behavior?
+- Does this domain want fail-loud correctness or graceful degradation? Defensive code that is right in UI/web paths can silently corrupt data/correctness paths.
 - Are resource leaks possible on error paths? (files, connections, locks)
 
 ### Step 4: Structural Assessment
@@ -169,6 +179,9 @@ Zoom out from individual lines to assess structural impact:
   a design smell, not a testing problem.
 - **Test quality:** Do the tests verify behavior (what it does) or implementation
   (how it does it)? Implementation-coupled tests are fragile.
+- **Modular Mirage:** Did the change create many small well-named files or helpers
+  while scattering one concept, reversing dependency direction, or replacing one
+  readable flow with shallow pass-through structure?
 
 ### Step 5: Compile the Review
 
@@ -254,6 +267,7 @@ Sort findings from both the metrics (Step 1) and the design review (Step 2)
 into priority tiers using this framework:
 
 **Tier 1 — Fix now (correctness risk):**
+
 - Functions with CC > 20
 - Duplicated blocks that have diverged (inconsistent clones)
 - Dead code paths (unreachable branches, unused exports)
@@ -262,6 +276,7 @@ into priority tiers using this framework:
 - Files appearing in both "high complexity" and "high churn" lists (hotspots)
 
 **Tier 2 — Fix soon (maintenance risk):**
+
 - Functions with CC 15-20
 - Functions longer than 60 lines
 - Nesting depth > 4
@@ -270,6 +285,7 @@ into priority tiers using this framework:
 - Missing error handling on I/O operations
 
 **Tier 3 — Improve opportunistically:**
+
 - Functions with CC 10-15
 - Functions 25-60 lines
 - Naming inconsistencies
@@ -277,6 +293,7 @@ into priority tiers using this framework:
 - Missing type annotations (in gradually-typed languages)
 
 **Tier 4 — Note but don't prioritize:**
+
 - Style preferences that differ from reviewer's taste but are internally consistent
 - Minor duplication (< 3%)
 - Tests that test implementation rather than behavior
@@ -301,13 +318,13 @@ as prioritized recommendations rather than change requests.
 
 Every finding should have one of these severity levels:
 
-| Level | Meaning | Reviewer expectation |
-|-------|---------|---------------------|
-| **blocker** | Correctness bug, security vulnerability, data loss risk | Must fix before merge |
-| **major** | Significant health degradation, missing error handling, architectural concern | Should fix before merge |
-| **minor** | Complexity increase, naming concern, duplication, style inconsistency | Fix or acknowledge with justification |
-| **nit** | Style preference, optional improvement, alternative approach | Take or leave |
-| **positive** | Something done well, good pattern, notable improvement | No action needed |
+| Level        | Meaning                                                                       | Reviewer expectation                  |
+| ------------ | ----------------------------------------------------------------------------- | ------------------------------------- |
+| **blocker**  | Correctness bug, security vulnerability, data loss risk                       | Must fix before merge                 |
+| **major**    | Significant health degradation, missing error handling, architectural concern | Should fix before merge               |
+| **minor**    | Complexity increase, naming concern, duplication, style inconsistency         | Fix or acknowledge with justification |
+| **nit**      | Style preference, optional improvement, alternative approach                  | Take or leave                         |
+| **positive** | Something done well, good pattern, notable improvement                        | No action needed                      |
 
 Always include **positive** findings. Reviews that only contain criticism miss the
 opportunity to reinforce good practices and demoralize the author.
@@ -315,6 +332,7 @@ opportunity to reinforce good practices and demoralize the author.
 ### Finding Structure
 
 Each finding should include:
+
 1. **Location:** File and line range (or function name)
 2. **Severity:** One of the levels above
 3. **What:** What you observed (factual, not judgmental)
@@ -331,6 +349,7 @@ out correctness and structural review. Do the structural analysis first, THEN ad
 style.
 
 **Project conventions (minor severity):**
+
 - Deviations from the project's established patterns. If the rest of the codebase
   uses factory functions and the new code introduces a builder pattern for the same
   purpose, that's a legitimate finding. Consistency within a codebase matters more
@@ -342,6 +361,7 @@ style.
 - File/directory organization that breaks the existing module structure.
 
 **Org-specific conventions (minor severity):**
+
 - Naming conventions for specific domains (API routes, database columns, environment
   variables, config keys).
 - Required file headers, license blocks, or copyright notices.
@@ -350,6 +370,7 @@ style.
 - Required test naming patterns or test organization conventions.
 
 **Hygiene nits (nit severity — but still worth flagging):**
+
 - Typos in variable names, function names, comments, error messages, and documentation.
   Typos in identifiers are worse than typos in comments because they propagate through
   the codebase and are harder to fix later.
@@ -421,6 +442,7 @@ This grounds the review in observable facts before presenting subjective assessm
 This is the most important skill in code review, and the one most reviewers lack.
 
 **Evidence-backed (state with confidence):**
+
 - "This function has CC 22, which is associated with higher defect rates in the literature.
   Consider splitting at the [specific logical boundary]."
 - "This duplicated block appears in two files with slight divergence. Research shows
@@ -431,6 +453,7 @@ This is the most important skill in code review, and the one most reviewers lack
   would flatten this."
 
 **Preferences (frame as suggestions, not requirements):**
+
 - "I'd personally extract this into a separate module, but the current placement
   is reasonable."
 - "You could use a map/dict lookup here instead of a switch — it's a style choice."
@@ -472,7 +495,7 @@ or health metrics. If you're about to block a merge, verify your concerns are at
 
 If the review identifies significant refactoring needs, point the author to the
 **refactoring** skill for structured cleanup. The code review skill identifies
-*what* needs work; the refactoring skill provides the *how*.
+_what_ needs work; the refactoring skill provides the _how_.
 
 For new code being written, the **AGENTS.md code health** section provides the
 principles that should prevent the issues this review skill catches.
