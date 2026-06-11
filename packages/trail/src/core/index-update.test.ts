@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, w
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { taskFromFrontmatter } from './frontmatter.js';
 import { loadIndex, updateIndex } from './index-update.js';
 
 function writeTask(
@@ -413,5 +414,99 @@ describe('gitignore management', () => {
     const content = readFileSync(join(tasksDir, '.gitignore'), 'utf-8');
     const matches = content.split('\n').filter((l) => l.trim() === 'index.toon');
     expect(matches).toHaveLength(1);
+  });
+});
+
+describe('canonical mapper alignment', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'canonical-mapper-test-'));
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  it('normalizes malformed enum values in the index, matching taskFromFrontmatter', () => {
+    // Write a task file with malformed frontmatter directly
+    const projectDir = join(tasksDir, 'TCL');
+    mkdirSync(projectDir, { recursive: true });
+    writeFileSync(
+      join(projectDir, 'TCL-1.md'),
+      `---
+title: Malformed task
+status: BOGUS
+kind: FEATURE
+priority: URGENT
+assignee: nobody-special
+reporter: somebody-else
+created_at: "2026-01-01"
+updated_at: "2026-01-01"
+---\n\n# Malformed task\n`,
+    );
+
+    const index = updateIndex(tasksDir);
+    const indexed = index.tasks['TCL-1']!;
+
+    // The canonical mapper would normalize these — the index must match
+    const canonical = taskFromFrontmatter('TCL-1', {
+      title: 'Malformed task',
+      status: 'BOGUS',
+      kind: 'FEATURE',
+      priority: 'URGENT',
+      assignee: 'nobody-special',
+      reporter: 'somebody-else',
+      created_at: '2026-01-01',
+      updated_at: '2026-01-01',
+    });
+
+    expect(indexed.title).toBe(canonical.title);
+    expect(indexed.status).toBe(canonical.status);
+    expect(indexed.kind).toBe(canonical.kind);
+    expect(indexed.priority).toBe(canonical.priority);
+    expect(indexed.assignee).toBe(canonical.assignee);
+    expect(indexed.reporter).toBe(canonical.reporter);
+  });
+
+  it('preserves scalar array fields as single-element arrays in the index', () => {
+    const projectDir = join(tasksDir, 'TCL');
+    mkdirSync(projectDir, { recursive: true });
+    writeFileSync(
+      join(projectDir, 'TCL-2.md'),
+      `---
+title: Scalar deps
+depends_on: SHR-1
+blocked_by: SHR-2
+related: SHR-3
+---\n\n# Scalar deps\n`,
+    );
+
+    const index = updateIndex(tasksDir);
+    const indexed = index.tasks['TCL-2']!;
+
+    expect(indexed.dependsOn).toEqual(['SHR-1']);
+    expect(indexed.blockedBy).toEqual(['SHR-2']);
+    expect(indexed.related).toEqual(['SHR-3']);
+  });
+
+  it('derives project from the task key, not the directory, for a misfiled task', () => {
+    // A task whose key prefix disagrees with its containing project dir.
+    // Pre-collapse the index used the directory name; the canonical mapper
+    // derives project from the key (projectFromKey). This pins the live
+    // behavior change so a misfiled task reads back consistently with show/list.
+    const wrongDir = join(tasksDir, 'FOO');
+    mkdirSync(wrongDir, { recursive: true });
+    writeFileSync(
+      join(wrongDir, 'TCL-5.md'),
+      `---
+title: Misfiled task
+---\n\n# Misfiled task\n`,
+    );
+
+    const index = updateIndex(tasksDir);
+    const indexed = index.tasks['TCL-5']!;
+
+    expect(indexed.project).toBe('TCL');
   });
 });

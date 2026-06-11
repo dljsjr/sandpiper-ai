@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -11,6 +11,7 @@ import {
   createTask,
   pickupTask,
   updateTaskFields,
+  writeTaskFileAuditably,
 } from './mutate.js';
 
 function readTaskFrontmatter(path: string): Record<string, string | string[]> {
@@ -602,5 +603,134 @@ describe('counter allocation', () => {
 
     // Assert: index floor wins → FOO-4 (no counter regression)
     expect(result.key).toBe('FOO-4');
+  });
+});
+
+describe('writeTaskFileAuditably', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'audited-write-test-'));
+    createProject(tasksDir, 'AUD');
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  it('writes content to disk and appends activity log entry', () => {
+    const result = createTask(tasksDir, {
+      project: 'AUD',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Test task',
+      reporter: 'USER',
+    });
+    const taskPath = result.path;
+    const originalContent = readFileSync(taskPath, 'utf-8');
+
+    const newContent = originalContent.replace('NOT STARTED', 'IN PROGRESS');
+    const changes = [{ field: 'status', from: 'NOT STARTED', to: 'IN PROGRESS' }];
+
+    writeTaskFileAuditably({ taskPath, tasksDir, originalContent, newContent, changes });
+
+    const updatedContent = readFileSync(taskPath, 'utf-8');
+    expect(updatedContent).toContain('IN PROGRESS');
+    expect(updatedContent).toContain('# Activity Log');
+    expect(updatedContent).toContain('status');
+    expect(updatedContent).toContain('NOT STARTED → IN PROGRESS');
+  });
+
+  it('writes a history diff when content changes', () => {
+    const result = createTask(tasksDir, {
+      project: 'AUD',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Test task',
+      reporter: 'USER',
+    });
+    const taskPath = result.path;
+    const originalContent = readFileSync(taskPath, 'utf-8');
+
+    const newContent = originalContent.replace('NOT STARTED', 'IN PROGRESS');
+    const changes = [{ field: 'status', from: 'NOT STARTED', to: 'IN PROGRESS' }];
+
+    writeTaskFileAuditably({ taskPath, tasksDir, originalContent, newContent, changes });
+
+    // History diff should exist
+    const historyDir = join(tasksDir, 'history', result.key);
+    expect(existsSync(historyDir)).toBe(true);
+    const diffFileName = readdirSync(historyDir).find((f) => f.endsWith('.diff'));
+    expect(diffFileName).toBeDefined();
+    const diffContent = readFileSync(join(historyDir, diffFileName!), 'utf-8');
+    expect(diffContent).toContain('IN PROGRESS');
+  });
+
+  it('does not write activity or diff when content is unchanged and no changes', () => {
+    const result = createTask(tasksDir, {
+      project: 'AUD',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Test task',
+      reporter: 'USER',
+    });
+    const taskPath = result.path;
+    const originalContent = readFileSync(taskPath, 'utf-8');
+
+    writeTaskFileAuditably({ taskPath, tasksDir, originalContent, newContent: originalContent, changes: [] });
+
+    const contentAfter = readFileSync(taskPath, 'utf-8');
+    // Content should be unchanged — no activity log appended
+    expect(contentAfter).toBe(originalContent);
+  });
+
+  it('appends activity log even when new content matches old content (e.g. activity-only change)', () => {
+    // Edge case: if someone passes changes but content didn't differ,
+    // we still want the activity log to reflect the declared changes
+    const result = createTask(tasksDir, {
+      project: 'AUD',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Test task',
+      reporter: 'USER',
+    });
+    const taskPath = result.path;
+    const originalContent = readFileSync(taskPath, 'utf-8');
+
+    const changes = [{ field: 'references', from: undefined, to: 'updated' }];
+    writeTaskFileAuditably({ taskPath, tasksDir, originalContent, newContent: originalContent, changes });
+
+    const contentAfter = readFileSync(taskPath, 'utf-8');
+    expect(contentAfter).toContain('# Activity Log');
+  });
+
+  it('uses historyKey override for history directory when provided', () => {
+    const result = createTask(tasksDir, {
+      project: 'AUD',
+      kind: 'TASK',
+      priority: 'MEDIUM',
+      title: 'Test task',
+      reporter: 'USER',
+    });
+    const taskPath = result.path;
+    const originalContent = readFileSync(taskPath, 'utf-8');
+
+    const newContent = originalContent.replace('NOT STARTED', 'IN PROGRESS');
+    const changes = [{ field: 'key', from: 'AUD-1', to: 'MOV-1' }];
+
+    // Write with historyKey override — diff should land under the old key
+    writeTaskFileAuditably({
+      taskPath,
+      tasksDir,
+      originalContent,
+      newContent,
+      changes,
+      historyKey: 'AUD-1',
+    });
+
+    const historyDir = join(tasksDir, 'history', 'AUD-1');
+    expect(existsSync(historyDir)).toBe(true);
+    const diffFileName = readdirSync(historyDir).find((f) => f.endsWith('.diff'));
+    expect(diffFileName).toBeDefined();
   });
 });

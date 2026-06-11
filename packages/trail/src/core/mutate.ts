@@ -316,6 +316,57 @@ function replaceArrayField(content: string, fieldName: string, values: readonly 
 }
 
 /**
+ * Write a task file to disk with full audit trail: activity log entry + history diff.
+ *
+ * This is the single audited write path for task content changes.
+ * All mutations that modify task file content should route through here
+ * to ensure the activity log and diff history are consistently maintained.
+ *
+ * @param taskPath - Absolute path to the task file
+ * @param tasksDir - Root tasks directory (e.g., .sandpiper/tasks/)
+ * @param originalContent - File content before the change
+ * @param newContent - File content after the change (before activity log append)
+ * @param changes - Field changes to record in the activity log
+ */
+export interface AuditedWriteOptions {
+  /** Absolute path to the task file. */
+  readonly taskPath: string;
+  /** Root tasks directory (e.g., .sandpiper/tasks/). */
+  readonly tasksDir: string;
+  /** File content before the change. */
+  readonly originalContent: string;
+  /** File content after the change (before activity log append). */
+  readonly newContent: string;
+  /** Field changes to record in the activity log. Empty means no activity entry. */
+  readonly changes: readonly FieldChange[];
+  /**
+   * Task key for the history directory. Defaults to basename(taskPath, '.md').
+   * Move operations pass the old key so history lands under the pre-move identity.
+   */
+  readonly historyKey?: string;
+}
+
+export function writeTaskFileAuditably(opts: AuditedWriteOptions): void {
+  const { taskPath, tasksDir, originalContent, newContent, changes, historyKey } = opts;
+
+  if (originalContent === newContent && changes.length === 0) return;
+
+  let content = newContent;
+  const timestamp = new Date().toISOString();
+
+  if (changes.length > 0) {
+    content = appendActivityEntry(content, changes);
+  }
+
+  writeFileAtomic(taskPath, content);
+
+  if (originalContent !== content) {
+    const key = historyKey ?? basename(taskPath, '.md');
+    writeDiff(tasksDir, key, originalContent, content, timestamp);
+  }
+}
+
+/**
  * Update fields on a task file on disk.
  * Validates that COMPLETE status requires a resolution.
  */
@@ -335,22 +386,19 @@ export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
     content = replaceDescription(content, normalizedFields.description);
   }
 
-  // Compute field changes for the activity log
   const changes = computeChanges(originalFm, normalizedFields, originalContent);
-  const timestamp = new Date().toISOString();
-  if (changes.length > 0) {
-    content = appendActivityEntry(content, changes);
-  }
-
-  writeFileAtomic(taskPath, content);
-
-  // Write diff to history
-  if (originalContent !== content) {
-    const tasksDir = resolveTasksRoot(taskPath);
-    const key = basename(taskPath, '.md');
-    if (tasksDir) {
-      writeDiff(tasksDir, key, originalContent, content, timestamp);
-    }
+  const tasksDir = resolveTasksRoot(taskPath);
+  if (tasksDir) {
+    writeTaskFileAuditably({
+      taskPath,
+      tasksDir,
+      originalContent,
+      newContent: content,
+      changes,
+    });
+  } else {
+    // Fallback: write without audit trail if tasks root cannot be resolved
+    writeFileAtomic(taskPath, content);
   }
 }
 
