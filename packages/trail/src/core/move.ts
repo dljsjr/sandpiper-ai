@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { decode as decodeToon, encode as encodeToon } from '@toon-format/toon';
+import type { FieldChange } from './activity-log.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { loadIndex, readProjectCounter } from './index-update.js';
-import { applyInternalFieldUpdates } from './mutate.js';
+import { applyInternalFieldUpdates, writeTaskFileAuditably } from './mutate.js';
 import { projectFromKey, resolveTaskFile, scanHighestNumber, TASK_FILE_RE, TASK_KEY_RE } from './patterns.js';
 import type { IndexedTask, TaskKind } from './types.js';
 
@@ -55,7 +56,15 @@ export function moveTask(tasksDir: string, key: string, opts: MoveOptions): Move
   validateMoveTarget(tasksDir, current, target);
 
   const plan = planMove(tasksDir, key, current, target);
-  writeMovedTaskFile(plan.newPath, applyMoveFieldUpdates(current.content, current.kind, target.kind));
+  const moveChanges = buildMoveActivityChanges(key, plan.newKey, current, target);
+  writeMovedTaskFile(
+    tasksDir,
+    plan.newPath,
+    current.content,
+    applyMoveFieldUpdates(current.content, current.kind, target.kind),
+    key,
+    moveChanges,
+  );
   moveSubtasksForPlan(tasksDir, plan);
   removeOriginalTaskFiles(tasksDir, key, current, plan.newPath);
   writeMoveTombstones(tasksDir, plan.reKeyMap);
@@ -156,9 +165,47 @@ function applyMoveFieldUpdates(content: string, currentKind: TaskKind, targetKin
   return applyInternalFieldUpdates(content, { kind: targetKind });
 }
 
-function writeMovedTaskFile(newPath: string, content: string): void {
+function buildMoveActivityChanges(
+  oldKey: string,
+  newKey: string,
+  current: CurrentTaskState,
+  target: MoveTarget,
+): FieldChange[] {
+  const changes: FieldChange[] = [];
+  if (oldKey !== newKey) {
+    changes.push({ field: 'key', from: oldKey, to: newKey });
+  }
+  if (target.kind !== current.kind) {
+    changes.push({ field: 'kind', from: current.kind, to: target.kind });
+  }
+  const targetParent = target.kind === 'SUBTASK' ? target.parent : undefined;
+  if (targetParent !== current.parent) {
+    changes.push({
+      field: 'parent',
+      from: current.parent ?? '(none)',
+      to: targetParent ?? '(none)',
+    });
+  }
+  return changes;
+}
+
+function writeMovedTaskFile(
+  tasksDir: string,
+  newPath: string,
+  originalContent: string,
+  newContent: string,
+  historyKey: string,
+  changes: readonly FieldChange[],
+): void {
   mkdirSync(join(newPath, '..'), { recursive: true });
-  writeFileAtomic(newPath, content);
+  writeTaskFileAuditably({
+    taskPath: newPath,
+    tasksDir,
+    originalContent,
+    newContent,
+    changes,
+    historyKey,
+  });
 }
 
 function moveSubtasksForPlan(tasksDir: string, plan: MovePlan): void {
@@ -298,16 +345,38 @@ function moveSubtasks(
 
   for (const [oldSubKey, oldSubPath] of subtasks) {
     const newSubKey = reKeyMap?.get(oldSubKey) ?? oldSubKey;
-    let content = readFileSync(oldSubPath, 'utf-8');
+    const originalContent = readFileSync(oldSubPath, 'utf-8');
+    let content = originalContent;
 
     // Update kind to SUBTASK if not already
     const subFm = parseFrontmatter(content);
-    if (subFm.kind !== 'SUBTASK') {
+    const kindChanged = subFm.kind !== 'SUBTASK';
+    if (kindChanged) {
       content = applyInternalFieldUpdates(content, { kind: 'SUBTASK' });
     }
 
     const newSubPath = join(targetDir, `${newSubKey}.md`);
-    writeFileAtomic(newSubPath, content);
+
+    const subChanges: FieldChange[] = [];
+    if (oldSubKey !== newSubKey) {
+      subChanges.push({ field: 'key', from: oldSubKey, to: newSubKey });
+    }
+    if (kindChanged) {
+      subChanges.push({ field: 'kind', from: subFm.kind as string, to: 'SUBTASK' });
+    }
+    // A move is always a meaningful event — record it even when content is unchanged
+    if (subChanges.length === 0) {
+      subChanges.push({ field: 'location', from: undefined, to: 'moved' });
+    }
+
+    writeTaskFileAuditably({
+      taskPath: newSubPath,
+      tasksDir,
+      originalContent,
+      newContent: content,
+      changes: subChanges,
+      historyKey: oldSubKey,
+    });
     rmSync(oldSubPath, { force: true });
   }
 }
@@ -322,7 +391,7 @@ function updateAllReferences(tasksDir: string, reKeyMap: ReadonlyMap<string, str
   for (const task of Object.values(index.tasks)) {
     const filePath = resolveIndexedTaskPath(tasksDir, task, reKeyMap);
     if (existsSync(filePath)) {
-      updateReferencesInFile(filePath, reKeyMap);
+      updateReferencesInFile(filePath, reKeyMap, tasksDir);
     }
   }
 }
@@ -332,11 +401,11 @@ function updateReferencesByScanningTaskFiles(tasksDir: string, reKeyMap: Readonl
     if (!projectEntry.isDirectory()) continue;
     const projectDir = join(tasksDir, projectEntry.name);
 
-    updateReferencesInDir(projectDir, reKeyMap);
+    updateReferencesInDir(projectDir, reKeyMap, tasksDir);
 
     for (const subEntry of readdirSync(projectDir, { withFileTypes: true })) {
       if (!subEntry.isDirectory()) continue;
-      updateReferencesInDir(join(projectDir, subEntry.name), reKeyMap);
+      updateReferencesInDir(join(projectDir, subEntry.name), reKeyMap, tasksDir);
     }
   }
 }
@@ -354,15 +423,16 @@ function resolveIndexedTaskPath(tasksDir: string, task: IndexedTask, reKeyMap: R
   return join(tasksDir, project, `${key}.md`);
 }
 
-function updateReferencesInDir(dir: string, reKeyMap: ReadonlyMap<string, string>): void {
+function updateReferencesInDir(dir: string, reKeyMap: ReadonlyMap<string, string>, tasksDir: string): void {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     if (!entry.isFile() || !TASK_FILE_RE.test(entry.name)) continue;
-    updateReferencesInFile(join(dir, entry.name), reKeyMap);
+    updateReferencesInFile(join(dir, entry.name), reKeyMap, tasksDir);
   }
 }
 
-function updateReferencesInFile(filePath: string, reKeyMap: ReadonlyMap<string, string>): void {
-  let content = readFileSync(filePath, 'utf-8');
+function updateReferencesInFile(filePath: string, reKeyMap: ReadonlyMap<string, string>, tasksDir: string): void {
+  const originalContent = readFileSync(filePath, 'utf-8');
+  let content = originalContent;
   let changed = false;
 
   for (const [oldKey, newKey] of reKeyMap) {
@@ -376,7 +446,20 @@ function updateReferencesInFile(filePath: string, reKeyMap: ReadonlyMap<string, 
   }
 
   if (changed) {
-    writeFileAtomic(filePath, content);
+    // Build change descriptions for the re-key references
+    const changes: Array<{ field: string; from: string | undefined; to: string }> = [];
+    for (const [oldKey, newKey] of reKeyMap) {
+      if (originalContent.includes(oldKey)) {
+        changes.push({ field: 'references', from: oldKey, to: newKey });
+      }
+    }
+    writeTaskFileAuditably({
+      taskPath: filePath,
+      tasksDir,
+      originalContent,
+      newContent: content,
+      changes,
+    });
   }
 }
 

@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { parseFrontmatter } from './frontmatter.js';
 import { updateIndex } from './index-update.js';
 import { moveTask } from './move.js';
-import { createProject, createTask } from './mutate.js';
+import { createProject, createTask, updateTaskFields } from './mutate.js';
 
 function fm(path: string) {
   return parseFrontmatter(readFileSync(path, 'utf-8'));
@@ -409,6 +409,109 @@ describe('moveTask', () => {
 
       // Counter should be 3 (not 2, because FOO-2.moved exists)
       expect(index.counters.FOO?.nextTaskNumber).toBe(3);
+    });
+  });
+
+  describe('audit trail', () => {
+    let tasksDir: string;
+
+    beforeEach(() => {
+      tasksDir = mkdtempSync(join(tmpdir(), 'move-audit-test-'));
+    });
+
+    afterEach(() => {
+      rmSync(tasksDir, { recursive: true, force: true });
+    });
+
+    it('records activity log entry for moved task', () => {
+      createProject(tasksDir, 'FOO');
+      createProject(tasksDir, 'BAR');
+      const task = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Task to move',
+        reporter: 'USER',
+      });
+
+      moveTask(tasksDir, task.key, { project: 'BAR' });
+
+      // The moved task file should have an activity log entry
+      const newPath = join(tasksDir, 'BAR', `${task.key.replace('FOO', 'BAR')}.md`);
+      const content = readFileSync(newPath, 'utf-8');
+      expect(content).toContain('# Activity Log');
+    });
+
+    it('records activity log entry for reference-rewritten files', () => {
+      createProject(tasksDir, 'FOO');
+      const t1 = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Task 1',
+        reporter: 'USER',
+      });
+      const t2 = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Task 2 (references t1)',
+        reporter: 'USER',
+      });
+      const t3 = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Task 3 (references t1)',
+        reporter: 'USER',
+      });
+
+      // Add references from t2 and t3 to t1
+      updateTaskFields(t2.path, { dependsOn: [t1.key] });
+      updateTaskFields(t3.path, { related: [t1.key] });
+
+      // Create a new project and move t1
+      createProject(tasksDir, 'BAR');
+      moveTask(tasksDir, t1.key, { project: 'BAR' });
+
+      // t2 and t3 should have activity log entries for the reference update
+      const t2Content = readFileSync(t2.path, 'utf-8');
+      const t3Content = readFileSync(t3.path, 'utf-8');
+      expect(t2Content).toContain('# Activity Log');
+      expect(t3Content).toContain('# Activity Log');
+      expect(t2Content).toContain('references');
+      expect(t3Content).toContain('references');
+    });
+
+    it('records history diff for reference-rewritten files', () => {
+      createProject(tasksDir, 'FOO');
+      const t1 = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Task 1',
+        reporter: 'USER',
+      });
+      const t2 = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Task 2',
+        reporter: 'USER',
+      });
+
+      // Add reference from t2 to t1
+      updateTaskFields(t2.path, { dependsOn: [t1.key] });
+
+      // Move t1 to new project
+      createProject(tasksDir, 'BAR');
+      moveTask(tasksDir, t1.key, { project: 'BAR' });
+
+      // t2 should have a history diff
+      const historyDir = join(tasksDir, 'history', t2.key);
+      expect(existsSync(historyDir)).toBe(true);
+      const diffFiles = readdirSync(historyDir).filter((f) => f.endsWith('.diff'));
+      expect(diffFiles.length).toBeGreaterThan(0);
     });
   });
 });
