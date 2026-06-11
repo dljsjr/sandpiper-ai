@@ -13,6 +13,78 @@ export const TASK_FILE_RE = /^[A-Z]{2,}-\d+\.md$/;
 /** Matches a task key: SHR-1, TOOLS-42, etc. */
 export const TASK_KEY_RE = /^[A-Z]{2,}-\d+$/;
 
+/** Matches a subtask directory name: SHR-1, TOOLS-42, etc. */
+const SUBTASK_DIR_RE = /^[A-Z]{2,}-\d+$/;
+
+/** Directory name for archived tasks (excluded from active traversal). */
+const ARCHIVE_DIR = 'archive';
+
+/** A task file discovered on disk by the terrain walker. */
+export interface TaskFileEntry {
+  readonly key: string;
+  readonly project: string;
+  readonly path: string;
+  readonly parent?: string;
+}
+
+/**
+ * Walk all active task files in a tasks directory.
+ *
+ * Yields one entry per .md task file, including top-level tasks
+ * and one-level subtasks. Excludes archive directories, tombstones,
+ * and non-task files.
+ */
+export function* walkTaskFiles(tasksDir: string): Generator<TaskFileEntry> {
+  if (!existsSync(tasksDir)) return;
+
+  const entries = readdirSync(tasksDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) continue;
+
+    const projectDir = join(tasksDir, entry.name);
+    yield* walkProjectDir(projectDir, entry.name);
+  }
+}
+
+function* walkProjectDir(projectDir: string, project: string): Generator<TaskFileEntry> {
+  const entries = readdirSync(projectDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.name === ARCHIVE_DIR) continue;
+
+    if (entry.isFile() && TASK_FILE_RE.test(entry.name)) {
+      const key = entry.name.replace(/\.md$/, '');
+      yield {
+        key,
+        project,
+        path: join(projectDir, entry.name),
+      };
+    }
+
+    if (entry.isDirectory() && SUBTASK_DIR_RE.test(entry.name)) {
+      const parentKey = entry.name;
+      const subtaskDir = join(projectDir, entry.name);
+      yield* walkSubtaskDir(subtaskDir, project, parentKey);
+    }
+  }
+}
+
+function* walkSubtaskDir(subtaskDir: string, project: string, parentKey: string): Generator<TaskFileEntry> {
+  const entries = readdirSync(subtaskDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isFile() && TASK_FILE_RE.test(entry.name)) {
+      const key = entry.name.replace(/\.md$/, '');
+      yield {
+        key,
+        project,
+        path: join(subtaskDir, entry.name),
+        parent: parentKey,
+      };
+    }
+  }
+}
+
 /** Extract the project key from a task key. */
 export function projectFromKey(key: string): string {
   const dash = key.indexOf('-');

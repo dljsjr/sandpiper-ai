@@ -6,7 +6,14 @@ import { parseFrontmatter } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { loadIndex, readProjectCounter } from './index-update.js';
 import { applyInternalFieldUpdates, writeTaskFileAuditably } from './mutate.js';
-import { projectFromKey, resolveTaskFile, scanHighestNumber, TASK_FILE_RE, TASK_KEY_RE } from './patterns.js';
+import {
+  projectFromKey,
+  resolveTaskFile,
+  scanHighestNumber,
+  TASK_FILE_RE,
+  TASK_KEY_RE,
+  walkTaskFiles,
+} from './patterns.js';
 import type { IndexedTask, TaskKind } from './types.js';
 
 export interface MoveOptions {
@@ -397,16 +404,8 @@ function updateAllReferences(tasksDir: string, reKeyMap: ReadonlyMap<string, str
 }
 
 function updateReferencesByScanningTaskFiles(tasksDir: string, reKeyMap: ReadonlyMap<string, string>): void {
-  for (const projectEntry of readdirSync(tasksDir, { withFileTypes: true })) {
-    if (!projectEntry.isDirectory()) continue;
-    const projectDir = join(tasksDir, projectEntry.name);
-
-    updateReferencesInDir(projectDir, reKeyMap, tasksDir);
-
-    for (const subEntry of readdirSync(projectDir, { withFileTypes: true })) {
-      if (!subEntry.isDirectory()) continue;
-      updateReferencesInDir(join(projectDir, subEntry.name), reKeyMap, tasksDir);
-    }
+  for (const entry of walkTaskFiles(tasksDir)) {
+    updateReferencesInFile(entry.path, reKeyMap, tasksDir);
   }
 }
 
@@ -421,13 +420,6 @@ function resolveIndexedTaskPath(tasksDir: string, task: IndexedTask, reKeyMap: R
     }
   }
   return join(tasksDir, project, `${key}.md`);
-}
-
-function updateReferencesInDir(dir: string, reKeyMap: ReadonlyMap<string, string>, tasksDir: string): void {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isFile() || !TASK_FILE_RE.test(entry.name)) continue;
-    updateReferencesInFile(join(dir, entry.name), reKeyMap, tasksDir);
-  }
 }
 
 function updateReferencesInFile(filePath: string, reKeyMap: ReadonlyMap<string, string>, tasksDir: string): void {

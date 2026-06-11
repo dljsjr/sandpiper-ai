@@ -1,9 +1,9 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import { decode, encode } from '@toon-format/toon';
 import { parseFrontmatter, taskFromFrontmatter } from './frontmatter.js';
 import { addPathToGitignore, writeFileAtomic } from './fs.js';
-import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
+import { PROJECT_KEY_RE, walkTaskFiles } from './patterns.js';
 import { CURRENT_SCHEMA_VERSION, migrateIndex, validateSchemaVersion } from './schema.js';
 import type { IndexedTask, ProjectCounter, TaskIndex } from './types.js';
 
@@ -81,32 +81,26 @@ export function updateIndex(tasksDir: string): TaskIndex {
 
   const tasks: Record<string, IndexedTask> = {};
 
-  // Discover project directories
-  const entries = readdirSync(tasksDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) {
+  // Walk all active task files using the canonical terrain walker
+  for (const entry of walkTaskFiles(tasksDir)) {
+    const existingTask = existing?.tasks[entry.key];
+    const mtimeMs = statSync(entry.path).mtimeMs;
+
+    // Skip if not modified since last index
+    if (existingTask && mtimeMs <= existingTask.lastIndexedAt) {
+      tasks[entry.key] = existingTask;
       continue;
     }
 
-    const projectKey = entry.name;
-    const projectDir = join(tasksDir, projectKey);
+    const content = readFileSync(entry.path, 'utf-8');
+    const fm = parseFrontmatter(content);
+    const task = taskFromFrontmatter(entry.key, fm);
 
-    // Scan top-level task files
-    scanTaskFiles(projectDir, undefined, existing, tasks);
-
-    // Scan subtask directories (named like "SHR-1", matching a task key pattern)
-    const projectEntries = readdirSync(projectDir, { withFileTypes: true });
-    for (const pe of projectEntries) {
-      if (!pe.isDirectory()) {
-        continue;
-      }
-      if (!/^[A-Z]{2,}-\d+$/.test(pe.name)) {
-        continue;
-      }
-
-      const subtaskDir = join(projectDir, pe.name);
-      scanTaskFiles(subtaskDir, pe.name, existing, tasks);
-    }
+    tasks[entry.key] = {
+      ...task,
+      ...(entry.parent ? { parent: entry.parent } : {}),
+      lastIndexedAt: Date.now(),
+    };
   }
 
   // Build counters: preserve existing counters, only rebuild for missing projects
@@ -126,7 +120,8 @@ export function updateIndex(tasksDir: string): TaskIndex {
   }
 
   // Also scan .moved tombstone files for counter purposes
-  for (const entry of entries) {
+  const tombstoneEntries = readdirSync(tasksDir, { withFileTypes: true });
+  for (const entry of tombstoneEntries) {
     if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) continue;
     const projectDir = join(tasksDir, entry.name);
     for (const file of readdirSync(projectDir)) {
@@ -162,50 +157,4 @@ export function updateIndex(tasksDir: string): TaskIndex {
 
   saveIndex(tasksDir, index);
   return index;
-}
-
-/**
- * Scan a directory for task .md files and add them to the tasks record.
- */
-function scanTaskFiles(
-  dir: string,
-  parentKey: string | undefined,
-  existing: TaskIndex | null,
-  tasks: Record<string, IndexedTask>,
-): void {
-  if (!existsSync(dir)) {
-    return;
-  }
-
-  const entries = readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isFile() || !TASK_FILE_RE.test(entry.name)) {
-      continue;
-    }
-
-    const taskKey = basename(entry.name, '.md');
-    const taskPath = join(dir, entry.name);
-    const stat = statSync(taskPath);
-    const mtimeMs = stat.mtimeMs;
-
-    // Check if we can skip this file (not modified since last index)
-    const existingTask = existing?.tasks[taskKey];
-    if (existingTask && mtimeMs <= existingTask.lastIndexedAt) {
-      tasks[taskKey] = existingTask;
-      continue;
-    }
-
-    // Parse the file through the canonical mapper
-    const content = readFileSync(taskPath, 'utf-8');
-    const fm = parseFrontmatter(content);
-    const task = taskFromFrontmatter(taskKey, fm);
-
-    const indexedTask: IndexedTask = {
-      ...task,
-      ...(parentKey ? { parent: parentKey } : {}),
-      lastIndexedAt: Date.now(),
-    };
-
-    tasks[taskKey] = indexedTask;
-  }
 }
