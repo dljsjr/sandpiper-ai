@@ -34,7 +34,9 @@ function stringValue(value: string | string[] | undefined, fallback: string): st
 }
 
 function arrayValue(value: string | string[] | undefined): readonly string[] {
-  return Array.isArray(value) ? value : [];
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string') return [value];
+  return [];
 }
 
 function parseStatus(value: string | string[] | undefined): TaskStatus {

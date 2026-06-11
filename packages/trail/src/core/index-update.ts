@@ -1,21 +1,11 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { decode, encode } from '@toon-format/toon';
-import { parseFrontmatter } from './frontmatter.js';
+import { parseFrontmatter, taskFromFrontmatter } from './frontmatter.js';
 import { addPathToGitignore, writeFileAtomic } from './fs.js';
 import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
 import { CURRENT_SCHEMA_VERSION, migrateIndex, validateSchemaVersion } from './schema.js';
-import type {
-  IndexedTask,
-  ProjectCounter,
-  TaskAssignee,
-  TaskIndex,
-  TaskKind,
-  TaskPriority,
-  TaskReporter,
-  TaskResolution,
-  TaskStatus,
-} from './types.js';
+import type { IndexedTask, ProjectCounter, TaskIndex } from './types.js';
 
 const INDEX_FILENAME = 'index.toon';
 const INDEX_GITIGNORE_ENTRY = 'index.toon';
@@ -102,7 +92,7 @@ export function updateIndex(tasksDir: string): TaskIndex {
     const projectDir = join(tasksDir, projectKey);
 
     // Scan top-level task files
-    scanTaskFiles(projectDir, projectKey, undefined, existing, tasks);
+    scanTaskFiles(projectDir, undefined, existing, tasks);
 
     // Scan subtask directories (named like "SHR-1", matching a task key pattern)
     const projectEntries = readdirSync(projectDir, { withFileTypes: true });
@@ -115,7 +105,7 @@ export function updateIndex(tasksDir: string): TaskIndex {
       }
 
       const subtaskDir = join(projectDir, pe.name);
-      scanTaskFiles(subtaskDir, projectKey, pe.name, existing, tasks);
+      scanTaskFiles(subtaskDir, pe.name, existing, tasks);
     }
   }
 
@@ -179,7 +169,6 @@ export function updateIndex(tasksDir: string): TaskIndex {
  */
 function scanTaskFiles(
   dir: string,
-  projectKey: string,
   parentKey: string | undefined,
   existing: TaskIndex | null,
   tasks: Record<string, IndexedTask>,
@@ -206,41 +195,17 @@ function scanTaskFiles(
       continue;
     }
 
-    // Parse the file
+    // Parse the file through the canonical mapper
     const content = readFileSync(taskPath, 'utf-8');
     const fm = parseFrontmatter(content);
+    const task = taskFromFrontmatter(taskKey, fm);
 
-    const resolution = asString(fm.resolution) as TaskResolution | undefined;
     const indexedTask: IndexedTask = {
-      key: taskKey,
-      project: projectKey,
-      title: asString(fm.title) ?? taskKey,
-      status: (asString(fm.status) as TaskStatus) ?? 'NOT STARTED',
-      kind: (asString(fm.kind) as TaskKind) ?? 'TASK',
-      priority: (asString(fm.priority) as TaskPriority) ?? 'MEDIUM',
-      assignee: (asString(fm.assignee) as TaskAssignee) ?? 'UNASSIGNED',
-      reporter: (asString(fm.reporter) as TaskReporter) ?? 'USER',
-      createdAt: asString(fm.created_at) ?? '',
-      updatedAt: asString(fm.updated_at) ?? '',
-      ...(resolution ? { resolution } : {}),
-      dependsOn: asStringArray(fm.depends_on),
-      blockedBy: asStringArray(fm.blocked_by),
-      related: asStringArray(fm.related),
+      ...task,
       ...(parentKey ? { parent: parentKey } : {}),
       lastIndexedAt: Date.now(),
     };
 
     tasks[taskKey] = indexedTask;
   }
-}
-
-function asString(value: string | string[] | undefined): string | undefined {
-  if (typeof value === 'string') return value;
-  return undefined;
-}
-
-function asStringArray(value: string | string[] | undefined): string[] {
-  if (Array.isArray(value)) return value;
-  if (typeof value === 'string') return [value];
-  return [];
 }

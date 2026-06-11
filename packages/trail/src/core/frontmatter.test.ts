@@ -177,4 +177,17 @@ describe('taskFromFrontmatter', () => {
     expect(task.priority).toBe('MEDIUM');
     expect(task.resolution).toBeUndefined();
   });
+
+  it('coerces scalar strings for array fields into single-element arrays', () => {
+    const task = taskFromFrontmatter('TCL-200', {
+      title: 'Scalar array fields',
+      depends_on: 'SHR-1',
+      blocked_by: 'SHR-2',
+      related: 'SHR-3',
+    });
+
+    expect(task.dependsOn).toEqual(['SHR-1']);
+    expect(task.blockedBy).toEqual(['SHR-2']);
+    expect(task.related).toEqual(['SHR-3']);
+  });
 });
