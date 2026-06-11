@@ -21,6 +21,21 @@ of naive reviews: spending time on style while missing structural problems, trea
 subjective preferences as objective quality issues, and failing to distinguish between
 code that is merely unfamiliar and code that is genuinely problematic.
 
+## AI Slop Quick Pass
+
+For agent-authored or AI-assisted code, check these before line-by-line comments:
+
+| Tell                               | Review question                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------------ |
+| Local idiom mismatch               | Does this fit neighboring code, or generic “best practice”?                    |
+| Long Method / God Class            | Did logic centralize into one procedural blob or manager object?               |
+| Redundant inline implementation    | Is this the third copy, a diverged clone, or just honest duplication?          |
+| Modular Mirage                     | Do small well-named files scatter one concept or reverse dependency direction? |
+| Defensive code in the wrong domain | Should this path fail loud or degrade gracefully?                              |
+| Green tests masking bad design     | Do tests pass while the abstraction, names, or data flow still lie?            |
+
+If the issue needs cleanup rather than a review comment, use the `refactoring` skill for the first move.
+
 ## Language-Specific References
 
 After reading this file, read the appropriate reference for the code being reviewed:

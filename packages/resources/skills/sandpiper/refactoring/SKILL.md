@@ -17,6 +17,19 @@ This skill provides a structured workflow for improving code health through meas
 verified refactoring. It is language-agnostic at the core, with language-specific
 reference files for tooling and idioms.
 
+## Smell → Cleanup Move
+
+Use this as the first move, not the whole plan:
+
+| Smell                              | First cleanup move                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------- |
+| Long Method / procedural bloat     | Extract a deep helper that hides complexity, or flatten guard clauses.          |
+| God Class / manager centralization | Split by reason to change; move behavior toward the data it operates on.        |
+| Redundant inline implementation    | Wait for a third copy or diverged clone, then extract at the real cut-point.    |
+| Modular Mirage                     | Restore cohesion and dependency direction; fewer files may be better.           |
+| Wrong abstraction                  | Re-inline, specialize callers, delete dead branches, then re-extract if earned. |
+| Defensive-default drift            | Decide fail-loud vs degrade-graceful before adding or deleting guards.          |
+
 ## Language-Specific References
 
 After reading this file, read the appropriate reference for the target language:
