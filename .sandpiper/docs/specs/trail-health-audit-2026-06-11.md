@@ -108,6 +108,85 @@ These are the load-bearing rules to judge findings against. If a cleanup does no
 
 **`--no-save` gap:** `task-move.ts` now honors `--no-save`. Separate seam from the audit/history fix.
 
+**Tombstone writes:** Explicitly out of scope for the audit contract. Tombstones are filesystem metadata (`.moved` files), not task content. The audit contract (§§7.7/8.4) is about task modifications, not directory entries.
+
+**Current status:** 289 core tests green. +700/-120 across 11 files. Commit pending.
+
+## File-level checklist
+
+Doug requested tracking audited status and fixes applied per file. This table tracks which files have been read (audit) and which have had code changes (fixes applied).
+
+| File | Audited | Fixes applied | Notes |
+|---|:---:|:---:|---|
+| `core/frontmatter.ts` | ✅ | ✅ | `arrayValue` fix: wraps scalars to single-element arrays |
+| `core/frontmatter.test.ts` | ✅ | ✅ | New test: scalar array coercion |
+| `core/index-update.ts` | ✅ | ✅ | `scanTaskFiles` collapsed onto `taskFromFrontmatter`; dead code removed |
+| `core/index-update.test.ts` | ✅ | ✅ | Three new tests: enum validation, scalar arrays, misfiled project derivation |
+| `core/mutate.ts` | ✅ | ✅ | `writeTaskFileAuditably` helper added; `updateTaskFields` refactored to use it |
+| `core/mutate.test.ts` | ✅ | ✅ | Red tests for `writeTaskFileAuditably` (now green) |
+| `core/move.ts` | ✅ | ✅ | `moveTask` wired through helper (main + subtask + reference rewrites) |
+| `core/move.test.ts` | ✅ | ✅ | Three new audit trail tests |
+| `commands/task-update.ts` | ✅ | ✅ | Interactive edit wired through `writeTaskFileAuditably` |
+| `commands/task-move.ts` | ✅ | ✅ | `--no-save` check added |
+| `commands/helpers.ts` | ✅ | — | |
+| `commands/index-cmd.ts` | ✅ | — | |
+| `commands/index-cmd.test.ts` | ✅ | — | |
+| `commands/project-cmd.ts` | ✅ | — | |
+| `commands/project-cmd.test.ts` | ✅ | — | |
+| `commands/storage-cmd.ts` | ✅ | — | |
+| `commands/storage-cmd.test.ts` | ✅ | — | |
+| `commands/task-archive.ts` | ✅ | — | |
+| `commands/task-cmd-helpers.ts` | ✅ | — | |
+| `commands/task-cmd-helpers.test.ts` | ✅ | — | |
+| `commands/task-cmd.ts` | ✅ | — | |
+| `commands/task-complete.ts` | ✅ | — | |
+| `commands/task-create.ts` | ✅ | — | |
+| `commands/task-list.ts` | ✅ | — | |
+| `commands/task-pickup.ts` | ✅ | — | |
+| `commands/task-show.ts` | ✅ | — | |
+| `commands/task-subcommands.test.ts` | ✅ | — | |
+| `commands/task-summary.ts` | ✅ | — | |
+| `core/activity-log.ts` | ✅ | — | |
+| `core/activity-log.test.ts` | ✅ | — | |
+| `core/archive.ts` | ✅ | — | |
+| `core/archive.test.ts` | ✅ | — | |
+| `core/auto-commit.ts` | ✅ | — | |
+| `core/auto-commit.test.ts` | ✅ | — | |
+| `core/consistency.ts` | ✅ | — | |
+| `core/consistency.test.ts` | ✅ | — | |
+| `core/counter.test.ts` | ✅ | — | |
+| `core/description.ts` | ✅ | — | |
+| `core/editor.ts` | ✅ | — | |
+| `core/format.ts` | ✅ | — | |
+| `core/fs.ts` | ✅ | — | |
+| `core/fs.test.ts` | ✅ | — | |
+| `core/history.ts` | ✅ | — | |
+| `core/history.test.ts` | ✅ | — | |
+| `core/interactive.test.ts` | ✅ | — | |
+| `core/migrate.ts` | ✅ | — | |
+| `core/migrate.test.ts` | ✅ | — | |
+| `core/output.ts` | ✅ | — | |
+| `core/output.test.ts` | ✅ | — | |
+| `core/patterns.ts` | ✅ | — | |
+| `core/project-metadata.ts` | ✅ | — | |
+| `core/project-metadata.test.ts` | ✅ | — | |
+| `core/query.ts` | ✅ | — | |
+| `core/query.test.ts` | ✅ | — | |
+| `core/resolution.test.ts` | ✅ | — | |
+| `core/schema.ts` | ✅ | — | |
+| `core/schema.test.ts` | ✅ | — | |
+| `core/search.ts` | ✅ | — | |
+| `core/search.test.ts` | ✅ | — | |
+| `core/storage-backend.ts` | ✅ | — | |
+| `core/storage-backend.test.ts` | ✅ | — | |
+| `core/storage-config.ts` | ✅ | — | |
+| `core/storage-config.test.ts` | ✅ | — | |
+| `core/types.ts` | ✅ | — | |
+| `core/vcs.ts` | ✅ | — | |
+| `core/vcs.test.ts` | ✅ | — | |
+| `index.ts` | ✅ | — | |
+| `vitest.config.ts` | ✅ | — | |
+
 ## Port-readiness ranking
 
 This is a domain-weight ranking, not an implementation sequence. Rank answers "how much Rust-port ambiguity does this remove?" Sequence answers "what is the cheapest safe slice?" Do not turn this table into a fake project plan. A lower-ranked item may still be the first commit if it cheaply exposes the seam that lets the higher-ranked law land cleanly.

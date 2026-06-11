@@ -2,7 +2,7 @@ import { Command } from '@commander-js/extra-typings';
 import { updateIndex } from '../core/index-update.js';
 import { moveTask } from '../core/move.js';
 import type { TaskKind } from '../core/types.js';
-import { getTasksDir, withErrorHandling } from './helpers.js';
+import { getTasksDir, shouldSave, withErrorHandling } from './helpers.js';
 
 export const taskMoveCommand = new Command('move')
   .description('Move task between projects, change kind (TASK↔BUG↔SUBTASK), or reparent')
@@ -16,6 +16,11 @@ export const taskMoveCommand = new Command('move')
 
       if (!opts.project && !opts.kind && !opts.parent) {
         throw new Error('Nothing to move. Use --project, --kind, or --parent.');
+      }
+
+      if (!shouldSave(cmd)) {
+        console.log('Dry run: move would be performed but --no-save was specified.');
+        return;
       }
 
       const result = moveTask(tasksDir, key.toUpperCase(), {

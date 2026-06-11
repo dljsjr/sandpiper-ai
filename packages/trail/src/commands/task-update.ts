@@ -1,9 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { Command } from '@commander-js/extra-typings';
 import { editInEditor } from '../core/editor.js';
-import { writeFileAtomic } from '../core/fs.js';
 import { updateIndex } from '../core/index-update.js';
-import { updateTaskFields } from '../core/mutate.js';
+import { updateTaskFields, writeTaskFileAuditably } from '../core/mutate.js';
 import { getTasksDir, resolveTaskPath, shouldSave, withErrorHandling } from './helpers.js';
 import {
   applyInteractiveFieldUpdates,
@@ -57,7 +56,15 @@ export const taskUpdateCommand = new Command('update')
           return;
         }
 
-        writeFileAtomic(taskPath, edited);
+        if (edited !== content) {
+          writeTaskFileAuditably({
+            taskPath,
+            tasksDir,
+            originalContent: content,
+            newContent: edited,
+            changes: [{ field: 'content', from: undefined, to: 'updated via editor' }],
+          });
+        }
         updateIndex(tasksDir);
         console.log(`Updated ${taskKey} via editor.`);
         return;
