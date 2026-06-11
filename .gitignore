@@ -34,6 +34,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .turbo/
 **/.turbo/
 *.tsbuildinfo
+__pycache__/
+*.py[cod]
 
 # IntelliJ based IDEs
 .idea
