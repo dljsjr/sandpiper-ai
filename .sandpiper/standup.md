@@ -1,47 +1,49 @@
 # Session Stand-Up
 
-## Session 019eb324-494e-7cc4-9da2-fe4fde6bf456 (Updated: 2026-06-11T15:18:52.931Z)
+## Session 019eb77e-e251-70f9-afbc-5f27193b3a83 (Updated: 2026-06-11T19:45:07.763Z)
 
-Session file: /Users/doug.stephen/.sandpiper/agent/identities/Roux/sessions/2026-06-10T20-06-00-270Z_019eb324-494e-7cc4-9da2-fe4fde6bf456.jsonl
+Session file: /Users/doug.stephen/.sandpiper/agent/identities/Piper/sessions/2026-06-11T16-23-26-545Z_019eb77e-e251-70f9-afbc-5f27193b3a83.jsonl
 
 ### Accomplished
-- Ran a Dora-first code health sweep focused on local overgrowth rather than global architecture rot. Confirmed no cycles/high bidirectional coupling; mess is local complexity and concept-braid.
-- Checkpointed preexisting dirty workspace as jj change `twqpkrqs` (`chore: checkpoint workspace before Trail refactor`) before touching Trail.
-- Created and completed three Trail cleanup tasks, all now NEEDS REVIEW:
-  - `TCL-131`: refactored `packages/trail/src/core/move.ts`; extracted `moveTask` transaction script into named behavior-preserving phases. Commit `nlksrosp` / `5bc32aaf`.
-  - `TCL-132`: refactored `packages/trail/src/core/mutate.ts`; table-drove scalar/array field updates and extracted description change formatting. Commit `ymwwqnzr` / `6aa8e152`.
-  - `TCL-133`: refactored `packages/trail/src/core/query.ts`; table-drove filter predicates and reduced `matchesFilter` branch pile. Commit `lpnzqqtr` / `13fd9645`.
-- Verification completed after the Trail cuts:
-  - `bun run test:vitest -- packages/trail/src/core` → 22 files / 277 tests passed.
-  - `bun run test:vitest -- packages/trail/src/commands packages/trail/src/core/query.test.ts` → 6 files / 124 tests passed.
-  - `bun run check:tsc` clean.
-  - Biome checks clean on changed Trail files.
-  - Dora smells clean for `move.ts`, `mutate.ts`, and `query.ts`.
-- Entrypoint/standalone extension wiring was scouted by Huginn/Muninn and confirmed as a real second first-class cleanup slice, but intentionally not mixed into the Trail commits.
+- Completed AGENT-217 code-quality / AI-slop canon fold-in work for shared surfaces.
+- Committed global role canon:
+  - `zprqsplq` / `f81260c7` — `docs: fold code-quality canon into roles`
+  - `wmppqrkq` / `d826d804` — `docs: add anti-slop routing cards`
+- Committed Sandpiper hot skill canon:
+  - `lovsssym` / `6c7b18bc` — `docs(skills): fold code-quality canon into review guidance`
+  - `kxuslquo` / `fa3f7560` — `docs(skills): add anti-slop quick cards`
+- Committed Python bytecode ignore/untrack cleanup:
+  - `slotwkqm` / `c744dbc1` — `chore: ignore Python bytecode caches (Refs: AGENT-217)`
+- Validated edited hot skills with `uv run --with pyyaml python packages/resources/skills-on-demand/third-party/skill-creator/scripts/quick_validate.py ...`.
+- Marked AGENT-217 as NEEDS REVIEW.
+- Reviewed personal code-quality lenses from Roux, Muninn, and Huginn; all passed with no required changes.
+- Completed Piper's own Librarian/IA code-quality research pass in her personal workspace:
+  - `~/.sandpiper/agent/identities/Piper/notes/code-quality-librarian-research-2026-06-11.md`
+  - `~/.sandpiper/agent/identities/Piper/memory/code-quality.md`
+  - `~/.sandpiper/agent/identities/Piper/skills/code-quality-librarian/SKILL.md`
+  - skill validation passed: `Skill is valid!`
+- Filed YAAMS/checkpoint facts for the personal-lens work: 400-406.
 
 ### In Progress
-- Current jj `@` is empty on top of the Trail cleanup stack.
-- Trail cleanup stack above prior checkpoint:
-  - `lpnzqqtr` `13fd9645` — `refactor(trail): table-drive query filters (Refs: TCL-133)`
-  - `ymwwqnzr` `6aa8e152` — `refactor(trail): table-drive mutate field changes (Refs: TCL-132)`
-  - `nlksrosp` `5bc32aaf` — `refactor(trail): extract moveTask phases (Refs: TCL-131)`
-  - `twqpkrqs` `ddc2f0ed` — `chore: checkpoint workspace before Trail refactor`
+- Resume sandpiper-ai code cleanup after reload.
+- The next useful target is the repo cleanup/gate thread, not more code-quality doctrine. The doctrine pass is done.
 
 ### Next Session
-- First, let Doug decide what to do with the Trail cleanup stack: review/ratify, continue Trail cleanup, or switch to entrypoint wiring.
-- If continuing Trail cleanup, remaining Dora smells in `packages/trail/src/core` are:
-  1. `index-update.ts`: `updateIndex` CC 20, `scanTaskFiles` CC 17 — best next mechanical target.
-  2. `frontmatter.ts`: `parseFrontmatter` CC 13.
-  3. `consistency.ts`: `countTaskFilesOnDisk` CC 13.
-  4. `history.ts`: `findChanges` CC 11 — do premise review before changing; do not delete/replace the custom diff engine on metric smell alone.
-- If switching to entrypoint wiring, treat it as a separate slice: consolidate duplicated built-in extension/resource inventory into one boring manifest and split `standalone_bootstrap.ts` by concept. Preserve the vanilla Pi/plugin shim boundary.
+- Start by reading this stand-up, then orient in `/Users/doug.stephen/git/sandpiper-ai`.
+- Use `jj`, not `git`; read version-control guidance before version-control operations if not already loaded.
+- Check current task state for AGENT-217 and any cleanup-related tasks with the task CLI.
+- Inspect repo status with `jj status` in `sandpiper-ai` and verify no old personal-work files are being mistaken for project changes.
+- Continue the sandpiper-ai code cleanup from the actual failing gates:
+  - `bun check` previously failed on `mcporter ^0.12.0 → 0.12.0` semver mismatch in `extensions/web-search/package.json` at `.dependencies`.
+  - `bun run check:biome-check` previously failed on formatting in `extensions/system/context-management.ts`.
+- Run the smallest meaningful gate after each cleanup step; do not turn this into another architecture platform.
 
 ### Blockers
-- None technically. The reset is safe.
-- Hold consequential decisions for Doug: ratifying Trail stack, choosing next cleanup slice, and whether to start the entrypoint wiring manifest work.
+- No blocker for the completed code-quality lens/canon work.
+- Known gate failures above are pending cleanup targets, not blockers.
 
 ### Context
-- Doug asked the room to memory flush + checkpoint before resetting context windows.
-- Trail changes were intentionally behavior-preserving; no product semantics changed.
-- The scout consensus: Tattler/Chorus protocol/runtime is heavy but not currently lying; do not gut it from line-count smell alone.
-- The entrypoint smell is not cyclomatic complexity; it is duplicate fact ownership across root `package.json`, `devtools/distPackageJson.ts`, `packages/cli/sandpiper_resources.ts`, `devtools/piPackageArtifactMetadata.ts`, and related standalone/bootstrap wiring.
+- Global guidance and Sandpiper hot-skill code-quality changes were already committed before Piper's personal exercise.
+- Piper's personal code-quality files live under `~/.sandpiper/agent/identities/Piper/` and are intentionally not project changes.
+- The important boundary from the completed work: shared canon stays in global roles/skills; personal lenses stay in each agent workspace; no birdup/template changes were made.
+- Avoid further deduping-by-homogenizing. The agents' personal lenses are meant to remain distinct.

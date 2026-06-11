@@ -80,7 +80,7 @@ Resume your original work once you've finished.
       instructions: contextNotificationInstructions,
       data: contextNotificationData,
       deliverAs: 'nextTurn',
-      triggerTurn: false
+      triggerTurn: false,
     };
 
     if (notification.instructions) {
