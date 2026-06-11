@@ -2,15 +2,13 @@
 name: refactoring
 description: >
   Use this skill whenever performing code cleanup, refactoring, reducing complexity, improving
-  code health, removing duplication, or restructuring existing code. Triggers include: any mention
-  of "refactor", "cleanup", "code health", "code quality", "reduce complexity", "simplify",
-  "tech debt", "code smell", "dead code", "duplication", requests to "clean up" a file or module,
-  or when metrics indicate a file needs attention (high cyclomatic complexity, deep nesting,
-  excessive length). Also trigger when the user asks to "improve" or "tidy up" existing code,
-  or when working on a file that is clearly overgrown or poorly structured. This skill covers
-  the full refactoring workflow: measurement, target identification, safe transformation, and
-  verification. Always consult this skill before performing non-trivial refactoring — it contains
-  metric thresholds, tool commands, language-specific guidance, and anti-patterns to avoid.
+  code health, removing duplication, or restructuring existing code. Trigger on: "refactor",
+  "cleanup", "code health", "code quality", "reduce complexity", "simplify", "tech debt",
+  "code smell", "AI slop", "agent-authored code", "wrong abstraction", "dead code",
+  "duplication", "clean up this file", "improve this module", high cyclomatic complexity,
+  deep nesting, excessive length, or overgrown code. Covers measurement, target identification,
+  safe transformations, verification, metric thresholds, language-specific tooling, and
+  anti-patterns including tiny-function churn, eager DRY, and metric gaming.
 ---
 
 # Code Refactoring & Health Improvement
@@ -23,18 +21,18 @@ reference files for tooling and idioms.
 
 After reading this file, read the appropriate reference for the target language:
 
-| Language | Reference file | When to read |
-|----------|---------------|--------------|
-| TypeScript / JavaScript | `references/typescript.md` | Any .ts, .tsx, .js, .jsx, .mjs, .cjs files |
-| Python | `references/python.md` | Any .py files |
-| Rust | `references/rust.md` | Any .rs files, Cargo projects |
-| Go | `references/go.md` | Any .go files |
-| C / C++ | `references/c-cpp.md` | Any .c, .cpp, .h, .hpp files |
-| Swift | `references/swift.md` | Any .swift files |
-| Ruby | `references/ruby.md` | Any .rb files |
-| Java / Kotlin | `references/java-kotlin.md` | Any .java, .kt, .kts files |
-| Lua | `references/lua.md` | Any .lua files, Neovim plugins, Love2D, OpenResty, embedded scripting |
-| PHP | `references/php.md` | Any .php files, Laravel, Symfony, WordPress |
+| Language                | Reference file              | When to read                                                          |
+| ----------------------- | --------------------------- | --------------------------------------------------------------------- |
+| TypeScript / JavaScript | `references/typescript.md`  | Any .ts, .tsx, .js, .jsx, .mjs, .cjs files                            |
+| Python                  | `references/python.md`      | Any .py files                                                         |
+| Rust                    | `references/rust.md`        | Any .rs files, Cargo projects                                         |
+| Go                      | `references/go.md`          | Any .go files                                                         |
+| C / C++                 | `references/c-cpp.md`       | Any .c, .cpp, .h, .hpp files                                          |
+| Swift                   | `references/swift.md`       | Any .swift files                                                      |
+| Ruby                    | `references/ruby.md`        | Any .rb files                                                         |
+| Java / Kotlin           | `references/java-kotlin.md` | Any .java, .kt, .kts files                                            |
+| Lua                     | `references/lua.md`         | Any .lua files, Neovim plugins, Love2D, OpenResty, embedded scripting |
+| PHP                     | `references/php.md`         | Any .php files, Laravel, Symfony, WordPress                           |
 
 Always read the relevant language reference before starting work. If working across
 multiple languages, read all relevant references.
@@ -74,6 +72,7 @@ sentrux snapshot --label before-refactor
 Then run the language-specific linter/analyzer (see language reference).
 
 **What to capture from this phase:**
+
 - List of functions with CC > 10, noting any > 15 or > 20
 - List of functions longer than 60 lines
 - List of functions with nesting depth > 3
@@ -136,7 +135,8 @@ both the "high complexity" and "high churn" lists are the highest-ROI refactorin
 Apply refactorings in order of safety (least likely to break behavior first):
 
 **Safe refactorings (do freely):**
-- Extract function/method (reduces CC and length)
+
+- Extract function/method when the new name hides real complexity behind a narrow interface — not just to shrink line count
 - Flatten nesting with early returns / guard clauses
 - Replace magic numbers/strings with named constants
 - Remove dead code (unused variables, unreachable branches, commented-out code)
@@ -156,6 +156,7 @@ ast-grep run -p '<old-pattern>' -r '<new-pattern>' -l <lang> -U <path>
 ```
 
 Common safe ast-grep transforms:
+
 ```bash
 # Replace && guard calls with optional chaining
 ast-grep run -p '$A && $A()' -r '$A?.()' -l ts -U <path>
@@ -192,19 +193,22 @@ rule:
 ast-grep operates on syntax trees, not text — it's safer than sed, but still verify.
 
 **Moderate refactorings (verify with tests):**
-- Extract class / module (split large files)
-- Replace conditional with polymorphism
+
+- Extract class / module (split large files at concepts that change independently)
+- Replace conditional with polymorphism when branches have independent behavior and at least 3 real variants
 - Introduce parameter object (for functions with > 4 params)
-- Consolidate duplicate code into shared function
+- Consolidate duplicate code into shared function only after verifying same intent, a third instance or diverged clone, and a real cut-point
 - Simplify boolean expressions
 
 **Structural refactorings (require careful review):**
+
 - Change function signatures / public APIs
 - Move code between modules (affects import graphs)
 - Introduce or remove abstraction layers
 - Change data structures or state management
 
 **Rules during transformation:**
+
 - Make one logical change per step. Don't combine "extract function" with "change algorithm."
 - After each step, verify the code still compiles/parses.
 - If tests exist, run them after each structural change.
@@ -227,6 +231,7 @@ sentrux diff before-refactor after-refactor
 ```
 
 **Verify the ratchet:**
+
 - No function's CC should be higher than before (unless a justified new function was added)
 - Overall duplication percentage should not increase
 - Total lines of code should decrease or stay the same (refactoring rarely needs more code)
@@ -248,16 +253,16 @@ These thresholds are grounded in empirical research. Treat them as starting poin
 not absolute rules. Context matters — a CC of 12 in a well-tested parser may be
 fine; a CC of 8 in an untested utility function may be dangerous.
 
-| Metric | Good | Investigate | Refactor | Source |
-|--------|------|-------------|----------|--------|
-| Cyclomatic complexity (per function) | ≤ 10 | 11–15 | > 15 | NIST 500-235; McCabe 1976 |
-| Cognitive complexity (per function) | ≤ 10 | 11–15 | > 15 | SonarSource; ESEM 2020 |
-| Function length (lines) | 5–25 | 26–60 | > 60 | Hatton 1997; consensus |
-| Nesting depth | ≤ 3 | 4 | > 4 | Antinyan et al. 2017 |
-| Parameter count | ≤ 4 | 5–6 | > 6 | Clean Code; cognitive load |
-| File length (lines) | < 300 | 300–500 | > 500 | Experience-based |
-| Code duplication | < 3% | 3–5% | > 5% | SonarQube defaults; Juergens 2009 |
-| Coupling (imports from distinct modules) | < 8 | 8–12 | > 12 | CK metrics research |
+| Metric                                   | Good                             | Investigate             | Refactor                                                     | Source                                  |
+| ---------------------------------------- | -------------------------------- | ----------------------- | ------------------------------------------------------------ | --------------------------------------- |
+| Cyclomatic complexity (per function)     | ≤ 10                             | 11–15                   | > 15                                                         | NIST 500-235; McCabe 1976               |
+| Cognitive complexity (per function)      | ≤ 10                             | 11–15                   | > 15                                                         | SonarSource; ESEM 2020                  |
+| Function length (lines)                  | Clear natural seam, usually < 60 | > 60 or hard to scan    | Split when extraction hides complexity                       | Hatton 1997; cognitive load             |
+| Nesting depth                            | ≤ 3                              | 4                       | > 4                                                          | Antinyan et al. 2017                    |
+| Parameter count                          | ≤ 4                              | 5–6                     | > 6                                                          | Clean Code; cognitive load              |
+| File length (lines)                      | < 300                            | 300–500                 | > 500                                                        | Experience-based                        |
+| Code duplication                         | < 3% and not diverged            | 3–5% or repeated intent | > 5%, diverged clones, or third instance with real cut-point | SonarQube defaults; Juergens 2009; Metz |
+| Coupling (imports from distinct modules) | < 8                              | 8–12                    | > 12                                                         | CK metrics research                     |
 
 ## Tool Reference (Universal)
 
@@ -342,7 +347,7 @@ even if function-level metrics improved.
 ### ast-grep — Structural pattern search and rewrite
 
 ast-grep matches code by its AST, not by text. Patterns look like ordinary code
-with `$WILDCARD` placeholders. This makes it precise — it finds function *calls*,
+with `$WILDCARD` placeholders. This makes it precise — it finds function _calls_,
 not comments mentioning the function name. Use the `ast-grep` binary (not `sg`,
 which collides with another common tool).
 
@@ -389,6 +394,7 @@ rule:
 ```
 
 **Key gotchas:**
+
 - Always set `stopBy: end` on relational rules (`inside`, `has`). The default
   `stopBy: neighbor` only checks the immediate parent/child.
 - `$VAR` matches one AST node; `$$$VARS` matches zero or more. Forgetting `$$$`
@@ -403,6 +409,7 @@ rule:
 ### Flatten nesting with guard clauses
 
 Before:
+
 ```
 function process(data) {
     if (data) {
@@ -416,6 +423,7 @@ function process(data) {
 ```
 
 After:
+
 ```
 function process(data) {
     if (!data) return;
@@ -430,22 +438,35 @@ function process(data) {
 
 When a function has CC > 15, identify independent branches or blocks and extract
 them into well-named helper functions. Each extracted function should:
+
 - Do exactly one thing
 - Have a name that describes what it does, not how
 - Take only the parameters it needs (not a god-object)
 - Return a value rather than mutating shared state, when possible
 
-### Consolidate duplicated blocks
+### Triage duplicated blocks
 
 When jscpd identifies clones:
+
 1. Verify the clones are truly identical in intent (not just similar-looking)
-2. Extract the shared logic into a single function
-3. Replace all clone sites with calls to the shared function
-4. If the clones have small variations, parameterize the shared function
+2. If there are only two honest copies and no visible seam, leave them for now and note the pattern
+3. If clones have diverged, or a third instance appears with the same reason to change, extract at the real cut-point
+4. Replace clone sites with the smallest shared function/module that preserves local clarity
+5. If variations require flags, params, or conditionals threaded through shared code, you probably found the wrong abstraction — re-inline instead
+
+### Recover from the wrong abstraction
+
+When shared code grows flags, mode parameters, or conditionals to serve callers that no longer want the same behavior:
+
+1. Re-inline the abstraction into each caller
+2. Specialize each caller to the behavior it actually needs
+3. Delete dead branches and unused parameters
+4. Re-extract only if a clearer seam appears after specialization
 
 ### Replace complex conditionals
 
 When a function has a long chain of if/else-if or a switch with many cases:
+
 - Consider a lookup table (map/dict) if each branch returns a value
 - Consider polymorphism if each branch has complex behavior
 - Consider the strategy pattern only if you have 3+ strategies that change independently
@@ -453,6 +474,7 @@ When a function has a long chain of if/else-if or a switch with many cases:
 ### Reduce parameter count
 
 When a function takes > 5 parameters:
+
 - Group related parameters into a struct/object/dataclass
 - Check if some parameters are always passed together (indicates a missing abstraction)
 - Check if some parameters have defaults that are rarely overridden (make them optional)
