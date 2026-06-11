@@ -3,9 +3,7 @@
  * matches the task files on disk, with automatic self-healing.
  */
 
-import { existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
-import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
+import { walkTaskFiles } from './patterns.js';
 import type { TaskIndex } from './types.js';
 
 /**
@@ -14,34 +12,9 @@ import type { TaskIndex } from './types.js';
  */
 export function countTaskFilesOnDisk(tasksDir: string): number {
   let count = 0;
-
-  const entries = readdirSync(tasksDir, { withFileTypes: true });
-  for (const entry of entries) {
-    if (!entry.isDirectory() || !PROJECT_KEY_RE.test(entry.name)) {
-      continue;
-    }
-
-    const projectDir = join(tasksDir, entry.name);
-    const projectEntries = readdirSync(projectDir, { withFileTypes: true });
-
-    for (const pe of projectEntries) {
-      if (pe.isFile() && TASK_FILE_RE.test(pe.name)) {
-        count++;
-      }
-      // Scan subtask directories
-      if (pe.isDirectory() && /^[A-Z]{2,}-\d+$/.test(pe.name)) {
-        const subtaskDir = join(projectDir, pe.name);
-        if (existsSync(subtaskDir)) {
-          for (const se of readdirSync(subtaskDir, { withFileTypes: true })) {
-            if (se.isFile() && TASK_FILE_RE.test(se.name)) {
-              count++;
-            }
-          }
-        }
-      }
-    }
+  for (const _entry of walkTaskFiles(tasksDir)) {
+    count++;
   }
-
   return count;
 }
 
