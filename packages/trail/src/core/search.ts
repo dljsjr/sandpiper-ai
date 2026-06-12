@@ -15,6 +15,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { TASK_FILE_RE, TASK_KEY_RE } from './patterns.js';
 
+const ARCHIVE_DIR = 'archive';
+
 /** Options to narrow the search scope. */
 export interface SearchScope {
   readonly project?: string;
@@ -121,6 +123,8 @@ function searchWithRipgrep(searchDir: string, pattern: string, regex: boolean): 
     '--ignore-case',
     '--glob',
     '*.md',
+    '--glob',
+    `!**/${ARCHIVE_DIR}/**`,
     ...(regex ? [] : ['--fixed-strings']),
     '--',
     pattern,
@@ -166,7 +170,9 @@ function collectTaskDocumentsInto(dir: string, documents: SearchDocument[]): voi
   for (const entry of entries) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
-      collectTaskDocumentsInto(path, documents);
+      if (entry.name !== ARCHIVE_DIR) {
+        collectTaskDocumentsInto(path, documents);
+      }
       continue;
     }
 
