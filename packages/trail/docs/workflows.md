@@ -171,7 +171,7 @@ trail task complete APP-12 --final --resolution WONTFIX
 Bulk completion requires filters:
 
 ```bash
-trail task complete -p APP --filter-status NEEDS_REVIEW --final --resolution DONE
+trail task complete -p APP --filter-status NEEDS_REVIEW --final --resolution DONE --bulk
 ```
 
 ## Edit task details
