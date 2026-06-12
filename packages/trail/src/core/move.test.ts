@@ -2,6 +2,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { extractActivityLog } from './activity-log.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { updateIndex } from './index-update.js';
 import { moveTask } from './move.js';
@@ -466,6 +467,26 @@ describe('moveTask', () => {
       const newPath = join(tasksDir, 'BAR', `${task.key.replace('FOO', 'BAR')}.md`);
       const content = readFileSync(newPath, 'utf-8');
       expect(content).toContain('# Activity Log');
+    });
+
+    it('records literal on-disk kind values in activity log when repairing corrupt kind', () => {
+      createProject(tasksDir, 'FOO');
+      const task = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'MEDIUM',
+        title: 'Corrupt kind to repair',
+        reporter: 'USER',
+      });
+      writeFileSync(task.path, readFileSync(task.path, 'utf-8').replace('kind: TASK', 'kind: banana'));
+
+      moveTask(tasksDir, task.key, { kind: 'TASK' });
+
+      const content = readFileSync(task.path, 'utf-8');
+      const activityLog = extractActivityLog(content);
+      const kindChange = activityLog.flatMap((entry) => entry.changes).find((change) => change.field === 'kind');
+      expect(fm(task.path).kind).toBe('TASK');
+      expect(kindChange).toMatchObject({ from: 'banana', to: 'TASK' });
     });
 
     it('records activity log entry for reference-rewritten files', () => {
