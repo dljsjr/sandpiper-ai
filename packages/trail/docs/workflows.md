@@ -130,10 +130,10 @@ trail -f toon task show APP-12 --metadata-only
 trail -f json project list
 ```
 
-Use `--no-save` to preview create or update output without writing files:
+Use `--format json` or `--format toon` on read commands when scripts need structured task data:
 
 ```bash
-trail --no-save task create -p APP -t "Preview task"
+trail -f json task list -p APP --top-level
 ```
 
 ## Pick up and complete work
@@ -147,7 +147,7 @@ trail task pickup APP-12
 Pick up a filtered set:
 
 ```bash
-trail task pickup -p APP --filter-status NOT_STARTED
+trail task pickup -p APP --filter-status NOT_STARTED --bulk
 ```
 
 Mark work ready for review:

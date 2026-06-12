@@ -1,8 +1,8 @@
 import { Command } from '@commander-js/extra-typings';
-import { normalizeReporterInput, parseFrontmatter } from '../core/frontmatter.js';
-import { createTask, renderTaskContent } from '../core/mutate.js';
+import { normalizeReporterInput } from '../core/frontmatter.js';
+import { createTask } from '../core/mutate.js';
 import type { TaskKind, TaskPriority, TaskReporter } from '../core/types.js';
-import { emitMutationResult, getOutputFormat, getTasksDir, shouldSave, withErrorHandling } from './helpers.js';
+import { emitMutationResult, getTasksDir, withErrorHandling } from './helpers.js';
 
 export const taskCreateCommand = new Command('create')
   .description('Create a new task, bug, or subtask')
@@ -30,17 +30,6 @@ export const taskCreateCommand = new Command('create')
         related: opts.related?.split(',').map((s: string) => s.trim()),
         description: opts.desc,
       };
-
-      if (!shouldSave(cmd)) {
-        const format = getOutputFormat(cmd);
-        const content = renderTaskContent(createOpts);
-        if (format === 'json') {
-          console.log(JSON.stringify([parseFrontmatter(content)], null, 2));
-        } else {
-          console.log(content);
-        }
-        return;
-      }
 
       const tasksDir = getTasksDir(cmd);
       const result = createTask(tasksDir, createOpts);

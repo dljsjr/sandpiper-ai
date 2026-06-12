@@ -38,7 +38,7 @@ function setupTasksDir(): { rootDir: string; tasksDir: string } {
 }
 
 function createRootCommand(rootDir: string): Parameters<typeof resolveTargetPaths>[2] {
-  const command = new Command().option('-d, --dir <path>').option('-f, --format <format>').option('--no-save');
+  const command = new Command().option('-d, --dir <path>').option('-f, --format <format>');
   command.setOptionValue('dir', rootDir);
   return command;
 }
@@ -166,24 +166,6 @@ Old body
         bulk: true,
       },
       createRootCommand(rootDir),
-      tasksDir,
-    );
-
-    expect(paths.length).toBeGreaterThan(0);
-  });
-
-  it('resolves bulk target paths for preview without --bulk when --no-save is set', () => {
-    const { rootDir, tasksDir } = setupTasksDir();
-    const cmd = createRootCommand(rootDir);
-    // Simulate --no-save
-    cmd.setOptionValue('save', false);
-
-    const paths = resolveTargetPaths(
-      undefined,
-      {
-        project: 'AGENT',
-      },
-      cmd,
       tasksDir,
     );
 

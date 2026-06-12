@@ -1,8 +1,8 @@
 import { Command } from '@commander-js/extra-typings';
 import { completeTask } from '../core/mutate.js';
-import type { TaskResolution, TaskStatus } from '../core/types.js';
-import { emitMutationResult, getTasksDir, shouldSave, withErrorHandling } from './helpers.js';
-import { type BulkFilterOptions, emitMutationOutput, resolveTargetPaths } from './task-cmd-helpers.js';
+import type { TaskResolution } from '../core/types.js';
+import { emitMutationResult, getTasksDir, withErrorHandling } from './helpers.js';
+import { type BulkFilterOptions, resolveTargetPaths } from './task-cmd-helpers.js';
 
 interface CompleteCommandOptions extends BulkFilterOptions {
   readonly final?: boolean;
@@ -29,28 +29,13 @@ export const taskCompleteCommand = new Command('complete')
 
       const tasksDir = getTasksDir(cmd);
       const resolution = opts.resolution?.toUpperCase() as TaskResolution | undefined;
-      const fields = {
-        status: targetStatus as TaskStatus,
-        ...(resolution ? { resolution } : {}),
-      };
-
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task completion');
-      if (shouldSave(cmd)) {
-        for (const path of paths) {
-          completeTask(path, opts.final ?? false, resolution);
-        }
-        emitMutationResult(
-          cmd,
-          paths,
-          `Completed ${paths.length} task${paths.length !== 1 ? 's' : ''} → ${targetStatus}.`,
-        );
-        return;
+      for (const path of paths) {
+        completeTask(path, opts.final ?? false, resolution);
       }
-
-      emitMutationOutput(
+      emitMutationResult(
         cmd,
         paths,
-        fields,
         `Completed ${paths.length} task${paths.length !== 1 ? 's' : ''} → ${targetStatus}.`,
       );
     });
