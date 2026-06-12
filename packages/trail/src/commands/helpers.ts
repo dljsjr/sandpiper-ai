@@ -99,9 +99,6 @@ export function loadTasks(cmd: Command<any, any, any>): readonly Task[] {
   return tasksFromIndex(index);
 }
 
-// Re-export resolveTaskFile as resolveTaskPath for backward compat
-export { resolveTaskFile as resolveTaskPath } from '../core/patterns.js';
-
 /**
  * After a mutation, output affected tasks in the requested format and update the index.
  */

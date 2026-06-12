@@ -5,7 +5,8 @@ import { applyFieldUpdates } from '../core/mutate.js';
 import type { TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
 import type { TaskStatus } from '../core/types.js';
-import { loadTasks, resolveTaskPath, searchToKeys } from './helpers.js';
+import { loadTasks, searchToKeys } from './helpers.js';
+import { resolveTaskFile } from '../core/patterns.js';
 
 export interface UpdateOptions {
   readonly status?: string;
@@ -81,7 +82,7 @@ export function resolveTargetPaths(
   operation = 'Task mutation',
 ): string[] {
   if (key) {
-    return [resolveTaskPath(tasksDir, key.toUpperCase())];
+    return [resolveTaskFile(tasksDir, key.toUpperCase())];
   }
 
   if (!opts.project && !opts.filterStatus && !opts.search) {
@@ -122,7 +123,7 @@ export function resolveTargetPaths(
     );
   }
 
-  return matched.map((task) => resolveTaskPath(tasksDir, task.key));
+  return matched.map((task) => resolveTaskFile(tasksDir, task.key));
 }
 
 export function searchFilterToTaskFilter(

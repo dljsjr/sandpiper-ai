@@ -7,7 +7,8 @@ import type { SortField, TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
 import { searchTasks } from '../core/search.js';
 import type { Task, TaskAssignee, TaskKind, TaskPriority } from '../core/types.js';
-import { getOutputFormat, getTasksDir, loadTasks, resolveTaskPath, withErrorHandling } from './helpers.js';
+import { getOutputFormat, getTasksDir, loadTasks, withErrorHandling } from './helpers.js';
+import { resolveTaskFile } from '../core/patterns.js';
 import { normalizeStatus } from './task-cmd-helpers.js';
 
 export const taskListCommand = new Command('list')
@@ -70,7 +71,7 @@ export const taskListCommand = new Command('list')
 
       if (format === 'raw') {
         const files = result.map((task) => {
-          const path = resolveTaskPath(getTasksDir(cmd), task.key);
+          const path = resolveTaskFile(getTasksDir(cmd), task.key);
           return { path, content: readFileSync(path, 'utf-8') };
         });
         console.log(formatRawOutput(files));
