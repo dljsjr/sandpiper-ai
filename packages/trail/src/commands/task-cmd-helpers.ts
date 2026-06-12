@@ -1,26 +1,11 @@
-import { readFileSync } from 'node:fs';
-import { basename } from 'node:path';
 import type { Command } from '@commander-js/extra-typings';
 import { replaceDescription } from '../core/description.js';
-import {
-  normalizeAssigneeInput,
-  normalizeReporterInput,
-  parseFrontmatter,
-  taskFromFrontmatter,
-} from '../core/frontmatter.js';
+import { normalizeAssigneeInput, normalizeReporterInput } from '../core/frontmatter.js';
 import { applyFieldUpdates } from '../core/mutate.js';
-import { formatRawOutput, formatTasksOutput } from '../core/output.js';
 import type { TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
 import type { TaskStatus } from '../core/types.js';
-import {
-  emitMutationResult,
-  getOutputFormat,
-  loadTasks,
-  resolveTaskPath,
-  searchToKeys,
-  shouldSave,
-} from './helpers.js';
+import { loadTasks, resolveTaskPath, searchToKeys } from './helpers.js';
 
 export interface UpdateOptions {
   readonly status?: string;
@@ -79,34 +64,6 @@ export function buildFieldsFromOptions(opts: UpdateOptions): Record<string, unkn
 // These helpers only rely on root-level option access, so we erase concrete option shapes.
 type AnyCommand = Command<unknown[], Record<string, unknown>, Record<string, unknown>>;
 
-export function emitMutationOutput(
-  cmd: AnyCommand,
-  paths: readonly string[],
-  fields: Record<string, unknown>,
-  humanMessage: string,
-): void {
-  if (shouldSave(cmd)) {
-    emitMutationResult(cmd, paths, humanMessage);
-    return;
-  }
-
-  const format = getOutputFormat(cmd);
-  const modified = paths.map((path) => ({
-    path,
-    content: applyFieldUpdates(readFileSync(path, 'utf-8'), fields),
-  }));
-
-  if (format === 'json' || format === 'toon') {
-    const tasks = modified.map((taskFile) =>
-      taskFromFrontmatter(basename(taskFile.path, '.md'), parseFrontmatter(taskFile.content)),
-    );
-    console.log(formatTasksOutput(tasks, format));
-    return;
-  }
-
-  console.log(formatRawOutput(modified));
-}
-
 export function applyInteractiveFieldUpdates(content: string, fields: Record<string, unknown>): string {
   if (Object.keys(fields).length === 0) return content;
   let updated = applyFieldUpdates(content, fields);
@@ -158,12 +115,10 @@ export function resolveTargetPaths(
     throw new Error('No tasks matched the given filters.');
   }
 
-  // Preview (--no-save) is always allowed — no writes will occur.
-  // Writing requires explicit --bulk to confirm intent.
-  if (shouldSave(cmd) && !opts.bulk) {
+  if (!opts.bulk) {
     throw new Error(
       `${operation} matched ${matched.length} task${matched.length !== 1 ? 's' : ''} and requires --bulk to modify them. ` +
-        'Rerun with --bulk to write, or --no-save to preview.',
+        'Inspect matches with task list/show, then rerun with --bulk to write.',
     );
   }
 

@@ -1,8 +1,8 @@
 import { Command } from '@commander-js/extra-typings';
 import { normalizeAssigneeInput } from '../core/frontmatter.js';
 import { pickupTask } from '../core/mutate.js';
-import { emitMutationResult, getTasksDir, shouldSave, withErrorHandling } from './helpers.js';
-import { type BulkFilterOptions, emitMutationOutput, resolveTargetPaths } from './task-cmd-helpers.js';
+import { emitMutationResult, getTasksDir, withErrorHandling } from './helpers.js';
+import { type BulkFilterOptions, resolveTargetPaths } from './task-cmd-helpers.js';
 
 interface PickupOptions extends BulkFilterOptions {
   readonly assignee?: string;
@@ -27,14 +27,9 @@ export const taskPickupCommand = new Command('pickup')
       };
 
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task pickup');
-      if (shouldSave(cmd)) {
-        for (const path of paths) {
-          pickupTask(path, fields.assignee);
-        }
-        emitMutationResult(cmd, paths, `Picked up ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
-        return;
+      for (const path of paths) {
+        pickupTask(path, fields.assignee);
       }
-
-      emitMutationOutput(cmd, paths, fields, `Picked up ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
+      emitMutationResult(cmd, paths, `Picked up ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
     });
   });

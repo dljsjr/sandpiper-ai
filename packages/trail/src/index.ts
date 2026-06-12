@@ -14,8 +14,7 @@ const program = new Command()
   .description('Trail: plaintext task management with Markdown files and YAML frontmatter')
   .version('0.0.1')
   .option('-d, --dir <path>', 'Path to the directory containing .sandpiper/tasks (defaults to cwd)')
-  .option('-f, --format <format>', 'Output format: raw, json, toon')
-  .option('--no-save', 'Skip writing to disk and index; output only (implies --format raw if no format set)');
+  .option('-f, --format <format>', 'Output format: raw, json, toon');
 
 program.addCommand(indexCommand);
 program.addCommand(taskCommand);

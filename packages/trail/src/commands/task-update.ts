@@ -3,12 +3,11 @@ import { Command } from '@commander-js/extra-typings';
 import { editInEditor } from '../core/editor.js';
 import { updateIndex } from '../core/index-update.js';
 import { updateTaskFields, writeTaskFileAuditably } from '../core/mutate.js';
-import { getTasksDir, resolveTaskPath, shouldSave, withErrorHandling } from './helpers.js';
+import { emitMutationResult, getTasksDir, resolveTaskPath, withErrorHandling } from './helpers.js';
 import {
   applyInteractiveFieldUpdates,
   type BulkFilterOptions,
   buildFieldsFromOptions,
-  emitMutationOutput,
   resolveTargetPaths,
   type UpdateOptions,
 } from './task-cmd-helpers.js';
@@ -80,12 +79,10 @@ export const taskUpdateCommand = new Command('update')
       }
 
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task update');
-      if (shouldSave(cmd)) {
-        for (const path of paths) {
-          updateTaskFields(path, fields);
-        }
+      for (const path of paths) {
+        updateTaskFields(path, fields);
       }
 
-      emitMutationOutput(cmd, paths, fields, `Updated ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
+      emitMutationResult(cmd, paths, `Updated ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
     });
   });

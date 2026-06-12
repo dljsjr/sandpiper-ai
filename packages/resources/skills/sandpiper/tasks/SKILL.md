@@ -77,7 +77,6 @@ scripts/trail --dir /path/to/project <command>
 |------|-------------|
 | `-d, --dir <path>` | Path to directory containing `.sandpiper/tasks` (defaults to cwd) |
 | `-f, --format <fmt>` | Output format: `raw`, `json`, `toon` |
-| `--no-save` | Skip disk writes and index update; output only (implies `--format raw`) |
 
 ## Common Operations
 
@@ -94,7 +93,7 @@ scripts/trail task create -p SHR -t "Write tests" -k SUBTASK --parent SHR-1 --re
 ```bash
 scripts/trail task pickup SHR-1                                # assignee defaults to AGENT
 scripts/trail task pickup SHR-1 --assignee "Piper"              # named/freeform assignee
-scripts/trail task pickup -p SHR --filter-status NOT_STARTED    # bulk
+scripts/trail task pickup -p SHR --filter-status NOT_STARTED --bulk  # bulk
 ```
 
 ### Complete a task
@@ -116,7 +115,7 @@ scripts/trail task update SHR-1 --depends-on SHR-2,SHR-3       # set dependencie
 scripts/trail task update SHR-1 --related ""                   # clear relationships
 scripts/trail task update SHR-1 -i                             # open in $EDITOR
 scripts/trail task update SHR-1 -i --status IN_PROGRESS        # pre-apply fields, then edit
-scripts/trail task update -p SHR --filter-status IN_PROGRESS --assignee USER  # bulk
+scripts/trail task update -p SHR --filter-status IN_PROGRESS --assignee USER --bulk  # bulk
 ```
 
 ### Move tasks
@@ -165,7 +164,6 @@ scripts/trail project update SHR -i                            # open PROJECT.md
 scripts/trail task archive                                     # archive all completed tasks
 scripts/trail task archive -p SHR                              # archive only SHR completed tasks
 scripts/trail task archive --list                              # list already-archived tasks
-scripts/trail --no-save task archive                           # dry run (show what would be archived)
 ```
 
 Archiving moves completed task files (and their subtask directories) to an `archive/` subdirectory within each project. Archived tasks are excluded from normal queries but preserved in full. Use `--list` to see what's been archived.
@@ -182,7 +180,6 @@ scripts/trail index update                                     # rebuild index
 scripts/trail -f json task list -p SHR --top-level             # JSON array
 scripts/trail -f toon task show SHR-1                          # TOON format
 scripts/trail -f raw task show SHR-1                           # raw markdown
-scripts/trail --no-save task create -p SHR -t "Preview"        # dry run
 ```
 
 ## CLI-First Operations

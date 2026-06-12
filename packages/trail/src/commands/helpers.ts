@@ -14,7 +14,6 @@ import type { Task } from '../core/types.js';
 export interface RootOptions {
   readonly dir?: string;
   readonly format?: OutputFormat;
-  readonly save?: boolean; // Commander inverts --no-save to save=false
 }
 
 /**
@@ -66,25 +65,13 @@ export function getRootOpts(cmd: Command<any, any, any>): RootOptions {
 
 /**
  * Get the effective output format from root options.
- * --no-save without --format implies "raw".
  * Returns undefined if no format output is requested (normal human-readable mode).
  */
 export function getOutputFormat(
   // biome-ignore lint/suspicious/noExplicitAny: Commander generic params vary per command
   cmd: Command<any, any, any>,
 ): OutputFormat | undefined {
-  const opts = getRootOpts(cmd);
-  if (opts.format) return opts.format;
-  if (opts.save === false) return 'raw';
-  return undefined;
-}
-
-/**
- * Whether disk writes (task files + index) should be performed.
- */
-// biome-ignore lint/suspicious/noExplicitAny: Commander generic params vary per command
-export function shouldSave(cmd: Command<any, any, any>): boolean {
-  return getRootOpts(cmd).save !== false;
+  return getRootOpts(cmd).format;
 }
 
 /**
@@ -117,7 +104,6 @@ export { resolveTaskFile as resolveTaskPath } from '../core/patterns.js';
 
 /**
  * After a mutation, output affected tasks in the requested format and update the index.
- * If --no-save was set, the caller should have skipped the disk write — this just handles output.
  */
 export function emitMutationResult(
   // biome-ignore lint/suspicious/noExplicitAny: Commander generic params vary
@@ -144,12 +130,10 @@ export function emitMutationResult(
     console.log(humanMessage);
   }
 
-  if (shouldSave(cmd)) {
-    updateIndex(getTasksDir(cmd));
-    const rootDir = getRootDir(cmd) ?? process.cwd();
-    const config = resolveStorageConfig(rootDir);
-    autoCommitIfEnabled(rootDir, config, humanMessage.split('\n')[0] ?? humanMessage);
-  }
+  updateIndex(getTasksDir(cmd));
+  const rootDir = getRootDir(cmd) ?? process.cwd();
+  const config = resolveStorageConfig(rootDir);
+  autoCommitIfEnabled(rootDir, config, humanMessage.split('\n')[0] ?? humanMessage);
 }
 
 /**

@@ -15,7 +15,6 @@ trail [options] [command]
 | `-V, --version`        | Print the Trail version.                                                     |
 | `-d, --dir <path>`     | Directory containing `.sandpiper/tasks`; defaults to the current directory.  |
 | `-f, --format <format>` | Output format: `raw`, `json`, or `toon`.                                     |
-| `--no-save`            | Skip disk writes and index updates; implies `raw` unless a format is passed. |
 | `-h, --help`           | Show help.                                                                   |
 
 ## Output formats
@@ -133,6 +132,7 @@ trail task update [options] [key]
 | `-q, --search <text>`       | Bulk full-text search filter.                    |
 | `--regex`                   | Use regex search.                                |
 | `--ripgrep`                 | Use ripgrep search.                              |
+| `--bulk`                    | Confirm intent for keyless bulk mutation.        |
 
 ### `trail task pickup`
 
@@ -146,7 +146,7 @@ trail task pickup [options] [key]
 | --------------------------- | -------------------------------------------- |
 | `-a, --assignee <assignee>` | Freeform assignee string; default is `AGENT`. |
 
-Also supports the same bulk filters as `task update`: `--project`, `--filter-status`, `--search`, `--regex`, and `--ripgrep`.
+Also supports the same bulk filters as `task update`: `--project`, `--filter-status`, `--search`, `--regex`, and `--ripgrep`. Keyless bulk pickup requires `--bulk`.
 
 ### `trail task complete`
 
@@ -165,6 +165,7 @@ trail task complete [options] [key]
 | `-q, --search <text>`      | Bulk full-text search filter.                               |
 | `--regex`                  | Use regex search.                                           |
 | `--ripgrep`                | Use ripgrep search.                                         |
+| `--bulk`                   | Confirm intent for keyless bulk mutation.                   |
 
 ### `trail task move`
 

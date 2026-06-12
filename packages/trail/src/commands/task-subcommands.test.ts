@@ -55,7 +55,6 @@ async function runTaskCommand(
       .name('trail')
       .option('-d, --dir <path>')
       .option('-f, --format <format>')
-      .option('--no-save')
       .addCommand(taskCommand);
 
     await program.parseAsync(['-d', rootDir, 'task', ...args], { from: 'user' });
