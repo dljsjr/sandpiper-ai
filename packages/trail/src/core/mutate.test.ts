@@ -2,6 +2,7 @@ import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSy
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { extractActivityLog } from './activity-log.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { updateIndex } from './index-update.js';
 import {
@@ -332,6 +333,19 @@ describe('updateTaskFields', () => {
     updateTaskFields(taskPath, { status: 'IN PROGRESS' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.status).toBe('IN PROGRESS');
+  });
+
+  it('should record literal on-disk status values in activity log', () => {
+    writeFileSync(taskPath, readFileSync(taskPath, 'utf-8').replace('status: NOT STARTED', 'status: banana'));
+
+    updateTaskFields(taskPath, { status: 'IN PROGRESS' }, tasksDir);
+
+    const content = readFileSync(taskPath, 'utf-8');
+    const statusChange = extractActivityLog(content)
+      .flatMap((entry) => entry.changes)
+      .find((change) => change.field === 'status');
+    expect(readTaskFrontmatter(taskPath).status).toBe('IN PROGRESS');
+    expect(statusChange).toMatchObject({ from: 'banana', to: 'IN PROGRESS' });
   });
 
   it('should update assignee', () => {

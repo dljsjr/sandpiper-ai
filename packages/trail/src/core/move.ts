@@ -35,12 +35,14 @@ interface CurrentTaskState {
   readonly path: string;
   readonly content: string;
   readonly kind: TaskKind;
+  readonly literalKind?: string;
   readonly parent?: string;
 }
 
 interface MoveTarget {
   readonly project: string;
   readonly kind: TaskKind;
+  readonly kindRequested: boolean;
   readonly parent?: string;
 }
 
@@ -68,7 +70,7 @@ export function moveTask(tasksDir: string, key: string, opts: MoveOptions): Move
     tasksDir,
     plan.newPath,
     current.content,
-    applyMoveFieldUpdates(current.content, current.kind, target.kind),
+    applyMoveFieldUpdates(current.content, current, target),
     key,
     moveChanges,
   );
@@ -93,12 +95,15 @@ function readCurrentTask(tasksDir: string, key: string): CurrentTaskState {
   const path = resolveTaskFile(tasksDir, key);
   const content = readFileSync(path, 'utf-8');
   const frontmatter = parseFrontmatter(content);
+  const task = taskFromFrontmatter(key, frontmatter);
+  const literalKind = typeof frontmatter.kind === 'string' ? frontmatter.kind : undefined;
 
   return {
     project,
     path,
     content,
-    kind: (frontmatter.kind as TaskKind | undefined) ?? 'TASK',
+    kind: task.kind,
+    ...(literalKind !== undefined ? { literalKind } : {}),
     parent: resolveParentFromPath(tasksDir, path, project),
   };
 }
@@ -109,6 +114,7 @@ function resolveMoveTarget(current: CurrentTaskState, opts: MoveOptions): MoveTa
   return {
     project: opts.project ?? current.project,
     kind,
+    kindRequested: opts.kind !== undefined,
     parent: opts.parent ?? (kind === 'SUBTASK' ? current.parent : undefined),
   };
 }
@@ -165,11 +171,11 @@ function allocateMoveKeys(
   return { newKey, reKeyMap };
 }
 
-function applyMoveFieldUpdates(content: string, currentKind: TaskKind, targetKind: TaskKind): string {
-  if (targetKind === currentKind) {
+function applyMoveFieldUpdates(content: string, current: CurrentTaskState, target: MoveTarget): string {
+  if (!target.kindRequested || target.kind === (current.literalKind ?? current.kind)) {
     return content;
   }
-  return applyInternalFieldUpdates(content, { kind: targetKind });
+  return applyInternalFieldUpdates(content, { kind: target.kind });
 }
 
 function buildMoveActivityChanges(
@@ -182,8 +188,8 @@ function buildMoveActivityChanges(
   if (oldKey !== newKey) {
     changes.push({ field: 'key', from: oldKey, to: newKey });
   }
-  if (target.kind !== current.kind) {
-    changes.push({ field: 'kind', from: current.kind, to: target.kind });
+  if (target.kindRequested && target.kind !== (current.literalKind ?? current.kind)) {
+    changes.push({ field: 'kind', from: current.literalKind ?? current.kind, to: target.kind });
   }
   const targetParent = target.kind === 'SUBTASK' ? target.parent : undefined;
   if (targetParent !== current.parent) {
