@@ -104,6 +104,15 @@ describe('archiveCompletedTasks', () => {
     expect(result.archived).toEqual([]);
     expect(result.skipped).toEqual([]);
   });
+
+  it('should not archive tasks with unknown status values', () => {
+    writeTask(join(tasksDir, 'SHR'), 'SHR-1', 'banana');
+
+    const result = archiveCompletedTasks(tasksDir);
+
+    expect(result.skipped).toContain('SHR-1');
+    expect(result.archived).not.toContain('SHR-1');
+  });
 });
 
 describe('listArchivedTasks', () => {
