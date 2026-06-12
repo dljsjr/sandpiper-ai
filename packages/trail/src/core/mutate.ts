@@ -8,6 +8,7 @@ import {
   normalizeReporterInput,
   normalizeTitleInput,
   parseFrontmatter,
+  taskFromFrontmatter,
 } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { writeDiff } from './history.js';
@@ -510,7 +511,8 @@ export function completeTask(
     throw new Error('Completing a task (final=true) requires a resolution: DONE or WONTFIX.');
   }
   if (final && resolution === 'DONE') {
-    const current = parseFrontmatter(readFileSync(taskPath, 'utf-8'));
+    const key = basename(taskPath, '.md');
+    const current = taskFromFrontmatter(key, parseFrontmatter(readFileSync(taskPath, 'utf-8')));
     if (current.status !== 'NEEDS REVIEW') {
       throw new Error('Completing a task with resolution DONE requires current status NEEDS REVIEW.');
     }
