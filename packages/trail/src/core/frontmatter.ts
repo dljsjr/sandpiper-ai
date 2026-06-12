@@ -1,3 +1,4 @@
+import { isMap, isScalar, isSeq, parseDocument } from 'yaml';
 import { projectFromKey } from './patterns.js';
 import type { Task, TaskAssignee, TaskKind, TaskPriority, TaskReporter, TaskResolution, TaskStatus } from './types.js';
 
@@ -140,88 +141,74 @@ function parseResolution(value: string | string[] | undefined): TaskResolution |
   }
 }
 
-function parseScalarValue(value: string): string {
-  if (value.startsWith('"') && value.endsWith('"')) {
-    try {
-      const parsed = JSON.parse(value) as unknown;
-      if (typeof parsed === 'string') return parsed;
-    } catch {
-      // Fall through to legacy quote stripping below.
-    }
-    return value.replace(/^"(.*)"$/, '$1');
-  }
-  return value;
-}
-
 /**
  * Parse YAML frontmatter from a markdown file's content.
  *
- * Expects the file to start with `---\n`, followed by YAML key-value pairs,
- * closed by `---\n`. Returns a flat Record of string keys to values.
+ * Expects the file to start with `---\n`, followed by YAML frontmatter,
+ * closed by `---\n`. Returns a flat Record of string keys to string scalars
+ * or string arrays.
  *
- * This is a minimal parser for the task management YAML subset — it handles:
- * - Simple key: value pairs (strings, including quoted strings)
- * - Arrays (using `  - item` syntax on subsequent lines)
- *
- * It does NOT handle nested objects, multi-line strings, or full YAML spec.
+ * Trail reads YAML 1.2 with the failsafe schema: collections are YAML, but all
+ * scalars stay strings. Duplicate keys preserve the first value for backwards
+ * compatibility with the previous hand-rolled parser.
  */
 export function parseFrontmatter(content: string): Record<string, string | string[]> {
-  const lines = content.split('\n');
+  const source = extractFrontmatterSource(content);
+  if (source === undefined) {
+    return {};
+  }
 
-  if (lines[0]?.trim() !== '---') {
+  const doc = parseDocument(source, { schema: 'failsafe', uniqueKeys: false });
+  const root = doc.contents;
+  if (!isMap(root)) {
     return {};
   }
 
   const result: Record<string, string | string[]> = {};
-  let currentArrayKey: string | null = null;
-  let currentArray: string[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    // biome-ignore lint/style/noNonNullAssertion: loop bounded by lines.length
-    const line = lines[i]!;
-
-    // End of frontmatter
-    if (line.trim() === '---') {
-      // Flush any pending array
-      if (currentArrayKey) {
-        result[currentArrayKey] = currentArray;
-      }
-      break;
-    }
-
-    // Array item line: `  - value`
-    const arrayMatch = line.match(/^\s+-\s+(.+)$/);
-    if (arrayMatch?.[1] && currentArrayKey) {
-      currentArray.push(arrayMatch[1].trim());
+  for (const pair of root.items) {
+    const key = scalarStringValue(pair.key);
+    if (key === undefined || Object.hasOwn(result, key)) {
       continue;
     }
 
-    // Key-value line: `key: value`
-    const kvMatch = line.match(/^([a-z_]+):\s*(.*)$/);
-    if (kvMatch) {
-      // Flush previous array if any
-      if (currentArrayKey) {
-        result[currentArrayKey] = currentArray;
-        currentArrayKey = null;
-        currentArray = [];
-      }
-
-      const key = kvMatch[1] ?? '';
-      const value = (kvMatch[2] ?? '').trim();
-
-      if (Object.hasOwn(result, key)) {
-        continue;
-      }
-
-      if (value === '') {
-        // Empty value — could be the start of an array
-        currentArrayKey = key;
-        currentArray = [];
-      } else {
-        result[key] = parseScalarValue(value);
-      }
+    const value = frontmatterValue(pair.value);
+    if (value !== undefined) {
+      result[key] = value;
     }
   }
 
   return result;
+}
+
+function extractFrontmatterSource(content: string): string | undefined {
+  const lines = content.split('\n');
+  if (lines[0]?.trim() !== '---') {
+    return undefined;
+  }
+
+  const end = lines.findIndex((line, index) => index > 0 && line.trim() === '---');
+  return end === -1 ? undefined : lines.slice(1, end).join('\n');
+}
+
+function frontmatterValue(value: unknown): string | string[] | undefined {
+  if (value === null) {
+    return [];
+  }
+  if (isScalar(value)) {
+    if (value.type === 'PLAIN' && value.value === '') {
+      return [];
+    }
+    return typeof value.value === 'string' ? value.value : String(value.value ?? '');
+  }
+  if (isSeq(value)) {
+    return value.items.map((item) => scalarStringValue(item) ?? '').filter((item) => item !== '');
+  }
+  return undefined;
+}
+
+function scalarStringValue(value: unknown): string | undefined {
+  if (!isScalar(value)) {
+    return undefined;
+  }
+  return typeof value.value === 'string' ? value.value : String(value.value ?? '');
 }

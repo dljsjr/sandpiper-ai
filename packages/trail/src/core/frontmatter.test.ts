@@ -119,6 +119,50 @@ status: NOT STARTED
     expect(fm.depends_on).toEqual([]);
     expect(fm.status).toBe('NOT STARTED');
   });
+
+  it('should parse YAML failsafe scalars without coercion', () => {
+    const content = `---
+title: NO
+assignee: Yes
+priority: 00123
+reporter: null
+created_at: 2026-06-13
+---
+`;
+
+    const fm = parseFrontmatter(content);
+
+    expect(fm.title).toBe('NO');
+    expect(fm.assignee).toBe('Yes');
+    expect(fm.priority).toBe('00123');
+    expect(fm.reporter).toBe('null');
+    expect(fm.created_at).toBe('2026-06-13');
+  });
+
+  it('should parse flow arrays as string arrays', () => {
+    const content = `---
+title: Flow arrays
+depends_on: [SHR-1, SHR-2]
+---
+`;
+
+    const fm = parseFrontmatter(content);
+
+    expect(fm.depends_on).toEqual(['SHR-1', 'SHR-2']);
+  });
+
+  it('should parse block scalars as strings', () => {
+    const content = `---
+title: |
+  Multi-line
+  title
+---
+`;
+
+    const fm = parseFrontmatter(content);
+
+    expect(fm.title).toBe('Multi-line\ntitle\n');
+  });
 });
 
 describe('taskFromFrontmatter', () => {

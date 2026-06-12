@@ -269,6 +269,7 @@ function applyArrayFieldUpdates(content: string, fields: InternalUpdateFields): 
 }
 
 function replaceScalarField(content: string, fieldName: string, value: string): string {
+  assertRoundTrippableFieldForm(content, fieldName, 'scalar');
   return content.replace(new RegExp(`^${fieldName}: .+$`, 'm'), `${fieldName}: ${value}`);
 }
 
@@ -281,6 +282,8 @@ function touchUpdatedAt(content: string): string {
  * Replace or insert an array field in frontmatter content.
  */
 function replaceArrayField(content: string, fieldName: string, values: readonly string[]): string {
+  assertRoundTrippableFieldForm(content, fieldName, 'array');
+
   // Remove existing field (key line + any indented array items)
   const existingPattern = new RegExp(`^${fieldName}:.*(?:\\n  - .+)*`, 'm');
   let result = content.replace(existingPattern, '').replace(/\n{3,}/g, '\n\n');
@@ -297,6 +300,78 @@ function replaceArrayField(content: string, fieldName: string, values: readonly 
   result = result.replace(/^(updated_at: .+)$/m, `${insertion}\n$1`);
 
   return result;
+}
+
+type FieldUpdateShape = 'scalar' | 'array';
+
+function assertRoundTrippableFieldForm(content: string, fieldName: string, updateShape: FieldUpdateShape): void {
+  const form = findFrontmatterFieldForm(content, fieldName);
+  if (!form || isRoundTrippableFieldForm(form, updateShape)) {
+    return;
+  }
+
+  throw new Error(
+    `Cannot update frontmatter field "${fieldName}" because its YAML form is non-round-trippable by Trail's surgical writer.`,
+  );
+}
+
+interface FrontmatterFieldForm {
+  readonly value: string;
+  readonly continuationLines: readonly string[];
+}
+
+function findFrontmatterFieldForm(content: string, fieldName: string): FrontmatterFieldForm | undefined {
+  const lines = content.split('\n');
+  if (lines[0]?.trim() !== '---') {
+    return undefined;
+  }
+
+  const fieldPattern = new RegExp(`^${escapeRegex(fieldName)}:\\s*(.*)$`);
+  for (let index = 1; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === undefined || line.trim() === '---') {
+      return undefined;
+    }
+
+    const match = line.match(fieldPattern);
+    if (!match) {
+      continue;
+    }
+
+    const continuationLines: string[] = [];
+    for (let next = index + 1; next < lines.length; next++) {
+      const nextLine = lines[next];
+      if (nextLine === undefined || nextLine.trim() === '---' || /^\S/.test(nextLine)) {
+        break;
+      }
+      continuationLines.push(nextLine);
+    }
+
+    return { value: match[1]?.trim() ?? '', continuationLines };
+  }
+
+  return undefined;
+}
+
+function isRoundTrippableFieldForm(form: FrontmatterFieldForm, updateShape: FieldUpdateShape): boolean {
+  if (form.value === '') {
+    return updateShape === 'array' && form.continuationLines.every((line) => /^\s+-\s+/.test(line));
+  }
+
+  if (updateShape === 'array' && /^\[[\s\S]*\]$/.test(form.value)) {
+    return true;
+  }
+
+  if (/^[|>]/.test(form.value)) return false;
+  if (/^[{[]/.test(form.value)) return false;
+  if (/^[&*]/.test(form.value)) return false;
+  if (/\s[&*][A-Za-z0-9_-]+/.test(form.value)) return false;
+
+  return form.continuationLines.length === 0;
+}
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**

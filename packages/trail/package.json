@@ -32,7 +32,8 @@
     "@commander-js/extra-typings": "15.0.0",
     "@toon-format/toon": "2.3.0",
     "commander": "15.0.0",
-    "diff": "8.0.4"
+    "diff": "8.0.4",
+    "yaml": "2.9.0"
   },
   "devDependencies": {},
   "scripts": {
