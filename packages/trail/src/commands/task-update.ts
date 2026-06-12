@@ -36,6 +36,7 @@ export const taskUpdateCommand = new Command('update')
   .option('-q, --search <text>', 'Full-text search filter (for bulk)')
   .option('--regex', 'Use JavaScript regex search (or ripgrep regex search with --ripgrep)')
   .option('--ripgrep', 'Use ripgrep search instead of the built-in search backend')
+  .option('--bulk', 'Confirm intent for keyless bulk mutation')
   .action((key, opts: UpdateCommandOptions, cmd) => {
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);
