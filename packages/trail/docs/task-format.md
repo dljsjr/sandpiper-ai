@@ -48,7 +48,7 @@ when_to_read: Use for application feature, bug, and release work
 
 ## Task file structure
 
-A task file starts with YAML frontmatter, followed by a Markdown body:
+A task file starts with Trail frontmatter, followed by a Markdown body. The frontmatter is a constrained YAML-compatible dialect: Trail writes simple scalar fields and simple arrays, and it does not rely on nested objects, anchors, tags, or multi-line YAML scalars.
 
 ```markdown
 ---
@@ -89,6 +89,8 @@ Show progress while large files import.
 Trail accepts status filter names such as `NOT_STARTED` in CLI options and writes human-readable status values such as `NOT STARTED` in frontmatter.
 
 `title`, `assignee`, and `reporter` must be non-empty, single-line strings. Conventional assignee/reporter tokens are canonicalized case-insensitively (`agent` becomes `AGENT`), while other names are preserved. Trail quotes and escapes freeform values in frontmatter when needed.
+
+Relationship fields (`depends_on`, `blocked_by`, `related`) are written as arrays. The parser also accepts a single scalar task key and treats it as a one-item array for compatibility with hand-written files.
 
 ## Kinds and hierarchy
 
