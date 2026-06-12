@@ -1,3 +1,15 @@
+/**
+ * Task search — local, dependency-free, deterministic.
+ *
+ * This module owns a private BM25 implementation rather than depending on a
+ * shelf search library. This is an intentional design choice: Trail is a CLI
+ * tool with no service or database, so search must work offline, with zero
+ * external dependencies, and produce deterministic ranking from the same
+ * input. The Rust port will likely replace this with a Tantivy-based index,
+ * but until then, the constraint is: local-only, no deps, same answer every
+ * time.
+ */
+
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
