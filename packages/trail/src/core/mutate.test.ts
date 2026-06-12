@@ -6,6 +6,7 @@ import { extractActivityLog } from './activity-log.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { updateIndex } from './index-update.js';
 import {
+  applyFieldUpdates,
   applyInternalFieldUpdates,
   completeTask,
   createProject,
@@ -287,6 +288,111 @@ describe('createTask', () => {
 });
 
 describe('applyInternalFieldUpdates', () => {
+  it('should normalize an edited flow array field without changing untouched fields', () => {
+    const content = `---
+title: "Flow array task"
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+depends_on: [FOO-1, FOO-2]
+created_at: 2026-04-01T00:00:00Z
+updated_at: 2026-04-01T00:00:00Z
+---
+
+# Flow array task
+`;
+
+    const updated = applyFieldUpdates(content, { dependsOn: ['FOO-3'] });
+
+    expect(updated).toContain('title: "Flow array task"');
+    expect(updated).toContain('depends_on:\n  - FOO-3\nupdated_at:');
+    expect(updated).not.toContain('depends_on: [FOO-1, FOO-2]');
+    expect(updated).toContain('\n# Flow array task\n');
+  });
+
+  it('should leave untouched block scalar fields byte-stable when editing another field', () => {
+    const content = `---
+title: |
+  Multi-line
+  title
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-04-01T00:00:00Z
+updated_at: 2026-04-01T00:00:00Z
+---
+
+# Multi-line title
+`;
+
+    const updated = applyFieldUpdates(content, { status: 'IN PROGRESS' });
+
+    expect(updated).toContain('title: |\n  Multi-line\n  title\n');
+    expect(updated).toContain('status: IN PROGRESS');
+  });
+
+  it('should reject scalar edits to sequence-form fields that the surgical writer cannot round-trip', () => {
+    const content = `---
+title:
+  - Bad
+  - Shape
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-04-01T00:00:00Z
+updated_at: 2026-04-01T00:00:00Z
+---
+
+# Bad Shape
+`;
+
+    expect(() => applyFieldUpdates(content, { title: 'New title' })).toThrow('non-round-trippable');
+  });
+
+  it('should reject empty scalar edits that the surgical writer cannot round-trip', () => {
+    const content = `---
+title:
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-04-01T00:00:00Z
+updated_at: 2026-04-01T00:00:00Z
+---
+
+# Empty title
+`;
+
+    expect(() => applyFieldUpdates(content, { title: 'New title' })).toThrow('non-round-trippable');
+  });
+
+  it('should reject editing block scalar fields that the surgical writer cannot round-trip', () => {
+    const content = `---
+title: |
+  Multi-line
+  title
+status: NOT STARTED
+kind: TASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: USER
+created_at: 2026-04-01T00:00:00Z
+updated_at: 2026-04-01T00:00:00Z
+---
+
+# Multi-line title
+`;
+
+    expect(() => applyFieldUpdates(content, { title: 'New title' })).toThrow('non-round-trippable');
+  });
+
   it('should expose an explicit internal API for kind updates', () => {
     const content = `---
 title: "Example"
