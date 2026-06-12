@@ -3,7 +3,8 @@ import { Command } from '@commander-js/extra-typings';
 import { editInEditor } from '../core/editor.js';
 import { updateIndex } from '../core/index-update.js';
 import { updateTaskFields, writeTaskFileAuditably } from '../core/mutate.js';
-import { emitMutationResult, getTasksDir, resolveTaskPath, withErrorHandling } from './helpers.js';
+import { emitMutationResult, getTasksDir, withErrorHandling } from './helpers.js';
+import { resolveTaskFile } from '../core/patterns.js';
 import {
   applyInteractiveFieldUpdates,
   type BulkFilterOptions,
@@ -47,7 +48,7 @@ export const taskUpdateCommand = new Command('update')
         }
 
         const taskKey = key.toUpperCase();
-        const taskPath = resolveTaskPath(tasksDir, taskKey);
+        const taskPath = resolveTaskFile(tasksDir, taskKey);
         const content = readFileSync(taskPath, 'utf-8');
         const edited = editInEditor(applyInteractiveFieldUpdates(content, fields), `${taskKey}.md`);
 

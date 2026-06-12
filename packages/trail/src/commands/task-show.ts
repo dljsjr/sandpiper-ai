@@ -3,7 +3,8 @@ import { Command } from '@commander-js/extra-typings';
 import { formatTaskDetail, formatTaskLine } from '../core/format.js';
 import { extractFrontmatter, formatTasksOutput } from '../core/output.js';
 import { getSubtasks, getTask } from '../core/query.js';
-import { getOutputFormat, getTasksDir, loadTasks, resolveTaskPath, withErrorHandling } from './helpers.js';
+import { getOutputFormat, getTasksDir, loadTasks, withErrorHandling } from './helpers.js';
+import { resolveTaskFile } from '../core/patterns.js';
 
 export const taskShowCommand = new Command('show')
   .description('Show details for a specific task')
@@ -27,7 +28,7 @@ export const taskShowCommand = new Command('show')
       }
 
       if (format === 'raw') {
-        const path = resolveTaskPath(getTasksDir(cmd), task.key);
+        const path = resolveTaskFile(getTasksDir(cmd), task.key);
         const content = readFileSync(path, 'utf-8');
         console.log(opts.metadataOnly ? extractFrontmatter(content) : content);
         return;
