@@ -3,12 +3,12 @@ import { Command } from '@commander-js/extra-typings';
 import { formatTaskLine } from '../core/format.js';
 import { normalizeAssigneeInput } from '../core/frontmatter.js';
 import { formatRawOutput, formatTasksOutput } from '../core/output.js';
+import { resolveTaskFile } from '../core/patterns.js';
 import type { SortField, TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
 import { searchTasks } from '../core/search.js';
 import type { Task, TaskAssignee, TaskKind, TaskPriority } from '../core/types.js';
 import { getOutputFormat, getTasksDir, loadTasks, withErrorHandling } from './helpers.js';
-import { resolveTaskFile } from '../core/patterns.js';
 import { normalizeStatus } from './task-cmd-helpers.js';
 
 export const taskListCommand = new Command('list')

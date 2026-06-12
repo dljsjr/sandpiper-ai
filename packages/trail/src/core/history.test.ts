@@ -38,7 +38,7 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS' });
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
 
     const histDir = join(tasksDir, 'history', key);
     expect(existsSync(histDir)).toBe(true);
@@ -55,7 +55,7 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' });
+    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' }, tasksDir);
 
     const histDir = join(tasksDir, 'history', key);
     const diffs = readdirSync(histDir).filter((f) => f.endsWith('.diff'));
@@ -77,9 +77,9 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS' });
-    updateTaskFields(path, { priority: 'LOW' });
-    updateTaskFields(path, { assignee: 'AGENT' });
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
+    updateTaskFields(path, { priority: 'LOW' }, tasksDir);
+    updateTaskFields(path, { assignee: 'AGENT' }, tasksDir);
 
     const histDir = join(tasksDir, 'history', key);
     const diffs = readdirSync(histDir).filter((f) => f.endsWith('.diff'));
@@ -95,9 +95,13 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, {
-      description: 'First version of the description.',
-    });
+    updateTaskFields(
+      path,
+      {
+        description: 'First version of the description.',
+      },
+      tasksDir,
+    );
 
     const histDir = join(tasksDir, 'history', key);
     const diffs = readdirSync(histDir).filter((f) => f.endsWith('.diff'));
@@ -114,9 +118,9 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { description: 'Original content.' });
+    updateTaskFields(path, { description: 'Original content.' }, tasksDir);
     await new Promise((r) => setTimeout(r, 10));
-    updateTaskFields(path, { description: 'Revised content.' });
+    updateTaskFields(path, { description: 'Revised content.' }, tasksDir);
 
     const histDir = join(tasksDir, 'history', key);
     const diffs = readdirSync(histDir)
@@ -139,9 +143,9 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS' });
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
     await new Promise((r) => setTimeout(r, 10));
-    updateTaskFields(path, { status: 'NEEDS REVIEW' });
+    updateTaskFields(path, { status: 'NEEDS REVIEW' }, tasksDir);
 
     const histDir = join(tasksDir, 'history', key);
     const diffs = readdirSync(histDir)
@@ -161,7 +165,7 @@ describe('History diffs', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS' });
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
 
     // History is at tasksDir/history/KEY, NOT tasksDir/FOO/history/KEY
     expect(existsSync(join(tasksDir, 'history', key))).toBe(true);

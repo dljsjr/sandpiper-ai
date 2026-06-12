@@ -39,7 +39,7 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS' });
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
 
     const content = readFileSync(path, 'utf-8');
     const log = extractActivityLog(content);
@@ -60,7 +60,7 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' });
+    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' }, tasksDir);
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(1);
@@ -86,8 +86,8 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' });
-    updateTaskFields(path, { priority: 'LOW' });
+    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' }, tasksDir);
+    updateTaskFields(path, { priority: 'LOW' }, tasksDir);
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(2);
@@ -102,7 +102,7 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    pickupTask(path);
+    pickupTask(path, tasksDir);
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(1);
@@ -127,8 +127,8 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    completeTask(path);
-    completeTask(path, true, 'DONE');
+    completeTask(path, tasksDir);
+    completeTask(path, tasksDir, true, 'DONE');
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(2);
@@ -153,7 +153,7 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { title: 'New title' });
+    updateTaskFields(path, { title: 'New title' }, tasksDir);
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(1);
@@ -173,7 +173,7 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { description: 'New body content.' });
+    updateTaskFields(path, { description: 'New body content.' }, tasksDir);
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(1);
@@ -192,10 +192,14 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { description: 'Line one.' });
-    updateTaskFields(path, {
-      description: 'Line one.\n\nLine two.\n\nLine three.',
-    });
+    updateTaskFields(path, { description: 'Line one.' }, tasksDir);
+    updateTaskFields(
+      path,
+      {
+        description: 'Line one.\n\nLine two.\n\nLine three.',
+      },
+      tasksDir,
+    );
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(2);
@@ -214,7 +218,7 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS' });
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
 
     const log = extractActivityLog(readFileSync(path, 'utf-8'));
     expect(log).toHaveLength(1);
@@ -231,10 +235,14 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, {
-      description: "Important description.\n\nDon't lose this.",
-    });
-    updateTaskFields(path, { status: 'IN PROGRESS' });
+    updateTaskFields(
+      path,
+      {
+        description: "Important description.\n\nDon't lose this.",
+      },
+      tasksDir,
+    );
+    updateTaskFields(path, { status: 'IN PROGRESS' }, tasksDir);
 
     const content = readFileSync(path, 'utf-8');
     expect(content).toContain('Important description.');
@@ -251,8 +259,8 @@ describe('Activity Log', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' });
-    updateTaskFields(path, { status: 'NEEDS REVIEW' });
+    updateTaskFields(path, { status: 'IN PROGRESS', assignee: 'AGENT' }, tasksDir);
+    updateTaskFields(path, { status: 'NEEDS REVIEW' }, tasksDir);
 
     const content = readFileSync(path, 'utf-8');
     // Should have the activity log delimiter and header

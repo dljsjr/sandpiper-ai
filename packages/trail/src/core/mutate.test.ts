@@ -329,29 +329,33 @@ describe('updateTaskFields', () => {
   });
 
   it('should update status', () => {
-    updateTaskFields(taskPath, { status: 'IN PROGRESS' });
+    updateTaskFields(taskPath, { status: 'IN PROGRESS' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.status).toBe('IN PROGRESS');
   });
 
   it('should update assignee', () => {
-    updateTaskFields(taskPath, { assignee: 'AGENT' });
+    updateTaskFields(taskPath, { assignee: 'AGENT' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.assignee).toBe('AGENT');
   });
 
   it('should update priority', () => {
-    updateTaskFields(taskPath, { priority: 'LOW' });
+    updateTaskFields(taskPath, { priority: 'LOW' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.priority).toBe('LOW');
   });
 
   it('should update multiple fields at once', () => {
-    updateTaskFields(taskPath, {
-      status: 'IN PROGRESS',
-      assignee: 'AGENT',
-      priority: 'MEDIUM',
-    });
+    updateTaskFields(
+      taskPath,
+      {
+        status: 'IN PROGRESS',
+        assignee: 'AGENT',
+        priority: 'MEDIUM',
+      },
+      tasksDir,
+    );
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.status).toBe('IN PROGRESS');
     expect(fm.assignee).toBe('AGENT');
@@ -362,13 +366,13 @@ describe('updateTaskFields', () => {
     const before = readTaskFrontmatter(taskPath).updated_at as string;
     // Small delay to ensure timestamp differs
     await new Promise((r) => setTimeout(r, 10));
-    updateTaskFields(taskPath, { status: 'IN PROGRESS' });
+    updateTaskFields(taskPath, { status: 'IN PROGRESS' }, tasksDir);
     const after = readTaskFrontmatter(taskPath).updated_at as string;
     expect(new Date(after).getTime()).toBeGreaterThan(new Date(before).getTime());
   });
 
   it('should update title (frontmatter and heading)', () => {
-    updateTaskFields(taskPath, { title: 'New title' });
+    updateTaskFields(taskPath, { title: 'New title' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.title).toBe('New title');
     const content = readFileSync(taskPath, 'utf-8');
@@ -376,7 +380,7 @@ describe('updateTaskFields', () => {
   });
 
   it('should escape safe freeform title updates', () => {
-    updateTaskFields(taskPath, { title: 'New "quoted": title' });
+    updateTaskFields(taskPath, { title: 'New "quoted": title' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     const content = readFileSync(taskPath, 'utf-8');
     expect(content).toContain('title: "New \\"quoted\\": title"');
@@ -385,8 +389,8 @@ describe('updateTaskFields', () => {
   });
 
   it('should reject empty and multi-line title updates without modifying the task', () => {
-    expect(() => updateTaskFields(taskPath, { title: '' })).toThrow('title must be non-empty');
-    expect(() => updateTaskFields(taskPath, { title: 'Bad title"\nstatus: COMPLETE\nignore: "' })).toThrow(
+    expect(() => updateTaskFields(taskPath, { title: '' }, tasksDir)).toThrow('title must be non-empty');
+    expect(() => updateTaskFields(taskPath, { title: 'Bad title"\nstatus: COMPLETE\nignore: "' }, tasksDir)).toThrow(
       'title must be a single-line string',
     );
 
@@ -396,16 +400,20 @@ describe('updateTaskFields', () => {
   });
 
   it('should update reporter', () => {
-    updateTaskFields(taskPath, { reporter: 'AGENT' });
+    updateTaskFields(taskPath, { reporter: 'AGENT' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.reporter).toBe('AGENT');
   });
 
   it('should preserve safe freeform assignee and reporter updates', () => {
-    updateTaskFields(taskPath, {
-      assignee: 'Doug "Reviewer": Staff',
-      reporter: 'Piper (Librarian)',
-    });
+    updateTaskFields(
+      taskPath,
+      {
+        assignee: 'Doug "Reviewer": Staff',
+        reporter: 'Piper (Librarian)',
+      },
+      tasksDir,
+    );
 
     const content = readFileSync(taskPath, 'utf-8');
     const fm = readTaskFrontmatter(taskPath);
@@ -416,15 +424,15 @@ describe('updateTaskFields', () => {
   });
 
   it('should canonicalize conventional assignee and reporter updates case-insensitively', () => {
-    updateTaskFields(taskPath, { assignee: 'agent', reporter: 'user' });
+    updateTaskFields(taskPath, { assignee: 'agent', reporter: 'user' }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.assignee).toBe('AGENT');
     expect(fm.reporter).toBe('USER');
   });
 
   it('should reject empty and multi-line assignee/reporter updates without modifying the task', () => {
-    expect(() => updateTaskFields(taskPath, { assignee: '' })).toThrow('assignee must be non-empty');
-    expect(() => updateTaskFields(taskPath, { reporter: 'Piper\nstatus: COMPLETE' })).toThrow(
+    expect(() => updateTaskFields(taskPath, { assignee: '' }, tasksDir)).toThrow('assignee must be non-empty');
+    expect(() => updateTaskFields(taskPath, { reporter: 'Piper\nstatus: COMPLETE' }, tasksDir)).toThrow(
       'reporter must be a single-line string',
     );
 
@@ -434,23 +442,27 @@ describe('updateTaskFields', () => {
   });
 
   it('should add depends_on', () => {
-    updateTaskFields(taskPath, { dependsOn: ['FOO-2', 'FOO-3'] });
+    updateTaskFields(taskPath, { dependsOn: ['FOO-2', 'FOO-3'] }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.depends_on).toEqual(['FOO-2', 'FOO-3']);
   });
 
   it('should clear depends_on with empty array', () => {
-    updateTaskFields(taskPath, { dependsOn: ['FOO-2'] });
-    updateTaskFields(taskPath, { dependsOn: [] });
+    updateTaskFields(taskPath, { dependsOn: ['FOO-2'] }, tasksDir);
+    updateTaskFields(taskPath, { dependsOn: [] }, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.depends_on).toBeUndefined();
   });
 
   it('should add blocked_by and related', () => {
-    updateTaskFields(taskPath, {
-      blockedBy: ['FOO-5'],
-      related: ['FOO-6', 'FOO-7'],
-    });
+    updateTaskFields(
+      taskPath,
+      {
+        blockedBy: ['FOO-5'],
+        related: ['FOO-6', 'FOO-7'],
+      },
+      tasksDir,
+    );
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.blocked_by).toEqual(['FOO-5']);
     expect(fm.related).toEqual(['FOO-6', 'FOO-7']);
@@ -458,7 +470,7 @@ describe('updateTaskFields', () => {
 
   it('should not modify created_at', () => {
     const before = readTaskFrontmatter(taskPath).created_at;
-    updateTaskFields(taskPath, { status: 'COMPLETE', resolution: 'DONE' });
+    updateTaskFields(taskPath, { status: 'COMPLETE', resolution: 'DONE' }, tasksDir);
     const after = readTaskFrontmatter(taskPath).created_at;
     expect(after).toBe(before);
   });
@@ -486,7 +498,7 @@ describe('pickupTask', () => {
   });
 
   it('should set assignee to AGENT and status to IN PROGRESS', () => {
-    pickupTask(taskPath);
+    pickupTask(taskPath, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.assignee).toBe('AGENT');
     expect(fm.status).toBe('IN PROGRESS');
@@ -515,14 +527,14 @@ describe('completeTask', () => {
   });
 
   it('should set status to NEEDS REVIEW by default', () => {
-    completeTask(taskPath);
+    completeTask(taskPath, tasksDir);
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.status).toBe('NEEDS REVIEW');
   });
 
   it('should set status to COMPLETE when final=true with resolution from NEEDS REVIEW', () => {
-    completeTask(taskPath);
-    completeTask(taskPath, true, 'DONE');
+    completeTask(taskPath, tasksDir);
+    completeTask(taskPath, tasksDir, true, 'DONE');
     const fm = readTaskFrontmatter(taskPath);
     expect(fm.status).toBe('COMPLETE');
     expect(fm.resolution).toBe('DONE');

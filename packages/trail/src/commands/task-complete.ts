@@ -31,7 +31,7 @@ export const taskCompleteCommand = new Command('complete')
       const resolution = opts.resolution?.toUpperCase() as TaskResolution | undefined;
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task completion');
       for (const path of paths) {
-        completeTask(path, opts.final ?? false, resolution);
+        completeTask(path, tasksDir, opts.final ?? false, resolution);
       }
       emitMutationResult(
         cmd,

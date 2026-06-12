@@ -101,9 +101,13 @@ Some content.
         reporter: 'USER',
       });
 
-      updateTaskFields(path, {
-        description: 'Added via CLI.\n\nMore details.\n',
-      });
+      updateTaskFields(
+        path,
+        {
+          description: 'Added via CLI.\n\nMore details.\n',
+        },
+        tasksDir,
+      );
       const content = readFileSync(path, 'utf-8');
       expect(content).toContain('Added via CLI.');
       expect(content).toContain('More details.');
@@ -118,11 +122,15 @@ Some content.
         reporter: 'USER',
       });
 
-      updateTaskFields(path, {
-        status: 'IN PROGRESS',
-        assignee: 'AGENT',
-        description: 'Now with a description.\n',
-      });
+      updateTaskFields(
+        path,
+        {
+          status: 'IN PROGRESS',
+          assignee: 'AGENT',
+          description: 'Now with a description.\n',
+        },
+        tasksDir,
+      );
 
       const fm = parseFrontmatter(readFileSync(path, 'utf-8'));
       expect(fm.status).toBe('IN PROGRESS');
