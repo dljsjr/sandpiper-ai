@@ -136,4 +136,28 @@ describe('searchTasks', () => {
       expect(key).toMatch(/^[A-Z]{2,}-\d+$/);
     }
   });
+
+  it('should exclude archived task files from default BM25 search', () => {
+    writeTaskFile(tasksDir, 'SHR/archive', 'SHR-99', '# Archived FIFO\n\nFIFO archive-only marker\n');
+
+    const keys = searchTasks(tasksDir, 'archive-only');
+
+    expect(keys).not.toContain('SHR-99');
+  });
+
+  it('should exclude archived task files from regex search', () => {
+    writeTaskFile(tasksDir, 'SHR/archive', 'SHR-99', '# Archived FIFO\n\nFIFO archive-only marker\n');
+
+    const keys = searchTasks(tasksDir, 'archive-only', undefined, { regex: true });
+
+    expect(keys).not.toContain('SHR-99');
+  });
+
+  it('should exclude archived task files from ripgrep search', () => {
+    writeTaskFile(tasksDir, 'SHR/archive', 'SHR-99', '# Archived FIFO\n\nFIFO archive-only marker\n');
+
+    const keys = searchTasks(tasksDir, 'archive-only', undefined, { ripgrep: true });
+
+    expect(keys).not.toContain('SHR-99');
+  });
 });
