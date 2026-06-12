@@ -383,7 +383,7 @@ describe('task subcommands (happy paths)', () => {
 
   it('update allows explicit bulk filters', async () => {
     const { rootDir } = setupTasksDir();
-    const result = await runTaskCommand(rootDir, ['update', '--status', 'IN_PROGRESS', '-p', 'AGENT']);
+    const result = await runTaskCommand(rootDir, ['update', '--status', 'IN_PROGRESS', '-p', 'AGENT', '--bulk']);
     expect(result.stdout).toContain('Updated 2 tasks.');
   });
 
@@ -423,7 +423,7 @@ describe('task subcommands (happy paths)', () => {
 
   it('pickup search supports regex backend', async () => {
     const { rootDir } = setupTasksDir();
-    const result = await runTaskCommand(rootDir, ['pickup', '-q', 'Primar(?:y)', '--regex']);
+    const result = await runTaskCommand(rootDir, ['pickup', '-q', 'Primar(?:y)', '--regex', '--bulk']);
     expect(result.stdout).toContain('Picked up 1 task.');
   });
 

@@ -41,6 +41,8 @@ export interface BulkFilterOptions {
   readonly search?: string;
   readonly regex?: boolean;
   readonly ripgrep?: boolean;
+  /** Confirm intent for keyless bulk mutation. Required when no task key is provided. */
+  readonly bulk?: boolean;
 }
 
 export function normalizeStatus(input: string): TaskStatus {
@@ -154,6 +156,15 @@ export function resolveTargetPaths(
   const matched = queryTasks(tasks, filter);
   if (matched.length === 0) {
     throw new Error('No tasks matched the given filters.');
+  }
+
+  // Preview (--no-save) is always allowed — no writes will occur.
+  // Writing requires explicit --bulk to confirm intent.
+  if (shouldSave(cmd) && !opts.bulk) {
+    throw new Error(
+      `${operation} matched ${matched.length} task${matched.length !== 1 ? 's' : ''} and requires --bulk to modify them. ` +
+        'Rerun with --bulk to write, or --no-save to preview.',
+    );
   }
 
   return matched.map((task) => resolveTaskPath(tasksDir, task.key));

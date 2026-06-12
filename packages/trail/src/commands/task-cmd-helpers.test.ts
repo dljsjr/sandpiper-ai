@@ -115,6 +115,7 @@ Old body
       {
         project: 'AGENT',
         filterStatus: 'IN_PROGRESS',
+        bulk: true,
       },
       createRootCommand(rootDir),
       tasksDir,
@@ -132,10 +133,60 @@ Old body
         {
           project: 'AGENT',
           filterStatus: 'COMPLETE',
+          bulk: true,
         },
         createRootCommand(rootDir),
         tasksDir,
       ),
     ).toThrow('No tasks matched the given filters.');
+  });
+
+  it('throws when writing bulk mutations without explicit --bulk', () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+
+    expect(() =>
+      resolveTargetPaths(
+        undefined,
+        {
+          project: 'AGENT',
+        },
+        createRootCommand(rootDir),
+        tasksDir,
+      ),
+    ).toThrow(/matched 2 tasks and requires --bulk/);
+  });
+
+  it('resolves bulk target paths when bulk intent is explicit', () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+
+    const paths = resolveTargetPaths(
+      undefined,
+      {
+        project: 'AGENT',
+        bulk: true,
+      },
+      createRootCommand(rootDir),
+      tasksDir,
+    );
+
+    expect(paths.length).toBeGreaterThan(0);
+  });
+
+  it('resolves bulk target paths for preview without --bulk when --no-save is set', () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    const cmd = createRootCommand(rootDir);
+    // Simulate --no-save
+    cmd.setOptionValue('save', false);
+
+    const paths = resolveTargetPaths(
+      undefined,
+      {
+        project: 'AGENT',
+      },
+      cmd,
+      tasksDir,
+    );
+
+    expect(paths.length).toBeGreaterThan(0);
   });
 });
