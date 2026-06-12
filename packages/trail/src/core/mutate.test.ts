@@ -539,6 +539,12 @@ describe('completeTask', () => {
     expect(fm.status).toBe('COMPLETE');
     expect(fm.resolution).toBe('DONE');
   });
+
+  it('should treat unknown current status as canonical NOT STARTED for final DONE guard', () => {
+    writeFileSync(taskPath, readFileSync(taskPath, 'utf-8').replace('status: NOT STARTED', 'status: banana'));
+
+    expect(() => completeTask(taskPath, tasksDir, true, 'DONE')).toThrow('NEEDS REVIEW');
+  });
 });
 
 describe('counter allocation', () => {

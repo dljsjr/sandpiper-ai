@@ -194,6 +194,32 @@ describe('moveTask', () => {
         }),
       ).toThrow();
     });
+
+    it('should treat unknown parent kind as canonical TASK for parent validation', () => {
+      createProject(tasksDir, 'FOO');
+      const parent = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Corrupt parent kind',
+        reporter: 'USER',
+      });
+      writeFileSync(parent.path, readFileSync(parent.path, 'utf-8').replace('kind: TASK', 'kind: banana'));
+      const standalone = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'LOW',
+        title: 'Will become subtask',
+        reporter: 'USER',
+      });
+
+      const result = moveTask(tasksDir, standalone.key, {
+        kind: 'SUBTASK',
+        parent: parent.key,
+      });
+
+      expect(result.newPath).toBe(join(tasksDir, 'FOO', parent.key, `${standalone.key}.md`));
+    });
   });
 
   describe('cross-project move', () => {

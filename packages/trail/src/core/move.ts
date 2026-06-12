@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:f
 import { basename, join } from 'node:path';
 import { decode as decodeToon, encode as encodeToon } from '@toon-format/toon';
 import type { FieldChange } from './activity-log.js';
-import { parseFrontmatter } from './frontmatter.js';
+import { parseFrontmatter, taskFromFrontmatter } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { loadIndex, readProjectCounter } from './index-update.js';
 import { applyInternalFieldUpdates, writeTaskFileAuditably } from './mutate.js';
@@ -275,9 +275,8 @@ function validateParentIsTopLevel(tasksDir: string, parentKey: string, project: 
   if (!existsSync(parentPath)) {
     throw new Error(`Parent task not found at top level: ${parentKey}`);
   }
-  const parentFm = parseFrontmatter(readFileSync(parentPath, 'utf-8'));
-  const parentKind = parentFm.kind as string;
-  if (parentKind === 'SUBTASK') {
+  const parentTask = taskFromFrontmatter(parentKey, parseFrontmatter(readFileSync(parentPath, 'utf-8')));
+  if (parentTask.kind === 'SUBTASK') {
     throw new Error(`Cannot make a subtask of ${parentKey} — it is itself a SUBTASK. Parent must be a TASK or BUG.`);
   }
 }
@@ -355,9 +354,12 @@ function moveSubtasks(
     const originalContent = readFileSync(oldSubPath, 'utf-8');
     let content = originalContent;
 
-    // Update kind to SUBTASK if not already
+    // Update kind to SUBTASK if not already.
+    // Branch on canonical task shape; keep the literal field for audit provenance.
     const subFm = parseFrontmatter(content);
-    const kindChanged = subFm.kind !== 'SUBTASK';
+    const subTask = taskFromFrontmatter(oldSubKey, subFm);
+    const literalKind = typeof subFm.kind === 'string' ? subFm.kind : undefined;
+    const kindChanged = subTask.kind !== 'SUBTASK';
     if (kindChanged) {
       content = applyInternalFieldUpdates(content, { kind: 'SUBTASK' });
     }
@@ -369,7 +371,7 @@ function moveSubtasks(
       subChanges.push({ field: 'key', from: oldSubKey, to: newSubKey });
     }
     if (kindChanged) {
-      subChanges.push({ field: 'kind', from: subFm.kind as string, to: 'SUBTASK' });
+      subChanges.push({ field: 'kind', from: literalKind, to: 'SUBTASK' });
     }
     // A move is always a meaningful event — record it even when content is unchanged
     if (subChanges.length === 0) {
