@@ -84,7 +84,7 @@ These are the load-bearing rules to judge findings against. If a cleanup does no
 - Three characterization tests added: enum validation, scalar array coercion, misfiled project derivation.
 - 359/359 tests green.
 
-### Slice 2: Audited write-through helper — IN PROGRESS
+### Slice 2: Audited write-through helper — DONE
 
 **`writeTaskFileAuditably()` in `mutate.ts`** — the single audited write gate. Takes task path, tasks dir, original content, new content, and field changes. Appends activity log, writes atomically, writes history diff.
 
@@ -110,7 +110,7 @@ These are the load-bearing rules to judge findings against. If a cleanup does no
 
 **Tombstone writes:** Explicitly out of scope for the audit contract. Tombstones are filesystem metadata (`.moved` files), not task content. The audit contract (§§7.7/8.4) is about task modifications, not directory entries.
 
-**Current status:** 289 core tests green. +700/-120 across 11 files. Commit pending.
+**Current status:** 379/379 green, tsc clean, biome clean. Committed.
 
 ## File-level checklist
 
