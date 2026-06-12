@@ -277,7 +277,7 @@ scripts/trail -f json task list -s IN_PROGRESS | jq '.[].key'
 scripts/trail task list -s NEEDS_REVIEW
 
 # Bulk mutation
-scripts/trail task complete --final --resolution DONE --filter-status NEEDS_REVIEW
+scripts/trail task complete --final --resolution DONE --filter-status NEEDS_REVIEW --bulk
 ```
 
 ## Task Storage Modes
