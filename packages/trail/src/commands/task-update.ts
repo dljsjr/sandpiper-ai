@@ -3,8 +3,8 @@ import { Command } from '@commander-js/extra-typings';
 import { editInEditor } from '../core/editor.js';
 import { updateIndex } from '../core/index-update.js';
 import { updateTaskFields, writeTaskFileAuditably } from '../core/mutate.js';
-import { emitMutationResult, getTasksDir, withErrorHandling } from './helpers.js';
 import { resolveTaskFile } from '../core/patterns.js';
+import { emitMutationResult, getTasksDir, withErrorHandling } from './helpers.js';
 import {
   applyInteractiveFieldUpdates,
   type BulkFilterOptions,
@@ -81,7 +81,7 @@ export const taskUpdateCommand = new Command('update')
 
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task update');
       for (const path of paths) {
-        updateTaskFields(path, fields);
+        updateTaskFields(path, fields, tasksDir);
       }
 
       emitMutationResult(cmd, paths, `Updated ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);

@@ -2,11 +2,11 @@ import type { Command } from '@commander-js/extra-typings';
 import { replaceDescription } from '../core/description.js';
 import { normalizeAssigneeInput, normalizeReporterInput } from '../core/frontmatter.js';
 import { applyFieldUpdates } from '../core/mutate.js';
+import { resolveTaskFile } from '../core/patterns.js';
 import type { TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
 import type { TaskStatus } from '../core/types.js';
 import { loadTasks, searchToKeys } from './helpers.js';
-import { resolveTaskFile } from '../core/patterns.js';
 
 export interface UpdateOptions {
   readonly status?: string;

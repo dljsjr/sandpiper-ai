@@ -82,7 +82,7 @@ describe('task subcommands (happy paths)', () => {
 
   it('list filters conventional assignee values case-insensitively', async () => {
     const { rootDir, tasksDir } = setupTasksDir();
-    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'AGENT' });
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'AGENT' }, tasksDir);
 
     const result = await runTaskCommand(rootDir, ['list', '-a', 'agent']);
 
@@ -115,7 +115,7 @@ describe('task subcommands (happy paths)', () => {
       reporter: 'USER',
       parent: hiddenParent.key,
     });
-    updateTaskFields(join(tasksDir, 'AGENT', `${hiddenParent.key}.md`), { status: 'IN PROGRESS' });
+    updateTaskFields(join(tasksDir, 'AGENT', `${hiddenParent.key}.md`), { status: 'IN PROGRESS' }, tasksDir);
 
     const result = await runTaskCommand(rootDir, ['list', '-s', 'NOT_STARTED', '--sort', 'key']);
 
@@ -152,7 +152,7 @@ describe('task subcommands (happy paths)', () => {
 
   it('list filters by freeform assignee values', async () => {
     const { rootDir, tasksDir } = setupTasksDir();
-    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' });
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' }, tasksDir);
 
     const result = await runTaskCommand(rootDir, ['list', '-a', 'Doug Stephen']);
 
@@ -174,7 +174,7 @@ describe('task subcommands (happy paths)', () => {
 
   it('summary includes freeform assignee values', async () => {
     const { rootDir, tasksDir } = setupTasksDir();
-    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' });
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { assignee: 'Doug Stephen' }, tasksDir);
 
     const result = await runTaskCommand(rootDir, ['summary']);
 
@@ -428,9 +428,13 @@ describe('task subcommands (happy paths)', () => {
 
   it('complete', async () => {
     const { rootDir, tasksDir } = setupTasksDir();
-    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), {
-      status: 'NEEDS REVIEW',
-    });
+    updateTaskFields(
+      join(tasksDir, 'AGENT', 'AGENT-1.md'),
+      {
+        status: 'NEEDS REVIEW',
+      },
+      tasksDir,
+    );
 
     const result = await runTaskCommand(rootDir, ['complete', 'AGENT-1', '--final', '--resolution', 'DONE']);
     expect(result.stdout).toContain('Completed 1 task → COMPLETE.');
@@ -452,10 +456,14 @@ describe('task subcommands (happy paths)', () => {
 
   it('archive', async () => {
     const { rootDir, tasksDir } = setupTasksDir();
-    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-2.md'), {
-      status: 'COMPLETE',
-      resolution: 'DONE',
-    });
+    updateTaskFields(
+      join(tasksDir, 'AGENT', 'AGENT-2.md'),
+      {
+        status: 'COMPLETE',
+        resolution: 'DONE',
+      },
+      tasksDir,
+    );
 
     const result = await runTaskCommand(rootDir, ['archive']);
     expect(result.stdout).toContain('Archived 1 task:');

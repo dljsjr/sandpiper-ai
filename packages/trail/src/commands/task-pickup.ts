@@ -28,7 +28,7 @@ export const taskPickupCommand = new Command('pickup')
 
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task pickup');
       for (const path of paths) {
-        pickupTask(path, fields.assignee);
+        pickupTask(path, tasksDir, fields.assignee);
       }
       emitMutationResult(cmd, paths, `Picked up ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
     });

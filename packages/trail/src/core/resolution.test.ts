@@ -38,7 +38,7 @@ describe('Resolution field', () => {
       reporter: 'USER',
     });
 
-    expect(() => completeTask(path, true)).toThrow('resolution');
+    expect(() => completeTask(path, tasksDir, true)).toThrow('resolution');
   });
 
   it('should accept DONE resolution when completing from NEEDS REVIEW', () => {
@@ -50,8 +50,8 @@ describe('Resolution field', () => {
       reporter: 'USER',
     });
 
-    completeTask(path, false);
-    completeTask(path, true, 'DONE');
+    completeTask(path, tasksDir, false);
+    completeTask(path, tasksDir, true, 'DONE');
     const fm = parseFrontmatter(readFileSync(path, 'utf-8'));
     expect(fm.status).toBe('COMPLETE');
     expect(fm.resolution).toBe('DONE');
@@ -66,7 +66,7 @@ describe('Resolution field', () => {
       reporter: 'USER',
     });
 
-    expect(() => completeTask(path, true, 'DONE')).toThrow('NEEDS REVIEW');
+    expect(() => completeTask(path, tasksDir, true, 'DONE')).toThrow('NEEDS REVIEW');
   });
 
   it('should accept WONTFIX resolution when completing', () => {
@@ -78,7 +78,7 @@ describe('Resolution field', () => {
       reporter: 'USER',
     });
 
-    completeTask(path, true, 'WONTFIX');
+    completeTask(path, tasksDir, true, 'WONTFIX');
     const fm = parseFrontmatter(readFileSync(path, 'utf-8'));
     expect(fm.status).toBe('COMPLETE');
     expect(fm.resolution).toBe('WONTFIX');
@@ -94,7 +94,7 @@ describe('Resolution field', () => {
     });
 
     // Should not throw
-    completeTask(path, false);
+    completeTask(path, tasksDir, false);
     const fm = parseFrontmatter(readFileSync(path, 'utf-8'));
     expect(fm.status).toBe('NEEDS REVIEW');
   });
@@ -108,7 +108,7 @@ describe('Resolution field', () => {
       reporter: 'USER',
     });
 
-    updateTaskFields(path, { status: 'COMPLETE', resolution: 'DONE' });
+    updateTaskFields(path, { status: 'COMPLETE', resolution: 'DONE' }, tasksDir);
     const fm = parseFrontmatter(readFileSync(path, 'utf-8'));
     expect(fm.status).toBe('COMPLETE');
     expect(fm.resolution).toBe('DONE');
@@ -123,6 +123,6 @@ describe('Resolution field', () => {
       reporter: 'USER',
     });
 
-    expect(() => updateTaskFields(path, { status: 'COMPLETE' })).toThrow('resolution');
+    expect(() => updateTaskFields(path, { status: 'COMPLETE' }, tasksDir)).toThrow('resolution');
   });
 });

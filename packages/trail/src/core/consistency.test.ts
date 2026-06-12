@@ -134,7 +134,7 @@ describe('Index-file consistency', () => {
         reporter: 'USER',
       });
 
-      pickupTask(path);
+      pickupTask(path, tasksDir);
       const index = updateIndex(tasksDir);
       const indexed = index.tasks[key];
       expect(indexed).toBeDefined();
@@ -153,8 +153,8 @@ describe('Index-file consistency', () => {
         reporter: 'USER',
       });
 
-      completeTask(path);
-      completeTask(path, true, 'DONE');
+      completeTask(path, tasksDir);
+      completeTask(path, tasksDir, true, 'DONE');
       const index = updateIndex(tasksDir);
       const indexed = index.tasks[key];
       expect(indexed).toBeDefined();
@@ -173,11 +173,15 @@ describe('Index-file consistency', () => {
         reporter: 'USER',
       });
 
-      updateTaskFields(path, {
-        status: 'IN PROGRESS',
-        assignee: 'AGENT',
-        priority: 'LOW',
-      });
+      updateTaskFields(
+        path,
+        {
+          status: 'IN PROGRESS',
+          assignee: 'AGENT',
+          priority: 'LOW',
+        },
+        tasksDir,
+      );
       const index = updateIndex(tasksDir);
       const indexed = index.tasks[key];
       expect(indexed).toBeDefined();

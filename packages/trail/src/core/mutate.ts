@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
+import { basename, join } from 'node:path';
 import { appendActivityEntry, type FieldChange } from './activity-log.js';
 import { extractDescription, replaceDescription } from './description.js';
 import {
@@ -146,23 +146,6 @@ function getNextTaskNumber(tasksDir: string, projectKey: string): number {
   const fromDisk = scanHighestNumber(tasksDir, projectKey) + 1;
   const fromIndex = readProjectCounter(tasksDir, projectKey);
   return fromIndex !== undefined && fromIndex > fromDisk ? fromIndex : fromDisk;
-}
-
-/**
- * Walk up from a task file path to find the tasks root directory.
- * The tasks root is the parent of the project directory (uppercase name, 2+ letters).
- */
-function resolveTasksRoot(taskPath: string): string | null {
-  let dir = dirname(taskPath);
-  for (let i = 0; i < 3; i++) {
-    const parent = dirname(dir);
-    const dirName = basename(dir);
-    if (/^[A-Z]{2,}$/.test(dirName)) {
-      return parent;
-    }
-    dir = parent;
-  }
-  return null;
 }
 
 // ─── Task Field Updates ──────────────────────────────────────────
@@ -370,7 +353,7 @@ export function writeTaskFileAuditably(opts: AuditedWriteOptions): void {
  * Update fields on a task file on disk.
  * Validates that COMPLETE status requires a resolution.
  */
-export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
+export function updateTaskFields(taskPath: string, fields: UpdateFields, tasksDir: string): void {
   const normalizedFields = normalizeUpdateFields(fields);
   if (normalizedFields.status === 'COMPLETE' && !normalizedFields.resolution) {
     throw new Error(
@@ -387,19 +370,13 @@ export function updateTaskFields(taskPath: string, fields: UpdateFields): void {
   }
 
   const changes = computeChanges(originalFm, normalizedFields, originalContent);
-  const tasksDir = resolveTasksRoot(taskPath);
-  if (tasksDir) {
-    writeTaskFileAuditably({
-      taskPath,
-      tasksDir,
-      originalContent,
-      newContent: content,
-      changes,
-    });
-  } else {
-    // Fallback: write without audit trail if tasks root cannot be resolved
-    writeFileAtomic(taskPath, content);
-  }
+  writeTaskFileAuditably({
+    taskPath,
+    tasksDir,
+    originalContent,
+    newContent: content,
+    changes,
+  });
 }
 
 const SIMPLE_FIELD_MAPPINGS: ReadonlyArray<{ readonly key: ScalarChangeKey; readonly fmKey: string }> = [
@@ -519,11 +496,16 @@ function computeChanges(
 
 // ─── Convenience Mutations ───────────────────────────────────────
 
-export function pickupTask(taskPath: string, assignee: TaskAssignee = 'AGENT'): void {
-  updateTaskFields(taskPath, { status: 'IN PROGRESS', assignee });
+export function pickupTask(taskPath: string, tasksDir: string, assignee: TaskAssignee = 'AGENT'): void {
+  updateTaskFields(taskPath, { status: 'IN PROGRESS', assignee }, tasksDir);
 }
 
-export function completeTask(taskPath: string, final = false, resolution?: TaskResolution): void {
+export function completeTask(
+  taskPath: string,
+  tasksDir: string,
+  final = false,
+  resolution: TaskResolution | undefined = undefined,
+): void {
   if (final && !resolution) {
     throw new Error('Completing a task (final=true) requires a resolution: DONE or WONTFIX.');
   }
@@ -533,8 +515,12 @@ export function completeTask(taskPath: string, final = false, resolution?: TaskR
       throw new Error('Completing a task with resolution DONE requires current status NEEDS REVIEW.');
     }
   }
-  updateTaskFields(taskPath, {
-    status: final ? 'COMPLETE' : 'NEEDS REVIEW',
-    ...(resolution ? { resolution } : {}),
-  });
+  updateTaskFields(
+    taskPath,
+    {
+      status: final ? 'COMPLETE' : 'NEEDS REVIEW',
+      ...(resolution ? { resolution } : {}),
+    },
+    tasksDir,
+  );
 }

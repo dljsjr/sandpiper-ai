@@ -467,8 +467,8 @@ describe('moveTask', () => {
       });
 
       // Add references from t2 and t3 to t1
-      updateTaskFields(t2.path, { dependsOn: [t1.key] });
-      updateTaskFields(t3.path, { related: [t1.key] });
+      updateTaskFields(t2.path, { dependsOn: [t1.key] }, tasksDir);
+      updateTaskFields(t3.path, { related: [t1.key] }, tasksDir);
 
       // Create a new project and move t1
       createProject(tasksDir, 'BAR');
@@ -501,7 +501,7 @@ describe('moveTask', () => {
       });
 
       // Add reference from t2 to t1
-      updateTaskFields(t2.path, { dependsOn: [t1.key] });
+      updateTaskFields(t2.path, { dependsOn: [t1.key] }, tasksDir);
 
       // Move t1 to new project
       createProject(tasksDir, 'BAR');

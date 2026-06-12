@@ -106,9 +106,13 @@ Old body
 
   it('resolves bulk target paths from project/status filters', () => {
     const { rootDir, tasksDir } = setupTasksDir();
-    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-2.md'), {
-      status: 'IN PROGRESS',
-    });
+    updateTaskFields(
+      join(tasksDir, 'AGENT', 'AGENT-2.md'),
+      {
+        status: 'IN PROGRESS',
+      },
+      tasksDir,
+    );
 
     const paths = resolveTargetPaths(
       undefined,
