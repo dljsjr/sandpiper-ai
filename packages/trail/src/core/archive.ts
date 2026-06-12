@@ -9,7 +9,7 @@
 
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { parseFrontmatter } from './frontmatter.js';
+import { parseFrontmatter, taskFromFrontmatter } from './frontmatter.js';
 import { PROJECT_KEY_RE, TASK_FILE_RE } from './patterns.js';
 
 const ARCHIVE_DIR = 'archive';
@@ -66,9 +66,9 @@ export function archiveCompletedTasks(tasksDir: string, projectFilter?: string):
       const taskKey = basename(projectEntry.name, '.md');
       const taskPath = join(projectDir, projectEntry.name);
       const content = readFileSync(taskPath, 'utf-8');
-      const fm = parseFrontmatter(content);
+      const task = taskFromFrontmatter(taskKey, parseFrontmatter(content));
 
-      if (fm.status !== 'COMPLETE') {
+      if (task.status !== 'COMPLETE') {
         skipped.push(taskKey);
         continue;
       }
