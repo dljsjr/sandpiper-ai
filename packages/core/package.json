@@ -14,7 +14,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "fast-xml-parser": "5.8.0"
+    "fast-xml-parser": "5.9.3"
   },
   "author": {
     "name": "Doug Stephen",
