@@ -10,7 +10,7 @@ import {
   formatProjectTriggersForPrompt,
   formatWorkingCopySummaryForPrompt,
 } from './startup-context.js';
-import { buildSandpiperSystemPrompt, formatColdStartGuidance, formatStandupContext } from './system-prompt.js';
+import { buildSandpiperSystemPrompt } from './system-prompt.js';
 import { readSandpiperUserProfile } from './user-profile.js';
 import { detectVersionControl } from './version-control.js';
 
@@ -31,9 +31,7 @@ export interface StartupPromptDependencies extends StandupContentDependencies {
   readonly detectVersionControl?: typeof detectVersionControl;
   readonly readUserProfile?: typeof readSandpiperUserProfile;
   readonly formatActiveTaskContextForPrompt?: typeof formatActiveTaskContextForPrompt;
-  readonly formatColdStartGuidance?: typeof formatColdStartGuidance;
   readonly formatProjectTriggersForPrompt?: typeof formatProjectTriggersForPrompt;
-  readonly formatStandupContext?: typeof formatStandupContext;
   readonly formatWorkingCopySummaryForPrompt?: typeof formatWorkingCopySummaryForPrompt;
 }
 
@@ -64,9 +62,7 @@ function resolveStartupPromptDependencies(dependencies: StartupPromptDependencie
     detectVersionControl,
     readUserProfile: readSandpiperUserProfile,
     formatActiveTaskContextForPrompt,
-    formatColdStartGuidance,
     formatProjectTriggersForPrompt,
-    formatStandupContext,
     formatWorkingCopySummaryForPrompt,
     ...withoutUndefinedValues<ResolvedStartupPromptDependencies>(dependencies),
   };
@@ -121,7 +117,6 @@ export async function buildSandpiperStartupPrompt(
   const workingCopyContext = state.startupContextPending
     ? resolved.formatWorkingCopySummaryForPrompt(resolved.collectWorkingCopySummary(input.cwd))
     : '';
-  const coldStartGuidance = state.coldStartGuidancePending ? resolved.formatColdStartGuidance() : '';
 
   state.startupContextPending = false;
   state.coldStartGuidancePending = false;
@@ -141,8 +136,6 @@ export async function buildSandpiperStartupPrompt(
       projectTriggers,
       activeTaskContext,
       workingCopyContext,
-      coldStartGuidance,
-      standupContent: resolved.formatStandupContext(readSandpiperStandupContent(input.cwd, resolved)),
       identityOverride: input.identityContent,
       dumpSystemPrompt: input.dumpSystemPrompt,
     },

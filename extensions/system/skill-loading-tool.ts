@@ -694,15 +694,11 @@ export function registerSkillLoadingTool(
     name: 'skill',
     label: 'Skill',
     description:
-      'Load a skill by name from the catalogue, or from an explicit filesystem path when the user asks for a non-catalogued skill. ' +
-      'The catalog is routing metadata only; this tool returns the actual SKILL.md instructions.',
+      'Load a skill by name from the catalogue, or from an explicit filesystem path when the user asks for a non-catalogued skill.',
     promptSnippet: 'Load a skill by name or explicit filesystem path and return its full instructions',
     promptGuidelines: [
-      'Use the `skill` tool to load a matching skill from <available_skills> before planning, answering, editing files, or running commands.',
-      'When loading a catalog skill, call the `skill` tool with the exact skill name as the only tool call in that assistant turn; then follow the returned instructions.',
-      'Use skill names exactly as listed in <available_skills>; do not invent catalog skill names.',
+      'Use the `skill` tool to load a skill by name.',
       'Use `source="filesystem"` only when the user explicitly asks to load a non-catalogued skill from a filesystem path.',
-      'Skills with `disable-model-invocation: true` cannot be loaded by this tool from any source.',
     ],
     parameters,
     renderCall(args, theme, context) {
