@@ -203,11 +203,11 @@ describe('registerSkillLoadingTool', () => {
       label: 'Skill',
       promptSnippet: 'Load a skill by name or explicit filesystem path and return its full instructions',
     });
-    expect(tools[0]?.description).toContain('SKILL.md instructions');
+    expect(tools[0]?.description).toContain('Load a skill by name from the catalogue');
     expect(tools[0]?.promptGuidelines).toEqual(
       expect.arrayContaining([
-        expect.stringContaining('Use the `skill` tool to load a matching skill'),
-        expect.stringContaining('as the only tool call'),
+        expect.stringContaining('Use the `skill` tool to load a skill by name'),
+        expect.stringContaining('Use `source="filesystem"` only when the user explicitly asks'),
       ]),
     );
   });
