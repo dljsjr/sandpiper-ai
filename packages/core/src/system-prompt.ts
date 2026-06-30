@@ -218,7 +218,7 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
   const hasSkillTool = (originalPromptOptions.selectedTools || []).includes('skill');
   const loadInstruction = hasSkillTool
     ? '- Use the `skill` tool to load relevant skills by name. If multiple skills match, load all relevant skills.'
-    : '- Use the `read` tool to load the skill\'s SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.';
+    : "- Use the `read` tool to load the skill's SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.";
 
   const skillEntries = visibleSkills.map((skillInfo) => ({
     '@_name': skillInfo.name,

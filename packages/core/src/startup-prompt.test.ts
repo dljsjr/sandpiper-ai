@@ -21,9 +21,7 @@ function createDependencies(overrides: Partial<StartupPromptDependencies> = {}):
     },
     fileExists: vi.fn(() => false),
     formatActiveTaskContextForPrompt: vi.fn(() => '<active/>'),
-    formatColdStartGuidance: vi.fn(() => '<cold-start/>'),
     formatProjectTriggersForPrompt: vi.fn(() => '<projects/>'),
-    formatStandupContext: vi.fn((content) => `<standup>${content}</standup>`),
     formatWorkingCopySummaryForPrompt: vi.fn(() => '<working-copy/>'),
     readFile: vi.fn(() => ''),
     readUserProfile: vi.fn(() => ''),
@@ -77,8 +75,6 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"projectTriggers":"<projects/>"');
     expect(prompt).toContain('"activeTaskContext":"<active/>"');
     expect(prompt).toContain('"workingCopyContext":"<working-copy/>"');
-    expect(prompt).toContain('"coldStartGuidance":"<cold-start/>"');
-    expect(prompt).toContain('"standupContent":"<standup>standup from cli</standup>"');
     expect(prompt).toContain('"versionControl":{"system":"jj","colocatedGit":true,"detection":"session_start"}');
     expect(state.startupContextPending).toBe(false);
     expect(state.coldStartGuidancePending).toBe(false);
@@ -118,7 +114,6 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"projectTriggers":"<projects/>"');
     expect(prompt).toContain('"activeTaskContext":""');
     expect(prompt).toContain('"workingCopyContext":""');
-    expect(prompt).toContain('"coldStartGuidance":""');
   });
 });
 
