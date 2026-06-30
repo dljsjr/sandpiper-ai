@@ -52,24 +52,14 @@ export function registerContextManagementHooks(pi: ExtensionAPI) {
 
     if (!warned && ctxUsage?.percent && ctxUsage.percent >= CONTEXT_USAGE_WARNING_THRESHOLD) {
       contextNotificationInstructions = `
-<warning>
-Context usage is above 50%. Start thinking about taking a break to capture any information/memory you want to preserve before compaction hits.
-</warning>
+<info>Context usage is above 50%.</info>
 `.trim();
       warned = true;
     }
 
     if (!alerted && ctxUsage?.percent && ctxUsage.percent >= CONTEXT_USAGE_ALERT_THRESHOLD) {
       contextNotificationInstructions = `
-<alert>
-Context usage is above 80%. Stop current work and capture continuity now — compaction is imminent.
-
-  1. Call memory_write for every decision, preference, pattern, or fact from this session not yet in YAAMS. Do this first.
-  2. Checkpoint active work (standup / CHECKPOINT.md).
-  3. Update project docs and tasks if shared truth changed.
-
-Resume your original work once you've finished.
-</alert>
+<important>Context usage is above 80%. Make sure you've persisted anything you don't want to forget before continuing your current work.</important>
 `.trim();
       alerted = true;
     }
