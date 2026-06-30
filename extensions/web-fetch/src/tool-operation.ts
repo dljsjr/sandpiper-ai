@@ -36,6 +36,19 @@ export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
 }
 
+function formatLlmsTxtMetadata(llmsTxt: LlmsTxtProbeResult): string {
+  const lines = [
+    '<additional_content>',
+    '  <llms_txt',
+    `    status="${llmsTxt.status}"`,
+    `    url="${llmsTxt.url}"`,
+    ...(llmsTxt.statusCode === undefined ? [] : [`    http_status="${llmsTxt.statusCode}"`]),
+    '  />',
+    '</additional_content>',
+  ];
+  return lines.join('\n');
+}
+
 export function formatWebFetchResult(result: WebFetchResult): string {
   const header = [
     result.title && `# ${result.title}`,
@@ -52,6 +65,10 @@ export function formatWebFetchResult(result: WebFetchResult): string {
   if (result.links && result.links.length > 0) {
     const linkList = result.links.map((link) => `- [${link.text}](${link.href})`).join('\n');
     output += `\n\n---\n\n## Links found on page\n\n${linkList}`;
+  }
+
+  if (result.llmsTxt?.exists === true) {
+    output += `\n\n---\n\n${formatLlmsTxtMetadata(result.llmsTxt)}`;
   }
 
   return output;

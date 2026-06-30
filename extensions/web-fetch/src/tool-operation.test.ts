@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { executeWebFetchTool, formatWebFetchResult } from './tool-operation.js';
-import { type FetchAdapter, type WebFetchFilterSpec, WebFetchFilterType, type WebFetchResult } from './types.js';
+import {
+  type FetchAdapter,
+  type LlmsTxtProbeResult,
+  type WebFetchFilterSpec,
+  WebFetchFilterType,
+  type WebFetchResult,
+} from './types.js';
 
 function createResult(overrides: Partial<WebFetchResult> = {}): WebFetchResult {
   return {
@@ -44,6 +50,58 @@ describe('formatWebFetchResult', () => {
     expect(output).toContain('## Links found on page');
     expect(output).toContain('- [Docs](https://example.com/docs)');
   });
+
+  it('appends llms.txt metadata block when the probe found llms.txt', () => {
+    const llmsTxt: LlmsTxtProbeResult = {
+      checked: true,
+      exists: true,
+      status: 'found',
+      url: 'https://example.com/llms.txt',
+      checkedAt: '2026-05-13T00:00:00.000Z',
+      statusCode: 200,
+    };
+    const output = formatWebFetchResult(createResult({ llmsTxt }));
+
+    expect(output).toContain('<additional_content>');
+    expect(output).toContain('status="found"');
+    expect(output).toContain('url="https://example.com/llms.txt"');
+    expect(output).toContain('http_status="200"');
+  });
+
+  it('omits the llms.txt metadata block when llms.txt is missing', () => {
+    const llmsTxt: LlmsTxtProbeResult = {
+      checked: true,
+      exists: false,
+      status: 'missing',
+      url: 'https://example.com/llms.txt',
+      checkedAt: '2026-05-13T00:00:00.000Z',
+      statusCode: 404,
+    };
+    const output = formatWebFetchResult(createResult({ llmsTxt }));
+
+    expect(output).not.toContain('<additional_content>');
+    expect(output).not.toContain('llms.txt');
+  });
+
+  it('omits the llms.txt metadata block when the probe was indeterminate', () => {
+    const llmsTxt: LlmsTxtProbeResult = {
+      checked: true,
+      exists: null,
+      status: 'unknown',
+      url: 'https://example.com/llms.txt',
+      checkedAt: '2026-05-13T00:00:00.000Z',
+      reason: 'unexpected-status',
+    };
+    const output = formatWebFetchResult(createResult({ llmsTxt }));
+
+    expect(output).not.toContain('<additional_content>');
+  });
+
+  it('omits the llms.txt metadata block when no probe was attempted', () => {
+    const output = formatWebFetchResult(createResult());
+
+    expect(output).not.toContain('<additional_content>');
+  });
 });
 
 describe('executeWebFetchTool', () => {
@@ -82,28 +140,47 @@ describe('executeWebFetchTool', () => {
     });
   });
 
-  it('includes llms.txt probe metadata in tool details without adding it to visible content', async () => {
-    const result = createResult({
-      llmsTxt: {
-        checked: true,
-        exists: true,
-        status: 'found',
-        url: 'https://example.com/llms.txt',
-        checkedAt: '2026-05-13T00:00:00.000Z',
-        statusCode: 200,
-      },
-    });
+  it('includes llms.txt probe metadata in tool details and visible content when llms.txt exists', async () => {
+    const llmsTxt: LlmsTxtProbeResult = {
+      checked: true,
+      exists: true,
+      status: 'found',
+      url: 'https://example.com/llms.txt',
+      checkedAt: '2026-05-13T00:00:00.000Z',
+      statusCode: 200,
+    };
+    const result = createResult({ llmsTxt });
     const fetchAndExtract = vi.fn(async () => result);
 
     const output = await executeWebFetchTool(createAdapter(), { url: 'https://example.com' }, { fetchAndExtract });
 
     expect(output.content[0]?.text).toBe(formatWebFetchResult(result));
-    expect(output.content[0]?.text).not.toContain('llms.txt');
+    expect(output.content[0]?.text).toContain('<additional_content>');
+    expect(output.content[0]?.text).toContain('status="found"');
     expect(output.details).toEqual({
       url: 'https://example.com/final',
       title: 'Example title',
-      llmsTxt: result.llmsTxt,
+      llmsTxt,
     });
+  });
+
+  it('keeps llms.txt probe metadata in details but out of visible content when llms.txt is missing', async () => {
+    const llmsTxt: LlmsTxtProbeResult = {
+      checked: true,
+      exists: false,
+      status: 'missing',
+      url: 'https://example.com/llms.txt',
+      checkedAt: '2026-05-13T00:00:00.000Z',
+      statusCode: 404,
+    };
+    const result = createResult({ llmsTxt });
+    const fetchAndExtract = vi.fn(async () => result);
+
+    const output = await executeWebFetchTool(createAdapter(), { url: 'https://example.com' }, { fetchAndExtract });
+
+    expect(output.content[0]?.text).not.toContain('<additional_content>');
+    expect(output.content[0]?.text).not.toContain('llms.txt');
+    expect(output.details.llmsTxt).toBe(llmsTxt);
   });
 
   it('returns fetch failures as text results with error details', async () => {
