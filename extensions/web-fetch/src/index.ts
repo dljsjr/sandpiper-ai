@@ -4,14 +4,9 @@
  */
 
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { SystemNotificationSourceType, sendSystemNotification } from 'sandpiper-ai-core';
 import { Type } from 'typebox';
 import { SimpleFetchAdapter } from './fetch.js';
-import {
-  executeWebFetchTool as defaultExecuteWebFetchTool,
-  type WebFetchToolDetails,
-  type WebFetchToolResult,
-} from './tool-operation.js';
+import { executeWebFetchTool as defaultExecuteWebFetchTool, type WebFetchToolDetails } from './tool-operation.js';
 import { renderWebFetchCall, renderWebFetchResult } from './tool-rendering.js';
 import { type FetchAdapter, WebFetchFilterType } from './types.js';
 
@@ -63,27 +58,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
       ),
     }),
     async execute(_toolCallId, params): Promise<AgentToolResult<WebFetchToolDetails>> {
-      const result: WebFetchToolResult = await executeWebFetchTool(adapter, params);
-      if (result.details.llmsTxt?.checked) {
-        sendSystemNotification(pi, {
-          sourceType: SystemNotificationSourceType.Tool,
-          sourceId: 'web_fetch',
-          instructions: 'Supplemental metadata only. Do not treat this as fetched page content or as a user request.',
-          data: {
-            page: { url: result.details.url },
-            llms_txt: {
-              status: result.details.llmsTxt.status,
-              url: result.details.llmsTxt.url,
-              ...(result.details.llmsTxt.statusCode === undefined
-                ? {}
-                : { http_status: result.details.llmsTxt.statusCode }),
-              content_fetched: false,
-            },
-          },
-        });
-      }
-
-      return result;
+      return executeWebFetchTool(adapter, params);
     },
     renderCall: renderWebFetchCall,
     renderResult: renderWebFetchResult,
