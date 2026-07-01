@@ -1,14 +1,15 @@
 ---
 name: tasks
 description: >-
-  Create, update, query, and organize project work items (tasks, bugs, subtasks) as
-  markdown files with YAML frontmatter stored in `.sandpiper/tasks`. Use this skill
-  whenever the user mentions tasks, tickets, backlog, sprints, milestones, todos, or
-  project status. Also use at session start when orienting from standup notes that
-  reference tasks, or when task files in `.sandpiper/tasks/` are visible. Always prefer
-  the bundled CLI over direct file access for any task-related data. Use when the user
-  asks to create or complete tasks, check what's in progress, assign work, manage a
-  backlog, review tickets, filter by status or priority, or query the task board.
+  Create, update, query, and organize project work items (tasks, bugs, subtasks)
+  tracked under `.sandpiper/tasks` — always go through the bundled CLI, never the
+  raw contents of that directory, for lookups and status checks as much as for
+  creating or editing. Use this skill whenever the user mentions tasks, tickets,
+  backlog, sprints, milestones, todos, or project status; at session start when
+  orienting from standup notes that reference tasks, or when `.sandpiper/tasks/`
+  is present in the project; or when the user asks to create or complete tasks,
+  check what's in progress, assign work, manage a backlog, review tickets, filter
+  by status or priority, or query the task board.
 compatibility: Requires a local .sandpiper/tasks directory in the project. Uses ripgrep (rg) for full-text search.
 ---
 
@@ -17,6 +18,12 @@ compatibility: Requires a local .sandpiper/tasks directory in the project. Uses 
 Manage project work items as markdown files with YAML frontmatter, stored in the local project's `.sandpiper/tasks` directory.
 
 For the full normative specification, see [references/SPEC.md](references/SPEC.md). This skill document provides operational guidance and quick reference.
+
+## Use `trail` for Reads Too, Not Just Writes
+
+The files being plain markdown makes a raw `cat`/`grep`/`Read` look like a harmless shortcut for a quick check — nothing's being written, so what's the risk? But "harmless" isn't something you can judge from outside the skill: `trail` may apply filtering, migration, or side effects a given command doesn't advertise, and the only way to know is to already know the CLI's internals — which is what loading this skill gives you. Treat `trail` as the interface for looking, not just changing. The write-side failure modes of skipping it (missing fields, duplicate task numbers, stale indexes) are covered under [CLI-First Operations](#cli-first-operations) below, but don't read that section as the whole reason — it documents what goes wrong on writes specifically, not why reads matter too.
+
+This isn't just true in principle — it's true even for the narrowest possible read, "what does SHR-14 say," where you already know the exact file path. Subtasks live in a sibling directory (`SHR-14/SHR-15.md`, not inside `SHR-14.md`), so `cat SHR-14.md` silently omits them while `trail task show SHR-14` includes them. And if the task was ever moved, the original path now holds a `.moved` tombstone pointing at its new key — `cat`/`Read` on the old path gets you a redirect stub or a "file not found," while `trail task show` follows it transparently. A single known key is not a safe shortcut; it's the case where the raw file is most likely to be silently incomplete or stale.
 
 ## Session Start: Project Routing
 
@@ -143,6 +150,8 @@ scripts/trail --format toon task show SHR-1 --metadata-only    # structured meta
 scripts/trail task summary                                     # status/priority breakdown
 scripts/trail task summary -p SHR                              # project-scoped summary
 ```
+
+Use `task show`/`task list` even when you already know the exact key and could `cat`/`Read` the file directly — see [Use `trail` for Reads Too](#use-trail-for-reads-too-not-just-writes) above for why a single known task is exactly where a raw file read goes silently wrong.
 
 ### Projects
 
