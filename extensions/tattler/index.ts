@@ -279,8 +279,16 @@ is used to resume an existing session.
 
     tmp.setGracefulCleanup();
     const fileSanitizedIdentity = sanitize(ownIdentity.name);
+    const idFileName = `${fileSanitizedIdentity}.id`;
+    // /reload keeps the same session UUID (and, with a fixed `--tattler-id`, /new keeps the same
+    // override name too), so this identity file can already exist from the session we're replacing.
+    // tmp.fileSync creates with O_EXCL and throws EEXIST on a pre-existing file, so clear it first.
+    const idFilePath = normalize(join(tattlerRuntimeDir, idFileName));
+    if (await stat(idFilePath, { throwIfNoEntry: false })) {
+      await unlink(idFilePath);
+    }
     const idTmpFile = tmp.fileSync({
-      name: `${fileSanitizedIdentity}.id`,
+      name: idFileName,
       tmpdir: dirname(tattlerRuntimeDir),
       dir: basename(tattlerRuntimeDir),
       mode: 0o644,
@@ -313,13 +321,23 @@ is used to resume an existing session.
     registerSendMessageTool(tattlerRuntimeDir, ownIdentity, pi);
   });
 
-  pi.on('session_shutdown', (_evt, _ctx) => {
+  pi.on('session_shutdown', async (_evt, _ctx) => {
     clearEventResponders();
     pendingInbox.clear();
     pendingInboxNotifier.reset();
     activeContext = undefined;
     if (server) {
-      server.close();
+      const closingServer = server;
+      server = undefined;
+      // node doesn't unlink the UDS file on close, and close() itself doesn't settle
+      // synchronously — /reload reuses this exact socketPath (same session UUID), so
+      // await the close and remove the file now instead of leaving the next
+      // session_start's isSocketAlive probe to race against it.
+      await new Promise<void>((resolve) => closingServer.close(() => resolve()));
+      const socketPath = ownIdentity?.socketPath;
+      if (socketPath && (await stat(socketPath, { throwIfNoEntry: false }))) {
+        await unlink(socketPath);
+      }
     }
   });
 }
