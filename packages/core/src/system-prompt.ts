@@ -217,8 +217,8 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
 
   const hasSkillTool = (originalPromptOptions.selectedTools || []).includes('skill');
   const loadInstruction = hasSkillTool
-    ? '- Use the `skill` tool to load relevant skills by name. If multiple skills match, load all relevant skills.'
-    : "- Use the `read` tool to load the skill's SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.";
+    ? 'Use the `skill` tool to load relevant skills by name. If multiple skills match, load all relevant skills.'
+    : "Use the `read` tool to load the skill's SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.";
 
   const skillEntries = visibleSkills.map((skillInfo) => ({
     '@_name': skillInfo.name,
@@ -230,8 +230,14 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
 The following skills provide specialized instructions, scripts, and references for specific tasks. Utilize them when directed to the user, by
 guidance/instructions, or when the task at hand matches the skill's description.
 
+<instructions>
+<loading_skills>
 ${loadInstruction}
-- When a skill references a relative path, resolve it against the skill's base directory and use the absolute path.
+</loading_skills>
+<additional_skill_files>
+When a skill refers to a relative path for a file/script/command (most commonly \`scripts/\` or \`references\`), ***resolve it against the skill's base directory or location, and use the absolute path.***
+</additional_skill_files>
+</instructions>
 
 ${buildXml({ available_skills: { skill: skillEntries } })}
 </skills>

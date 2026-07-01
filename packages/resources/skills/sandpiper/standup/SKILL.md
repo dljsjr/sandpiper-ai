@@ -47,9 +47,13 @@ scripts/sandpiper-standup read
 ```
 
 This command:
-- returns standup context grouped as **Active Sessions** and **Inactive Sessions**
-- performs passive cleanup of dead sessions
+- returns standup context grouped as **Active Sessions** (current `SANDPIPER_SESSION_ID`) and **Inactive Sessions** (every other section — "inactive" means "not this session," not "abandoned")
+- **deletes every Inactive section from disk as a side effect of printing it.** It's a one-shot baton handoff, not a pure read: the first caller consumes the prior sessions' notes, and stdout is the only durable trace — discard it and that content is gone, no archive.
 - preserves legacy standup content during read migration
+
+Never call this casually or from automation that won't capture the output. And don't reach for a direct read of `.sandpiper/standup.md` as a "safer" alternative — the CLI is the operation with the side effect here, not the raw file.
+
+This holds even for a quick recheck later in the same session, when you've already run `read` once and are tempted to just `cat`/`Read` the file instead of calling the CLI again. Two concrete reasons a raw peek is worse, not just redundant: the file's raw `## Session <uuid>` headers don't tell you which section is actually yours — that's exactly the Active/Inactive classification the CLI computes from `SANDPIPER_SESSION_ID`, so a raw read forces you to reimplement that judgment by hand and can misattribute another session's stale notes as your own continuation. And if `read` already ran this session, the file has already been consumed — a raw peek at that point can only show you *less* than what the CLI's stdout already gave you, never more, since there's nothing left to find that wasn't already surfaced or deleted.
 
 ### Write
 
