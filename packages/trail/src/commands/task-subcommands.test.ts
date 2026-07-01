@@ -39,6 +39,7 @@ function setupTasksDir(): { rootDir: string; tasksDir: string } {
 async function runTaskCommand(
   rootDir: string,
   args: readonly string[],
+  globalArgs: readonly string[] = [],
 ): Promise<{ stdout: string; stderr: string; exitCode: string | number | null | undefined }> {
   const logs: string[] = [];
   const errors: string[] = [];
@@ -57,7 +58,7 @@ async function runTaskCommand(
       .option('-f, --format <format>')
       .addCommand(taskCommand);
 
-    await program.parseAsync(['-d', rootDir, 'task', ...args], { from: 'user' });
+    await program.parseAsync(['-d', rootDir, ...globalArgs, 'task', ...args], { from: 'user' });
   } finally {
     logSpy.mockRestore();
     errorSpy.mockRestore();
@@ -164,6 +165,32 @@ describe('task subcommands (happy paths)', () => {
     const { rootDir } = setupTasksDir();
     const result = await runTaskCommand(rootDir, ['show', 'AGENT-1']);
     expect(result.stdout).toContain('AGENT-1: Primary task');
+  });
+
+  it('show includes the description body unless --metadata-only is set', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    updateTaskFields(
+      join(tasksDir, 'AGENT', 'AGENT-1.md'),
+      { description: 'Body text that should show up.' },
+      tasksDir,
+    );
+
+    const full = await runTaskCommand(rootDir, ['show', 'AGENT-1']);
+    expect(full.stdout).toContain('Body text that should show up.');
+
+    const metadataOnly = await runTaskCommand(rootDir, ['show', 'AGENT-1', '--metadata-only']);
+    expect(metadataOnly.stdout).not.toContain('Body text that should show up.');
+  });
+
+  it('show --format json includes description unless --metadata-only is set', async () => {
+    const { rootDir, tasksDir } = setupTasksDir();
+    updateTaskFields(join(tasksDir, 'AGENT', 'AGENT-1.md'), { description: 'JSON body text.' }, tasksDir);
+
+    const full = await runTaskCommand(rootDir, ['show', 'AGENT-1'], ['-f', 'json']);
+    expect(JSON.parse(full.stdout)[0].description).toBe('JSON body text.');
+
+    const metadataOnly = await runTaskCommand(rootDir, ['show', 'AGENT-1', '--metadata-only'], ['-f', 'json']);
+    expect(JSON.parse(metadataOnly.stdout)[0].description).toBeUndefined();
   });
 
   it('summary', async () => {

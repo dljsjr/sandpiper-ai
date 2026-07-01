@@ -11,8 +11,9 @@ export function formatTaskLine(task: Task): string {
 
 /**
  * Format a task's full details for show output.
+ * When `description` is a non-empty string, it's appended as a body section.
  */
-export function formatTaskDetail(task: Task): string {
+export function formatTaskDetail(task: Task, description?: string): string {
   const dependsOn = task.dependsOn ?? [];
   const blockedBy = task.blockedBy ?? [];
   const related = task.related ?? [];
@@ -42,6 +43,10 @@ export function formatTaskDetail(task: Task): string {
   }
   if (related.length > 0) {
     lines.push(`  Related:  ${related.join(', ')}`);
+  }
+
+  if (description) {
+    lines.push('', description);
   }
 
   return lines.join('\n');
