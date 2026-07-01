@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { Command } from '@commander-js/extra-typings';
+import { extractDescription } from '../core/description.js';
 import { formatTaskDetail, formatTaskLine } from '../core/format.js';
 import { extractFrontmatter, formatTasksOutput } from '../core/output.js';
 import { resolveTaskFile } from '../core/patterns.js';
@@ -20,9 +21,14 @@ export const taskShowCommand = new Command('show')
         return;
       }
 
+      const readDescription = () =>
+        extractDescription(readFileSync(resolveTaskFile(getTasksDir(cmd), task.key), 'utf-8')).trimEnd();
+
       const format = getOutputFormat(cmd);
       if (format && format !== 'raw') {
-        const output = opts.metadataOnly ? [task] : [task, ...getSubtasks(tasks, task.key)];
+        const description = opts.metadataOnly ? undefined : readDescription();
+        const primary = description ? { ...task, description } : task;
+        const output = opts.metadataOnly ? [primary] : [primary, ...getSubtasks(tasks, task.key)];
         console.log(formatTasksOutput(output, format));
         return;
       }
@@ -34,7 +40,7 @@ export const taskShowCommand = new Command('show')
         return;
       }
 
-      console.log(formatTaskDetail(task));
+      console.log(formatTaskDetail(task, opts.metadataOnly ? undefined : readDescription()));
       if (opts.metadataOnly) {
         return;
       }
