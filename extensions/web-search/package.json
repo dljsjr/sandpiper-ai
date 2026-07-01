@@ -9,16 +9,16 @@
   },
   "dependencies": {
     "jsdom": "29.1.1",
-    "mcporter": "0.12.2",
+    "mcporter": "0.12.3",
     "sandpiper-ai-core": "0.0.1"
   },
   "devDependencies": {
     "@types/jsdom": "28.0.3"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "0.80.2",
-    "@earendil-works/pi-tui": "0.80.2",
-    "typebox": "1.3.2"
+    "@earendil-works/pi-coding-agent": "0.80.3",
+    "@earendil-works/pi-tui": "0.80.3",
+    "typebox": "1.3.5"
   },
   "pi": {
     "extensions": [
