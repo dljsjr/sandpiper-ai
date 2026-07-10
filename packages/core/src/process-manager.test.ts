@@ -49,9 +49,9 @@ describe('ProcessManager', () => {
       expect(proc.pid).toBeDefined();
     });
 
-    it('should throw if ID is already in use', () => {
+    it('should throw if a process with the ID is still running', () => {
       pm.spawn({ id: 'test', command: 'sleep', args: ['10'] });
-      expect(() => pm.spawn({ id: 'test', command: 'echo' })).toThrow('already exists');
+      expect(() => pm.spawn({ id: 'test', command: 'echo' })).toThrow('is already running');
     });
 
     it('should allow reuse of ID after process is removed', () => {
@@ -59,6 +59,26 @@ describe('ProcessManager', () => {
       pm.remove('test');
       const reused = pm.spawn({ id: 'test', command: 'echo', args: ['world'] });
       expect(reused.id).toBe('test');
+    });
+
+    it('should allow reuse of ID after the previous process exited, without an explicit remove', async () => {
+      const first = pm.spawn({ id: 'test', command: 'true' });
+      await waitFor(() => expect(first.running).toBe(false), { timeout: 2000 });
+
+      const second = pm.spawn({ id: 'test', command: 'echo', args: ['world'] });
+      expect(second.id).toBe('test');
+      expect(second).not.toBe(first);
+    });
+
+    it('should allow reuse of ID after the previous process was killed externally', async () => {
+      const first = pm.spawn({ id: 'test', command: 'sleep', args: ['60'] });
+      // Simulate a kill delivered outside this process's own kill() call (e.g. `kill -9`
+      // from another terminal) — the OS still notifies us via the child's exit event.
+      first.kill('SIGKILL');
+      await waitFor(() => expect(first.running).toBe(false), { timeout: 2000 });
+
+      const second = pm.spawn({ id: 'test', command: 'echo', args: ['world'] });
+      expect(second.id).toBe('test');
     });
   });
 

@@ -13,7 +13,10 @@ const BACKGROUND_PROCESS_COMPLETION_INSTRUCTIONS =
   'A background process started with start_background_process completed. Use check_background_process if you need its final output before continuing.';
 
 const BACKGROUND_PROCESS_POLLING_GUIDELINE =
-  'After starting a background process, do not immediately poll in a sleep loop; keep working and check occasionally with check_background_process when output or status is needed.';
+  'Do not immediately poll a background process in a sleep loop, and do not wait idle for it. ' +
+  'You will automatically get a system notification the moment it exits, so there is nothing to gain by checking early — ' +
+  'keep working on other things and let the notification tell you when to look. ' +
+  'Call check_background_process proactively only if you need to inspect output while the process is still running.';
 
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.registerTool({
@@ -21,7 +24,8 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
     label: 'Start Background Process',
     description:
       'Start a long-running background process. Returns immediately with a process ID. ' +
-      'The process runs independently — use check_background_process to poll its status and output. ' +
+      'The process runs independently, and you will be notified automatically when it exits — no need to poll. ' +
+      'Use check_background_process only to inspect status or output while it is still running, or to read final output after the completion notification arrives. ' +
       'This allows you to keep working with the user on other things. ' +
       'Use for any executable you would normally background with "&", such as "bun run dev", dev servers, file watchers, build watchers, or any long-running command that should run while you continue working. ',
     promptSnippet: 'Start a long-running background process (builds, dev servers, file watchers)',
@@ -80,7 +84,7 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
         content: [
           {
             type: 'text' as const,
-            text: `Background process "${params.id}" started (PID: ${result.process.pid}).`,
+            text: `Background process "${params.id}" started (PID: ${result.process.pid}). You'll get an automatic notification when it exits — no need to poll; keep working in the meantime.`,
           },
         ],
         details: { id: params.id, pid: result.process.pid, status: 'running' },
