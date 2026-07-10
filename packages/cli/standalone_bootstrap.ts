@@ -223,10 +223,10 @@ export function prepareStandalonePackageDir(options: PrepareStandalonePackageDir
   copyIfPresent(join(options.resourceRoot, 'CHANGELOG.md'), join(options.packageDir, 'CHANGELOG.md'));
   symlinkDirIfPresent(join(options.resourceRoot, 'docs'), join(options.packageDir, 'docs'));
 
-  replaceWithSymlink(
-    join(options.resourceRoot, 'extensions', 'shell-relay', 'shell-integration'),
-    join(options.packageDir, 'extensions', 'shell-relay', 'shell-integration'),
-  );
+  // replaceWithSymlink(
+  //   join(options.resourceRoot, 'extensions', 'shell-relay', 'shell-integration'),
+  //   join(options.packageDir, 'extensions', 'shell-relay', 'shell-integration'),
+  // );
   replaceWithSymlink(join(options.piPackageDir, 'dist', 'modes'), join(options.packageDir, 'dist', 'modes'));
   replaceWithSymlink(join(options.piPackageDir, 'dist', 'core'), join(options.packageDir, 'dist', 'core'));
 }

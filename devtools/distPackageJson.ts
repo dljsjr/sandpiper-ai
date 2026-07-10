@@ -25,7 +25,8 @@ const SANDPIPER_DIST_PI_CONFIG = {
 } as const;
 
 export const SANDPIPER_DIST_PI_RESOURCES = {
-  extensions: ['./extensions/system', './extensions/shell-relay', './extensions/web-fetch', './extensions/autotoon'],
+  // extensions: ['./extensions/system', './extensions/shell-relay', './extensions/web-fetch', './extensions/autotoon'],
+  extensions: ['./extensions/system', './extensions/web-fetch', './extensions/autotoon'],
   skills: ['./skills/sandpiper', './skills/third-party'],
   prompts: ['./prompts'],
   themes: ['./themes'],

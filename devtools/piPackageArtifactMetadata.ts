@@ -2,7 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
 import autotoonExtensionPackageJson from '../extensions/autotoon/package.json' with { type: 'json' };
-import shellRelayPackageJson from '../extensions/shell-relay/package.json' with { type: 'json' };
+// import shellRelayPackageJson from '../extensions/shell-relay/package.json' with { type: 'json' };
 import systemPackageJson from '../extensions/system/package.json' with { type: 'json' };
 import webFetchPackageJson from '../extensions/web-fetch/package.json' with { type: 'json' };
 import autotoonPackageJson from '../packages/capability-autotoon/package.json' with { type: 'json' };
@@ -175,27 +175,27 @@ export function createSystemExtensionPackageJson(rootPackageJson: RootPackageJso
   };
 }
 
-export function createShellRelayExtensionPackageJson(rootPackageJson: RootPackageJson): SupportPackageJson {
-  return {
-    name: 'shell-relay',
-    version: rootPackageJson.version,
-    type: 'module',
-    description: 'Pi extension: shared terminal session between user and agent via Zellij',
-    dependencies: {
-      'sandpiper-ai-core': 'file:../../packages/core',
-    },
-    peerDependencies: {
-      '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
-        shellRelayPackageJson,
-        '@earendil-works/pi-coding-agent',
-      ),
-      typebox: packagePeerDependencyVersion(shellRelayPackageJson, 'typebox'),
-    },
-    pi: {
-      extensions: ['./src/index.ts'],
-    },
-  };
-}
+// export function createShellRelayExtensionPackageJson(rootPackageJson: RootPackageJson): SupportPackageJson {
+//   return {
+//     name: 'shell-relay',
+//     version: rootPackageJson.version,
+//     type: 'module',
+//     description: 'Pi extension: shared terminal session between user and agent via Zellij',
+//     dependencies: {
+//       'sandpiper-ai-core': 'file:../../packages/core',
+//     },
+//     peerDependencies: {
+//       '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
+//         shellRelayPackageJson,
+//         '@earendil-works/pi-coding-agent',
+//       ),
+//       typebox: packagePeerDependencyVersion(shellRelayPackageJson, 'typebox'),
+//     },
+//     pi: {
+//       extensions: ['./src/index.ts'],
+//     },
+//   };
+// }
 
 export function createWebFetchExtensionPackageJson(rootPackageJson: RootPackageJson): SupportPackageJson {
   return {
@@ -261,10 +261,10 @@ export async function writePiArtifactSupportPackageJsons(
       join(outputDir, 'extensions', 'system', 'package.json'),
       createSystemExtensionPackageJson(rootPackageJson),
     ),
-    writeJson(
-      join(outputDir, 'extensions', 'shell-relay', 'package.json'),
-      createShellRelayExtensionPackageJson(rootPackageJson),
-    ),
+    // writeJson(
+    //   join(outputDir, 'extensions', 'shell-relay', 'package.json'),
+    //   createShellRelayExtensionPackageJson(rootPackageJson),
+    // ),
     writeJson(
       join(outputDir, 'extensions', 'web-fetch', 'package.json'),
       createWebFetchExtensionPackageJson(rootPackageJson),
