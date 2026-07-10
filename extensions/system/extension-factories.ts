@@ -34,7 +34,7 @@ export function createSandpiperIdentityExtension(options: SandpiperIdentityExten
 
   return (pi: ExtensionAPI) => {
     registerMigrationControls(pi);
-    registerStartupPromptHooks(pi, runtimeState, dumpSystemPrompt);
+    registerStartupPromptHooks(pi, dumpSystemPrompt);
     registerSessionContinuityHooks(pi, runtimeState);
     registerDiagnosticsHooks(pi, updateCheck);
   };

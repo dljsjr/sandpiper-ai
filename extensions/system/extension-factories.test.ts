@@ -69,8 +69,6 @@ describe('system extension factory split', () => {
     ]);
     expect(events).toEqual([
       'session_start',
-      'session_start',
-      'session_shutdown',
       'before_agent_start',
       'session_start',
       'session_shutdown',

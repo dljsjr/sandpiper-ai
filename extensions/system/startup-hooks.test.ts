@@ -2,7 +2,6 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
-import { SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL } from './prompt-contributions.js';
 import { createSystemRuntimeState } from './runtime.js';
 import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
 import { createBackgroundLifecycleProcessManagerStub, createEventStub } from './test-helpers.js';
@@ -68,36 +67,21 @@ describe('startup hooks', () => {
   beforeEach(() => {
     mockGetAgentDir.mockClear();
     mockGetAgentDir.mockReturnValue('/agent');
-    mockBuildSandpiperStartupPrompt.mockImplementation(
-      async (
-        state: { startupContextPending: boolean; coldStartGuidancePending: boolean },
-        input: { agentDir?: string; cwd: string },
-      ) => {
-        state.startupContextPending = false;
-        state.coldStartGuidancePending = false;
-        return JSON.stringify({
-          agentDir: input.agentDir,
-          cwd: input.cwd,
-          projectTriggers: '',
-          activeTaskContext: '',
-          workingCopyContext: '',
-          coldStartGuidance: 'Cold-Start Guidance',
-        });
-      },
-    );
+    mockBuildSandpiperStartupPrompt.mockImplementation(async (input: { agentDir?: string; cwd: string }) => {
+      return JSON.stringify({
+        agentDir: input.agentDir,
+        cwd: input.cwd,
+      });
+    });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('builds startup prompt sections and clears one-shot state after before_agent_start', async () => {
-    const state = createSystemRuntimeState();
-    state.startupContextPending = true;
-    state.coldStartGuidancePending = true;
-
+  it('builds startup prompt from agentDir and cwd on before_agent_start', async () => {
     const { pi, handlers } = createStartupPromptHookStub();
-    registerStartupPromptHooks(pi, state);
+    registerStartupPromptHooks(pi);
 
     const handler = handlers.get('before_agent_start');
     if (!handler) {
@@ -114,160 +98,9 @@ describe('startup hooks', () => {
     expect(result.systemPrompt).toContain('"agentDir":"/agent"');
     expect(result.systemPrompt).toContain('"cwd":"/repo"');
     expect(mockGetAgentDir).toHaveBeenCalled();
-    expect(result.systemPrompt).toContain('"projectTriggers":""');
-    expect(result.systemPrompt).toContain('"activeTaskContext":""');
-    expect(result.systemPrompt).toContain('"workingCopyContext":""');
-    expect(result.systemPrompt).toContain('Cold-Start Guidance');
-    expect(state.startupContextPending).toBe(false);
-    expect(state.coldStartGuidancePending).toBe(false);
   });
 
-  it('appends prompt contributions registered after session_start', async () => {
-    const state = createSystemRuntimeState();
-    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
-
-    const { pi, handlers, events } = createStartupPromptHookStub();
-    registerStartupPromptHooks(pi, state);
-
-    const onStart = handlers.get('session_start');
-    const beforeAgentStart = handlers.get('before_agent_start');
-    if (!onStart || !beforeAgentStart) {
-      throw new Error('startup prompt lifecycle hooks not registered');
-    }
-
-    await onStart({ reason: 'startup' }, { cwd: '/repo' });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'yaams-memory-bootstrap',
-      getContent: () => '<memory source="yaams">recent facts</memory>',
-    });
-
-    const result = (await beforeAgentStart(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      {
-        cwd: '/repo',
-      },
-    )) as { systemPrompt: string };
-
-    expect(result.systemPrompt).toBe(
-      '<system_prompt>sandpiper</system_prompt>\n\n<memory source="yaams">recent facts</memory>',
-    );
-  });
-
-  it('dedupes prompt contributions by id and preserves prepend/append phases', async () => {
-    const state = createSystemRuntimeState();
-    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
-
-    const { pi, handlers, events } = createStartupPromptHookStub();
-    registerStartupPromptHooks(pi, state);
-
-    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'header',
-      phase: 'prepend',
-      getContent: () => '<header>first</header>',
-    });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'header',
-      phase: 'prepend',
-      getContent: () => '<header>duplicate</header>',
-    });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'footer',
-      phase: 'append',
-      getContent: () => '<footer>tail</footer>',
-    });
-
-    const result = (await handlers.get('before_agent_start')?.(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      {
-        cwd: '/repo',
-      },
-    )) as { systemPrompt: string };
-
-    expect(result.systemPrompt).toBe(
-      '<header>first</header>\n\n<system_prompt>sandpiper</system_prompt>\n\n<footer>tail</footer>',
-    );
-  });
-
-  it('acknowledges prompt contributions when the collector accepts them', async () => {
-    const state = createSystemRuntimeState();
-    const acknowledge = vi.fn();
-    const duplicateAcknowledge = vi.fn();
-
-    const { pi, handlers, events } = createStartupPromptHookStub();
-    registerStartupPromptHooks(pi, state);
-
-    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'yaams-memory-bootstrap',
-      acknowledge,
-      getContent: () => '<memory>stable</memory>',
-    });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'yaams-memory-bootstrap',
-      acknowledge: duplicateAcknowledge,
-      getContent: () => '<memory>duplicate</memory>',
-    });
-
-    expect(acknowledge).toHaveBeenCalledTimes(1);
-    expect(duplicateAcknowledge).not.toHaveBeenCalled();
-  });
-
-  it('freezes prompt contribution content after first before_agent_start', async () => {
-    const state = createSystemRuntimeState();
-    mockBuildSandpiperStartupPrompt.mockResolvedValue('<system_prompt>sandpiper</system_prompt>');
-    const getContent = vi.fn(async () => '<memory>stable</memory>');
-
-    const { pi, handlers, events } = createStartupPromptHookStub();
-    registerStartupPromptHooks(pi, state);
-
-    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'yaams-memory-bootstrap',
-      getContent,
-    });
-
-    const first = (await handlers.get('before_agent_start')?.(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      { cwd: '/repo' },
-    )) as { systemPrompt: string };
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'late',
-      getContent: () => '<late>ignored</late>',
-    });
-    const second = (await handlers.get('before_agent_start')?.(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      { cwd: '/repo' },
-    )) as { systemPrompt: string };
-
-    expect(first.systemPrompt).toBe('<system_prompt>sandpiper</system_prompt>\n\n<memory>stable</memory>');
-    expect(second.systemPrompt).toBe('<system_prompt>sandpiper</system_prompt>\n\n<memory>stable</memory>');
-    expect(getContent).toHaveBeenCalledTimes(1);
-  });
-
-  it('unsubscribes the prompt contribution listener on session_shutdown', async () => {
-    const state = createSystemRuntimeState();
-    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
-
-    const { pi, handlers, events } = createStartupPromptHookStub();
-    registerStartupPromptHooks(pi, state);
-
-    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
-    await handlers.get('session_shutdown')?.({ reason: 'reload' }, {});
-    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
-      id: 'after-shutdown',
-      getContent: () => '<memory>leaked</memory>',
-    });
-
-    const result = (await handlers.get('before_agent_start')?.(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      { cwd: '/repo' },
-    )) as { systemPrompt: string };
-
-    expect(result.systemPrompt).toBe('<system_prompt>sandpiper</system_prompt>');
-  });
-
-  it('sets cold start from heuristic on startup, env vars on all reasons', async () => {
+  it('sets session env vars on session_start', async () => {
     const state = createSystemRuntimeState();
     const { pi, handlers } = createEventStub();
 
@@ -279,58 +112,13 @@ describe('startup hooks', () => {
     }
 
     const getSessionFile = vi.fn(() => '/tmp/session.jsonl');
-    const getEntries = vi.fn(() => []);
     const getSessionId = vi.fn(() => 'session-1234');
-    const sessionCtx = { sessionManager: { getSessionFile, getEntries, getSessionId } };
+    const sessionCtx = { sessionManager: { getSessionFile, getSessionId } };
 
-    // startup: uses shouldTreatInitialLoadAsColdStart heuristic + sets env vars
     await onStart({ reason: 'startup' }, sessionCtx);
 
-    expect(state.startupContextPending).toBe(true);
-    expect(state.coldStartGuidancePending).toBe(true);
     expect(process.env.SANDPIPER_SESSION_ID).toBe('session-1234');
     expect(process.env.SANDPIPER_SESSION_FILE).toBe('/tmp/session.jsonl');
-  });
-
-  it('treats /new as a cold start', async () => {
-    const state = createSystemRuntimeState();
-    const { pi, handlers } = createEventStub();
-    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
-
-    const onStart = handlers.get('session_start')!;
-    const sessionCtx = {
-      sessionManager: {
-        getSessionFile: vi.fn(() => null),
-        getEntries: vi.fn(() => []),
-        getSessionId: vi.fn(() => 'new-session'),
-      },
-    };
-
-    await onStart({ reason: 'new' }, sessionCtx);
-
-    expect(state.startupContextPending).toBe(true);
-    expect(state.coldStartGuidancePending).toBe(true);
-  });
-
-  it.each(['reload', 'resume', 'fork'] as const)('treats %s as NOT a cold start', async (reason) => {
-    const state = createSystemRuntimeState();
-    state.coldStartGuidancePending = true; // pre-set to verify it gets cleared
-    const { pi, handlers } = createEventStub();
-    registerSessionContinuityHooks(pi as Parameters<typeof registerSessionContinuityHooks>[0], state);
-
-    const onStart = handlers.get('session_start')!;
-    const sessionCtx = {
-      sessionManager: {
-        getSessionFile: vi.fn(() => '/tmp/s.jsonl'),
-        getEntries: vi.fn(() => []),
-        getSessionId: vi.fn(() => 'id'),
-      },
-    };
-
-    await onStart({ reason }, sessionCtx);
-
-    expect(state.startupContextPending).toBe(true);
-    expect(state.coldStartGuidancePending).toBe(false);
   });
 
   it('kills all background processes on shutdown without registering completion context hooks', async () => {

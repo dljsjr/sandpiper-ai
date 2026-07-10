@@ -27,9 +27,7 @@ This isn't just true in principle — it's true even for the narrowest possible 
 
 ## Session Start: Project Routing
 
-Project routing triggers (`whenToRead` fields) are **automatically injected into the system prompt** by the sandpiper system extension at session start. You do not need to run `project list` to get routing context — it is already in your context as an `<available_projects>` block.
-
-If you need the full project list with task counts (e.g., to assess project health or find the right key), run:
+Project routing triggers (`whenToRead` fields) are **not** automatically injected into the system prompt — that used to happen but was removed to keep the system prompt small and cache-stable. Run `project list` yourself at session start to get routing context:
 
 ```bash
 scripts/trail project list
