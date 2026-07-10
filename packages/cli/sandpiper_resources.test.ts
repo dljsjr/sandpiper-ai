@@ -2,12 +2,33 @@ import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ExtensionAPI, InlineExtension } from '@earendil-works/pi-coding-agent';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// web-search's real adapter-selection resolves the Brave key via readSettingsKey, which reads
+// the actual ~/.sandpiper/agent/settings.json -- and this developer's config resolves it through
+// a `!op read ...` shell-out. Mock it the same way extensions/web-search/src/adapter-selection.test.ts
+// does, so this cross-package test never touches real user config or invokes a real 1Password prompt.
+vi.mock('../../extensions/web-search/src/config-resolver.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../extensions/web-search/src/config-resolver.js')>();
+  return { ...actual, readSettingsKey: vi.fn(() => undefined) };
+});
+
 import {
   createNeutralCapabilityExtensionFactories,
   createSandpiperExtensionFactories,
   resolveSandpiperResourcePaths,
 } from './sandpiper_resources.js';
+
+const savedBraveApiKey = process.env.BRAVE_API_KEY;
+
+beforeEach(() => {
+  delete process.env.BRAVE_API_KEY;
+});
+
+afterEach(() => {
+  if (savedBraveApiKey === undefined) delete process.env.BRAVE_API_KEY;
+  else process.env.BRAVE_API_KEY = savedBraveApiKey;
+});
 
 function createExtensionCapture(): {
   readonly pi: Pick<
@@ -109,7 +130,8 @@ describe('Sandpiper resource adapter', () => {
     const { commands, flags, renderers, tools } = applyFactories(createNeutralCapabilityExtensionFactories('/repo'));
 
     expect(tools).toEqual(expect.arrayContaining(['skill', 'start_background_process', 'check_background_process']));
-    expect(tools).toEqual(expect.arrayContaining(['shell_relay', 'shell_relay_inspect', 'web_fetch']));
+    expect(tools).toEqual(expect.arrayContaining(['web_fetch']));
+    expect(tools).not.toEqual(expect.arrayContaining(['shell_relay', 'shell_relay_inspect']));
     expect(tools).toContain('send_chorus_reply');
     expect(commands).toContain('chorus');
     expect(renderers).toContain('chorus-room-message');

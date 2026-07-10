@@ -94,10 +94,15 @@ describe('distribution source-boundary invariants', () => {
     expect(matches).toEqual([]);
   });
 
-  it('keeps the neutral Pi capability entrypoint free of Sandpiper identity wiring', () => {
+  it('keeps the neutral Pi capability entrypoints free of Sandpiper identity wiring', () => {
     const matches = findForbiddenTextMatches(
       repoRoot,
-      ['plugins/pi/extensions/capabilities.ts'],
+      [
+        'plugins/pi/extensions/skill-loading.ts',
+        'plugins/pi/extensions/turn-control.ts',
+        'plugins/pi/extensions/context-management.ts',
+        'plugins/pi/extensions/background-process.ts',
+      ],
       NEUTRAL_CAPABILITY_ENTRYPOINT_FORBIDDEN_PATTERNS,
     );
 
