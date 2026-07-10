@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import chorusExtension from '../../extensions/chorus.js';
-import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
+// import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
 import {
   createNeutralCapabilityExtension,
   createSandpiperIdentityExtension,
@@ -48,7 +48,7 @@ function createSandpiperResourceExtension(resourcePaths: SandpiperResourcePaths)
 export function createNeutralCapabilityExtensionFactories(resourceRoot: string): readonly ExtensionFactory[] {
   return [
     createNeutralCapabilityExtension(),
-    shellRelayExtension,
+    // shellRelayExtension,
     webFetchExtension,
     webSearchExtension,
     autotoonExtension,

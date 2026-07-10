@@ -71,7 +71,7 @@ configurePiEnvironment(
   process.env,
 );
 mirrorPiSandpiperEnvironment(process.env);
-console.log(`using pi-coding-agent version: ${piMetadata.version}\n`);
+// console.log(`using pi-coding-agent version: ${piMetadata.version}\n`);
 
 const { loadPiMain } = await import('./deferred_pi_import.js');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
