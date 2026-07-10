@@ -3,15 +3,21 @@ import { checkForUpdates as checkForSandpiperUpdates, type UpdateInfo } from 'sa
 import { registerDiagnosticsHooks } from './diagnostics-hooks.js';
 import { registerMigrationControls } from './migration-controls.js';
 import {
-  createNeutralCapabilityExtension,
-  type NeutralCapabilityExtensionOptions,
+  type BackgroundProcessExtensionOptions,
+  createBackgroundProcessExtension,
+  createContextManagementExtension,
+  createSkillLoadingExtension,
+  createTurnControlExtension,
 } from './neutral-capability-extension.js';
 import { createSystemRuntimeState, type SystemRuntimeState } from './runtime.js';
 import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
 
 export {
-  createNeutralCapabilityExtension,
-  type NeutralCapabilityExtensionOptions,
+  type BackgroundProcessExtensionOptions,
+  createBackgroundProcessExtension,
+  createContextManagementExtension,
+  createSkillLoadingExtension,
+  createTurnControlExtension,
 } from './neutral-capability-extension.js';
 
 export interface SandpiperIdentityExtensionOptions {
@@ -42,13 +48,19 @@ export function createSandpiperIdentityExtension(options: SandpiperIdentityExten
 
 export function createSandpiperSystemExtension(
   identityOptions: SandpiperIdentityExtensionOptions = {},
-  capabilityOptions: NeutralCapabilityExtensionOptions = {},
+  capabilityOptions: BackgroundProcessExtensionOptions = {},
 ): ExtensionFactory {
   const identityExtension = createSandpiperIdentityExtension(identityOptions);
-  const capabilityExtension = createNeutralCapabilityExtension(capabilityOptions);
+  const skillLoadingExtension = createSkillLoadingExtension();
+  const turnControlExtension = createTurnControlExtension();
+  const contextManagementExtension = createContextManagementExtension();
+  const backgroundProcessExtension = createBackgroundProcessExtension(capabilityOptions);
 
   return (pi: ExtensionAPI) => {
     identityExtension(pi);
-    capabilityExtension(pi);
+    skillLoadingExtension(pi);
+    turnControlExtension(pi);
+    contextManagementExtension(pi);
+    backgroundProcessExtension(pi);
   };
 }

@@ -5,8 +5,11 @@ import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import chorusExtension from '../../extensions/chorus.js';
 // import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
 import {
-  createNeutralCapabilityExtension,
+  createBackgroundProcessExtension,
+  createContextManagementExtension,
   createSandpiperIdentityExtension,
+  createSkillLoadingExtension,
+  createTurnControlExtension,
 } from '../../extensions/system/extension-factories.js';
 import tattlerExtension from '../../extensions/tattler/index.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
@@ -51,7 +54,10 @@ function createSandpiperResourceExtension(resourcePaths: SandpiperResourcePaths)
 
 export function createNeutralCapabilityExtensionFactories(resourceRoot: string): readonly InlineExtension[] {
   return [
-    inlineExtension('sandpiper-neutral-capability', createNeutralCapabilityExtension()),
+    inlineExtension('skill-loading', createSkillLoadingExtension()),
+    inlineExtension('turn-control', createTurnControlExtension()),
+    inlineExtension('context-management', createContextManagementExtension()),
+    inlineExtension('background-process', createBackgroundProcessExtension()),
     // shellRelayExtension,
     inlineExtension('web-fetch', webFetchExtension),
     inlineExtension('web-search', webSearchExtension),
@@ -66,7 +72,7 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
 }
 
 function createSandpiperIdentityExtensionFactories(): readonly InlineExtension[] {
-  return [inlineExtension('sandpiper-identity', createSandpiperIdentityExtension())];
+  return [inlineExtension('sandpiper-core', createSandpiperIdentityExtension())];
 }
 
 export function createSandpiperExtensionFactories(resourceRoot: string): InlineExtension[] {

@@ -44,7 +44,10 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     expect(extensionResult.errors).toEqual([]);
     expect(loadedExtensionPaths).toEqual(
       expect.arrayContaining([
-        join(packageDir, 'plugins', 'pi', 'extensions', 'capabilities.ts'),
+        join(packageDir, 'plugins', 'pi', 'extensions', 'skill-loading.ts'),
+        join(packageDir, 'plugins', 'pi', 'extensions', 'turn-control.ts'),
+        join(packageDir, 'plugins', 'pi', 'extensions', 'context-management.ts'),
+        join(packageDir, 'plugins', 'pi', 'extensions', 'background-process.ts'),
         join(packageDir, 'plugins', 'pi', 'extensions', 'shell-relay.ts'),
         join(packageDir, 'plugins', 'pi', 'extensions', 'web-fetch.ts'),
         join(packageDir, 'plugins', 'pi', 'extensions', 'autotoon.ts'),

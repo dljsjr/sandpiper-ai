@@ -6,17 +6,32 @@ import { registerContextManagementHooks } from './context-management.js';
 import { registerSkillLoadingTool } from './skill-loading-tool.js';
 import { registerTurnControlTool } from './turn-control-tool.js';
 
-export interface NeutralCapabilityExtensionOptions {
+export function createSkillLoadingExtension(): ExtensionFactory {
+  return (pi: ExtensionAPI) => {
+    registerSkillLoadingTool(pi);
+  };
+}
+
+export function createTurnControlExtension(): ExtensionFactory {
+  return (pi: ExtensionAPI) => {
+    registerTurnControlTool(pi);
+  };
+}
+
+export function createContextManagementExtension(): ExtensionFactory {
+  return (pi: ExtensionAPI) => {
+    registerContextManagementHooks(pi);
+  };
+}
+
+export interface BackgroundProcessExtensionOptions {
   readonly processManager?: ProcessManager;
 }
 
-export function createNeutralCapabilityExtension(options: NeutralCapabilityExtensionOptions = {}): ExtensionFactory {
+export function createBackgroundProcessExtension(options: BackgroundProcessExtensionOptions = {}): ExtensionFactory {
   const processManager = options.processManager ?? new ProcessManager();
 
   return (pi: ExtensionAPI) => {
-    registerSkillLoadingTool(pi);
-    registerTurnControlTool(pi);
-    registerContextManagementHooks(pi);
     registerBackgroundProcessTools(pi, processManager);
     registerBackgroundProcessLifecycleHooks(pi, processManager);
   };

@@ -1,6 +1,12 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
-import { createNeutralCapabilityExtension, createSandpiperIdentityExtension } from './extension-factories.js';
+import {
+  createBackgroundProcessExtension,
+  createContextManagementExtension,
+  createSandpiperIdentityExtension,
+  createSkillLoadingExtension,
+  createTurnControlExtension,
+} from './extension-factories.js';
 
 function createExtensionCapture(): {
   readonly pi: Pick<ExtensionAPI, 'events' | 'getFlag' | 'on' | 'registerCommand' | 'registerFlag' | 'registerTool'>;
@@ -42,14 +48,30 @@ function createExtensionCapture(): {
 }
 
 describe('system extension factory split', () => {
-  it('registers neutral capabilities without Sandpiper identity hooks or flags', () => {
-    const { pi, events, flags, tools } = createExtensionCapture();
+  it('registers each neutral capability as an independent extension', () => {
+    const skillLoading = createExtensionCapture();
+    createSkillLoadingExtension()(skillLoading.pi as ExtensionAPI);
+    expect(skillLoading.tools).toEqual(['skill']);
+    expect(skillLoading.events).toEqual([]);
 
-    createNeutralCapabilityExtension()(pi as ExtensionAPI);
+    const turnControl = createExtensionCapture();
+    createTurnControlExtension()(turnControl.pi as ExtensionAPI);
+    expect(turnControl.tools).toEqual(['done']);
+    expect(turnControl.events).toEqual([]);
 
-    expect(tools).toEqual(['skill', 'done', 'start_background_process', 'check_background_process']);
-    expect(events).toEqual(['turn_end', 'session_shutdown']);
-    expect(flags).toEqual([]);
+    const contextManagement = createExtensionCapture();
+    createContextManagementExtension()(contextManagement.pi as ExtensionAPI);
+    expect(contextManagement.tools).toEqual([]);
+    expect(contextManagement.events).toEqual(['turn_end']);
+
+    const backgroundProcess = createExtensionCapture();
+    createBackgroundProcessExtension()(backgroundProcess.pi as ExtensionAPI);
+    expect(backgroundProcess.tools).toEqual(['start_background_process', 'check_background_process']);
+    expect(backgroundProcess.events).toEqual(['session_shutdown']);
+
+    for (const capture of [skillLoading, turnControl, contextManagement, backgroundProcess]) {
+      expect(capture.flags).toEqual([]);
+    }
   });
 
   it('registers Sandpiper identity behavior separately from neutral tools', () => {
