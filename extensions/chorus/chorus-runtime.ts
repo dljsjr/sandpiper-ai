@@ -257,19 +257,9 @@ export function isChorusBrokerAuthor(from: string, broker: ChorusReplyRouteV0): 
   return from === broker.name || from === broker.shortId;
 }
 
-export function createChorusUserMessageContent(details: ChorusIncomingMessageDetails): string {
-  return `<chorus_inbox roomId="${escapeXml(details.roomId)}" pending="1" visibility="visible" replyTool="send_chorus_reply">
-  <message from="${escapeXml(details.from)}" postId="${escapeXml(details.postId)}" brokerName="${escapeXml(details.broker.name)}" brokerShortId="${escapeXml(details.broker.shortId)}" brokerSocketPath="${escapeXml(details.broker.socketPath)}">${escapeXml(details.message)}</message>
-</chorus_inbox>`;
-}
-
 export function assertMessageSize(message: string): void {
   const messageLength = Buffer.byteLength(message, 'utf8');
   if (messageLength > MAX_MESSAGE_BYTES) {
     throw new Error(`Chorus message length ${messageLength} > ${MAX_MESSAGE_BYTES}`);
   }
-}
-
-function escapeXml(value: string): string {
-  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
 }

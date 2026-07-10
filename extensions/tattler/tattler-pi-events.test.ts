@@ -1,25 +1,21 @@
 import { createEventBus } from '@earendil-works/pi-coding-agent';
 import { describe, expect, test } from 'vitest';
 import {
-  announceChorusReady,
   emitChorusRoomDelivery,
   emitChorusRoomPostReceived,
-  onChorusReady,
-  onChorusReadyRequest,
   onChorusRoomDelivery,
   onChorusRoomPostReceived,
   onChorusRoomPostRequest,
   onListPeersRequest,
   onTattlerPendingMessageQueueRequest,
-  requestChorusReady,
   requestChorusRoomPost,
   requestListPeers,
   requestTattlerPendingMessageQueue,
-  roomPostToDelivery,
 } from './tattler-pi-events';
 import {
   buildMessage,
   type ChorusReplyRouteV0,
+  type ChorusRoomDeliveryV0,
   createChorusRoomPost,
   roomId,
   type TattlerIdentityV0,
@@ -41,38 +37,6 @@ function fakeExtensionPair() {
 }
 
 describe('Chorus Pi event-bus contracts', () => {
-  test('announces broker readiness for listeners already registered', () => {
-    const { producer, consumer } = fakeExtensionPair();
-    const seen: number[] = [];
-
-    const unsubscribe = onChorusReady(consumer, (event) => {
-      seen.push(event.generation);
-    });
-
-    announceChorusReady(producer, { generation: 1 });
-    unsubscribe();
-    announceChorusReady(producer, { generation: 2 });
-
-    expect(seen).toEqual([1]);
-  });
-
-  test('supports late readiness probes through an event-bus responder', async () => {
-    const { producer, consumer } = fakeExtensionPair();
-    const ready = { generation: 2 };
-
-    onChorusReadyRequest(producer, () => ready);
-
-    await expect(requestChorusReady(consumer)).resolves.toEqual(ready);
-  });
-
-  test('times out readiness probes when no broker is registered', async () => {
-    const { consumer } = fakeExtensionPair();
-
-    await expect(requestChorusReady(consumer, { timeoutMs: 1 })).rejects.toThrow(
-      'Timed out waiting for event response on chorus:request:ready',
-    );
-  });
-
   test('uses callback replies so concurrent peer requests do not race on a shared response channel', async () => {
     const { producer, consumer } = fakeExtensionPair();
     const piper: TattlerIdentityV0 = buildMessage('tattler.identity.v0', {
@@ -179,7 +143,12 @@ describe('Chorus Pi event-bus contracts', () => {
   test('uses broadcast events for room deliveries', () => {
     const { producer, consumer } = fakeExtensionPair();
     const post = createChorusRoomPost(roomId('chorus-dev'), 'Piper', broker, 'hello everyone');
-    const delivery = roomPostToDelivery(post);
+    const delivery: ChorusRoomDeliveryV0 = buildMessage('chorus.room-delivery.v0', {
+      roomId: post.roomId,
+      from: post.from,
+      message: post.message,
+      postId: post.id,
+    });
     const seen: string[] = [];
 
     onChorusRoomDelivery(consumer, (event) => {

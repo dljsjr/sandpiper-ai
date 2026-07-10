@@ -6,7 +6,6 @@ import type {
   TattlerIdentityV0,
   TattlerMessageId,
 } from './tattler-protocol';
-import { createChorusRoomDelivery } from './tattler-protocol';
 
 export const DEFAULT_EVENT_REQUEST_TIMEOUT_MS = 5_000;
 
@@ -33,8 +32,6 @@ const TattlerPiEventBusKey = {
 } as const;
 
 const ChorusPiEventBusKey = {
-  ready: 'chorus:ready',
-  readyRequest: 'chorus:request:ready',
   roomPost: 'chorus:request:roomPost',
   roomPostReceived: 'chorus:event:roomPostReceived',
   roomDelivery: 'chorus:event:roomDelivery',
@@ -57,11 +54,6 @@ export type TattlerPendingMessageQueueResponse =
 
 interface TattlerPendingMessageQueueEventRequest extends EventRequest<TattlerPendingMessageQueueResponse> {
   readonly message: TattlerPendingMessage;
-}
-
-export interface ChorusReadyEvent {
-  /** Monotonic generation for this extension-runtime registration. */
-  readonly generation: number;
 }
 
 export interface ChorusRoomPostRequest {
@@ -199,26 +191,6 @@ export function onTattlerPendingMessageQueueRequest(
   });
 }
 
-export function announceChorusReady(pi: HasPiEventBus, event: ChorusReadyEvent): void {
-  pi.events.emit(ChorusPiEventBusKey.ready, event);
-}
-
-export function onChorusReady(pi: HasPiEventBus, handler: (event: ChorusReadyEvent) => void): () => void {
-  return pi.events.on(ChorusPiEventBusKey.ready, (event) => {
-    handler(event as ChorusReadyEvent);
-  });
-}
-
-export async function requestChorusReady(pi: HasPiEventBus, options?: EventRequestOptions): Promise<ChorusReadyEvent> {
-  return request<ChorusReadyEvent>(ChorusPiEventBusKey.readyRequest, pi, options);
-}
-
-export function onChorusReadyRequest(pi: HasPiEventBus, handler: () => Awaitable<ChorusReadyEvent>): () => void {
-  return pi.events.on(ChorusPiEventBusKey.readyRequest, (data) => {
-    respond(data, handler);
-  });
-}
-
 export async function requestChorusRoomPost(
   pi: HasPiEventBus,
   requestBody: ChorusRoomPostRequest,
@@ -289,8 +261,4 @@ export function onChorusRoomDelivery(pi: HasPiEventBus, handler: ChorusRoomDeliv
   return pi.events.on(ChorusPiEventBusKey.roomDelivery, (delivery) => {
     handler(delivery as ChorusRoomDeliveryV0);
   });
-}
-
-export function roomPostToDelivery(post: ChorusRoomPostV0): ChorusRoomDeliveryV0 {
-  return createChorusRoomDelivery(post);
 }

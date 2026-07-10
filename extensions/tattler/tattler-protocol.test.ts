@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import {
   type ChorusReplyRouteV0,
-  createChorusRoomDelivery,
   createChorusRoomPost,
   parseIncomingPayloadFrame,
   roomId,
@@ -60,19 +59,6 @@ describe('Chorus room wire messages', () => {
         message: 'scout note',
       }),
     ).toThrow('Incoming room message missing required reply route field [broker]');
-  });
-
-  test('creates deliveries that preserve the original post id for correlation', () => {
-    const post = createChorusRoomPost(roomId('chorus-dev'), 'Muninn', broker, 'steward note');
-    const delivery = createChorusRoomDelivery(post);
-
-    expect(JSON.parse(serializeToJsonl(delivery))).toMatchObject({
-      format: 'chorus.room-delivery.v0',
-      roomId: 'chorus-dev',
-      from: 'Muninn',
-      message: 'steward note',
-      postId: post.id,
-    });
   });
 
   test('rejects empty room ids', () => {

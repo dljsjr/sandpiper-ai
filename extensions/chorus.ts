@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { dirname, join, normalize } from 'node:path';
-import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
 import type { Component } from '@earendil-works/pi-tui';
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
@@ -58,7 +58,6 @@ let activeRoom: ActiveChorusRoom | undefined;
 let eventUnsubscribers: Array<() => void> = [];
 let ownIdentityRequest: Promise<TattlerIdentityV0> | undefined;
 
-const SELF_CHAT_IDLE_RETRY_MS = 25;
 const TATTLER_PENDING_QUEUE_TIMEOUT_MS = 50;
 
 interface SendChorusMessageOptions {
@@ -251,30 +250,6 @@ export async function sendChorusMessageToChatOrQueue(
   }
 
   sendChorusMessageToChat(pi, details, options);
-}
-
-export function sendChorusSelfMessageToChatWhenIdle(
-  pi: ExtensionAPI,
-  ctx: Pick<ExtensionContext, 'isIdle'>,
-  details: ChorusIncomingMessageDetails,
-): void {
-  const flush = (): void => {
-    let isIdle: boolean;
-    try {
-      isIdle = ctx.isIdle();
-    } catch {
-      return;
-    }
-
-    if (!isIdle) {
-      setTimeout(flush, SELF_CHAT_IDLE_RETRY_MS);
-      return;
-    }
-
-    sendChorusMessageToChat(pi, details, { triggerTurn: false, modelVisible: false });
-  };
-
-  setTimeout(flush, 0);
 }
 
 async function handleRoomPostReceived(pi: ExtensionAPI, post: ChorusRoomPostV0): Promise<void> {

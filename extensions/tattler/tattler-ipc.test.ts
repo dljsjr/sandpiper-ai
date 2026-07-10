@@ -11,7 +11,7 @@ import { onChorusRoomDelivery, onChorusRoomPostReceived } from './tattler-pi-eve
 import {
   buildMessage,
   type ChorusReplyRouteV0,
-  createChorusRoomDelivery,
+  type ChorusRoomDeliveryV0,
   createChorusRoomPost,
   roomId,
   serializeToJsonl,
@@ -209,7 +209,12 @@ describe('Tattler IPC payload frames', () => {
     const runtime = fakeRuntime();
     const { peer } = await listen(runtime);
     const post = createChorusRoomPost(roomId('chorus-dev'), 'Huginn', broker, 'scout note');
-    const delivery = createChorusRoomDelivery(post);
+    const delivery: ChorusRoomDeliveryV0 = buildMessage('chorus.room-delivery.v0', {
+      roomId: post.roomId,
+      from: post.from,
+      message: post.message,
+      postId: post.id,
+    });
     const received = new Promise<string>((resolve) => {
       onChorusRoomDelivery(runtime, (event) => {
         resolve(`${event.roomId}:${event.from}:${event.message}:${event.postId}`);

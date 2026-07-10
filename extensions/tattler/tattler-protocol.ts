@@ -167,14 +167,6 @@ export function createChorusRoomPost(
   });
 }
 
-export function createChorusRoomDelivery(post: ChorusRoomPostV0): ChorusRoomDeliveryV0 {
-  return buildMessage('chorus.room-delivery.v0', {
-    roomId: post.roomId,
-    from: post.from,
-    message: post.message,
-    postId: post.id,
-  });
-}
 //#endregion
 
 // ============================================================================
