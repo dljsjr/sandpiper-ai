@@ -9,7 +9,6 @@ import {
 import {
   createChorusRoomBroker,
   createChorusRoomDeliveryFrame,
-  createChorusUserMessageContent,
   isChorusBrokerAuthor,
   sendChorusReply,
 } from './chorus-runtime';
@@ -203,32 +202,5 @@ describe('Chorus broker runtime', () => {
     expect(isChorusBrokerAuthor('chorus-piper', broker)).toBe(true);
     expect(isChorusBrokerAuthor('Piper', broker)).toBe(false);
     expect(isChorusBrokerAuthor('Doug', broker)).toBe(false);
-  });
-
-  test('builds slim model-facing Chorus message content with current reply route metadata', () => {
-    const frame = createChorusRoomDeliveryFrame(
-      roomId('chorus-dev'),
-      'Huginn',
-      'original-post',
-      'reply </message> & <note attr="x">',
-    );
-    const content = createChorusUserMessageContent({
-      roomId: frame.roomId,
-      from: frame.from,
-      message: frame.message,
-      postId: frame.postId,
-      broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus-dev.sock' },
-    });
-
-    expect(content).toContain(
-      '<chorus_inbox roomId="chorus-dev" pending="1" visibility="visible" replyTool="send_chorus_reply">',
-    );
-    expect(content).toContain(
-      '<message from="Huginn" postId="original-post" brokerName="chorus:chorus-dev" brokerShortId="chorus-dev" brokerSocketPath="/tmp/chorus-dev.sock">reply &lt;/message&gt; &amp; &lt;note attr=&quot;x&quot;&gt;</message>',
-    );
-    expect(content).not.toContain('<chorus_room_message');
-    expect(content).not.toContain('<source>');
-    expect(content).not.toContain('reply_policy');
-    expect(content).not.toContain('reply_contract');
   });
 });

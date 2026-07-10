@@ -15,11 +15,15 @@
         "devtools/assembleDistribution.ts!",
         "devtools/vendor.ts!",
         "devtools/claudeCodePlugin.ts!",
-        "devtools/standaloneSandpiperApp.ts!"
+        "devtools/standaloneSandpiperApp.ts!",
+        "extensions/system.ts!"
       ],
       "project": [
         "devtools/distPackageJson.ts!",
-        "devtools/piPackageArtifactMetadata.ts!"
+        "devtools/piPackageArtifactMetadata.ts!",
+        "extensions/*.ts!",
+        "extensions/chorus/**/*.ts!",
+        "extensions/tattler/**/*.ts!"
       ],
       "ignoreDependencies": [
         // Used by distribution assembly through `bun mcporter`.
