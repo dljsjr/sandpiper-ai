@@ -6,7 +6,10 @@
   "description": "Neutral Pi extension adapters for Sandpiper capabilities",
   "pi": {
     "extensions": [
-      "./capabilities.ts",
+      "./skill-loading.ts",
+      "./turn-control.ts",
+      "./context-management.ts",
+      "./background-process.ts",
       "./shell-relay.ts",
       "./web-fetch.ts",
       "./autotoon.ts",

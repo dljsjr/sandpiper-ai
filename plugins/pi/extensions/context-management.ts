@@ -1,6 +1,9 @@
+// Thin Pi provider adapter; source logic lives in extensions/system/neutral-capability-extension.ts.
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { registerContextManagementHooks } from '../../../extensions/system/context-management.js';
+import { createContextManagementExtension } from '../../../extensions/system/neutral-capability-extension.js';
+
+const contextManagementExtension = createContextManagementExtension();
 
 export default function (pi: ExtensionAPI) {
-  registerContextManagementHooks(pi);
+  contextManagementExtension(pi);
 }
