@@ -209,10 +209,15 @@ export class ManagedProcess {
 export class ProcessManager {
   private processes = new Map<string, ManagedProcess>();
 
-  /** Spawn a new managed process. Throws if the ID is already in use. */
+  /**
+   * Spawn a new managed process. Throws if a process with this ID is still running.
+   * If a prior process with this ID has already exited, its entry is replaced —
+   * exit (however it happened, including an external kill) always frees the ID
+   * for reuse without requiring an explicit `remove()` call.
+   */
   spawn(options: SpawnOptions): ManagedProcess {
-    if (this.processes.has(options.id)) {
-      throw new Error(`Process "${options.id}" already exists. Kill it first or use a different ID.`);
+    if (this.processes.get(options.id)?.running) {
+      throw new Error(`Process "${options.id}" is already running. Kill it first or use a different ID.`);
     }
 
     const managed = new ManagedProcess(options.id);
