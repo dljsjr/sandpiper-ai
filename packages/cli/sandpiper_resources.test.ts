@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI, InlineExtension } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
 import {
   createNeutralCapabilityExtensionFactories,
@@ -65,10 +65,11 @@ function createExtensionCapture(): {
   };
 }
 
-function applyFactories(factories: readonly ExtensionFactory[]): ReturnType<typeof createExtensionCapture> {
+function applyFactories(factories: readonly InlineExtension[]): ReturnType<typeof createExtensionCapture> {
   const capture = createExtensionCapture();
   for (const factory of factories) {
-    factory(capture.pi as ExtensionAPI);
+    const fn = typeof factory === 'function' ? factory : factory.factory;
+    fn(capture.pi as ExtensionAPI);
   }
   return capture;
 }
