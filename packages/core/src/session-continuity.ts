@@ -2,19 +2,13 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { SessionIdentityEnvNames } from './host-context.js';
 import { getPidFilePath } from './paths.js';
-import { type SessionEntryLike, shouldTreatInitialLoadAsColdStart } from './system-startup.js';
 
 export interface SystemRuntimeState {
-  startupContextPending: boolean;
-  coldStartGuidancePending: boolean;
   currentSessionId?: string;
 }
 
 export function createSystemRuntimeState(): SystemRuntimeState {
-  return {
-    startupContextPending: true,
-    coldStartGuidancePending: false,
-  };
+  return {};
 }
 
 export const SANDPIPER_SESSION_ENV_NAMES: SessionIdentityEnvNames = {
@@ -23,11 +17,9 @@ export const SANDPIPER_SESSION_ENV_NAMES: SessionIdentityEnvNames = {
 };
 
 export interface SessionContinuityStartInput {
-  readonly reason: string;
   readonly cwd: string;
   readonly sessionId: string;
   readonly sessionFile?: string | null;
-  readonly entries: readonly SessionEntryLike[];
 }
 
 export interface SessionContinuityOptions {
@@ -41,8 +33,6 @@ export interface SessionContinuityOptions {
 export interface SessionContinuityStartResult {
   readonly sessionId: string;
   readonly sessionFile?: string;
-  readonly startupContextPending: boolean;
-  readonly coldStartGuidancePending: boolean;
   readonly pidFilePath: string;
   readonly removedPidFilePath?: string;
 }
@@ -69,17 +59,6 @@ function removePidFile(path: string): void {
   }
 }
 
-function shouldStartWithColdStartGuidance(input: SessionContinuityStartInput): boolean {
-  switch (input.reason) {
-    case 'startup':
-      return shouldTreatInitialLoadAsColdStart(input.sessionFile ?? undefined, input.entries);
-    case 'new':
-      return true;
-    default:
-      return false;
-  }
-}
-
 export function handleSandpiperSessionStart(
   state: SystemRuntimeState,
   input: SessionContinuityStartInput,
@@ -89,9 +68,6 @@ export function handleSandpiperSessionStart(
   const envNames = options.envNames ?? SANDPIPER_SESSION_ENV_NAMES;
   const previousSessionId = state.currentSessionId;
   let removedPidFilePath: string | undefined;
-
-  state.startupContextPending = true;
-  state.coldStartGuidancePending = shouldStartWithColdStartGuidance(input);
 
   env[envNames.sessionId] = input.sessionId;
   if (input.sessionFile) {
@@ -110,8 +86,6 @@ export function handleSandpiperSessionStart(
   return {
     sessionId: input.sessionId,
     sessionFile: input.sessionFile || undefined,
-    startupContextPending: state.startupContextPending,
-    coldStartGuidancePending: state.coldStartGuidancePending,
     pidFilePath,
     removedPidFilePath,
   };

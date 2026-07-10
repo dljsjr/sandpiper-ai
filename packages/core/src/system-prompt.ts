@@ -122,12 +122,6 @@ export interface SandpiperSystemPromptOptions {
   readonly platform?: NodeJS.Platform | string;
   readonly versionControl?: SandpiperVersionControlContext;
   readonly userProfile?: string;
-  readonly staticCapabilityGuidance?: string;
-  readonly projectTriggers?: string;
-  readonly activeTaskContext?: string;
-  readonly workingCopyContext?: string;
-  readonly coldStartGuidance?: string;
-  readonly standupContent?: string;
   readonly identityOverride?: string;
   readonly dumpSystemPrompt?: boolean;
 }
