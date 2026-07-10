@@ -131,7 +131,6 @@ describe('standalone bootstrap', () => {
       const resourceRoot = join(dir, 'repo');
       const packageDir = join(dir, 'package');
       const piPackageDir = join(dir, 'pi');
-      mkdirSync(join(resourceRoot, 'extensions', 'shell-relay', 'shell-integration'), { recursive: true });
       mkdirSync(join(resourceRoot, 'docs'), { recursive: true });
       mkdirSync(join(piPackageDir, 'dist', 'modes'), { recursive: true });
       mkdirSync(join(piPackageDir, 'dist', 'core'), { recursive: true });
@@ -156,7 +155,9 @@ describe('standalone bootstrap', () => {
       expect(generated.pi).toBeUndefined();
       expect(generated.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
       expect(existsSync(join(packageDir, 'docs'))).toBe(true);
-      expect(existsSync(join(packageDir, 'extensions', 'shell-relay', 'shell-integration'))).toBe(true);
+      // shell-relay is temporarily disabled (df04a14d); its shell-integration symlink step is commented
+      // out in prepareStandalonePackageDir, so it should not appear in the generated package.
+      expect(existsSync(join(packageDir, 'extensions', 'shell-relay', 'shell-integration'))).toBe(false);
       expect(existsSync(join(packageDir, 'dist', 'modes'))).toBe(true);
       expect(existsSync(join(packageDir, 'dist', 'core'))).toBe(true);
     } finally {

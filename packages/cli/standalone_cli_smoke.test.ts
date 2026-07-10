@@ -275,7 +275,8 @@ export default function runtimeImportProbe(pi) {
         }),
       );
 
-      expect(output).toContain('using pi-coding-agent version:');
+      // The startup diagnostic line printing this was removed: it broke Pi RPC mode, which
+      // expects well-formed JSON-LD over stdout and can't tolerate arbitrary interleaved text.
       expect(output.trim().endsWith(expectedVersion)).toBe(true);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
