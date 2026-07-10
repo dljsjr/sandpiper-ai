@@ -30,10 +30,10 @@ export const cleanupCommand = new Command('cleanup')
     if (result.inactiveSections.length > 0) {
       console.log('Cleaned inactive sessions:');
       for (const section of result.inactiveSections) {
-        console.log(`  - ${section.uuid} (Updated: ${section.updated})`);
+        console.log(`  - ${section.id} (Updated: ${section.updated})`);
 
         // Clean up the PID file if it exists
-        const pidFilePath = getPidFilePath(section.uuid);
+        const pidFilePath = getPidFilePath(section.id);
         if (existsSync(pidFilePath)) {
           rmSync(pidFilePath);
           console.log(`    Removed PID file: ${pidFilePath}`);

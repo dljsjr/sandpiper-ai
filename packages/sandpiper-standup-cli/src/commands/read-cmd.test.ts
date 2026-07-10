@@ -95,7 +95,7 @@ Session file: /path/to/session.jsonl
       env: { ...process.env, SANDPIPER_SESSION_ID: sessionId },
     });
     expect(output).toContain('## Active Sessions');
-    expect(output).toContain(`### Session ${sessionId}`);
+    expect(output).toContain(`### ${sessionId}`);
     expect(output).toContain('Work done');
   });
 
@@ -153,11 +153,49 @@ Session file: /path/to/dead.jsonl
       env: { ...process.env, SANDPIPER_SESSION_ID: aliveSessionId },
     });
     expect(output).toContain('## Active Sessions');
-    expect(output).toContain(`### Session ${aliveSessionId}`);
+    expect(output).toContain(`### ${aliveSessionId}`);
     expect(output).toContain('Alive work');
     expect(output).toContain('## Inactive Sessions');
-    expect(output).toContain(`### Session ${deadSessionId}`);
+    expect(output).toContain(`### ${deadSessionId}`);
     expect(output).toContain('Dead work');
+  });
+
+  it('does not delete inactive sections from disk — only explicit cleanup may prune them', () => {
+    const aliveSessionId = 'session-alive-2';
+    const deadSessionId = 'session-dead-2';
+    createPidFile(aliveSessionId, 1);
+    createPidFile(deadSessionId, 99999999); // Dead PID
+
+    const standupContent = `# Session Stand-Up
+
+## Session ${aliveSessionId} (Updated: 2026-04-05T10:30:00Z)
+
+Session file: /path/to/alive.jsonl
+
+### Accomplished
+- Alive work
+
+## Session ${deadSessionId} (Updated: 2026-04-05T10:25:00Z)
+
+Session file: /path/to/dead.jsonl
+
+### Accomplished
+- Dormant thread, still needed months later
+`;
+
+    const standupPath = join(testDir, '.sandpiper', 'standup.md');
+    writeFileSync(standupPath, standupContent);
+
+    execSync(`node ${JSON.stringify(standupBin)} read -d ${testDir}`, {
+      encoding: 'utf-8',
+      env: { ...process.env, SANDPIPER_SESSION_ID: aliveSessionId },
+    });
+
+    // A dead pidfile just means "not this session" for display purposes — it must
+    // not cause read to delete the section. Only `cleanup` prunes anything.
+    const persisted = readFileSync(standupPath, 'utf-8');
+    expect(persisted).toContain(`## Session ${deadSessionId}`);
+    expect(persisted).toContain('Dormant thread, still needed months later');
   });
 
   it('preserves legacy standup content on read', () => {
@@ -178,11 +216,41 @@ Updated: 2026-04-05T10:00:00Z
     });
 
     expect(output).toContain('## Inactive Sessions');
-    expect(output).toContain('### Session unknown');
+    expect(output).toContain('### unknown');
     expect(output).toContain('Legacy work');
 
     // File remains in legacy format after read.
     const persisted = readFileSync(standupPath, 'utf-8');
     expect(persisted).toBe(legacyContent);
+  });
+
+  it('classifies a foreign-harness section (e.g. Claude Code) as active via its own --pid, with no sandpiper pidfile', () => {
+    const sandpiperSessionId = 'sandpiper-session';
+    createPidFile(sandpiperSessionId, 1);
+    // No pidfile is ever created for 'claude-code-session' — this section was
+    // written by a different harness that recorded its own PID directly.
+
+    const standupContent = `# Session Stand-Up
+
+## Session claude-code-session (Updated: 2026-04-05T10:30:00Z)
+
+Session file:
+PID: ${process.pid}
+
+### Accomplished
+- Foreign harness work, still running
+`;
+
+    writeFileSync(join(testDir, '.sandpiper', 'standup.md'), standupContent);
+
+    const output = execSync(`node ${JSON.stringify(standupBin)} read -d ${testDir}`, {
+      encoding: 'utf-8',
+      env: { ...process.env, SANDPIPER_SESSION_ID: sandpiperSessionId },
+    });
+
+    expect(output).toContain('## Active Sessions');
+    expect(output).toContain('### claude-code-session');
+    expect(output).toContain('Foreign harness work, still running');
+    expect(output).not.toContain('## Inactive Sessions');
   });
 });

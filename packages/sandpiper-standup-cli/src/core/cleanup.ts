@@ -27,13 +27,14 @@ export function cleanupStandup(content: string, opts: CleanupOptions): CleanupRe
 
   for (const section of parsed.sections) {
     // Always keep the current session
-    if (section.uuid === currentSessionId) {
+    if (section.id === currentSessionId) {
       cleanedSections.push(section);
       continue;
     }
 
-    // Check liveness for other sessions
-    const pidInfo = checkProcessLiveness(section.uuid);
+    // Check liveness for other sessions — prefers a section's own explicit
+    // pid (harness-agnostic) over the sandpiper pidfile registry.
+    const pidInfo = checkProcessLiveness(section.id, section.pid);
 
     if (pidInfo === null) {
       // No PID file = dead session

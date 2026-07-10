@@ -1,7 +1,6 @@
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  formatMissingSessionFileMessage,
   formatMissingSessionIdMessage,
   formatSessionFileHelp,
   formatSessionIdHelp,
@@ -15,13 +14,12 @@ describe('standup command host context', () => {
       sessionFile: 'CUSTOM_SESSION_FILE',
     };
 
-    expect(formatSessionIdHelp(envNames)).toBe('Session UUID (defaults to CUSTOM_SESSION_ID)');
+    expect(formatSessionIdHelp(envNames)).toBe(
+      'Session ID — any stable string identifying this session across successive writes, not necessarily a UUID (defaults to CUSTOM_SESSION_ID)',
+    );
     expect(formatSessionFileHelp(envNames)).toBe('Session file path (defaults to CUSTOM_SESSION_FILE)');
     expect(formatMissingSessionIdMessage(envNames)).toBe(
-      'Session UUID required. Provide --uuid or set CUSTOM_SESSION_ID environment variable.',
-    );
-    expect(formatMissingSessionFileMessage(envNames)).toBe(
-      'Session file path required. Provide --file or set CUSTOM_SESSION_FILE environment variable.',
+      'Session ID required. Provide --id or set CUSTOM_SESSION_ID environment variable.',
     );
   });
 

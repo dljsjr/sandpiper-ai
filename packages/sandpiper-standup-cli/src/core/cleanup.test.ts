@@ -71,7 +71,7 @@ Session file: /path/to/session.jsonl
     const result = cleanupStandup(content, { currentSessionId: process.env.SANDPIPER_SESSION_ID });
     expect(result.cleanedSections).toHaveLength(1);
     expect(result.inactiveSections).toHaveLength(0);
-    expect(result.cleanedSections[0]?.uuid).toBe('session-alive');
+    expect(result.cleanedSections[0]?.id).toBe('session-alive');
   });
 
   it('should remove sections with dead processes', () => {
@@ -122,9 +122,9 @@ Session file: /path/to/dead.jsonl
 
     const result = cleanupStandup(content, { currentSessionId: process.env.SANDPIPER_SESSION_ID });
     expect(result.cleanedSections).toHaveLength(1);
-    expect(result.cleanedSections[0]?.uuid).toBe('session-current');
+    expect(result.cleanedSections[0]?.id).toBe('session-current');
     expect(result.inactiveSections).toHaveLength(1);
-    expect(result.inactiveSections[0]?.uuid).toBe('session-dead');
+    expect(result.inactiveSections[0]?.id).toBe('session-dead');
   });
 
   it('should remove sections with no PID file', () => {
@@ -175,15 +175,44 @@ Session file: /path/to/orphan.jsonl
 
     const result = cleanupStandup(content, { currentSessionId: process.env.SANDPIPER_SESSION_ID });
     expect(result.cleanedSections).toHaveLength(1);
-    expect(result.cleanedSections[0]?.uuid).toBe('session-current');
+    expect(result.cleanedSections[0]?.id).toBe('session-current');
     expect(result.inactiveSections).toHaveLength(1);
-    expect(result.inactiveSections[0]?.uuid).toBe('session-orphan');
+    expect(result.inactiveSections[0]?.id).toBe('session-orphan');
   });
 
   it('should handle empty content', () => {
     process.env.SANDPIPER_SESSION_ID = 'session-test';
     const result = cleanupStandup('', { currentSessionId: undefined });
     expect(result.cleanedSections).toHaveLength(0);
+    expect(result.inactiveSections).toHaveLength(0);
+  });
+
+  it('should classify a foreign-harness section as active via its explicit pid, with no sandpiper pidfile', () => {
+    process.env.SANDPIPER_SESSION_ID = 'session-current';
+    createPidFile('session-current', 1);
+    // No pidfile ever created for 'claude-code-session' — it's a foreign harness
+    // that recorded its own liveness anchor directly on the section instead.
+
+    const content = `# Session Stand-Up
+
+## Session session-current (Updated: 2026-04-05T10:30:00Z)
+
+Session file: /path/to/current.jsonl
+
+### Accomplished
+- Current work
+
+## Session claude-code-session (Updated: 2026-04-05T10:25:00Z)
+
+Session file: /path/to/claude.jsonl
+PID: 1
+
+### Accomplished
+- Foreign harness work, still in progress
+`;
+
+    const result = cleanupStandup(content, { currentSessionId: process.env.SANDPIPER_SESSION_ID });
+    expect(result.cleanedSections.map((s) => s.id).sort()).toEqual(['claude-code-session', 'session-current']);
     expect(result.inactiveSections).toHaveLength(0);
   });
 
@@ -216,6 +245,6 @@ Session file: /path/to/current.jsonl
     const result = cleanupStandup(content, { currentSessionId: process.env.SANDPIPER_SESSION_ID });
     // Current session should be kept even without PID file
     expect(result.cleanedSections).toHaveLength(1);
-    expect(result.cleanedSections[0]?.uuid).toBe('session-current');
+    expect(result.cleanedSections[0]?.id).toBe('session-current');
   });
 });

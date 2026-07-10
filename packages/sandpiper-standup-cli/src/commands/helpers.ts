@@ -37,7 +37,7 @@ export const SANDPIPER_SESSION_ENV_NAMES: StandupSessionEnvNames = {
 } as const;
 
 export function formatSessionIdHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
-  return `Session UUID (defaults to ${envNames.sessionId})`;
+  return `Session ID — any stable string identifying this session across successive writes, not necessarily a UUID (defaults to ${envNames.sessionId})`;
 }
 
 export function formatSessionFileHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
@@ -45,11 +45,7 @@ export function formatSessionFileHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): s
 }
 
 export function formatMissingSessionIdMessage(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
-  return `Session UUID required. Provide --uuid or set ${envNames.sessionId} environment variable.`;
-}
-
-export function formatMissingSessionFileMessage(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
-  return `Session file path required. Provide --file or set ${envNames.sessionFile} environment variable.`;
+  return `Session ID required. Provide --id or set ${envNames.sessionId} environment variable.`;
 }
 
 /**

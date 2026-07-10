@@ -1,9 +1,7 @@
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { Command } from '@commander-js/extra-typings';
-import { cleanupStandup } from '../core/cleanup.js';
 import { parseStandup, type StandupSection, serializeStandup } from '../core/parser.js';
 import {
-  formatMissingSessionFileMessage,
   formatMissingSessionIdMessage,
   formatSessionFileHelp,
   formatSessionIdHelp,
@@ -13,15 +11,21 @@ import {
 
 export const writeCommand = new Command('write')
   .description('Write a standup section (reads from stdin)')
-  .option('-u, --uuid <uuid>', formatSessionIdHelp())
+  .option('-i, --id <id>', formatSessionIdHelp())
   .option('-f, --file <path>', formatSessionFileHelp())
+  .option(
+    '-p, --pid <pid>',
+    'Explicit PID for harness-agnostic liveness — checked directly via the OS instead of ' +
+      "sandpiper's own pidfile registry. Any caller can pass its own long-lived process's PID here " +
+      'without needing to know anything about sandpiper session internals.',
+  )
   .option('-s, --session-file <path>', 'Path to file containing section body (if not provided, reads from stdin)')
   .action(async (opts, cmd) => {
     const context = resolveStandupCommandContext({
       rootDir: getRootDir(cmd as Command),
       cwd: process.cwd(),
       env: process.env,
-      sessionId: opts.uuid,
+      sessionId: opts.id,
       sessionFile: opts.file,
     });
     const { sessionId, sessionFile } = context.session;
@@ -32,10 +36,14 @@ export const writeCommand = new Command('write')
       return;
     }
 
-    if (!sessionFile) {
-      console.error(formatMissingSessionFileMessage());
-      process.exitCode = 1;
-      return;
+    let pid: number | undefined;
+    if (opts.pid !== undefined) {
+      pid = Number.parseInt(opts.pid, 10);
+      if (Number.isNaN(pid)) {
+        console.error(`Invalid --pid: "${opts.pid}" is not a number.`);
+        process.exitCode = 1;
+        return;
+      }
     }
 
     // Read section body from file or stdin
@@ -66,64 +74,39 @@ export const writeCommand = new Command('write')
       existingContent = readFileSync(context.standupPath, 'utf-8');
     }
 
-    // Parse existing content (don't clean yet - we need to preserve legacy on first write)
+    // Parse existing content. Every section is preserved as-is (parseStandup's
+    // legacy fallback already yields a single "unknown" section for old-format
+    // files, so no separate legacy handling is needed here) — write only
+    // upserts the current session's own section; it never prunes anyone
+    // else's, dead or alive. Only an explicit `cleanup` call may remove a
+    // section, since a dormant thread may be intentionally revisited months
+    // later.
     const parsed = parseStandup(existingContent);
-
-    // Check if this is a legacy format file (single "unknown" section with no session file)
-    const isLegacyFormat =
-      parsed.sections.length === 1 && parsed.sections[0]?.uuid === 'unknown' && !parsed.sections[0]?.sessionFile;
-
-    // Clean existing content
-    const cleanupResult = cleanupStandup(existingContent, { currentSessionId: sessionId });
 
     // Create new section
     const now = new Date().toISOString();
     const newSection: StandupSection = {
-      uuid: sessionId,
+      id: sessionId,
       updated: now,
-      sessionFile,
+      sessionFile: sessionFile ?? '',
+      pid,
       body: body.trim(),
     };
 
     // Check if section already exists and update it
-    const existingSectionIndex = cleanupResult.cleanedSections.findIndex((s) => s.uuid === sessionId);
+    const existingSectionIndex = parsed.sections.findIndex((s) => s.id === sessionId);
 
-    let cleanedSections: StandupSection[];
+    let sections: StandupSection[];
     if (existingSectionIndex >= 0) {
-      // Update existing section
-      cleanedSections = [...cleanupResult.cleanedSections];
-      cleanedSections[existingSectionIndex] = newSection;
+      sections = [...parsed.sections];
+      sections[existingSectionIndex] = newSection;
     } else {
-      // Add new section
-      cleanedSections = [...cleanupResult.cleanedSections, newSection];
-    }
-
-    // On first write to a legacy format file, preserve the unknown legacy section.
-    const preservedKeys = new Set<string>();
-    if (isLegacyFormat && cleanupResult.inactiveSections.length > 0) {
-      const legacyUnknown = cleanupResult.inactiveSections.find((section) => section.uuid === 'unknown');
-      if (legacyUnknown) {
-        const key = `${legacyUnknown.uuid}:${legacyUnknown.updated}`;
-        preservedKeys.add(key);
-        cleanedSections = [legacyUnknown, ...cleanedSections];
-      }
+      sections = [...parsed.sections, newSection];
     }
 
     // Serialize and write atomically
-    const serialized = serializeStandup(cleanedSections);
+    const serialized = serializeStandup(sections);
     const tempPath = `${context.standupPath}.tmp`;
     writeFileSync(tempPath, serialized, 'utf-8');
     renameSync(tempPath, context.standupPath);
-
-    // Output only sessions that were actually removed.
-    const removedInactive = cleanupResult.inactiveSections.filter(
-      (section) => !preservedKeys.has(`${section.uuid}:${section.updated}`),
-    );
-
-    if (removedInactive.length > 0) {
-      console.error('Inactive sessions removed:');
-      for (const section of removedInactive) {
-        console.error(`  - ${section.uuid} (Updated: ${section.updated})`);
-      }
-    }
   });
