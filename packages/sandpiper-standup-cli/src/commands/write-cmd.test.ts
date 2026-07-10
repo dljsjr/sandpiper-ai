@@ -75,7 +75,7 @@ describe('write command', () => {
     });
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
-    expect(standupContent).toContain(`## Session ${sessionId}`);
+    expect(standupContent).toContain(`## ${sessionId}`);
     expect(standupContent).toContain(sessionFile);
     expect(standupContent).toContain('Test work');
   });
@@ -88,14 +88,14 @@ describe('write command', () => {
     const body = '### Accomplished\n- Explicit flag work';
 
     execSync(
-      `echo '${body}' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '${body}' | node ${JSON.stringify(standupBin)} write -d ${testDir} -i ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
     );
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
-    expect(standupContent).toContain(`## Session ${sessionId}`);
+    expect(standupContent).toContain(`## ${sessionId}`);
     expect(standupContent).toContain(sessionFile);
     expect(standupContent).toContain('Explicit flag work');
   });
@@ -107,7 +107,7 @@ describe('write command', () => {
 
     // First write
     execSync(
-      `echo '### Accomplished\n- First' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '### Accomplished\n- First' | node ${JSON.stringify(standupBin)} write -d ${testDir} -i ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
@@ -115,7 +115,7 @@ describe('write command', () => {
 
     // Second write (update)
     execSync(
-      `echo '### Accomplished\n- Updated' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '### Accomplished\n- Updated' | node ${JSON.stringify(standupBin)} write -d ${testDir} -i ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
@@ -123,7 +123,7 @@ describe('write command', () => {
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
     // Should only have one section
-    const sectionCount = (standupContent.match(/## Session/g) || []).length;
+    const sectionCount = (standupContent.match(/\(Updated: /g) || []).length;
     expect(sectionCount).toBe(1);
     expect(standupContent).toContain('Updated');
     expect(standupContent).not.toContain('First');
@@ -146,16 +146,16 @@ Updated: 2026-04-05T10:00:00Z
 
     // Write new section
     execSync(
-      `echo '### Accomplished\n- New work' | node ${JSON.stringify(standupBin)} write -d ${testDir} -u ${sessionId} -f ${sessionFile}`,
+      `echo '### Accomplished\n- New work' | node ${JSON.stringify(standupBin)} write -d ${testDir} -i ${sessionId} -f ${sessionFile}`,
       {
         encoding: 'utf-8',
       },
     );
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
-    expect(standupContent).toContain('## Session unknown');
+    expect(standupContent).toContain('## unknown');
     expect(standupContent).toContain('Legacy work');
-    expect(standupContent).toContain('## Session new-session');
+    expect(standupContent).toContain('## new-session');
     expect(standupContent).toContain('New work');
   });
 
@@ -176,7 +176,7 @@ Updated: 2026-04-05T10:00:00Z
     });
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
-    expect(standupContent).toContain(`## Session ${sessionId}`);
+    expect(standupContent).toContain(`## ${sessionId}`);
     expect(standupContent).toContain(sessionFile);
     expect(standupContent).toContain('Env var test');
   });
@@ -207,9 +207,71 @@ Updated: 2026-04-05T10:00:00Z
     });
 
     const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
-    expect(standupContent).toContain(`## Session ${sessionA.id}`);
+    expect(standupContent).toContain(`## ${sessionA.id}`);
     expect(standupContent).toContain('Work A');
-    expect(standupContent).toContain(`## Session ${sessionB.id}`);
+    expect(standupContent).toContain(`## ${sessionB.id}`);
     expect(standupContent).toContain('Work B');
+  });
+
+  it('preserves a dead session section when a different session writes — only cleanup may prune it', () => {
+    const deadSessionId = 'session-dead-write';
+    createPidFile(deadSessionId, 99999999); // Dead PID
+
+    const standupContent = `# Session Stand-Up
+
+## Session ${deadSessionId} (Updated: 2026-04-05T10:25:00Z)
+
+Session file: /path/to/dead.jsonl
+
+### Accomplished
+- Dormant thread, ADHD-parked for months
+`;
+    writeFileSync(join(testDir, '.sandpiper', 'standup.md'), standupContent);
+
+    const newSessionId = 'session-new-writer';
+    createPidFile(newSessionId, 1);
+
+    execSync(`echo '### Accomplished\n- New work' | node ${JSON.stringify(standupBin)} write -d ${testDir}`, {
+      encoding: 'utf-8',
+      env: {
+        ...process.env,
+        SANDPIPER_SESSION_ID: newSessionId,
+        SANDPIPER_SESSION_FILE: '/path/to/new.jsonl',
+      },
+    });
+
+    const standupContentAfter = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
+    // The dead section was on disk in the old "## Session <id>" format (see fixture
+    // above) but gets rewritten to the new header format too — write reserializes
+    // every section it passes through, old or new, it just never drops content.
+    expect(standupContentAfter).toContain(`## ${deadSessionId}`);
+    expect(standupContentAfter).toContain('Dormant thread, ADHD-parked for months');
+    expect(standupContentAfter).toContain(`## ${newSessionId}`);
+    expect(standupContentAfter).toContain('New work');
+  });
+
+  it('writes successfully without a session file — foreign harnesses need not have one', () => {
+    const sessionId = 'claude-code-session';
+
+    execSync(
+      `echo '### Accomplished\n- Claude Code work' | node ${JSON.stringify(standupBin)} write -d ${testDir} -i ${sessionId}`,
+      { encoding: 'utf-8' },
+    );
+
+    const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
+    expect(standupContent).toContain(`## ${sessionId}`);
+    expect(standupContent).toContain('Claude Code work');
+  });
+
+  it('records an explicit --pid for harness-agnostic liveness, with no sandpiper pidfile', () => {
+    const sessionId = 'claude-code-session-2';
+
+    execSync(
+      `echo '### Accomplished\n- Foreign harness work' | node ${JSON.stringify(standupBin)} write -d ${testDir} -i ${sessionId} -p ${process.pid}`,
+      { encoding: 'utf-8' },
+    );
+
+    const standupContent = readFileSync(join(testDir, '.sandpiper', 'standup.md'), 'utf-8');
+    expect(standupContent).toContain(`PID: ${process.pid}`);
   });
 });

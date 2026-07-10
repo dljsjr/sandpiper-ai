@@ -1,7 +1,15 @@
 export interface StandupSection {
-  readonly uuid: string;
+  readonly id: string;
   readonly updated: string;
   readonly sessionFile: string;
+  /**
+   * Optional liveness anchor recorded directly on the section, independent of
+   * sandpiper's own pidfile registry. Lets any harness (not just sandpiper's)
+   * supply a portable liveness signal — a raw OS PID any caller can check with
+   * `process.kill(pid, 0)`, no participation in sandpiper's pidfile directory
+   * convention required. Absent for sections written without `--pid`.
+   */
+  readonly pid?: number;
   readonly body: string;
 }
 
@@ -20,36 +28,41 @@ export function parseStandup(content: string): ParsedStandup {
     return { sections: [] };
   }
 
-  // Try to parse new format first (## Session <uuid> headers)
-  // New format takes precedence; any file with ## Session headers is treated as new format.
+  // Try to parse new format first (## <id> headers, with an optional legacy
+  // "Session " prefix still accepted for files written before the header
+  // format dropped it — new writes never emit the prefix, but old on-disk
+  // sections must keep parsing).
+  // New format takes precedence; any file with ## <id> headers is treated as new format.
   // Legacy content mixed with new format headers will be silently dropped (unlikely in practice).
   // Match section headers and capture everything until next header or end
   const lines = content.split('\n');
   let currentSection: {
-    uuid: string;
+    id: string;
     updated: string;
     sessionFile: string;
+    pid?: number;
     bodyLines: string[];
   } | null = null;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i] || '';
-    const sectionMatch = line.match(/^## Session (\S+) \(Updated: ([^)]+)\)$/);
+    const sectionMatch = line.match(/^## (?:Session )?(\S+) \(Updated: ([^)]+)\)$/);
 
     if (sectionMatch) {
       // Save previous section if exists
       if (currentSection) {
         sections.push({
-          uuid: currentSection.uuid,
+          id: currentSection.id,
           updated: currentSection.updated,
           sessionFile: currentSection.sessionFile,
+          pid: currentSection.pid,
           body: currentSection.bodyLines.join('\n').trim(),
         });
       }
 
       // Start new section
       currentSection = {
-        uuid: sectionMatch[1] || '',
+        id: sectionMatch[1] || '',
         updated: sectionMatch[2] || '',
         sessionFile: '',
         bodyLines: [],
@@ -62,6 +75,21 @@ export function parseStandup(content: string): ParsedStandup {
         if (nextLine.startsWith('Session file:')) {
           currentSection.sessionFile = nextLine.replace('Session file:', '').trim();
           i = j; // Skip to session file line
+
+          // Optional PID line, harness-agnostic liveness anchor — check the line
+          // right after "Session file:" for it.
+          for (let k = j + 1; k < lines.length; k++) {
+            const pidLine = lines[k] || '';
+            if (!pidLine.trim()) continue;
+            if (pidLine.startsWith('PID:')) {
+              const parsedPid = Number.parseInt(pidLine.replace('PID:', '').trim(), 10);
+              if (!Number.isNaN(parsedPid)) {
+                currentSection.pid = parsedPid;
+              }
+              i = k;
+            }
+            break;
+          }
         }
         break;
       }
@@ -71,11 +99,12 @@ export function parseStandup(content: string): ParsedStandup {
   }
 
   // Don't forget the last section
-  if (currentSection?.uuid && currentSection.updated) {
+  if (currentSection?.id && currentSection.updated) {
     sections.push({
-      uuid: currentSection.uuid,
+      id: currentSection.id,
       updated: currentSection.updated,
       sessionFile: currentSection.sessionFile,
+      pid: currentSection.pid,
       body: currentSection.bodyLines.join('\n').trim(),
     });
   }
@@ -97,7 +126,7 @@ export function parseStandup(content: string): ParsedStandup {
 
     if (body) {
       sections.push({
-        uuid: 'unknown',
+        id: 'unknown',
         updated,
         sessionFile: '',
         body,
@@ -117,7 +146,8 @@ export function serializeStandup(sections: readonly StandupSection[]): string {
   }
 
   const parts = sections.map((section) => {
-    return `## Session ${section.uuid} (Updated: ${section.updated})\n\nSession file: ${section.sessionFile}\n\n${section.body}`;
+    const pidLine = section.pid !== undefined ? `\nPID: ${section.pid}` : '';
+    return `## ${section.id} (Updated: ${section.updated})\n\nSession file: ${section.sessionFile}${pidLine}\n\n${section.body}`;
   });
 
   return `# Session Stand-Up\n\n${parts.join('\n\n')}\n`;
