@@ -43,7 +43,13 @@ Projects with no `PROJECT.md` will appear with empty `whenToRead`. If you create
 
 1. Create a task: `task create -p SHR -t "Implement feature X" --priority HIGH --reporter USER`
 2. Pick it up: `task pickup SHR-1` (or `task pickup SHR-1 --assignee "Piper"` for a named assignee)
-3. If the work breaks down into steps, create subtasks: `task create -p SHR -t "Write parser" -k SUBTASK --parent SHR-1 --reporter AGENT`
+3. Break the work into subtasks up front, before starting — don't wait to be asked. If the task
+   involves 3+ distinct steps, spans multiple sessions, or has pieces that could block or fail
+   independently, create subtasks now: `task create -p SHR -t "Write parser" -k SUBTASK --parent
+   SHR-1 --reporter AGENT`. A parent task with only a vague one-line title and no subtask
+   breakdown after you've started is usually a sign the work wasn't actually planned, not that it
+   was simple. Skip this for genuinely single-step tasks — a one-line fix doesn't need a
+   breakdown just to have one.
 4. Work, committing with `Refs: SHR-1` in commit messages
 
 ### Discovering a bug during implementation
@@ -85,6 +91,12 @@ scripts/trail --dir /path/to/project <command>
 | `-d, --dir <path>` | Path to directory containing `.sandpiper/tasks` (defaults to cwd) |
 | `-f, --format <fmt>` | Output format: `raw`, `json`, `toon` |
 
+Both work before or after the subcommand, and interleave freely with subcommand-specific flags —
+`trail -f json task list` and `trail task list -p SHR --top-level --format json` are both valid.
+They won't appear in `trail task --help` or `trail task list --help` — Commander (the CLI parsing
+library) only surfaces global options at `trail --help`. Their absence from a subcommand's own
+`--help` output doesn't mean they're unsupported there.
+
 ## Common Operations
 
 ### Create a task
@@ -93,6 +105,8 @@ scripts/trail --dir /path/to/project <command>
 scripts/trail task create -p SHR -t "Implement feature X" --priority HIGH --reporter USER
 scripts/trail task create -p SHR -t "Fix the bug" -k BUG --priority HIGH --reporter AGENT
 scripts/trail task create -p SHR -t "Write tests" -k SUBTASK --parent SHR-1 --reporter AGENT
+scripts/trail task create -p SHR -t "Fix auth bug" -k BUG --priority HIGH --reporter AGENT \
+  --blocked-by SHR-2 --depends-on SHR-3                          # set relationships at creation time
 ```
 
 ### Pick up a task (assign and set IN PROGRESS)
@@ -139,19 +153,78 @@ Moving across projects re-keys the task and all its subtasks, creates `.moved` t
 
 ### Query tasks
 
+`task list` filters, sorts, and full-text-searches across every task in the project — reach for
+these flags before reaching for `grep`/`python`/`jq` over the raw frontmatter. The index behind
+these queries already accounts for subtask sibling-directories, `.moved` tombstones, and archived
+tasks (excluded by default); a hand-rolled parse of the files has to reinvent all three and will
+get at least one of them wrong.
+
 ```bash
 scripts/trail task list                                        # all tasks
 scripts/trail task list -p SHR --top-level                     # top-level SHR tasks
 scripts/trail task list -s NOT_STARTED --priority HIGH         # high priority not started
-scripts/trail task list -q "FIFO"                              # full-text search
+scripts/trail task list -a "Piper"                              # filter by assignee
+scripts/trail task list -k BUG -p SHR                            # only bugs in SHR
+scripts/trail task list --parent SHR-1                          # subtasks of SHR-1
+scripts/trail task list --subtasks-only                         # every subtask, any parent
+```
+
+Filters compose: `task list -p SHR -s IN_PROGRESS --priority HIGH -k BUG` is one query, not four.
+
+#### Full-text search
+
+```bash
+scripts/trail task list -q "FIFO"                                # BM25 relevance search (default)
+scripts/trail task list -q "FIFO" -p SHR                          # scoped to one project
+scripts/trail task list -q "race.*condition" --regex             # JS regex search
+scripts/trail task list -q 'TODO\(.*\)' --ripgrep                 # ripgrep-backed regex search
+scripts/trail task list -q "FIFO" --sort updatedAt --desc         # override the default relevance sort
+scripts/trail task list -q "FIFO" --limit 5                       # cap result count
+```
+
+Plain `-q` ranks by BM25 relevance, not file order — the closest match comes first. Reach for
+`--regex`/`--ripgrep` only when the search itself is a pattern (finding a `TODO(...)` shape, say),
+not as a substitute for filtering — `-p`/`-s`/`-k`/`--priority`/`-a`/`--parent` are the filters,
+and they combine with `-q` rather than replace it.
+
+Valid `--sort` values: `relevance` (implied by `-q`, invalid without it), `key`, `priority`,
+`status`, `createdAt`, `updatedAt`. Default sort is `priority` unless `-q` is present.
+
+#### Inspect one task
+
+```bash
 scripts/trail task show SHR-1                                  # full detail + subtasks
 scripts/trail task show SHR-1 --metadata-only                  # frontmatter fields only, no body or subtasks
 scripts/trail --format toon task show SHR-1 --metadata-only    # structured metadata (minimal context cost)
 scripts/trail task summary                                     # status/priority breakdown
 scripts/trail task summary -p SHR                              # project-scoped summary
+scripts/trail task summary -q "auth"                            # summary of a search's matches
 ```
 
 Use `task show`/`task list` even when you already know the exact key and could `cat`/`Read` the file directly — see [Use `trail` for Reads Too](#use-trail-for-reads-too-not-just-writes) above for why a single known task is exactly where a raw file read goes silently wrong.
+
+### Bulk operations
+
+`update`, `pickup`, and `complete` accept a filter instead of a single key: `-p/--project`,
+`--filter-status`, and `-q/--search` (with `--regex`/`--ripgrep`), combined with `--bulk` to
+confirm intent. Omit `--bulk` and the filter runs as a dry run — the CLI reports the match count
+and refuses to write, e.g. `Task pickup matched 4 tasks and requires --bulk to modify them.`
+
+```bash
+# Preview the match set first (task list uses -s, not --filter-status — see below)
+scripts/trail task list -p SHR -s NOT_STARTED
+
+# Then mutate the same set
+scripts/trail task pickup -p SHR --filter-status NOT_STARTED --bulk           # pick up everything
+scripts/trail task update -p SHR --filter-status IN_PROGRESS --assignee USER --bulk  # reassign a batch
+scripts/trail task update -q "auth" --priority HIGH --bulk                    # search-targeted bulk edit
+scripts/trail task complete --final --resolution DONE --filter-status NEEDS_REVIEW --bulk  # bulk-complete
+```
+
+A batch edit driven by a text search ("bump priority on everything mentioning auth") doesn't need
+a script looping over `task list` output — pass the same `-q` straight to `update`/`pickup`/`complete`
+with `--bulk`. See [Status filter flag gotcha](#status-filter-flag-gotcha) for the `-s` vs
+`--filter-status` naming mismatch between querying and bulk-mutating commands.
 
 ### Projects
 
@@ -164,6 +237,7 @@ scripts/trail project create SHR \
   --when-to-read "Use for relay extension work"                  # create project (all three flags required)
 scripts/trail project show SHR                                 # show PROJECT.md for a project
 scripts/trail project update SHR --when-to-read "New trigger"  # update metadata field(s)
+scripts/trail project update SHR --status paused                # active, archived, or paused
 scripts/trail project update SHR -i                            # open PROJECT.md in $EDITOR
 ```
 
@@ -189,6 +263,8 @@ scripts/trail index update                                     # rebuild index
 scripts/trail -f json task list -p SHR --top-level             # JSON array
 scripts/trail -f toon task show SHR-1                          # TOON format
 scripts/trail -f raw task show SHR-1                           # raw markdown
+scripts/trail task list -p SHR --top-level --format json       # same as the first line — flag order doesn't matter
+scripts/trail task show SHR-1 --metadata-only --dir /path/to/project --format toon  # --dir + --format, interleaved with a subcommand flag
 ```
 
 ## CLI-First Operations

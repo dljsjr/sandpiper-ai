@@ -47,13 +47,11 @@ scripts/sandpiper-standup read
 ```
 
 This command:
-- returns standup context grouped as **Active Sessions** (current `SANDPIPER_SESSION_ID`) and **Inactive Sessions** (every other section — "inactive" means "not this session," not "abandoned")
-- **deletes every Inactive section from disk as a side effect of printing it.** It's a one-shot baton handoff, not a pure read: the first caller consumes the prior sessions' notes, and stdout is the only durable trace — discard it and that content is gone, no archive.
-- preserves legacy standup content during read migration
+- returns standup context grouped as **Active Sessions** (current `SANDPIPER_SESSION_ID`, plus any other session whose owning process is confirmed alive) and **Inactive Sessions** (every other section — "inactive" means "not currently running," not "abandoned")
+- **is non-destructive.** `read` never deletes anything from disk, no matter how many dead sections it shows you. A section can sit there for months — a thread you got ADHD-distracted away from and haven't come back to yet is not distinguishable, from the file's perspective, from one that's genuinely done. Only an explicit `cleanup` call (see below) removes a section, because only a human or an agent acting on the user's explicit judgment can tell those two cases apart.
+- preserves legacy standup content
 
-Never call this casually or from automation that won't capture the output. And don't reach for a direct read of `.sandpiper/standup.md` as a "safer" alternative — the CLI is the operation with the side effect here, not the raw file.
-
-This holds even for a quick recheck later in the same session, when you've already run `read` once and are tempted to just `cat`/`Read` the file instead of calling the CLI again. Two concrete reasons a raw peek is worse, not just redundant: the file's raw `## Session <uuid>` headers don't tell you which section is actually yours — that's exactly the Active/Inactive classification the CLI computes from `SANDPIPER_SESSION_ID`, so a raw read forces you to reimplement that judgment by hand and can misattribute another session's stale notes as your own continuation. And if `read` already ran this session, the file has already been consumed — a raw peek at that point can only show you *less* than what the CLI's stdout already gave you, never more, since there's nothing left to find that wasn't already surfaced or deleted.
+Prefer the CLI over a direct read of `.sandpiper/standup.md` — the file's raw `## <id>` headers don't tell you which section is actually yours, or which sessions are still running; that's the Active/Inactive classification the CLI computes for you. A raw peek forces you to reimplement that judgment by hand and can misattribute another session's notes as your own.
 
 ### Write
 
@@ -78,7 +76,29 @@ scripts/sandpiper-standup write <<'EOF'
 EOF
 ```
 
-`SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` are injected by the extension and used automatically. Avoid manually passing `--uuid`/`--file` unless needed for explicit tooling.
+`SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` are injected by the extension and used automatically. Avoid manually passing `--id`/`--file` unless needed for explicit tooling. `write` only ever upserts your own section (matched by id) — like `read`, it never touches anyone else's section, dead or alive.
+
+`--file`/`SANDPIPER_SESSION_FILE` is optional — omit it if there's no meaningful session-transcript path to record. `--id`/`SANDPIPER_SESSION_ID` is the only thing `write` actually requires: any stable string that identifies "this session" across successive `write` calls works — it doesn't have to be a UUID, and it doesn't have to come from sandpiper's own session machinery. A **persistent agent identity** (e.g. `Piper`) works too, and is a deliberate use case, not a workaround: pass the same identity across different actual sessions and `write` keeps upserting the same section, so "Piper's standup" becomes one continuously-refreshed thread rather than siloed per-session notes. Whoever writes as that identity next is responsible for reading the prior content and folding forward anything still relevant, same as any other reused id.
+
+### Working from a non-sandpiper harness (e.g. Claude Code)
+
+The standup file and CLI aren't sandpiper-exclusive. A different harness can read and write sections in the same file as long as it picks a stable id and passes it explicitly:
+
+```bash
+scripts/sandpiper-standup write -i <your-id> <<'EOF'
+### Accomplished
+- ...
+EOF
+```
+
+By default, a section written this way has no way to be confirmed "alive" — there's no sandpiper pidfile for a non-sandpiper id, so it always displays under Inactive Sessions (still fine: nothing gets deleted). To get accurate Active/Inactive display, pass `--pid <n>` with any long-lived process ID your harness controls (its own host process, for instance) — the CLI checks that PID directly with the OS (`process.kill(pid, 0)`) and never needs to know anything about sandpiper's own pidfile registry or directory layout:
+
+```bash
+scripts/sandpiper-standup write -i <your-id> -p $$ <<'EOF'
+### Accomplished
+- ...
+EOF
+```
 
 ### Cleanup (manual / maintenance)
 
@@ -88,7 +108,13 @@ Use:
 scripts/sandpiper-standup cleanup
 ```
 
-This removes dead sections and orphaned PID files.
+This is the **only** command that removes anything — it prunes sections whose owning process is confirmed dead, and cleans up orphaned PID files. Call it deliberately, not reflexively:
+
+- The user explicitly says a thread is done and its notes are no longer needed ("clean up standup," "we don't need that old note anymore").
+- You (the agent) are confident a specific Inactive section's content has been fully superseded — e.g. its work is now tracked as a COMPLETE task in the task tracker, so the standup note is pure duplication, not the only remaining record.
+- The Inactive Sessions list has grown long enough that skimming it is real overhead, *and* you've checked with the user (or the sections are unambiguously done) before pruning — `cleanup` is irreversible, unlike `read`.
+
+Don't call `cleanup` reflexively after every `read` just because Inactive Sessions is non-empty — a dormant thread the user hasn't circled back to yet looks identical, from the file's perspective, to a genuinely finished one. When in doubt, leave it; the cost of an unpruned section sitting in the file is small, the cost of deleting someone's still-needed continuity notes is not.
 
 ## When to Write
 
