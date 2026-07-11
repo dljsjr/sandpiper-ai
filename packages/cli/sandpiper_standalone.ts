@@ -71,7 +71,12 @@ configurePiEnvironment(
   process.env,
 );
 mirrorPiSandpiperEnvironment(process.env);
-// console.log(`using pi-coding-agent version: ${piMetadata.version}\n`);
+// stderr, not stdout: RPC mode expects well-formed JSON-LD over stdout and can't
+// tolerate arbitrary interleaved text. Opt-in only -- useful when debugging the
+// distribution machinery, noisy otherwise.
+if (process.env.SANDPIPER_PRINT_PI_VERSION === '1') {
+  console.error(`using pi-coding-agent version: ${piMetadata.version}\n`);
+}
 
 const { loadPiMain } = await import('./deferred_pi_import.js');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
