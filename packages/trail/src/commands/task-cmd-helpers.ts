@@ -1,11 +1,12 @@
 import type { Command } from '@commander-js/extra-typings';
+import type { UpdateFieldGuardInputs } from '../core/consistency-guards.js';
 import { replaceDescription } from '../core/description.js';
 import { normalizeAssigneeInput, normalizeReporterInput } from '../core/frontmatter.js';
 import { applyFieldUpdates } from '../core/mutate.js';
 import { resolveTaskFile } from '../core/patterns.js';
 import type { TaskFilter } from '../core/query.js';
 import { queryTasks } from '../core/query.js';
-import type { TaskStatus } from '../core/types.js';
+import type { Task, TaskStatus } from '../core/types.js';
 import { loadTasks, searchToKeys } from './helpers.js';
 
 export interface UpdateOptions {
@@ -72,6 +73,27 @@ export function applyInteractiveFieldUpdates(content: string, fields: Record<str
     updated = replaceDescription(updated, fields.description as string);
   }
   return updated;
+}
+
+function sameRelationArray(a: readonly string[], b: readonly string[]): boolean {
+  return a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
+/**
+ * Reduce a free-text interactive edit to just the fields the consistency guards care
+ * about, comparing parsed before/after task state rather than requiring a structured
+ * diff up front -- an interactive edit can touch anything, so "what changed" has to be
+ * derived after the fact. Guards that only fire when a specific field is touched in this
+ * call (e.g. check 1b) rely on this returning `undefined` for anything that didn't change.
+ */
+export function diffGuardRelevantFields(original: Task, edited: Task): UpdateFieldGuardInputs {
+  return {
+    ...(edited.status !== original.status ? { status: edited.status } : {}),
+    ...(edited.resolution !== original.resolution ? { resolution: edited.resolution } : {}),
+    ...(!sameRelationArray(edited.blockedBy, original.blockedBy) ? { blockedBy: edited.blockedBy } : {}),
+    ...(!sameRelationArray(edited.dependsOn, original.dependsOn) ? { dependsOn: edited.dependsOn } : {}),
+    ...(!sameRelationArray(edited.related, original.related) ? { related: edited.related } : {}),
+  };
 }
 
 export function resolveTargetPaths(

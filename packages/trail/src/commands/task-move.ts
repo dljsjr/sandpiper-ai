@@ -10,6 +10,7 @@ export const taskMoveCommand = new Command('move')
   .option('-p, --project <key>', 'Target project (triggers re-key)')
   .option('-k, --kind <kind>', 'New kind: TASK, BUG, SUBTASK')
   .option('--parent <key>', 'New parent (required when kind is SUBTASK)')
+  .option('--force', 'Demote the re-parent consistency guard (parent status) to a warning')
   .action((key, opts, cmd) => {
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);
@@ -22,6 +23,7 @@ export const taskMoveCommand = new Command('move')
         project: opts.project?.toUpperCase(),
         kind: opts.kind?.toUpperCase() as TaskKind | undefined,
         parent: opts.parent?.toUpperCase(),
+        force: opts.force ?? false,
       });
 
       updateIndex(tasksDir);

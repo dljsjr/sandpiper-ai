@@ -429,6 +429,17 @@ describe('updateTaskFields', () => {
       reporter: 'USER',
     });
     taskPath = result.path;
+    // FOO-2..FOO-7: real fixtures so relationship-field tests reference existing tasks,
+    // not dangling keys the new referential-integrity guard would reject.
+    for (let i = 0; i < 6; i++) {
+      createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'LOW',
+        title: `Related fixture ${i}`,
+        reporter: 'USER',
+      });
+    }
   });
 
   afterEach(() => {
@@ -664,6 +675,530 @@ describe('completeTask', () => {
     writeFileSync(taskPath, readFileSync(taskPath, 'utf-8').replace('status: NOT STARTED', 'status: banana'));
 
     expect(() => completeTask(taskPath, tasksDir, true, 'DONE')).toThrow('NEEDS REVIEW');
+  });
+});
+
+describe('consistency guards', () => {
+  let tasksDir: string;
+
+  beforeEach(() => {
+    tasksDir = mkdtempSync(join(tmpdir(), 'mutate-test-'));
+    createProject(tasksDir, 'CON');
+  });
+
+  afterEach(() => {
+    rmSync(tasksDir, { recursive: true, force: true });
+  });
+
+  describe('check 1: parent/child status consistency', () => {
+    it('blocks finalizing a parent with a non-COMPLETE subtask', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+      completeTask(parent.path, tasksDir);
+
+      expect(() => completeTask(parent.path, tasksDir, true, 'DONE')).toThrow('non-COMPLETE subtasks');
+    });
+
+    it('also blocks finalizing a parent with a non-COMPLETE subtask as WONTFIX (unlike check 2, this exemption does not apply here)', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+      completeTask(parent.path, tasksDir);
+
+      expect(() => completeTask(parent.path, tasksDir, true, 'WONTFIX')).toThrow('non-COMPLETE subtasks');
+    });
+
+    it("also blocks a direct updateTaskFields call to COMPLETE, not just completeTask (Huginn's finding: check 1a used to only fire through completeTask)", () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+
+      // task update PARENT --status COMPLETE --resolution DONE reaches updateTaskFields
+      // directly, bypassing completeTask's wrapper entirely -- this must be blocked too.
+      expect(() => updateTaskFields(parent.path, { status: 'COMPLETE', resolution: 'DONE' }, tasksDir)).toThrow(
+        'non-COMPLETE subtasks',
+      );
+    });
+
+    it('allows finalizing a parent with a non-COMPLETE subtask when forced', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+      completeTask(parent.path, tasksDir);
+
+      expect(() => completeTask(parent.path, tasksDir, true, 'DONE', true)).not.toThrow();
+      expect(readTaskFrontmatter(parent.path).status).toBe('COMPLETE');
+    });
+
+    it('allows finalizing a parent whose subtasks are all COMPLETE', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      const child = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+      completeTask(child.path, tasksDir);
+      completeTask(child.path, tasksDir, true, 'DONE');
+      completeTask(parent.path, tasksDir);
+
+      expect(() => completeTask(parent.path, tasksDir, true, 'DONE')).not.toThrow();
+    });
+
+    it('does not fire when only moving a parent to NEEDS REVIEW', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+
+      expect(() => completeTask(parent.path, tasksDir)).not.toThrow();
+    });
+
+    it('blocks activating a subtask whose parent is COMPLETE', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      const child = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+      completeTask(child.path, tasksDir);
+      completeTask(child.path, tasksDir, true, 'DONE');
+      completeTask(parent.path, tasksDir);
+      completeTask(parent.path, tasksDir, true, 'DONE');
+
+      expect(() => updateTaskFields(child.path, { status: 'IN PROGRESS' }, tasksDir)).toThrow('is COMPLETE');
+    });
+
+    it('allows activating a subtask whose parent is COMPLETE when forced', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      const child = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'SUBTASK',
+        priority: 'LOW',
+        title: 'Child',
+        reporter: 'USER',
+        parent: parent.key,
+      });
+      completeTask(child.path, tasksDir);
+      completeTask(child.path, tasksDir, true, 'DONE');
+      completeTask(parent.path, tasksDir);
+      completeTask(parent.path, tasksDir, true, 'DONE');
+
+      expect(() => updateTaskFields(child.path, { status: 'IN PROGRESS' }, tasksDir, true)).not.toThrow();
+      expect(readTaskFrontmatter(child.path).status).toBe('IN PROGRESS');
+    });
+
+    it('blocks creating a new subtask under an already-COMPLETE parent', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      completeTask(parent.path, tasksDir);
+      completeTask(parent.path, tasksDir, true, 'DONE');
+
+      expect(() =>
+        createTask(tasksDir, {
+          project: 'CON',
+          kind: 'SUBTASK',
+          priority: 'LOW',
+          title: 'Late child',
+          reporter: 'USER',
+          parent: parent.key,
+        }),
+      ).toThrow('is COMPLETE');
+    });
+
+    it('allows creating a subtask under a COMPLETE parent when forced', () => {
+      const parent = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Parent',
+        reporter: 'USER',
+      });
+      completeTask(parent.path, tasksDir);
+      completeTask(parent.path, tasksDir, true, 'DONE');
+
+      expect(() =>
+        createTask(tasksDir, {
+          project: 'CON',
+          kind: 'SUBTASK',
+          priority: 'LOW',
+          title: 'Late child',
+          reporter: 'USER',
+          parent: parent.key,
+          force: true,
+        }),
+      ).not.toThrow();
+    });
+  });
+
+  describe('check 2: blocker-resolution consistency', () => {
+    it('blocks moving to NEEDS REVIEW while a blocker is unresolved', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const blocked = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocked',
+        reporter: 'USER',
+        blockedBy: [blocker.key],
+      });
+
+      expect(() => completeTask(blocked.path, tasksDir)).toThrow('Unresolved blocker');
+    });
+
+    it('allows moving to NEEDS REVIEW with an unresolved blocker when forced', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const blocked = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocked',
+        reporter: 'USER',
+        blockedBy: [blocker.key],
+      });
+
+      expect(() => completeTask(blocked.path, tasksDir, false, undefined, true)).not.toThrow();
+    });
+
+    it('allows moving to NEEDS REVIEW once the blocker is COMPLETE + DONE', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const blocked = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocked',
+        reporter: 'USER',
+        blockedBy: [blocker.key],
+      });
+      completeTask(blocker.path, tasksDir);
+      completeTask(blocker.path, tasksDir, true, 'DONE');
+
+      expect(() => completeTask(blocked.path, tasksDir)).not.toThrow();
+    });
+
+    it('blocks adding a new unresolved blocker to a task already in NEEDS REVIEW', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const reviewed = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Reviewed',
+        reporter: 'USER',
+      });
+      completeTask(reviewed.path, tasksDir);
+
+      expect(() => updateTaskFields(reviewed.path, { blockedBy: [blocker.key] }, tasksDir)).toThrow(
+        'Unresolved blocker',
+      );
+    });
+
+    it('blocks finalizing when a stored (not freshly-set) blocker reference has gone dangling', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const blocked = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocked',
+        reporter: 'USER',
+        blockedBy: [blocker.key],
+      });
+      // Simulate the blocker becoming unreachable after the reference was validly set
+      // (e.g. archive-nesting, manual edit) without touching blocked_by on `blocked`.
+      rmSync(blocker.path);
+
+      // completeTask doesn't pass --blocked-by, so this exercises the fallback to the
+      // stored array -- checkReferencesExist never runs in this call shape at all.
+      expect(() => completeTask(blocked.path, tasksDir)).toThrow('Unresolved blocker');
+    });
+
+    it('allows finalizing as WONTFIX with an unresolved blocker, without --force', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const blocked = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocked',
+        reporter: 'USER',
+        blockedBy: [blocker.key],
+      });
+      // Force through the NEEDS REVIEW setup step -- the blocker is still unresolved at
+      // this point too, and that's not what this test is exercising.
+      completeTask(blocked.path, tasksDir, false, undefined, true);
+
+      expect(() => completeTask(blocked.path, tasksDir, true, 'WONTFIX')).not.toThrow();
+      expect(readTaskFrontmatter(blocked.path).status).toBe('COMPLETE');
+      expect(readTaskFrontmatter(blocked.path).resolution).toBe('WONTFIX');
+    });
+
+    it('still blocks finalizing as DONE with an unresolved blocker (WONTFIX exemption does not leak to DONE)', () => {
+      const blocker = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocker',
+        reporter: 'USER',
+      });
+      const blocked = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Blocked',
+        reporter: 'USER',
+        blockedBy: [blocker.key],
+      });
+      completeTask(blocked.path, tasksDir, false, undefined, true);
+
+      expect(() => completeTask(blocked.path, tasksDir, true, 'DONE')).toThrow('Unresolved blocker');
+    });
+  });
+
+  describe('check 3: dangling relationship references', () => {
+    it('blocks creating a task with a blockedBy key that does not exist', () => {
+      expect(() =>
+        createTask(tasksDir, {
+          project: 'CON',
+          kind: 'TASK',
+          priority: 'HIGH',
+          title: 'Task',
+          reporter: 'USER',
+          blockedBy: ['CON-999'],
+        }),
+      ).toThrow('not found');
+    });
+
+    it('allows creating with a dangling reference when forced', () => {
+      expect(() =>
+        createTask(tasksDir, {
+          project: 'CON',
+          kind: 'TASK',
+          priority: 'HIGH',
+          title: 'Task',
+          reporter: 'USER',
+          blockedBy: ['CON-999'],
+          force: true,
+        }),
+      ).not.toThrow();
+    });
+
+    it('blocks updating dependsOn to a key that does not exist', () => {
+      const task = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Task',
+        reporter: 'USER',
+      });
+
+      expect(() => updateTaskFields(task.path, { dependsOn: ['CON-999'] }, tasksDir)).toThrow('not found');
+    });
+
+    it('allows a relationship field pointing at a real task', () => {
+      const other = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Other',
+        reporter: 'USER',
+      });
+      const task = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Task',
+        reporter: 'USER',
+      });
+
+      expect(() => updateTaskFields(task.path, { related: [other.key] }, tasksDir)).not.toThrow();
+    });
+  });
+
+  describe('check 4: cycle detection', () => {
+    it('blocks a task listing itself as its own blocker', () => {
+      const task = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Task',
+        reporter: 'USER',
+      });
+
+      expect(() => updateTaskFields(task.path, { blockedBy: [task.key] }, tasksDir)).toThrow('cycle');
+    });
+
+    it('blocks a two-hop cycle across dependsOn', () => {
+      const a = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'A',
+        reporter: 'USER',
+      });
+      const b = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'B',
+        reporter: 'USER',
+        dependsOn: [a.key],
+      });
+
+      expect(() => updateTaskFields(a.path, { dependsOn: [b.key] }, tasksDir)).toThrow('cycle');
+    });
+
+    it('allows a cycle when forced', () => {
+      const task = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Task',
+        reporter: 'USER',
+      });
+
+      expect(() => updateTaskFields(task.path, { blockedBy: [task.key] }, tasksDir, true)).not.toThrow();
+    });
+
+    it('allows a non-cyclic dependency chain', () => {
+      const a = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'A',
+        reporter: 'USER',
+      });
+      const b = createTask(tasksDir, {
+        project: 'CON',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'B',
+        reporter: 'USER',
+      });
+
+      expect(() => updateTaskFields(b.path, { dependsOn: [a.key] }, tasksDir)).not.toThrow();
+    });
   });
 });
 

@@ -6,7 +6,7 @@ import { extractActivityLog } from './activity-log.js';
 import { parseFrontmatter } from './frontmatter.js';
 import { updateIndex } from './index-update.js';
 import { moveTask } from './move.js';
-import { createProject, createTask, updateTaskFields } from './mutate.js';
+import { completeTask, createProject, createTask, updateTaskFields } from './mutate.js';
 
 function fm(path: string) {
   return parseFrontmatter(readFileSync(path, 'utf-8'));
@@ -559,6 +559,72 @@ describe('moveTask', () => {
       expect(existsSync(historyDir)).toBe(true);
       const diffFiles = readdirSync(historyDir).filter((f) => f.endsWith('.diff'));
       expect(diffFiles.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('check 1: parent/child status consistency on re-parent', () => {
+    it('blocks re-parenting an active task under a COMPLETE parent', () => {
+      createProject(tasksDir, 'FOO');
+      const completeParent = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Done parent',
+        reporter: 'USER',
+      });
+      completeTask(completeParent.path, tasksDir);
+      completeTask(completeParent.path, tasksDir, true, 'DONE');
+      const { key } = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'LOW',
+        title: 'Active task',
+        reporter: 'USER',
+      });
+
+      expect(() => moveTask(tasksDir, key, { kind: 'SUBTASK', parent: completeParent.key })).toThrow('is COMPLETE');
+    });
+
+    it('allows re-parenting under a COMPLETE parent when forced', () => {
+      createProject(tasksDir, 'FOO');
+      const completeParent = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Done parent',
+        reporter: 'USER',
+      });
+      completeTask(completeParent.path, tasksDir);
+      completeTask(completeParent.path, tasksDir, true, 'DONE');
+      const { key } = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'LOW',
+        title: 'Active task',
+        reporter: 'USER',
+      });
+
+      expect(() => moveTask(tasksDir, key, { kind: 'SUBTASK', parent: completeParent.key, force: true })).not.toThrow();
+    });
+
+    it('allows re-parenting under a non-COMPLETE parent', () => {
+      createProject(tasksDir, 'FOO');
+      const openParent = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'HIGH',
+        title: 'Open parent',
+        reporter: 'USER',
+      });
+      const { key } = createTask(tasksDir, {
+        project: 'FOO',
+        kind: 'TASK',
+        priority: 'LOW',
+        title: 'Active task',
+        reporter: 'USER',
+      });
+
+      expect(() => moveTask(tasksDir, key, { kind: 'SUBTASK', parent: openParent.key })).not.toThrow();
     });
   });
 });

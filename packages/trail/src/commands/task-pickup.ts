@@ -6,6 +6,7 @@ import { type BulkFilterOptions, resolveTargetPaths } from './task-cmd-helpers.j
 
 interface PickupOptions extends BulkFilterOptions {
   readonly assignee?: string;
+  readonly force?: boolean;
 }
 
 export const taskPickupCommand = new Command('pickup')
@@ -18,6 +19,7 @@ export const taskPickupCommand = new Command('pickup')
   .option('--regex', 'Use JavaScript regex search (or ripgrep regex search with --ripgrep)')
   .option('--ripgrep', 'Use ripgrep search instead of the built-in search backend')
   .option('--bulk', 'Confirm intent for keyless bulk mutation')
+  .option('--force', 'Demote the parent/child consistency guard to a warning')
   .action((key, opts: PickupOptions, cmd) => {
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);
@@ -28,7 +30,7 @@ export const taskPickupCommand = new Command('pickup')
 
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task pickup');
       for (const path of paths) {
-        pickupTask(path, tasksDir, fields.assignee);
+        pickupTask(path, tasksDir, fields.assignee, opts.force ?? false);
       }
       emitMutationResult(cmd, paths, `Picked up ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
     });
