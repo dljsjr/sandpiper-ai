@@ -7,6 +7,7 @@ import { type BulkFilterOptions, resolveTargetPaths } from './task-cmd-helpers.j
 interface CompleteCommandOptions extends BulkFilterOptions {
   readonly final?: boolean;
   readonly resolution?: string;
+  readonly force?: boolean;
 }
 
 export const taskCompleteCommand = new Command('complete')
@@ -20,6 +21,7 @@ export const taskCompleteCommand = new Command('complete')
   .option('--regex', 'Use JavaScript regex search (or ripgrep regex search with --ripgrep)')
   .option('--ripgrep', 'Use ripgrep search instead of the built-in search backend')
   .option('--bulk', 'Confirm intent for keyless bulk mutation')
+  .option('--force', 'Demote consistency-guard violations (parent/child, blockers) to warnings')
   .action((key, opts: CompleteCommandOptions, cmd) => {
     withErrorHandling(() => {
       const targetStatus = opts.final ? 'COMPLETE' : 'NEEDS REVIEW';
@@ -31,7 +33,7 @@ export const taskCompleteCommand = new Command('complete')
       const resolution = opts.resolution?.toUpperCase() as TaskResolution | undefined;
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task completion');
       for (const path of paths) {
-        completeTask(path, tasksDir, opts.final ?? false, resolution);
+        completeTask(path, tasksDir, opts.final ?? false, resolution, opts.force ?? false);
       }
       emitMutationResult(
         cmd,

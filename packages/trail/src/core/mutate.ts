@@ -1,6 +1,11 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { appendActivityEntry, type FieldChange } from './activity-log.js';
+import {
+  assertCompleteRequiresResolution,
+  enforceCreateTaskGuards,
+  enforceUpdateFieldGuards,
+} from './consistency-guards.js';
 import { extractDescription, replaceDescription } from './description.js';
 import {
   formatFrontmatterScalar,
@@ -79,6 +84,8 @@ export interface CreateTaskOptions {
   readonly blockedBy?: readonly string[];
   readonly related?: readonly string[];
   readonly description?: string;
+  /** Demote consistency-guard violations (parent status, dangling refs) to warnings. */
+  readonly force?: boolean;
 }
 
 export interface CreateTaskResult {
@@ -104,6 +111,12 @@ export function createTask(tasksDir: string, opts: CreateTaskOptions): CreateTas
   if (opts.parent && !existsSync(join(projectDir, `${opts.parent}.md`))) {
     throw new Error(`Parent task not found: ${opts.parent}`);
   }
+
+  enforceCreateTaskGuards(
+    tasksDir,
+    { parent: opts.parent, blockedBy: opts.blockedBy, dependsOn: opts.dependsOn, related: opts.related },
+    opts.force ?? false,
+  );
 
   // Get next task number from index, or scan files as fallback
   const taskNum = getNextTaskNumber(tasksDir, opts.project);
@@ -429,16 +442,16 @@ export function writeTaskFileAuditably(opts: AuditedWriteOptions): void {
  * Update fields on a task file on disk.
  * Validates that COMPLETE status requires a resolution.
  */
-export function updateTaskFields(taskPath: string, fields: UpdateFields, tasksDir: string): void {
+export function updateTaskFields(taskPath: string, fields: UpdateFields, tasksDir: string, force = false): void {
   const normalizedFields = normalizeUpdateFields(fields);
-  if (normalizedFields.status === 'COMPLETE' && !normalizedFields.resolution) {
-    throw new Error(
-      'Setting status to COMPLETE requires a resolution. ' + 'Use resolution: DONE or resolution: WONTFIX.',
-    );
-  }
+  assertCompleteRequiresResolution(normalizedFields.status, normalizedFields.resolution);
 
   const originalContent = readFileSync(taskPath, 'utf-8');
   const originalFm = parseFrontmatter(originalContent);
+  const key = basename(taskPath, '.md');
+  const currentTask = taskFromFrontmatter(key, originalFm);
+
+  enforceUpdateFieldGuards(tasksDir, taskPath, currentTask, normalizedFields, force);
 
   let content = applyFieldUpdates(originalContent, normalizedFields);
   if (normalizedFields.description !== undefined) {
@@ -572,26 +585,36 @@ function computeChanges(
 
 // ─── Convenience Mutations ───────────────────────────────────────
 
-export function pickupTask(taskPath: string, tasksDir: string, assignee: TaskAssignee = 'AGENT'): void {
-  updateTaskFields(taskPath, { status: 'IN PROGRESS', assignee }, tasksDir);
+export function pickupTask(taskPath: string, tasksDir: string, assignee: TaskAssignee = 'AGENT', force = false): void {
+  updateTaskFields(taskPath, { status: 'IN PROGRESS', assignee }, tasksDir, force);
 }
 
+// Sequential gates, not simultaneous reporting: if both the NEEDS-REVIEW-before-DONE
+// rule (below) and checkChildrenCompleteBeforeFinalize (inside updateTaskFields's own
+// guard orchestration, at the end of this function) would fail, only the first one
+// thrown surfaces. Fixing it and retrying reveals the second. Each check is still
+// correct in isolation; this only affects which single violation a caller sees first.
 export function completeTask(
   taskPath: string,
   tasksDir: string,
   final = false,
   resolution: TaskResolution | undefined = undefined,
+  force = false,
 ): void {
   if (final && !resolution) {
     throw new Error('Completing a task (final=true) requires a resolution: DONE or WONTFIX.');
   }
-  if (final && resolution === 'DONE') {
-    const key = basename(taskPath, '.md');
-    const current = taskFromFrontmatter(key, parseFrontmatter(readFileSync(taskPath, 'utf-8')));
-    if (current.status !== 'NEEDS REVIEW') {
-      throw new Error('Completing a task with resolution DONE requires current status NEEDS REVIEW.');
-    }
+
+  const key = basename(taskPath, '.md');
+  const current = taskFromFrontmatter(key, parseFrontmatter(readFileSync(taskPath, 'utf-8')));
+
+  if (final && resolution === 'DONE' && current.status !== 'NEEDS REVIEW') {
+    throw new Error('Completing a task with resolution DONE requires current status NEEDS REVIEW.');
   }
+
+  // Check 1a (children-complete-before-finalize) fires from inside updateTaskFields's
+  // own guard orchestration below, not here directly -- it needs to apply uniformly to
+  // `task update --status COMPLETE` and the --interactive path too, not just this one.
   updateTaskFields(
     taskPath,
     {
@@ -599,5 +622,6 @@ export function completeTask(
       ...(resolution ? { resolution } : {}),
     },
     tasksDir,
+    force,
   );
 }

@@ -1,25 +1,28 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { join } from 'node:path';
 import { decode as decodeToon, encode as encodeToon } from '@toon-format/toon';
 import type { FieldChange } from './activity-log.js';
+import { checkParentNotCompleteForReparent, enforceGuard } from './consistency-guards.js';
 import { parseFrontmatter, taskFromFrontmatter } from './frontmatter.js';
 import { writeFileAtomic } from './fs.js';
 import { loadIndex, readProjectCounter } from './index-update.js';
 import { applyInternalFieldUpdates, writeTaskFileAuditably } from './mutate.js';
 import {
+  collectSubtasks,
   projectFromKey,
+  resolveParentFromPath,
   resolveTaskFile,
   scanHighestNumber,
-  TASK_FILE_RE,
-  TASK_KEY_RE,
   walkTaskFiles,
 } from './patterns.js';
-import type { IndexedTask, TaskKind } from './types.js';
+import type { IndexedTask, TaskKind, TaskStatus } from './types.js';
 
 export interface MoveOptions {
   readonly project?: string;
   readonly kind?: TaskKind;
   readonly parent?: string;
+  /** Demote the parent-status consistency guard to a warning. */
+  readonly force?: boolean;
 }
 
 export interface MoveResult {
@@ -62,7 +65,7 @@ interface MovePlan {
 export function moveTask(tasksDir: string, key: string, opts: MoveOptions): MoveResult {
   const current = readCurrentTask(tasksDir, key);
   const target = resolveMoveTarget(current, opts);
-  validateMoveTarget(tasksDir, current, target);
+  validateMoveTarget(tasksDir, key, current, target, opts.force ?? false);
 
   const plan = planMove(tasksDir, key, current, target);
   const moveChanges = buildMoveActivityChanges(key, plan.newKey, current, target);
@@ -119,12 +122,19 @@ function resolveMoveTarget(current: CurrentTaskState, opts: MoveOptions): MoveTa
   };
 }
 
-function validateMoveTarget(tasksDir: string, current: CurrentTaskState, target: MoveTarget): void {
+function validateMoveTarget(
+  tasksDir: string,
+  key: string,
+  current: CurrentTaskState,
+  target: MoveTarget,
+  force: boolean,
+): void {
   if (target.kind === 'SUBTASK' && !target.parent) {
     throw new Error('Moving to SUBTASK requires --parent.');
   }
   if (target.kind === 'SUBTASK' && target.parent) {
-    validateParentIsTopLevel(tasksDir, target.parent, target.project);
+    const currentStatus = taskFromFrontmatter(key, parseFrontmatter(current.content)).status;
+    validateParentIsTopLevel(tasksDir, target.parent, target.project, currentStatus, force);
   }
   if (current.kind === 'SUBTASK' && target.kind === 'SUBTASK' && target.project !== current.project) {
     throw new Error('Cannot move a subtask to another project without promoting it to TASK or BUG.');
@@ -268,15 +278,13 @@ function updateInboundReferences(tasksDir: string, reKeyMap: ReadonlyMap<string,
   }
 }
 
-function resolveParentFromPath(tasksDir: string, taskPath: string, project: string): string | undefined {
-  const projectDir = join(tasksDir, project);
-  const dir = join(taskPath, '..');
-  if (dir === projectDir) return undefined;
-  const parentKey = basename(dir);
-  return TASK_KEY_RE.test(parentKey) ? parentKey : undefined;
-}
-
-function validateParentIsTopLevel(tasksDir: string, parentKey: string, project: string): void {
+function validateParentIsTopLevel(
+  tasksDir: string,
+  parentKey: string,
+  project: string,
+  currentStatus: TaskStatus,
+  force: boolean,
+): void {
   const parentPath = join(tasksDir, project, `${parentKey}.md`);
   if (!existsSync(parentPath)) {
     throw new Error(`Parent task not found at top level: ${parentKey}`);
@@ -285,21 +293,7 @@ function validateParentIsTopLevel(tasksDir: string, parentKey: string, project: 
   if (parentTask.kind === 'SUBTASK') {
     throw new Error(`Cannot make a subtask of ${parentKey} — it is itself a SUBTASK. Parent must be a TASK or BUG.`);
   }
-}
-
-function collectSubtasks(tasksDir: string, parentKey: string, project: string): Map<string, string> {
-  const subtaskDir = join(tasksDir, project, parentKey);
-  const subtasks = new Map<string, string>(); // key → path
-
-  if (!existsSync(subtaskDir)) return subtasks;
-
-  for (const entry of readdirSync(subtaskDir, { withFileTypes: true })) {
-    if (!entry.isFile() || !TASK_FILE_RE.test(entry.name)) continue;
-    const subKey = basename(entry.name, '.md');
-    subtasks.set(subKey, join(subtaskDir, entry.name));
-  }
-
-  return subtasks;
+  enforceGuard(checkParentNotCompleteForReparent(parentKey, parentTask.status, currentStatus), force);
 }
 
 /**

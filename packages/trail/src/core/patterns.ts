@@ -1,5 +1,5 @@
 import { existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 
 /** Matches an uppercase project key (2+ letters): SHR, CLI, TOOLS, etc. */
 export const PROJECT_KEY_RE = /^[A-Z]{2,}$/;
@@ -112,6 +112,36 @@ export function resolveTaskFile(tasksDir: string, key: string): string {
   }
 
   throw new Error(`Task file not found: ${key}`);
+}
+
+/**
+ * Resolve a task's parent key from its file path, or undefined if it's top-level.
+ */
+export function resolveParentFromPath(tasksDir: string, taskPath: string, project: string): string | undefined {
+  const projectDir = join(tasksDir, project);
+  const dir = join(taskPath, '..');
+  if (dir === projectDir) return undefined;
+  const parentKey = basename(dir);
+  return TASK_KEY_RE.test(parentKey) ? parentKey : undefined;
+}
+
+/**
+ * Collect a parent task's direct subtasks as a key → path map.
+ * Returns an empty map if the parent has no subtask directory.
+ */
+export function collectSubtasks(tasksDir: string, parentKey: string, project: string): Map<string, string> {
+  const subtaskDir = join(tasksDir, project, parentKey);
+  const subtasks = new Map<string, string>(); // key → path
+
+  if (!existsSync(subtaskDir)) return subtasks;
+
+  for (const entry of readdirSync(subtaskDir, { withFileTypes: true })) {
+    if (!entry.isFile() || !TASK_FILE_RE.test(entry.name)) continue;
+    const subKey = basename(entry.name, '.md');
+    subtasks.set(subKey, join(subtaskDir, entry.name));
+  }
+
+  return subtasks;
 }
 
 /**

@@ -16,6 +16,7 @@ export const taskCreateCommand = new Command('create')
   .option('--blocked-by <keys>', 'Comma-separated task keys blocking this')
   .option('--related <keys>', 'Comma-separated related task keys')
   .option('--desc <text>', 'Set description (task body text)')
+  .option('--force', 'Demote consistency-guard violations (parent status, dangling references) to warnings')
   .action((opts, cmd) => {
     withErrorHandling(() => {
       const createOpts = {
@@ -29,6 +30,7 @@ export const taskCreateCommand = new Command('create')
         blockedBy: opts.blockedBy?.split(',').map((s: string) => s.trim()),
         related: opts.related?.split(',').map((s: string) => s.trim()),
         description: opts.desc,
+        force: opts.force ?? false,
       };
 
       const tasksDir = getTasksDir(cmd);

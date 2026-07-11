@@ -4,12 +4,33 @@ import { join } from 'node:path';
 import { Command } from '@commander-js/extra-typings';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createProject, createTask, updateTaskFields } from '../core/mutate.js';
+import type { Task } from '../core/types.js';
 import {
   applyInteractiveFieldUpdates,
   buildFieldsFromOptions,
+  diffGuardRelevantFields,
   normalizeStatus,
   resolveTargetPaths,
 } from './task-cmd-helpers.js';
+
+function fixtureTask(overrides: Partial<Task> = {}): Task {
+  return {
+    key: 'FOO-1',
+    project: 'FOO',
+    title: 'Task',
+    status: 'NOT STARTED',
+    kind: 'TASK',
+    priority: 'MEDIUM',
+    assignee: 'UNASSIGNED',
+    reporter: 'USER',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    dependsOn: [],
+    blockedBy: [],
+    related: [],
+    ...overrides,
+  };
+}
 
 const tempDirs: string[] = [];
 
@@ -174,5 +195,55 @@ Old body
     );
 
     expect(paths.length).toBeGreaterThan(0);
+  });
+});
+
+describe('diffGuardRelevantFields', () => {
+  it('returns nothing when none of the guard-relevant fields changed', () => {
+    const original = fixtureTask();
+    const edited = fixtureTask({ title: 'Renamed' });
+
+    expect(diffGuardRelevantFields(original, edited)).toEqual({});
+  });
+
+  it('includes status only when it changed', () => {
+    const original = fixtureTask({ status: 'NOT STARTED' });
+    const edited = fixtureTask({ status: 'IN PROGRESS' });
+
+    expect(diffGuardRelevantFields(original, edited)).toEqual({ status: 'IN PROGRESS' });
+  });
+
+  it('includes blockedBy only when it changed', () => {
+    const original = fixtureTask({ blockedBy: ['FOO-2'] });
+    const edited = fixtureTask({ blockedBy: ['FOO-2', 'FOO-3'] });
+
+    expect(diffGuardRelevantFields(original, edited)).toEqual({ blockedBy: ['FOO-2', 'FOO-3'] });
+  });
+
+  it('treats reordering a relation array as a change (order is significant)', () => {
+    const original = fixtureTask({ related: ['FOO-2', 'FOO-3'] });
+    const edited = fixtureTask({ related: ['FOO-3', 'FOO-2'] });
+
+    expect(diffGuardRelevantFields(original, edited)).toEqual({ related: ['FOO-3', 'FOO-2'] });
+  });
+
+  it('includes multiple changed fields together', () => {
+    const original = fixtureTask({ status: 'NOT STARTED', dependsOn: [] });
+    const edited = fixtureTask({ status: 'NEEDS REVIEW', dependsOn: ['FOO-9'] });
+
+    expect(diffGuardRelevantFields(original, edited)).toEqual({
+      status: 'NEEDS REVIEW',
+      dependsOn: ['FOO-9'],
+    });
+  });
+
+  it('includes resolution only when it changed, so an interactive WONTFIX picks up the check-2 exemption', () => {
+    const original = fixtureTask({ status: 'NEEDS REVIEW' });
+    const edited = fixtureTask({ status: 'COMPLETE', resolution: 'WONTFIX' });
+
+    expect(diffGuardRelevantFields(original, edited)).toEqual({
+      status: 'COMPLETE',
+      resolution: 'WONTFIX',
+    });
   });
 });

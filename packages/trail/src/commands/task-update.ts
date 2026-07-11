@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { Command } from '@commander-js/extra-typings';
+import { assertCompleteRequiresResolution, enforceUpdateFieldGuards } from '../core/consistency-guards.js';
 import { editInEditor } from '../core/editor.js';
+import { parseFrontmatter, taskFromFrontmatter } from '../core/frontmatter.js';
 import { updateIndex } from '../core/index-update.js';
 import { updateTaskFields, writeTaskFileAuditably } from '../core/mutate.js';
 import { resolveTaskFile } from '../core/patterns.js';
@@ -9,12 +11,14 @@ import {
   applyInteractiveFieldUpdates,
   type BulkFilterOptions,
   buildFieldsFromOptions,
+  diffGuardRelevantFields,
   resolveTargetPaths,
   type UpdateOptions,
 } from './task-cmd-helpers.js';
 
 interface UpdateCommandOptions extends UpdateOptions, BulkFilterOptions {
   readonly interactive?: boolean;
+  readonly force?: boolean;
 }
 
 export const taskUpdateCommand = new Command('update')
@@ -37,6 +41,7 @@ export const taskUpdateCommand = new Command('update')
   .option('--regex', 'Use JavaScript regex search (or ripgrep regex search with --ripgrep)')
   .option('--ripgrep', 'Use ripgrep search instead of the built-in search backend')
   .option('--bulk', 'Confirm intent for keyless bulk mutation')
+  .option('--force', 'Demote consistency-guard violations (parent/child, blockers, references, cycles) to warnings')
   .action((key, opts: UpdateCommandOptions, cmd) => {
     withErrorHandling(() => {
       const tasksDir = getTasksDir(cmd);
@@ -58,6 +63,18 @@ export const taskUpdateCommand = new Command('update')
         }
 
         if (edited !== content) {
+          const originalTask = taskFromFrontmatter(taskKey, parseFrontmatter(content));
+          const editedTask = taskFromFrontmatter(taskKey, parseFrontmatter(edited));
+
+          assertCompleteRequiresResolution(editedTask.status, editedTask.resolution);
+          enforceUpdateFieldGuards(
+            tasksDir,
+            taskPath,
+            originalTask,
+            diffGuardRelevantFields(originalTask, editedTask),
+            opts.force ?? false,
+          );
+
           writeTaskFileAuditably({
             taskPath,
             tasksDir,
@@ -81,7 +98,7 @@ export const taskUpdateCommand = new Command('update')
 
       const paths = resolveTargetPaths(key, opts, cmd, tasksDir, 'Task update');
       for (const path of paths) {
-        updateTaskFields(path, fields, tasksDir);
+        updateTaskFields(path, fields, tasksDir, opts.force ?? false);
       }
 
       emitMutationResult(cmd, paths, `Updated ${paths.length} task${paths.length !== 1 ? 's' : ''}.`);
