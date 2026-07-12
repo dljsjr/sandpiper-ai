@@ -6,7 +6,12 @@ import { join } from 'node:path';
 import { createEventBus } from '@earendil-works/pi-coding-agent';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createTattlerPendingInbox, type TattlerPendingBatchCustomMessage } from './tattler-inbox';
-import { createServerWithNotificationSender, sendAgentMessage, sendPayloadFrame } from './tattler-ipc';
+import {
+  createServerWithNotificationSender,
+  sendAgentMessage,
+  sendPayloadFrame,
+  shutdownTattlerServer,
+} from './tattler-ipc';
 import { onChorusRoomDelivery, onChorusRoomPostReceived } from './tattler-pi-events';
 import {
   buildMessage,
@@ -263,5 +268,26 @@ describe('Tattler IPC payload frames', () => {
 
     await expect(sendPayloadFrame(peer, post)).resolves.toEqual({ messageIdAck: post.id });
     expect(rawPost).toContain('"format":"chorus.room-post.v0"');
+  });
+});
+
+describe('shutdownTattlerServer', () => {
+  test('settles promptly while a peer connection is still open', async () => {
+    const { server, socketPath } = await listen(fakeRuntime());
+
+    const client = new net.Socket();
+    client.connect(socketPath);
+    await once(client, 'connect');
+    // A partial frame (no trailing newline) keeps serverHandler's read
+    // loop — and therefore the accepted connection — alive indefinitely.
+    // net.Server.close() alone would wait on it forever.
+    client.write('{"format":"tattler.agent-message.v0"');
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const started = Date.now();
+    await shutdownTattlerServer(server, 2_000);
+    expect(Date.now() - started).toBeLessThan(1_500);
+
+    client.destroy();
   });
 });
