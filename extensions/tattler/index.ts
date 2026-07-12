@@ -15,7 +15,12 @@ import { createTattlerPendingInbox, TATTLER_PENDING_INBOX_ENTRY_KEY } from './ta
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
 import { createTattlerPendingInboxSnapshot, restoreTattlerPendingInboxFromSession } from './tattler-inbox-persistence';
 import { registerTattlerPendingBatchRenderer } from './tattler-inbox-renderer';
-import { createServerWithNotificationSender, isSocketAlive, sendAgentMessage } from './tattler-ipc';
+import {
+  createServerWithNotificationSender,
+  isSocketAlive,
+  sendAgentMessage,
+  shutdownTattlerServer,
+} from './tattler-ipc';
 import { createTattlerPendingInboxNotifier } from './tattler-pending-cue';
 import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueRequest } from './tattler-pi-events';
 import {
@@ -332,8 +337,10 @@ is used to resume an existing session.
       // node doesn't unlink the UDS file on close, and close() itself doesn't settle
       // synchronously — /reload reuses this exact socketPath (same session UUID), so
       // await the close and remove the file now instead of leaving the next
-      // session_start's isSocketAlive probe to race against it.
-      await new Promise<void>((resolve) => closingServer.close(() => resolve()));
+      // session_start's isSocketAlive probe to race against it. The close is
+      // connection-destroying and timeboxed: a lingering peer connection would
+      // otherwise hold close()'s callback hostage and hang the whole pi exit.
+      await shutdownTattlerServer(closingServer);
       const socketPath = ownIdentity?.socketPath;
       if (socketPath && (await stat(socketPath, { throwIfNoEntry: false }))) {
         await unlink(socketPath);

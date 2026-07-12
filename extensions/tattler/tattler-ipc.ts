@@ -150,11 +150,47 @@ async function serverHandler(socket: net.Socket, runtime?: TattlerIpcRuntime): P
   }
 }
 
+const serverConnections = new WeakMap<net.Server, Set<net.Socket>>();
+
 export function createServerWithNotificationSender(sender: TattlerIpcRuntime): net.Server {
   const handler = async (socket: net.Socket) => {
     return serverHandler(socket, sender);
   };
-  return net.createServer(handler);
+  const server = net.createServer(handler);
+  const connections = new Set<net.Socket>();
+  serverConnections.set(server, connections);
+  server.on('connection', (socket) => {
+    connections.add(socket);
+    socket.once('close', () => connections.delete(socket));
+  });
+  return server;
+}
+
+const SERVER_CLOSE_TIMEOUT_MS = 2_000;
+
+/**
+ * Close a Tattler server without letting a lingering peer connection stall
+ * the caller forever: net.Server.close() only fires its callback once every
+ * accepted connection has fully closed, so destroy tracked connections
+ * first and timebox the close as a belt. Swallows a close timeout (logged)
+ * — shutdown must proceed to socket-file cleanup regardless.
+ */
+export async function shutdownTattlerServer(
+  server: net.Server,
+  timeoutMs: number = SERVER_CLOSE_TIMEOUT_MS,
+): Promise<void> {
+  for (const socket of serverConnections.get(server) ?? []) {
+    socket.destroy();
+  }
+  try {
+    await withTimeout(
+      new Promise<void>((resolve) => server.close(() => resolve())),
+      timeoutMs,
+      'Timed out waiting for the Tattler server to close',
+    );
+  } catch (closeErr) {
+    console.error('Tattler server did not close cleanly during shutdown: ', closeErr);
+  }
 }
 
 async function readIncomingFrameLine(socket: net.Socket): Promise<string | undefined> {
