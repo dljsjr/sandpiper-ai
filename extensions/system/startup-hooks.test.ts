@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
+import { SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL } from './prompt-contributions.js';
 import { createSystemRuntimeState } from './runtime.js';
 import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
 import { createBackgroundLifecycleProcessManagerStub, createEventStub } from './test-helpers.js';
@@ -98,6 +99,71 @@ describe('startup hooks', () => {
     expect(result.systemPrompt).toContain('"agentDir":"/agent"');
     expect(result.systemPrompt).toContain('"cwd":"/repo"');
     expect(mockGetAgentDir).toHaveBeenCalled();
+  });
+
+  // Guardrail: the prompt-contribution channel is a PUBLIC extension API (external consumers like
+  // pi-yaams's memory bootstrap inject through it). These tests fail loudly if the channel wiring is
+  // removed again — the exact regression eff4bda53 introduced when the collector was swept up as
+  // "dead code" (no *internal* emitters) and no test guarded it.
+  it('appends prompt contributions registered on the contribution channel (first-turn only)', async () => {
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
+
+    const { pi, handlers, events } = createStartupPromptHookStub();
+    registerStartupPromptHooks(pi);
+
+    const onStart = handlers.get('session_start');
+    const beforeAgentStart = handlers.get('before_agent_start');
+    if (!onStart || !beforeAgentStart) {
+      throw new Error('startup prompt lifecycle hooks not registered');
+    }
+
+    await onStart({ reason: 'startup' }, { cwd: '/repo' });
+    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
+      id: 'yaams-memory-bootstrap',
+      getContent: () => '<memory source="yaams">recent facts</memory>',
+    });
+
+    const result = (await beforeAgentStart(
+      { systemPrompt: 'base prompt', systemPromptOptions: {} },
+      { cwd: '/repo' },
+    )) as { systemPrompt: string };
+
+    expect(result.systemPrompt).toBe(
+      '<system_prompt>sandpiper</system_prompt>\n\n<memory source="yaams">recent facts</memory>',
+    );
+  });
+
+  it('dedupes prompt contributions by id and preserves prepend/append phases', async () => {
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
+
+    const { pi, handlers, events } = createStartupPromptHookStub();
+    registerStartupPromptHooks(pi);
+
+    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
+    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
+      id: 'header',
+      phase: 'prepend',
+      getContent: () => '<header>first</header>',
+    });
+    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
+      id: 'header',
+      phase: 'prepend',
+      getContent: () => '<header>duplicate</header>',
+    });
+    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
+      id: 'footer',
+      phase: 'append',
+      getContent: () => '<footer>tail</footer>',
+    });
+
+    const result = (await handlers.get('before_agent_start')?.(
+      { systemPrompt: 'base prompt', systemPromptOptions: {} },
+      { cwd: '/repo' },
+    )) as { systemPrompt: string };
+
+    expect(result.systemPrompt).toBe(
+      '<header>first</header>\n\n<system_prompt>sandpiper</system_prompt>\n\n<footer>tail</footer>',
+    );
   });
 
   it('sets session env vars on session_start', async () => {

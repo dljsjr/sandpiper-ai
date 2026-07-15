@@ -6,12 +6,41 @@ import {
   handleSandpiperSessionShutdown,
   handleSandpiperSessionStart,
 } from 'sandpiper-ai-core';
+import {
+  applyPromptContributions,
+  SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL,
+  SandpiperPromptContributionCollector,
+} from './prompt-contributions.js';
 import type { SystemRuntimeState } from './runtime.js';
 
 export function registerStartupPromptHooks(pi: ExtensionAPI, dumpSystemPrompt?: boolean): void {
+  // First-turn-only: contributions are collected during session_start and folded into the
+  // cached prompt once at before_agent_start. They never re-apply per turn, so this does not
+  // reintroduce the across-turns mutation eff4bda53 removed. External consumers (e.g. pi-yaams's
+  // memory bootstrap) inject via SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL — a public extension API.
+  const promptContributions = new SandpiperPromptContributionCollector();
+  let unsubscribePromptContributions: (() => void) | undefined;
+
+  const resetPromptContributionListener = () => {
+    unsubscribePromptContributions?.();
+    unsubscribePromptContributions = undefined;
+    promptContributions.reset();
+  };
+
   pi.registerFlag('identity', {
     type: 'string',
     description: 'Content or markdown file that replaces the <identity>...</identity> block in the system prompt',
+  });
+
+  pi.on('session_start', () => {
+    resetPromptContributionListener();
+    unsubscribePromptContributions = pi.events.on(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, (payload) => {
+      promptContributions.add(payload);
+    });
+  });
+
+  pi.on('session_shutdown', () => {
+    resetPromptContributionListener();
   });
 
   pi.on('before_agent_start', async (event, ctx) => {
@@ -30,16 +59,19 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, dumpSystemPrompt?: 
       identityContent = identityContent ?? identityFlag;
     }
 
-    const finalSystemPrompt = await buildSandpiperStartupPrompt({
+    const effectiveSystemPrompt = await buildSandpiperStartupPrompt({
       agentDir: getAgentDir(),
       cwd: ctx.cwd,
       systemPromptOptions: event.systemPromptOptions,
       identityContent,
       dumpSystemPrompt,
     });
-    if (finalSystemPrompt === undefined) {
+    if (effectiveSystemPrompt === undefined) {
       return;
     }
+
+    const resolvedContributions = await promptContributions.resolve();
+    const finalSystemPrompt = applyPromptContributions(effectiveSystemPrompt, resolvedContributions);
 
     if (dumpSystemPrompt) {
       // console.error('base prompt:\n', event.systemPrompt);
