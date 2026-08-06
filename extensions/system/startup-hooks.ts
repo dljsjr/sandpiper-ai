@@ -77,6 +77,14 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, dumpSystemPrompt?: 
       // console.error('base prompt:\n', event.systemPrompt);
       console.error('system prompt:\n', finalSystemPrompt);
       ctx.shutdown();
+      // ctx.shutdown() only exits reliably in modes that wire a real shutdown
+      // handler (tui, rpc). Pi's print mode -- forced whenever stdin/stdout
+      // isn't a TTY, i.e. every headless/scripted/CI invocation -- never
+      // registers one, so shutdown() silently no-ops there and execution
+      // would otherwise fall through into a real agent turn. Hard-exit
+      // shortly after as a fallback for that case; harmless when shutdown()
+      // already worked, since the process is gone before this fires.
+      setTimeout(() => process.exit(0), 200);
     }
 
     return {
