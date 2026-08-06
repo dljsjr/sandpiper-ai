@@ -33,6 +33,11 @@ import {
 const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
 const LITERAL_SLASH_PREFIX = '//';
 const CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4;
+// ToolRenderResultOptions (unlike MessageRenderOptions) does not expose outputPad as of
+// Pi 0.84.0, so tool renderResult callbacks have no way to read the user's actual setting --
+// fall back to Pi's own documented default (docs/settings.md: outputPad defaults to 1). A
+// natural candidate for an upstream ask alongside AGENT-245.
+export const DEFAULT_OUTPUT_PAD = 1;
 
 interface ThemeLike {
   fg(color: 'accent' | 'dim' | 'muted' | 'success', text: string): string;
@@ -238,22 +243,26 @@ class ChorusRoomEditor extends CustomEditor {
   }
 }
 
-export function createChorusMessageComponent(details: ChorusIncomingMessageDetails, theme: ThemeLike): Component {
+export function createChorusMessageComponent(
+  details: ChorusIncomingMessageDetails,
+  theme: ThemeLike,
+  outputPad: number,
+): Component {
   const room = ` #${details.roomId}`;
   const tagColor = details.self ? 'success' : 'accent';
   const backgroundColor = details.self ? 'toolSuccessBg' : 'customMessageBg';
   const status = details.status ? theme.fg('dim', ` ${details.status}`) : '';
   const badge = `${theme.bold(theme.fg(tagColor, `[${details.from}]`))}${status}${theme.fg('muted', room)}`;
-  const box = new Box(1, 1, (text) => theme.bg(backgroundColor, text));
+  const box = new Box(outputPad, 1, (text) => theme.bg(backgroundColor, text));
   box.addChild(new Text(`${badge}\n${details.message}`, 0, 0));
   return box;
 }
 
 export function registerChorusMessageRenderer(pi: ExtensionAPI): void {
-  pi.registerMessageRenderer<ChorusIncomingMessageDetails>(CHORUS_MESSAGE_CUSTOM_TYPE, (message, _options, theme) => {
+  pi.registerMessageRenderer<ChorusIncomingMessageDetails>(CHORUS_MESSAGE_CUSTOM_TYPE, (message, options, theme) => {
     const details = message.details;
     if (details) {
-      return createChorusMessageComponent(details, theme as ThemeLike);
+      return createChorusMessageComponent(details, theme as ThemeLike, options.outputPad);
     }
 
     return createChorusMessageComponent(
@@ -265,6 +274,7 @@ export function registerChorusMessageRenderer(pi: ExtensionAPI): void {
         broker: { name: 'unknown', shortId: 'unknown', socketPath: '' },
       },
       theme as ThemeLike,
+      options.outputPad,
     );
   });
 }
