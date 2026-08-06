@@ -2,6 +2,16 @@
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "stream",
   "noUpdateNotifier": true,
+  "globalPassThroughEnv": [
+    "TMPDIR",
+    "XDG_RUNTIME_DIR",
+    "TATTLER_RUNTIME_NAMESPACE",
+    "PI_PACKAGE_DIR",
+    "PI_SKIP_VERSION_CHECK",
+    "GITHUB_TOKEN",
+    "GH_TOKEN",
+    "USERNAME"
+  ],
   "globalDependencies": [
     "packages/core/src/**/*.ts",
     "packages/core/package.json",
