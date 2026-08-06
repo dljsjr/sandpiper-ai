@@ -23,13 +23,46 @@ export function inspectPaneSetupFailureMessage(message: string): string {
   return `Shell Relay setup failed: ${message}\n\nCannot inspect pane — the relay is not connected.`;
 }
 
+const DEFAULT_TIMEOUT_SECONDS = 30;
+// setTimeout's max delay is a signed 32-bit int of milliseconds (2^31 - 1); anything larger
+// silently wraps and fires immediately instead of waiting. Mirrors Pi's own bash tool fix
+// (0.80.4, #6181): fail with a clear validation error instead of clamping to that immediate
+// timeout.
+const MAX_TIMEOUT_MS = 2_147_483_647;
+const MAX_TIMEOUT_SECONDS = MAX_TIMEOUT_MS / 1000;
+
+export function resolveShellRelayTimeoutMs(timeout: number | undefined): number {
+  if (timeout === undefined) {
+    return DEFAULT_TIMEOUT_SECONDS * 1000;
+  }
+  if (!Number.isFinite(timeout) || timeout <= 0) {
+    throw new Error('Invalid timeout: must be a finite number of seconds');
+  }
+  const timeoutMs = timeout * 1000;
+  if (timeoutMs > MAX_TIMEOUT_MS) {
+    throw new Error(`Invalid timeout: maximum is ${MAX_TIMEOUT_SECONDS} seconds`);
+  }
+  return timeoutMs;
+}
+
 export async function executeShellRelayTool(
   runtime: RelayRuntime,
   ctx: RelaySetupContext,
   input: ShellRelayToolInput,
 ): Promise<ToolExecuteResult> {
+  let timeoutMs: number;
+  try {
+    timeoutMs = resolveShellRelayTimeoutMs(input.timeout);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return {
+      content: [{ type: 'text', text: msg }],
+      details: { error: msg },
+      isError: true,
+    };
+  }
+
   return withRelaySetup(runtime, ctx, input.session, shellRelaySetupFailureMessage, async () => {
-    const timeoutMs = (input.timeout ?? 30) * 1000;
     try {
       const result = await runtime.executeQueued(input.command, timeoutMs);
       const renderedOutput = result.output.length > 0 ? result.output : '(no output)';
