@@ -3,8 +3,6 @@ import type { ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-a
 import type { Component } from '@earendil-works/pi-tui';
 import { drainPendingInboxToBatch, type TattlerPendingInbox } from './tattler-inbox';
 
-const TATTLER_RECEIVE_IDLE_RETRY_MS = 25;
-
 const emptyToolRenderComponent: Component = {
   render: () => [],
   invalidate: () => undefined,
@@ -20,7 +18,6 @@ export function registerTattlerReceiveTool(
   idleProvider: TattlerReceiveIdleProvider,
 ): void {
   let receiveRequested = false;
-  let receiveScheduled = false;
 
   pi.registerTool({
     name: 'tattler_receive',
@@ -46,33 +43,32 @@ export function registerTattlerReceiveTool(
     },
   });
 
-  pi.on('agent_end', () => {
-    if (!receiveRequested || receiveScheduled) {
+  // agent_settled fires once Pi will not continue running automatically (no pending
+  // retry/compaction/follow-up) -- the precise signal tattler_receive needs, replacing the
+  // old agent_end + 25ms isIdle() poll loop entirely. Per Pi's docs, isIdle() is true here
+  // "unless another extension started a new run" -- keep the defensive check for that case;
+  // if it's not idle, drop this attempt and let the existing before_agent_start drain hook
+  // (registerTattlerPendingInboxHooks) pick the batch up on the next turn instead of retrying.
+  pi.on('agent_settled', () => {
+    if (!receiveRequested) {
       return;
     }
 
     receiveRequested = false;
-    receiveScheduled = true;
-    setTimeout(flushWhenIdle, 0);
-  });
 
-  function flushWhenIdle(): void {
     let idle = false;
     try {
       idle = idleProvider.isIdle();
     } catch {
-      receiveScheduled = false;
       return;
     }
 
     if (!idle) {
-      setTimeout(flushWhenIdle, TATTLER_RECEIVE_IDLE_RETRY_MS);
       return;
     }
 
     const drain = drainPendingInboxToBatch(inbox);
     if (!drain) {
-      receiveScheduled = false;
       return;
     }
 
@@ -81,10 +77,8 @@ export function registerTattlerReceiveTool(
       drain.markHandedToTurn();
     } catch {
       drain.release();
-    } finally {
-      receiveScheduled = false;
     }
-  }
+  });
 }
 
 export type TattlerReceiveContext = Pick<ExtensionContext, 'isIdle'>;
