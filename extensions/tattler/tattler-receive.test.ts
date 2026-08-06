@@ -1,5 +1,5 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { createTattlerPendingInbox } from './tattler-inbox';
 import { buildMessage } from './tattler-protocol';
 import { registerTattlerReceiveTool } from './tattler-receive';
@@ -47,77 +47,102 @@ async function callTattlerReceive(tool: RegisteredTool | undefined): Promise<unk
 }
 
 describe('tattler_receive tool', () => {
-  test('terminates the current turn and starts a direct pending batch turn after idle', async () => {
-    vi.useFakeTimers();
-    try {
-      const inbox = createTattlerPendingInbox();
-      inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'urgent note' }));
-      const { pi, handlers, tools, sentMessages } = fakePi();
-      let idle = false;
+  test('terminates the current turn and delivers the pending batch when agent_settled fires idle', async () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'urgent note' }));
+    const { pi, handlers, tools, sentMessages } = fakePi();
 
-      registerTattlerReceiveTool(pi, inbox, { isIdle: () => idle });
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
 
-      const result = await callTattlerReceive(tools.get('tattler_receive'));
+    const result = await callTattlerReceive(tools.get('tattler_receive'));
 
-      expect(result).toMatchObject({ terminate: true });
-      expect(sentMessages).toHaveLength(0);
+    expect(result).toMatchObject({ terminate: true });
+    expect(sentMessages).toHaveLength(0);
 
-      handlers.get('agent_end')?.({ messages: [] });
-      await vi.advanceTimersByTimeAsync(25);
-      expect(sentMessages).toHaveLength(0);
+    handlers.get('agent_settled')?.({});
 
-      idle = true;
-      await vi.advanceTimersByTimeAsync(25);
+    expect(sentMessages).toHaveLength(1);
+    expect(sentMessages[0]?.options).toEqual({ triggerTurn: true, deliverAs: 'steer' });
+    expect(sentMessages[0]?.message).toMatchObject({
+      customType: 'tattler:pending-batch',
+      content: expect.stringContaining('urgent note'),
+    });
+    expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 1, total: 1 });
+  });
 
-      expect(sentMessages).toHaveLength(1);
-      expect(sentMessages[0]?.options).toEqual({ triggerTurn: true, deliverAs: 'steer' });
-      expect(sentMessages[0]?.message).toMatchObject({
-        customType: 'tattler:pending-batch',
-        content: expect.stringContaining('urgent note'),
-      });
-      expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 1, total: 1 });
-    } finally {
-      vi.useRealTimers();
-    }
+  test('does not deliver when agent_settled fires while not idle, leaving the batch for before_agent_start to pick up', async () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'urgent note' }));
+    const { pi, handlers, tools, sentMessages } = fakePi();
+
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => false });
+
+    await callTattlerReceive(tools.get('tattler_receive'));
+
+    handlers.get('agent_settled')?.({});
+
+    expect(sentMessages).toHaveLength(0);
+    // Still pending -- not lost, not marked handed-to-turn; the existing before_agent_start
+    // drain hook (registerTattlerPendingInboxHooks) will pick it up on the next turn.
+    expect(inbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
+  });
+
+  test('does not fire again on a second agent_settled without a new tattler_receive call', async () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'urgent note' }));
+    const { pi, handlers, tools, sentMessages } = fakePi();
+
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
+    await callTattlerReceive(tools.get('tattler_receive'));
+
+    handlers.get('agent_settled')?.({});
+    handlers.get('agent_settled')?.({});
+
+    expect(sentMessages).toHaveLength(1);
   });
 
   test('does not start a synthetic turn when no pending messages exist', async () => {
-    vi.useFakeTimers();
-    try {
-      const inbox = createTattlerPendingInbox();
-      const { pi, handlers, tools, sentMessages } = fakePi();
+    const inbox = createTattlerPendingInbox();
+    const { pi, handlers, tools, sentMessages } = fakePi();
 
-      registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
-      await callTattlerReceive(tools.get('tattler_receive'));
-      handlers.get('agent_end')?.({ messages: [] });
-      await vi.advanceTimersByTimeAsync(0);
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
+    await callTattlerReceive(tools.get('tattler_receive'));
+    handlers.get('agent_settled')?.({});
 
-      expect(sentMessages).toHaveLength(0);
-      expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 0, total: 0 });
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(sentMessages).toHaveLength(0);
+    expect(inbox.counts()).toEqual({ pending: 0, reserved: 0, handedToTurn: 0, total: 0 });
   });
 
   test('releases the reserved batch if direct synthetic turn handoff throws', async () => {
-    vi.useFakeTimers();
-    try {
-      const inbox = createTattlerPendingInbox();
-      inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'retry later' }));
-      const { pi, handlers, tools } = fakePi({
-        sendMessage: () => {
-          throw new Error('handoff failed');
-        },
-      });
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'retry later' }));
+    const { pi, handlers, tools } = fakePi({
+      sendMessage: () => {
+        throw new Error('handoff failed');
+      },
+    });
 
-      registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
-      await callTattlerReceive(tools.get('tattler_receive'));
-      handlers.get('agent_end')?.({ messages: [] });
-      await vi.advanceTimersByTimeAsync(0);
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
+    await callTattlerReceive(tools.get('tattler_receive'));
+    handlers.get('agent_settled')?.({});
 
-      expect(inbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(inbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
+  });
+
+  test('does not throw when isIdle() itself throws, and does not deliver', async () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'urgent note' }));
+    const { pi, handlers, tools, sentMessages } = fakePi();
+
+    registerTattlerReceiveTool(pi, inbox, {
+      isIdle: () => {
+        throw new Error('context unavailable');
+      },
+    });
+    await callTattlerReceive(tools.get('tattler_receive'));
+
+    expect(() => handlers.get('agent_settled')?.({})).not.toThrow();
+    expect(sentMessages).toHaveLength(0);
+    expect(inbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
   });
 });
