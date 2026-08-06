@@ -36,16 +36,29 @@ export const SANDPIPER_SESSION_ENV_NAMES: StandupSessionEnvNames = {
   sessionFile: 'SANDPIPER_SESSION_FILE',
 } as const;
 
+// 0.82.0 injects PI_SESSION_ID/PI_SESSION_FILE into Pi bash-tool child processes at spawn
+// time (bash.ts) -- NOT covered by mirrorPiSandpiperEnvironment, which only runs once at
+// boot in the parent process, so a sandpiper-standup invocation from inside a bash-tool
+// child otherwise sees neither SANDPIPER_SESSION_* var set. Accept them as fallbacks;
+// SANDPIPER_SESSION_* still wins whenever present (our own injection, set by the
+// session-continuity extension). Shell-relay panes and user shells never receive Pi's
+// bash-tool env, so this is a pure fallback with no risk of shadowing a real user-set
+// SANDPIPER_SESSION_* value.
+const PI_SESSION_FALLBACK_ENV_NAMES: StandupSessionEnvNames = {
+  sessionId: 'PI_SESSION_ID',
+  sessionFile: 'PI_SESSION_FILE',
+} as const;
+
 export function formatSessionIdHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
-  return `Session ID — any stable string identifying this session across successive writes, not necessarily a UUID (defaults to ${envNames.sessionId})`;
+  return `Session ID — any stable string identifying this session across successive writes, not necessarily a UUID (defaults to ${envNames.sessionId}, falling back to ${PI_SESSION_FALLBACK_ENV_NAMES.sessionId})`;
 }
 
 export function formatSessionFileHelp(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
-  return `Session file path (defaults to ${envNames.sessionFile})`;
+  return `Session file path (defaults to ${envNames.sessionFile}, falling back to ${PI_SESSION_FALLBACK_ENV_NAMES.sessionFile})`;
 }
 
 export function formatMissingSessionIdMessage(envNames = SANDPIPER_SESSION_ENV_NAMES): string {
-  return `Session ID required. Provide --id or set ${envNames.sessionId} environment variable.`;
+  return `Session ID required. Provide --id or set ${envNames.sessionId} (or ${PI_SESSION_FALLBACK_ENV_NAMES.sessionId}) environment variable.`;
 }
 
 /**
@@ -62,13 +75,19 @@ export function resolveStandupCommandContext(options: ResolveStandupCommandConte
     identity: SANDPIPER_STANDUP_IDENTITY,
   });
 
+  const env = {
+    ...options.env,
+    SANDPIPER_SESSION_ID: options.env.SANDPIPER_SESSION_ID ?? options.env.PI_SESSION_ID,
+    SANDPIPER_SESSION_FILE: options.env.SANDPIPER_SESSION_FILE ?? options.env.PI_SESSION_FILE,
+  };
+
   return {
     host,
     standupPath: join(host.paths.projectConfigDir, 'standup.md'),
     session: resolveSessionIdentity({
       sessionId: options.sessionId,
       sessionFile: options.sessionFile,
-      env: options.env,
+      env,
       envNames: SANDPIPER_SESSION_ENV_NAMES,
     }),
   };

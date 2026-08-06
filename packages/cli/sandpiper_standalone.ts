@@ -45,6 +45,11 @@ function resolvePiMetadata(standalonePaths: StandalonePaths): PiMetadata {
 }
 
 process.title = 'sandpiper';
+// Pi's own cli.ts/rpc-entry.ts set AI_AGENT="pi" for child-process attribution, but this
+// standalone entry calls main() directly and never goes through either -- set our own
+// equivalent here so spawned children (e.g. the bash tool) can still detect they're running
+// under an AI coding agent.
+process.env.AI_AGENT = 'sandpiper';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const standalonePaths = resolveStandalonePaths({
