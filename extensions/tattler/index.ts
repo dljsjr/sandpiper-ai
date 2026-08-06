@@ -5,11 +5,10 @@
 import { appendFile, stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { basename, dirname, join, normalize } from 'node:path';
-import { StringEnum } from '@earendil-works/pi-ai';
+import { StringEnum, Type } from '@earendil-works/pi-ai';
 import type { CustomEntry, ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
 import { sessionShortIdGenerator } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
-import { Type } from 'typebox';
 import { listPeerSockets } from './tattler-identity';
 import { createTattlerPendingInbox, TATTLER_PENDING_INBOX_ENTRY_KEY } from './tattler-inbox';
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';

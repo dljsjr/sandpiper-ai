@@ -1,6 +1,6 @@
+import { Type } from '@earendil-works/pi-ai';
 import type { ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
 import type { Component } from '@earendil-works/pi-tui';
-import { Type } from 'typebox';
 import { drainPendingInboxToBatch, type TattlerPendingInbox } from './tattler-inbox';
 
 const TATTLER_RECEIVE_IDLE_RETRY_MS = 25;
