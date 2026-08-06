@@ -10,7 +10,8 @@
     "PI_SKIP_VERSION_CHECK",
     "GITHUB_TOKEN",
     "GH_TOKEN",
-    "USERNAME"
+    "USERNAME",
+    "SANDPIPER_CODING_AGENT_DIR"
   ],
   "globalDependencies": [
     "packages/core/src/**/*.ts",

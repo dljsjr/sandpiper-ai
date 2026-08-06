@@ -101,13 +101,15 @@ describe('initExternalRepo — git backend (integration)', () => {
   beforeEach(() => {
     rootDir = mkdtempSync(join(tmpdir(), 'ext-repo-git-test-'));
     remoteDir = mkdtempSync(join(tmpdir(), 'ext-repo-remote-'));
-    // Current project repo
-    execSync('git init -q', { cwd: rootDir });
+    // Current project repo. -b main pins the initial branch name explicitly
+    // rather than relying on init.defaultBranch / git's built-in default,
+    // since this describe block checks out 'main' by name below.
+    execSync('git init -q -b main', { cwd: rootDir });
     execSync('git config user.email "test@test.com"', { cwd: rootDir });
     execSync('git config user.name "Test"', { cwd: rootDir });
     execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
     // Remote repo to clone from (non-bare is fine for local clones)
-    execSync('git init -q', { cwd: remoteDir });
+    execSync('git init -q -b main', { cwd: remoteDir });
     execSync('git config user.email "test@test.com"', { cwd: remoteDir });
     execSync('git config user.name "Test"', { cwd: remoteDir });
     execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });

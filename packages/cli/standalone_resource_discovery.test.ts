@@ -12,10 +12,15 @@ describe('standalone Sandpiper resource discovery', () => {
     const agentDir = await mkdtemp(join(tmpdir(), 'sandpiper-standalone-resources-'));
     const previousPackageDir = process.env.PI_PACKAGE_DIR;
     const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
+    const previousAgentDir = process.env.SANDPIPER_CODING_AGENT_DIR;
 
     try {
       process.env.PI_PACKAGE_DIR = repoRoot;
       process.env.PI_SKIP_VERSION_CHECK = '1';
+      // bindExtensions() boots the web-search extension in-process, which reads the
+      // real global agent-dir settings.json unless this is set — must not leak
+      // Doug's real settings (e.g. an `!op read ...` braveApiKey) into the test.
+      process.env.SANDPIPER_CODING_AGENT_DIR = agentDir;
 
       const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
       const { DefaultResourceLoader, SessionManager, createAgentSession } = await import(
@@ -65,6 +70,12 @@ describe('standalone Sandpiper resource discovery', () => {
         delete process.env.PI_SKIP_VERSION_CHECK;
       } else {
         process.env.PI_SKIP_VERSION_CHECK = previousSkipVersionCheck;
+      }
+
+      if (previousAgentDir === undefined) {
+        delete process.env.SANDPIPER_CODING_AGENT_DIR;
+      } else {
+        process.env.SANDPIPER_CODING_AGENT_DIR = previousAgentDir;
       }
 
       await rm(agentDir, { recursive: true, force: true });
