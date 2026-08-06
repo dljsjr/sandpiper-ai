@@ -214,7 +214,13 @@ Session file:
 describe('serializeStandup', () => {
   it('emits a PID line when the section has one', () => {
     const serialized = serializeStandup([
-      { id: 'claude-code-abc', updated: '2026-04-05T10:30:00Z', sessionFile: '/path/to/session.jsonl', pid: 4242, body: 'body' },
+      {
+        id: 'claude-code-abc',
+        updated: '2026-04-05T10:30:00Z',
+        sessionFile: '/path/to/session.jsonl',
+        pid: 4242,
+        body: 'body',
+      },
     ]);
     expect(serialized).toContain('PID: 4242');
   });
@@ -228,7 +234,13 @@ describe('serializeStandup', () => {
 
   it('round-trips a pid through serialize then parse', () => {
     const serialized = serializeStandup([
-      { id: 'claude-code-abc', updated: '2026-04-05T10:30:00Z', sessionFile: '/path/to/session.jsonl', pid: 4242, body: 'body' },
+      {
+        id: 'claude-code-abc',
+        updated: '2026-04-05T10:30:00Z',
+        sessionFile: '/path/to/session.jsonl',
+        pid: 4242,
+        body: 'body',
+      },
     ]);
     const reparsed = parseStandup(serialized);
     expect(reparsed.sections[0]?.pid).toBe(4242);
