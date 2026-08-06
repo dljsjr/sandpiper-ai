@@ -19,6 +19,9 @@ export function registerInspectPaneTool(pi: ExtensionAPI, runtime: RelayRuntime)
         }),
       ),
     }),
+    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
+    // otherwise. Single optional scalar field, no unions -- low risk.
+    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       return executeInspectPaneTool(runtime, ctx, params);
     },

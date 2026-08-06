@@ -33,6 +33,9 @@ export function registerStartRelayTool(pi: ExtensionAPI, runtime: RelayRuntime):
         }),
       ),
     }),
+    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
+    // otherwise. Plain scalar fields, no unions -- low risk.
+    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       return executeShellRelayTool(runtime, ctx, params);
     },
