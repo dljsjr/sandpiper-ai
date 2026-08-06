@@ -9,7 +9,17 @@ import {
 } from './extension-factories.js';
 
 function createExtensionCapture(): {
-  readonly pi: Pick<ExtensionAPI, 'events' | 'getFlag' | 'on' | 'registerCommand' | 'registerFlag' | 'registerTool'>;
+  readonly pi: Pick<
+    ExtensionAPI,
+    | 'appendEntry'
+    | 'events'
+    | 'getFlag'
+    | 'on'
+    | 'registerCommand'
+    | 'registerEntryRenderer'
+    | 'registerFlag'
+    | 'registerTool'
+  >;
   readonly commands: string[];
   readonly events: string[];
   readonly flags: string[];
@@ -39,6 +49,8 @@ function createExtensionCapture(): {
       registerTool: ((tool: { readonly name: string }) => {
         tools.push(tool.name);
       }) as ExtensionAPI['registerTool'],
+      registerEntryRenderer: vi.fn() as ExtensionAPI['registerEntryRenderer'],
+      appendEntry: vi.fn() as ExtensionAPI['appendEntry'],
     },
     commands,
     events,
