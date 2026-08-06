@@ -12,6 +12,7 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
   const cwd = join(tempRoot, 'project');
   const previousPackageDir = process.env.PI_PACKAGE_DIR;
   const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
+  const previousAgentDir = process.env.SANDPIPER_CODING_AGENT_DIR;
 
   try {
     mkdirSync(agentDir, { recursive: true });
@@ -20,6 +21,10 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
     // as an installed package through SettingsManager below.
     process.env.PI_PACKAGE_DIR = repoRoot;
     process.env.PI_SKIP_VERSION_CHECK = '1';
+    // No extension currently boots in this smoke test, but getAgentDir() would
+    // otherwise fall through to Doug's real ~/.sandpiper/agent if any future
+    // extension load reads it — pin it to the temp agent dir defensively.
+    process.env.SANDPIPER_CODING_AGENT_DIR = agentDir;
 
     const { DefaultResourceLoader, SettingsManager } = await import('@earendil-works/pi-coding-agent');
 
@@ -92,6 +97,12 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
       delete process.env.PI_SKIP_VERSION_CHECK;
     } else {
       process.env.PI_SKIP_VERSION_CHECK = previousSkipVersionCheck;
+    }
+
+    if (previousAgentDir === undefined) {
+      delete process.env.SANDPIPER_CODING_AGENT_DIR;
+    } else {
+      process.env.SANDPIPER_CODING_AGENT_DIR = previousAgentDir;
     }
 
     rmSync(tempRoot, { recursive: true, force: true });
