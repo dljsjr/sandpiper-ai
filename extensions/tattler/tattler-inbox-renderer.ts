@@ -3,6 +3,7 @@ import type { Component } from '@earendil-works/pi-tui';
 import { truncateToWidth, visibleWidth, wrapTextWithAnsi } from '@earendil-works/pi-tui';
 import {
   TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+  TATTLER_PENDING_BATCH_ENTRY_TYPE,
   type TattlerPendingBatchDetails,
   type TattlerPendingChorusMessage,
   type TattlerPendingMessage,
@@ -36,17 +37,29 @@ class TattlerPendingBatchComponent implements Component {
   invalidate(): void {}
 }
 
-export function registerTattlerPendingBatchRenderer(pi: Pick<ExtensionAPI, 'registerMessageRenderer'>): void {
+function componentForBatchDetails(details: TattlerPendingBatchDetails | undefined, theme: ThemeLike): Component {
+  if (details?.kind !== 'batch' || !Array.isArray(details.messages)) {
+    return emptyComponent;
+  }
+
+  return new TattlerPendingBatchComponent(details, theme);
+}
+
+// Registers renderers for BOTH the legacy message-based batch (TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+// still emitted for every model-visible batch) and the display-only entry-based batch
+// (TATTLER_PENDING_BATCH_ENTRY_TYPE, used for model-invisible batches like chorus self-echoes).
+// Keep both registered permanently, not just during a migration window -- old session files
+// with legacy custom_message-shaped batches are a persistent population, not a transient one.
+export function registerTattlerPendingBatchRenderer(
+  pi: Pick<ExtensionAPI, 'registerEntryRenderer' | 'registerMessageRenderer'>,
+): void {
   pi.registerMessageRenderer<TattlerPendingBatchDetails>(
     TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-    (message, _options, theme) => {
-      const details = message.details;
-      if (details?.kind !== 'batch' || !Array.isArray(details.messages)) {
-        return emptyComponent;
-      }
+    (message, _options, theme) => componentForBatchDetails(message.details, theme as ThemeLike),
+  );
 
-      return new TattlerPendingBatchComponent(details, theme as ThemeLike);
-    },
+  pi.registerEntryRenderer<TattlerPendingBatchDetails>(TATTLER_PENDING_BATCH_ENTRY_TYPE, (entry, _options, theme) =>
+    componentForBatchDetails(entry.data, theme as ThemeLike),
   );
 }
 

@@ -3,6 +3,10 @@ import type { ChorusReplyRouteV0, ChorusRoomId, TattlerAgentMessageV0, TattlerMe
 
 export const TATTLER_PENDING_BATCH_CUSTOM_TYPE = 'tattler:pending-batch';
 export const TATTLER_PENDING_INBOX_ENTRY_KEY = 'tattler:pending-inbox';
+// Entry (not message) variant: for pending batches that must never participate in LLM
+// context (e.g. a chorus self-echo shown to the user only). Distinct customType from
+// TATTLER_PENDING_BATCH_CUSTOM_TYPE so the two never collide in session scans.
+export const TATTLER_PENDING_BATCH_ENTRY_TYPE = 'tattler:pending-batch-display-only';
 
 export type PendingInboxState = 'pending' | 'reserved' | 'handedToTurn';
 
@@ -192,24 +196,31 @@ export function drainPendingInboxToBatch(inbox: TattlerPendingInbox): TattlerPen
 export function createTattlerPendingBatchMessage(batch: TattlerPendingBatch): TattlerPendingBatchCustomMessage {
   return createTattlerPendingBatchMessageFromMessages(
     batch.items.map((item) => item.message),
-    { batchId: batch.batchId },
+    batch.batchId,
   );
+}
+
+export function createTattlerPendingBatchDetails(
+  messages: readonly TattlerPendingMessage[],
+  batchId?: string,
+): TattlerPendingBatchDetails {
+  return {
+    kind: 'batch',
+    batchId: batchId ?? `tattler-batch-${randomUUID()}`,
+    messages,
+  };
 }
 
 export function createTattlerPendingBatchMessageFromMessages(
   messages: readonly TattlerPendingMessage[],
-  options: { readonly batchId?: string; readonly modelVisible?: boolean } = {},
+  batchId?: string,
 ): TattlerPendingBatchCustomMessage {
-  const batchId = options.batchId ?? `tattler-batch-${randomUUID()}`;
+  const details = createTattlerPendingBatchDetails(messages, batchId);
   return {
     customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-    content: options.modelVisible === false ? '' : createTattlerPendingBatchContent(messages),
+    content: createTattlerPendingBatchContent(messages),
     display: messages.some((message) => message.visible),
-    details: {
-      kind: 'batch',
-      batchId,
-      messages,
-    },
+    details,
   };
 }
 

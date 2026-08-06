@@ -5,6 +5,7 @@ import {
   createTattlerPendingInbox,
   drainPendingInboxToBatch,
   TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+  TATTLER_PENDING_BATCH_ENTRY_TYPE,
   type TattlerPendingBatchDetails,
 } from './tattler-inbox';
 import { registerTattlerPendingBatchRenderer } from './tattler-inbox-renderer';
@@ -19,14 +20,30 @@ interface BatchCustomMessage {
   readonly timestamp: number;
 }
 
+interface BatchCustomEntry {
+  readonly type: 'custom';
+  readonly customType: string;
+  readonly data?: TattlerPendingBatchDetails;
+}
+
 type BatchRenderer = (
   message: BatchCustomMessage,
   options: { expanded: boolean },
   theme: unknown,
 ) => Component | undefined;
 
-function captureRenderer(): { readonly pi: Pick<ExtensionAPI, 'registerMessageRenderer'>; renderer?: BatchRenderer } {
-  const capture: { renderer?: BatchRenderer } = {};
+type BatchEntryRenderer = (
+  entry: BatchCustomEntry,
+  options: { expanded: boolean },
+  theme: unknown,
+) => Component | undefined;
+
+function captureRenderer(): {
+  readonly pi: Pick<ExtensionAPI, 'registerEntryRenderer' | 'registerMessageRenderer'>;
+  renderer?: BatchRenderer;
+  entryRenderer?: BatchEntryRenderer;
+} {
+  const capture: { renderer?: BatchRenderer; entryRenderer?: BatchEntryRenderer } = {};
   return {
     pi: {
       registerMessageRenderer: ((customType: string, renderer: BatchRenderer) => {
@@ -34,9 +51,17 @@ function captureRenderer(): { readonly pi: Pick<ExtensionAPI, 'registerMessageRe
           capture.renderer = renderer;
         }
       }) as ExtensionAPI['registerMessageRenderer'],
+      registerEntryRenderer: ((customType: string, renderer: BatchEntryRenderer) => {
+        if (customType === TATTLER_PENDING_BATCH_ENTRY_TYPE) {
+          capture.entryRenderer = renderer;
+        }
+      }) as ExtensionAPI['registerEntryRenderer'],
     },
     get renderer() {
       return capture.renderer;
+    },
+    get entryRenderer() {
+      return capture.entryRenderer;
     },
   };
 }
@@ -131,5 +156,66 @@ describe('Tattler pending batch renderer', () => {
     expect(rendered).toContain('[Librarian] #chorus-dev');
     expect(rendered).toContain('second visible note');
     expect(rendered).not.toContain('hidden coordination note');
+  });
+
+  test('renders display-only entry batches identically to message batches (shared component)', () => {
+    const details: TattlerPendingBatchDetails = {
+      kind: 'batch',
+      batchId: 'entry-batch-1',
+      messages: [
+        {
+          kind: 'chorus.room-message.v0',
+          id: 'delivery-1' as TattlerMessageId,
+          roomId: roomId('chorus-dev'),
+          from: 'Piper',
+          message: 'self-echoed note',
+          postId: 'post-1' as TattlerMessageId,
+          broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+          self: true,
+          visible: true,
+        },
+      ],
+    };
+
+    const capture = captureRenderer();
+    registerTattlerPendingBatchRenderer(capture.pi);
+
+    const entryComponent = capture.entryRenderer?.(
+      { type: 'custom', customType: TATTLER_PENDING_BATCH_ENTRY_TYPE, data: details },
+      { expanded: false },
+      plainTheme,
+    );
+    const messageComponent = capture.renderer?.(
+      {
+        role: 'custom',
+        customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+        content: '',
+        display: true,
+        details,
+        timestamp: Date.now(),
+      },
+      { expanded: false },
+      plainTheme,
+    );
+
+    expect(entryComponent?.render(80)).toEqual(messageComponent?.render(80));
+    expect(entryComponent?.render(80).join('\n')).toContain('self-echoed note');
+  });
+
+  test('renders malformed entry data as empty instead of throwing', () => {
+    const capture = captureRenderer();
+    registerTattlerPendingBatchRenderer(capture.pi);
+
+    const component = capture.entryRenderer?.(
+      {
+        type: 'custom',
+        customType: TATTLER_PENDING_BATCH_ENTRY_TYPE,
+        data: { kind: 'batch' } as unknown as TattlerPendingBatchDetails,
+      },
+      { expanded: false },
+      plainTheme,
+    );
+
+    expect(component?.render(80)).toEqual([]);
   });
 });

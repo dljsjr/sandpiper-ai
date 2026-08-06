@@ -15,7 +15,10 @@ import {
   wrapTextWithAnsi,
 } from '@earendil-works/pi-tui';
 import {
+  createTattlerPendingBatchDetails,
   createTattlerPendingBatchMessageFromMessages,
+  TATTLER_PENDING_BATCH_ENTRY_TYPE,
+  type TattlerPendingBatchDetails,
   type TattlerPendingChorusMessage,
 } from '../tattler/tattler-inbox';
 import { requestChorusRoomPost } from '../tattler/tattler-pi-events';
@@ -271,12 +274,24 @@ export function sendChorusMessageToChat(
   details: ChorusIncomingMessageDetails,
   options: SendChorusMessageOptions = {},
 ): void {
-  pi.sendMessage(
-    createTattlerPendingBatchMessageFromMessages([createPendingChorusMessage(details)], {
-      modelVisible: options.modelVisible ?? true,
-    }),
-    { triggerTurn: options.triggerTurn ?? true, deliverAs: 'steer' },
-  );
+  const pendingMessage = createPendingChorusMessage(details);
+
+  // modelVisible: false is display-only (always paired with self-authored echoes, which
+  // are also always triggerTurn: false -- see the three chorus.ts call sites). Route
+  // through appendEntry so it structurally never participates in LLM context, instead of
+  // faking non-participation with an empty sendMessage content string.
+  if (options.modelVisible === false) {
+    pi.appendEntry<TattlerPendingBatchDetails>(
+      TATTLER_PENDING_BATCH_ENTRY_TYPE,
+      createTattlerPendingBatchDetails([pendingMessage]),
+    );
+    return;
+  }
+
+  pi.sendMessage(createTattlerPendingBatchMessageFromMessages([pendingMessage]), {
+    triggerTurn: options.triggerTurn ?? true,
+    deliverAs: 'steer',
+  });
 }
 
 function createPendingChorusMessage(details: ChorusIncomingMessageDetails): TattlerPendingChorusMessage {

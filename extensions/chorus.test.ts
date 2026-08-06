@@ -1,7 +1,7 @@
 import { createEventBus, type ExtensionAPI, type ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
 import { describe, expect, test, vi } from 'vitest';
 import chorusExtension, { sendChorusMessageToChatOrQueue } from './chorus';
-import { TATTLER_PENDING_BATCH_CUSTOM_TYPE } from './tattler/tattler-inbox';
+import { TATTLER_PENDING_BATCH_CUSTOM_TYPE, TATTLER_PENDING_BATCH_ENTRY_TYPE } from './tattler/tattler-inbox';
 import { onTattlerPendingMessageQueueRequest } from './tattler/tattler-pi-events';
 import { roomId, type TattlerMessageId } from './tattler/tattler-protocol';
 
@@ -44,11 +44,13 @@ function fakePi() {
   const commands = new Map<string, RegisteredCommand>();
   const tools: RegisteredTool[] = [];
   const pi = {
+    appendEntry: vi.fn(),
     events: createEventBus(),
     on: vi.fn(),
     registerCommand: vi.fn((name: string, command: RegisteredCommand) => {
       commands.set(name, command);
     }),
+    registerEntryRenderer: vi.fn(),
     registerMessageRenderer: vi.fn(),
     registerTool: vi.fn((tool: RegisteredTool) => {
       tools.push(tool);
@@ -225,6 +227,43 @@ describe('Chorus extension commands', () => {
         }),
       }),
       { triggerTurn: true, deliverAs: 'steer' },
+    );
+  });
+
+  test('routes model-invisible self-echo Chorus messages through appendEntry, never sendMessage', async () => {
+    const { pi } = fakePi();
+    onTattlerPendingMessageQueueRequest(pi, () => ({ queued: false }));
+
+    await sendChorusMessageToChatOrQueue(
+      pi,
+      {
+        roomId: roomId('chorus-dev'),
+        from: 'Piper',
+        message: 'my own post echoed back',
+        postId: 'post-1' as TattlerMessageId,
+        broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+        self: true,
+      },
+      { triggerTurn: false, modelVisible: false },
+    );
+
+    expect(pi.sendMessage).not.toHaveBeenCalled();
+    expect(pi.appendEntry).toHaveBeenCalledWith(
+      TATTLER_PENDING_BATCH_ENTRY_TYPE,
+      expect.objectContaining({
+        kind: 'batch',
+        messages: [
+          expect.objectContaining({
+            kind: 'chorus.room-message.v0',
+            roomId: 'chorus-dev',
+            from: 'Piper',
+            message: 'my own post echoed back',
+            postId: 'post-1',
+            self: true,
+            visible: true,
+          }),
+        ],
+      }),
     );
   });
 });
