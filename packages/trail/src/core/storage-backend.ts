@@ -156,8 +156,41 @@ export function pushTaskBranch(workspacePath: string, backend: VcsBackend, branc
   if (backend === 'jj') {
     run('jj', ['git', 'push', '--bookmark', branchName], workspacePath);
   } else {
-    run('git', ['push'], workspacePath);
+    pushGitWithUpstreamFallback(workspacePath);
   }
+}
+
+/**
+ * Push the current branch, establishing upstream tracking on first push.
+ *
+ * Neither separate-branch mode (initGitWorktree's `git worktree add --orphan`)
+ * nor external-repo mode's fallback for a branch absent on the remote
+ * (checkoutOrCreateBranchGit's `git checkout -b`) ever configure upstream
+ * tracking, so a bare `git push` fails on the first auto_push with "no
+ * upstream branch" unless push.autoSetupRemote happens to be set globally.
+ * Retry once with --set-upstream against origin, using the actual current
+ * branch (not the caller's branchName, which may be '@' for "whatever's
+ * checked out"). Only the specific no-upstream failure triggers the retry —
+ * any other push failure (network, rejected, etc.) propagates.
+ */
+function pushGitWithUpstreamFallback(workspacePath: string): void {
+  try {
+    run('git', ['push'], workspacePath);
+  } catch (error) {
+    if (!isProcessError(error) || !String(error.stderr ?? '').includes('has no upstream branch')) {
+      throw error;
+    }
+
+    const currentBranch = execFileSync('git', ['branch', '--show-current'], {
+      cwd: workspacePath,
+      encoding: 'utf-8',
+    }).trim();
+    run('git', ['push', '--set-upstream', 'origin', currentBranch], workspacePath);
+  }
+}
+
+function isProcessError(error: unknown): error is Error & { readonly stderr?: Buffer | string } {
+  return error instanceof Error;
 }
 
 /**
