@@ -18,6 +18,7 @@ import {
   choosePeers,
   clearChorusRoomUi,
   createChorusMessageComponent,
+  DEFAULT_OUTPUT_PAD,
   registerChorusMessageRenderer,
   sendChorusMessageToChat,
   setChorusRoomUi,
@@ -365,6 +366,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
       return createChorusMessageComponent(
         details.sentMessage,
         theme as Parameters<typeof createChorusMessageComponent>[1],
+        DEFAULT_OUTPUT_PAD,
       );
     },
     async execute(_toolCallId, params) {

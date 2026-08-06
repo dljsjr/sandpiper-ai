@@ -28,7 +28,7 @@ interface BatchCustomEntry {
 
 type BatchRenderer = (
   message: BatchCustomMessage,
-  options: { expanded: boolean },
+  options: { expanded: boolean; outputPad: number },
   theme: unknown,
 ) => Component | undefined;
 
@@ -86,7 +86,7 @@ describe('Tattler pending batch renderer', () => {
         details: { kind: 'batch' } as unknown as TattlerPendingBatchDetails,
         timestamp: Date.now(),
       },
-      { expanded: false },
+      { expanded: false, outputPad: 1 },
       plainTheme,
     );
 
@@ -135,7 +135,7 @@ describe('Tattler pending batch renderer', () => {
         details: drain!.message.details,
         timestamp: Date.now(),
       },
-      { expanded: false },
+      { expanded: false, outputPad: 1 },
       plainTheme,
     );
 
@@ -194,12 +194,56 @@ describe('Tattler pending batch renderer', () => {
         details,
         timestamp: Date.now(),
       },
-      { expanded: false },
+      // outputPad: 1 matches the entry renderer's DEFAULT_OUTPUT_PAD fallback (entries have no
+      // outputPad in their options at all) -- otherwise this comparison wouldn't be apples-to-apples.
+      { expanded: false, outputPad: 1 },
       plainTheme,
     );
 
     expect(entryComponent?.render(80)).toEqual(messageComponent?.render(80));
     expect(entryComponent?.render(80).join('\n')).toContain('self-echoed note');
+  });
+
+  test('honors outputPad for the message-renderer path (unavailable to the entry-renderer path)', () => {
+    const details: TattlerPendingBatchDetails = {
+      kind: 'batch',
+      batchId: 'pad-check-1',
+      messages: [
+        {
+          kind: 'chorus.room-message.v0',
+          id: 'pad-1' as TattlerMessageId,
+          roomId: roomId('chorus-dev'),
+          from: 'Piper',
+          message: 'padding check',
+          postId: 'post-1' as TattlerMessageId,
+          broker: { name: 'chorus:chorus-dev', shortId: 'chorus-dev', socketPath: '/tmp/chorus.sock' },
+          visible: true,
+        },
+      ],
+    };
+    const asMessage = (outputPad: number) =>
+      capture.renderer?.(
+        {
+          role: 'custom',
+          customType: TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+          content: '',
+          display: true,
+          details,
+          timestamp: Date.now(),
+        },
+        { expanded: false, outputPad },
+        plainTheme,
+      );
+
+    const capture = captureRenderer();
+    registerTattlerPendingBatchRenderer(capture.pi);
+
+    const padded = asMessage(1)?.render(80) ?? [];
+    const unpadded = asMessage(0)?.render(80) ?? [];
+
+    // padContentLineToWidth prepends outputPad spaces before the badge/content text.
+    expect(padded[1]?.startsWith('<customMessageBg> [Piper]')).toBe(true);
+    expect(unpadded[1]?.startsWith('<customMessageBg>[Piper]')).toBe(true);
   });
 
   test('renders malformed entry data as empty instead of throwing', () => {

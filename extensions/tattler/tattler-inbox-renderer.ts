@@ -20,16 +20,23 @@ const emptyComponent: Component = {
   invalidate: () => undefined,
 };
 
+// EntryRenderOptions (unlike MessageRenderOptions) does not expose outputPad as of Pi
+// 0.84.0, so the entry-renderer path below has no way to read the user's actual setting --
+// fall back to Pi's own documented default (docs/settings.md: outputPad defaults to 1).
+// A natural candidate for an upstream ask alongside AGENT-245.
+const DEFAULT_OUTPUT_PAD = 1;
+
 class TattlerPendingBatchComponent implements Component {
   constructor(
     private readonly details: TattlerPendingBatchDetails,
     private readonly theme: ThemeLike,
+    private readonly outputPad: number,
   ) {}
 
   render(width: number): string[] {
     const visibleMessages = this.details.messages.filter(isVisibleChorusMessage);
     return visibleMessages.flatMap((message, index) => {
-      const lines = renderChorusMessage(message, width, this.theme);
+      const lines = renderChorusMessage(message, width, this.theme, this.outputPad);
       return index === 0 ? lines : ['', ...lines];
     });
   }
@@ -37,12 +44,16 @@ class TattlerPendingBatchComponent implements Component {
   invalidate(): void {}
 }
 
-function componentForBatchDetails(details: TattlerPendingBatchDetails | undefined, theme: ThemeLike): Component {
+function componentForBatchDetails(
+  details: TattlerPendingBatchDetails | undefined,
+  theme: ThemeLike,
+  outputPad: number,
+): Component {
   if (details?.kind !== 'batch' || !Array.isArray(details.messages)) {
     return emptyComponent;
   }
 
-  return new TattlerPendingBatchComponent(details, theme);
+  return new TattlerPendingBatchComponent(details, theme, outputPad);
 }
 
 // Registers renderers for BOTH the legacy message-based batch (TATTLER_PENDING_BATCH_CUSTOM_TYPE,
@@ -53,13 +64,12 @@ function componentForBatchDetails(details: TattlerPendingBatchDetails | undefine
 export function registerTattlerPendingBatchRenderer(
   pi: Pick<ExtensionAPI, 'registerEntryRenderer' | 'registerMessageRenderer'>,
 ): void {
-  pi.registerMessageRenderer<TattlerPendingBatchDetails>(
-    TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-    (message, _options, theme) => componentForBatchDetails(message.details, theme as ThemeLike),
+  pi.registerMessageRenderer<TattlerPendingBatchDetails>(TATTLER_PENDING_BATCH_CUSTOM_TYPE, (message, options, theme) =>
+    componentForBatchDetails(message.details, theme as ThemeLike, options.outputPad),
   );
 
   pi.registerEntryRenderer<TattlerPendingBatchDetails>(TATTLER_PENDING_BATCH_ENTRY_TYPE, (entry, _options, theme) =>
-    componentForBatchDetails(entry.data, theme as ThemeLike),
+    componentForBatchDetails(entry.data, theme as ThemeLike, DEFAULT_OUTPUT_PAD),
   );
 }
 
@@ -67,11 +77,16 @@ function isVisibleChorusMessage(message: TattlerPendingMessage): message is Tatt
   return message.kind === 'chorus.room-message.v0' && message.visible;
 }
 
-function renderChorusMessage(message: TattlerPendingChorusMessage, width: number, theme: ThemeLike): string[] {
+function renderChorusMessage(
+  message: TattlerPendingChorusMessage,
+  width: number,
+  theme: ThemeLike,
+  outputPad: number,
+): string[] {
   const tagColor = message.self ? 'success' : 'accent';
   const backgroundColor = message.self ? 'toolSuccessBg' : 'customMessageBg';
   const badge = `${theme.bold(theme.fg(tagColor, `[${message.from}]`))}${theme.fg('muted', ` #${message.roomId}`)}`;
-  const contentWidth = Math.max(0, width - 2);
+  const contentWidth = Math.max(0, width - outputPad * 2);
   const messageLines = message.message.split(/\r?\n/).flatMap((line) => {
     const text = line.length === 0 ? '␤' : line;
     return wrapTextWithAnsi(text, contentWidth).map((wrapped) => truncateToWidth(wrapped, contentWidth));
@@ -79,17 +94,17 @@ function renderChorusMessage(message: TattlerPendingChorusMessage, width: number
 
   const blankLine = theme.bg(backgroundColor, ' '.repeat(Math.max(0, width)));
   const contentLines = [truncateToWidth(badge, contentWidth), ...messageLines].map((line) =>
-    theme.bg(backgroundColor, padContentLineToWidth(line, width)),
+    theme.bg(backgroundColor, padContentLineToWidth(line, width, outputPad)),
   );
 
   return [blankLine, ...contentLines, blankLine];
 }
 
-function padContentLineToWidth(line: string, width: number): string {
+function padContentLineToWidth(line: string, width: number, outputPad: number): string {
   if (width <= 0) {
     return '';
   }
 
-  const rightPadding = Math.max(1, width - visibleWidth(line) - 1);
-  return ` ${line}${' '.repeat(rightPadding)}`;
+  const rightPadding = Math.max(outputPad, width - visibleWidth(line) - outputPad);
+  return `${' '.repeat(outputPad)}${line}${' '.repeat(rightPadding)}`;
 }

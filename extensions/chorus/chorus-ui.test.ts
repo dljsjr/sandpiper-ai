@@ -121,6 +121,7 @@ describe('Chorus room UI helpers', () => {
     const lines = createChorusMessageComponent(
       messageDetails({ from: 'Piper', message: 'self-authored note', self: true }),
       markerTheme,
+      1,
     ).render(80);
 
     expect(lines.join('\n')).toContain('<fg:success>[Piper]</fg:success>');
@@ -128,9 +129,20 @@ describe('Chorus room UI helpers', () => {
   });
 
   test('styles non-self chat messages with default room tag color and background', () => {
-    const lines = createChorusMessageComponent(messageDetails(), markerTheme).render(80);
+    const lines = createChorusMessageComponent(messageDetails(), markerTheme, 1).render(80);
 
     expect(lines.join('\n')).toContain('<fg:accent>[Huginn]</fg:accent>');
     expect(lines.join('\n')).toContain('<bg:customMessageBg>');
+  });
+
+  test('honors outputPad for horizontal padding, matching Box(outputPad, 1, ...)', () => {
+    const paddedLines = createChorusMessageComponent(messageDetails(), markerTheme, 1).render(80);
+    const unpaddedLines = createChorusMessageComponent(messageDetails(), markerTheme, 0).render(80);
+
+    // Box(paddingX, 1, bgFn) prepends paddingX spaces to content before applying the
+    // background wrap, so a padded line reads '<bg:...> <content>' (space right after the
+    // opening tag) while an unpadded line reads '<bg:...><content>' (no space).
+    expect(paddedLines[1]).toContain('<bg:customMessageBg> <bold>');
+    expect(unpaddedLines[1]).toContain('<bg:customMessageBg><bold>');
   });
 });
