@@ -84,9 +84,9 @@ export function packagePeerDependencyVersion(packageJson: PackageJsonWithDepende
 
 export function createPiPeerDependencies(rootPackageJson: RootPackageJson): Record<string, string> {
   return {
+    '@earendil-works/pi-ai': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-ai'),
     '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-coding-agent'),
     '@earendil-works/pi-tui': packagePeerDependencyVersion(rootPackageJson, '@earendil-works/pi-tui'),
-    typebox: packagePeerDependencyVersion(rootPackageJson, 'typebox'),
   };
 }
 
@@ -209,11 +209,11 @@ export function createWebFetchExtensionPackageJson(rootPackageJson: RootPackageJ
       turndown: packageDependencyVersion(webFetchPackageJson, 'turndown'),
     },
     peerDependencies: {
+      '@earendil-works/pi-ai': packagePeerDependencyVersion(webFetchPackageJson, '@earendil-works/pi-ai'),
       '@earendil-works/pi-coding-agent': packagePeerDependencyVersion(
         webFetchPackageJson,
         '@earendil-works/pi-coding-agent',
       ),
-      typebox: packagePeerDependencyVersion(webFetchPackageJson, 'typebox'),
     },
     pi: {
       extensions: ['./src/index.ts'],

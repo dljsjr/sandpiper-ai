@@ -22,9 +22,9 @@
         "vitest": "4.1.10",
       },
       "peerDependencies": {
+        "@earendil-works/pi-ai": "0.80.7",
         "@earendil-works/pi-coding-agent": "0.80.7",
         "@earendil-works/pi-tui": "0.80.7",
-        "typebox": "1.3.6",
       },
     },
     "extensions/autotoon": {
@@ -41,8 +41,8 @@
         "sandpiper-ai-core": "0.0.1",
       },
       "peerDependencies": {
+        "@earendil-works/pi-ai": "0.80.7",
         "@earendil-works/pi-coding-agent": "0.80.7",
-        "typebox": "1.3.6",
       },
     },
     "extensions/system": {
@@ -52,9 +52,9 @@
         "sandpiper-ai-core": "0.0.1",
       },
       "peerDependencies": {
+        "@earendil-works/pi-ai": "0.80.7",
         "@earendil-works/pi-coding-agent": "0.80.7",
         "@earendil-works/pi-tui": "0.80.7",
-        "typebox": "1.3.6",
       },
     },
     "extensions/web-fetch": {
@@ -71,9 +71,9 @@
         "@types/turndown": "5.0.6",
       },
       "peerDependencies": {
+        "@earendil-works/pi-ai": "0.80.7",
         "@earendil-works/pi-coding-agent": "0.80.7",
         "@earendil-works/pi-tui": "0.80.7",
-        "typebox": "1.3.6",
       },
     },
     "extensions/web-search": {
@@ -88,9 +88,9 @@
         "@types/jsdom": "28.0.3",
       },
       "peerDependencies": {
+        "@earendil-works/pi-ai": "0.80.7",
         "@earendil-works/pi-coding-agent": "0.80.7",
         "@earendil-works/pi-tui": "0.80.7",
-        "typebox": "1.3.6",
       },
     },
     "packages/adapter-claude-code": {
@@ -172,7 +172,6 @@
         "@earendil-works/pi-ai": "0.80.7",
         "@earendil-works/pi-coding-agent": "0.80.7",
         "@earendil-works/pi-tui": "0.80.7",
-        "typebox": "1.3.6",
       },
     },
   },

@@ -3,8 +3,8 @@
  * Thin glue layer — delegates all logic to framework-independent modules.
  */
 
+import { Type } from '@earendil-works/pi-ai';
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { Type } from 'typebox';
 import { SimpleFetchAdapter } from './fetch.js';
 import { executeWebFetchTool as defaultExecuteWebFetchTool, type WebFetchToolDetails } from './tool-operation.js';
 import { renderWebFetchCall, renderWebFetchResult } from './tool-rendering.js';
