@@ -90,11 +90,13 @@ describe('system extension factory split', () => {
       'identity',
     ]);
     expect(events).toEqual([
-      'session_start',
-      'before_agent_start',
-      'session_start',
-      'session_shutdown',
-      'session_start',
+      'session_start', // registerMigrationControls
+      'session_start', // registerStartupPromptHooks
+      'session_shutdown', // registerStartupPromptHooks
+      'before_agent_start', // registerStartupPromptHooks
+      'session_start', // registerSessionContinuityHooks
+      'session_shutdown', // registerSessionContinuityHooks
+      'session_start', // registerDiagnosticsHooks
     ]);
   });
 });
