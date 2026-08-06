@@ -16,12 +16,15 @@ afterEach(() => {
 
 function fakePi(flags: Record<string, string> = {}) {
   const handlers = new Map<string, (evt: unknown, ctx: unknown) => unknown>();
+  const tools: Array<{ readonly name: string; readonly constrainedSampling?: unknown }> = [];
   const pi = {
     events: createEventBus(),
     on: vi.fn((event: string, handler: (evt: unknown, ctx: unknown) => unknown) => {
       handlers.set(event, handler);
     }),
-    registerTool: vi.fn(),
+    registerTool: vi.fn((tool: { readonly name: string; readonly constrainedSampling?: unknown }) => {
+      tools.push(tool);
+    }),
     registerCommand: vi.fn(),
     registerFlag: vi.fn(),
     registerMessageRenderer: vi.fn(),
@@ -31,7 +34,7 @@ function fakePi(flags: Record<string, string> = {}) {
     sendMessage: vi.fn(),
   } as unknown as ExtensionAPI;
 
-  return { pi, handlers };
+  return { pi, handlers, tools };
 }
 
 function fakeContext(sessionId: string, entries: unknown[]): ExtensionContext {
@@ -124,5 +127,28 @@ describe('Tattler session lifecycle', () => {
     expect(idFiles).toHaveLength(1);
 
     await sessionShutdown?.({ type: 'session_shutdown', reason: 'quit' }, fakeContext(sessionId, entries));
+  });
+
+  it('registers send_peer_message with prefer-strict constrainedSampling, and list_peers without any', async () => {
+    setUpIsolatedRuntimeDir('tt-constrained-sampling');
+
+    const { pi, handlers, tools } = fakePi();
+    await tattlerExtension(pi);
+    const sessionStart = handlers.get('session_start');
+
+    const sessionId = 'cccc3333';
+    const entries: unknown[] = [];
+    (pi.appendEntry as ReturnType<typeof vi.fn>).mockImplementation((customType: string, data: unknown) => {
+      entries.push({ type: 'custom', id: 'x', parentId: null, timestamp: new Date().toISOString(), customType, data });
+    });
+
+    await sessionStart?.({ type: 'session_start', reason: 'startup' }, fakeContext(sessionId, entries));
+
+    const sendPeerMessage = tools.find((tool) => tool.name === 'send_peer_message');
+    const listPeers = tools.find((tool) => tool.name === 'list_peers');
+
+    expect(sendPeerMessage?.constrainedSampling).toEqual({ type: 'json_schema', strict: 'prefer' });
+    // list_peers has zero parameters -- nothing for strict-mode sampling to constrain.
+    expect(listPeers?.constrainedSampling).toBeUndefined();
   });
 });
