@@ -25,6 +25,7 @@ function fakePi(flags: Record<string, string> = {}) {
     registerCommand: vi.fn(),
     registerFlag: vi.fn(),
     registerMessageRenderer: vi.fn(),
+    registerEntryRenderer: vi.fn(),
     getFlag: vi.fn((name: string) => flags[name]),
     appendEntry: vi.fn(),
     sendMessage: vi.fn(),
