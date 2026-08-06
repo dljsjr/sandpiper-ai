@@ -38,6 +38,7 @@ function createExtensionCapture(): {
     | 'getFlag'
     | 'on'
     | 'registerCommand'
+    | 'registerEntryRenderer'
     | 'registerFlag'
     | 'registerMessageRenderer'
     | 'registerTool'
@@ -71,6 +72,7 @@ function createExtensionCapture(): {
       registerFlag: ((name: string) => {
         flags.push(name);
       }) as ExtensionAPI['registerFlag'],
+      registerEntryRenderer: vi.fn() as ExtensionAPI['registerEntryRenderer'],
       registerMessageRenderer: ((customType: string) => {
         renderers.push(customType);
       }) as ExtensionAPI['registerMessageRenderer'],

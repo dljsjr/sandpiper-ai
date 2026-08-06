@@ -65,13 +65,23 @@ export function createEventStub(flags: Record<string, boolean | string | undefin
   };
 }
 
-// ─── Diagnostics hooks stub (on + events) ────────────────────────
+// ─── Diagnostics hooks stub (on + events + entries) ──────────────
+
+type AnyEntryRenderer = (
+  entry: { readonly data?: unknown },
+  options: { readonly expanded: boolean },
+  theme: unknown,
+) => unknown;
 
 export function createDiagnosticsStub(): {
-  pi: Pick<ExtensionAPI, 'on' | 'events'>;
+  pi: Pick<ExtensionAPI, 'on' | 'events' | 'appendEntry' | 'registerEntryRenderer'>;
   handlers: Map<string, AnyHandler>;
+  entryRenderers: Map<string, AnyEntryRenderer>;
+  appendedEntries: Array<{ readonly customType: string; readonly data: unknown }>;
 } {
   const handlers = new Map<string, AnyHandler>();
+  const entryRenderers = new Map<string, AnyEntryRenderer>();
+  const appendedEntries: Array<{ readonly customType: string; readonly data: unknown }> = [];
   return {
     pi: {
       on: ((event: string, handler: AnyHandler) => {
@@ -81,8 +91,16 @@ export function createDiagnosticsStub(): {
         on: vi.fn(),
         emit: vi.fn(),
       } as unknown as ExtensionAPI['events'],
+      appendEntry: ((customType: string, data?: unknown) => {
+        appendedEntries.push({ customType, data });
+      }) as ExtensionAPI['appendEntry'],
+      registerEntryRenderer: ((customType: string, renderer: AnyEntryRenderer) => {
+        entryRenderers.set(customType, renderer);
+      }) as ExtensionAPI['registerEntryRenderer'],
     },
     handlers,
+    entryRenderers,
+    appendedEntries,
   };
 }
 
