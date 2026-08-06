@@ -252,9 +252,7 @@ describe('system-prompt', () => {
       expect(block).toContain('The following skills provide specialized instructions');
       expect(block).toContain("Use the `read` tool to load the skill's SKILL.md file from the exact `location`");
       expect(block).toContain('If multiple skills match, load all relevant skills.');
-      expect(block).toContain(
-        "When a skill references a relative path, resolve it against the skill's base directory and use the absolute path.",
-      );
+      expect(block).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
     });
 
     it('uses skill for skill loading rules when the tool is active', () => {
@@ -276,9 +274,7 @@ describe('system-prompt', () => {
       const block = skillsBlock(options)!;
       expect(block).toContain('Use the `skill` tool to load relevant skills by name');
       expect(block).toContain('If multiple skills match, load all relevant skills.');
-      expect(block).toContain(
-        "When a skill references a relative path, resolve it against the skill's base directory and use the absolute path.",
-      );
+      expect(block).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
       expect(block).not.toContain("Use the `read` tool to load the skill's SKILL.md");
     });
   });
