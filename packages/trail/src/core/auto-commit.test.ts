@@ -69,6 +69,11 @@ describe('autoCommitIfEnabled', () => {
       writeFileSync(join(workspacePath, 'TST-1.md'), '# Task\n');
       // First commit so the branch exists before we try to push
       execSync('git add -A && git commit -m "seed"', { cwd: workspacePath });
+      // Establish upstream tracking as a real first manual `git push -u` would
+      // — this test covers the steady-state auto_push path (upstream already
+      // tracked). The fresh-branch/no-upstream first push is covered by
+      // 'establishes upstream tracking...' below (TCL-143).
+      execSync('git push -u origin sandpiper-tasks', { cwd: workspacePath, stdio: 'pipe' });
 
       const config: TaskStorageConfig = {
         ...SEPARATE_BRANCH_CONFIG,
@@ -85,6 +90,42 @@ describe('autoCommitIfEnabled', () => {
         encoding: 'utf-8',
       });
       expect(remoteLog).toContain('Create TST-2: auto push test');
+    } finally {
+      rmSync(remoteDir, { recursive: true, force: true });
+    }
+  });
+
+  it('establishes upstream tracking and pushes on the first auto_push after a fresh worktree (TCL-143)', () => {
+    // Arrange: bare remote, no prior push/upstream — the exact state right
+    // after separate-branch storage init (initGitWorktree's `git worktree add
+    // --orphan`), before any manual `git push -u` has ever been run.
+    const remoteDir = mkdtempSync(join(tmpdir(), 'auto-push-fresh-remote-'));
+    try {
+      execSync('git init --bare -q', { cwd: remoteDir });
+      execSync(`git remote add origin "${remoteDir}"`, { cwd: workspacePath });
+
+      const config: TaskStorageConfig = {
+        ...SEPARATE_BRANCH_CONFIG,
+        version_control: { ...SEPARATE_BRANCH_CONFIG.version_control, auto_push: true },
+      };
+      writeFileSync(join(workspacePath, 'TST-1.md'), '# Task\n');
+
+      // Act — no upstream configured yet; pushTaskBranch must establish it and
+      // retry rather than failing with "no upstream branch".
+      autoCommitIfEnabled(rootDir, config, 'Create TST-1: first auto push');
+
+      // Assert: remote has the commit, and the local branch now tracks origin.
+      const remoteLog = execSync('git log --oneline sandpiper-tasks', {
+        cwd: remoteDir,
+        encoding: 'utf-8',
+      });
+      expect(remoteLog).toContain('Create TST-1: first auto push');
+
+      const upstream = execSync('git rev-parse --abbrev-ref sandpiper-tasks@{upstream}', {
+        cwd: workspacePath,
+        encoding: 'utf-8',
+      }).trim();
+      expect(upstream).toBe('origin/sandpiper-tasks');
     } finally {
       rmSync(remoteDir, { recursive: true, force: true });
     }
