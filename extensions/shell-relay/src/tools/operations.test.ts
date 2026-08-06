@@ -83,6 +83,55 @@ describe('executeShellRelayTool', () => {
     expect(result.content[0]?.text).toContain('Shell Relay error: pane closed');
     expect(result.details).toEqual({ error: 'pane closed' });
   });
+
+  it.each([
+    [0, 'zero'],
+    [-5, 'negative'],
+    [Number.NaN, 'NaN'],
+    [Number.POSITIVE_INFINITY, 'Infinity'],
+  ])('rejects a %s (%s) timeout as a validation error without touching the relay', async (timeout) => {
+    const runtime = createRuntime();
+
+    const result = await executeShellRelayTool(runtime, createContext(), { command: 'whoami', timeout });
+
+    expect(result).toEqual({
+      content: [{ type: 'text', text: 'Invalid timeout: must be a finite number of seconds' }],
+      details: { error: 'Invalid timeout: must be a finite number of seconds' },
+      isError: true,
+    });
+    expect(runtime.setup).not.toHaveBeenCalled();
+    expect(runtime.executeQueued).not.toHaveBeenCalled();
+  });
+
+  it('rejects a timeout large enough to overflow setTimeout instead of clamping it to an immediate timeout', async () => {
+    const runtime = createRuntime();
+
+    // Any value whose *1000 milliseconds exceeds 2^31 - 1 (setTimeout's max signed 32-bit delay).
+    const result = await executeShellRelayTool(runtime, createContext(), {
+      command: 'whoami',
+      timeout: 2_147_484,
+    });
+
+    expect(result).toEqual({
+      content: [{ type: 'text', text: 'Invalid timeout: maximum is 2147483.647 seconds' }],
+      details: { error: 'Invalid timeout: maximum is 2147483.647 seconds' },
+      isError: true,
+    });
+    expect(runtime.setup).not.toHaveBeenCalled();
+    expect(runtime.executeQueued).not.toHaveBeenCalled();
+  });
+
+  it('accepts the maximum valid timeout at the boundary', async () => {
+    const runtime = createRuntime();
+
+    const result = await executeShellRelayTool(runtime, createContext(), {
+      command: 'whoami',
+      timeout: 2_147_483.647,
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(runtime.executeQueued).toHaveBeenCalledWith('whoami', 2_147_483_647);
+  });
 });
 
 describe('executeInspectPaneTool', () => {
