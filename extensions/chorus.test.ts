@@ -18,6 +18,7 @@ type ToolRenderTheme = {
 
 type RegisteredTool = {
   readonly name: string;
+  readonly constrainedSampling?: unknown;
   readonly promptGuidelines?: readonly string[];
   readonly parameters?: {
     readonly properties?: {
@@ -75,6 +76,15 @@ describe('Chorus extension commands', () => {
     expect(guidelines).toContain('Use done if no reply is needed and no other work remains');
     expect(guidelines).not.toContain('own SELF/identity voice');
     expect(tool?.parameters?.properties?.message?.description).toContain('SELF/identity voice');
+  });
+
+  test('prefers strict JSON-schema sampling for send_chorus_reply (six plain required strings)', () => {
+    const { pi, tools } = fakePi();
+    chorusExtension(pi);
+
+    const tool = tools.find((registeredTool) => registeredTool.name === 'send_chorus_reply');
+
+    expect(tool?.constrainedSampling).toEqual({ type: 'json_schema', strict: 'prefer' });
   });
 
   test('renders successful replies as local sent receipts', () => {

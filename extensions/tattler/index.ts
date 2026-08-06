@@ -66,6 +66,8 @@ function registerListPeersTool(tattlerRuntimeDir: string, ownIdentity: TattlerId
     promptGuidelines: [TATTLER_ROUTING_PROMPT_GUIDELINE],
     description: 'List other agent peers with live sockets, which means they are candidates for receiving messages',
     parameters: Type.Object({}),
+    // No constrainedSampling: this tool has zero parameters, so there's no schema shape
+    // for strict-mode sampling to constrain.
     async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
       const peerSockets = await listPeerSockets(tattlerRuntimeDir, ownIdentity);
       if (peerSockets.length === 0) {
@@ -121,6 +123,11 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
         description: `The authored message to send to the peer, written as your own response prose and limited to ${MAX_MESSAGE_BYTES} bytes`,
       }),
     }),
+    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
+    // to normal tool calling otherwise -- addressType's StringEnum schema is plain
+    // {type:'string', enum:[...]}, no nonstandard keywords, so no supported-strict provider
+    // can reject it.
+    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
       const addressType = (params.addressType || 'name') as keyof TattlerIdentityV0;
       // TODO: don't probe for live sockets every single time we send a message; this could add significant latency.

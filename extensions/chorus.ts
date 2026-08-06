@@ -355,6 +355,10 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
       'Use send_chorus_reply only when a visible Chorus room message warrants a substantive reply; do not use send_peer_message for Chorus replies unless the user explicitly asks for a direct Tattler DM. Use done if no reply is needed and no other work remains for the turn.',
     ],
     parameters: SendChorusReplyParameters,
+    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
+    // otherwise. All six fields are plain required strings -- no schema shape for a strict
+    // provider to reject.
+    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     renderShell: 'self',
     renderCall: () => emptyToolRenderComponent,
     renderResult: (result, _options, theme) => {
