@@ -66,12 +66,16 @@ interface BunBuildPlugin {
   setup(build: BunPluginBuilder): void;
 }
 
+interface BunCompileOptions {
+  readonly autoloadBunfig?: boolean;
+}
+
 interface BunBuildOptions {
   readonly entrypoints: readonly string[];
   readonly outdir: string;
   readonly target: 'bun';
   readonly minify: boolean;
-  readonly compile: boolean;
+  readonly compile: boolean | BunCompileOptions;
   readonly external: readonly string[];
   readonly plugins: readonly BunBuildPlugin[];
 }
@@ -244,7 +248,17 @@ export async function buildStandaloneSandpiperApp(options: BuildStandaloneSandpi
     outdir: options.outputDir,
     target: 'bun',
     minify: true,
-    compile: true,
+    // Upstream #7684: a cwd bunfig.toml with preload scripts crashes compiled Bun binaries at
+    // startup (Bun tries to run the user's project preload scripts inside the standalone
+    // executable, which has no matching project). autoloadBunfig defaults to true; disable it
+    // so a compiled sandpiper binary never reads whatever bunfig.toml happens to be in its
+    // launch cwd. Confirmed the Bun.build JS API exposes this directly (as
+    // CompileBuildOptions.autoloadBunfig in Bun's own bun-types package, equivalent to the
+    // --no-compile-autoload-bunfig CLI flag) -- no need to shell out to `bun build --compile`
+    // the way upstream's scripts/build-binaries.sh does. This file hand-rolls a minimal ambient
+    // Bun type locally (see BunBuildOptions above) rather than depending on bun-types, so
+    // BunCompileOptions widens `compile` to accept this one field.
+    compile: { autoloadBunfig: false },
     external: ['canvas'],
     plugins: [cssTreeBundledDataPlugin(options.repoRoot)],
   });
