@@ -25,6 +25,8 @@ describe('turn control tool', () => {
     expect(tool.description).toContain('without producing an assistant message');
     expect(tool.promptGuidelines?.join('\n')).toContain('Do not use done for normal user requests');
     expect(tool.promptGuidelines?.join('\n')).toContain('call it by itself');
+    // Zero parameters -- nothing for strict-mode sampling to constrain.
+    expect(tool.constrainedSampling).toBeUndefined();
   });
 
   test('terminates the current turn with provider-safe content and no rendering', async () => {
