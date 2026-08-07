@@ -41,20 +41,6 @@ describe('registerBackgroundProcessTools', () => {
     expect(result.details).toMatchObject({ id: 'dev-server', pid: 4242, status: 'running' });
   });
 
-  it('prefers strict JSON-schema sampling for both tools', () => {
-    const { pi, tools } = createToolRegistrationStub();
-    const processManager = createProcessManagerStub();
-
-    registerBackgroundProcessTools(
-      pi as Parameters<typeof registerBackgroundProcessTools>[0],
-      processManager as Parameters<typeof registerBackgroundProcessTools>[1],
-    );
-
-    for (const tool of tools) {
-      expect(tool.constrainedSampling).toEqual({ type: 'json_schema', strict: 'prefer' });
-    }
-  });
-
   it('sends a steering notification that wakes the agent when a started process exits', async () => {
     const { pi, tools, sendMessage } = createToolRegistrationStub();
     let exitHandler: ((code: number | null, signal: string | null) => void) | undefined;

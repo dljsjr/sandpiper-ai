@@ -51,9 +51,6 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
         }),
       ),
     }),
-    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
-    // otherwise. Plain scalars plus a string array, no unions -- low risk.
-    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       const result = startBackgroundProcess(processManager, {
         id: params.id,
@@ -110,9 +107,6 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       tail_lines: Type.Optional(Type.Number({ description: 'Only include last N lines of output' })),
       clear_buffer: Type.Optional(Type.Boolean({ description: 'Clear output buffers after reading (default: false)' })),
     }),
-    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
-    // otherwise. Plain scalars, no unions -- low risk.
-    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params) {
       const result = checkBackgroundProcess(processManager, {
         id: params.id,

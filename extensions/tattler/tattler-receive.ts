@@ -29,8 +29,6 @@ export function registerTattlerReceiveTool(
       'Call tattler_receive by itself, not alongside other tools; it terminates the current turn so pending messages can be delivered cleanly.',
     ],
     parameters: Type.Object({}),
-    // No constrainedSampling: this tool has zero parameters, so there's no schema shape
-    // for strict-mode sampling to constrain.
     executionMode: 'sequential',
     renderShell: 'self',
     renderCall: () => emptyToolRenderComponent,

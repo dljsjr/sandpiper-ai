@@ -700,11 +700,6 @@ export function registerSkillLoadingTool(
       'Use the `skill` tool to load a skill by name.',
       'Use `source="filesystem"` only when the user explicitly asks to load a non-catalogued skill from a filesystem path.',
     ],
-    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
-    // otherwise. source is a Type.Union of two Type.Literal strings -- verified this compiles
-    // to plain {anyOf:[{type:'string',const:...}, ...]}, no nonstandard keywords a strict-mode
-    // provider could reject.
-    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     parameters,
     renderCall(args, theme, context) {
       const text = reuseTextComponent(context.lastComponent);
