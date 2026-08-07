@@ -1,11 +1,17 @@
 # AGENT-249: Headless CLI Integration-Test Harness — Grounding + Design (AGENT-250)
 
-Status: approved (AGENT-250); implemented (AGENT-251) at devtools/integration/. The Guard
-injection vector section below carries an AGENT-251 correction to the originally-approved
-fetch/http/https sketch — the http/https half was found broken and unnecessary once actually
-built and verified; see that section for the empirical evidence. Full live-completion
-verification of the RPC/mock-provider claims beyond the guard's own mechanics remains AGENT-252's
-scope (see [Dependency inversion](#dependency-inversion-live-verification-moves-downstream)).
+Status: approved (AGENT-250); implemented (AGENT-251) at devtools/integration/, revised once
+during review. The Guard injection vector section below carries two rounds of correction, both
+recorded rather than silently fixed: AGENT-251 first found the originally-approved `http`/`https`
+patch broken (ESM module namespace immutability) and initially dropped it entirely on the
+further claim that nothing in pi-ai's dependency tree calls `http.request`/`https.request` — that
+claim was false, caught in review (`@smithy/node-http-handler`, a transitive Bedrock-provider
+dependency, does call `node:https.request` via a genuine CJS `require()`), so the `https.request`
+half is restored, verified to intercept via a call-time property lookup, with the remaining
+narrow residual (smithy's non-TLS fallback, unreachable by real AWS traffic) named explicitly.
+Full live-completion verification of the RPC/mock-provider claims beyond the guard's own
+mechanics remains AGENT-252's scope (see
+[Dependency inversion](#dependency-inversion-live-verification-moves-downstream)).
 
 ## Context
 
@@ -174,9 +180,11 @@ Two layers, and they are not equally strong:
    docs read so far, and this pair does not promote unverified mechanisms to guarantees anymore.
 2. **Harness-level network-deny guard (recommended as the actual answer)** — independent of
    whether (1) holds, every integration test run should install a process-wide guard for its
-   duration: monkeypatch `globalThis.fetch` to reject if invoked (see the Guard injection
-   vector section below for why `fetch` alone, not `http`/`https`, turned out to be the correct
-   and sufficient interception point once AGENT-251 built and empirically verified it). This
+   duration: monkeypatch `globalThis.fetch` to reject if invoked, plus a `require()`-based
+   `node:https.request` patch for dependencies that bypass `fetch` (see the Guard injection
+   vector section below for exactly which real dependency needed that second half, and why an
+   ESM `import` of `node:http`/`node:https` cannot be patched at all — both found and verified
+   empirically while AGENT-251 built this, including a caught-and-corrected false claim). This
    catches egress from *any* cause — wrong provider resolution, an extension under test making
    its own incidental fetch, a future pi regression — not just "the mock provider was
    configured correctly." It converts "we trust the mock" into "we structurally cannot make a
@@ -191,28 +199,93 @@ harness. State this limitation in the harness's own README, not just here.
 
 ### Guard injection vector (coordinator-required specification)
 
-The guard has to run *inside* the spawned `pi`/`sandpiper` process — patching `fetch` from the
-test runner's own process does nothing for a child process's separate Node realm. The vector is:
-**the guard is itself a tiny extension**, loaded via an additional `-e` flag the shared isolation
-helper always appends (alongside the mock provider's own `-e`), e.g.
+The guard has to run *inside* the spawned `pi`/`sandpiper` process — patching `fetch`/`https`
+from the test runner's own process does nothing for a child process's separate Node realm. The
+vector is: **the guard is itself a tiny extension**, loaded via an additional `-e` flag the
+shared isolation helper always appends (alongside the mock provider's own `-e`), e.g.
 `devtools/integration/network-deny-guard.ts`. Its factory function patches `globalThis.fetch`
-synchronously at the top, before doing anything else.
+and `node:https`'s `.request` synchronously at the top, before doing anything else.
 
-**AGENT-251 correction to this design (recorded, not silently fixed):** the version approved
-here also patched `node:http`/`node:https` `.request`. Building it surfaced that this half was
-both broken and unnecessary, confirmed empirically rather than assumed away a second time:
-`import * as http from 'node:http'` yields an ECMAScript module namespace object, which is
-exotic-object-immutable from outside the module (`Object.defineProperty` with
-`configurable:true` throws "Cannot replace module namespace object's binding"; a *separately
-obtained* `require('node:http')` CJS reference can be mutated, but that mutation does not
-propagate to the ESM namespace's own binding — confirmed with a standalone bun script). It also
-turned out to be moot: pi-ai's Anthropic and OpenAI-family providers go through the official
-`@anthropic-ai/sdk`/`openai` SDK packages, which resolve their HTTP client via a bare `fetch`
-global read at call time (`@anthropic-ai/sdk/internal/shims.js`'s `getDefaultFetch()`), and
-grepping the full installed pi-ai + pi-coding-agent dist tree found zero `http.request`/
-`https.request`/direct-`undici`-request usage anywhere. `globalThis.fetch` alone is the correct
-and sufficient interception point for this dependency chain; the http/https half of the sketch
-is dropped from the shipped implementation.
+**AGENT-251 correction to this design, then a partial restoration during review (both recorded,
+neither silently fixed):** the version approved here patched `node:http`/`node:https`
+`.request`. Building it, AGENT-251 found `import * as http from 'node:http'` yields an
+ECMAScript module namespace object, exotic-object-immutable from outside the module
+(`Object.defineProperty` with `configurable:true` throws "Cannot replace module namespace
+object's binding"; a *separately obtained* `require('node:http')` CJS reference can be mutated,
+but that mutation does not propagate to the ESM namespace's own binding — confirmed with a
+standalone bun script; the failure was a require/import interop mismatch specifically, not
+proof that node:http/https can never be patched — AGENT-251's original test mutated a
+`require()`-obtained object but then verified the result by reading through a *separate*
+`import * as http` binding) — and an initial AGENT-251 submission dropped the http/https half
+entirely, on the additional claim that pi-ai's dependency tree never calls `http.request`/
+`https.request` anywhere.
+
+**That claim was false, caught in review.** `@smithy/node-http-handler` (a transitive dependency
+of `@aws-sdk/client-bedrock-runtime`, used by pi-ai's Bedrock provider,
+`api/bedrock-converse-stream.js`) does `var node_https = require('node:https');` at module scope
+in its `dist-cjs/index.js`, and its request-sending function does `const requestFunc = isSSL ?
+node_https.request : hRequest;` — a **property lookup performed at call time**, not a
+destructured/cached reference taken once at load. Two consequences: (1) since this is a genuine
+CJS `require()`, not an ESM namespace, it *can* be mutated the same way the guard's own
+`require('node:https')` reaches it — the restored patch works. (2) because the lookup happens at
+call time rather than being cached at import time, the patch intercepts regardless of whether
+smithy's module evaluates before or after the guard installs — load order doesn't matter for
+this path specifically. The same file's plain-HTTP fallback (`hRequest`, populated via `const {
+request } = await import('node:http')`) is an ESM dynamic import and remains genuinely
+unreachable by any monkeypatch, for the same immutability reason as node:http generally — but
+real AWS/Bedrock endpoints are always TLS (`isSSL` always true in practice), so this residual is
+narrow: a plain-HTTP fallback that real Bedrock traffic never actually takes, not the SSL path
+real requests use.
+
+**Two Bedrock load paths, documented precisely rather than collapsed into "unreachable via
+pinning" generically** (found during review): pi-ai's Bedrock API loader
+(`api/bedrock-converse-stream.lazy.js`) exposes two distinct ways smithy's module can end up
+loaded:
+
+- **Path (a), eager/static** — `setBedrockProviderModule()` lets a build register a
+  statically-imported bedrock module up front, used by pi's compiled single-file Bun binary
+  build (`dist/bun/cli.js`) specifically, because that build's bundler cannot follow a
+  variable-specifier dynamic `import()` into the Node-only AWS SDK. **Neither harness entry
+  mode goes through that binary** — `entry:'pi'` runs `node_modules/@earendil-works/
+  pi-coding-agent/dist/cli.js` directly via `bun <path>`, and `entry:'sandpiper'` runs
+  `packages/cli/sandpiper_standalone.ts` from source — so path (a) is unreachable by
+  construction, not by provider pinning. Confirmed: `setBedrockProviderModule` has no other
+  caller anywhere in the installed pi-ai dist tree; it's wired up only by pi's own Bun-compile
+  build tooling, which we never invoke.
+- **Path (b), lazy/normal** — `bedrockConverseStreamApi()` wraps the real load in `lazyApi()`
+  around a dynamic `import("./bedrock-converse-stream.ts")` (the module doing the smithy
+  `require('node:https')` documented above). This is the path every non-Bun-binary invocation
+  takes, **and it only evaluates when the API function is actually called** — i.e. only when
+  pi dispatches a real completion request through a model resolved to the Bedrock provider.
+  Loading pi-ai at all (any invocation, since it's the full provider catalog) does not trigger
+  this import; only an actual Bedrock-family turn does.
+
+**Consequence for AGENT-252's guard-fires test**: because path (b) is dispatch-triggered, a
+`--provider amazon-bedrock` misconfiguration case that only *passes the flag* proves nothing —
+smithy never loads, the guard's `https.request` patch never gets exercised, and the test would
+pass for the wrong reason (nothing attempted egress, not "the guard stopped an attempt"). The
+test must drive an actual turn attempt (a `prompt` command via the RPC driver, or an equivalent
+print-mode invocation) against the Bedrock pin, so smithy's module genuinely loads and calls
+`node_https.request`, for the guard's sentinel to have anything real to intercept.
+
+**Defense-in-depth for that test itself, added to the harness's default isolation env**: the
+guard-fires test's own failure mode, if the guard ever regresses, is a real Bedrock dispatch
+using whatever AWS credentials are ambient on the test machine (`~/.aws/credentials`, env vars,
+an IAM role) — structurally the same ambient-credential risk this whole harness exists to
+prevent, now specifically inside the one test designed to probe the boundary. Mitigation,
+applied unconditionally by `prepareIsolatedSpawn()` (not opt-in per test): pin
+`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` to garbage literal values and `AWS_PROFILE` to a
+name that doesn't exist. The AWS SDK credential-resolution chain checks environment variables
+before `~/.aws` or IAM-role metadata, so even a guard-regression scenario authenticates as
+garbage and gets a 403 from AWS rather than spending real ambient credentials. Same principle as
+the op-shim tripwire: the backstop behind the backstop assumes the mechanism above it fails.
+
+Net result: `globalThis.fetch` plus a `require()`-based `node:https.request` patch together cover
+every HTTP client this dependency chain actually uses for real network calls (Anthropic/OpenAI
+via `fetch`, Bedrock via smithy's SSL path, reachable only through the lazy path (b)); the one
+remaining gap (smithy's non-TLS fallback) is named rather than silently absorbed into "fully
+covered," and is not exercised by real AWS/Bedrock traffic; and the guard-fires test that
+exercises the Bedrock path carries its own independent credential-poisoning backstop.
 
 ```typescript
 export default function (pi: ExtensionAPI) {
@@ -220,6 +293,14 @@ export default function (pi: ExtensionAPI) {
     const label = typeof input === 'string' || input instanceof URL ? String(input) : input.url;
     return Promise.reject(new Error(`network-deny-guard: blocked fetch(${label}) during isolated integration test`));
   }) as typeof fetch;
+
+  // require(), not `import * as https` -- see above for why the ESM namespace form cannot be
+  // mutated, and why this CJS singleton form (matching how smithy itself accesses node:https)
+  // can be.
+  const httpsModule = require('node:https') as typeof import('node:https');
+  httpsModule.request = (() => {
+    throw new Error('network-deny-guard: blocked https.request during isolated integration test');
+  }) as typeof httpsModule.request;
 }
 ```
 
@@ -254,6 +335,19 @@ and assert the process fails with the guard's own sentinel error message (`netwo
 blocked ...`), not a real network error, not a hang, not a silent success. If that scenario ever
 produces a real HTTP response or a different failure mode, the guard isn't wired correctly and
 no other integration test result can be trusted until it is.
+
+**Upgraded scope, added during review**: include a `--provider amazon-bedrock` misconfiguration
+case specifically, not only a generic wrong-provider one. Because the `https.request` patch is
+now verified to intercept smithy's SSL path via a call-time property lookup (see above), this
+case can assert the guard's `https.request` sentinel actually fires on a real code path known to
+bypass `fetch` — an empirical demonstration that the restored patch works end-to-end, not just a
+documented limitation. Strictly stronger than the generic case: it exercises the one dependency
+that needed the non-`fetch` half of the guard in the first place. **This case must drive an
+actual turn/dispatch attempt, not just pass the `--provider`/`--model` flags** — per the two
+Bedrock load paths documented above, smithy only loads lazily on real dispatch (path (b)); a
+flag-only spawn never touches smithy at all and would pass for the wrong reason. The harness's
+default fake-AWS-credential env vars (see above) are the deliberate backstop for exactly this
+test, in case the guard itself has regressed by the time AGENT-252 runs it.
 
 **AGENT-252 concrete deliverable, restated**: build the mock provider (a), pin explicitly (1),
 install the network-deny guard (2), and produce one test that demonstrates the guard actually

@@ -110,6 +110,17 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     GIT_CONFIG_GLOBAL: '/dev/null',
     GIT_CONFIG_SYSTEM: '/dev/null',
     JJ_CONFIG: TRAIL_JJ_FIXTURE,
+    // Defense-in-depth for the network-deny guard itself, not a substitute for it: the AWS
+    // credential chain checks env vars before ~/.aws or an IAM role, so pinning garbage
+    // values here means that if the guard ever regresses (e.g. AGENT-252's Bedrock
+    // guard-fires test has to drive a REAL dispatch attempt for smithy to even load -- see
+    // the design doc), that dispatch authenticates as garbage and gets a 403 from AWS rather
+    // than spending whatever real AWS credentials happen to be ambient on this machine. Same
+    // principle as the op-shim tripwire: the backstop behind the backstop assumes the
+    // mechanism above it fails.
+    AWS_ACCESS_KEY_ID: 'sandpiper-integration-harness-fake-key',
+    AWS_SECRET_ACCESS_KEY: 'sandpiper-integration-harness-fake-secret',
+    AWS_PROFILE: 'sandpiper-integration-harness-nonexistent-profile',
   };
 
   const isolateExtensions = options.isolateExtensions ?? options.entry === 'pi';

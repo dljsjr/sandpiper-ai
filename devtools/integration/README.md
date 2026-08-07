@@ -24,6 +24,11 @@ every spawn:
   `--provider`/`--model` always pinned to the mock unless a caller deliberately overrides them
   (the one sanctioned exception: proving the guard fires when a spawn is misconfigured to skip
   the mock — see AGENT-252).
+- Fake `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_PROFILE` values, unconditionally. This
+  is defense-in-depth for the guard itself, not a substitute for it — the AWS credential chain
+  checks env vars before `~/.aws`/IAM-role metadata, so if the network-deny guard ever
+  regresses, a real Bedrock dispatch attempt (see AGENT-252's guard-fires test) authenticates
+  as garbage and gets a 403 rather than spending real ambient AWS credentials.
 
 Two entry modes: `entry: 'pi'` bypasses Sandpiper's own extension manifest entirely (true
 single/combinatoric-extension isolation, `--no-extensions -e <path>` against the raw installed
@@ -43,16 +48,21 @@ extensions a test adds.
 
 ## Known limitations
 
-- **The network-deny guard patches `globalThis.fetch` only** (not `node:http`/`node:https`).
-  This was a deliberate correction during AGENT-251, not an oversight: ECMAScript module
-  namespace objects (`import * as http from 'node:http'`) are immutable from outside the module,
-  confirmed empirically; a separately-`require()`d CJS reference *can* be mutated but that
-  mutation does not propagate to the ESM namespace binding other code actually calls through.
-  It's also unnecessary for this dependency chain — pi-ai's Anthropic/OpenAI-family providers
-  resolve their HTTP client via a bare `fetch` global read (`@anthropic-ai/sdk`'s
-  `getDefaultFetch()`), and the installed pi-ai + pi-coding-agent dist tree has zero direct
-  `http.request`/`https.request`/`undici`-request usage. If a future dependency bypasses `fetch`
-  entirely, this guard would not catch it — that's a real gap, not a hidden one.
+- **The network-deny guard patches `globalThis.fetch` and `node:https`'s `.request`** (via
+  `require()`, not `node:http`). Two rounds of correction went into this, both recorded rather
+  than silently fixed — see the design doc's Guard injection vector section for the full
+  evidence: (1) ECMAScript module namespace objects (`import * as http from 'node:http'`) are
+  immutable from outside the module, so any consumer that reads node:http/node:https via a
+  static or dynamic `import` cannot be intercepted by this guard at all, full stop; (2) an
+  initial version dropped `https.request` patching entirely on the claim that nothing in
+  pi-ai's dependency tree calls it — that claim was false: `@smithy/node-http-handler`
+  (pi-ai's Bedrock provider dependency) calls `node:https.request` via a genuine CJS
+  `require()`, at call time rather than a cached reference, which this guard's own
+  `require('node:https')` patch does intercept. The one remaining named residual: smithy's
+  plain-HTTP fallback path is an ESM dynamic import and unreachable by any monkeypatch — not
+  exercised by real AWS/Bedrock traffic (always TLS), but real in principle. If a future
+  dependency bypasses both `fetch` and a CJS-`require()`d `node:https`, this guard would not
+  catch it — that's a real gap, not a hidden one.
 - **In-process only.** The guard cannot catch egress from native code or a subprocess pi itself
   spawns outside the patched process. No OS-level sandboxing (network namespace, firewall rule)
   backs this — out of scope for a portable dev-machine harness.
