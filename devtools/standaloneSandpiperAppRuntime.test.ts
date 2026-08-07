@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -78,5 +78,28 @@ describe('standalone Sandpiper app runtime smoke', () => {
     expect(output).toContain('sandpiper - AI coding assistant');
     expect(countFlagLines(output, '--migrate-pi-configs')).toBe(1);
     expect(countFlagLines(output, '--install-shell-integrations')).toBe(1);
+  });
+
+  it('starts cleanly from a cwd with a bunfig.toml preload entry (upstream #7684)', () => {
+    // A cwd bunfig.toml with a preload script crashes compiled Bun binaries when the
+    // executable autoloads it -- the compiled binary has no matching project for that
+    // preload context. compile.autoloadBunfig: false (standaloneSandpiperApp.ts) must stop
+    // the binary from reading this bunfig.toml at all. The preload entry below points at a
+    // file that doesn't exist and would throw a module-resolution error if Bun actually tried
+    // to load it -- if this test ever starts failing because of THIS preload path specifically
+    // (not some unrelated change), that's the regression this test exists to catch.
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-bunfig-'));
+
+    try {
+      const projectDir = join(tempDir, 'project');
+      mkdirSync(projectDir, { recursive: true });
+      writeFileSync(join(projectDir, 'bunfig.toml'), 'preload = ["./this-preload-script-does-not-exist.ts"]\n');
+
+      const output = runAppHelp(projectDir);
+
+      expect(output).toContain('sandpiper - AI coding assistant');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 });
