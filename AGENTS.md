@@ -19,7 +19,24 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 - Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
 - Tests must not touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config).
+- Do not create tasks for changes we believe *upstream* should make. Record the finding in the related task or doc and move on. Tasks that track an already-filed upstream PR or issue we are genuinely blocked on are fine.
 - YAAMS is adjacent tooling, not part of this monorepo yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; built-in continuity remains standup, tasks, inbox, and session logs until an integration lands.
+
+## Turn Discipline
+
+- End turns at rest. After finishing a unit of work, do not propose next actions for the user,
+  declare future scope unilaterally, or leave work queued pending their signal ("want me to X?",
+  "say the word", "ready when you are"). `Done` is a complete way to end a turn. This binds
+  structure, not phrasing: swapping the wording while keeping the shape is the same failure.
+- Do not manufacture decisions. Escalate only when there is a real tradeoff the user would weigh
+  differently than you, or the action is outward-facing, destructive, or hard to reverse.
+  Choosing an order for actions that all need doing — where no dependencies exist, or they are
+  obvious — is not a decision. Pick a sensible order and proceed.
+- When something genuinely does need the user, surface exactly one small next thing, not a menu
+  of options to choose among.
+- Shipping is not a goal in itself. Pushing to a remote, cutting a release, and closing a
+  milestone are not gates on anything here; do not treat unpushed or unreleased work as risk,
+  debt, or something needing remediation.
 
 ## Routing
 
