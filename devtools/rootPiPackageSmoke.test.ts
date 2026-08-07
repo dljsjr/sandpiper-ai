@@ -1,5 +1,5 @@
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -112,5 +112,47 @@ async function expectRootNeutralPiPackageLoads(packageDir: string): Promise<void
 describe('root Pi package smoke', () => {
   it('loads source-root neutral Pi routing without Sandpiper identity behavior', async () => {
     await expectRootNeutralPiPackageLoads(repoRoot);
+  }, 15_000);
+
+  it('resolves CONFIG_DIR_NAME and the default agent dir to .sandpiper via the root package.json piConfig (AGENT-221)', async () => {
+    const previousPackageDir = process.env.PI_PACKAGE_DIR;
+    const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
+    const previousSandpiperAgentDir = process.env.SANDPIPER_CODING_AGENT_DIR;
+
+    try {
+      process.env.PI_PACKAGE_DIR = repoRoot;
+      process.env.PI_SKIP_VERSION_CHECK = '1';
+      // Test the *unoverridden* fallback, not a pinned temp dir: Pi 0.82.0 (#6958) fixed
+      // debug/crash logs to respect a configured agent dir override, but the fallback path
+      // (no override at all) is the one that actually proves CONFIG_DIR_NAME -- derived from
+      // this repo's package.json piConfig block -- took effect, not `.pi`. Only
+      // SANDPIPER_CODING_AGENT_DIR is relevant here: Pi's ENV_AGENT_DIR override key is
+      // `${APP_NAME.toUpperCase()}_CODING_AGENT_DIR`, and our piConfig makes APP_NAME
+      // "sandpiper", not "pi".
+      delete process.env.SANDPIPER_CODING_AGENT_DIR;
+
+      const { CONFIG_DIR_NAME, getAgentDir } = await import('@earendil-works/pi-coding-agent');
+
+      expect(CONFIG_DIR_NAME).toBe('.sandpiper');
+      expect(getAgentDir()).toBe(join(homedir(), '.sandpiper', 'agent'));
+    } finally {
+      if (previousPackageDir === undefined) {
+        delete process.env.PI_PACKAGE_DIR;
+      } else {
+        process.env.PI_PACKAGE_DIR = previousPackageDir;
+      }
+
+      if (previousSkipVersionCheck === undefined) {
+        delete process.env.PI_SKIP_VERSION_CHECK;
+      } else {
+        process.env.PI_SKIP_VERSION_CHECK = previousSkipVersionCheck;
+      }
+
+      if (previousSandpiperAgentDir === undefined) {
+        delete process.env.SANDPIPER_CODING_AGENT_DIR;
+      } else {
+        process.env.SANDPIPER_CODING_AGENT_DIR = previousSandpiperAgentDir;
+      }
+    }
   }, 15_000);
 });
