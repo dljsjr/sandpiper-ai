@@ -18,9 +18,12 @@
 // other test in this worker (including real web-fetch tests) would start failing with the
 // sentinel error too.
 
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import networkDenyGuard, { NETWORK_DENY_SENTINEL } from './network-deny-guard.js';
+import networkDenyGuard, { NETWORK_DENY_GUARD_LOG_ENV_VAR, NETWORK_DENY_SENTINEL } from './network-deny-guard.js';
 
 describe('network-deny-guard', () => {
   const originalFetch = globalThis.fetch;
@@ -46,5 +49,33 @@ describe('network-deny-guard', () => {
 
   it('throws the sentinel error for https.request, accessed the same way smithy accesses it (require, call-time lookup)', () => {
     expect(() => httpsModule.request('https://example.invalid')).toThrow(NETWORK_DENY_SENTINEL);
+  });
+
+  describe('diagnostic log (the mechanism spawned-process guard-fires tests actually read)', () => {
+    let logDir: string;
+    let logPath: string;
+
+    beforeEach(() => {
+      logDir = mkdtempSync(join(tmpdir(), 'network-deny-guard-log-'));
+      logPath = join(logDir, 'denials.log');
+      process.env[NETWORK_DENY_GUARD_LOG_ENV_VAR] = logPath;
+    });
+
+    afterEach(() => {
+      delete process.env[NETWORK_DENY_GUARD_LOG_ENV_VAR];
+      rmSync(logDir, { recursive: true, force: true });
+    });
+
+    it('logs a fetch denial with the requested URL, independent of how the rejection itself is normalized downstream', async () => {
+      await expect(fetch('https://example.invalid/denied')).rejects.toThrow();
+      const logged = readFileSync(logPath, 'utf-8');
+      expect(logged).toContain('fetch https://example.invalid/denied');
+    });
+
+    it('logs an https.request denial', () => {
+      expect(() => httpsModule.request('https://example.invalid')).toThrow();
+      const logged = readFileSync(logPath, 'utf-8');
+      expect(logged).toContain('https.request');
+    });
   });
 });

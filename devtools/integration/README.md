@@ -46,34 +46,70 @@ extensions a test adds.
   protocol-compliant here), buffers `message_update` text deltas by `contentIndex`, and treats
   `message_end.message` as authoritative — never the buffered deltas alone.
 
-## Known limitations
+## Network-deny guard: threat model and its one real failure so far
 
-- **The network-deny guard patches `globalThis.fetch` and `node:https`'s `.request`** (via
-  `require()`, not `node:http`). Two rounds of correction went into this, both recorded rather
-  than silently fixed — see the design doc's Guard injection vector section for the full
-  evidence: (1) ECMAScript module namespace objects (`import * as http from 'node:http'`) are
-  immutable from outside the module, so any consumer that reads node:http/node:https via a
-  static or dynamic `import` cannot be intercepted by this guard at all, full stop; (2) an
-  initial version dropped `https.request` patching entirely on the claim that nothing in
-  pi-ai's dependency tree calls it — that claim was false: `@smithy/node-http-handler`
-  (pi-ai's Bedrock provider dependency) calls `node:https.request` via a genuine CJS
-  `require()`, at call time rather than a cached reference, which this guard's own
-  `require('node:https')` patch does intercept. The one remaining named residual: smithy's
-  plain-HTTP fallback path is an ESM dynamic import and unreachable by any monkeypatch — not
-  exercised by real AWS/Bedrock traffic (always TLS), but real in principle. If a future
-  dependency bypasses both `fetch` and a CJS-`require()`d `node:https`, this guard would not
-  catch it — that's a real gap, not a hidden one.
-- **In-process only.** The guard cannot catch egress from native code or a subprocess pi itself
-  spawns outside the patched process. No OS-level sandboxing (network namespace, firewall rule)
-  backs this — out of scope for a portable dev-machine harness.
-- **The mock provider's scripting is deliberately minimal** (AGENT-251 scope: one canned text
-  reply per process, via the `SANDPIPER_INTEGRATION_MOCK_REPLY` env var). Multi-turn/tool-calling
-  scripting is AGENT-252's extension of this same provider.
-- **The guard-fires proof is not yet built.** AGENT-251 verified the guard's own mechanics
-  in-process (`network-deny-guard.test.ts`) and verified real spawns complete successfully with
-  zero network activity when the mock is used correctly (the smoke tests, tripwire-log-verified).
-  It has not yet proven the guard intercepts a *deliberately misconfigured* spawn that skips the
-  mock — that's AGENT-252's scoped deliverable.
+The guard's actual guarantee is **enumeration + canary + backstop**, not a single mechanism --
+see `network-deny-guard.ts`'s module comment for the full model and citations. Short version:
+
+1. **Enumeration.** The guard patches every real HTTP transport this dependency tree is known
+   to use: `globalThis.fetch`, `node:https`'s `.request`, and `node:http2`'s `.connect` (all
+   three via `require()`, never `import * as X` -- ECMAScript module namespace objects are
+   immutable from outside the module, confirmed empirically; only a CJS `require()`-obtained
+   reference can be mutated, and only when the target module reads it the same way). This is
+   an enumeration, not a proof -- "everything checked so far," not "everything."
+2. **Canary.** [`network-deny-guard-fires.integration.test.ts`](./network-deny-guard-fires.integration.test.ts)
+   deliberately misconfigures a spawn per real provider family and drives an actual dispatch
+   attempt, asserting the guard intercepted it via `SANDPIPER_INTEGRATION_GUARD_LOG` (a
+   diagnostic log file the guard writes to when that env var is set -- **the only reliable
+   signal**, since pi normalizes most provider errors away from the guard's own sentinel text
+   before they reach the RPC wire). If a future SDK version or provider picks a transport this
+   file doesn't patch, the corresponding canary test fails loudly in CI.
+3. **Backstop.** Fake `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY`/`AWS_PROFILE`, pinned
+   unconditionally by `harness.ts`. Even an undetected transport gap authenticates as garbage
+   and gets rejected by the real provider, bounding the blast radius to a 403/auth failure.
+
+**This model exists because layer (1) had a real gap, found the hard way.** Building the
+Bedrock canary test (AGENT-252) surfaced that an earlier version of this guard's `https.request`
+patch did not protect Bedrock traffic at all: `@aws-sdk/client-bedrock-runtime` defaults to
+`NodeHttp2Handler` (HTTP/2, `node:http2.connect`), not the HTTP/1.1 handler this guard had
+verified. A real dispatch attempt (fake AWS credentials, per the backstop above) reached AWS's
+real servers and got back a real, structured rejection -- `UnrecognizedClientException`, HTTP
+403, with a real AWS request ID. The backstop is what actually stopped that request from
+succeeding; layer (1) has since been extended to cover `http2.connect` too, and layer (2) (this
+file's canary tests) is what makes that kind of gap self-detecting going forward instead of
+requiring a human to notice a live incident.
+
+**Known residual, real but never exercised by real traffic**: `@smithy/node-http-handler`'s
+plain-HTTP (non-TLS) fallback is an ESM dynamic import (`await import('node:http')`) and
+genuinely unreachable by any monkeypatch. Real AWS/Bedrock endpoints are always TLS/HTTP2, so
+this path never actually runs for real traffic -- but "not exercised in practice" is a
+narrower, more honest claim than "not possible."
+
+**In-process only, beyond the transport enumeration itself.** The guard cannot catch egress
+from native code or a subprocess pi itself spawns outside the patched process. No OS-level
+sandboxing (network namespace, firewall rule) backs this -- out of scope for a portable
+dev-machine harness.
+
+## Other known limitations
+
+- **The mock provider's scripting** (AGENT-252): scripted multi-turn conversations and tool
+  calls via `SANDPIPER_INTEGRATION_MOCK_SCRIPT` (JSON-encoded, see `mock-provider.ts`'s
+  `MockScript` type and `encodeMockScript()`), indexed by how many assistant messages already
+  exist in context -- not a call counter, so it's immune to retries. Falls back to
+  `SANDPIPER_INTEGRATION_MOCK_REPLY`'s single canned reply (AGENT-251's original scope) when no
+  script is set.
+- **`entry: 'sandpiper'` runs from source** (`packages/cli/sandpiper_standalone.ts` directly via
+  `bun`, no build step). Chosen for dev-loop speed, but this is a real, named tradeoff, not a
+  hypothetical one: AGENT-243 (this same session) found a bug that only manifested in the
+  *compiled* standalone binary, invisible from source. Deferred as named wave-2 scope in
+  AGENT-249's own description, with AGENT-253 empowered to add one representative
+  compiled-binary smoke test in wave 1 if cheap (the compile infrastructure already exists in
+  `standaloneSandpiperAppRuntime.test.ts`) -- skip-if-not-built, not a forced build step,
+  consistent with how this harness treats everything else.
+- **`rpc-driver.ts`'s line-buffering/command-response correlation logic is only exercised by
+  the smoke tests' happy path.** No synthetic edge-case unit tests (multiple JSON objects per
+  stdout chunk, a JSON object split across chunks, command-timeout paths). Real gap, expected
+  to close incidentally as AGENT-253's wave-1 coverage exercises the driver more.
 
 ## Placement note
 
