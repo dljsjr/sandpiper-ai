@@ -11,7 +11,7 @@
 // `--provider` pin to fall through from -- an unknown provider or unresolvable model is a hard
 // error, not a fallback. The scar tissue is documented so it doesn't get rebuilt from scratch.
 
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -69,6 +69,14 @@ export interface IsolatedSpawnOptions {
    * names, GIT_CONFIG_*, JJ_CONFIG) always win over this -- pass agent-dir-relative state
    * through `agentDir` instead of trying to override them. */
   readonly env?: Readonly<NodeJS.ProcessEnv>;
+  /** Written as `<agentDir>/settings.json` before the spawn is returned (so it exists on disk
+   * before any test actually starts the process). Isolated-by-construction like everything
+   * else here: the file only ever exists in this spawn's own fresh temp agent dir, never the
+   * real one. Primary use: `compaction.keepRecentTokens` -- pi's default (20000 tokens) means
+   * a realistically-sized scripted test conversation never has anything old enough to
+   * compact, so AGENT-253's compaction coverage lowers it to make manual `compact` reachable
+   * without generating an unreasonably large scripted conversation. */
+  readonly settingsJson?: Record<string, unknown>;
 }
 
 export interface IsolatedSpawn {
@@ -127,6 +135,10 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     GIT_CONFIG_SYSTEM: '/dev/null',
     JJ_CONFIG: TRAIL_JJ_FIXTURE,
   };
+
+  if (options.settingsJson) {
+    writeFileSync(join(agentDir, 'settings.json'), JSON.stringify(options.settingsJson));
+  }
 
   const isolateExtensions = options.isolateExtensions ?? options.entry === 'pi';
   const flags: string[] = [
