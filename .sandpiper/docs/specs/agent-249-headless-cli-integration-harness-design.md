@@ -185,6 +185,52 @@ http/https modules. It is the strongest guarantee achievable without OS-level sa
 (network namespace, firewall rule), which is out of scope for a portable dev-machine test
 harness. State this limitation in the harness's own README, not just here.
 
+### Guard injection vector (coordinator-required specification)
+
+The guard has to run *inside* the spawned `pi`/`sandpiper` process — patching `fetch`/`http` from
+the test runner's own process does nothing for a child process's separate Node realm. The vector
+is: **the guard is itself a tiny extension**, loaded via an additional `-e` flag the shared
+isolation helper always appends (alongside the mock provider's own `-e`), e.g.
+`devtools/integration/network-deny-guard.ts`. Its factory function does the monkeypatching
+synchronously at the top, before doing anything else:
+
+```typescript
+export default function (pi: ExtensionAPI) {
+  const deny = (label: string) => { throw new Error(`network-deny-guard: blocked ${label} during isolated integration test`); };
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = (...args) => { deny(`fetch(${String(args[0])})`); };
+  const http = require('node:http');
+  const https = require('node:https');
+  const realHttpRequest = http.request;
+  const realHttpsRequest = https.request;
+  http.request = (...args) => deny('http.request');
+  https.request = (...args) => deny('https.request');
+  // realFetch/realHttpRequest/realHttpsRequest intentionally unused here — no restore path
+  // needed, since the guard's whole process is a throwaway spawned for one isolated test.
+}
+```
+
+**Load-ordering guarantee, traced (not assumed) in pi's own startup source**: every extension
+factory — including this one — runs synchronously to completion inside
+`resourceLoader.reload()`, called from `createAgentSessionServices()`
+(`agent-session-services.js`). The *first* point after that where pi could originate real
+network I/O is later in the same function: `await modelRuntime.refresh({ allowNetwork: false })`
+(confirmed at `agent-session-services.js:98` — notably already network-barred by pi itself for
+startup catalog refresh, independent of our guard) followed by `resolveModelScope`/session
+creation back in `main.js`'s `createRuntime`, which happens strictly after
+`createAgentSessionServices()` returns. So: all extension factories (guard included) are
+guaranteed to finish before pi resolves a model or could construct a provider's network client.
+This is grounded in reading the actual call sequence, not asserted — but it has not been
+exercised live (see [Dependency inversion](#dependency-inversion-live-verification-moves-downstream)),
+so AGENT-252 must still confirm it holds in practice, not just in the source's control flow.
+
+**Guard-fires verification (the concrete AGENT-252 test)**: deliberately misconfigure one
+scenario to *not* use the mock — e.g. spawn with `--provider anthropic` and no mock registered —
+and assert the process fails with the guard's own sentinel error message (`network-deny-guard:
+blocked ...`), not a real network error, not a hang, not a silent success. If that scenario ever
+produces a real HTTP response or a different failure mode, the guard isn't wired correctly and
+no other integration test result can be trusted until it is.
+
 **AGENT-252 concrete deliverable, restated**: build the mock provider (a), pin explicitly (1),
 install the network-deny guard (2), and produce one test that demonstrates the guard actually
 fires — i.e., deliberately misconfigure a scenario to fall through to a non-mock path and assert
