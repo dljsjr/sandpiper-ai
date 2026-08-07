@@ -50,24 +50,25 @@ Session file:
 - Global-guidance jj repo (~/.sandpiper/agent/) still has uncommitted edits to `playbooks/workflow/orienting.md` and `playbooks/skills/loading.md` from earlier in this session (skill-loading rationale fixes) — auto-revertible per Doug's own note, not blocking anything.
 - Key design memory for future standup work: liveness and time-since-write are BOTH ruled out as auto-GC signals — the former breaks under concurrency, the latter breaks under legitimate long-gap continuity. Only explicit `cleanup` should ever delete. Don't re-litigate this without revisiting that constraint.
 
-## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T18:12:04.104Z)
+## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T18:33:48.515Z)
 
 Session file: /Users/dstephen/.sandpiper/agent/sessions/--Users-dstephen-git-sandpiper-ai--/2026-08-06T19-50-06-948Z_019fd8a0-3964-7fc8-84f3-1656595afa4d.jsonl
 
 ### Accomplished
-- **INTEGRATION LANE: harness + mock provider LANDED** (AGENT-251, AGENT-252 both APPROVE). Chain at 22 approved changes; head tmznwzyqntsn/deab0961d5c6.
-- **THE GUARD ARC: BUILT THEN TORN DOWN, on Doug's push.** Root cause of both morning "ambient credential" incidents finally found: OUR OWN BRANDING TRAP - dev's ad hoc commands set PI_CODING_AGENT_DIR while inherited PI_PACKAGE_DIR pointed at the branded standalone package, so SANDPIPER_CODING_AGENT_DIR was the honored (untouched) name -> real settings loaded -> Doug's real claude-cli (forks to Claude Code CLI, no stored auth) and Codex providers ran. No OS keychain involved. prepareIsolatedSpawn was NEVER affected (always set both names). Doug's decisive question, which none of us asked for hours: what makes a PINNED invocation not use the mock? Answer: nothing - unknown provider/model = hard error, no silent substitution. Entire network-deny guard (4 transport patches, guard-log, drills, fake-AWS defaults) DELETED. Replaced by --offline in spawn defaults (mechanism source-verified at model-runtime.js:88).
-- Final harness surface: dual agent-dir vars + isolated settings, GIT/JJ neutralization, mock provider + scripting, TWO load-bearing tests - canary (isolated+keyless -> exit nonzero + stderr text + EMPTY STDOUT + empty agent dir) and mock-used smoke. Docs carry an honest postmortem so nobody re-derives the scar tissue.
-- New standing rule: full-suite gate runs SERIALIZED via announcement (machine load hit 26 from our own concurrent runs; dev correctly submitted with a caveated citation rather than claiming an unearned pass - vindicated when reviewer's serialized run came back clean 118/118+1099/1099).
+- **INTEGRATION LANE COMPLETE (AGENT-249 tree closed): 250 design / 251 harness / 252 mock+teardown / 253 wave-1 coverage, all APPROVE.** Chain: 23 changes, every one independently reproduced by the reviewer. Head qoxwsurzrxly/1b758d34cd9b.
+- **AGENT-237 item (e) CONVERTED FROM MANUAL TO CI**: wave1-compaction.integration.test.ts drives real pi compaction + steer delivery via RPC against the mock, zero egress; structural claims asserted (compact succeeds w/ non-empty summary, steer visible in get_entries pre-compaction, normal turn completes post-compaction), summary content deliberately NOT asserted (would encode an indexing accident). Doug's manual checklist is now TWO EYEBALL ITEMS ONLY: (c) fullscreen TUI, (d) compiled-app /login + image handling.
+- Wave-1 coverage: skill + autotoon isolated, autotoon+probe combinatoric (real cross-extension tool_result seam), MIN_JSON_BYTES=256 threshold verified, rpc-driver line-buffering extracted to a pure function w/ deterministic unit tests incl. the U+2028/U+2029 case pi's own docs warn about. Compiled-binary smoke evaluated and DEFERRED as named wave-2 scope (not silent debt, recorded on AGENT-249).
+- Guard build-then-teardown closed honestly: root cause was our own branding trap in ad hoc commands (never the harness); Doug's question - what makes a PINNED invocation not use the mock? nothing, it hard-errors - dissolved the whole edifice. Guard/log/4 transport patches/drills/fake-AWS all deleted; --offline replaces them; postmortem in the design doc.
+- New standing rule proven out: serialized full-suite runs (machine load hit 26 from our own concurrency). Dev's caveated-not-claimed citation vindicated by reviewer's clean serialized run.
 
 ### In Progress
-- Dev on AGENT-253 (coverage wave 1): skill+autotoon isolated, >=1 combinatoric seam, rpc-driver buffering paths exercised, the AGENT-237(e) RPC-compaction hypothesis, optional cheap compiled-binary smoke. Last subtask of the lane.
+- NOTHING. Both agents STOOD DOWN. Dev is writing a short end-of-package summary FOR DOUG (what the lane gives him, what it deliberately doesn't cover, one-paragraph guard postmortem in their own words), then holds.
 
 ### Next Session
-- Drain Tattler. After 253: lane complete. Doug-gated pile: AGENT-237 remainder (2 eyeball items + (e) pending 253's result), 3 upstream-asks (AGENT-245 env prefix, EntryRenderOptions outputPad, strict-prefer gating), AGENT-255 (strict re-adoption, now gated on mock provider which EXISTS - unblocked), TCL-144 (rewrite Trail VCS tests to need no real git/jj - NEW, Doug-directed), parked decisions (turbo clean-at-start, vitest workspace, warning enforcement), constraint lifts, chain push strategy.
+- Drain Tattler (dev's summary will be there). ALL remaining work is Doug-gated: AGENT-255 (strict re-adoption - UNBLOCKED now that the mock provider exists; give it a scriptable OpenAI-strict validator), TCL-144 (Trail VCS test rewrite, his direction), AGENT-237's two eyeball items, three upstream-asks (AGENT-245 env prefix / EntryRenderOptions outputPad / strict-prefer gating), parked build decisions (turbo clean-at-start, root vitest workspace config, bun check warning enforcement), constraint lifts (zero-TouchID, tripwires on agent shell usage, VCS network ops), push/PR strategy on 23 commits, claude-cli-provider wedge follow-through, NAV-85 + incubating-repo follow-ons.
 
 ### Blockers
-- None mechanical.
+- None mechanical. Everything above is a Doug decision.
 
 ### Context
-- Tripwire/op-shim rules still apply to AGENT SHELL USAGE (separate from harness, untouched by teardown). Zero-TouchID unlifted. Lesson recorded in the design doc postmortem: reactive layering on unroot-caused incidents; the fix was asking what the platform actually does when pinned.
+- Tripwire/op-shim rules still govern AGENT SHELL USAGE (separate from the deleted harness guard). Zero-TouchID unlifted. Serialization rule in force. Task storage separate-branch; working copy clean but for this note.

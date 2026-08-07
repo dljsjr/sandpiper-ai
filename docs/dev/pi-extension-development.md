@@ -32,6 +32,25 @@ Useful starting points:
 - `$PI_CODING_AGENT_PACKAGE/docs/packages.md`
 - `$PI_CODING_AGENT_PACKAGE/examples/`
 
+Provider, model, and sampling behavior lives in a different package. For anything about
+providers, model capabilities, tool sampling (strict JSON schema, grammar tools), or
+streaming, read pi-ai's README first:
+
+```bash
+less node_modules/@earendil-works/pi-ai/README.md
+```
+
+Read these docs before deriving behavior from compiled `dist/` sources. Reading the shipped
+JavaScript tells you what the code does; it does not tell you what the API promises, and the
+two have differed in ways that changed our conclusions.
+
+When adopting a capability announced in Pi's `CHANGELOG.md`, follow the doc links in that
+entry before writing the adoption plan. Entries link directly to the header describing the
+feature's contract — `../ai/README.md#...` for provider and sampling behavior, `docs/...`
+for coding-agent surfaces. We once adopted a tool-sampling flag from its changelog summary
+alone, misread what it guaranteed, shipped it, and reverted it; the entry we planned from
+linked to the answer twice.
+
 For upstream source browsing, see the [Pi coding-agent package](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent).
 
 ## Keep source and generated artifacts separate
