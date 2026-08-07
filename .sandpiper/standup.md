@@ -50,22 +50,23 @@ Session file:
 - Global-guidance jj repo (~/.sandpiper/agent/) still has uncommitted edits to `playbooks/workflow/orienting.md` and `playbooks/skills/loading.md` from earlier in this session (skill-loading rationale fixes) — auto-revertible per Doug's own note, not blocking anything.
 - Key design memory for future standup work: liveness and time-since-write are BOTH ruled out as auto-GC signals — the former breaks under concurrency, the latter breaks under legitimate long-gap continuity. Only explicit `cleanup` should ever delete. Don't re-litigate this without revisiting that constraint.
 
-## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T02:39:16.604Z)
+## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T15:01:44.483Z)
 
 Session file: /Users/dstephen/.sandpiper/agent/sessions/--Users-dstephen-git-sandpiper-ai--/2026-08-06T19-50-06-948Z_019fd8a0-3964-7fc8-84f3-1656595afa4d.jsonl
 
 ### Accomplished
-- Queue items 1-6 of 7 LANDED: AGENT-227, 239, 241, 242, 240 (3 commits), 243 - chain at 18 approved changes, all independently reproduced. Head: zokxwrqorwxw/02c62b09341d.
-- DEV INSTANCE REPLACED: original sandpiper-0.84-dev hit unrecoverable context-overflow wedge (claude-cli provider bug; root-caused by that provider's own agent using the wedged transcript as specimen). Zero work lost - AGENT-244 was investigation-start only. Fresh instance (shortId 019fda14) fully re-briefed: state, AGENT-244 assignment + caution, AGENT-245 hold, all 9 standing rules. Reviewer notified with memory-asymmetry guidance (restate context; calibration-level scrutiny on first submission; watch predecessor's drift-seams since those corrections died with its context).
+- Overnight: chain closed at 20 approved changes; AGENT-235 tree drained (244 landed, 219 WONTFIX-on-evidence, 221 verified+pinned); two coordinator claims falsified and recorded.
+- Morning: Doug commissioned a SECOND VALIDATION LANE - headless CLI integration tests. Tree created: AGENT-249 (parent, carries all session-learned design constraints) + AGENT-250 (grounding/design, design-doc-to-coordinator gate) + 251 (harness, isolation-by-construction) + 252 (scripted mock provider) + 253 (coverage wave 1, incl. testing whether RPC Compaction commands make AGENT-237(e) headless-testable). Fixed direction from Doug: RPC mode over experimental PiClient; -p for one-shots.
 
 ### In Progress
-- Fresh dev on AGENT-244 (event-bus listener bookkeeping): investigation-first, findings to coordinator BEFORE any deletion; per-session vs per-runtime lifetime caution; chorus /new responder side-finding in scope. Awaiting its ack + investigation plan.
+- Dev on AGENT-250 grounding under amended rules after a SAFETY-RULE FAILURE: my provider-blackhole rule (ANTHROPIC_BASE_URL=dead port) DOES NOT WORK - pi-ai's anthropic provider hardcodes baseUrl (anthropic.js:43), no env override; dev's first true exercise of the rule reached real api.anthropic.com (401, throwaway key, zero harm). THIRD coordinator claim falsified, first that was a safety mechanism. Timeline inventory: nothing ever relied on it in belief (all prior 401s disclosed pre-rule).
+- AMENDED STANDING RULES: blackhole rule RETIRED; sanctioned interim = NO-API-KEY early exit (model resolution exits pre-before_agent_start, zero network); AGENT-250 Q3 now REQUIRES empirically verified no-egress demonstration for its mechanism (mock provider expected; proxy-env candidates must be verified-or-unused); META-RULE: no mechanism becomes a standing safety rule without empirical demonstration, coordinator rules included.
 
 ### Next Session
-- Drain Tattler. After 244: tree drained except Doug-gated items (AGENT-245 upstream PR + outputPad EntryRenderOptions companion ask; AGENT-237 second half checklist c/d1/d2/e; parked decisions: turbo clean-at-start, vitest workspace config, warning enforcement; constraint lifts - Doug is back at machine but has NOT lifted zero-TouchID yet).
+- Drain Tattler. Expect AGENT-250 design doc -> my approval -> 251 harness commit (reviewer lens locked: isolation must be structurally unbypassable; no-egress guarantee must rest on verified mechanism). Doug items still open: AGENT-237 second half (fullscreen eyeball + compiled /login; (e) pending the 253 hypothesis), AGENT-245 + EntryRenderOptions ask, parked decisions (turbo clean-at-start, vitest workspace, warning enforcement), constraint lifts, chain push/PR strategy.
 
 ### Blockers
-- None mechanical. Doug items above.
+- None mechanical.
 
 ### Context
-- Re-brief recipe validated twice now (reviewer restart, dev replacement): state + assignment + 9 standing rules + memory-asymmetry note to surviving pair member. Standing rules unchanged; shim baseline 3 lines. Task storage separate-branch.
+- Standing patterns otherwise unchanged (tripwires/3-line shim baseline/agent-dir isolation/file-routed prose/commit+submit ritual). Zero-TouchID still in force - Doug back but has not lifted. Task storage separate-branch.
