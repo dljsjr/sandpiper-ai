@@ -1,13 +1,18 @@
 # AGENT-249: Headless CLI Integration-Test Harness — Grounding + Design (AGENT-250)
 
 Status: approved (AGENT-250); implemented (AGENT-251) at devtools/integration/, revised once
-during review. The Guard injection vector section below carries two rounds of correction, both
-recorded rather than silently fixed: AGENT-251 first found the originally-approved `http`/`https`
-patch broken (ESM module namespace immutability) and initially dropped it entirely on the
-further claim that nothing in pi-ai's dependency tree calls `http.request`/`https.request` — that
-claim was false, caught in review (`@smithy/node-http-handler`, a transitive Bedrock-provider
-dependency, does call `node:https.request` via a genuine CJS `require()`), so the `https.request`
-half is restored, verified to intercept via a call-time property lookup, with the remaining
+during review, then again during AGENT-252's guard-fires proof. The Guard injection vector
+section below now carries three rounds of correction, all recorded rather than silently fixed —
+the third (AGENT-252) found a real, previously-shipped gap via a real (fake-credentialed) AWS
+request reaching AWS's servers before being caught; see "AGENT-252: the layered threat model,
+and the incident that forced it into words" for the full account and the resulting
+enumeration+canary+backstop model. Summary of the first two rounds: AGENT-251 first found the
+originally-approved `http`/`https` patch broken (ESM module namespace immutability) and
+initially dropped it entirely on the further claim that nothing in pi-ai's dependency tree calls
+`http.request`/`https.request` — that claim was false, caught in review (`@smithy/node-http-handler`,
+a transitive Bedrock-provider dependency, does call `node:https.request` via a genuine CJS
+`require()`), so the `https.request` half is restored, verified to intercept via a call-time
+property lookup, with the remaining
 narrow residual (smithy's non-TLS fallback, unreachable by real AWS traffic) named explicitly.
 Full live-completion verification of the RPC/mock-provider claims beyond the guard's own
 mechanics remains AGENT-252's scope (see
@@ -354,6 +359,62 @@ install the network-deny guard (2), and produce one test that demonstrates the g
 fires — i.e., deliberately misconfigure a scenario to fall through to a non-mock path and assert
 the guard throws — before trusting it protects real coverage. An unverified guard is exactly the
 class of claim that started this incident.
+
+### AGENT-252: the layered threat model, and the incident that forced it into words
+
+Building the Bedrock guard-fires test surfaced a second real gap, more serious than the first:
+the `https.request` patch this document already describes does not protect Bedrock traffic at
+all. `@aws-sdk/client-bedrock-runtime`'s `dist-cjs/runtimeConfig.js:62` defaults its request
+handler to `NodeHttp2Handler` (HTTP/2, `node:http2.connect`), not the `NodeHttpHandler`
+(HTTP/1.1, `node:https.request`) previously traced and patched. A real dispatch attempt against
+`--provider amazon-bedrock` (fake AWS credentials, per the harness's own backstop) reached AWS's
+real servers and got back a real, structured rejection — `UnrecognizedClientException`, HTTP
+403, with a real AWS request ID (`6a01f6f7-ae33-4d21-b4d8-46f0ba74a5fc`). No real AWS account
+was touched (fake credentials, real rejection) — but the guard, as approved and shipped up to
+that point, did not stop the request from being sent.
+
+The fix is mechanically identical to the `https.request` case: `@smithy/node-http-handler`'s
+bundled `dist-cjs/index.js` also does `var http2 = require('node:http2');` at module scope and
+calls `http2.connect(url)` as a call-time property lookup (line 665, same pattern as
+`node_https.request` at line 344) — so patching `http2Module.connect` via the same
+`require('node:http2')` singleton mechanism intercepts it, verified empirically (the guard log
+now shows `http2.connect https://bedrock-runtime.us-east-1.amazonaws.com/` instead of a real
+AWS response).
+
+**The mechanism doesn't stop at "patch one more thing," though — the incident forced a named
+model for what this guard actually promises:**
+
+1. **Enumeration, not universality.** Prevention covers every transport verified so far —
+   `fetch`, `node:https.request`, `node:http2.connect` — and no more. There is no proof a
+   fourth transport doesn't exist somewhere in this dependency tree or a future version of it.
+2. **Canary.** Because (1) is an enumeration, every provider-family guard-fires test
+   (`network-deny-guard-fires.integration.test.ts`) is a standing drift detector, not a
+   one-time check. If a future SDK version or provider picks an unpatched transport, the
+   diagnostic log shows nothing intercepted for that provider, the test fails in CI — the same
+   discovery that just happened by hand, but automated and without a live-request precondition.
+3. **Backstop.** The harness's unconditional fake-AWS-credential env vars are what actually
+   stopped this specific incident from touching a real AWS account. That's not incidental —
+   it's the layer doing its documented job when the layer above it had a gap, the first live
+   validation of the layered model rather than a hypothetical justification for it.
+
+**Diagnostic log promoted to first-class, not scaffolding**: `SANDPIPER_INTEGRATION_GUARD_LOG`
+(set by a test to a file path; the guard appends one line per denied call) turned out to be the
+*only* reliable way to confirm the guard fired from outside the spawned process — pi's own
+error normalization erases the sentinel text for `fetch`-based providers (Anthropic's
+`APIConnectionError` wraps the rejection in `{ cause: response }`, and pi-ai's
+`normalizeProviderError()` reads `error.message`, the SDK's own generic "Connection error.",
+not `error.cause.message`). Bedrock's error path happens to preserve the sentinel text on the
+RPC wire, confirmed empirically — but that's a property of Bedrock's specific error handling,
+not something to rely on generally, so the log stays the documented mechanism and the RPC
+field is treated as bonus corroboration where it happens to work.
+
+**Process note, recorded per the corrections rule**: the sentinel-visibility finding and the
+guard-log addition were themselves a correction to the approved test mechanism, implemented
+before being reported — disclosed immediately afterward as part of the freeze on the http2
+finding, so no review cycle was actually burned, but under the standing rule (corrections to
+approved designs get report-before-fix treatment) that pause should come before the code next
+time, even for additions that feel like pure observability scaffolding rather than a
+behavior change.
 
 ## 4. Harness placement + wiring
 
