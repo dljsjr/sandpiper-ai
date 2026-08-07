@@ -16,6 +16,13 @@ Development scripts and build utilities. Not distributed with the package.
 | `piPackageArtifactMetadata.ts` | Shared manifest/dependency generation for npm-installable Pi package artifacts |
 | `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
 
+## Integration Tests
+
+[`integration/`](./integration/) is the headless CLI/RPC integration-test lane (AGENT-249) --
+tests driven through real `pi`/`sandpiper` process spawns instead of mocked extension APIs. See
+[`integration/README.md`](./integration/README.md) and
+[`.sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md`](../.sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md).
+
 ## Configuration
 
 | File | Purpose |

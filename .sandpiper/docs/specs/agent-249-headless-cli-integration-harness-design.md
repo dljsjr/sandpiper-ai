@@ -1,8 +1,11 @@
 # AGENT-249: Headless CLI Integration-Test Harness — Grounding + Design (AGENT-250)
 
-Status: proposed, pending coordinator approval. No harness code exists yet; this document is the
-AGENT-250 deliverable. Live-completion verification of anything in this doc is deferred to
-AGENT-252/253 (see [Dependency inversion](#dependency-inversion-live-verification-moves-downstream)).
+Status: approved (AGENT-250); implemented (AGENT-251) at devtools/integration/. The Guard
+injection vector section below carries an AGENT-251 correction to the originally-approved
+fetch/http/https sketch — the http/https half was found broken and unnecessary once actually
+built and verified; see that section for the empirical evidence. Full live-completion
+verification of the RPC/mock-provider claims beyond the guard's own mechanics remains AGENT-252's
+scope (see [Dependency inversion](#dependency-inversion-live-verification-moves-downstream)).
 
 ## Context
 
@@ -171,12 +174,13 @@ Two layers, and they are not equally strong:
    docs read so far, and this pair does not promote unverified mechanisms to guarantees anymore.
 2. **Harness-level network-deny guard (recommended as the actual answer)** — independent of
    whether (1) holds, every integration test run should install a process-wide guard for its
-   duration: monkeypatch `global.fetch` and Node's `http.request`/`https.request` to throw
-   synchronously if invoked, restored afterward. This catches egress from *any* cause — wrong
-   provider resolution, an extension under test making its own incidental fetch, a future pi
-   regression — not just "the mock provider was configured correctly." It converts "we trust the
-   mock" into "we structurally cannot make a real request during this test," and it is something
-   AGENT-252 can build and verify today without needing pi's resolver internals to cooperate.
+   duration: monkeypatch `globalThis.fetch` to reject if invoked (see the Guard injection
+   vector section below for why `fetch` alone, not `http`/`https`, turned out to be the correct
+   and sufficient interception point once AGENT-251 built and empirically verified it). This
+   catches egress from *any* cause — wrong provider resolution, an extension under test making
+   its own incidental fetch, a future pi regression — not just "the mock provider was
+   configured correctly." It converts "we trust the mock" into "we structurally cannot make a
+   real request during this test."
 
 **Honest limitation**: this is an in-process JS-level guard. It cannot catch egress from a
 subprocess pi itself spawns outside the patched process (none identified in the RPC/print-mode
@@ -187,26 +191,35 @@ harness. State this limitation in the harness's own README, not just here.
 
 ### Guard injection vector (coordinator-required specification)
 
-The guard has to run *inside* the spawned `pi`/`sandpiper` process — patching `fetch`/`http` from
-the test runner's own process does nothing for a child process's separate Node realm. The vector
-is: **the guard is itself a tiny extension**, loaded via an additional `-e` flag the shared
-isolation helper always appends (alongside the mock provider's own `-e`), e.g.
-`devtools/integration/network-deny-guard.ts`. Its factory function does the monkeypatching
-synchronously at the top, before doing anything else:
+The guard has to run *inside* the spawned `pi`/`sandpiper` process — patching `fetch` from the
+test runner's own process does nothing for a child process's separate Node realm. The vector is:
+**the guard is itself a tiny extension**, loaded via an additional `-e` flag the shared isolation
+helper always appends (alongside the mock provider's own `-e`), e.g.
+`devtools/integration/network-deny-guard.ts`. Its factory function patches `globalThis.fetch`
+synchronously at the top, before doing anything else.
+
+**AGENT-251 correction to this design (recorded, not silently fixed):** the version approved
+here also patched `node:http`/`node:https` `.request`. Building it surfaced that this half was
+both broken and unnecessary, confirmed empirically rather than assumed away a second time:
+`import * as http from 'node:http'` yields an ECMAScript module namespace object, which is
+exotic-object-immutable from outside the module (`Object.defineProperty` with
+`configurable:true` throws "Cannot replace module namespace object's binding"; a *separately
+obtained* `require('node:http')` CJS reference can be mutated, but that mutation does not
+propagate to the ESM namespace's own binding — confirmed with a standalone bun script). It also
+turned out to be moot: pi-ai's Anthropic and OpenAI-family providers go through the official
+`@anthropic-ai/sdk`/`openai` SDK packages, which resolve their HTTP client via a bare `fetch`
+global read at call time (`@anthropic-ai/sdk/internal/shims.js`'s `getDefaultFetch()`), and
+grepping the full installed pi-ai + pi-coding-agent dist tree found zero `http.request`/
+`https.request`/direct-`undici`-request usage anywhere. `globalThis.fetch` alone is the correct
+and sufficient interception point for this dependency chain; the http/https half of the sketch
+is dropped from the shipped implementation.
 
 ```typescript
 export default function (pi: ExtensionAPI) {
-  const deny = (label: string) => { throw new Error(`network-deny-guard: blocked ${label} during isolated integration test`); };
-  const realFetch = globalThis.fetch;
-  globalThis.fetch = (...args) => { deny(`fetch(${String(args[0])})`); };
-  const http = require('node:http');
-  const https = require('node:https');
-  const realHttpRequest = http.request;
-  const realHttpsRequest = https.request;
-  http.request = (...args) => deny('http.request');
-  https.request = (...args) => deny('https.request');
-  // realFetch/realHttpRequest/realHttpsRequest intentionally unused here — no restore path
-  // needed, since the guard's whole process is a throwaway spawned for one isolated test.
+  globalThis.fetch = ((input: RequestInfo | URL) => {
+    const label = typeof input === 'string' || input instanceof URL ? String(input) : input.url;
+    return Promise.reject(new Error(`network-deny-guard: blocked fetch(${label}) during isolated integration test`));
+  }) as typeof fetch;
 }
 ```
 
@@ -220,9 +233,20 @@ startup catalog refresh, independent of our guard) followed by `resolveModelScop
 creation back in `main.js`'s `createRuntime`, which happens strictly after
 `createAgentSessionServices()` returns. So: all extension factories (guard included) are
 guaranteed to finish before pi resolves a model or could construct a provider's network client.
-This is grounded in reading the actual call sequence, not asserted — but it has not been
-exercised live (see [Dependency inversion](#dependency-inversion-live-verification-moves-downstream)),
-so AGENT-252 must still confirm it holds in practice, not just in the source's control flow.
+
+Second, independent corroboration found while implementing the guard: `main.js` also calls
+`configureHttpDispatcher()` after `createAgentSessionServices()` returns (i.e. after every
+extension factory has already run). That function explicitly checks whether `globalThis.fetch`
+still equals its own captured original before calling `undici.install()` to install undici's
+fetch implementation — so a fetch override already in place when it runs (ours) is preserved,
+not silently overwritten by pi's own startup code.
+
+AGENT-251 exercised this live: the harness's smoke tests spawn real `pi`/`sandpiper` processes
+with the guard extension loaded, and the tripwire op-shim log stayed at its 3-line baseline
+across every run, with zero real network activity observed. What remains for AGENT-252
+specifically is the deliberate-misconfiguration case — proving the guard fires when a spawn
+points at a real, unmocked provider — not the guard's basic load-and-patch mechanics, which are
+now live-verified.
 
 **Guard-fires verification (the concrete AGENT-252 test)**: deliberately misconfigure one
 scenario to *not* use the mock — e.g. spawn with `--provider anthropic` and no mock registered —

@@ -50,23 +50,25 @@ Session file:
 - Global-guidance jj repo (~/.sandpiper/agent/) still has uncommitted edits to `playbooks/workflow/orienting.md` and `playbooks/skills/loading.md` from earlier in this session (skill-loading rationale fixes) — auto-revertible per Doug's own note, not blocking anything.
 - Key design memory for future standup work: liveness and time-since-write are BOTH ruled out as auto-GC signals — the former breaks under concurrency, the latter breaks under legitimate long-gap continuity. Only explicit `cleanup` should ever delete. Don't re-litigate this without revisiting that constraint.
 
-## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T15:01:44.483Z)
+## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T15:28:04.613Z)
 
 Session file: /Users/dstephen/.sandpiper/agent/sessions/--Users-dstephen-git-sandpiper-ai--/2026-08-06T19-50-06-948Z_019fd8a0-3964-7fc8-84f3-1656595afa4d.jsonl
 
 ### Accomplished
-- Overnight: chain closed at 20 approved changes; AGENT-235 tree drained (244 landed, 219 WONTFIX-on-evidence, 221 verified+pinned); two coordinator claims falsified and recorded.
-- Morning: Doug commissioned a SECOND VALIDATION LANE - headless CLI integration tests. Tree created: AGENT-249 (parent, carries all session-learned design constraints) + AGENT-250 (grounding/design, design-doc-to-coordinator gate) + 251 (harness, isolation-by-construction) + 252 (scripted mock provider) + 253 (coverage wave 1, incl. testing whether RPC Compaction commands make AGENT-237(e) headless-testable). Fixed direction from Doug: RPC mode over experimental PiClient; -p for one-shots.
+- MORNING ARC (2026-08-07): Doug commissioned the second validation lane (headless CLI integration tests; RPC over PiClient; -p one-shots). AGENT-249 tree created (250 design / 251 harness / 252 mock provider / 253 wave 1).
+- TWO SAFETY-RULE FALSIFICATIONS during grounding, both by the dev, both zero-harm, both froze correctly: (1) provider-blackhole env var retired (pi-ai hardcodes anthropic baseUrl at anthropic.js:43); (2) no-key early-exit retired (AMBIENT KEYCHAIN OAUTH authenticates keyless runs past temp agent dirs - one real "Hi!" completion burned on Doug's cached credential, disclosed). RULING: MOCK-PROVIDER-ONLY for anything reaching model resolution, permanent; ambient credentials are the named threat model; META-RULE: no safety mechanism without empirical demonstration.
+- AGENT-250 DESIGN COMPLETE, both my direction-gate and reviewer craft-gate approved (2 commits): raw-pi -e isolation w/ dual agent-dir env names, mock provider via registerProvider+streamSimple, network-deny guard as -e-loaded extension w/ load-ordering traced to source and guard-fires test, devtools/integration placement, wave 1 = skill+autotoon. Design doc: .sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md.
+- AGENT-254 RESOLVED - AGENT-240 WAS A REGRESSION, REVERTED: resolveJsonSchemaStrictSampling gates capability-only (zero schema inspection), forwards verbatim w/ strict:true; our Type.Optional-heavy schemas are strict-invalid; pi built-ins never opt in (why upstream is silent). Full 19-occurrence revert landed+approved (byte-inverse verified against original review passes). AGENT-240 record annotated (conclusion reversed; review boundary preserved - strict-activated path was structurally unverifiable then). AGENT-255 banked: re-adoption gated on mock provider growing a scriptable OpenAI-strict validator (converts the unverifiable property into CI). Upstream-ask recorded there: prefer's capability-only gate contradicts transparent-fallback promise.
+- Chain head: mkyozwsmxwrw/0a1e84acdadc. File-count report discrepancy resolved cleanly (untracked editor configs in long-lived checkout; delta-vs-absolute lesson issued).
 
 ### In Progress
-- Dev on AGENT-250 grounding under amended rules after a SAFETY-RULE FAILURE: my provider-blackhole rule (ANTHROPIC_BASE_URL=dead port) DOES NOT WORK - pi-ai's anthropic provider hardcodes baseUrl (anthropic.js:43), no env override; dev's first true exercise of the rule reached real api.anthropic.com (401, throwaway key, zero harm). THIRD coordinator claim falsified, first that was a safety mechanism. Timeline inventory: nothing ever relied on it in belief (all prior 401s disclosed pre-rule).
-- AMENDED STANDING RULES: blackhole rule RETIRED; sanctioned interim = NO-API-KEY early exit (model resolution exits pre-before_agent_start, zero network); AGENT-250 Q3 now REQUIRES empirically verified no-egress demonstration for its mechanism (mock provider expected; proxy-env candidates must be verified-or-unused); META-RULE: no mechanism becomes a standing safety rule without empirical demonstration, coordinator rules included.
+- Dev building AGENT-251 (harness foundation) under approved design; reviewer lens locked (isolation structurally unbypassable; egress claims need attached demonstrations).
 
 ### Next Session
-- Drain Tattler. Expect AGENT-250 design doc -> my approval -> 251 harness commit (reviewer lens locked: isolation must be structurally unbypassable; no-egress guarantee must rest on verified mechanism). Doug items still open: AGENT-237 second half (fullscreen eyeball + compiled /login; (e) pending the 253 hypothesis), AGENT-245 + EntryRenderOptions ask, parked decisions (turbo clean-at-start, vitest workspace, warning enforcement), constraint lifts, chain push/PR strategy.
+- Drain Tattler. Pipeline: 251 -> 252 (mock + guard-fires proof) -> 253 (wave 1 + RPC-compaction hypothesis for AGENT-237(e)). Doug-gated pile grew: upstream-asks now THREE (AGENT-245 env prefix, EntryRenderOptions outputPad, strict-prefer gating); plus AGENT-237 second half, parked decisions, constraint lifts, chain push strategy, and NEW: ambient-credential observation (any local process can silently spend his subscription quota - flagged to him 2026-08-07).
 
 ### Blockers
 - None mechanical.
 
 ### Context
-- Standing patterns otherwise unchanged (tripwires/3-line shim baseline/agent-dir isolation/file-routed prose/commit+submit ritual). Zero-TouchID still in force - Doug back but has not lifted. Task storage separate-branch.
+- LIVE-INVOCATION BAN: nothing that reaches model resolution runs outside the mock provider, ever, on this machine. Interim patterns all retired except tripwires (op shim baseline 3 lines) + agent-dir isolation + file-routed prose + commit+submit ritual. Zero-TouchID formally unlifted.
