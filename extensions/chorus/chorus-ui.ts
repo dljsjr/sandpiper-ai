@@ -30,9 +30,66 @@ import {
   type ChorusTranscriptEntry,
 } from './chorus-runtime';
 
+// Data retention bound: how many recent entries the transcript keeps as render candidates.
+// The actual on-screen height is a SEPARATE, smaller bound -- see CHORUS_ROOM_LINE_BUDGET_CAP
+// and computeChorusTranscriptLineBudget below -- so dropping this number just means fewer
+// candidates for that budget to work with. Don't re-merge the two concerns.
 const CHORUS_TRANSCRIPT_ENTRY_LIMIT = 12;
 const LITERAL_SLASH_PREFIX = '//';
 const CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT = 4;
+
+// In fullscreen TUI mode the aboveEditor widget sits in a sticky dock (widget + editor +
+// footer + status) that is a flex sibling of the scrollable chat transcript with grow:0 --
+// it never yields space back. The transcript's basis:0 disqualifies it from the shrink pass
+// once it hits its 1-row minSize, so the *entire* deficit lands on the dock until its natural
+// height crosses terminalRows-1, at which point the transcript collapses to exactly 1 row in
+// a single step, not a graceful shrink (AGENT-256). This budget keeps the widget's own
+// contribution well clear of that threshold: a flat 30 lines on terminals roomy enough to
+// afford it, scaling down on shorter terminals (reserving ~12 rows for editor/footer/status
+// overhead) so a 24-row terminal -- a common default, not an absurd edge case -- still leaves
+// the transcript alive instead of reproducing the exact collapse this exists to prevent.
+// Applied in both TUI modes (not just fullscreen): a fixed line budget is harmless in regular
+// mode (native scrollback already handles unbounded content) and it also stops the widget's
+// height from jittering with every arrival once the budget is reached, which entry-count
+// clamping could never do.
+const CHORUS_ROOM_LINE_BUDGET_CAP = 30;
+const CHORUS_ROOM_DOCK_RESERVED_ROWS = 12;
+
+export function computeChorusTranscriptLineBudget(terminalRows: number): number {
+  return Math.max(1, Math.min(CHORUS_ROOM_LINE_BUDGET_CAP, terminalRows - CHORUS_ROOM_DOCK_RESERVED_ROWS));
+}
+
+// Renders entries newest-first against a rendered-line budget, dropping the OLDEST entries
+// once including another would exceed it. The most recent entry always renders even if it
+// alone exceeds the budget (each entry is already capped at CHORUS_TRANSCRIPT_ENTRY_LINE_LIMIT
+// lines, so the overshoot is small and bounded) -- there is no narrower fallback below "show
+// the latest message". No truncation indicator: Doug didn't ask for one, and a line budget
+// alone already fixes the jitter and starvation this exists to prevent.
+export function selectTranscriptLinesWithinBudget(
+  entries: readonly ChorusTranscriptEntry[],
+  width: number,
+  theme: ThemeLike,
+  lineBudget: number,
+): string[] {
+  if (entries.length === 0) {
+    return [];
+  }
+
+  const includedBlocks: string[][] = [];
+  let usedLines = 0;
+  for (let index = entries.length - 1; index >= 0; index--) {
+    const entry = entries[index];
+    if (entry === undefined) continue;
+    const entryLines = formatChorusTranscriptEntryLines(entry, width, theme);
+    if (includedBlocks.length > 0 && usedLines + entryLines.length > lineBudget) {
+      break;
+    }
+    includedBlocks.unshift(entryLines);
+    usedLines += entryLines.length;
+  }
+
+  return includedBlocks.flat();
+}
 // ToolRenderResultOptions (unlike MessageRenderOptions) does not expose outputPad as of
 // Pi 0.84.0, so tool renderResult callbacks have no way to read the user's actual setting --
 // fall back to Pi's own documented default (docs/settings.md: outputPad defaults to 1). A
@@ -163,8 +220,16 @@ export function formatChorusTranscriptEntryLines(
   return capTranscriptEntryLines(renderedLines, width, theme);
 }
 
+// Narrow slice of TUI that ChorusRoomTranscript needs for line-budgeting -- deliberately
+// not the full TUI type, so the render-time-not-construction-time read (see render() below)
+// is obvious from the shape alone and the component stays trivially testable with a fake.
+export interface ChorusRoomViewport {
+  readonly terminal: { readonly rows: number };
+}
+
 class ChorusRoomTranscript implements Component {
   constructor(
+    private readonly viewport: ChorusRoomViewport,
     private readonly broker: ChorusRoomBroker,
     private readonly peers: readonly TattlerIdentityV0[],
     private readonly theme: ThemeLike,
@@ -184,9 +249,11 @@ class ChorusRoomTranscript implements Component {
       return lines.map((line) => truncateToWidth(line, width));
     }
 
-    for (const entry of entries) {
-      lines.push(...formatChorusTranscriptEntryLines(entry, width, this.theme));
-    }
+    // Read terminal rows fresh on every render -- fullscreen is runtime-toggleable and the
+    // terminal can resize between frames, so a value captured once in the constructor would
+    // go stale and let the exact starvation/jitter this budget exists to prevent creep back.
+    const lineBudget = computeChorusTranscriptLineBudget(this.viewport.terminal.rows);
+    lines.push(...selectTranscriptLinesWithinBudget(entries, width, this.theme, lineBudget));
 
     return lines;
   }
@@ -333,7 +400,7 @@ export function setChorusRoomUi(options: ChorusRoomUiOptions): void {
     'chorus-room',
     (tui, theme) => {
       onRenderReady(() => tui.requestRender());
-      return new ChorusRoomTranscript(broker, peers, theme as ThemeLike);
+      return new ChorusRoomTranscript(tui, broker, peers, theme as ThemeLike);
     },
     { placement: 'aboveEditor' },
   );
