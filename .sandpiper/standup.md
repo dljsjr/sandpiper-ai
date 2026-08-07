@@ -49,3 +49,23 @@ Session file:
 ### Context
 - Global-guidance jj repo (~/.sandpiper/agent/) still has uncommitted edits to `playbooks/workflow/orienting.md` and `playbooks/skills/loading.md` from earlier in this session (skill-loading rationale fixes) — auto-revertible per Doug's own note, not blocking anything.
 - Key design memory for future standup work: liveness and time-since-write are BOTH ruled out as auto-GC signals — the former breaks under concurrency, the latter breaks under legitimate long-gap continuity. Only explicit `cleanup` should ever delete. Don't re-litigate this without revisiting that constraint.
+
+## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T02:39:16.604Z)
+
+Session file: /Users/dstephen/.sandpiper/agent/sessions/--Users-dstephen-git-sandpiper-ai--/2026-08-06T19-50-06-948Z_019fd8a0-3964-7fc8-84f3-1656595afa4d.jsonl
+
+### Accomplished
+- Queue items 1-6 of 7 LANDED: AGENT-227, 239, 241, 242, 240 (3 commits), 243 - chain at 18 approved changes, all independently reproduced. Head: zokxwrqorwxw/02c62b09341d.
+- DEV INSTANCE REPLACED: original sandpiper-0.84-dev hit unrecoverable context-overflow wedge (claude-cli provider bug; root-caused by that provider's own agent using the wedged transcript as specimen). Zero work lost - AGENT-244 was investigation-start only. Fresh instance (shortId 019fda14) fully re-briefed: state, AGENT-244 assignment + caution, AGENT-245 hold, all 9 standing rules. Reviewer notified with memory-asymmetry guidance (restate context; calibration-level scrutiny on first submission; watch predecessor's drift-seams since those corrections died with its context).
+
+### In Progress
+- Fresh dev on AGENT-244 (event-bus listener bookkeeping): investigation-first, findings to coordinator BEFORE any deletion; per-session vs per-runtime lifetime caution; chorus /new responder side-finding in scope. Awaiting its ack + investigation plan.
+
+### Next Session
+- Drain Tattler. After 244: tree drained except Doug-gated items (AGENT-245 upstream PR + outputPad EntryRenderOptions companion ask; AGENT-237 second half checklist c/d1/d2/e; parked decisions: turbo clean-at-start, vitest workspace config, warning enforcement; constraint lifts - Doug is back at machine but has NOT lifted zero-TouchID yet).
+
+### Blockers
+- None mechanical. Doug items above.
+
+### Context
+- Re-brief recipe validated twice now (reviewer restart, dev replacement): state + assignment + 9 standing rules + memory-asymmetry note to surviving pair member. Standing rules unchanged; shim baseline 3 lines. Task storage separate-branch.

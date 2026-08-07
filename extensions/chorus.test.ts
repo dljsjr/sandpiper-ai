@@ -2,7 +2,7 @@ import { createEventBus, type ExtensionAPI, type ExtensionCommandContext } from 
 import { describe, expect, test, vi } from 'vitest';
 import chorusExtension, { sendChorusMessageToChatOrQueue } from './chorus';
 import { TATTLER_PENDING_BATCH_CUSTOM_TYPE, TATTLER_PENDING_BATCH_ENTRY_TYPE } from './tattler/tattler-inbox';
-import { onTattlerPendingMessageQueueRequest } from './tattler/tattler-pi-events';
+import { onTattlerPendingMessageQueueRequest, requestChorusRoomPost } from './tattler/tattler-pi-events';
 import { roomId, type TattlerMessageId } from './tattler/tattler-protocol';
 
 type RegisteredCommand = {
@@ -44,10 +44,13 @@ const markerTheme: ToolRenderTheme = {
 function fakePi() {
   const commands = new Map<string, RegisteredCommand>();
   const tools: RegisteredTool[] = [];
+  const handlers = new Map<string, (evt: unknown, ctx: unknown) => unknown>();
   const pi = {
     appendEntry: vi.fn(),
     events: createEventBus(),
-    on: vi.fn(),
+    on: vi.fn((event: string, handler: (evt: unknown, ctx: unknown) => unknown) => {
+      handlers.set(event, handler);
+    }),
     registerCommand: vi.fn((name: string, command: RegisteredCommand) => {
       commands.set(name, command);
     }),
@@ -60,7 +63,7 @@ function fakePi() {
     sendUserMessage: vi.fn(),
   } as unknown as ExtensionAPI;
 
-  return { pi, commands, tools };
+  return { pi, commands, tools, handlers };
 }
 
 describe('Chorus extension commands', () => {
@@ -275,5 +278,55 @@ describe('Chorus extension commands', () => {
         ],
       }),
     );
+  });
+});
+
+// AGENT-244: chorus registers its `pi.events`-backed room-post responder at extension-load
+// time (inside the default export, not inside a `session_start` handler) and only tears it
+// down on `session_shutdown`. Pi source (loader.js's `loadExtension`, resource-loader.js's
+// `loadCurrentExtensionSet`) always re-invokes the extension factory on every session-
+// replacement path this repo actually uses (reload reuses the same eventBus in place;
+// new/resume/fork get an entirely fresh ResourceLoader+eventBus via `createRuntime` in pi's
+// main.js) -- so the responder should come back regardless of which case fires. These two
+// tests exercise that exact contract directly against chorus's own factory.
+describe('Chorus event-responder lifecycle across session boundaries (AGENT-244)', () => {
+  test('same-bus reload: room-post responder re-registers after session_shutdown clears it and the factory reruns on the same events bus', async () => {
+    const { pi, handlers } = fakePi();
+    chorusExtension(pi);
+
+    await expect(
+      requestChorusRoomPost(pi, { roomId: roomId('chorus-dev'), message: 'hi' }, { timeoutMs: 50 }),
+    ).rejects.toThrow('No active Chorus broker');
+
+    // /reload: session_shutdown clears listeners on this same eventBus, then pi's real reload
+    // machinery re-invokes the extension factory against the SAME ResourceLoader/eventBus
+    // (resource-loader.js never recreates `this.eventBus` inside `reload()`).
+    handlers.get('session_shutdown')?.(undefined, undefined);
+    chorusExtension(pi);
+
+    await expect(
+      requestChorusRoomPost(pi, { roomId: roomId('chorus-dev'), message: 'hi' }, { timeoutMs: 50 }),
+    ).rejects.toThrow('No active Chorus broker');
+  });
+
+  test('fresh-bus /new: room-post responder registers on a brand-new events bus after the old one is torn down', async () => {
+    const { pi: oldPi, handlers: oldHandlers } = fakePi();
+    chorusExtension(oldPi);
+    oldHandlers.get('session_shutdown')?.(undefined, undefined);
+
+    // /new (and resume/fork): pi's `createRuntime` builds an entirely new ResourceLoader, so a
+    // brand-new eventBus backs the next session, and the extension factory runs against it fresh.
+    const { pi: newPi } = fakePi();
+    chorusExtension(newPi);
+
+    // The old, torn-down bus must not still answer -- nothing should have revived it.
+    await expect(
+      requestChorusRoomPost(oldPi, { roomId: roomId('chorus-dev'), message: 'hi' }, { timeoutMs: 50 }),
+    ).rejects.toThrow('Timed out');
+
+    // The new bus answers via the freshly re-registered responder.
+    await expect(
+      requestChorusRoomPost(newPi, { roomId: roomId('chorus-dev'), message: 'hi' }, { timeoutMs: 50 }),
+    ).rejects.toThrow('No active Chorus broker');
   });
 });

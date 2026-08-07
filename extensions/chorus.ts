@@ -510,7 +510,10 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.on('session_shutdown', () => {
-    clearEventListeners();
+    // No manual clearEventListeners() here: Pi 0.84.0's runtime.invalidate() (called on this
+    // same session_shutdown/dispose boundary) already unsubscribes every pi.events.on()
+    // registration for this runtime. The factory-entry-top clearEventListeners() call stays,
+    // as a cheap, idempotent, defensive guard against any future same-bus double-load path.
     ownIdentityRequest = undefined;
     void stopActiveRoom();
   });
