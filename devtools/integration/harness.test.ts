@@ -28,6 +28,20 @@ describe('prepareIsolatedSpawn', () => {
     }
   });
 
+  it('pins fake AWS credentials unconditionally, as a backstop for the guard itself', () => {
+    const spawn = prepareIsolatedSpawn({ entry: 'pi' });
+    try {
+      expect(spawn.env.AWS_ACCESS_KEY_ID).toBeTruthy();
+      expect(spawn.env.AWS_SECRET_ACCESS_KEY).toBeTruthy();
+      expect(spawn.env.AWS_PROFILE).toBeTruthy();
+      // Real AWS keys are never this shape; this is just a sanity check that we didn't
+      // accidentally leak a real-looking or empty value.
+      expect(spawn.env.AWS_ACCESS_KEY_ID).toContain('fake');
+    } finally {
+      spawn.cleanup();
+    }
+  });
+
   it('pins --provider/--model to the mock by default', () => {
     const spawn = prepareIsolatedSpawn({ entry: 'pi' });
     try {
