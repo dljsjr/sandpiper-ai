@@ -39,9 +39,6 @@ export default async function init(pi: ExtensionAPI, dependencies: WebSearchExte
       query: Type.String({ description: PARAM_QUERY_DESC }),
       count: Type.Optional(Type.Integer({ description: PARAM_COUNT_DESC, minimum: 1, maximum: MAX_RESULT_COUNT })),
     }),
-    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
-    // otherwise. Plain scalar fields, no unions -- low risk.
-    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params): Promise<AgentToolResult<WebSearchToolDetails>> {
       const count = params.count === undefined ? undefined : Math.min(params.count, MAX_RESULT_COUNT);
       return executeWebSearchTool(adapter, { query: params.query, count });

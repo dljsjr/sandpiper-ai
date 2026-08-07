@@ -57,12 +57,6 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
         ]),
       ),
     }),
-    // 'prefer': strict JSON-schema sampling when the model supports it, transparent fallback
-    // otherwise. filter is the highest-value case in the sweep -- an anyOf union of two
-    // object shapes discriminated by a Type.Literal 'type' field, exactly the pattern
-    // strict mode most helps the model produce correctly. See index.test.ts's union-arm
-    // regression coverage (0.84.0 #7328 pairing).
-    constrainedSampling: { type: 'json_schema', strict: 'prefer' },
     async execute(_toolCallId, params): Promise<AgentToolResult<WebFetchToolDetails>> {
       return executeWebFetchTool(adapter, params);
     },

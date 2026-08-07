@@ -41,19 +41,6 @@ describe('web-fetch extension', () => {
     expect(schemaText).toContain('heading');
   });
 
-  it('prefers strict JSON-schema sampling for the filter anyOf union (0.84.0 #7328 pairing)', async () => {
-    const pi = {
-      registerTool: vi.fn(),
-    } as unknown as ExtensionAPI;
-
-    await init(pi, { adapter: createAdapter() });
-
-    const registeredTool = vi.mocked(pi.registerTool).mock.calls[0]?.[0] as
-      | { readonly constrainedSampling?: unknown }
-      | undefined;
-    expect(registeredTool?.constrainedSampling).toEqual({ type: 'json_schema', strict: 'prefer' });
-  });
-
   it.each([
     ['css_selector filter arm', { type: WebFetchFilterType.CssSelector, selector: '.article' }],
     ['markdown_section filter arm', { type: WebFetchFilterType.MarkdownSection, heading: 'Usage', level: 2 }],
