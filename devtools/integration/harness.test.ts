@@ -28,15 +28,10 @@ describe('prepareIsolatedSpawn', () => {
     }
   });
 
-  it('pins fake AWS credentials unconditionally, as a backstop for the guard itself', () => {
+  it('passes --offline unconditionally, so isolated runs never make incidental startup network calls', () => {
     const spawn = prepareIsolatedSpawn({ entry: 'pi' });
     try {
-      expect(spawn.env.AWS_ACCESS_KEY_ID).toBeTruthy();
-      expect(spawn.env.AWS_SECRET_ACCESS_KEY).toBeTruthy();
-      expect(spawn.env.AWS_PROFILE).toBeTruthy();
-      // Real AWS keys are never this shape; this is just a sanity check that we didn't
-      // accidentally leak a real-looking or empty value.
-      expect(spawn.env.AWS_ACCESS_KEY_ID).toContain('fake');
+      expect(spawn.args).toContain('--offline');
     } finally {
       spawn.cleanup();
     }
@@ -56,7 +51,7 @@ describe('prepareIsolatedSpawn', () => {
     }
   });
 
-  it('allows overriding provider/model explicitly (the deliberate guard-fires escape hatch)', () => {
+  it('allows overriding provider/model explicitly', () => {
     const spawn = prepareIsolatedSpawn({ entry: 'pi', provider: 'anthropic', model: 'claude-not-a-real-model' });
     try {
       const providerIndex = spawn.args.indexOf('--provider');
@@ -66,12 +61,21 @@ describe('prepareIsolatedSpawn', () => {
     }
   });
 
-  it('always loads the mock-provider and network-deny-guard extensions, even with no extraExtensions', () => {
+  it('omits --provider/--model entirely when skipProviderPin is set, reproducing the incident invocation shape', () => {
+    const spawn = prepareIsolatedSpawn({ entry: 'pi', skipProviderPin: true });
+    try {
+      expect(spawn.args).not.toContain('--provider');
+      expect(spawn.args).not.toContain('--model');
+    } finally {
+      spawn.cleanup();
+    }
+  });
+
+  it('always loads the mock-provider extension, even with no extraExtensions', () => {
     const spawn = prepareIsolatedSpawn({ entry: 'pi' });
     try {
       const extensionPaths = spawn.args.filter((_, index) => spawn.args[index - 1] === '-e');
       expect(extensionPaths.some((path) => path.endsWith('mock-provider.ts'))).toBe(true);
-      expect(extensionPaths.some((path) => path.endsWith('network-deny-guard.ts'))).toBe(true);
     } finally {
       spawn.cleanup();
     }

@@ -1,21 +1,17 @@
 # AGENT-249: Headless CLI Integration-Test Harness — Grounding + Design (AGENT-250)
 
-Status: approved (AGENT-250); implemented (AGENT-251) at devtools/integration/, revised once
-during review, then again during AGENT-252's guard-fires proof. The Guard injection vector
-section below now carries three rounds of correction, all recorded rather than silently fixed —
-the third (AGENT-252) found a real, previously-shipped gap via a real (fake-credentialed) AWS
-request reaching AWS's servers before being caught; see "AGENT-252: the layered threat model,
-and the incident that forced it into words" for the full account and the resulting
-enumeration+canary+backstop model. Summary of the first two rounds: AGENT-251 first found the
-originally-approved `http`/`https` patch broken (ESM module namespace immutability) and
-initially dropped it entirely on the further claim that nothing in pi-ai's dependency tree calls
-`http.request`/`https.request` — that claim was false, caught in review (`@smithy/node-http-handler`,
-a transitive Bedrock-provider dependency, does call `node:https.request` via a genuine CJS
-`require()`), so the `https.request` half is restored, verified to intercept via a call-time
-property lookup, with the remaining
-narrow residual (smithy's non-TLS fallback, unreachable by real AWS traffic) named explicitly.
-Full live-completion verification of the RPC/mock-provider claims beyond the guard's own
-mechanics remains AGENT-252's scope (see
+Status: approved (AGENT-250); implemented (AGENT-251/252) at devtools/integration/. Carries a
+postmortem (§3): the original incident behind this whole design was misdiagnosed as an
+ambient/OS-keychain credential leak, which motivated building a "network-deny guard" (a
+monkeypatch-based network-interception layer) across AGENT-251 and part of AGENT-252. The real
+root cause turned out to be a self-inflicted, pre-harness configuration gap (see §3's "Incident
+log and postmortem"), and pi has no silent-fallback path from an explicit `--provider` pin to
+begin with -- so the guard was torn down entirely (§3's "The network-deny guard: built, then
+torn down, and why"), replaced by a direct proof of the actual fix (the config-isolation
+containment canary) plus `--offline` for test hermeticity. Read that section before this
+document's history in `.jj`/task records, which still reflect the guard's now-superseded
+build-out -- this is the current, load-bearing account. Full live-completion verification of the
+RPC/mock-provider claims remains scoped as originally described (see
 [Dependency inversion](#dependency-inversion-live-verification-moves-downstream)).
 
 ## Context
@@ -58,8 +54,10 @@ node dist/cli.js --no-extensions --no-skills --no-prompt-templates --no-themes -
   -e plugins/pi/extensions/skill-loading.ts -p "..." < /dev/null
 ```
 
-successfully loaded exactly the one extension file (see [§3 incident log](#incident-log-ambient-credentials-are-the-threat)
-for what happened downstream of this same invocation — the flag composition itself worked).
+successfully loaded exactly the one extension file (see [§3 incident log](#incident-log-and-postmortem-what-actually-happened-and-what-didnt)
+for what happened downstream of this same invocation — the flag composition itself worked; the
+incident's original OS-keychain explanation was later corrected and the whole detour it caused
+was torn down, see that section).
 
 **Two distinct entry modes, per AGENT-249's own framing, confirmed as genuinely different:**
 1. `sandpiper` (the wrapper: `packages/cli/sandpiper_standalone.ts`) — always loads Sandpiper's
@@ -128,37 +126,97 @@ extensions that hook `user_bash`-style events.
 
 ## 3. Deterministic turns: mock-provider mechanism
 
-### Incident log: ambient credentials are the threat
+### Incident log and postmortem: what actually happened, and what didn't
 
-Two live smoke attempts this session (both disclosed and frozen on immediately) proved the
-overnight "blackhole via `ANTHROPIC_BASE_URL`" rule doesn't work (`pi-ai`'s Anthropic provider
-hardcodes `baseUrl: "https://api.anthropic.com"` — no env override exists; grepped the whole
-installed `pi-ai`+`pi-coding-agent` dist tree, the only `ANTHROPIC_BASE_URL` reference is
-Cloudflare AI Gateway routing, unrelated), and that omitting API keys entirely *also* doesn't
-guarantee no egress — a keyless run with no `--provider`/`--model` pinning still resolved to a
-real, ambiently-authenticated Codex/Copilot-family credential (OS keychain or cached OAuth,
-independent of `PI_CODING_AGENT_DIR`/`auth.json`) and completed a real turn. **Neither env vars
-nor a temp agent dir constrain OS-level credential stores.** Coordinator ruling in response:
-mock-provider-only for anything reaching model resolution, permanently, until a verified
-no-fallback mechanism exists. This design treats that as the load-bearing constraint for
-everything in this section.
+Two live smoke attempts during AGENT-250 grounding (both disclosed and frozen on immediately)
+proved the overnight "blackhole via `ANTHROPIC_BASE_URL`" rule doesn't work (`pi-ai`'s Anthropic
+provider hardcodes `baseUrl: "https://api.anthropic.com"` — no env override exists; grepped the
+whole installed `pi-ai`+`pi-coding-agent` dist tree, the only `ANTHROPIC_BASE_URL` reference is
+Cloudflare AI Gateway routing, unrelated). That finding stands.
+
+A second finding — that a keyless run with no `--provider`/`--model` pinning completed a real
+turn against a real, ambiently-authenticated provider — was real, but its original explanation
+was wrong and has since been corrected (2026-08-08, root-caused by Doug against the pair's own
+earlier framing). It was not an OS keychain or cached-OAuth store bypassing process isolation.
+It was a self-inflicted configuration gap in the ad hoc debug commands that produced the
+incident, run before this harness existed: those commands set only `PI_CODING_AGENT_DIR` to a
+temp directory, never `SANDPIPER_CODING_AGENT_DIR`, and never overrode `PI_PACKAGE_DIR`. Because
+`PI_PACKAGE_DIR` was left unset, it inherited the *invoking* Sandpiper session's own value —
+pointed at Sandpiper's branded package (with `piConfig`), making `APP_NAME` resolve to
+`"sandpiper"` and `ENV_AGENT_DIR` resolve to `"SANDPIPER_CODING_AGENT_DIR"` (AGENT-221's
+confirmed derivation) — the one variable name those commands never touched, which therefore
+inherited the *real* `~/.sandpiper/agent`. Real `settings.json` loaded, with Doug's real
+configured providers (a `claude-cli` provider that forks to the real Claude Code CLI binary,
+needing no stored credential file at all — explaining the keyless success; and a Codex-family
+provider — explaining the separate strict-schema rejection incident, consistent with, not
+contradicted by, AGENT-254's independently source-verified capability-only-gating finding).
+Verified by reconstruction and by a safe re-run: identical invocation, both agent-dir names set
+to the same fresh temp dir, keyless — clean, deterministic `"No API key found for the selected
+model."` exit, zero completion, the temp agent dir left holding only fresh empty state.
+
+**This harness's own `prepareIsolatedSpawn()` was never affected.** It has set *both* agent-dir
+env var names unconditionally since AGENT-251 — precisely the fix this correction confirms is
+sufficient. The incident was a property of hand-run debug commands that predated the harness,
+not a gap in its design.
+
+### The network-deny guard: built, then torn down, and why
+
+Between the corrected root cause above and AGENT-252's build of the guard-fires proof, this
+design carried a "network-deny guard" — a monkeypatch of `fetch`/`https.request`/`http2.connect`
+inside every spawned process, with a documented enumeration+canary+backstop threat model, built
+in direct response to what was, at the time, believed to be an ambient-credential leak the
+harness couldn't otherwise contain. Building its per-provider-family guard-fires tests found and
+fixed two real, specific gaps in it along the way (a broken `https.request` patch attempt, then
+a missed `http2.connect` transport used by Bedrock's actual default handler) — both real
+findings, verified empirically, and both now moot for a reason that has nothing to do with
+either fix being wrong.
+
+**Doug's question, unanswered until he asked it directly: what situation causes a pinned
+invocation to *not* use the mock?** Answer: none. An unknown `--provider` value is a hard error.
+An unresolvable `--model` value is a hard error. Pi 0.84.0 makes model-resolution ambiguity an
+explicit error, not a silent substitution. There is no fall-through mechanism from an explicit
+provider pin to *anything* else — real credential, ambient OAuth, or otherwise. Every layer of
+the guard was scar tissue from an incident whose real root cause (the branding-trap isolation
+gap above) was found only once Doug pushed past the pair's own prior framing. The guard
+machinery was built to defend against a fallback path that does not exist in pi.
+
+**Torn down entirely, not reframed**: the guard extension, its diagnostic-log mechanism, all
+transport patches, the per-provider-family guard-fires tests, and the fake-AWS-credential env
+defaults that existed to backstop them. What replaced it, per Doug's ruling, is simpler and maps
+onto what's actually true:
+
+- **Config isolation** (dual agent-dir env var names, always set — the real fix for the real
+  incident) plus **routing through an isolated `settings.json`** is what prevents a spawned test
+  from ever reaching real credentials. Proven directly by
+  `config-isolation-canary.integration.test.ts`: isolated, keyless, and deliberately unpinned
+  (reproducing the incident's exact invocation shape) — hard error, no completion, confirmed.
+- **Explicit `--provider`/`--model` pinning** to the mock, for every test that isn't the canary
+  above, relies on pi's own hard-error-on-unknown-provider behavior rather than a
+  process-level interception layer backing it up. There is no known mechanism by which that pin
+  gets silently ignored.
+- **`--offline`**, passed unconditionally by `prepareIsolatedSpawn()`, is the answer to the one
+  real *hermeticity* (not safety) concern that survived the teardown: isolated test runs were
+  making incidental network calls at startup regardless of whether a turn was ever attempted —
+  observed directly while building the guard, as repeated `https://pi.dev/api/models/providers/
+  ...` catalog-refresh fetches even in a keyless, immediately-failing run. `--offline` suppresses
+  pi's startup network operations; verified empirically (with the guard's diagnostic log, before
+  it was deleted, as a one-time debugging tool) that the catalog fetches stop happening with the
+  flag set. This is a determinism measure — isolated tests shouldn't depend on reaching a real
+  network endpoint just to start up — not a credential-safety mechanism.
+
+The mock provider itself (below) is unaffected by this teardown: it was never the thing doing
+the protecting, and remains the right mechanism for deterministic, scripted, offline turns.
 
 ### Mechanism evaluation
 
-**(a) `pi.registerProvider()` with a full `streamSimple` implementation — recommended.**
-`docs/custom-provider.md` documents `streamSimple: (model, context, options) =>
-AssistantMessageEventStream` as a complete escape hatch: the extension owns the entire event
-sequence (`start` → content deltas → `done`/`error`) and pi never constructs its own HTTP client
-for that provider at all. A mock built this way can be **structurally incapable of network
-I/O** — not merely configured not to use it — because there is no code path inside our own
-`streamSimple` function that calls `fetch`/`http`/`https`. This is the strongest available
-guarantee and it comes from pi's own supported extension surface, not a workaround.
-
-Config shape (`ProviderConfig`) still declares `apiKey`/`baseUrl`/`api` as fields "required when
-defining models," but since `streamSimple` overrides the actual request path, these can be inert
-placeholders — AGENT-252 must verify this empirically (does pi's startup/model-catalog code path
-ever independently touch `baseUrl`/`apiKey` for validation reasons before `streamSimple` takes
-over?) rather than assume it from the docs prose.
+**(a) `pi.registerProvider()` with a full `streamSimple` implementation — recommended, and
+what's implemented.** `docs/custom-provider.md` documents `streamSimple: (model, context,
+options) => AssistantMessageEventStream` as a complete escape hatch: the extension owns the
+entire event sequence (`start` → content deltas → `done`/`error`) and pi never constructs its
+own HTTP client for that provider at all. A mock built this way is structurally incapable of
+network I/O in its own right — no code path inside `mock-provider.ts`'s `streamSimple`
+implementation calls `fetch`/`http`/`https` — independent of whatever else this design does or
+doesn't do around it.
 
 **(b) The "faux-provider" deferred-response contracts (0.84.0, #7339) — investigated, not
 useful for this.** Changelog: "deferred provider request contracts, durable response handles,
@@ -169,252 +227,18 @@ approval, not a scripted chat-completion mock). AGENT-250's task description fla
 candidate to evaluate; verdict: **not applicable** — wrong feature, no scripted-conversation
 surface, dropping it from consideration.
 
-**(c) Blackholed provider + error-path-only assertions — rejected outright**, not merely
-"weakest." The whole reason this section exists is that blackholing doesn't work as a control at
-all (§ incident log). This option is retired along with the overnight rule that inspired it.
+**(c) Blackholed provider + error-path-only assertions — rejected outright.** The whole reason
+this section exists is that env-var blackholing doesn't work as a control at all (see the
+`ANTHROPIC_BASE_URL` finding above). This option is retired along with the overnight rule that
+inspired it.
 
-### No-fallback: the hard problem, named honestly
-
-Two layers, and they are not equally strong:
-
-1. **Explicit pinning** (`--provider <mock> --model <mock-id>` on every invocation, never
-   omitted, never left to auto-resolve). This directly addresses the observed failure mode (both
-   incidents happened with *no* explicit provider/model given). Whether pi's resolver, given an
-   explicit pin that doesn't match a real credential, fails hard instead of silently scanning
-   other sources is a property AGENT-252 must verify empirically — it is asserted nowhere in
-   docs read so far, and this pair does not promote unverified mechanisms to guarantees anymore.
-2. **Harness-level network-deny guard (recommended as the actual answer)** — independent of
-   whether (1) holds, every integration test run should install a process-wide guard for its
-   duration: monkeypatch `globalThis.fetch` to reject if invoked, plus a `require()`-based
-   `node:https.request` patch for dependencies that bypass `fetch` (see the Guard injection
-   vector section below for exactly which real dependency needed that second half, and why an
-   ESM `import` of `node:http`/`node:https` cannot be patched at all — both found and verified
-   empirically while AGENT-251 built this, including a caught-and-corrected false claim). This
-   catches egress from *any* cause — wrong provider resolution, an extension under test making
-   its own incidental fetch, a future pi regression — not just "the mock provider was
-   configured correctly." It converts "we trust the mock" into "we structurally cannot make a
-   real request during this test."
-
-**Honest limitation**: this is an in-process JS-level guard. It cannot catch egress from a
-subprocess pi itself spawns outside the patched process (none identified in the RPC/print-mode
-paths read so far, but not exhaustively verified), nor from native code bypassing Node's
-http/https modules. It is the strongest guarantee achievable without OS-level sandboxing
-(network namespace, firewall rule), which is out of scope for a portable dev-machine test
-harness. State this limitation in the harness's own README, not just here.
-
-### Guard injection vector (coordinator-required specification)
-
-The guard has to run *inside* the spawned `pi`/`sandpiper` process — patching `fetch`/`https`
-from the test runner's own process does nothing for a child process's separate Node realm. The
-vector is: **the guard is itself a tiny extension**, loaded via an additional `-e` flag the
-shared isolation helper always appends (alongside the mock provider's own `-e`), e.g.
-`devtools/integration/network-deny-guard.ts`. Its factory function patches `globalThis.fetch`
-and `node:https`'s `.request` synchronously at the top, before doing anything else.
-
-**AGENT-251 correction to this design, then a partial restoration during review (both recorded,
-neither silently fixed):** the version approved here patched `node:http`/`node:https`
-`.request`. Building it, AGENT-251 found `import * as http from 'node:http'` yields an
-ECMAScript module namespace object, exotic-object-immutable from outside the module
-(`Object.defineProperty` with `configurable:true` throws "Cannot replace module namespace
-object's binding"; a *separately obtained* `require('node:http')` CJS reference can be mutated,
-but that mutation does not propagate to the ESM namespace's own binding — confirmed with a
-standalone bun script; the failure was a require/import interop mismatch specifically, not
-proof that node:http/https can never be patched — AGENT-251's original test mutated a
-`require()`-obtained object but then verified the result by reading through a *separate*
-`import * as http` binding) — and an initial AGENT-251 submission dropped the http/https half
-entirely, on the additional claim that pi-ai's dependency tree never calls `http.request`/
-`https.request` anywhere.
-
-**That claim was false, caught in review.** `@smithy/node-http-handler` (a transitive dependency
-of `@aws-sdk/client-bedrock-runtime`, used by pi-ai's Bedrock provider,
-`api/bedrock-converse-stream.js`) does `var node_https = require('node:https');` at module scope
-in its `dist-cjs/index.js`, and its request-sending function does `const requestFunc = isSSL ?
-node_https.request : hRequest;` — a **property lookup performed at call time**, not a
-destructured/cached reference taken once at load. Two consequences: (1) since this is a genuine
-CJS `require()`, not an ESM namespace, it *can* be mutated the same way the guard's own
-`require('node:https')` reaches it — the restored patch works. (2) because the lookup happens at
-call time rather than being cached at import time, the patch intercepts regardless of whether
-smithy's module evaluates before or after the guard installs — load order doesn't matter for
-this path specifically. The same file's plain-HTTP fallback (`hRequest`, populated via `const {
-request } = await import('node:http')`) is an ESM dynamic import and remains genuinely
-unreachable by any monkeypatch, for the same immutability reason as node:http generally — but
-real AWS/Bedrock endpoints are always TLS (`isSSL` always true in practice), so this residual is
-narrow: a plain-HTTP fallback that real Bedrock traffic never actually takes, not the SSL path
-real requests use.
-
-**Two Bedrock load paths, documented precisely rather than collapsed into "unreachable via
-pinning" generically** (found during review): pi-ai's Bedrock API loader
-(`api/bedrock-converse-stream.lazy.js`) exposes two distinct ways smithy's module can end up
-loaded:
-
-- **Path (a), eager/static** — `setBedrockProviderModule()` lets a build register a
-  statically-imported bedrock module up front, used by pi's compiled single-file Bun binary
-  build (`dist/bun/cli.js`) specifically, because that build's bundler cannot follow a
-  variable-specifier dynamic `import()` into the Node-only AWS SDK. **Neither harness entry
-  mode goes through that binary** — `entry:'pi'` runs `node_modules/@earendil-works/
-  pi-coding-agent/dist/cli.js` directly via `bun <path>`, and `entry:'sandpiper'` runs
-  `packages/cli/sandpiper_standalone.ts` from source — so path (a) is unreachable by
-  construction, not by provider pinning. Confirmed: `setBedrockProviderModule` has no other
-  caller anywhere in the installed pi-ai dist tree; it's wired up only by pi's own Bun-compile
-  build tooling, which we never invoke.
-- **Path (b), lazy/normal** — `bedrockConverseStreamApi()` wraps the real load in `lazyApi()`
-  around a dynamic `import("./bedrock-converse-stream.ts")` (the module doing the smithy
-  `require('node:https')` documented above). This is the path every non-Bun-binary invocation
-  takes, **and it only evaluates when the API function is actually called** — i.e. only when
-  pi dispatches a real completion request through a model resolved to the Bedrock provider.
-  Loading pi-ai at all (any invocation, since it's the full provider catalog) does not trigger
-  this import; only an actual Bedrock-family turn does.
-
-**Consequence for AGENT-252's guard-fires test**: because path (b) is dispatch-triggered, a
-`--provider amazon-bedrock` misconfiguration case that only *passes the flag* proves nothing —
-smithy never loads, the guard's `https.request` patch never gets exercised, and the test would
-pass for the wrong reason (nothing attempted egress, not "the guard stopped an attempt"). The
-test must drive an actual turn attempt (a `prompt` command via the RPC driver, or an equivalent
-print-mode invocation) against the Bedrock pin, so smithy's module genuinely loads and calls
-`node_https.request`, for the guard's sentinel to have anything real to intercept.
-
-**Defense-in-depth for that test itself, added to the harness's default isolation env**: the
-guard-fires test's own failure mode, if the guard ever regresses, is a real Bedrock dispatch
-using whatever AWS credentials are ambient on the test machine (`~/.aws/credentials`, env vars,
-an IAM role) — structurally the same ambient-credential risk this whole harness exists to
-prevent, now specifically inside the one test designed to probe the boundary. Mitigation,
-applied unconditionally by `prepareIsolatedSpawn()` (not opt-in per test): pin
-`AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` to garbage literal values and `AWS_PROFILE` to a
-name that doesn't exist. The AWS SDK credential-resolution chain checks environment variables
-before `~/.aws` or IAM-role metadata, so even a guard-regression scenario authenticates as
-garbage and gets a 403 from AWS rather than spending real ambient credentials. Same principle as
-the op-shim tripwire: the backstop behind the backstop assumes the mechanism above it fails.
-
-Net result: `globalThis.fetch` plus a `require()`-based `node:https.request` patch together cover
-every HTTP client this dependency chain actually uses for real network calls (Anthropic/OpenAI
-via `fetch`, Bedrock via smithy's SSL path, reachable only through the lazy path (b)); the one
-remaining gap (smithy's non-TLS fallback) is named rather than silently absorbed into "fully
-covered," and is not exercised by real AWS/Bedrock traffic; and the guard-fires test that
-exercises the Bedrock path carries its own independent credential-poisoning backstop.
-
-```typescript
-export default function (pi: ExtensionAPI) {
-  globalThis.fetch = ((input: RequestInfo | URL) => {
-    const label = typeof input === 'string' || input instanceof URL ? String(input) : input.url;
-    return Promise.reject(new Error(`network-deny-guard: blocked fetch(${label}) during isolated integration test`));
-  }) as typeof fetch;
-
-  // require(), not `import * as https` -- see above for why the ESM namespace form cannot be
-  // mutated, and why this CJS singleton form (matching how smithy itself accesses node:https)
-  // can be.
-  const httpsModule = require('node:https') as typeof import('node:https');
-  httpsModule.request = (() => {
-    throw new Error('network-deny-guard: blocked https.request during isolated integration test');
-  }) as typeof httpsModule.request;
-}
-```
-
-**Load-ordering guarantee, traced (not assumed) in pi's own startup source**: every extension
-factory — including this one — runs synchronously to completion inside
-`resourceLoader.reload()`, called from `createAgentSessionServices()`
-(`agent-session-services.js`). The *first* point after that where pi could originate real
-network I/O is later in the same function: `await modelRuntime.refresh({ allowNetwork: false })`
-(confirmed at `agent-session-services.js:98` — notably already network-barred by pi itself for
-startup catalog refresh, independent of our guard) followed by `resolveModelScope`/session
-creation back in `main.js`'s `createRuntime`, which happens strictly after
-`createAgentSessionServices()` returns. So: all extension factories (guard included) are
-guaranteed to finish before pi resolves a model or could construct a provider's network client.
-
-Second, independent corroboration found while implementing the guard: `main.js` also calls
-`configureHttpDispatcher()` after `createAgentSessionServices()` returns (i.e. after every
-extension factory has already run). That function explicitly checks whether `globalThis.fetch`
-still equals its own captured original before calling `undici.install()` to install undici's
-fetch implementation — so a fetch override already in place when it runs (ours) is preserved,
-not silently overwritten by pi's own startup code.
-
-AGENT-251 exercised this live: the harness's smoke tests spawn real `pi`/`sandpiper` processes
-with the guard extension loaded, and the tripwire op-shim log stayed at its 3-line baseline
-across every run, with zero real network activity observed. What remains for AGENT-252
-specifically is the deliberate-misconfiguration case — proving the guard fires when a spawn
-points at a real, unmocked provider — not the guard's basic load-and-patch mechanics, which are
-now live-verified.
-
-**Guard-fires verification (the concrete AGENT-252 test)**: deliberately misconfigure one
-scenario to *not* use the mock — e.g. spawn with `--provider anthropic` and no mock registered —
-and assert the process fails with the guard's own sentinel error message (`network-deny-guard:
-blocked ...`), not a real network error, not a hang, not a silent success. If that scenario ever
-produces a real HTTP response or a different failure mode, the guard isn't wired correctly and
-no other integration test result can be trusted until it is.
-
-**Upgraded scope, added during review**: include a `--provider amazon-bedrock` misconfiguration
-case specifically, not only a generic wrong-provider one. Because the `https.request` patch is
-now verified to intercept smithy's SSL path via a call-time property lookup (see above), this
-case can assert the guard's `https.request` sentinel actually fires on a real code path known to
-bypass `fetch` — an empirical demonstration that the restored patch works end-to-end, not just a
-documented limitation. Strictly stronger than the generic case: it exercises the one dependency
-that needed the non-`fetch` half of the guard in the first place. **This case must drive an
-actual turn/dispatch attempt, not just pass the `--provider`/`--model` flags** — per the two
-Bedrock load paths documented above, smithy only loads lazily on real dispatch (path (b)); a
-flag-only spawn never touches smithy at all and would pass for the wrong reason. The harness's
-default fake-AWS-credential env vars (see above) are the deliberate backstop for exactly this
-test, in case the guard itself has regressed by the time AGENT-252 runs it.
-
-**AGENT-252 concrete deliverable, restated**: build the mock provider (a), pin explicitly (1),
-install the network-deny guard (2), and produce one test that demonstrates the guard actually
-fires — i.e., deliberately misconfigure a scenario to fall through to a non-mock path and assert
-the guard throws — before trusting it protects real coverage. An unverified guard is exactly the
-class of claim that started this incident.
-
-### AGENT-252: the layered threat model, and the incident that forced it into words
-
-Building the Bedrock guard-fires test surfaced a second real gap, more serious than the first:
-the `https.request` patch this document already describes does not protect Bedrock traffic at
-all. `@aws-sdk/client-bedrock-runtime`'s `dist-cjs/runtimeConfig.js:62` defaults its request
-handler to `NodeHttp2Handler` (HTTP/2, `node:http2.connect`), not the `NodeHttpHandler`
-(HTTP/1.1, `node:https.request`) previously traced and patched. A real dispatch attempt against
-`--provider amazon-bedrock` (fake AWS credentials, per the harness's own backstop) reached AWS's
-real servers and got back a real, structured rejection — `UnrecognizedClientException`, HTTP
-403, with a real AWS request ID (`6a01f6f7-ae33-4d21-b4d8-46f0ba74a5fc`). No real AWS account
-was touched (fake credentials, real rejection) — but the guard, as approved and shipped up to
-that point, did not stop the request from being sent.
-
-The fix is mechanically identical to the `https.request` case: `@smithy/node-http-handler`'s
-bundled `dist-cjs/index.js` also does `var http2 = require('node:http2');` at module scope and
-calls `http2.connect(url)` as a call-time property lookup (line 665, same pattern as
-`node_https.request` at line 344) — so patching `http2Module.connect` via the same
-`require('node:http2')` singleton mechanism intercepts it, verified empirically (the guard log
-now shows `http2.connect https://bedrock-runtime.us-east-1.amazonaws.com/` instead of a real
-AWS response).
-
-**The mechanism doesn't stop at "patch one more thing," though — the incident forced a named
-model for what this guard actually promises:**
-
-1. **Enumeration, not universality.** Prevention covers every transport verified so far —
-   `fetch`, `node:https.request`, `node:http2.connect` — and no more. There is no proof a
-   fourth transport doesn't exist somewhere in this dependency tree or a future version of it.
-2. **Canary.** Because (1) is an enumeration, every provider-family guard-fires test
-   (`network-deny-guard-fires.integration.test.ts`) is a standing drift detector, not a
-   one-time check. If a future SDK version or provider picks an unpatched transport, the
-   diagnostic log shows nothing intercepted for that provider, the test fails in CI — the same
-   discovery that just happened by hand, but automated and without a live-request precondition.
-3. **Backstop.** The harness's unconditional fake-AWS-credential env vars are what actually
-   stopped this specific incident from touching a real AWS account. That's not incidental —
-   it's the layer doing its documented job when the layer above it had a gap, the first live
-   validation of the layered model rather than a hypothetical justification for it.
-
-**Diagnostic log promoted to first-class, not scaffolding**: `SANDPIPER_INTEGRATION_GUARD_LOG`
-(set by a test to a file path; the guard appends one line per denied call) turned out to be the
-*only* reliable way to confirm the guard fired from outside the spawned process — pi's own
-error normalization erases the sentinel text for `fetch`-based providers (Anthropic's
-`APIConnectionError` wraps the rejection in `{ cause: response }`, and pi-ai's
-`normalizeProviderError()` reads `error.message`, the SDK's own generic "Connection error.",
-not `error.cause.message`). Bedrock's error path happens to preserve the sentinel text on the
-RPC wire, confirmed empirically — but that's a property of Bedrock's specific error handling,
-not something to rely on generally, so the log stays the documented mechanism and the RPC
-field is treated as bonus corroboration where it happens to work.
-
-**Process note, recorded per the corrections rule**: the sentinel-visibility finding and the
-guard-log addition were themselves a correction to the approved test mechanism, implemented
-before being reported — disclosed immediately afterward as part of the freeze on the http2
-finding, so no review cycle was actually burned, but under the standing rule (corrections to
-approved designs get report-before-fix treatment) that pause should come before the code next
-time, even for additions that feel like pure observability scaffolding rather than a
-behavior change.
+**Scripting (AGENT-252, implemented)**: `mock-provider.ts` supports scripted multi-turn
+conversations and scripted tool calls via `SANDPIPER_INTEGRATION_MOCK_SCRIPT` (a JSON-encoded
+array of text/toolCall steps), indexed by how many assistant messages already exist in
+`context.messages` — not a call counter, so script position is immune to retries. Falls back to
+a single canned reply (`SANDPIPER_INTEGRATION_MOCK_REPLY`, AGENT-251's original scope) when no
+script is set. Proved end-to-end via a real spawned RPC session driving a real tool execution
+against a test fixture tool, including a deterministic error when a script runs out of steps.
 
 ## 4. Harness placement + wiring
 
@@ -446,14 +270,15 @@ suite currently depends on zero-config root behavior working as-is). Instead:
   distribution/smoke-test precedent — both are "drive the real thing end-to-end" test classes,
   and `devtools/` is already the established home for tests that spawn real processes/binaries).
 - **Isolation-by-construction, not per-test discipline** (AGENT-249's explicit requirement): a
-  single shared helper, e.g. `devtools/integration/harness.ts`, exporting something like
-  `runIsolatedPi(options)` / `withIsolatedRpcSession(options, fn)`. It is the *only* supported
-  way to spawn `pi`/`sandpiper` from a test; it always sets **both** `SANDPIPER_CODING_AGENT_DIR`
-  and `PI_CODING_AGENT_DIR` to a fresh `mkdtempSync` directory (per §1's raw-vs-wrapper env-var
-  divergence), always neutralizes `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM`/points `JJ_CONFIG` at
-  Trail's existing fixture where the extension under test might spawn VCS, always installs the
-  network-deny guard (§3) around the spawned process's lifetime, and always requires an explicit
-  `--provider`/`--model` pin to the mock. No test file constructs its own `spawn()` call.
+  single shared helper, `devtools/integration/harness.ts`'s `prepareIsolatedSpawn()`. It is the
+  *only* supported way to spawn `pi`/`sandpiper` from a test; it always sets **both**
+  `SANDPIPER_CODING_AGENT_DIR` and `PI_CODING_AGENT_DIR` to a fresh `mkdtempSync` directory (per
+  §1's raw-vs-wrapper env-var divergence -- this is the actual fix for the incident described in
+  §3, not a guard around it), always neutralizes `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM`/points
+  `JJ_CONFIG` at Trail's existing fixture where the extension under test might spawn VCS, always
+  passes `--offline` (§3, hermeticity not safety), and always requires an explicit
+  `--provider`/`--model` pin to the mock by default (overridable for the config-isolation
+  canary, which deliberately omits it). No test file constructs its own `spawn()` call.
 - Because this lives under the default include glob, it *is* swept by a bare `bun run test`
   today — confirmed no existing mechanism in this repo actually excludes suites from the default
   sweep (`test:distribution`/`test:standalone` are convenience subset scripts for targeted CI
@@ -502,15 +327,17 @@ existing first. Restating the actual dependency graph:
 - AGENT-250 (this doc) ships on **static grounding only**: `--help` output, installed source
   reading, docs reading, and the one static (no-network, no-completion) `-e`/`--no-extensions`
   flag-composition smoke test that predates the mock-provider rule and needed no model call.
-- AGENT-252 must build the mock provider **and** the network-deny guard **and** demonstrate the
-  guard fires, before any of §2's RPC-handshake claims or §3's no-fallback pinning claims get
+- AGENT-252 built the mock provider and its scripting, and (per §3's postmortem) the
+  config-isolation containment canary, before any of §2's RPC-handshake claims got
   live-exercised for the first time.
 - AGENT-253's wave-1 coverage is the first real exercise of the full stack end-to-end.
 
-This is a real schedule cost (design and first live proof are no longer the same milestone), and
-worth stating plainly rather than quietly absorbing: **nothing in §2 or §3 of this document has
-been run against a live model or a live RPC session.** It is grounded in installed source and
-documentation, not observed behavior. Flagging this explicitly is the point of the exercise.
+**Historical note**: this section originally stated "nothing in §2 or §3 of this document has
+been run against a live model or a live RPC session" -- true when AGENT-250 was written, no
+longer true. AGENT-251 and AGENT-252 both ran extensive live verification (real spawned
+processes, real RPC sessions, real tool execution, the real incident and its correction
+documented in §3) -- kept here as a record of the dependency structure this design was built
+under, not a claim about current state. See the Status line at the top of this document.
 
 ## Open questions for the coordinator
 

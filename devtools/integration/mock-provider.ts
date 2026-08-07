@@ -1,7 +1,6 @@
 // Loaded via -e on every isolated integration-test spawn (see harness.ts). Registers a
 // provider that never performs real network I/O -- no fetch/http call exists anywhere in
-// this file's streamSimple implementation, so it is structurally incapable of egress,
-// independent of the network-deny-guard extension's process-wide backstop.
+// this file's streamSimple implementation, so it is structurally incapable of egress.
 //
 // Scripting (AGENT-252): a test drives a deterministic multi-turn conversation, including
 // tool calls against the extension under test, by setting MOCK_SCRIPT_ENV_VAR to a JSON-
