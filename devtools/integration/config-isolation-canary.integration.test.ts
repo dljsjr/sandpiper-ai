@@ -38,7 +38,13 @@ describe('config isolation containment canary (AGENT-252)', () => {
     });
 
     expect(result.exitCode).not.toBe(0);
-    expect(result.stdout + result.stderr).toContain('No API key found');
+    expect(result.stderr).toContain('No API key found');
+    // The direct claim, not just an inference from the error text: in -p mode, stdout is
+    // precisely the assistant-output channel, so empty stdout IS "no completion happened,"
+    // measured directly rather than inferred from "an error occurred, therefore no model ran."
+    // Confirmed empirically which stream carries what before writing this assertion (stdout
+    // was 0 bytes, the error text was entirely on stderr).
+    expect(result.stdout.trim()).toBe('');
   });
 
   it('leaves only fresh, empty agent-dir state behind -- never touches or copies real settings/auth', () => {
