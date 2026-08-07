@@ -69,6 +69,34 @@ function isResponse(value: unknown): value is RpcResponse {
 }
 
 /**
+ * Pure line-splitting step for the strict-JSONL framing described in the module comment above
+ * (split on `\n` only, strip a trailing `\r`). Extracted as a standalone function -- rather
+ * than left inline in the `data` handler -- specifically so it can be unit tested directly
+ * with synthetic multi-line-per-chunk and line-split-across-chunks input
+ * (`rpc-driver.test.ts`) without needing a real spawned process to coincidentally produce
+ * that chunking, which is OS/timing-dependent and not something a real-process test can
+ * reliably force either way.
+ *
+ * `buffer` is the accumulated-but-not-yet-dispatched text (including this call's new chunk
+ * already appended by the caller). Returns every complete line found and the leftover partial
+ * line (if any) for the caller to keep accumulating.
+ */
+export function extractCompleteLines(buffer: string): {
+  readonly lines: readonly string[];
+  readonly remainder: string;
+} {
+  const lines: string[] = [];
+  let remainder = buffer;
+  let newlineIndex = remainder.indexOf('\n');
+  while (newlineIndex !== -1) {
+    lines.push(remainder.slice(0, newlineIndex).replace(/\r$/, ''));
+    remainder = remainder.slice(newlineIndex + 1);
+    newlineIndex = remainder.indexOf('\n');
+  }
+  return { lines, remainder };
+}
+
+/**
  * Spawn pi/sandpiper in RPC mode and return a session for sending commands and observing
  * events. The child's stdout is split strictly on '\n' (see the framing note above), and each
  * parsed line is dispatched either to a pending command's promise (via `id` correlation) or
@@ -157,13 +185,10 @@ export function startRpcSession(options: StartRpcSessionOptions): RpcSession {
 
   child.stdout.setEncoding('utf-8');
   child.stdout.on('data', (chunk: string) => {
-    stdoutBuffer += chunk;
-    let newlineIndex = stdoutBuffer.indexOf('\n');
-    while (newlineIndex !== -1) {
-      const line = stdoutBuffer.slice(0, newlineIndex).replace(/\r$/, '');
-      stdoutBuffer = stdoutBuffer.slice(newlineIndex + 1);
+    const { lines, remainder } = extractCompleteLines(stdoutBuffer + chunk);
+    stdoutBuffer = remainder;
+    for (const line of lines) {
       dispatchLine(line);
-      newlineIndex = stdoutBuffer.indexOf('\n');
     }
   });
 

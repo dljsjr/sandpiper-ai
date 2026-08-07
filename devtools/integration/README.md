@@ -34,6 +34,13 @@ single/combinatoric-extension isolation, `--no-extensions -e <path>` against the
 `pi` binary); `entry: 'sandpiper'` runs Sandpiper's normal bundle on top of whatever extra
 extensions a test adds.
 
+Optional per-spawn `settingsJson` (AGENT-253): written as `<agentDir>/settings.json` before the
+process starts, in the same fresh isolated agent dir as everything else — never the real one.
+Primary use so far: pi's default `compaction.keepRecentTokens` (20000) means a realistically
+sized scripted test conversation never has anything old enough for manual `compact` to do
+anything, so the compaction coverage tests lower it to make compaction reachable without an
+unreasonably large scripted conversation.
+
 ## Drivers
 
 - [`print-mode-driver.ts`](./print-mode-driver.ts) — one-shot `-p` prompts, synchronous
@@ -84,24 +91,46 @@ If you're tempted to rebuild interception machinery here, read the design doc's 
 section first — it exists specifically so this doesn't get rebuilt from scratch against a
 threat that isn't real.
 
+## Wave 1 coverage (AGENT-253)
+
+- [`wave1-skill.integration.test.ts`](./wave1-skill.integration.test.ts) — the `skill` tool,
+  isolated. Real filesystem skill load (the jj skill's actual SKILL.md content) and a real
+  not-found error case, both through a real spawned RPC session.
+- [`wave1-autotoon.integration.test.ts`](./wave1-autotoon.integration.test.ts) — autotoon,
+  isolated (a padded bash-tool JSON result) and combinatoric (autotoon transforming
+  [`probe-tool.ts`](./probe-tool.ts)'s JSON result — the real cross-extension seam, since
+  autotoon has no knowledge of what produced the JSON it's converting), plus a below-threshold
+  case proving the 256-byte `MIN_JSON_BYTES` cutoff is real, not cosmetic.
+- [`wave1-compaction.integration.test.ts`](./wave1-compaction.integration.test.ts) — the
+  AGENT-237(e) payoff hypothesis: manual compaction and steer-message delivery driven headlessly
+  against the mock provider. See the design doc's "AGENT-237(e) payoff, realized" subsection for
+  the full account, including two real findings (`compaction.keepRecentTokens` and a compaction
+  summarization call context-shape difference) surfaced building it.
+- [`rpc-driver.test.ts`](./rpc-driver.test.ts) — direct unit coverage of `rpc-driver.ts`'s line
+  buffering, added because real spawns don't reliably exercise multi-line-per-chunk or
+  split-across-chunks stdout delivery (OS/timing-dependent, not something a passing integration
+  test proves happened that run). Forces both cases deterministically via the extracted
+  `extractCompleteLines()` function, plus the CRLF and U+2028/U+2029-non-splitting cases
+  `docs/rpc.md` specifically warns `readline` gets wrong. Command/response correlation needed no
+  separate test: every wave-1 test's `sendCommand()` calls already exercise it, dozens of times
+  over.
+
 ## Other known limitations
 
 - **The mock provider's scripting**: scripted multi-turn conversations and tool calls via
   `SANDPIPER_INTEGRATION_MOCK_SCRIPT` (JSON-encoded, see `mock-provider.ts`'s `MockScript` type
   and `encodeMockScript()`), indexed by how many assistant messages already exist in context —
   not a call counter, so it's immune to retries. Falls back to
-  `SANDPIPER_INTEGRATION_MOCK_REPLY`'s single canned reply when no script is set.
+  `SANDPIPER_INTEGRATION_MOCK_REPLY`'s single canned reply when no script is set. Does not
+  reliably index compaction-summarization calls the same way (see the design doc).
 - **`entry: 'sandpiper'` runs from source** (`packages/cli/sandpiper_standalone.ts` directly via
   `bun`, no build step). Chosen for dev-loop speed, but this is a real, named tradeoff, not a
   hypothetical one: AGENT-243 (this same session) found a bug that only manifested in the
-  *compiled* standalone binary, invisible from source. Deferred as named wave-2 scope in
-  AGENT-249's own description, with AGENT-253 empowered to add one representative
-  compiled-binary smoke test in wave 1 if cheap (the compile infrastructure already exists in
-  `standaloneSandpiperAppRuntime.test.ts`) — skip-if-not-built, not a forced build step.
-- **`rpc-driver.ts`'s line-buffering/command-response correlation logic is only exercised by
-  the smoke tests' happy path.** No synthetic edge-case unit tests (multiple JSON objects per
-  stdout chunk, a JSON object split across chunks, command-timeout paths). Real gap, expected
-  to close incidentally as AGENT-253's wave-1 coverage exercises the driver more.
+  *compiled* standalone binary, invisible from source. Evaluated for AGENT-253 (per the
+  coordinator's ruling, include a compiled-binary smoke only if genuinely cheap): the compiled
+  binary isn't currently built in this environment, and building it is a real `bun compile`
+  step, not something a skip-if-not-built test can make cheap on its own — deferred as named
+  wave-2 scope, not added.
 
 ## Placement note
 

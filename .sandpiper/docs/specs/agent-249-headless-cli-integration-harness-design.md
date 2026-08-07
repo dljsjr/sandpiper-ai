@@ -289,6 +289,13 @@ suite currently depends on zero-config root behavior working as-is). Instead:
 
 ## 5. Wave 1 scope cut
 
+**Status: implemented (AGENT-253).** `devtools/integration/wave1-skill.integration.test.ts`,
+`wave1-autotoon.integration.test.ts`, and `wave1-compaction.integration.test.ts` land the
+scope described below, plus the AGENT-237(e) payoff hypothesis (see the new subsection at the
+end of this section) and direct unit coverage of `rpc-driver.ts`'s line-buffering
+(`rpc-driver.test.ts`, forcing the OS-timing-dependent multi-line-per-chunk and
+split-across-chunks cases a real spawn can't reliably be made to exercise on demand).
+
 Recommending **skill + autotoon** as the committed wave-1 pair, both zero-external-dependency and
 both directly exercised by the confirmed `tool_execution_*` RPC events:
 
@@ -315,6 +322,43 @@ both directly exercised by the confirmed `tool_execution_*` RPC events:
   AGENT-249's own note; their mock adapters (e.g. `DdgSearchAdapter` already visible in
   `extensions/web-search/src/ddg-adapter.test.ts`) may allow *unit*-level inclusion later but add
   nothing RPC-specific to prove in wave 1.
+- The compiled-binary variant of `entry:'sandpiper'` (running the actual compiled standalone
+  app bundle rather than source) stayed OPTIONAL per the coordinator's ruling and was evaluated,
+  not skipped by default: the compiled binary isn't currently built in this environment, and
+  building it is a real `bun compile` step, not something a skip-if-not-built test can make
+  cheap on its own. Left as named wave-2 scope, per the same ruling.
+
+### The AGENT-237(e) payoff, realized
+
+AGENT-237(e) (tattler/chorus `deliverAs:'steer'` delivery through compaction) was deferred to
+Doug's manual sweep because, at the time, "there was zero existing test coverage of compaction
+anywhere in extensions/ or packages/core/, and the risk lives entirely inside Pi's internal
+turn/compaction state machine, which only exists during a real streaming turn -- nothing to mock
+without testing the mock instead of Pi's actual behavior." That reasoning predates this harness:
+the mock provider is a real, structurally-network-incapable *provider* that pi's actual
+compaction/turn machinery treats exactly like any other provider -- only the model *content* is
+scripted, not pi's internal state machine.
+
+`wave1-compaction.integration.test.ts` (AGENT-253) drives real manual compaction via the RPC
+`compact` command and a `steer`-delivered message mid-turn against the mock, both against real
+pi compaction/turn machinery, zero real network egress. Two real findings surfaced building it,
+recorded rather than smoothed over: (1) pi's default `compaction.keepRecentTokens` (20000)
+means a realistically-sized scripted conversation never has anything old enough to compact --
+a genuine pi safeguard, not a bug; `harness.ts` gained a `settingsJson` option (writes
+`settings.json` into the isolated agent dir before spawn) to make manual compaction reachable
+without an unreasonably large scripted conversation. (2) the compaction summarization
+`streamSimple()` call does not receive the same context shape a normal turn does (observed, not
+assumed) -- the mock's `context.messages`-count script-step indexing (AGENT-252) doesn't
+reliably land on a chosen "summary" step for compaction specifically. The tests therefore assert
+real structural claims (compact succeeds with a non-empty summary; a steer-delivered message is
+visible in `get_entries` before compaction; a normal turn completes correctly after compaction)
+rather than the compaction summary's exact content, which would assert an indexing accident, not
+a real claim -- exactly the tautological-test failure mode this whole project has repeatedly had
+to catch and correct elsewhere.
+
+Net result: AGENT-237(e) moves from "needs Doug at a real terminal, no headless path existed" to
+"headlessly tested, structurally proven, in CI." AGENT-237's own task record is the source of
+truth for its final disposition (Doug's call, not this design doc's).
 
 ## Dependency inversion: live verification moves downstream
 
