@@ -210,6 +210,9 @@ describe('registerSkillLoadingTool', () => {
         expect.stringContaining('Use `source="filesystem"` only when the user explicitly asks'),
       ]),
     );
+    // source is a Type.Union of two Type.Literal strings -- prefers strict JSON-schema
+    // sampling since it compiles to plain {anyOf:[{type:'string',const:...}, ...]}.
+    expect(tools[0]?.constrainedSampling).toEqual({ type: 'json_schema', strict: 'prefer' });
   });
 
   it('loads skill instructions from Pi-discovered skill commands', async () => {

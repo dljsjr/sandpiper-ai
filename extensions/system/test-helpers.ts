@@ -20,6 +20,7 @@ type AnyHandler = (...args: readonly unknown[]) => unknown;
 
 export interface CapturedTool {
   readonly name: string;
+  readonly constrainedSampling?: unknown;
   readonly execute: (...args: unknown[]) => Promise<{
     content: Array<{ type: 'text'; text: string }>;
     details: Record<string, unknown>;

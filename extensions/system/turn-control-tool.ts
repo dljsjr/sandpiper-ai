@@ -20,6 +20,8 @@ export function registerTurnControlTool(pi: ExtensionAPI): void {
       'Do not call done together with other tools; call it by itself only, because it terminates the turn without an assistant message.',
     ],
     parameters: Type.Object({}),
+    // No constrainedSampling: this tool has zero parameters, so there's no schema shape
+    // for strict-mode sampling to constrain.
     renderShell: 'self',
     renderCall: () => emptyToolRenderComponent,
     renderResult: () => emptyToolRenderComponent,
