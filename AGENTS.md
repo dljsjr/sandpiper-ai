@@ -39,7 +39,9 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 
 ## Verification
 
-- `bun check` is the lint/typecheck gate and must be clean: zero errors, zero warnings.
+- `bun check` is the lint/typecheck gate and must be clean: zero errors, zero warnings. Biome only
+  hard-fails on errors, so zero-warnings is discipline rather than enforcement. That is deliberate
+  — do not change the gate to fail on warnings.
 - Use `bun run test:vitest -- <testpath>` for focused Vitest runs.
 - Use `bun run test` for the full Vitest gate.
 - Before claiming distribution health, run `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`.
