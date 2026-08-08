@@ -39,6 +39,6 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "mkdir -p dist && tsc && bun build --production --minify --target=node src/index.ts --outfile ./dist/trail"
+    "build": "rm -rf dist && mkdir -p dist && tsc && bun build --production --minify --target=node src/index.ts --outfile ./dist/trail"
   }
 }
