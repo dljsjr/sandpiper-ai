@@ -50,25 +50,27 @@ Session file:
 - Global-guidance jj repo (~/.sandpiper/agent/) still has uncommitted edits to `playbooks/workflow/orienting.md` and `playbooks/skills/loading.md` from earlier in this session (skill-loading rationale fixes) — auto-revertible per Doug's own note, not blocking anything.
 - Key design memory for future standup work: liveness and time-since-write are BOTH ruled out as auto-GC signals — the former breaks under concurrency, the latter breaks under legitimate long-gap continuity. Only explicit `cleanup` should ever delete. Don't re-litigate this without revisiting that constraint.
 
-## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-07T18:33:48.515Z)
+## 019fd8a0-3964-7fc8-84f3-1656595afa4d (Updated: 2026-08-08T01:47:44.458Z)
 
 Session file: /Users/dstephen/.sandpiper/agent/sessions/--Users-dstephen-git-sandpiper-ai--/2026-08-06T19-50-06-948Z_019fd8a0-3964-7fc8-84f3-1656595afa4d.jsonl
 
 ### Accomplished
-- **INTEGRATION LANE COMPLETE (AGENT-249 tree closed): 250 design / 251 harness / 252 mock+teardown / 253 wave-1 coverage, all APPROVE.** Chain: 23 changes, every one independently reproduced by the reviewer. Head qoxwsurzrxly/1b758d34cd9b.
-- **AGENT-237 item (e) CONVERTED FROM MANUAL TO CI**: wave1-compaction.integration.test.ts drives real pi compaction + steer delivery via RPC against the mock, zero egress; structural claims asserted (compact succeeds w/ non-empty summary, steer visible in get_entries pre-compaction, normal turn completes post-compaction), summary content deliberately NOT asserted (would encode an indexing accident). Doug's manual checklist is now TWO EYEBALL ITEMS ONLY: (c) fullscreen TUI, (d) compiled-app /login + image handling.
-- Wave-1 coverage: skill + autotoon isolated, autotoon+probe combinatoric (real cross-extension tool_result seam), MIN_JSON_BYTES=256 threshold verified, rpc-driver line-buffering extracted to a pure function w/ deterministic unit tests incl. the U+2028/U+2029 case pi's own docs warn about. Compiled-binary smoke evaluated and DEFERRED as named wave-2 scope (not silent debt, recorded on AGENT-249).
-- Guard build-then-teardown closed honestly: root cause was our own branding trap in ad hoc commands (never the harness); Doug's question - what makes a PINNED invocation not use the mock? nothing, it hard-errors - dissolved the whole edifice. Guard/log/4 transport patches/drills/fake-AWS all deleted; --offline replaces them; postmortem in the design doc.
-- New standing rule proven out: serialized full-suite runs (machine load hit 26 from our own concurrency). Dev's caveated-not-claimed citation vindicated by reviewer's clean serialized run.
+- **AGENT-235 (Pi 0.84.0 upgrade) and AGENT-249 (headless CLI integration lane) both CLOSED.** 13 + 4 subtasks; every hack from the original audit removed; second validation lane live at devtools/integration (mock provider, print + RPC drivers, isolation-by-construction spawn helper, wave-1 coverage). AGENT-237 closed: prompt byte-identical across the bump, session format compatible, fullscreen confirmed in Doug's live dogfood, (e) converted from manual to CI, (d) descoped as upstream's domain.
+- AGENT-256 (chorus widget starving the fullscreen transcript) found by dogfood, fixed, visually confirmed by Doug. AGENT-254: AGENT-240's constrainedSampling adoption reverted - capability-only gating ships strict-invalid schemas; re-adoption is AGENT-255, gated on the mock provider growing a strict validator.
+- Build hygiene closed repo-wide (no tickets, per Doug): packages/cli, packages/trail, packages/sandpiper-standup-cli each now rm -rf dist at build start. Cause was turbo outputs dist/** + scripts that never fully clean, which resurrected a 5-month-old @mariozechner-scope snapshot. Reviewer reproduced the resurrect-after-full-deletion on all three and confirmed the fix also orphans existing poisoned entries (script text is part of the input hash).
+- **TCL-144 closed**: Trail's suite needs no real git/jj - bulk moved to unit tests against the run() seam, thin real-VCS integration layer retained. Proven both directions by shadowing git/jj with exit-127 stubs (447 pass with zero VCS calls; all 8 integration tests fail). Reviewer verified the retained layer by reverting TCL-143's fix and confirming it fails for real, and did the same for the added jj-side test.
+- Guidance changes: global AGENTS.md gained Turn Discipline (end at rest, no manufactured decisions, one small thing when needed, shipping is not a goal); USER.md item 3 rewritten ("Need me? Name one small thing, never a menu. Don't need me? Stop."); repo AGENTS.md gained the no-upstream-tickets rule and a note that bun check's zero-warnings is discipline not enforcement (deliberate - do not "fix"); playbooks/workflow/version_control.md gained the stdin-only commit-message rule with accurate reasoning.
 
 ### In Progress
-- NOTHING. Both agents STOOD DOWN. Dev is writing a short end-of-package summary FOR DOUG (what the lane gives him, what it deliberately doesn't cover, one-paragraph guard postmortem in their own words), then holds.
+- Dev on AGENT-258 (root vitest workspace config). No root config exists; six per-package configs are dormant under root invocation, which is why GIT_CONFIG/JJ_CONFIG isolation is hoisted into the root test:vitest script. Sprint, not a commit: land inert, enable one package at a time with a full-suite run between each. Isolation must never regress mid-migration.
 
 ### Next Session
-- Drain Tattler (dev's summary will be there). ALL remaining work is Doug-gated: AGENT-255 (strict re-adoption - UNBLOCKED now that the mock provider exists; give it a scriptable OpenAI-strict validator), TCL-144 (Trail VCS test rewrite, his direction), AGENT-237's two eyeball items, three upstream-asks (AGENT-245 env prefix / EntryRenderOptions outputPad / strict-prefer gating), parked build decisions (turbo clean-at-start, root vitest workspace config, bun check warning enforcement), constraint lifts (zero-TouchID, tripwires on agent shell usage, VCS network ops), push/PR strategy on 23 commits, claude-cli-provider wedge follow-through, NAV-85 + incubating-repo follow-ons.
+- Drain Tattler. After AGENT-258: AGENT-255 (strict re-adoption with strict-valid schema emission + mock-provider validator) is the only queued item.
+- Doug-only: the bash-env-var issue he is filing upstream; global-guidance edits are uncommitted in that repo alongside his own USER.md work.
 
 ### Blockers
-- None mechanical. Everything above is a Doug decision.
+- None.
 
 ### Context
-- Tripwire/op-shim rules still govern AGENT SHELL USAGE (separate from the deleted harness guard). Zero-TouchID unlifted. Serialization rule in force. Task storage separate-branch; working copy clean but for this note.
+- Standing rules (each earned by an incident): dual agent-dir env names for any CLI spawn; GIT_CONFIG neutralization for ad hoc VCS commands; no live model calls outside the harness mock; commit messages via stdin only, never as an argument; commit+submit atomic; serialized full-suite runs; coordinator statements are priors, not ground truth - four were falsified this week.
+- Task storage separate-branch. main advances as work lands; pushing is not a gate on anything.

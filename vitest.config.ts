@@ -13,7 +13,8 @@ import { configDefaults, defineConfig } from 'vitest/config';
  * two different configs — legacy-root's `exclude` starts from vitest's
  * own `configDefaults.exclude` rather than a hand-copied literal, so
  * migrating a package can't accidentally drop node_modules/.git from the
- * catch-all's exclusions). Migrated so far: packages/core.
+ * catch-all's exclusions). Migrated so far: packages/core,
+ * packages/sandpiper-standup-cli.
  */
 export default defineConfig({
   test: {
@@ -24,10 +25,11 @@ export default defineConfig({
           globals: false,
           environment: 'node',
           include: ['**/*.test.ts'],
-          exclude: [...configDefaults.exclude, 'packages/core/**'],
+          exclude: [...configDefaults.exclude, 'packages/core/**', 'packages/sandpiper-standup-cli/**'],
         },
       },
       'packages/core/vitest.config.ts',
+      'packages/sandpiper-standup-cli/vitest.config.ts',
     ],
   },
 });
