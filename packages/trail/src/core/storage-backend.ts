@@ -181,10 +181,7 @@ function pushGitWithUpstreamFallback(workspacePath: string): void {
       throw error;
     }
 
-    const currentBranch = execFileSync('git', ['branch', '--show-current'], {
-      cwd: workspacePath,
-      encoding: 'utf-8',
-    }).trim();
+    const currentBranch = vcsRunner('git', ['branch', '--show-current'], workspacePath).stdout.trim();
     run('git', ['push', '--set-upstream', 'origin', currentBranch], workspacePath);
   }
 }
@@ -206,6 +203,45 @@ export function pullTaskBranch(workspacePath: string, backend: VcsBackend): void
 
 // ─── Shell helpers ───────────────────────────────────────────────
 
+export interface VcsCommandResult {
+  readonly stdout: string;
+}
+
+/**
+ * A VCS command runner: given a command, its args, and the cwd to run in,
+ * either returns the captured stdout or throws (with `.stderr` attached,
+ * matching `execFileSync`'s failure shape) on non-zero exit.
+ *
+ * This is trail's VCS seam. All git/jj invocations in this module funnel
+ * through the module-level `vcsRunner`, which tests can swap out via
+ * `setVcsRunner` to assert on exactly which commands trail issues — and
+ * how it reacts to scripted outputs/failures — without spawning real git
+ * or jj processes.
+ */
+export type VcsRunner = (command: string, args: readonly string[], cwd: string) => VcsCommandResult;
+
+function defaultVcsRunner(command: string, args: readonly string[], cwd: string): VcsCommandResult {
+  const stdout = execFileSync(command, args, { cwd, encoding: 'utf-8' });
+  return { stdout };
+}
+
+let vcsRunner: VcsRunner = defaultVcsRunner;
+
+/**
+ * Test-only seam: replace the runner that issues real git/jj commands with
+ * a fake. See `storage-backend.test.ts` for the pattern: record invocations,
+ * script return values/errors per call, and assert on the exact command
+ * sequences trail issues.
+ */
+export function setVcsRunner(runner: VcsRunner): void {
+  vcsRunner = runner;
+}
+
+/** Test-only seam: restore the real git/jj-spawning runner. */
+export function resetVcsRunner(): void {
+  vcsRunner = defaultVcsRunner;
+}
+
 function run(command: string, args: readonly string[], cwd: string): void {
-  execFileSync(command, args, { cwd, stdio: 'pipe' });
+  vcsRunner(command, args, cwd);
 }
