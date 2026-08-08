@@ -1,29 +1,90 @@
 /**
- * Integration tests for the `storage` command group.
- * These tests run the actual CLI binary against real temp repos.
+ * Unit tests for the `storage` command group's dispatch logic.
+ *
+ * These invoke storageCommand (and, for the auto-commit case, taskCommand)
+ * in-process via Commander's `parseAsync` — no subprocess, no `bun index.ts`
+ * spawn — with the real `resolveStorageConfig`/`detectVcsBackend` (both
+ * fs-only, no VCS binary needed) and the real storage-backend/migrate logic,
+ * but with git/jj command execution faked via storage-backend's `VcsRunner`
+ * seam. This asserts on exactly what the CLI layer does — which commands it
+ * issues, in what order, with what messages/exit codes — without spawning
+ * real git or jj.
+ *
+ * Real end-to-end git/jj behavior (does `git worktree add --orphan` actually
+ * work, does jj's immutable-commit rule actually get avoided, etc.) is
+ * covered by the thin integration sets in storage-backend.integration.test.ts
+ * and auto-commit.integration.test.ts — deliberately not duplicated here.
  */
-import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { Command } from '@commander-js/extra-typings';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resetVcsRunner, setVcsRunner, type VcsCommandResult } from '../core/storage-backend.js';
+import { storageCommand } from './storage-cmd.js';
+import { taskCommand } from './task-cmd.js';
 
-const CLI_PATH = join(import.meta.dirname!, '..', 'index.ts');
+interface RecordedCall {
+  readonly command: string;
+  readonly args: readonly string[];
+  readonly cwd: string;
+}
 
-function runCli(args: string, cwd?: string): { stdout: string; stderr: string; exitCode: number } {
+function createFakeRunner(script: readonly (VcsCommandResult | Error)[] = []) {
+  const calls: RecordedCall[] = [];
+  setVcsRunner((command, args, cwd) => {
+    const index = calls.length;
+    calls.push({ command, args: [...args], cwd });
+    const scripted = script[index];
+    if (scripted instanceof Error) throw scripted;
+    return scripted ?? { stdout: '' };
+  });
+  return calls;
+}
+
+/** Build a minimal root Command wrapping the given subcommands, matching index.ts's -d/-f options. */
+function makeProgram(...subcommands: readonly Command[]): Command {
+  const program = new Command().exitOverride().option('-d, --dir <path>').option('-f, --format <format>');
+  for (const cmd of subcommands) program.addCommand(cmd);
+  return program;
+}
+
+interface CliResult {
+  readonly stdout: string;
+  readonly stderr: string;
+  readonly exitCode: number;
+}
+
+/** Minimal shell-like tokenizer: splits on whitespace, honoring "..." quoted spans. */
+function tokenize(args: string): string[] {
+  const tokens = args.match(/"[^"]*"|\S+/g) ?? [];
+  return tokens.map((t) => (t.startsWith('"') && t.endsWith('"') ? t.slice(1, -1) : t));
+}
+
+async function runInProcess(program: Command, args: string): Promise<CliResult> {
+  const logs: string[] = [];
+  const errors: string[] = [];
+  const logSpy = vi.spyOn(console, 'log').mockImplementation((msg: unknown) => {
+    logs.push(String(msg));
+  });
+  const errorSpy = vi.spyOn(console, 'error').mockImplementation((msg: unknown) => {
+    errors.push(String(msg));
+  });
+  process.exitCode = undefined;
   try {
-    const stdout = execSync(`bun ${CLI_PATH} ${args}`, {
-      encoding: 'utf-8',
-      cwd,
-      timeout: 15_000,
-      env: { ...process.env },
-    });
-    return { stdout, stderr: '', exitCode: 0 };
-  } catch (error: unknown) {
-    const e = error as { stdout?: string; stderr?: string; status?: number };
-    return { stdout: e.stdout ?? '', stderr: e.stderr ?? '', exitCode: e.status ?? 1 };
+    await program.parseAsync(['node', 'trail', ...tokenize(args)], { from: 'node' });
+    const exitCode = typeof process.exitCode === 'number' ? process.exitCode : 0;
+    return { stdout: logs.join('\n'), stderr: errors.join('\n'), exitCode };
+  } finally {
+    logSpy.mockRestore();
+    errorSpy.mockRestore();
+    process.exitCode = undefined;
   }
 }
+
+afterEach(() => {
+  resetVcsRunner();
+});
 
 // ─── storage init — mode: inline (default) ───────────────────────
 
@@ -39,10 +100,15 @@ describe('storage init — inline mode (default)', () => {
     rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('reports that inline mode requires no special initialisation', () => {
-    const result = runCli(`--dir ${rootDir} storage init`);
-    expect(result.exitCode).toBe(0);
-    expect(result.stdout).toMatch(/inline|already|no.?init/i);
+  it('reports that inline mode requires no special initialisation, issuing no VCS commands', () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    return runInProcess(program, `--dir ${rootDir} storage init`).then((result) => {
+      expect(result.exitCode).toBe(0);
+      expect(result.stdout).toMatch(/inline|already|no.?init/i);
+      expect(calls).toEqual([]);
+    });
   });
 });
 
@@ -64,25 +130,26 @@ describe('storage init — no VCS repo, separate-branch config', () => {
     rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('exits with error when no VCS repo is detected', () => {
-    const result = runCli(`--dir ${rootDir} storage init`);
+  it('exits with error when no VCS repo is detected, issuing no VCS commands', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage init`);
+
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toMatch(/no VCS|no vcs|repository/i);
+    expect(calls).toEqual([]);
   });
 });
 
 // ─── storage init — git backend ──────────────────────────────────
 
-describe('storage init — git backend (integration)', () => {
+describe('storage init — git backend', () => {
   let rootDir: string;
 
   beforeEach(() => {
     rootDir = mkdtempSync(join(tmpdir(), 'storage-init-git-test-'));
-    execSync('git init -q', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
-    // Do NOT pre-create .sandpiper/tasks — storage init must create it via worktree
+    mkdirSync(join(rootDir, '.git'));
     writeFileSync(
       join(rootDir, '.sandpiper-tasks.json'),
       JSON.stringify({ version_control: { mode: { branch: 'sandpiper-tasks' } } }),
@@ -93,36 +160,49 @@ describe('storage init — git backend (integration)', () => {
     rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('creates a git worktree at .sandpiper/tasks/', () => {
-    const result = runCli(`--dir ${rootDir} storage init`);
+  it('issues `git worktree add --orphan -b <branch> <path>`', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage init`);
+
     expect(result.exitCode).toBe(0);
-    expect(existsSync(join(rootDir, '.sandpiper', 'tasks'))).toBe(true);
-    const worktrees = execSync('git worktree list', { cwd: rootDir, encoding: 'utf-8' });
-    expect(worktrees).toContain('sandpiper-tasks');
+    expect(calls).toEqual([
+      { command: 'git', args: ['worktree', 'add', '--orphan', '-b', 'sandpiper-tasks', workspacePath], cwd: rootDir },
+    ]);
   });
 
-  it('adds .sandpiper/tasks/ to .gitignore on the main branch', () => {
-    runCli(`--dir ${rootDir} storage init`);
+  it('adds .sandpiper/tasks/ to .gitignore on the main branch', async () => {
+    createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    await runInProcess(program, `--dir ${rootDir} storage init`);
+
     const gitignore = readFileSync(join(rootDir, '.gitignore'), 'utf-8');
     expect(gitignore.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
   });
 
-  it('is idempotent when run a second time', () => {
-    runCli(`--dir ${rootDir} storage init`);
-    const result = runCli(`--dir ${rootDir} storage init`);
+  it('is idempotent when run a second time (workspace path pre-exists, no VCS command issued)', async () => {
+    mkdirSync(join(rootDir, '.sandpiper', 'tasks'), { recursive: true });
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage init`);
+
     expect(result.exitCode).toBe(0);
+    expect(calls).toEqual([]);
   });
 });
 
 // ─── storage init — jj backend ───────────────────────────────────
 
-describe('storage init — jj backend (integration)', () => {
+describe('storage init — jj backend', () => {
   let rootDir: string;
 
   beforeEach(() => {
     rootDir = mkdtempSync(join(tmpdir(), 'storage-init-jj-test-'));
-    execSync('jj git init --colocate', { cwd: rootDir, stdio: 'pipe' });
-    // Do NOT pre-create .sandpiper/tasks — storage init must create it via jj workspace
+    mkdirSync(join(rootDir, '.jj'));
     writeFileSync(
       join(rootDir, '.sandpiper-tasks.json'),
       JSON.stringify({ version_control: { mode: { branch: 'sandpiper-tasks' } } }),
@@ -130,42 +210,52 @@ describe('storage init — jj backend (integration)', () => {
   });
 
   afterEach(() => {
-    execSync(`rm -rf "${rootDir}"`);
+    rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('creates a jj workspace at .sandpiper/tasks/', () => {
-    const result = runCli(`--dir ${rootDir} storage init`);
+  it('issues `jj workspace add` then `jj bookmark create -r @`', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage init`);
+
     expect(result.exitCode).toBe(0);
-    const workspaces = execSync('jj workspace list', { cwd: rootDir, encoding: 'utf-8' });
-    expect(workspaces).toContain('tasks');
+    expect(calls).toEqual([
+      {
+        command: 'jj',
+        args: ['workspace', 'add', workspacePath, '--name', 'tasks', '--revision', 'root()'],
+        cwd: rootDir,
+      },
+      { command: 'jj', args: ['bookmark', 'create', 'sandpiper-tasks', '-r', '@'], cwd: workspacePath },
+    ]);
   });
 
-  it('adds .sandpiper/tasks/ to .gitignore on the main branch', () => {
-    runCli(`--dir ${rootDir} storage init`);
+  it('adds .sandpiper/tasks/ to .gitignore on the main branch', async () => {
+    createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    await runInProcess(program, `--dir ${rootDir} storage init`);
+
     const gitignore = readFileSync(join(rootDir, '.gitignore'), 'utf-8');
     expect(gitignore.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
   });
 });
 
-// ─── auto-commit on task mutation (integration) ────────────────────
+// ─── auto-commit on task mutation ────────────────────────────────
 
-describe('auto-commit on task mutation — git backend (integration)', () => {
+describe('auto-commit on task mutation — git backend', () => {
   let rootDir: string;
 
   beforeEach(() => {
     rootDir = mkdtempSync(join(tmpdir(), 'auto-commit-cli-test-'));
-    execSync('git init -q', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    mkdirSync(join(rootDir, '.git'));
     writeFileSync(
       join(rootDir, '.sandpiper-tasks.json'),
       JSON.stringify({
         version_control: { mode: { branch: 'sandpiper-tasks' }, auto_commit: true },
       }),
     );
-    runCli(`--dir ${rootDir} storage init`);
-    // Create a project directory in the task workspace
     mkdirSync(join(rootDir, '.sandpiper', 'tasks', 'TST'), { recursive: true });
   });
 
@@ -173,68 +263,77 @@ describe('auto-commit on task mutation — git backend (integration)', () => {
     rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('commits the task file after task create when auto_commit is true', () => {
-    const result = runCli(`--dir ${rootDir} task create -p TST -t "Auto-commit test" --reporter USER`);
-    expect(result.exitCode).toBe(0);
+  it('issues a git commit for the new task file after task create when auto_commit is true', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(taskCommand, storageCommand);
 
-    // A commit should exist on the sandpiper-tasks branch
-    const log = execSync('git log --oneline sandpiper-tasks', { cwd: rootDir, encoding: 'utf-8' });
-    expect(log).toContain('TST-1');
+    const result = await runInProcess(
+      program,
+      `--dir ${rootDir} task create -p TST -t "Auto-commit test" --reporter USER`,
+    );
+
+    expect(result.exitCode).toBe(0);
+    expect(calls).toEqual([
+      { command: 'git', args: ['add', '-A'], cwd: join(rootDir, '.sandpiper', 'tasks') },
+      {
+        command: 'git',
+        args: ['commit', '-m', expect.stringContaining('TST-1')],
+        cwd: join(rootDir, '.sandpiper', 'tasks'),
+      },
+    ]);
   });
 });
 
-// ─── storage init — external repo (integration) ─────────────────────
+// ─── storage init — external repo ─────────────────────────────────
 
-describe('storage init — external repo, git backend (integration)', () => {
+describe('storage init — external repo, git backend', () => {
   let rootDir: string;
-  let remoteDir: string;
 
   beforeEach(() => {
     rootDir = mkdtempSync(join(tmpdir(), 'storage-init-ext-test-'));
-    remoteDir = mkdtempSync(join(tmpdir(), 'storage-init-ext-remote-'));
-    execSync('git init -q', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
-    execSync('git init -q', { cwd: remoteDir });
-    execSync('git config user.email "test@test.com"', { cwd: remoteDir });
-    execSync('git config user.name "Test"', { cwd: remoteDir });
-    execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });
+    mkdirSync(join(rootDir, '.git'));
     writeFileSync(
       join(rootDir, '.sandpiper-tasks.json'),
-      JSON.stringify({ version_control: { mode: { branch: '@', repo: remoteDir } } }),
+      JSON.stringify({ version_control: { mode: { branch: '@', repo: 'https://example.invalid/tasks.git' } } }),
     );
   });
 
   afterEach(() => {
     rmSync(rootDir, { recursive: true, force: true });
-    rmSync(remoteDir, { recursive: true, force: true });
   });
 
-  it('clones external repo into .sandpiper/tasks/', () => {
-    const result = runCli(`--dir ${rootDir} storage init`);
+  it('issues `git clone <repo> <path>`', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage init`);
+
     expect(result.exitCode).toBe(0);
-    expect(existsSync(join(rootDir, '.sandpiper', 'tasks', '.git'))).toBe(true);
+    expect(calls).toEqual([
+      { command: 'git', args: ['clone', 'https://example.invalid/tasks.git', clonePath], cwd: rootDir },
+    ]);
   });
 
-  it('adds .sandpiper/tasks/ to .gitignore', () => {
-    runCli(`--dir ${rootDir} storage init`);
+  it('adds .sandpiper/tasks/ to .gitignore', async () => {
+    createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    await runInProcess(program, `--dir ${rootDir} storage init`);
+
     const gitignore = readFileSync(join(rootDir, '.gitignore'), 'utf-8');
     expect(gitignore.split('\n').map((l) => l.trim())).toContain('.sandpiper/tasks/');
   });
 });
 
-// ─── storage migrate (integration) ──────────────────────────────
+// ─── storage migrate ──────────────────────────────────────────────
 
-describe('storage migrate — git backend (integration)', () => {
+describe('storage migrate — git backend', () => {
   let rootDir: string;
 
   beforeEach(() => {
     rootDir = mkdtempSync(join(tmpdir(), 'storage-migrate-test-'));
-    execSync('git init -q', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    mkdirSync(join(rootDir, '.git'));
     // Set up inline tasks (current default mode)
     mkdirSync(join(rootDir, '.sandpiper', 'tasks', 'TST'), { recursive: true });
     writeFileSync(
@@ -252,62 +351,73 @@ describe('storage migrate — git backend (integration)', () => {
     rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('moves inline task files into the separate-branch workspace', () => {
-    const result = runCli(`--dir ${rootDir} storage migrate`);
-    expect(result.exitCode).toBe(0);
+  it('moves inline task files into the separate-branch workspace and issues the worktree-bootstrap command', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
 
-    // Task file now lives in the worktree
-    expect(existsSync(join(rootDir, '.sandpiper', 'tasks', 'TST', 'TST-1.md'))).toBe(true);
-    // The worktree is on the correct branch
-    const worktrees = execSync('git worktree list', { cwd: rootDir, encoding: 'utf-8' });
-    expect(worktrees).toContain('sandpiper-tasks');
+    const result = await runInProcess(program, `--dir ${rootDir} storage migrate`);
+
+    expect(result.exitCode).toBe(0);
+    expect(existsSync(join(workspacePath, 'TST', 'TST-1.md'))).toBe(true);
+    expect(calls).toEqual([
+      { command: 'git', args: ['worktree', 'add', '--orphan', '-b', 'sandpiper-tasks', workspacePath], cwd: rootDir },
+    ]);
   });
 });
 
-// ─── storage pull — external repo (integration) ─────────────────────
+// ─── storage sync/push/pull ───────────────────────────────────────
 
-describe('storage pull — external repo, git backend (integration)', () => {
+describe('storage sync/push/pull — separate-branch, git backend', () => {
   let rootDir: string;
-  let remoteDir: string;
+  const workspacePath = (root: string) => join(root, '.sandpiper', 'tasks');
 
   beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'storage-pull-ext-test-'));
-    remoteDir = mkdtempSync(join(tmpdir(), 'storage-pull-ext-remote-'));
-    execSync('git init -q', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
-    execSync('git init -q', { cwd: remoteDir });
-    execSync('git config user.email "test@test.com"', { cwd: remoteDir });
-    execSync('git config user.name "Test"', { cwd: remoteDir });
-    execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });
+    rootDir = mkdtempSync(join(tmpdir(), 'storage-sync-test-'));
+    mkdirSync(join(rootDir, '.git'));
+    mkdirSync(join(rootDir, '.sandpiper', 'tasks'), { recursive: true });
     writeFileSync(
       join(rootDir, '.sandpiper-tasks.json'),
-      JSON.stringify({ version_control: { mode: { branch: '@', repo: remoteDir } } }),
+      JSON.stringify({ version_control: { mode: { branch: 'sandpiper-tasks' } } }),
     );
-    // Bootstrap the external repo
-    runCli(`--dir ${rootDir} storage init`);
   });
 
   afterEach(() => {
     rmSync(rootDir, { recursive: true, force: true });
-    rmSync(remoteDir, { recursive: true, force: true });
   });
 
-  it('storage pull succeeds when no new remote commits exist', () => {
-    const result = runCli(`--dir ${rootDir} storage pull`);
+  it('storage pull issues `git pull` only', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage pull`);
+
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain('Pulled');
+    expect(calls).toEqual([{ command: 'git', args: ['pull'], cwd: workspacePath(rootDir) }]);
   });
 
-  it('storage init re-clones cleanly after broken clone is removed', () => {
-    // Simulate a broken clone by deleting it
-    rmSync(join(rootDir, '.sandpiper', 'tasks'), { recursive: true, force: true });
+  it('storage push issues `git push` only', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
 
-    // Re-init should clone fresh
-    const result = runCli(`--dir ${rootDir} storage init`);
+    const result = await runInProcess(program, `--dir ${rootDir} storage push`);
+
     expect(result.exitCode).toBe(0);
-    expect(existsSync(join(rootDir, '.sandpiper', 'tasks', '.git'))).toBe(true);
+    expect(calls).toEqual([{ command: 'git', args: ['push'], cwd: workspacePath(rootDir) }]);
+  });
+
+  it('storage sync pulls then pushes, in that order', async () => {
+    const calls = createFakeRunner();
+    const program = makeProgram(storageCommand);
+
+    const result = await runInProcess(program, `--dir ${rootDir} storage sync`);
+
+    expect(result.exitCode).toBe(0);
+    expect(calls).toEqual([
+      { command: 'git', args: ['pull'], cwd: workspacePath(rootDir) },
+      { command: 'git', args: ['push'], cwd: workspacePath(rootDir) },
+    ]);
   });
 });
 
@@ -326,10 +436,15 @@ describe('storage sync/push/pull — inline mode no-op', () => {
   });
 
   for (const subcmd of ['sync', 'push', 'pull'] as const) {
-    it(`storage ${subcmd} exits 0 and prints informational message in inline mode`, () => {
-      const result = runCli(`--dir ${rootDir} storage ${subcmd}`);
+    it(`storage ${subcmd} exits 0, prints informational message, issues no VCS command`, async () => {
+      const calls = createFakeRunner();
+      const program = makeProgram(storageCommand);
+
+      const result = await runInProcess(program, `--dir ${rootDir} storage ${subcmd}`);
+
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toMatch(/inline|normal VCS/i);
+      expect(calls).toEqual([]);
     });
   }
 });

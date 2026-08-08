@@ -1,9 +1,60 @@
-import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+/**
+ * Unit tests for storage-backend.ts's VCS-issuing logic.
+ *
+ * These assert on the exact command sequences trail issues (and how it
+ * reacts to scripted outputs/failures) via the injected `VcsRunner` seam
+ * (`setVcsRunner`/`resetVcsRunner`), without spawning real git or jj
+ * processes. A deliberately thin set of true git/jj integration tests
+ * lives in `storage-backend.integration.test.ts` — the reality-check
+ * layer for behavior a command-fake can't see (real argv-array vs. shell
+ * semantics, real jj immutable-commit rules, etc.).
+ */
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { commitTaskChanges, initExternalRepo, initSeparateBranch } from './storage-backend.js';
+import {
+  commitTaskChanges,
+  initExternalRepo,
+  initSeparateBranch,
+  pullTaskBranch,
+  pushTaskBranch,
+  resetVcsRunner,
+  setVcsRunner,
+  type VcsCommandResult,
+} from './storage-backend.js';
+
+// ─── Fake VCS runner ─────────────────────────────────────────────
+
+interface RecordedCall {
+  readonly command: string;
+  readonly args: readonly string[];
+  readonly cwd: string;
+}
+
+/**
+ * A fake runner that records every call and, per call, either returns a
+ * scripted result or throws a scripted error. `script` is consulted by
+ * call index (0-based); calls beyond the script length succeed with empty
+ * stdout.
+ */
+function createFakeRunner(script: readonly (VcsCommandResult | Error)[] = []) {
+  const calls: RecordedCall[] = [];
+  setVcsRunner((command, args, cwd) => {
+    const index = calls.length;
+    calls.push({ command, args: [...args], cwd });
+    const scripted = script[index];
+    if (scripted instanceof Error) throw scripted;
+    return scripted ?? { stdout: '' };
+  });
+  return calls;
+}
+
+afterEach(() => {
+  resetVcsRunner();
+});
+
+// ─── initSeparateBranch — error cases (no VCS involved) ──────────
 
 describe('initSeparateBranch — error cases', () => {
   let rootDir: string;
@@ -27,11 +78,11 @@ describe('initSeparateBranch — error cases', () => {
     ).toThrow('no VCS repository detected');
   });
 
-  it('is idempotent when workspace path already exists', () => {
+  it('is idempotent when workspace path already exists (no VCS command issued)', () => {
     const workspacePath = join(rootDir, '.sandpiper', 'tasks');
     mkdirSync(workspacePath, { recursive: true });
+    const calls = createFakeRunner();
 
-    // Should not throw even though the path exists
     expect(() =>
       initSeparateBranch({
         rootDir,
@@ -40,213 +91,296 @@ describe('initSeparateBranch — error cases', () => {
         workspacePath,
       }),
     ).not.toThrow();
+    expect(calls).toEqual([]);
   });
 });
 
-describe('initSeparateBranch — git backend (integration)', () => {
+// ─── initSeparateBranch — command sequences ───────────────────────
+
+describe('initSeparateBranch', () => {
   let rootDir: string;
 
   beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'init-git-test-'));
-    execSync('git init -q', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    // Need at least one commit so the worktree has a HEAD to reference
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
+    rootDir = mkdtempSync(join(tmpdir(), 'init-branch-unit-'));
   });
 
   afterEach(() => {
     rmSync(rootDir, { recursive: true, force: true });
   });
 
-  it('creates a git worktree at the given path on an orphan branch', () => {
+  it('git backend: issues a single `git worktree add --orphan -b <branch> <path>`', () => {
+    const calls = createFakeRunner();
     const workspacePath = join(rootDir, '.sandpiper', 'tasks');
-    initSeparateBranch({
-      rootDir,
-      backend: 'git',
-      branchName: 'sandpiper-tasks',
-      workspacePath,
-    });
+
+    initSeparateBranch({ rootDir, backend: 'git', branchName: 'sandpiper-tasks', workspacePath });
+
+    expect(calls).toEqual([
+      { command: 'git', args: ['worktree', 'add', '--orphan', '-b', 'sandpiper-tasks', workspacePath], cwd: rootDir },
+    ]);
+  });
+
+  it('jj backend: issues `jj workspace add` then `jj bookmark create -r @` (not @-, to avoid root())', () => {
+    const calls = createFakeRunner();
+    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+
+    initSeparateBranch({ rootDir, backend: 'jj', branchName: 'sandpiper-tasks', workspacePath });
+
+    expect(calls).toEqual([
+      {
+        command: 'jj',
+        args: ['workspace', 'add', workspacePath, '--name', 'tasks', '--revision', 'root()'],
+        cwd: rootDir,
+      },
+      { command: 'jj', args: ['bookmark', 'create', 'sandpiper-tasks', '-r', '@'], cwd: workspacePath },
+    ]);
+  });
+
+  it('jj backend: creates the workspace directory before issuing `jj workspace add` (jj does not create parents)', () => {
+    createFakeRunner();
+    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
+
+    initSeparateBranch({ rootDir, backend: 'jj', branchName: 'sandpiper-tasks', workspacePath });
 
     expect(existsSync(workspacePath)).toBe(true);
-    // Orphan branches don't appear in `git branch` until a commit exists;
-    // verify via `git worktree list` instead.
-    const worktrees = execSync('git worktree list', { cwd: rootDir, encoding: 'utf-8' });
-    expect(worktrees).toContain('sandpiper-tasks');
-  });
-
-  it('commits messages with shell metacharacters literally', () => {
-    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
-    const injectedPath = join(rootDir, 'injected-by-shell');
-    initSeparateBranch({
-      rootDir,
-      backend: 'git',
-      branchName: 'sandpiper-tasks',
-      workspacePath,
-    });
-    writeFileSync(join(workspacePath, 'TCL-1.md'), '# Task\n');
-
-    commitTaskChanges(workspacePath, 'git', `Create TCL-1: quote " semicolon ; touch ${injectedPath}`);
-
-    const message = execSync('git log -1 --pretty=%B', { cwd: workspacePath, encoding: 'utf-8' }).trim();
-    expect(message).toBe(`Create TCL-1: quote " semicolon ; touch ${injectedPath}`);
-    expect(existsSync(injectedPath)).toBe(false);
   });
 });
 
-describe('initExternalRepo — git backend (integration)', () => {
+// ─── initExternalRepo — command sequences ─────────────────────────
+
+describe('initExternalRepo', () => {
   let rootDir: string;
-  let remoteDir: string;
 
   beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'ext-repo-git-test-'));
-    remoteDir = mkdtempSync(join(tmpdir(), 'ext-repo-remote-'));
-    // Current project repo. -b main pins the initial branch name explicitly
-    // rather than relying on init.defaultBranch / git's built-in default,
-    // since this describe block checks out 'main' by name below.
-    execSync('git init -q -b main', { cwd: rootDir });
-    execSync('git config user.email "test@test.com"', { cwd: rootDir });
-    execSync('git config user.name "Test"', { cwd: rootDir });
-    execSync('git commit --allow-empty -m "init"', { cwd: rootDir });
-    // Remote repo to clone from (non-bare is fine for local clones)
-    execSync('git init -q -b main', { cwd: remoteDir });
-    execSync('git config user.email "test@test.com"', { cwd: remoteDir });
-    execSync('git config user.name "Test"', { cwd: remoteDir });
-    execSync('git commit --allow-empty -m "remote init"', { cwd: remoteDir });
+    rootDir = mkdtempSync(join(tmpdir(), 'ext-repo-unit-'));
   });
 
   afterEach(() => {
     rmSync(rootDir, { recursive: true, force: true });
-    rmSync(remoteDir, { recursive: true, force: true });
   });
 
-  it('clones the external repo into .sandpiper/tasks/', () => {
+  it('is idempotent when clone path already exists (no VCS command issued)', () => {
     const clonePath = join(rootDir, '.sandpiper', 'tasks');
-    initExternalRepo({
-      rootDir,
-      backend: 'git',
-      repoUrl: remoteDir,
-      clonePath,
-      branchName: '@',
-    });
+    mkdirSync(clonePath, { recursive: true });
+    const calls = createFakeRunner();
 
-    expect(existsSync(clonePath)).toBe(true);
-    expect(existsSync(join(clonePath, '.git'))).toBe(true);
-  });
-
-  it('is idempotent when clone path already exists', () => {
-    const clonePath = join(rootDir, '.sandpiper', 'tasks');
-    initExternalRepo({ rootDir, backend: 'git', repoUrl: remoteDir, clonePath, branchName: '@' });
-    // Should not throw
     expect(() =>
-      initExternalRepo({ rootDir, backend: 'git', repoUrl: remoteDir, clonePath, branchName: '@' }),
+      initExternalRepo({
+        rootDir,
+        backend: 'git',
+        repoUrl: 'https://example.invalid/x.git',
+        clonePath,
+        branchName: '@',
+      }),
     ).not.toThrow();
+    expect(calls).toEqual([]);
   });
 
-  it('checks out a named branch in the clone', () => {
-    // Add a named branch on the remote
-    execSync('git checkout -b sandpiper-tasks', { cwd: remoteDir });
-    execSync('git checkout main', { cwd: remoteDir });
-
+  it('git backend, branchName "@": issues only `git clone`, no checkout', () => {
+    const calls = createFakeRunner();
     const clonePath = join(rootDir, '.sandpiper', 'tasks');
+
+    initExternalRepo({ rootDir, backend: 'git', repoUrl: 'https://example.invalid/x.git', clonePath, branchName: '@' });
+
+    expect(calls).toEqual([
+      { command: 'git', args: ['clone', 'https://example.invalid/x.git', clonePath], cwd: rootDir },
+    ]);
+  });
+
+  it('git backend, named branch that exists on the remote: clone then `git checkout <branch>` succeeds, no fallback', () => {
+    const calls = createFakeRunner([{ stdout: '' }, { stdout: '' }]);
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+
     initExternalRepo({
       rootDir,
       backend: 'git',
-      repoUrl: remoteDir,
+      repoUrl: 'https://example.invalid/x.git',
       clonePath,
       branchName: 'sandpiper-tasks',
     });
 
-    const branch = execSync('git branch --show-current', { cwd: clonePath, encoding: 'utf-8' }).trim();
-    expect(branch).toBe('sandpiper-tasks');
-  });
-});
-
-describe('initExternalRepo — jj backend (integration)', () => {
-  let rootDir: string;
-  let remoteDir: string;
-
-  beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'ext-repo-jj-test-'));
-    remoteDir = mkdtempSync(join(tmpdir(), 'ext-repo-jj-remote-'));
-    execSync('jj git init --colocate', { cwd: rootDir, stdio: 'pipe' });
-    execSync('jj git init --colocate', { cwd: remoteDir, stdio: 'pipe' });
+    expect(calls).toEqual([
+      { command: 'git', args: ['clone', 'https://example.invalid/x.git', clonePath], cwd: rootDir },
+      { command: 'git', args: ['checkout', 'sandpiper-tasks'], cwd: clonePath },
+    ]);
   });
 
-  afterEach(() => {
-    execSync(`rm -rf "${rootDir}"`);
-    execSync(`rm -rf "${remoteDir}"`);
-  });
+  it('git backend, named branch absent on the remote: `git checkout <branch>` fails, falls back to `git checkout -b <branch>`', () => {
+    const calls = createFakeRunner([{ stdout: '' }, new Error('pathspec did not match'), { stdout: '' }]);
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
 
-  it('checks out a named branch that already exists on the remote', () => {
-    // Create a named branch on the remote with distinct content
-    writeFileSync(join(remoteDir, 'sentinel.md'), 'tasks branch sentinel\n');
-    execSync('jj bookmark create sandpiper-tasks -r @', { cwd: remoteDir, stdio: 'pipe' });
-    const remoteCommit = execSync("jj log --no-graph -r sandpiper-tasks --template 'change_id.short()'", {
-      cwd: remoteDir,
-      encoding: 'utf-8',
+    initExternalRepo({
+      rootDir,
+      backend: 'git',
+      repoUrl: 'https://example.invalid/x.git',
+      clonePath,
+      branchName: 'sandpiper-tasks',
     });
 
+    expect(calls).toEqual([
+      { command: 'git', args: ['clone', 'https://example.invalid/x.git', clonePath], cwd: rootDir },
+      { command: 'git', args: ['checkout', 'sandpiper-tasks'], cwd: clonePath },
+      { command: 'git', args: ['checkout', '-b', 'sandpiper-tasks'], cwd: clonePath },
+    ]);
+  });
+
+  it('jj backend, branchName "@": issues only `jj git clone --colocate`, no bookmark commands', () => {
+    const calls = createFakeRunner();
     const clonePath = join(rootDir, '.sandpiper', 'tasks');
+
+    initExternalRepo({ rootDir, backend: 'jj', repoUrl: 'https://example.invalid/x.git', clonePath, branchName: '@' });
+
+    expect(calls).toEqual([
+      { command: 'jj', args: ['git', 'clone', '--colocate', 'https://example.invalid/x.git', clonePath], cwd: rootDir },
+    ]);
+  });
+
+  it('jj backend, named branch that exists on the remote: sets the bookmark to the remote ref, then `jj new` onto a mutable commit', () => {
+    const calls = createFakeRunner([{ stdout: '' }, { stdout: '' }, { stdout: '' }]);
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+
     initExternalRepo({
       rootDir,
       backend: 'jj',
-      repoUrl: remoteDir,
+      repoUrl: 'https://example.invalid/x.git',
       clonePath,
       branchName: 'sandpiper-tasks',
     });
 
-    // Local bookmark should point at the same commit as the remote branch, not @
-    const localCommit = execSync("jj log --no-graph -r sandpiper-tasks --template 'change_id.short()'", {
-      cwd: clonePath,
-      encoding: 'utf-8',
+    expect(calls).toEqual([
+      { command: 'jj', args: ['git', 'clone', '--colocate', 'https://example.invalid/x.git', clonePath], cwd: rootDir },
+      { command: 'jj', args: ['bookmark', 'set', 'sandpiper-tasks', '-r', 'sandpiper-tasks@origin'], cwd: clonePath },
+      { command: 'jj', args: ['new', 'sandpiper-tasks'], cwd: clonePath },
+    ]);
+  });
+
+  it('jj backend, named branch absent on the remote: `jj bookmark set` fails, falls back to `jj bookmark create -r @`', () => {
+    const calls = createFakeRunner([{ stdout: '' }, new Error('no such remote bookmark')]);
+    const clonePath = join(rootDir, '.sandpiper', 'tasks');
+
+    initExternalRepo({
+      rootDir,
+      backend: 'jj',
+      repoUrl: 'https://example.invalid/x.git',
+      clonePath,
+      branchName: 'sandpiper-tasks',
     });
-    expect(localCommit.trim()).toBe(remoteCommit.trim());
+
+    expect(calls).toEqual([
+      { command: 'jj', args: ['git', 'clone', '--colocate', 'https://example.invalid/x.git', clonePath], cwd: rootDir },
+      { command: 'jj', args: ['bookmark', 'set', 'sandpiper-tasks', '-r', 'sandpiper-tasks@origin'], cwd: clonePath },
+      { command: 'jj', args: ['bookmark', 'create', 'sandpiper-tasks', '-r', '@'], cwd: clonePath },
+    ]);
   });
 });
 
-describe('initSeparateBranch — jj backend (integration)', () => {
-  let rootDir: string;
+// ─── commitTaskChanges — command sequences ────────────────────────
 
-  beforeEach(() => {
-    rootDir = mkdtempSync(join(tmpdir(), 'init-jj-test-'));
-    execSync('jj git init --colocate', { cwd: rootDir, stdio: 'pipe' });
+describe('commitTaskChanges', () => {
+  const workspacePath = '/fake/workspace';
+
+  it('jj backend: issues `jj commit -m <message>`', () => {
+    const calls = createFakeRunner();
+
+    commitTaskChanges(workspacePath, 'jj', 'Create TST-1: test task');
+
+    expect(calls).toEqual([{ command: 'jj', args: ['commit', '-m', 'Create TST-1: test task'], cwd: workspacePath }]);
   });
 
-  afterEach(() => {
-    // Node's rmSync struggles with jj's .jj workspace symlink structure on macOS
-    execSync(`rm -rf "${rootDir}"`);
+  it('git backend: issues `git add -A` then `git commit -m <message>`', () => {
+    const calls = createFakeRunner();
+
+    commitTaskChanges(workspacePath, 'git', 'Create TST-1: test task');
+
+    expect(calls).toEqual([
+      { command: 'git', args: ['add', '-A'], cwd: workspacePath },
+      { command: 'git', args: ['commit', '-m', 'Create TST-1: test task'], cwd: workspacePath },
+    ]);
   });
 
-  it('creates a jj workspace and bookmark at the given path', () => {
-    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
-    initSeparateBranch({
-      rootDir,
-      backend: 'jj',
-      branchName: 'sandpiper-tasks',
-      workspacePath,
+  it('passes a message containing shell metacharacters as a single literal argv element, not concatenated into a string', () => {
+    const calls = createFakeRunner();
+    const message = 'Create TCL-1: quote " semicolon ; touch /tmp/injected';
+
+    commitTaskChanges(workspacePath, 'git', message);
+
+    expect(calls[1]?.args).toEqual(['commit', '-m', message]);
+  });
+});
+
+// ─── pushTaskBranch — command sequences, including the upstream fallback ──
+
+describe('pushTaskBranch', () => {
+  const workspacePath = '/fake/workspace';
+
+  it('jj backend: issues `jj git push --bookmark <branch>`', () => {
+    const calls = createFakeRunner();
+
+    pushTaskBranch(workspacePath, 'jj', 'sandpiper-tasks');
+
+    expect(calls).toEqual([
+      { command: 'jj', args: ['git', 'push', '--bookmark', 'sandpiper-tasks'], cwd: workspacePath },
+    ]);
+  });
+
+  it('git backend: `git push` succeeds, no fallback issued', () => {
+    const calls = createFakeRunner();
+
+    pushTaskBranch(workspacePath, 'git', 'sandpiper-tasks');
+
+    expect(calls).toEqual([{ command: 'git', args: ['push'], cwd: workspacePath }]);
+  });
+
+  it('git backend (TCL-143 shape): `git push` fails with "no upstream branch" — retries with --set-upstream against the actual current branch', () => {
+    const noUpstreamError = Object.assign(new Error('failed'), {
+      stderr: 'fatal: The current branch sandpiper-tasks has no upstream branch.\n',
     });
+    const calls = createFakeRunner([noUpstreamError, { stdout: 'sandpiper-tasks\n' }, { stdout: '' }]);
 
-    expect(existsSync(workspacePath)).toBe(true);
-    const workspaces = execSync('jj workspace list', { cwd: rootDir, encoding: 'utf-8' });
-    expect(workspaces).toContain('tasks');
+    pushTaskBranch(workspacePath, 'git', '@');
+
+    expect(calls).toEqual([
+      { command: 'git', args: ['push'], cwd: workspacePath },
+      { command: 'git', args: ['branch', '--show-current'], cwd: workspacePath },
+      { command: 'git', args: ['push', '--set-upstream', 'origin', 'sandpiper-tasks'], cwd: workspacePath },
+    ]);
   });
 
-  it('bookmark does not point at root() after init (avoids git export warning)', () => {
-    const workspacePath = join(rootDir, '.sandpiper', 'tasks');
-    initSeparateBranch({
-      rootDir,
-      backend: 'jj',
-      branchName: 'sandpiper-tasks',
-      workspacePath,
+  it('git backend: a push failure unrelated to upstream tracking propagates without retry', () => {
+    const rejectedError = Object.assign(new Error('failed'), {
+      stderr: 'error: failed to push some refs (rejected: non-fast-forward)\n',
     });
+    const calls = createFakeRunner([rejectedError]);
 
-    // If the bookmark were on root(), jj bookmark list would show the null change ID.
-    // A bookmark on a real (non-root) commit shows a non-zero change ID.
-    const bookmarks = execSync('jj bookmark list', { cwd: rootDir, encoding: 'utf-8' });
-    // The line for sandpiper-tasks should NOT contain the root null change ID
-    const line = bookmarks.split('\n').find((l) => l.includes('sandpiper-tasks'));
-    expect(line).toBeDefined();
-    expect(line).not.toContain('zzzzzzzz');
+    expect(() => pushTaskBranch(workspacePath, 'git', 'sandpiper-tasks')).toThrow('failed');
+    expect(calls).toEqual([{ command: 'git', args: ['push'], cwd: workspacePath }]);
+  });
+
+  it('git backend: a push failure with no stderr at all propagates without retry (non-process-error shape guard)', () => {
+    const calls = createFakeRunner([new Error('spawn ENOENT')]);
+
+    expect(() => pushTaskBranch(workspacePath, 'git', 'sandpiper-tasks')).toThrow('spawn ENOENT');
+    expect(calls).toEqual([{ command: 'git', args: ['push'], cwd: workspacePath }]);
+  });
+});
+
+// ─── pullTaskBranch — command sequences ───────────────────────────
+
+describe('pullTaskBranch', () => {
+  const workspacePath = '/fake/workspace';
+
+  it('jj backend: issues `jj git fetch`', () => {
+    const calls = createFakeRunner();
+
+    pullTaskBranch(workspacePath, 'jj');
+
+    expect(calls).toEqual([{ command: 'jj', args: ['git', 'fetch'], cwd: workspacePath }]);
+  });
+
+  it('git backend: issues `git pull`', () => {
+    const calls = createFakeRunner();
+
+    pullTaskBranch(workspacePath, 'git');
+
+    expect(calls).toEqual([{ command: 'git', args: ['pull'], cwd: workspacePath }]);
   });
 });
