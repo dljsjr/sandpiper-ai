@@ -1,5 +1,5 @@
 import { readFile, stat } from 'node:fs/promises';
-import { normalize } from 'node:path';
+import { normalize, resolve } from 'node:path';
 import { type BuildSystemPromptOptions, type ExtensionAPI, getAgentDir } from '@earendil-works/pi-coding-agent';
 import {
   buildSandpiperStartupPrompt,
@@ -13,9 +13,13 @@ import {
 } from './prompt-contributions.js';
 import type { SystemRuntimeState } from './runtime.js';
 
+export interface StartupPromptDiagnosticSources {
+  readonly identity?: string;
+}
+
 export interface StartupPromptDiagnosticCommand {
   readonly commandName: string;
-  readonly onPrompt: (prompt: string) => void | Promise<void>;
+  readonly onPrompt: (prompt: string, sources: StartupPromptDiagnosticSources) => void | Promise<void>;
 }
 
 export function registerStartupPromptHooks(
@@ -55,25 +59,28 @@ export function registerStartupPromptHooks(
   const buildEffectiveSystemPrompt = async (cwd: string, systemPromptOptions: BuildSystemPromptOptions) => {
     const identityFlag = pi.getFlag('identity');
     let identityContent: string | undefined;
+    let identitySource: string | undefined;
 
     if (identityFlag && typeof identityFlag === 'string' && identityFlag.length > 0) {
       try {
         const fileStat = await stat(identityFlag, { throwIfNoEntry: false });
         if (fileStat?.isFile()) {
-          identityContent = await readFile(normalize(identityFlag), { encoding: 'utf-8' });
+          identitySource = resolve(normalize(identityFlag));
+          identityContent = await readFile(identitySource, { encoding: 'utf-8' });
         }
       } catch {}
 
       identityContent = identityContent ?? identityFlag;
     }
 
-    return buildSandpiperStartupPrompt({
+    const prompt = await buildSandpiperStartupPrompt({
       agentDir: getAgentDir(),
       cwd,
       systemPromptOptions,
       identityContent,
       dumpSystemPrompt,
     });
+    return { prompt, sources: { identity: identitySource } };
   };
 
   const applyResolvedContributions = async (systemPrompt: string) => {
@@ -82,25 +89,28 @@ export function registerStartupPromptHooks(
   };
 
   if (diagnosticCommand) {
+    pi.registerFlag('json', {
+      type: 'boolean',
+      description: 'Emit the system prompt diagnostic as JSON with source metadata',
+      default: false,
+    });
     pi.registerCommand(diagnosticCommand.commandName, {
       handler: async (_args, ctx) => {
-        const effectiveSystemPrompt = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions());
+        const result = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions());
         const finalSystemPrompt =
-          effectiveSystemPrompt === undefined
-            ? ctx.getSystemPrompt()
-            : await applyResolvedContributions(effectiveSystemPrompt);
-        await diagnosticCommand.onPrompt(finalSystemPrompt);
+          result.prompt === undefined ? ctx.getSystemPrompt() : await applyResolvedContributions(result.prompt);
+        await diagnosticCommand.onPrompt(finalSystemPrompt, result.sources);
       },
     });
   }
 
   pi.on('before_agent_start', async (event, ctx) => {
-    const effectiveSystemPrompt = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions);
-    if (effectiveSystemPrompt === undefined) {
+    const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions);
+    if (result.prompt === undefined) {
       return;
     }
 
-    const finalSystemPrompt = await applyResolvedContributions(effectiveSystemPrompt);
+    const finalSystemPrompt = await applyResolvedContributions(result.prompt);
 
     if (dumpSystemPrompt) {
       // console.error('base prompt:\n', event.systemPrompt);

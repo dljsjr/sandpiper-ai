@@ -77,6 +77,8 @@ packages/cli/bin/sandpiper-system-prompt --approve > /tmp/system-prompt.txt
 
 It accepts prompt-affecting Sandpiper/Pi flags such as `--identity`, `--append-system-prompt`, `--tools`, and resource discovery flags. It rejects positional prompt messages and `@file` arguments so a diagnostic invocation cannot become an agent turn. Diagnostics go to stderr.
 
+Pass `--json` for machine-readable output containing the rendered prompt and the resolved paths of file-backed identity, system prompt, appended prompt, and context inputs. Raw prompt flag values are intentionally absent from the source list because they have no file to update.
+
 The bin also satisfies `birdup`'s runner contract:
 
 ```bash

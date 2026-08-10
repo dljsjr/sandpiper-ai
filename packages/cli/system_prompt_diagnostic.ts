@@ -20,9 +20,18 @@ export interface SystemPromptDiagnosticOptions {
   readonly resourceRoot: string;
 }
 
+export interface SystemPromptDiagnosticSources {
+  readonly identity?: string;
+  readonly systemPrompt?: string;
+  readonly appendSystemPrompts: readonly string[];
+  readonly contextFiles: readonly string[];
+}
+
 export interface SystemPromptDiagnosticResult {
   readonly prompt: string;
   readonly warnings: readonly string[];
+  readonly sources: SystemPromptDiagnosticSources;
+  readonly json: boolean;
 }
 
 function resolveProjectTrust(cwd: string, agentDir: string, override: boolean | undefined): boolean {
@@ -51,12 +60,14 @@ export async function renderSystemPrompt(
     projectTrusted: resolveProjectTrust(options.cwd, agentDir, parsed.projectTrustOverride),
   });
   let renderedPrompt: string | undefined;
+  let identitySource: string | undefined;
   const extensionFactories = createSandpiperExtensionFactories(options.resourceRoot, {
     checkForUpdates: async () => [],
     systemPromptDiagnostic: {
       commandName: DIAGNOSTIC_COMMAND,
-      onPrompt: (prompt) => {
+      onPrompt: (prompt, sources) => {
         renderedPrompt = prompt;
+        identitySource = sources.identity;
       },
     },
   });
@@ -114,6 +125,7 @@ export async function renderSystemPrompt(
     sessionManager: SessionManager.inMemory(options.cwd),
   });
 
+  let json = false;
   try {
     for (const diagnostic of runtime.diagnostics) {
       if (diagnostic.type === 'error') {
@@ -128,6 +140,7 @@ export async function renderSystemPrompt(
         warnings.push(`Extension error (${error.extensionPath}): ${error.error}`);
       },
     });
+    json = runtime.session.extensionRunner.getFlagValues().get('json') === true;
     await runtime.session.prompt(`/${DIAGNOSTIC_COMMAND}`);
   } finally {
     await runtime.dispose();
@@ -137,5 +150,16 @@ export async function renderSystemPrompt(
     throw new Error('Sandpiper system prompt diagnostic command did not produce a prompt');
   }
 
-  return { prompt: renderedPrompt, warnings };
+  const resourceLoader = runtime.services.resourceLoader;
+  return {
+    prompt: renderedPrompt,
+    warnings,
+    sources: {
+      identity: identitySource,
+      systemPrompt: resourceLoader.getSystemPromptSource()?.path,
+      appendSystemPrompts: resourceLoader.getAppendSystemPromptSources().map(({ path }) => path),
+      contextFiles: resourceLoader.getAgentsFiles().agentsFiles.map(({ path }) => path),
+    },
+    json,
+  };
 }

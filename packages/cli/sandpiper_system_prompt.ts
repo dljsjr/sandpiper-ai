@@ -52,7 +52,8 @@ Usage:
 
 The command performs normal extension, tool, skill, and context discovery without
 sending a request to a model. The rendered prompt is written to stdout. Use
---approve to include untrusted project-local resources.`);
+--approve to include untrusted project-local resources and --json to include
+file-backed prompt source metadata.`);
 }
 
 const args = process.argv.slice(2);
@@ -99,7 +100,7 @@ if (args.includes('--help') || args.includes('-h')) {
     for (const warning of result.warnings) {
       console.error(`Warning: ${warning}`);
     }
-    await writeStdout(result.prompt);
+    await writeStdout(result.json ? JSON.stringify(result) : result.prompt);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;

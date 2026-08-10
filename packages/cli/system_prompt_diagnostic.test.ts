@@ -78,4 +78,66 @@ describe('system prompt diagnostic', () => {
       rmSync(tempDir, { recursive: true, force: true });
     }
   }, 30_000);
+
+  it('reports file-backed prompt sources as JSON', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-sources-'));
+    const agentDir = join(tempDir, 'agent');
+    const contextFile = join(agentDir, 'AGENTS.md');
+    const identityFile = join(tempDir, 'identity.md');
+    const systemPromptFile = join(tempDir, 'system.md');
+    const appendFile = join(tempDir, 'append.md');
+    mkdirSync(agentDir, { recursive: true });
+    mkdirSync(join(tempDir, 'home'), { recursive: true });
+    writeFileSync(contextFile, '# Diagnostic context\n');
+    writeFileSync(identityFile, '<identity>from file</identity>\n');
+    writeFileSync(systemPromptFile, '<diagnostic_base>from file</diagnostic_base>\n');
+    writeFileSync(appendFile, '<diagnostic_append>from file</diagnostic_append>\n');
+
+    try {
+      const output = execFileSync(
+        bunExecutable,
+        [
+          'run',
+          '--bun',
+          './packages/cli/sandpiper_system_prompt.ts',
+          '--json',
+          '--approve',
+          '--identity',
+          identityFile,
+          '--system-prompt',
+          systemPromptFile,
+          '--append-system-prompt',
+          appendFile,
+          '--append-system-prompt',
+          '<diagnostic_append>raw text</diagnostic_append>',
+        ],
+        {
+          cwd: repoRoot,
+          encoding: 'utf-8',
+          env: diagnosticEnv(agentDir),
+          stdio: ['ignore', 'pipe', 'pipe'],
+          timeout: 30_000,
+        },
+      );
+      const result = JSON.parse(output) as {
+        prompt: string;
+        sources: {
+          identity?: string;
+          systemPrompt?: string;
+          appendSystemPrompts: string[];
+          contextFiles: string[];
+        };
+      };
+
+      expect(result.prompt).toContain('<diagnostic_base>from file</diagnostic_base>');
+      expect(result.prompt).toContain('<diagnostic_append>from file</diagnostic_append>');
+      expect(result.prompt).toContain('<diagnostic_append>raw text</diagnostic_append>');
+      expect(result.sources.identity).toBe(identityFile);
+      expect(result.sources.systemPrompt).toBe(systemPromptFile);
+      expect(result.sources.appendSystemPrompts).toEqual([appendFile]);
+      expect(result.sources.contextFiles).toContain(contextFile);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  }, 30_000);
 });

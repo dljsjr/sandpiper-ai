@@ -170,6 +170,7 @@ describe('startup hooks', () => {
 
     expect(onPrompt).toHaveBeenCalledWith(
       '<system_prompt>sandpiper</system_prompt>\n\n<diagnostic>included</diagnostic>',
+      { identity: undefined },
     );
   });
 
