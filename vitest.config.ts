@@ -15,7 +15,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
  * migrating a package can't accidentally drop node_modules/.git from the
  * catch-all's exclusions). Migrated so far: extensions/shell-relay,
  * extensions/web-fetch, extensions/web-search, packages/core,
- * packages/sandpiper-standup-cli.
+ * packages/sandpiper-standup-cli, packages/trail.
  */
 export default defineConfig({
   test: {
@@ -32,6 +32,7 @@ export default defineConfig({
             'extensions/web-fetch/**',
             'extensions/web-search/**',
             'packages/core/**',
+            'packages/trail/**',
             'packages/sandpiper-standup-cli/**',
           ],
         },
@@ -40,6 +41,7 @@ export default defineConfig({
       'extensions/web-fetch/vitest.config.ts',
       'extensions/web-search/vitest.config.ts',
       'packages/core/vitest.config.ts',
+      'packages/trail/vitest.config.ts',
       'packages/sandpiper-standup-cli/vitest.config.ts',
     ],
   },
