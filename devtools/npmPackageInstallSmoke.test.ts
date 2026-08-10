@@ -84,6 +84,10 @@ describe('packed Sandpiper npm artifact', () => {
     const packageDir = join(npmGlobalRoot(prefix), 'sandpiper-ai');
     const binDir = npmGlobalBin(prefix);
     const binPath = join(binDir, process.platform === 'win32' ? 'sandpiper.cmd' : 'sandpiper');
+    const systemPromptBinPath = join(
+      binDir,
+      process.platform === 'win32' ? 'sandpiper-system-prompt.cmd' : 'sandpiper-system-prompt',
+    );
     const trailBinPath = join(binDir, process.platform === 'win32' ? 'trail.cmd' : 'trail');
     const compatTaskBinPath = join(binDir, process.platform === 'win32' ? 'sandpiper-tasks.cmd' : 'sandpiper-tasks');
 
@@ -117,6 +121,22 @@ describe('packed Sandpiper npm artifact', () => {
     });
 
     expect(output).toContain('sandpiper - AI coding assistant');
+
+    const systemPrompt = execFileSync(
+      systemPromptBinPath,
+      ['--approve', '--no-extensions', '--no-skills', '--no-prompt-templates', '--no-themes', '--no-context-files'],
+      {
+        cwd: makeTempDir('sandpiper-system-prompt-project-'),
+        encoding: 'utf-8',
+        env: {
+          ...process.env,
+          SANDPIPER_CODING_AGENT_DIR: agentDir,
+          PI_OFFLINE: '1',
+        },
+      },
+    );
+
+    expect(systemPrompt).toContain('<system_prompt>');
     expect(existsSync(join(packageDir, 'dist', 'standalone-package'))).toBe(false);
   }, 30_000);
 });

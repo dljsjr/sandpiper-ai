@@ -54,6 +54,7 @@ export interface DistPackageJson {
     'prompts/',
     'docs/',
     'sandpiper',
+    'sandpiper-system-prompt',
     'sandpiper-tasks',
     'trail',
     'README.md',
@@ -65,6 +66,7 @@ export interface DistPackageJson {
   readonly peerDependencies: Record<string, string>;
   readonly bin: {
     readonly sandpiper: './sandpiper';
+    readonly 'sandpiper-system-prompt': './sandpiper-system-prompt';
     readonly 'sandpiper-tasks': './sandpiper-tasks';
     readonly trail: './trail';
   };
@@ -91,6 +93,7 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
       'prompts/',
       'docs/',
       'sandpiper',
+      'sandpiper-system-prompt',
       'sandpiper-tasks',
       'trail',
       'README.md',
@@ -102,6 +105,7 @@ export function createDistPackageJson(rootPackageJson: RootPackageJson): DistPac
     peerDependencies: createPiPeerDependencies(rootPackageJson),
     bin: {
       sandpiper: './sandpiper',
+      'sandpiper-system-prompt': './sandpiper-system-prompt',
       'sandpiper-tasks': './sandpiper-tasks',
       trail: './trail',
     },

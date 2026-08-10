@@ -10,6 +10,7 @@ import {
   createSandpiperIdentityExtension,
   createSkillLoadingExtension,
   createTurnControlExtension,
+  type SandpiperIdentityExtensionOptions,
 } from '../../extensions/system/extension-factories.js';
 import tattlerExtension from '../../extensions/tattler/index.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
@@ -71,10 +72,18 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
   ];
 }
 
-function createSandpiperIdentityExtensionFactories(): readonly InlineExtension[] {
-  return [inlineExtension('sandpiper-core', createSandpiperIdentityExtension())];
+function createSandpiperIdentityExtensionFactories(
+  options: SandpiperIdentityExtensionOptions = {},
+): readonly InlineExtension[] {
+  return [inlineExtension('sandpiper-core', createSandpiperIdentityExtension(options))];
 }
 
-export function createSandpiperExtensionFactories(resourceRoot: string): InlineExtension[] {
-  return [...createSandpiperIdentityExtensionFactories(), ...createNeutralCapabilityExtensionFactories(resourceRoot)];
+export function createSandpiperExtensionFactories(
+  resourceRoot: string,
+  identityOptions: SandpiperIdentityExtensionOptions = {},
+): InlineExtension[] {
+  return [
+    ...createSandpiperIdentityExtensionFactories(identityOptions),
+    ...createNeutralCapabilityExtensionFactories(resourceRoot),
+  ];
 }

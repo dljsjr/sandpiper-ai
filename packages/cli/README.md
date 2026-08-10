@@ -19,8 +19,9 @@ The runtime intentionally writes `using pi-coding-agent version: <version>` to s
 
 ```bash
 bun run build            # tsc + build sandpiper runtime bundles
-bun run build:sandpiper  # build packages/cli/dist/sandpiper from sandpiper_standalone.ts
-bun run build:standalone # build packages/cli/dist/standalone/sandpiper_standalone.js
+bun run build:sandpiper     # build packages/cli/dist/sandpiper
+bun run build:system-prompt # build packages/cli/dist/sandpiper-system-prompt
+bun run build:standalone    # build importable bundles for both workspace bin shims
 ```
 
 Builds are explicit; dependency installation does not build runtime bundles.
@@ -58,12 +59,39 @@ Packaged runtime bundles use the prebuilt package root when the installed packag
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
+## System prompt diagnostic
+
+`sandpiper-system-prompt` performs the normal extension, tool, skill, context, identity, and appended-prompt discovery path, then writes the rendered system prompt to stdout without making a model request.
+
+Run it from source:
+
+```bash
+bun run system-prompt-dev -- --approve > /tmp/system-prompt.txt
+```
+
+After building the CLI package, use the stable workspace bin:
+
+```bash
+packages/cli/bin/sandpiper-system-prompt --approve > /tmp/system-prompt.txt
+```
+
+It accepts prompt-affecting Sandpiper/Pi flags such as `--identity`, `--append-system-prompt`, `--tools`, and resource discovery flags. It rejects positional prompt messages and `@file` arguments so a diagnostic invocation cannot become an agent turn. Diagnostics go to stderr.
+
+The bin also satisfies `birdup`'s runner contract:
+
+```bash
+birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux-system-prompt.txt
+```
+
 ## Key Files
 
 | File | Purpose |
 |------|---------|
 | `sandpiper_standalone.ts` | Normal Sandpiper runtime entrypoint — sets sidecar package metadata before loading Pi and injects Sandpiper factories/resources |
+| `sandpiper_system_prompt.ts` | Diagnostic entrypoint that configures the Sandpiper runtime and renders the prompt without a model request |
+| `system_prompt_diagnostic.ts` | SDK-based diagnostic session orchestration |
 | `bin/sandpiper` | Stable workspace bin shim for the normal runtime |
+| `bin/sandpiper-system-prompt` | Stable workspace bin shim for the system prompt diagnostic |
 | `deferred_pi_import.ts` | Load-order shim so Sandpiper imports Pi only after package metadata env vars are set |
 
 ## Pi Asset Resolution

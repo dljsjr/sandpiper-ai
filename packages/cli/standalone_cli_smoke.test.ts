@@ -70,11 +70,14 @@ describe('standalone Sandpiper CLI smoke', () => {
 
     expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe('workspace:*');
     expect(cliPackage.bin?.sandpiper).toBe('./bin/sandpiper');
+    expect(cliPackage.bin?.['sandpiper-system-prompt']).toBe('./bin/sandpiper-system-prompt');
     expect(cliPackage.bin).not.toHaveProperty('sandpiper-standalone');
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper'))).toBe(true);
+    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-system-prompt'))).toBe(true);
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(false);
     expect(cliPackage.scripts).not.toHaveProperty('preinstall');
     expect(cliPackage.scripts?.build).toContain('build:sandpiper');
+    expect(cliPackage.scripts?.build).toContain('build:system-prompt');
     expect(cliPackage.scripts?.build).toContain('build:standalone');
     expect(cliPackage.scripts?.['build:sandpiper']).toContain("--external '@earendil-works/*'");
     expect(cliPackage.scripts?.['build:sandpiper']).toContain("--external '@mariozechner/*'");

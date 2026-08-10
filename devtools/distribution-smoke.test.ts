@@ -38,7 +38,10 @@ describe('Pi package distribution smoke', () => {
     });
     expect(rootPackageJson.pi.skills).not.toContain('./packages/resources/skills-on-demand');
     expect(rootPackageJson.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
-    expect(rootPackageJson.bin).toEqual({ sandpiper: './packages/cli/bin/sandpiper' });
+    expect(rootPackageJson.bin).toEqual({
+      sandpiper: './packages/cli/bin/sandpiper',
+      'sandpiper-system-prompt': './packages/cli/bin/sandpiper-system-prompt',
+    });
     expect(rootPackageJson).not.toHaveProperty('files');
     expect(findMissingPiManifestPaths(repoRoot, rootPackageJson)).toEqual([]);
   });
@@ -96,6 +99,7 @@ describe('Pi package distribution smoke', () => {
           'prompts/',
           'docs/',
           'sandpiper',
+          'sandpiper-system-prompt',
           'sandpiper-tasks',
           'trail',
           'README.md',
@@ -103,7 +107,12 @@ describe('Pi package distribution smoke', () => {
           'skills-on-demand/',
           'themes/',
         ],
-        bin: { sandpiper: './sandpiper', 'sandpiper-tasks': './sandpiper-tasks', trail: './trail' },
+        bin: {
+          sandpiper: './sandpiper',
+          'sandpiper-system-prompt': './sandpiper-system-prompt',
+          'sandpiper-tasks': './sandpiper-tasks',
+          trail: './trail',
+        },
       });
       expect(findMissingPiManifestPaths(packageRoot, distPackageJson)).toEqual([]);
     } finally {

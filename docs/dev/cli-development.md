@@ -219,8 +219,10 @@ Bun is the preferred runtime for CLI development:
 
 | File                                                        | Purpose                                 |
 | ----------------------------------------------------------- | --------------------------------------- |
-| `packages/cli/sandpiper_standalone.ts`                      | CLI entry point for Sandpiper           |
-| `packages/cli/package.json`                                 | Package metadata with bin configuration |
+| `packages/cli/sandpiper_standalone.ts`                      | Main Sandpiper CLI entry point           |
+| `packages/cli/sandpiper_system_prompt.ts`                   | Model-free system prompt diagnostic      |
+| `packages/cli/system_prompt_diagnostic.ts`                  | Diagnostic SDK orchestration             |
+| `packages/cli/package.json`                                 | Package metadata with bin configuration  |
 | `packages/trail/src/commands/project-cmd.ts`  | Commander command wiring                |
 | `packages/trail/src/core/project-metadata.ts` | Core implementation logic               |
 

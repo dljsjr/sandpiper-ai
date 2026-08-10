@@ -1,6 +1,6 @@
 import { readFile, stat } from 'node:fs/promises';
 import { normalize } from 'node:path';
-import { type ExtensionAPI, getAgentDir } from '@earendil-works/pi-coding-agent';
+import { type BuildSystemPromptOptions, type ExtensionAPI, getAgentDir } from '@earendil-works/pi-coding-agent';
 import {
   buildSandpiperStartupPrompt,
   handleSandpiperSessionShutdown,
@@ -13,7 +13,16 @@ import {
 } from './prompt-contributions.js';
 import type { SystemRuntimeState } from './runtime.js';
 
-export function registerStartupPromptHooks(pi: ExtensionAPI, dumpSystemPrompt?: boolean): void {
+export interface StartupPromptDiagnosticCommand {
+  readonly commandName: string;
+  readonly onPrompt: (prompt: string) => void | Promise<void>;
+}
+
+export function registerStartupPromptHooks(
+  pi: ExtensionAPI,
+  dumpSystemPrompt?: boolean,
+  diagnosticCommand?: StartupPromptDiagnosticCommand,
+): void {
   // First-turn-only: contributions are collected during session_start and folded into the
   // cached prompt once at before_agent_start. They never re-apply per turn, so this does not
   // reintroduce the across-turns mutation eff4bda53 removed. External consumers (e.g. pi-yaams's
@@ -43,9 +52,8 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, dumpSystemPrompt?: 
     resetPromptContributionListener();
   });
 
-  pi.on('before_agent_start', async (event, ctx) => {
+  const buildEffectiveSystemPrompt = async (cwd: string, systemPromptOptions: BuildSystemPromptOptions) => {
     const identityFlag = pi.getFlag('identity');
-
     let identityContent: string | undefined;
 
     if (identityFlag && typeof identityFlag === 'string' && identityFlag.length > 0) {
@@ -59,19 +67,40 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, dumpSystemPrompt?: 
       identityContent = identityContent ?? identityFlag;
     }
 
-    const effectiveSystemPrompt = await buildSandpiperStartupPrompt({
+    return buildSandpiperStartupPrompt({
       agentDir: getAgentDir(),
-      cwd: ctx.cwd,
-      systemPromptOptions: event.systemPromptOptions,
+      cwd,
+      systemPromptOptions,
       identityContent,
       dumpSystemPrompt,
     });
+  };
+
+  const applyResolvedContributions = async (systemPrompt: string) => {
+    const resolvedContributions = await promptContributions.resolve();
+    return applyPromptContributions(systemPrompt, resolvedContributions);
+  };
+
+  if (diagnosticCommand) {
+    pi.registerCommand(diagnosticCommand.commandName, {
+      handler: async (_args, ctx) => {
+        const effectiveSystemPrompt = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions());
+        const finalSystemPrompt =
+          effectiveSystemPrompt === undefined
+            ? ctx.getSystemPrompt()
+            : await applyResolvedContributions(effectiveSystemPrompt);
+        await diagnosticCommand.onPrompt(finalSystemPrompt);
+      },
+    });
+  }
+
+  pi.on('before_agent_start', async (event, ctx) => {
+    const effectiveSystemPrompt = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions);
     if (effectiveSystemPrompt === undefined) {
       return;
     }
 
-    const resolvedContributions = await promptContributions.resolve();
-    const finalSystemPrompt = applyPromptContributions(effectiveSystemPrompt, resolvedContributions);
+    const finalSystemPrompt = await applyResolvedContributions(effectiveSystemPrompt);
 
     if (dumpSystemPrompt) {
       // console.error('base prompt:\n', event.systemPrompt);

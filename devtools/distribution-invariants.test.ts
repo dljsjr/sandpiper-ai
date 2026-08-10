@@ -125,6 +125,7 @@ describe('distribution source-boundary invariants', () => {
         'packages/cli/standalone_cli_smoke.test.ts',
         'packages/cli/standalone_resource_discovery.test.ts',
         'packages/cli/standalone_bootstrap.test.ts',
+        'packages/cli/system_prompt_diagnostic.test.ts',
       ],
       DISTRIBUTION_SMOKE_FORBIDDEN_PATTERNS,
     );

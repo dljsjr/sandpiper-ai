@@ -94,6 +94,7 @@ describe('ecosystem package artifacts', () => {
     expect(packageJson.type).toBe('module');
     expect(packageJson.bin).toEqual({
       sandpiper: './sandpiper',
+      'sandpiper-system-prompt': './sandpiper-system-prompt',
       'sandpiper-tasks': './sandpiper-tasks',
       trail: './trail',
     });
@@ -115,6 +116,7 @@ describe('ecosystem package artifacts', () => {
       'prompts/',
       'docs/',
       'sandpiper',
+      'sandpiper-system-prompt',
       'sandpiper-tasks',
       'trail',
       'README.md',
@@ -135,6 +137,7 @@ describe('ecosystem package artifacts', () => {
       expect.arrayContaining([
         'package.json',
         'sandpiper',
+        'sandpiper-system-prompt',
         expect.stringMatching(/^chunks\/sandpiper_resources-.*\.js$/),
         expect.stringMatching(/^chunks\/sandpiper_standalone-.*\.js$/),
         expect.stringMatching(/^chunks\/deferred_pi_import-.*\.js$/),

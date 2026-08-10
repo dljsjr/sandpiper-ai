@@ -10,7 +10,11 @@ import {
   createTurnControlExtension,
 } from './neutral-capability-extension.js';
 import { createSystemRuntimeState, type SystemRuntimeState } from './runtime.js';
-import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
+import {
+  registerSessionContinuityHooks,
+  registerStartupPromptHooks,
+  type StartupPromptDiagnosticCommand,
+} from './startup-hooks.js';
 
 export {
   type BackgroundProcessExtensionOptions,
@@ -24,6 +28,7 @@ export interface SandpiperIdentityExtensionOptions {
   readonly checkForUpdates?: () => Promise<readonly UpdateInfo[]>;
   readonly dumpSystemPrompt?: boolean;
   readonly runtimeState?: SystemRuntimeState;
+  readonly systemPromptDiagnostic?: StartupPromptDiagnosticCommand;
 }
 
 function defaultCheckForUpdates(): Promise<readonly UpdateInfo[]> {
@@ -40,7 +45,7 @@ export function createSandpiperIdentityExtension(options: SandpiperIdentityExten
 
   return (pi: ExtensionAPI) => {
     registerMigrationControls(pi);
-    registerStartupPromptHooks(pi, dumpSystemPrompt);
+    registerStartupPromptHooks(pi, dumpSystemPrompt, options.systemPromptDiagnostic);
     registerSessionContinuityHooks(pi, runtimeState);
     registerDiagnosticsHooks(pi, updateCheck);
   };

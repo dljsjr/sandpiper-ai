@@ -86,6 +86,20 @@ describe('system extension factory split', () => {
     }
   });
 
+  it('registers an opt-in system prompt diagnostic command', () => {
+    const { pi, commands } = createExtensionCapture();
+
+    createSandpiperIdentityExtension({
+      checkForUpdates: async () => [],
+      systemPromptDiagnostic: {
+        commandName: '__sandpiper-system-prompt',
+        onPrompt: vi.fn(),
+      },
+    })(pi as ExtensionAPI);
+
+    expect(commands).toContain('__sandpiper-system-prompt');
+  });
+
   it('registers Sandpiper identity behavior separately from neutral tools', () => {
     const { pi, commands, events, flags, tools } = createExtensionCapture();
 

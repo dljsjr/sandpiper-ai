@@ -7,7 +7,8 @@
     "email": "dljs.jr@dougstephenjr.com"
   },
   "bin": {
-    "sandpiper": "./bin/sandpiper"
+    "sandpiper": "./bin/sandpiper",
+    "sandpiper-system-prompt": "./bin/sandpiper-system-prompt"
   },
   "dependencies": {
     "@earendil-works/pi-coding-agent": "0.84.0"
@@ -16,8 +17,9 @@
     "@silvia-odwyer/photon-node": "0.3.4"
   },
   "scripts": {
-    "build": "rm -rf dist && mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:standalone",
+    "build": "rm -rf dist && mkdir -p dist && tsc --noEmit && bun run build:sandpiper && bun run build:system-prompt && bun run build:standalone",
     "build:sandpiper": "rm -rf dist/sandpiper dist/chunks && mkdir -p dist && bun build --sourcemap --production --minify --target=bun --splitting --entry-naming sandpiper --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts --outdir ./dist && chmod +x ./dist/sandpiper",
-    "build:standalone": "rm -rf dist/standalone && mkdir -p dist/standalone && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts --outdir ./dist/standalone"
+    "build:system-prompt": "rm -f dist/sandpiper-system-prompt && mkdir -p dist && bun build --sourcemap --production --minify --target=bun --splitting --entry-naming sandpiper-system-prompt --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_system_prompt.ts --outdir ./dist && chmod +x ./dist/sandpiper-system-prompt",
+    "build:standalone": "rm -rf dist/standalone && mkdir -p dist/standalone && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts ./sandpiper_system_prompt.ts --outdir ./dist/standalone"
   }
 }

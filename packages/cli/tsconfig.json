@@ -4,5 +4,10 @@
     "rootDir": "../..",
     "outDir": "dist"
   },
-  "include": ["./sandpiper_standalone.ts", "./bin/sandpiper"]
+  "include": [
+    "./sandpiper_standalone.ts",
+    "./sandpiper_system_prompt.ts",
+    "./bin/sandpiper",
+    "./bin/sandpiper-system-prompt"
+  ]
 }

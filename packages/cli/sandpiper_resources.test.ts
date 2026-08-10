@@ -143,6 +143,19 @@ describe('Sandpiper resource adapter', () => {
     expect(flags).not.toContain('install-shell-integrations');
   });
 
+  it('adds the opt-in system prompt diagnostic command to the identity extension', () => {
+    const { commands } = applyFactories(
+      createSandpiperExtensionFactories('/repo', {
+        systemPromptDiagnostic: {
+          commandName: '__sandpiper-system-prompt',
+          onPrompt: vi.fn(),
+        },
+      }),
+    );
+
+    expect(commands).toContain('__sandpiper-system-prompt');
+  });
+
   it('adds Sandpiper identity behavior exactly once for the Sandpiper distribution', () => {
     const { flags } = applyFactories(createSandpiperExtensionFactories('/repo'));
 

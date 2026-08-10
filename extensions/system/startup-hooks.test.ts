@@ -12,9 +12,13 @@ const mockGetAgentDir = vi.hoisted(() => vi.fn(() => '/agent'));
 
 type TestEventHandler = (...args: readonly unknown[]) => unknown;
 type TestBusHandler = (payload: unknown) => unknown;
+type TestCommand = {
+  readonly handler: (args: string, ctx: unknown) => unknown;
+};
 
 function createStartupPromptHookStub(flags: Record<string, boolean | string | undefined> = {}) {
   const handlers = new Map<string, TestEventHandler>();
+  const commands = new Map<string, TestCommand>();
   const busHandlers = new Map<string, Set<TestBusHandler>>();
   const events = {
     emit: vi.fn((channel: string, payload: unknown) => {
@@ -37,6 +41,9 @@ function createStartupPromptHookStub(flags: Record<string, boolean | string | un
     on: ((event: string, handler: TestEventHandler) => {
       handlers.set(event, handler);
     }) as Parameters<typeof registerStartupPromptHooks>[0]['on'],
+    registerCommand: ((name: string, command: TestCommand) => {
+      commands.set(name, command);
+    }) as Parameters<typeof registerStartupPromptHooks>[0]['registerCommand'],
     registerFlag: vi.fn() as Parameters<typeof registerStartupPromptHooks>[0]['registerFlag'],
     events: events as Parameters<typeof registerStartupPromptHooks>[0]['events'],
   } as Parameters<typeof registerStartupPromptHooks>[0];
@@ -44,6 +51,7 @@ function createStartupPromptHookStub(flags: Record<string, boolean | string | un
   return {
     pi,
     handlers,
+    commands,
     events,
   };
 }
@@ -130,6 +138,38 @@ describe('startup hooks', () => {
 
     expect(result.systemPrompt).toBe(
       '<system_prompt>sandpiper</system_prompt>\n\n<memory source="yaams">recent facts</memory>',
+    );
+  });
+
+  it('renders the contributed prompt from an extension command without starting an agent turn', async () => {
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
+
+    const onPrompt = vi.fn();
+    const { pi, handlers, commands, events } = createStartupPromptHookStub();
+    registerStartupPromptHooks(pi, undefined, {
+      commandName: '__sandpiper-system-prompt',
+      onPrompt,
+    });
+
+    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
+    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
+      id: 'diagnostic-contribution',
+      getContent: () => '<diagnostic>included</diagnostic>',
+    });
+
+    const command = commands.get('__sandpiper-system-prompt');
+    if (!command) {
+      throw new Error('system prompt diagnostic command not registered');
+    }
+
+    await command.handler('', {
+      cwd: '/repo',
+      getSystemPrompt: () => 'base prompt',
+      getSystemPromptOptions: () => ({ cwd: '/repo' }),
+    });
+
+    expect(onPrompt).toHaveBeenCalledWith(
+      '<system_prompt>sandpiper</system_prompt>\n\n<diagnostic>included</diagnostic>',
     );
   });
 

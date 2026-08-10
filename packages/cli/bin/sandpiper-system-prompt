@@ -1,0 +1,17 @@
+#!/usr/bin/env bun
+
+import { existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const builtEntrypoint = join(scriptDir, '..', 'dist', 'standalone', 'sandpiper_system_prompt.js');
+
+if (!existsSync(builtEntrypoint)) {
+  console.error(
+    'sandpiper-system-prompt has not been built yet. Run `bun run build:standalone` or `bun run prepare:distribution` from the repository root.',
+  );
+  process.exit(1);
+}
+
+await import(pathToFileURL(builtEntrypoint).href);
