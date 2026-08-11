@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,9 +33,23 @@ describe('system prompt diagnostic', () => {
   it('renders the complete prompt without making a provider request', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-'));
     const agentDir = join(tempDir, 'agent');
+    const credentialProbe = join(tempDir, 'credential-read');
     const providerProbe = join(tempDir, 'provider-probe.ts');
     mkdirSync(agentDir, { recursive: true });
     mkdirSync(join(tempDir, 'home'), { recursive: true });
+    const credentialCommand = [
+      JSON.stringify(process.execPath),
+      '-e',
+      JSON.stringify(`require('node:fs').writeFileSync(${JSON.stringify(credentialProbe)}, 'credential resolved')`),
+    ].join(' ');
+    writeFileSync(
+      join(agentDir, 'auth.json'),
+      `${JSON.stringify({ anthropic: { type: 'api_key', key: `!${credentialCommand}` } }, null, 2)}\n`,
+    );
+    writeFileSync(
+      join(agentDir, 'models.json'),
+      `${JSON.stringify({ providers: { anthropic: { apiKey: `!${credentialCommand}` } } }, null, 2)}\n`,
+    );
     writeFileSync(
       providerProbe,
       `export default function providerProbe(pi) {
@@ -74,6 +88,7 @@ describe('system prompt diagnostic', () => {
       expect(output).toContain('<available_tools>');
       expect(output).toContain('<available_skills>');
       expect(output).toContain('name="tasks"');
+      expect(existsSync(credentialProbe)).toBe(false);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

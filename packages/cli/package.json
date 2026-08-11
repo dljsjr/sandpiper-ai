@@ -11,6 +11,7 @@
     "sandpiper-system-prompt": "./bin/sandpiper-system-prompt"
   },
   "dependencies": {
+    "@earendil-works/pi-ai": "0.84.0",
     "@earendil-works/pi-coding-agent": "0.84.0"
   },
   "peerDependencies": {

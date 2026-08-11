@@ -51,7 +51,8 @@ Usage:
   sandpiper-system-prompt [sandpiper options]
 
 The command performs normal extension, tool, skill, and context discovery without
-sending a request to a model. The rendered prompt is written to stdout. Use
+loading stored provider credentials or sending a request to a model. The rendered
+prompt is written to stdout. Use
 --approve to include untrusted project-local resources and --json to include
 file-backed prompt source metadata.`);
 }

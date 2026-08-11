@@ -1,3 +1,5 @@
+import { join } from 'node:path';
+import { InMemoryCredentialStore } from '@earendil-works/pi-ai';
 import {
   type CreateAgentSessionRuntimeFactory,
   createAgentSessionFromServices,
@@ -5,6 +7,7 @@ import {
   createAgentSessionServices,
   getAgentDir,
   hasTrustRequiringProjectResources,
+  ModelRuntime,
   ProjectTrustStore,
   parseArgs,
   SessionManager,
@@ -59,6 +62,12 @@ export async function renderSystemPrompt(
   const settingsManager = SettingsManager.create(options.cwd, agentDir, {
     projectTrusted: resolveProjectTrust(options.cwd, agentDir, parsed.projectTrustOverride),
   });
+  // Prompt rendering needs model metadata for normal session setup, never stored provider credentials.
+  const modelRuntime = await ModelRuntime.create({
+    credentials: new InMemoryCredentialStore(),
+    modelsPath: join(agentDir, 'models.json'),
+    signal: AbortSignal.timeout(15_000),
+  });
   let renderedPrompt: string | undefined;
   let identitySource: string | undefined;
   const extensionFactories = createSandpiperExtensionFactories(options.resourceRoot, {
@@ -82,7 +91,7 @@ export async function renderSystemPrompt(
       cwd,
       agentDir: runtimeAgentDir,
       settingsManager,
-      modelRuntimeSignal: AbortSignal.timeout(15_000),
+      modelRuntime,
       extensionFlagValues: parsed.unknownFlags,
       resourceLoaderOptions: {
         additionalExtensionPaths: parsed.extensions,
