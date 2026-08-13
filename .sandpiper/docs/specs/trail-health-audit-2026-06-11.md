@@ -4,6 +4,53 @@ Mode: Explanation / working audit notes.
 
 Task: `TCL-138` - Audit Trail code health with anti-slop lens.
 
+## State of this audit (reconstructed 2026-08-12, Roux)
+
+**This audit is OPEN. It is not complete, and no section below should be read as a finish line.**
+
+Written during the Trail extraction scoping, after this document was found to be roughly two
+months stale and to disagree with the other two places the audit's state lives. Read this
+section before trusting anything under it.
+
+**The audit's state is split across three stores that do not agree:**
+
+| Store | Says | Last moved |
+|---|---|---|
+| This document | Findings 1–10, coverage "complete" | 2026-06-24 |
+| YAAMS (Roux's DB) | Findings 11 and 12, the whole rank-4 dialect thread, an open follow-up | 2026-06-13 |
+| `TCL-138` on the board | Nothing past initial scope | 2026-06-11 |
+
+None of the three is the record. The document was the artifact a later session actually
+found, so its self-assessment got believed — that is the failure this section exists to stop.
+
+**Known-incomplete by construction.** The audit was a three-hander (Roux, Huginn, Muninn,
+with Piper as Librarian). This reconstruction was assembled from **Roux's YAAMS database
+only**. Huginn's and Muninn's memory stores were not reachable at the time of writing and
+have not been folded in. Assume material is missing, not that this list is the remainder.
+
+**Coverage never reached its own top tier.** The ledger below marks 68 of 68 files `read`
+and **zero** `deep-read`, in a legend that defines `deep-read` as a level. "All files read"
+is true; "the audit is done" does not follow from it, and the repeated pattern on this task
+was a completeness claim that did not survive the next sweep.
+
+**What is actually open** (see the re-sweep section for detail):
+
+- **Finding 10** — search/archive terrain split. Named, deliberately unfixed.
+- **Finding 11** — guard cleanup (two SUBTASK guards + `mutate.ts:513`). Behavior-neutral. Status unknown.
+- **Rank-4 follow-up** — the frontmatter edit guard detects YAML forms by regex while the
+  codebase now owns a real `yaml` parser: a parallel representation, with a live
+  false-positive bug. Deferred to a writer-contract cut that does not exist yet.
+- **Ranks 1, 2, 3, 5, 6** — no tickets, no slices, untouched beyond what slices 1–2 covered.
+
+**Ranking caveat.** The port-readiness table ranks candidates by how much Rust-port
+ambiguity they remove. Doug set the Rust port aside as long-tail work on 2026-08-12. The
+*findings* all still hold; the *ordering* is optimizing for a shelved goal. Re-derive the
+sequence on current weights before treating that table as a plan.
+
+**Not a blocker for the Trail repo extraction.** Nothing open here gates standalone Trail.
+The rank-4 guard bug lives in `mutate.ts` and travels with the code either way.
+
+
 ## Aim
 
 Audit Trail as its own cone of attention. The goal is not a line-count target. `12k LoC` is smoke, not a gate. The goal is to make Trail small, simple, clean, and dumb in the good sense: necessary complexity may stay; ornamental complexity is cut.
@@ -120,7 +167,58 @@ After the initial seven findings were addressed, a re-sweep with fresh eyes foun
 
 **Finding 9: `resolveTasksRoot` in `mutate.ts` is an unanchored inverse.** `updateTaskFields` takes a `taskPath` and needs `tasksDir` for the audit write. Instead of requiring `tasksDir` as a parameter, it calls `resolveTasksRoot(taskPath)` — a private function that walks up the directory tree looking for an uppercase directory name. This is fragile: it assumes directory naming conventions instead of requiring the caller to pass what it already knows. Compare `moveTask(tasksDir, key, opts)` — it takes `tasksDir` directly. Fix: add `tasksDir` parameter to `updateTaskFields` (and convenience wrappers), kill `resolveTasksRoot`. **ADDRESSED.**
 
-**Finding 10: `collectTaskDocumentsInto` in `search.ts` is a residual parallel traversal.** It does recursive directory walking, reads file content eagerly, and doesn't use `walkTaskFiles`. It also doesn't exclude archive directories or enforce project-key structure — it just finds any `.md` file matching `TASK_FILE_RE` anywhere. This is a subtler divergence from the canonical terrain contract. The fix isn't trivial (search needs content, walkTaskFiles yields metadata only), but the Rust port needs one answer for "what files are searchable." Name the gap now; fix when the walker grows content-yielding capability.
+**Finding 10: `collectTaskDocumentsInto` in `search.ts` is a residual parallel traversal.** (See also the 2026-08-12 addendum below — F10 was later traced to a ghost flag and split.) It does recursive directory walking, reads file content eagerly, and doesn't use `walkTaskFiles`. It also doesn't exclude archive directories or enforce project-key structure — it just finds any `.md` file matching `TASK_FILE_RE` anywhere. This is a subtler divergence from the canonical terrain contract. The fix isn't trivial (search needs content, walkTaskFiles yields metadata only), but the Rust port needs one answer for "what files are searchable." Name the gap now; fix when the walker grows content-yielding capability.
+
+### Findings recorded only in YAAMS (added 2026-08-12, Roux)
+
+The sweep continued past Finding 10 and never came back to this document. Recovered from
+Roux's memory store; fact ids are Roux-DB-local and unreachable from any other identity.
+
+**Finding 11: guard cleanup.** Two SUBTASK guards plus `mutate.ts:513`. Explicitly
+behavior-neutral style cleanup. **Status unknown** — named in a session handoff (fact 346,
+2026-06-12) as pending, never confirmed either way. Verify against the code before acting.
+
+**Finding 12: activity-log `from`/`to` semantics — DECIDED, literal.** `FieldChange.from`/
+`.to` are display-only: `extractActivityLog` → `formatActivityEntry` renders them straight
+back to Markdown, nothing parses `from` back into a canonical `TaskKind`, nothing branches
+on it. A literal `banana` in the log pollutes nothing downstream. (fact 347)
+
+**Finding 10, re-traced: it is a ghost flag.** `searchTasks()` can include archived files,
+but the display path (`task list -q` → `loadTasks()` → `index.toon`) is active-only because
+`walkTaskFiles()` excludes `archive/`. So `--include-archived` in search *alone* returns
+archived keys the CLI cannot render. Split into its own slice. (fact 348)
+
+**Rank 4 (frontmatter dialect) is substantially LANDED, not open as the table implies.**
+The table row still reads as an unstarted candidate. In fact:
+
+- An A/B probe compared the hand-rolled parser against `yaml@2.9.0` across 578 real task and
+  fixture files plus adversarial coercion fixtures. (fact 350)
+- **Option A shipped**: reader is permissive (YAML 1.2 failsafe, Postel's law). (fact 352)
+- The **dialect is defined** as *the writer's safe round-trip set* — reader permissive,
+  documented format = what the surgical writer round-trips, writer guards the gap at the
+  edit boundary. This closed the rank-4 one-way door. (fact 353, Piper)
+- The write path is **surgical string editing, not parse-object-stringify**; there is no
+  `yaml.stringify` anywhere in the writer. (fact 351)
+- Refuse-vs-normalize was ruled **refuse-loud** for the parse-only slice; lossless normalize
+  is a deliberate *future* cut with its own tests, not a now-option. (fact 353)
+
+**Rank-4 open follow-up — the one with a live bug.** The edit guard
+(`assertRoundTrippableFieldForm` / `isRoundTrippableFieldForm` in `mutate.ts`) detects
+non-round-trippable YAML forms with **regex heuristics on raw text**, sitting beside the real
+`yaml` parser the codebase now owns. That is a parallel representation of YAML-form
+knowledge — the same anti-pattern class this audit exists to find.
+
+It has a known false positive: a legitimate plain scalar containing ` &word` or ` *word`
+(e.g. `title: Add &ref support`) is flagged non-round-trippable and **refused on edit**,
+because the regex cannot distinguish a real YAML anchor from an ampersand mid-scalar.
+Fail-loud-safe, never corrupts — but a real usability edge on plausible titles.
+
+Fix: replace regex form-detection with `yaml` parser node-type inspection (`isScalar` plus
+block-scalar type, `isMap`, `node.anchor`). Removes the false positive *and* the parallel
+representation. Deferred to the true-block-scalar-write-support / lossless-normalize
+writer-contract cut. Minor adapter note from the same review: `frontmatterValue()` drops
+nested-map values on read (returns `undefined`, key skipped) where the legacy parser gave
+`[]` — zero corpus impact, forward-edge only. (fact 355)
 
 ## File-level checklist
 
@@ -223,7 +321,16 @@ These are reading prompts, not verdicts.
 
 ## Coverage ledger
 
-All in-scope Trail TypeScript/config files now have at least read-level coverage. This means the audit has graduated from sampling to a real package health audit; the remaining work is ranking and slice design, not basic cartography.
+All in-scope Trail TypeScript/config files now have at least read-level coverage.
+
+> **Qualified 2026-08-12 (Roux).** The original wording continued: *"This means the audit has
+> graduated from sampling to a real package health audit; the remaining work is ranking and
+> slice design, not basic cartography."* That conclusion overreaches. Every row below is
+> `read`; **not one is `deep-read`**, a tier this table's own legend defines. Read-level
+> coverage of every file is a real milestone and it is not the same claim as a finished
+> audit — findings 11 and 12 and the entire rank-4 dialect thread were all found *after*
+> this line was written, and none of them are recorded above. Treat the table as a
+> cartography receipt, not a completeness certificate.
 
 Legend: `unread`, `skimmed`, `read`, `deep-read`.
 
