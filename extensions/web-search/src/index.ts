@@ -26,7 +26,11 @@ interface WebSearchExtensionDependencies {
 }
 
 export default async function init(pi: ExtensionAPI, dependencies: WebSearchExtensionDependencies = {}) {
-  const adapter = selectSearchAdapter(dependencies.adapter);
+  let adapter = dependencies.adapter;
+  const getAdapter = () => {
+    adapter ??= selectSearchAdapter();
+    return adapter;
+  };
   const executeWebSearchTool = dependencies.executeWebSearchTool ?? defaultExecuteWebSearchTool;
 
   pi.registerTool({
@@ -41,7 +45,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebSearchExte
     }),
     async execute(_toolCallId, params): Promise<AgentToolResult<WebSearchToolDetails>> {
       const count = params.count === undefined ? undefined : Math.min(params.count, MAX_RESULT_COUNT);
-      return executeWebSearchTool(adapter, { query: params.query, count });
+      return executeWebSearchTool(getAdapter(), { query: params.query, count });
     },
   });
 }

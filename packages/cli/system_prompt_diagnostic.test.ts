@@ -30,7 +30,7 @@ function diagnosticEnv(agentDir: string): NodeJS.ProcessEnv {
 }
 
 describe('system prompt diagnostic', () => {
-  it('renders the complete prompt without making a provider request', () => {
+  it('renders the complete prompt without resolving configured credentials or making a provider request', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-'));
     const agentDir = join(tempDir, 'agent');
     const credentialProbe = join(tempDir, 'credential-read');
@@ -49,6 +49,10 @@ describe('system prompt diagnostic', () => {
     writeFileSync(
       join(agentDir, 'models.json'),
       `${JSON.stringify({ providers: { anthropic: { apiKey: `!${credentialCommand}` } } }, null, 2)}\n`,
+    );
+    writeFileSync(
+      join(agentDir, 'settings.json'),
+      `${JSON.stringify({ 'web-search': { braveApiKey: `!${credentialCommand}` } }, null, 2)}\n`,
     );
     writeFileSync(
       providerProbe,
