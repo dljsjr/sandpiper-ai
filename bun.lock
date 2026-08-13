@@ -49,6 +49,7 @@
       "name": "sandpiper-system",
       "version": "0.0.1",
       "dependencies": {
+        "diff": "9.0.0",
         "sandpiper-ai-core": "0.0.1",
       },
       "peerDependencies": {

@@ -9,6 +9,7 @@
     ]
   },
   "dependencies": {
+    "diff": "9.0.0",
     "sandpiper-ai-core": "0.0.1"
   },
   "peerDependencies": {

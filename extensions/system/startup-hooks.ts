@@ -1,5 +1,5 @@
 import { readFile, stat } from 'node:fs/promises';
-import { normalize, resolve } from 'node:path';
+import { join, normalize, resolve } from 'node:path';
 import { type BuildSystemPromptOptions, type ExtensionAPI, getAgentDir } from '@earendil-works/pi-coding-agent';
 import {
   buildSandpiperStartupPrompt,
@@ -12,6 +12,9 @@ import {
   SandpiperPromptContributionCollector,
 } from './prompt-contributions.js';
 import type { SystemRuntimeState } from './runtime.js';
+import { appendFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { createTwoFilesPatch } from 'diff';
 
 export interface StartupPromptDiagnosticSources {
   readonly identity?: string;
@@ -104,6 +107,7 @@ export function registerStartupPromptHooks(
     });
   }
 
+  let lastKnownSystemPrompt: string | undefined;
   pi.on('before_agent_start', async (event, ctx) => {
     const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions);
     if (result.prompt === undefined) {
@@ -124,6 +128,18 @@ export function registerStartupPromptHooks(
       // shortly after as a fallback for that case; harmless when shutdown()
       // already worked, since the process is gone before this fires.
       setTimeout(() => process.exit(0), 200);
+    }
+
+    lastKnownSystemPrompt = lastKnownSystemPrompt ?? finalSystemPrompt;
+    if (lastKnownSystemPrompt !== finalSystemPrompt) {
+      const outFilePath = normalize(join(homedir(), `${Date.now()}-CHANGED-SYSPROMPT.diff`));
+      ctx.ui.notify(`unexpected system prompt change! Check ${outFilePath}`, 'warning');
+
+      appendFileSync(
+        outFilePath,
+        `${createTwoFilesPatch('previousPrompt', 'newPrompt', lastKnownSystemPrompt, finalSystemPrompt)}`,
+        { encoding: 'utf8' },
+      );
     }
 
     return {
