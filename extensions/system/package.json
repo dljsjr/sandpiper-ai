@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "diff": "9.0.0",
-    "sandpiper-ai-core": "0.0.1"
+    "sandpiper-ai-core": "latest"
   },
   "peerDependencies": {
-    "@earendil-works/pi-ai": "0.84.0",
+    "@earendil-works/pi-ai": "0.85.1",
     "@earendil-works/pi-coding-agent": "0.84.0",
-    "@earendil-works/pi-tui": "0.84.0"
+    "@earendil-works/pi-tui": "0.85.1"
   }
 }

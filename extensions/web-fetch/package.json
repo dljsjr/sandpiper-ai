@@ -5,18 +5,18 @@
   "description": "Pi extension: fetch web pages and return clean markdown content",
   "dependencies": {
     "@mozilla/readability": "0.6.0",
-    "jsdom": "29.1.1",
-    "sandpiper-ai-core": "0.0.1",
+    "jsdom": "30.0.1",
+    "sandpiper-ai-core": "latest",
     "turndown": "7.2.4"
   },
   "devDependencies": {
-    "@types/jsdom": "28.0.3",
+    "@types/jsdom": "30.0.0",
     "@types/turndown": "5.0.6"
   },
   "peerDependencies": {
-    "@earendil-works/pi-ai": "0.84.0",
+    "@earendil-works/pi-ai": "0.85.1",
     "@earendil-works/pi-coding-agent": "0.84.0",
-    "@earendil-works/pi-tui": "0.84.0"
+    "@earendil-works/pi-tui": "0.85.1"
   },
   "scripts": {
     "test": "vitest run",

@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@commander-js/extra-typings": "15.0.0",
-    "@toon-format/toon": "2.3.0",
+    "@toon-format/toon": "4.1.1",
     "commander": "15.0.0",
     "diff": "9.0.0",
     "yaml": "2.9.0"
