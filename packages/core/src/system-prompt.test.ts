@@ -74,7 +74,7 @@ describe('system-prompt', () => {
     it('includes the identity block content', () => {
       const block = systemPromptPersonaBlock({});
       expect(block).toContain('expert coding agent');
-      expect(block).toContain('Sandpiper agent harness');
+      expect(block).toContain('sandpiper coding agent harness');
       expect(block).toContain('Operating Principles');
       expect(block).toContain('Coding Defaults');
     });
@@ -293,13 +293,17 @@ describe('system-prompt', () => {
   describe('buildSandpiperSystemPrompt', () => {
     it('produces a prompt with all required sections', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({ cwd: '/repo', platform: 'darwin' }, promptOptions);
+      const prompt = await buildSandpiperSystemPrompt(
+        { cwd: '/repo', platform: 'darwin', sessionStartDate: '2026-09-08' },
+        promptOptions,
+      );
 
       expect(prompt).toContain('<identity>');
       expect(prompt).toContain('<tools>');
       expect(prompt).toContain('<system_notification_protocol>');
       expect(prompt).toContain('<environment>');
-      expect(prompt).toContain('<current_date>');
+      expect(prompt).toContain('<session_start_date>2026-09-08</session_start_date>');
+      expect(prompt).not.toContain('<current_date>');
       expect(prompt).toContain('<cwd>/repo</cwd>');
     });
 

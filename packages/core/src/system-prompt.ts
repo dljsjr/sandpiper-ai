@@ -17,7 +17,7 @@ const xmlBuilder = new XMLBuilder({
 
 const minimalIdentity = `<identity>
 You are a friendly, expert coding agent with a practical, collaborative style operating inside the sandpiper coding agent harness, an extension of the pi coding agent harness.
-</identity>`.trim()
+</identity>`.trim();
 
 const identityInteractionStyleBlock = `
 <interaction_style>
@@ -37,7 +37,7 @@ const identityInteractionStyleBlock = `
 - DO: Summarize what was done, communicate results, and surface important information that arises from your actions.
 - If you say you will implement something, complete the agreed scope or stop and explain what changed.
 </interaction_style>
-`.trim()
+`.trim();
 
 const identityCodingStyleBlock = `
 <role>
@@ -55,13 +55,12 @@ You are an export coder and software engineer. Baseline principles:
   - Comments should not duplicate code. If a comment is explaining the what/how, not the why, it doesn't need to be there.
   - Comments can explain the why behind something, but should not be used to enforce or protect that why. That's what test cases are assertions are for.
 </role>
-`.trim()
+`.trim();
 
 const fullIdentity = `${minimalIdentity.trim()}
 ${identityInteractionStyleBlock.trim()}
 ${identityCodingStyleBlock.trim()}
-`.trim()
-
+`.trim();
 
 function buildXml(value: unknown): string {
   return xmlBuilder.build(value).trimEnd();
@@ -134,7 +133,15 @@ export interface SandpiperSystemPromptOptions {
   readonly versionControl?: SandpiperVersionControlContext;
   readonly userProfile?: string;
   readonly identityOverride?: string;
+  readonly sessionStartDate?: string;
   readonly dumpSystemPrompt?: boolean;
+}
+
+export function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 export function systemPromptPersonaBlock(options: SandpiperSystemPromptOptions = {}) {
@@ -263,7 +270,7 @@ export function systemNotificationProtocolBlock(): string {
 }
 
 export function environmentBlock(options: {
-  readonly currentDate: string;
+  readonly sessionStartDate: string;
   readonly cwd: string;
   readonly platform: string;
   readonly versionControl?: SandpiperVersionControlContext;
@@ -281,7 +288,7 @@ export function environmentBlock(options: {
 
   return buildXml({
     environment: {
-      current_date: options.currentDate,
+      session_start_date: options.sessionStartDate,
       cwd: options.cwd,
       platform: options.platform,
       version_control: versionControlAttrs,
@@ -296,11 +303,7 @@ export async function buildSandpiperSystemPrompt(
   const resolvedCwd = options.cwd ?? process.cwd();
   const promptCwd = resolvedCwd.replace(/\\/g, '/');
 
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const date = `${year}-${month}-${day}`;
+  const sessionStartDate = options.sessionStartDate ?? formatLocalDate(new Date());
 
   const harnessDocsContent =
     options.piCodingAgentPackage || options.sandpiperCodingAgentPackage
@@ -314,7 +317,7 @@ export async function buildSandpiperSystemPrompt(
   const xmlOut = `<system_prompt>${systemPromptPersonaBlock(options)}
   ${userProfileContent ? `\n${userProfileContent}` : ''}${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
   ${systemNotificationProtocolBlock()}${environmentBlock({
-    currentDate: date,
+    sessionStartDate,
     cwd: promptCwd,
     platform: options.platform ?? process.platform,
     versionControl: options.versionControl,
@@ -331,7 +334,7 @@ export async function buildSandpiperSystemPrompt(
       userAppendedBlock: userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : '',
       systemNotificationProtocolContentBlock: systemNotificationProtocolBlock(),
       dynamicEnvironmentBlock: environmentBlock({
-        currentDate: date,
+        sessionStartDate,
         cwd: promptCwd,
         platform: options.platform ?? process.platform,
         versionControl: options.versionControl,

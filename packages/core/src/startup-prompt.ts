@@ -19,6 +19,7 @@ export interface StartupPromptInput {
   readonly identityContent?: string;
   readonly cwd: string;
   readonly systemPromptOptions: Parameters<BuildSystemPrompt>[1];
+  readonly sessionStartDate?: string;
   readonly dumpSystemPrompt?: boolean;
 }
 
@@ -63,6 +64,7 @@ export async function buildSandpiperStartupPrompt(
         readFile: resolved.readFile,
       }),
       identityOverride: input.identityContent,
+      sessionStartDate: input.sessionStartDate,
       dumpSystemPrompt: input.dumpSystemPrompt,
     },
     input.systemPromptOptions,

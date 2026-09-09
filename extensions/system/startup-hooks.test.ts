@@ -16,10 +16,15 @@ type TestCommand = {
   readonly handler: (args: string, ctx: unknown) => unknown;
 };
 
-function createStartupPromptHookStub(flags: Record<string, boolean | string | undefined> = {}) {
+function createStartupPromptHookStub(
+  flags: Record<string, boolean | string | undefined> = {},
+  initialEntries: readonly unknown[] = [],
+) {
   const handlers = new Map<string, TestEventHandler>();
   const commands = new Map<string, TestCommand>();
   const busHandlers = new Map<string, Set<TestBusHandler>>();
+  const appendedEntries: Array<{ readonly customType: string; readonly data: unknown }> = [];
+  const sessionEntries: unknown[] = [...initialEntries];
   const events = {
     emit: vi.fn((channel: string, payload: unknown) => {
       for (const handler of busHandlers.get(channel) ?? []) {
@@ -45,6 +50,10 @@ function createStartupPromptHookStub(flags: Record<string, boolean | string | un
       commands.set(name, command);
     }) as Parameters<typeof registerStartupPromptHooks>[0]['registerCommand'],
     registerFlag: vi.fn() as Parameters<typeof registerStartupPromptHooks>[0]['registerFlag'],
+    appendEntry: ((customType: string, data?: unknown) => {
+      appendedEntries.push({ customType, data });
+      sessionEntries.push({ type: 'custom', customType, data });
+    }) as Parameters<typeof registerStartupPromptHooks>[0]['appendEntry'],
     events: events as Parameters<typeof registerStartupPromptHooks>[0]['events'],
   } as Parameters<typeof registerStartupPromptHooks>[0];
 
@@ -53,6 +62,17 @@ function createStartupPromptHookStub(flags: Record<string, boolean | string | un
     handlers,
     commands,
     events,
+    appendedEntries,
+    sessionEntries,
+  };
+}
+
+function createPromptSessionContext(entries: readonly unknown[] = []) {
+  return {
+    cwd: '/repo',
+    sessionManager: {
+      getEntries: () => entries,
+    },
   };
 }
 
@@ -89,7 +109,7 @@ describe('startup hooks', () => {
   });
 
   it('builds startup prompt from agentDir and cwd on before_agent_start', async () => {
-    const { pi, handlers } = createStartupPromptHookStub();
+    const { pi, handlers, sessionEntries } = createStartupPromptHookStub();
     registerStartupPromptHooks(pi);
 
     const handler = handlers.get('before_agent_start');
@@ -99,14 +119,69 @@ describe('startup hooks', () => {
 
     const result = (await handler(
       { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      {
-        cwd: '/repo',
-      },
+      createPromptSessionContext(sessionEntries),
     )) as { systemPrompt: string };
 
     expect(result.systemPrompt).toContain('"agentDir":"/agent"');
     expect(result.systemPrompt).toContain('"cwd":"/repo"');
     expect(mockGetAgentDir).toHaveBeenCalled();
+  });
+
+  it('persists one local session start date and reuses it across later turns', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2026, 8, 9, 10, 0, 0));
+      const { pi, handlers, appendedEntries, sessionEntries } = createStartupPromptHookStub();
+      registerStartupPromptHooks(pi);
+      const sessionContext = createPromptSessionContext(sessionEntries);
+
+      await handlers.get('session_start')?.({ reason: 'startup' }, sessionContext);
+      const beforeAgentStart = handlers.get('before_agent_start');
+      await beforeAgentStart?.({ systemPrompt: 'base prompt', systemPromptOptions: {} }, sessionContext);
+      expect(appendedEntries).toEqual([
+        {
+          customType: 'sandpiper:session-start-date',
+          data: { version: 1, date: '2026-09-09' },
+        },
+      ]);
+
+      vi.setSystemTime(new Date(2026, 8, 10, 10, 0, 0));
+      await beforeAgentStart?.({ systemPrompt: 'base prompt', systemPromptOptions: {} }, sessionContext);
+
+      expect(mockBuildSandpiperStartupPrompt).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ sessionStartDate: '2026-09-09' }),
+      );
+      expect(mockBuildSandpiperStartupPrompt).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ sessionStartDate: '2026-09-09' }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('restores the persisted session start date after process restart', async () => {
+    const { pi, handlers, appendedEntries, sessionEntries } = createStartupPromptHookStub({}, [
+      {
+        type: 'custom',
+        customType: 'sandpiper:session-start-date',
+        data: { version: 1, date: '2026-09-08' },
+      },
+    ]);
+    registerStartupPromptHooks(pi);
+    const sessionContext = createPromptSessionContext(sessionEntries);
+
+    await handlers.get('session_start')?.({ reason: 'resume' }, sessionContext);
+    await handlers.get('before_agent_start')?.(
+      { systemPrompt: 'base prompt', systemPromptOptions: {} },
+      sessionContext,
+    );
+
+    expect(appendedEntries).toEqual([]);
+    expect(mockBuildSandpiperStartupPrompt).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionStartDate: '2026-09-08' }),
+    );
   });
 
   // Guardrail: the prompt-contribution channel is a PUBLIC extension API (external consumers like
@@ -116,8 +191,9 @@ describe('startup hooks', () => {
   it('appends prompt contributions registered on the contribution channel (first-turn only)', async () => {
     mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
 
-    const { pi, handlers, events } = createStartupPromptHookStub();
+    const { pi, handlers, events, sessionEntries } = createStartupPromptHookStub();
     registerStartupPromptHooks(pi);
+    const sessionContext = createPromptSessionContext(sessionEntries);
 
     const onStart = handlers.get('session_start');
     const beforeAgentStart = handlers.get('before_agent_start');
@@ -125,7 +201,7 @@ describe('startup hooks', () => {
       throw new Error('startup prompt lifecycle hooks not registered');
     }
 
-    await onStart({ reason: 'startup' }, { cwd: '/repo' });
+    await onStart({ reason: 'startup' }, sessionContext);
     events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
       id: 'yaams-memory-bootstrap',
       getContent: () => '<memory source="yaams">recent facts</memory>',
@@ -133,7 +209,7 @@ describe('startup hooks', () => {
 
     const result = (await beforeAgentStart(
       { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      { cwd: '/repo' },
+      sessionContext,
     )) as { systemPrompt: string };
 
     expect(result.systemPrompt).toBe(
@@ -145,13 +221,14 @@ describe('startup hooks', () => {
     mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
 
     const onPrompt = vi.fn();
-    const { pi, handlers, commands, events } = createStartupPromptHookStub();
+    const { pi, handlers, commands, events, sessionEntries } = createStartupPromptHookStub();
     registerStartupPromptHooks(pi, undefined, {
       commandName: '__sandpiper-system-prompt',
       onPrompt,
     });
 
-    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
+    const sessionContext = createPromptSessionContext(sessionEntries);
+    await handlers.get('session_start')?.({ reason: 'startup' }, sessionContext);
     events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
       id: 'diagnostic-contribution',
       getContent: () => '<diagnostic>included</diagnostic>',
@@ -163,7 +240,7 @@ describe('startup hooks', () => {
     }
 
     await command.handler('', {
-      cwd: '/repo',
+      ...sessionContext,
       getSystemPrompt: () => 'base prompt',
       getSystemPromptOptions: () => ({ cwd: '/repo' }),
     });
@@ -177,10 +254,11 @@ describe('startup hooks', () => {
   it('dedupes prompt contributions by id and preserves prepend/append phases', async () => {
     mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
 
-    const { pi, handlers, events } = createStartupPromptHookStub();
+    const { pi, handlers, events, sessionEntries } = createStartupPromptHookStub();
     registerStartupPromptHooks(pi);
+    const sessionContext = createPromptSessionContext(sessionEntries);
 
-    await handlers.get('session_start')?.({ reason: 'startup' }, { cwd: '/repo' });
+    await handlers.get('session_start')?.({ reason: 'startup' }, sessionContext);
     events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
       id: 'header',
       phase: 'prepend',
@@ -199,7 +277,7 @@ describe('startup hooks', () => {
 
     const result = (await handlers.get('before_agent_start')?.(
       { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      { cwd: '/repo' },
+      sessionContext,
     )) as { systemPrompt: string };
 
     expect(result.systemPrompt).toBe(

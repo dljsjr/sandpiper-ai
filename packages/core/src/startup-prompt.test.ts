@@ -38,11 +38,17 @@ describe('startup prompt operations', () => {
     });
 
     const prompt = await buildSandpiperStartupPrompt(
-      { agentDir: '/agent', cwd: '/repo', systemPromptOptions: { cwd: '/repo' } },
+      {
+        agentDir: '/agent',
+        cwd: '/repo',
+        systemPromptOptions: { cwd: '/repo' },
+        sessionStartDate: '2026-09-08',
+      },
       dependencies,
     );
 
     expect(prompt).toContain('"cwd":"/repo"');
+    expect(prompt).toContain('"sessionStartDate":"2026-09-08"');
     expect(prompt).toContain('"piCodingAgentPackage":"/pi/package"');
     expect(prompt).toContain('"piCodingAgentVersion":"1.2.3"');
     expect(prompt).toContain('"sandpiperCodingAgentPackage":"/sandpiper/package"');

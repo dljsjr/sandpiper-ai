@@ -1,8 +1,17 @@
+import { appendFileSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
+import { homedir } from 'node:os';
 import { join, normalize, resolve } from 'node:path';
-import { type BuildSystemPromptOptions, type ExtensionAPI, getAgentDir } from '@earendil-works/pi-coding-agent';
+import {
+  type BuildSystemPromptOptions,
+  type ExtensionAPI,
+  getAgentDir,
+  type SessionEntry,
+} from '@earendil-works/pi-coding-agent';
+import { createTwoFilesPatch } from 'diff';
 import {
   buildSandpiperStartupPrompt,
+  formatLocalDate,
   handleSandpiperSessionShutdown,
   handleSandpiperSessionStart,
 } from 'sandpiper-ai-core';
@@ -12,9 +21,42 @@ import {
   SandpiperPromptContributionCollector,
 } from './prompt-contributions.js';
 import type { SystemRuntimeState } from './runtime.js';
-import { appendFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { createTwoFilesPatch } from 'diff';
+
+const SESSION_START_DATE_ENTRY_TYPE = 'sandpiper:session-start-date';
+
+interface SessionStartDateEntryData {
+  readonly version: 1;
+  readonly date: string;
+}
+
+function parseSessionStartDate(data: unknown): string | undefined {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'version' in data &&
+    data.version === 1 &&
+    'date' in data &&
+    typeof data.date === 'string'
+  ) {
+    return data.date;
+  }
+  return undefined;
+}
+
+function getOrCreateSessionStartDate(pi: ExtensionAPI, entries: readonly SessionEntry[]): string {
+  const storedEntry = entries.find(
+    (entry) => entry.type === 'custom' && entry.customType === SESSION_START_DATE_ENTRY_TYPE,
+  );
+  const storedDate = storedEntry?.type === 'custom' ? parseSessionStartDate(storedEntry.data) : undefined;
+  if (storedDate !== undefined) {
+    return storedDate;
+  }
+
+  const date = formatLocalDate(new Date());
+  const data: SessionStartDateEntryData = { version: 1, date };
+  pi.appendEntry(SESSION_START_DATE_ENTRY_TYPE, data);
+  return date;
+}
 
 export interface StartupPromptDiagnosticSources {
   readonly identity?: string;
@@ -59,7 +101,11 @@ export function registerStartupPromptHooks(
     resetPromptContributionListener();
   });
 
-  const buildEffectiveSystemPrompt = async (cwd: string, systemPromptOptions: BuildSystemPromptOptions) => {
+  const buildEffectiveSystemPrompt = async (
+    cwd: string,
+    systemPromptOptions: BuildSystemPromptOptions,
+    sessionStartDate: string,
+  ) => {
     const identityFlag = pi.getFlag('identity');
     let identityContent: string | undefined;
     let identitySource: string | undefined;
@@ -81,6 +127,7 @@ export function registerStartupPromptHooks(
       cwd,
       systemPromptOptions,
       identityContent,
+      sessionStartDate,
       dumpSystemPrompt,
     });
     return { prompt, sources: { identity: identitySource } };
@@ -99,7 +146,8 @@ export function registerStartupPromptHooks(
     });
     pi.registerCommand(diagnosticCommand.commandName, {
       handler: async (_args, ctx) => {
-        const result = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions());
+        const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
+        const result = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions(), sessionStartDate);
         const finalSystemPrompt =
           result.prompt === undefined ? ctx.getSystemPrompt() : await applyResolvedContributions(result.prompt);
         await diagnosticCommand.onPrompt(finalSystemPrompt, result.sources);
@@ -109,7 +157,8 @@ export function registerStartupPromptHooks(
 
   let lastKnownSystemPrompt: string | undefined;
   pi.on('before_agent_start', async (event, ctx) => {
-    const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions);
+    const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
+    const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions, sessionStartDate);
     if (result.prompt === undefined) {
       return;
     }
