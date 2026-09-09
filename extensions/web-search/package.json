@@ -10,14 +10,14 @@
   "dependencies": {
     "jsdom": "30.0.1",
     "mcporter": "0.13.10",
-    "sandpiper-ai-core": "latest"
+    "sandpiper-ai-core": "0.0.1"
   },
   "devDependencies": {
     "@types/jsdom": "30.0.0"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "0.85.1",
-    "@earendil-works/pi-coding-agent": "0.84.0",
+    "@earendil-works/pi-coding-agent": "0.85.1",
     "@earendil-works/pi-tui": "0.85.1"
   },
   "pi": {

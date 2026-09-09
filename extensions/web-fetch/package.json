@@ -6,7 +6,7 @@
   "dependencies": {
     "@mozilla/readability": "0.6.0",
     "jsdom": "30.0.1",
-    "sandpiper-ai-core": "latest",
+    "sandpiper-ai-core": "0.0.1",
     "turndown": "7.2.4"
   },
   "devDependencies": {
@@ -15,7 +15,7 @@
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "0.85.1",
-    "@earendil-works/pi-coding-agent": "0.84.0",
+    "@earendil-works/pi-coding-agent": "0.85.1",
     "@earendil-works/pi-tui": "0.85.1"
   },
   "scripts": {

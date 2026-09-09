@@ -4,11 +4,11 @@
   "type": "module",
   "description": "Pi extension: shared terminal session between user and agent via Zellij",
   "dependencies": {
-    "sandpiper-ai-core": "latest"
+    "sandpiper-ai-core": "0.0.1"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "0.85.1",
-    "@earendil-works/pi-coding-agent": "0.84.0"
+    "@earendil-works/pi-coding-agent": "0.85.1"
   },
   "scripts": {
     "test": "vitest run",

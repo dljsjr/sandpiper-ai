@@ -19,8 +19,7 @@
       "label": "Workspace package local dependency specs stay npm-compatible",
       "packages": ["!sandpiper-ai"],
       "dependencies": ["$LOCAL"],
-      "dependencyTypes": ["dev", "prod"],
-      "isIgnored": true
+      "dependencyTypes": ["dev", "prod"]
     }
   ],
   "semverGroups": [

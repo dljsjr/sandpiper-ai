@@ -9,7 +9,7 @@
   "dependencies": {
     "@commander-js/extra-typings": "15.0.0",
     "commander": "15.0.0",
-    "sandpiper-ai-core": "latest"
+    "sandpiper-ai-core": "0.0.1"
   },
   "scripts": {
     "test": "vitest run",
