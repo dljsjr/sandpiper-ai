@@ -57,6 +57,8 @@ These were discussed but are not authorized. Each needs the user's go-ahead befo
 - Remove the synthetic-runs part of the local Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The prompt regression tests from AGENT-295 should still pass without it.
 - Declare `outputSchema` and return `structuredContent` from Sandpiper tools that return data.
 - Add tool `annotations` (`readOnlyHint` and related hints) to Sandpiper tools.
+- Register rarely used Sandpiper tools with `exposure: "deferred"` and enable `tool_search`, so their snippets and guidelines leave the `tools` and `rules` sections until the model loads them.
+- Register turn-control tools (`done`, `tattler_receive`) with `exposure: "model-only"` if codemode scripts calling them becomes a measured problem: calls from scripts ignore `terminate`.
 - Replace `mcporter` in the web-search Parallel adapter with `pi.registerMcpServer()`.
 
 ## If something goes wrong
