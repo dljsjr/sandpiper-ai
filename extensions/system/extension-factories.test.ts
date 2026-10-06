@@ -124,6 +124,7 @@ describe('system extension factory split', () => {
       'session_start', // registerSessionContinuityHooks
       'session_shutdown', // registerSessionContinuityHooks
       'session_start', // registerDiagnosticsHooks
+      'session_start', // registerStartupHeader
     ]);
   });
 });

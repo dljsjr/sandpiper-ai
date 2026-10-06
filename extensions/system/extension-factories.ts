@@ -10,6 +10,7 @@ import {
   createTurnControlExtension,
 } from './neutral-capability-extension.js';
 import { createSystemRuntimeState, type SystemRuntimeState } from './runtime.js';
+import { registerStartupHeader } from './startup-header.js';
 import {
   registerSessionContinuityHooks,
   registerStartupPromptHooks,
@@ -48,6 +49,7 @@ export function createSandpiperIdentityExtension(options: SandpiperIdentityExten
     registerStartupPromptHooks(pi, dumpSystemPrompt, options.systemPromptDiagnostic);
     registerSessionContinuityHooks(pi, runtimeState);
     registerDiagnosticsHooks(pi, updateCheck);
+    registerStartupHeader(pi);
   };
 }
 
