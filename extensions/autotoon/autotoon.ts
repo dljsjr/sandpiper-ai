@@ -10,7 +10,9 @@ export {
 
 export default function autotoon(pi: ExtensionAPI): void {
   pi.on('tool_result', async (event) => {
-    if (event.isError) {
+    // Nested calls come from another tool, such as a codemode script, which expects the tool's
+    // own output; only the result the model reads gets converted.
+    if (event.isError || event.parentToolCallId !== undefined) {
       return;
     }
 
@@ -33,6 +35,7 @@ export default function autotoon(pi: ExtensionAPI): void {
       return;
     }
 
-    return { content: newContent };
+    // Replacing content alone would drop the structured result Pi hands to scripts.
+    return { content: newContent, structuredContent: event.structuredContent };
   });
 }

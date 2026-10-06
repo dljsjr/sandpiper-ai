@@ -118,4 +118,51 @@ describe('autotoon Pi extension', () => {
     expect(textBlock!.text).toContain('[TOON]\n');
     expect(imageBlock!.type).toBe('image');
   });
+  it('leaves results of nested tool calls unchanged, so codemode scripts get the JSON they expect', async () => {
+    const largeJson = JSON.stringify(Array(50).fill({ id: 1, name: 'test', value: 42 }));
+    let handlerResult: unknown = null;
+
+    const mockPi = {
+      on: vi.fn((_event: string, handler: (result: unknown) => void) => {
+        handlerResult = handler({
+          toolName: 'bash',
+          toolCallId: 'tc-parent/1',
+          parentToolCallId: 'tc-parent',
+          input: { command: 'curl ...' },
+          content: [{ type: 'text', text: largeJson }],
+          details: {},
+          isError: false,
+        });
+      }),
+    } as unknown as ExtensionAPI;
+
+    autotoon(mockPi);
+
+    expect(await handlerResult).toBeUndefined();
+  });
+
+  it('keeps the structured result when it converts the text content', async () => {
+    const records = Array(50).fill({ id: 1, name: 'test', value: 42 });
+    let handlerResult: unknown = null;
+
+    const mockPi = {
+      on: vi.fn((_event: string, handler: (result: unknown) => void) => {
+        handlerResult = handler({
+          toolName: 'mcp__records__list',
+          toolCallId: 'tc-3',
+          input: {},
+          content: [{ type: 'text', text: JSON.stringify(records) }],
+          structuredContent: { records },
+          details: {},
+          isError: false,
+        });
+      }),
+    } as unknown as ExtensionAPI;
+
+    autotoon(mockPi);
+
+    const result = (await handlerResult) as { content: unknown; structuredContent: unknown } | undefined;
+    expect(result?.content).toBeDefined();
+    expect(result?.structuredContent).toEqual({ records });
+  });
 });
