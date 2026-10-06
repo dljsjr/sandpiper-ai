@@ -6,7 +6,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-05T21:08:10.437Z
-updated_at: 2026-10-06T20:13:52.572Z
+updated_at: 2026-10-06T20:16:59.238Z
 related:
   - AGENT-289
   - TOOLS-27
@@ -46,7 +46,8 @@ End-to-end progress (2026-10-06, built dist/sandpiper from the pi1 workspace at 
 - --export of a session to HTML works from the narrowed Pi assets.
 Joint check with migrated pi-claude-code-cli-provider (PCCP-304 joint build pnrqvzuy, claude-cli/haiku, RPC): user prompt, tool call, background-process wake, mid-run tool change (tools/list_changed; next user frame carried one <system_prompt_update> for tools), Tattler wake from a live 0.85 peer, and resume of a copied 0.85 session all pass. Found and fixed on the PCCP side: stream events used snake_case content_index/tool_call (PCCP-325). Resume placement (a pre-1.0 session's first system message lands after the legacy history) is fixed in PCCP-327. Final rerun on the complete PCCP-304 build zlxmrsts: user prompt, a bash tool call, and resume of a copied 0.85 session all pass; on resume, CC's system prompt carries <system_prompt> and no update frame is sent.
 Cutover (2026-10-06): Doug merged the migration into the default workspace (jj new vnrpqnus xmuwpwpm), and PCCP mainline moved to the PCCP-304 line (PCCP-327 at @-). First live session on it: the trail agent (~/git/trail), Pi 1.0.4, claude-cli/claude-opus-5.5. Claude Code got the full Sandpiper system prompt and all tools; Tattler, bash, and read work. Session: ~/.sandpiper/agent/sessions/--Users-dstephen-git-trail--/2026-10-06T20-11-52-135Z_01a112d8-0fc7-736e-b2ef-e03bc05585c7.jsonl
-Remaining: Doug's interactive dogfood (fullscreen Chorus room UI, Tattler pending-batch and diagnostics entry renderers, /export from the TUI). Then forget the pi1 jj workspace and remove ../sandpiper-ai-pi1.
+/export checked live (Doug, 2026-10-06; ~/pi-1.0.4-migration-export.html and .jsonl from the trail session): the HTML embeds the Sandpiper system prompt with no Pi default; the JSONL has exactly one system message (Sandpiper preamble plus tools/rules/cwd, 15 tools); after a tattler:pending-batch wake, six more assistant turns ran with no reverting system message.
+Remaining: Doug's interactive check of the fullscreen Chorus room UI and the Tattler pending-batch and diagnostics entry renderers. Then forget the pi1 jj workspace and remove ../sandpiper-ai-pi1.
 
 ---
 
@@ -88,3 +89,7 @@ Remaining: Doug's interactive dogfood (fullscreen Chorus room UI, Tattler pendin
 ## 2026-10-06T20:13:52.577Z
 
 - **description**: 32 lines → updated (33 lines)
+
+## 2026-10-06T20:16:59.239Z
+
+- **description**: 33 lines → updated (34 lines)
