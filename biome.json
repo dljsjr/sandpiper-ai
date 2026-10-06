@@ -21,7 +21,8 @@
       "!dist",
       "!**/dist",
       "!devtools/dash.ts",
-      "!.sandpiper/jj-workspaces"
+      "!.sandpiper/jj-workspaces",
+      "!.claude"
     ]
   },
   "linter": {

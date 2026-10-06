@@ -54,6 +54,10 @@ pi-session*.html
 .sandpiper/tasks/
 .sandpiper/jj-workspaces/
 
+# Claude Code local state
+.claude/
+.sandpiper/claude-code/
+
 # skill-creator ephemeral eval workspaces (generated next to each skill)
 packages/resources/skills/*/*-workspace/
 
