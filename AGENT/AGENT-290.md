@@ -6,7 +6,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-05T21:08:10.437Z
-updated_at: 2026-10-06T16:38:44.769Z
+updated_at: 2026-10-06T19:29:27.644Z
 related:
   - AGENT-289
   - TOOLS-27
@@ -38,6 +38,14 @@ Done when every subtask is complete and the built Sandpiper passes this end-to-e
 
 History (2026-10-06): absorbed AGENT-303. End-to-end verification is the parent's done criteria, not a separate task.
 
+End-to-end progress (2026-10-06, built dist/sandpiper from the pi1 workspace at change pvmntoqp, temp agent dir, scratch recording provider):
+- Print mode, resuming a copy of a 0.84/0.85-era session (2026-08-06): the request carries the Sandpiper prompt plus Pi's tools/rules/cwd sections and 14 tools; no Pi default text.
+- RPC mode, background-process wake: the idle synthetic wake turn carries the Sandpiper prompt; no reverting system message.
+- RPC mode, Tattler wake from a live 0.85 Sandpiper peer: delivered as <tattler_inbox>, with the Sandpiper prompt and no reverting system message.
+- TUI (pty capture), fullscreen and regular: Sandpiper header, key hints, and the loaded-resources list render; no Pi logo.
+- --export of a session to HTML works from the narrowed Pi assets.
+Remaining: live interactive dogfood by Doug (fullscreen Chorus room UI, Tattler pending-batch and diagnostics entry renderers, /export from the TUI), and the joint run with migrated pi-claude-code-cli-provider (PCCP-304).
+
 ---
 
 # Activity Log
@@ -62,3 +70,7 @@ History (2026-10-06): absorbed AGENT-303. End-to-end verification is the parent'
 ## 2026-10-06T16:38:44.770Z
 
 - **description**: updated
+
+## 2026-10-06T19:29:27.644Z
+
+- **description**: 23 lines → updated (31 lines)
