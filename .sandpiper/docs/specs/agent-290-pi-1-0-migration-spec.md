@@ -1,7 +1,7 @@
 # AGENT-290 Pi 1.0 migration spec
 
 - **Diátaxis mode**: Reference spec
-- **Status**: Draft
+- **Status**: Implemented in the `pi1` workspace (AGENT-293 to AGENT-300); AGENT-301 awaits decisions; the end-to-end check is pending
 - **Task**: AGENT-290 (subtasks AGENT-293 and AGENT-295 to AGENT-302)
 - **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](agent-290-pi-1-0-migration-work-plan.md)
 

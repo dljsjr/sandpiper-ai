@@ -7,7 +7,7 @@
 
 ## The problem
 
-Sandpiper's system prompt extension replaces Pi's base prompt wholesale in its `before_agent_start` hook. Any `before_agent_start` handler that appends to `event.systemPrompt` before Sandpiper's handler runs will have its contribution discarded.
+Sandpiper's system prompt extension replaces Pi's base prompt wholesale in its `before_agent_start` hook (on Pi 1.0, by setting `systemPromptOptions.customPrompt`). Any `before_agent_start` handler that appends to `event.systemPrompt` before Sandpiper's handler runs will have its contribution discarded. On Pi 1.0, a handler that returns `systemPrompt` also forces that text for the current run only, without recording it in the transcript; contribute through the channel below or through `systemPromptOptions.sections` instead.
 
 This is the bug that broke the YAAMS memory bootstrap: `pi-yaams` appended a `<memory>` block to the system prompt, then Sandpiper's startup hook rebuilt the prompt from scratch and lost the block.
 
@@ -150,18 +150,11 @@ For verification, use:
 - `SANDPIPER_DUMP_SYSTEM_PROMPT` — Sandpiper dumps the final assembled prompt and exits
 - A `before_provider_request` hook that captures the actual provider payload — this is the strongest proof, since it shows the exact bytes sent to the model
 
-### Known delivery gap: `sendCustomMessage` + `triggerTurn` bypasses `before_agent_start`
+### Turns started by extensions skip `before_agent_start`
 
-`emitBeforeAgentStart` is called **only** in `AgentSession.prompt()` — the interactive user-input path. Two turn-start APIs behave differently:
+Pi emits `before_agent_start` only for prompted runs (`AgentSession.prompt()`, which `pi.sendUserMessage` also uses). A run started by `pi.sendMessage(..., { triggerTurn: true })` while the agent is idle, as Tattler, Chorus, and background-process wakes do, never emits it, so contributions are not re-resolved on those turns.
 
-- **`sendUserMessage`** (`pi.sendUserMessage`) routes through `prompt()` → **does call `emitBeforeAgentStart`** — not affected.
-- **`sendCustomMessage`** (`pi.sendMessage`) with `triggerTurn: true` routes through `_runAgentPrompt` → `agent.continue()` → **never calls `emitBeforeAgentStart`** — affected, regardless of `deliverAs`.
-
-So for any programmatically-started turn via `pi.sendMessage({ triggerTurn: true })`, the `before_agent_start` system prompt rewrite (including the entire Sandpiper identity rebuild and all prompt contributions) is skipped. `agent.state.systemPrompt` stays at `_baseSystemPrompt`, and all providers send the base prompt. This affects Tattler (delivers via `pi.sendMessage` with `triggerTurn`) and parts of Chorus (mixed paths). Interactive turns and `pi.sendUserMessage` are unaffected.
-
-The fix is not in any provider bridge. Two directions:
-1. Make `sendCustomMessage`/triggerTurn paths run `emitBeforeAgentStart` like `prompt()` does.
-2. Apply the Sandpiper rebuild + contributions to the **base** system prompt at `session_start` (after `resources_discover`), so every turn-entry path inherits it — no per-turn `before_agent_start` dependency. This is prefix-cache-friendly by construction. Note: the post-`resources_discover` base prompt rebuild is gated on resource-path discovery; this gate must be lifted so contributions are resolved regardless of whether any skill/prompt/theme paths were found.
+On Pi 1.0, Sandpiper's prompt still reaches those turns. Sandpiper records its prompt, contributions included, in the session transcript through Pi's custom base prompt, and Sandpiper's local Pi patch keeps the recorded prompt for runs that skip `before_agent_start` (upstream [pi#5581](https://github.com/earendil-works/pi/issues/5581)). The exception is a fresh session whose first run is such a turn: no prompt is recorded yet, so that run uses Pi's own prompt. See the [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md).
 
 The CC bridge `begin_turn` drift handling (described above) is a separate improvement but was not the live root cause.
 

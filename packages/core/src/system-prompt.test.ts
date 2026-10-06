@@ -288,6 +288,10 @@ describe('system-prompt', () => {
       expect(prompt).toContain('<harness_docs>');
       expect(prompt).toContain('Pi: `/opt/pi`');
       expect(prompt).toContain('Sandpiper: `/opt/sandpiper`');
+      expect(prompt).toContain('MCP servers (docs/mcp.md)');
+      expect(prompt).toContain(
+        'codemode scripts and non-LLM models such as classifiers and image models (docs/codemode.md)',
+      );
     });
 
     it('omits harness docs block when package roots are not set', async () => {

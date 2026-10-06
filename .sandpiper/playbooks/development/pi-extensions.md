@@ -14,6 +14,7 @@ Read this before changing Pi extensions, custom tools, TUI behavior, provider ad
 - Do not use dynamic imports except for optional dependencies.
 - Use host-neutral package seams where available before adding Sandpiper-specific logic.
 - For TUI work, load the `tui` skill before changing extension UI.
+- Do not return `systemPrompt` from `before_agent_start`: on Pi 1.0 it forces that text for one run and is not recorded. Add prompt text through `systemPromptOptions.sections` or Sandpiper's prompt contribution channel. See `.sandpiper/docs/specs/sandpiper-system-prompt.md`.
 
 ## Current Extension Surfaces
 

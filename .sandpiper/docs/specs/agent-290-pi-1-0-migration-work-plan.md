@@ -1,7 +1,7 @@
 # AGENT-290 Pi 1.0 migration work plan
 
 - **Diátaxis mode**: How-to plan
-- **Status**: Ready to start
+- **Status**: Steps 1 to 7 and 9 done; step 8 (AGENT-301) awaits decisions; step 10 pending
 - **Task**: AGENT-290
 - **Related**: [migration spec](agent-290-pi-1-0-migration-spec.md), [discovery notes](agent-290-pi-1-0-discovery.md)
 
