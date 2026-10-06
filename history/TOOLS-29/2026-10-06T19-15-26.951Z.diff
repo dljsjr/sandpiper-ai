@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-29.md
++++ b/TOOLS-29.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "ecosystemPackage dist/ test times out under full-suite load"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: LOW
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-06T16:15:39.470Z
+-updated_at: 2026-10-06T16:15:39.470Z
++updated_at: 2026-10-06T19:15:26.950Z
+ ---
+ 
+ # ecosystemPackage dist/ test times out under full-suite load
+ 
+ devtools/ecosystemPackage.test.ts > 'emits a publishable Sandpiper Pi/npm package at dist/' hit Vitest's default 5000 ms timeout in 3 of 4 full `bun run test` runs on 2026-10-06. Alone, the file passes in 2.4 s. It reads the existing repo-root dist/, so it is sensitive to parallel load. Seen while verifying an unrelated change (PI_TELEMETRY default in packages/cli/standalone_bootstrap.ts), which does not touch that test's inputs.
++
++---
++
++# Activity Log
++
++## 2026-10-06T19:15:26.951Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

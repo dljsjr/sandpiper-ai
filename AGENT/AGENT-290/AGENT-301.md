@@ -1,12 +1,12 @@
 ---
 title: "Reassess build and distribution topology for Pi 1.0"
-status: NOT STARTED
+status: IN PROGRESS
 kind: SUBTASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.778Z
-updated_at: 2026-10-06T18:23:49.981Z
+updated_at: 2026-10-06T19:27:39.506Z
 depends_on:
   - AGENT-293
 ---
@@ -26,6 +26,8 @@ Steps:
 
 Done when: the agreed topology is implemented, and rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution is green.
 
+Status (2026-10-06): proposal written at .sandpiper/docs/specs/agent-301-build-topology-proposal.md. D (copy only the three Pi asset dirs, 8.6 MB to 1.2 MB) and E (clean.ts: .turbo, no depth limit, lstat) are done in the pi1 workspace. A (CLI-only dist/) and B ("*" peers for the Pi-package manifests) wait on Doug's decisions 1 and 2.
+
 ---
 
 # Activity Log
@@ -33,3 +35,12 @@ Done when: the agreed topology is implemented, and rm -rf dist && env -u PI_PACK
 ## 2026-10-06T18:23:49.982Z
 
 - **description**: 1 line → updated (12 lines)
+
+## 2026-10-06T19:21:18.145Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-06T19:27:39.507Z
+
+- **description**: 12 lines → updated (14 lines)

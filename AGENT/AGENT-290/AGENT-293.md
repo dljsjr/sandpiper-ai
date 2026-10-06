@@ -1,12 +1,12 @@
 ---
 title: "Bump Pi pins to 1.0.4 and fix test doubles"
-status: NOT STARTED
+status: NEEDS REVIEW
 kind: SUBTASK
 priority: HIGH
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.152Z
-updated_at: 2026-10-06T18:23:49.589Z
+updated_at: 2026-10-06T18:58:22.438Z
 ---
 
 # Bump Pi pins to 1.0.4 and fix test doubles
@@ -39,3 +39,12 @@ Done when: bun check is clean, bun run test is green, and rm -rf dist && env -u 
 ## 2026-10-06T18:23:49.593Z
 
 - **description**: 8 lines → updated (15 lines)
+
+## 2026-10-06T18:54:55.937Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-06T18:58:22.439Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,12 +1,12 @@
 ---
 title: "Make sandpiper-system-prompt render the prompt Pi sends"
-status: NOT STARTED
+status: NEEDS REVIEW
 kind: SUBTASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.484Z
-updated_at: 2026-10-06T18:36:12.078Z
+updated_at: 2026-10-06T19:15:26.837Z
 depends_on:
   - AGENT-295
 ---
@@ -37,3 +37,12 @@ Done when: `sandpiper-system-prompt --approve` output equals the prompt captured
 ## 2026-10-06T18:36:12.079Z
 
 - **description**: 11 lines → updated (12 lines)
+
+## 2026-10-06T19:15:26.726Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-06T19:15:26.838Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW

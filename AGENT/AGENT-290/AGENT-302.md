@@ -1,12 +1,12 @@
 ---
 title: "Update Sandpiper docs and playbooks for Pi 1.0"
-status: NOT STARTED
+status: NEEDS REVIEW
 kind: SUBTASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.852Z
-updated_at: 2026-10-06T16:38:49.425Z
+updated_at: 2026-10-06T19:27:39.381Z
 depends_on:
   - AGENT-295
 ---
@@ -26,3 +26,12 @@ Bring docs in line with the Pi 1.0 implementation: .sandpiper/docs/specs/sandpip
 ## 2026-10-06T16:38:49.426Z
 
 - **description**: updated
+
+## 2026-10-06T19:25:20.709Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-06T19:27:39.382Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW

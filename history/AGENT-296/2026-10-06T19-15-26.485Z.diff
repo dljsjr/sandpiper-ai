@@ -1,0 +1,14 @@
+===================================================================
+--- a/AGENT-296.md
++++ b/AGENT-296.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-06T02:57:59.409Z
+-updated_at: 2026-10-06T19:06:30.144Z
++updated_at: 2026-10-06T19:15:26.484Z
+ depends_on:
+   - AGENT-295
+ ---
+ 
