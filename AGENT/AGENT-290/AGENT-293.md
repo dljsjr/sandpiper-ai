@@ -1,17 +1,17 @@
 ---
-title: "Bump Pi pins to 1.0.3 and fix test doubles"
+title: "Bump Pi pins to 1.0.4 and fix test doubles"
 status: NOT STARTED
 kind: SUBTASK
 priority: HIGH
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.152Z
-updated_at: 2026-10-06T02:57:59.152Z
+updated_at: 2026-10-06T17:25:17.658Z
 ---
 
-# Bump Pi pins to 1.0.3 and fix test doubles
+# Bump Pi pins to 1.0.4 and fix test doubles
 
-Move every @earendil-works/pi-* pin from 0.85.1 to 1.0.3 (1.0.4 once it is on npm) across the root, packages/cli, extensions, and plugins manifests, keeping exact versions per check:deps. Regenerate bun.lock.
+Move every @earendil-works/pi-* pin from 0.85.1 to 1.0.4 across the root, packages/cli, extensions, and plugins manifests, keeping exact versions per check:deps. Regenerate bun.lock.
 
 Fix the four tsc errors the scratch build found:
 - extensions/system/extension-factories.test.ts and packages/cli/sandpiper_resources.test.ts: pi.on test doubles must return an unsubscribe function.
@@ -19,3 +19,12 @@ Fix the four tsc errors the scratch build found:
 - devtools/integration/mock-provider.ts: ToolCall.arguments must be JSON values, and streamSimple now receives TranscriptContext.
 
 Done when: bun check is clean, bun run test is green, and rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution is green. This step alone ships the prompt regressions, so do not use the result as a daily driver until AGENT-290's prompt subtasks land.
+
+---
+
+# Activity Log
+
+## 2026-10-06T17:25:17.658Z
+
+- **title**: Bump Pi pins to 1.0.3 and fix test doubles → Bump Pi pins to 1.0.4 and fix test doubles
+- **description**: updated
