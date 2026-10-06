@@ -94,7 +94,9 @@ Provider constraint (Claude Code 2.1.290, reported by the `pi-claude-code-cli-pr
 
   Claude Code announces an added tool inline as a deferred tool, so only the new definition is new input. Not yet tested: the model calling a tool added mid-session.
 
-So with this provider, every change to Sandpiper's prompt text is expensive, and tool changes are cheap. That favors keeping Sandpiper's prompt text constant for the session and moving the tool list and guidelines out of the prompt text, so tool changes travel only as tool deltas. Under consideration: a Sandpiper protocol clause, like the existing system-notification protocol, that gives framed user-side prompt updates system authority. That would make the cache-preserving path semantically correct, with the same prompt-injection exposure the notification protocol has.
+Decision (PCCP-266, 2026-10-06): the provider never restarts Claude Code to apply a prompt change. It renders each mid-conversation system message with pi-ai's `renderSystemMessageUpdate()` and writes it to Claude Code as a hidden synthetic user frame. Tool deltas still go through `mcp_set_servers`. A stock-Pi-style tools section therefore costs one small update per tool change and keeps the cache on Claude Code too, so the choice between a tools section and no tool text no longer depends on this provider.
+
+Sandpiper's prompt must declare that these frames are system prompt updates, like the existing system-notification protocol; otherwise Claude Code gives them user priority. The provider will supply the exact marker block around the `renderSystemMessageUpdate()` text. This clause carries the same prompt-injection exposure as the notification protocol.
 
 ### Invariants
 
