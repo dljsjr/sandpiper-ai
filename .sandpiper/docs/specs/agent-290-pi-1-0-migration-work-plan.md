@@ -13,7 +13,7 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 - Work in a dedicated jj workspace, for example `jj workspace add ../sandpiper-ai-pi1`, so the default workspace keeps running Sandpiper on Pi 0.85.1 until the end-to-end check in step 10 passes. When the work is merged, run `jj workspace forget` and remove the directory.
 - Make one jj change per subtask, with `Refs: AGENT-<n>` in the description.
 - Tests are part of the subtask they verify. Write them first, red on stock behavior, in the same change.
-- Target `1.0.3`. If `1.0.4` reaches npm mid-migration, bump in its own change and rerun every gate below.
+- Target `1.0.4`. If a later 1.0.x reaches npm mid-migration, bump in its own change and rerun every gate below.
 
 ## Steps
 
@@ -42,12 +42,12 @@ The `pi-claude-code-cli-provider` migration runs in its own repository with its 
 | Workspace           | `sandpiper-ai` (dedicated workspace)                                                                         | `pi-claude-code-cli-provider`                  |
 | Touchpoints         | `extensions/system/`, `packages/core/`, `extensions/autotoon/`, manifests                                    | The provider's stream and replay code          |
 | Integration hazards | The provider-facing request shape (system messages, sections, tool deltas) and the Pi version both sides pin | Same                                           |
-| Ready artifact      | AGENT-295 and AGENT-296 landed                                                                               | Provider passes its own tests against Pi 1.0.3 |
+| Ready artifact      | AGENT-295 and AGENT-296 landed                                                                               | Provider passes its own tests against Pi 1.0.4 |
 | Integration         | AGENT-290's end-to-end check runs Sandpiper with the migrated provider                                       | Same checkpoint                                |
 
 Coordinate over Tattler. The contract between the lanes is the [provider-facing request shape](agent-290-pi-1-0-migration-spec.md#provider-facing-request-shape). If either lane needs to change it, agree on the change over Tattler, then update the spec before implementing.
 
-The provider can develop against plain Pi 1.0.3 before Sandpiper's prompt work lands. The request has the same structure under plain Pi; only the sections present and their text differ.
+The provider can develop against plain Pi 1.0.4 before Sandpiper's prompt work lands. The request has the same structure under plain Pi; only the sections present and their text differ.
 
 ## After phase 1: adoption candidates
 

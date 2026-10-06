@@ -17,10 +17,10 @@ Out of scope:
 
 ## Versions
 
-| Item                                                 | Requirement                                                                                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.3` everywhere they appear (root, `packages/cli`, `extensions/*`, `plugins/pi/extensions`). Move to `1.0.4` once it is on npm. |
-| Version policy                                       | Exact versions, as enforced by `bun run check:deps`. Pi's recommendation of `"*"` peer ranges is deferred to AGENT-301.            |
+| Item                                                 | Requirement                                                                                                                  |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, `extensions/*`, `plugins/pi/extensions`). Published to npm 2026-10-05. |
+| Version policy                                       | Exact versions, as enforced by `bun run check:deps`. Pi's recommendation of `"*"` peer ranges is deferred to AGENT-301.      |
 
 ## System prompt
 
