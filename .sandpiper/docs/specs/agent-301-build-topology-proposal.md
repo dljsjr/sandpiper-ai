@@ -1,7 +1,7 @@
 # AGENT-301 build and distribution topology on Pi 1.0
 
 - **Diátaxis mode**: Explanation / proposal
-- **Status**: Proposed; D and E done, A and B await Doug's decisions
+- **Status**: D and E done under AGENT-301; A, B, and C moved to TOOLS-30 (post-migration build simplification)
 - **Task**: AGENT-301 (subtask of AGENT-290)
 - **Related**: [migration spec](agent-290-pi-1-0-migration-spec.md), [build system reference](../../../docs/dev/build-system.md)
 
@@ -46,5 +46,4 @@ Recommended: yes, for the repository root and `plugins/pi/extensions` only, enfo
 ## Status
 
 - D and E are done (2026-10-06). The distribution gate passes, `dist/dist/` is down to 1.2 MB, and the built `dist/sandpiper` starts its TUI and exports a session to HTML from the narrowed assets.
-- A and B wait on the two decisions; each lands as its own change.
-- C is one line in `docs/dev/build-system.md`, written with A.
+- A, B, and C moved to TOOLS-30 (2026-10-06): Doug ties the two decisions to the wider build simplification planned after the Pi 1.0 migration.
