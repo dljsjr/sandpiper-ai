@@ -21,7 +21,7 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 | ---------------------------------------- | --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | 1. Bump Pi pins, fix test doubles        | AGENT-293 | none                       | `bun check`; `bun run test`; `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`                                |
 | 2. Prompt ownership and Shape B Pi patch | AGENT-295 | 1                          | Its prompt regression tests fail on stock Pi, then pass; full suite green                                                    |
-| 3. Tool guidelines and hidden tools      | AGENT-296 | 1                          | Its tests show the guidelines block matches Pi 0.85.1 output for the same tools; full suite green                            |
+| 3. Pi tool sections under Sandpiper      | AGENT-296 | 2                          | Its tests show Pi's `rules` carries the 0.85.1 guidelines and both sections track tool changes; full suite green             |
 | 4. Diagnostic renders the sent prompt    | AGENT-297 | 2                          | `sandpiper-system-prompt --approve` output equals the prompt captured by a recording provider                                |
 | 5. AutoTOON nested calls                 | AGENT-298 | 1                          | New AutoTOON tests; full suite green                                                                                         |
 | 6. Compiled app runtime setup            | AGENT-299 | 1                          | `bun run test:standalone-app` plus a codemode check in the compiled binary, or a recorded decision to disable codemode there |
@@ -30,7 +30,7 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 | 9. Docs and playbooks                    | AGENT-302 | 2                          | Consistency sweep of touched docs                                                                                            |
 | 10. End-to-end check                     | AGENT-290 | 1 to 9, provider migration | The done criteria in AGENT-290 pass on the built runtime                                                                     |
 
-Steps 2, 3, and 5 can run in parallel after step 1. Do steps 1 to 3 and 5 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
+Steps 2 and 5 can run in parallel after step 1. Step 3 follows step 2 because both change the same patch file. Do steps 1 to 3 and 5 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
 
 ## Coordinating with the provider migration
 
@@ -54,7 +54,7 @@ The provider can develop against plain Pi 1.0.3 before Sandpiper's prompt work l
 These were discussed but are not authorized. Each needs the user's go-ahead before it becomes a task:
 
 - Render Sandpiper's blocks as Pi sections instead of one preamble, so changes travel as per-section updates.
-- Remove the Shape B Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The prompt regression tests from AGENT-295 should still pass without it.
+- Remove the synthetic-runs part of the local Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The prompt regression tests from AGENT-295 should still pass without it.
 - Declare `outputSchema` and return `structuredContent` from Sandpiper tools that return data.
 - Add tool `annotations` (`readOnlyHint` and related hints) to Sandpiper tools.
 - Replace `mcporter` in the web-search Parallel adapter with `pi.registerMcpServer()`.
@@ -63,4 +63,4 @@ These were discussed but are not authorized. Each needs the user's go-ahead befo
 
 - Undo jj operations with `jj op log` and `jj op restore <op-id>`. Because the work happens in a separate workspace, the default workspace is unaffected.
 - Sessions touched by Pi 1.0 contain `role: "system"` entries. Do not resume them with the 0.85.1 build.
-- The Shape B patch targets compiled Pi output (`patches/` via `bun patch`). Redo it and rerun the prompt regression tests on every Pi bump.
+- The local Pi patch targets compiled Pi output (`patches/` via `bun patch`). Redo it and rerun the prompt regression tests on every Pi bump.
