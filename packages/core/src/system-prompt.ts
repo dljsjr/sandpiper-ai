@@ -116,8 +116,6 @@ export interface SandpiperPromptSkill {
 export interface SandpiperBaseSystemPromptOptions {
   readonly customPrompt?: string;
   readonly selectedTools?: readonly string[];
-  readonly toolSnippets?: Readonly<Record<string, string>>;
-  readonly promptGuidelines?: readonly string[];
   readonly appendSystemPrompt?: string;
   readonly cwd?: string;
   readonly contextFiles?: readonly SandpiperPromptContextFile[];
@@ -157,44 +155,6 @@ Use it to personalize collaboration. Treat it as standing user-authored guidance
 
 ${buildXml({ content })}
 </user_profile>
-`;
-}
-
-function normalizePromptGuidelines(guidelines: readonly string[]): readonly string[] {
-  const seen = new Set<string>();
-  const normalized: string[] = [];
-
-  for (const guideline of guidelines) {
-    const trimmed = guideline.trim();
-    if (trimmed.length === 0 || trimmed.match('Be concise in your responses')) continue;
-    if (seen.has(trimmed)) continue;
-
-    seen.add(trimmed);
-    normalized.push(trimmed);
-  }
-
-  return normalized;
-}
-
-export function toolGuidanceBlock(originalPromptOptions: SandpiperBaseSystemPromptOptions) {
-  const selectedTools = originalPromptOptions.selectedTools || [];
-  const toolSnippets = originalPromptOptions.toolSnippets || {};
-  const toolEntries = Object.entries(toolSnippets)
-    .filter(([toolName, toolSnippet]) => selectedTools.includes(toolName) && toolSnippet.length > 0)
-    .map(([toolName, toolSnippet]) => ({
-      '@_name': toolName,
-      '#text': toolSnippet,
-    }));
-  const availableToolsBlock = buildXml({ available_tools: toolEntries.length > 0 ? { tool: toolEntries } : '' });
-
-  const guidelinesBlock = normalizePromptGuidelines(originalPromptOptions.promptGuidelines || [])
-    .map((guideline) => `- ${guideline}`)
-    .join('\n');
-  const guidelinesSection = guidelinesBlock.length > 0 ? `\n\nGuidelines:\n${guidelinesBlock}` : '';
-
-  return `<tools>
-${availableToolsBlock}${guidelinesSection}
-</tools>
 `;
 }
 
@@ -309,7 +269,7 @@ export async function buildSandpiperSystemPrompt(
   const userAppended = originalPromptOptions.appendSystemPrompt;
 
   const xmlOut = `<system_prompt>${systemPromptPersonaBlock(options)}
-  ${userProfileContent ? `\n${userProfileContent}` : ''}${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
+  ${userProfileContent ? `\n${userProfileContent}` : ''}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
   ${systemNotificationProtocolBlock()}${environmentBlock({
     sessionStartDate,
     platform: options.platform ?? process.platform,
@@ -320,7 +280,6 @@ export async function buildSandpiperSystemPrompt(
     const blocks: Record<string, string> = {
       personaBlock: systemPromptPersonaBlock(options),
       userProfileContentBlock: userProfileContent ? `\n${userProfileContent}` : '',
-      toolGuidanceContentBlock: toolGuidanceBlock(originalPromptOptions),
       harnessDocsBlock: harnessDocsContent,
       skillsBlock: skillsContent ? `\n${skillsContent}` : '',
       injectedContextBlock: injectedContextContent ? `\n${injectedContextContent}` : '',

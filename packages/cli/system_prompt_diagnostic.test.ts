@@ -95,7 +95,7 @@ describe('system prompt diagnostic', () => {
       expect(output).toContain(`<cwd>\n${repoRoot}\n</cwd>`);
       expect(output).toContain('<diagnostic_probe>\nextension section text\n</diagnostic_probe>');
       expect(output).toContain('<birdup>diagnostic append</birdup>');
-      expect(output).toContain('<available_tools>');
+      expect(output).toContain('<tools>\n- read:');
       expect(output).toContain('<available_skills>');
       expect(output).toContain('name="tasks"');
       expect(existsSync(credentialProbe)).toBe(false);

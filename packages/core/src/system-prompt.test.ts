@@ -7,7 +7,6 @@ import {
   skillsBlock,
   systemNotificationProtocolBlock,
   systemPromptPersonaBlock,
-  toolGuidanceBlock,
   userProfileBlock,
 } from './system-prompt.js';
 
@@ -16,12 +15,6 @@ function createPromptOptions(
 ): SandpiperBaseSystemPromptOptions {
   return {
     selectedTools: ['read', 'edit', 'bash'],
-    toolSnippets: {
-      read: 'Read file contents',
-      edit: 'Edit a file',
-      bash: 'Run a bash command',
-    },
-    promptGuidelines: ['Use read for files', 'Show file paths clearly when working with files'],
     cwd: '/tmp/sandpiper-test',
     contextFiles: [],
     skills: [],
@@ -98,84 +91,6 @@ describe('system-prompt', () => {
       expect(block).toContain('</user_profile>');
       expect(block).toContain('working preferences');
       expect(block).toContain('<content># User\nPrefers <clear> & direct communication</content>');
-    });
-  });
-
-  describe('toolGuidanceBlock', () => {
-    it('renders tool snippets for selected tools', () => {
-      const options = createPromptOptions({
-        selectedTools: ['read', 'edit'],
-        toolSnippets: {
-          read: 'Read file contents',
-          edit: 'Edit a file',
-        },
-      });
-
-      const block = toolGuidanceBlock(options);
-      expect(block).toContain('<tools>');
-      expect(block).toContain('</tools>');
-      expect(block).toContain('<available_tools>');
-      expect(block).toContain('<tool name="read">Read file contents</tool>');
-      expect(block).toContain('<tool name="edit">Edit a file</tool>');
-    });
-
-    it('omits tool snippets for tools not in selectedTools', () => {
-      const options = createPromptOptions({
-        selectedTools: ['read'],
-        toolSnippets: {
-          read: 'Read file contents',
-          edit: 'Edit a file',
-        },
-      });
-
-      const block = toolGuidanceBlock(options);
-      expect(block).toContain('<tool name="read">Read file contents</tool>');
-      expect(block).not.toContain('<tool name="edit">Edit a file</tool>');
-    });
-
-    it('renders normalized guidelines and strips "Be concise"', () => {
-      const options = createPromptOptions({
-        promptGuidelines: [
-          'Be concise in your responses',
-          '  Show file paths clearly when working with files  ',
-          'Show file paths clearly when working with files',
-          '',
-        ],
-      });
-
-      const block = toolGuidanceBlock(options);
-      expect(block).toContain('Guidelines:');
-      expect(block).toContain('- Show file paths clearly');
-      expect(block.match(/Show file paths clearly/g)).toHaveLength(1);
-      expect(block).not.toContain('Be concise in your responses');
-      expect(block).not.toContain('-   Show');
-    });
-
-    it('omits empty tool snippets', () => {
-      const options = createPromptOptions({
-        selectedTools: ['read', 'edit'],
-        toolSnippets: {
-          read: 'Read file contents',
-          edit: '',
-        },
-      });
-
-      const block = toolGuidanceBlock(options);
-      expect(block).toContain('<tool name="read">Read file contents</tool>');
-      expect(block).not.toContain('<tool name="edit"');
-    });
-
-    it('renders tool entries with raw prompt text', () => {
-      const options = createPromptOptions({
-        selectedTools: ['read<&'],
-        toolSnippets: {
-          'read<&': 'Read <files> & report "paths"',
-        },
-      });
-
-      const block = toolGuidanceBlock(options);
-      expect(block).toContain('<tool name="read<&">');
-      expect(block).toContain('Read <files> & report "paths"');
     });
   });
 
@@ -258,10 +173,6 @@ describe('system-prompt', () => {
     it('uses skill for skill loading rules when the tool is active', () => {
       const options = createPromptOptions({
         selectedTools: ['read', 'skill'],
-        toolSnippets: {
-          read: 'Read file contents',
-          skill: 'Load a skill by exact name',
-        },
         skills: [
           {
             name: 'jj',
@@ -299,7 +210,7 @@ describe('system-prompt', () => {
       );
 
       expect(prompt).toContain('<identity>');
-      expect(prompt).toContain('<tools>');
+      expect(prompt).not.toContain('<tools>');
       expect(prompt).toContain('<system_notification_protocol>');
       expect(prompt).toContain('<environment>');
       expect(prompt).toContain('<session_start_date>2026-09-08</session_start_date>');

@@ -26,7 +26,8 @@ export const RECORDING_PROVIDER = 'prompt-recorder';
 export const RECORDING_MODEL = 'recorder-1';
 export const NOOP_TOOL = 'noop';
 
-export type ScriptedResponse = 'text' | 'toolCall';
+/** 'toolCall' calls the harness's noop tool; `{ toolCall }` calls the named tool with no arguments. */
+export type ScriptedResponse = 'text' | 'toolCall' | { readonly toolCall: string };
 
 export interface RecordedRequest {
   readonly messages: readonly Message[];
@@ -45,6 +46,8 @@ export interface PromptRecordingSessionOptions {
 
 export interface PromptRecordingSession {
   readonly session: AgentSession;
+  /** The harness extension's API, for changing the active tools between runs. */
+  readonly extensionApi: ExtensionAPI;
   readonly requests: readonly RecordedRequest[];
   /** Run a user-prompted turn and wait for it to finish. */
   prompt(text: string): Promise<void>;
@@ -54,12 +57,13 @@ export interface PromptRecordingSession {
 }
 
 function assistantMessage(model: Model<Api>, response: ScriptedResponse, callNumber: number): AssistantMessage {
+  const toolName = response === 'text' ? undefined : response === 'toolCall' ? NOOP_TOOL : response.toolCall;
   return {
     role: 'assistant',
     content:
-      response === 'toolCall'
-        ? [{ type: 'toolCall', id: `call-${callNumber}`, name: NOOP_TOOL, arguments: {} }]
-        : [{ type: 'text', text: 'ok' }],
+      toolName === undefined
+        ? [{ type: 'text', text: 'ok' }]
+        : [{ type: 'toolCall', id: `call-${callNumber}`, name: toolName, arguments: {} }],
     api: model.api,
     provider: model.provider,
     model: model.id,
@@ -71,7 +75,7 @@ function assistantMessage(model: Model<Api>, response: ScriptedResponse, callNum
       totalTokens: 0,
       cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
     },
-    stopReason: response === 'toolCall' ? 'toolUse' : 'stop',
+    stopReason: toolName === undefined ? 'stop' : 'toolUse',
     timestamp: Date.now(),
   };
 }
@@ -155,22 +159,24 @@ export async function createPromptRecordingSession(
     throw new Error('prompt recorder model is not registered');
   }
   await session.setModel(model);
+  if (!trigger) {
+    throw new Error('prompt recorder extension did not load');
+  }
+  const extensionApi = trigger;
 
   return {
     session,
+    extensionApi,
     requests,
     async prompt(text) {
       await session.prompt(text);
       await session.waitForIdle();
     },
     async triggerSyntheticTurn(content = 'background process exited') {
-      if (!trigger) {
-        throw new Error('prompt recorder extension did not load');
-      }
       const agentEnd = new Promise<void>((resolve) => {
         resolveAgentEnd = resolve;
       });
-      await trigger.sendMessage(
+      await extensionApi.sendMessage(
         { customType: 'prompt-recorder:wake', content, display: false },
         { triggerTurn: true, deliverAs: 'steer' },
       );

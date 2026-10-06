@@ -1,9 +1,10 @@
 import { mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { Message } from '@earendil-works/pi-ai';
+import { getCurrentTools, type Message, Type } from '@earendil-works/pi-ai';
 import { type ExtensionFactory, SessionManager } from '@earendil-works/pi-coding-agent';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { createTurnControlExtension } from './neutral-capability-extension.js';
 import { createPromptRecordingSession, type PromptRecordingSession } from './prompt-recording-harness.js';
 import { registerStartupPromptHooks } from './startup-hooks.js';
 
@@ -166,6 +167,127 @@ describe('Sandpiper prompt ownership on Pi 1.0', () => {
       '',
       expect.stringContaining('You are an expert coding assistant'),
     ]);
+  });
+});
+
+const dropWriteToolExtension: ExtensionFactory = (pi) => {
+  pi.registerTool({
+    name: 'drop_write',
+    label: 'drop_write',
+    description: 'Removes the write tool from the active tools.',
+    parameters: Type.Object({}),
+    async execute() {
+      pi.setActiveTools(pi.getActiveTools().filter((name) => name !== 'write'));
+      return { content: [{ type: 'text', text: 'write removed' }], details: undefined };
+    },
+  });
+};
+
+const hiddenHelperExtension: ExtensionFactory = (pi) => {
+  pi.registerTool({
+    name: 'hidden_helper',
+    label: 'hidden_helper',
+    description: 'Reachable only through the orchestrator.',
+    promptSnippet: 'HIDDEN-HELPER-SNIPPET',
+    promptGuidelines: ['HIDDEN-HELPER-GUIDELINE'],
+    parameters: Type.Object({}),
+    async execute() {
+      return { content: [{ type: 'text', text: 'helped' }], details: undefined };
+    },
+  });
+  pi.registerTool({
+    name: 'orchestrator',
+    label: 'orchestrator',
+    description: 'Calls hidden_helper.',
+    parameters: Type.Object({}),
+    prepareLoadout: () => ({ hiddenDeclarations: ['hidden_helper'] }),
+    async execute() {
+      return { content: [{ type: 'text', text: 'orchestrated' }], details: undefined };
+    },
+  });
+};
+
+function sandpiperBlock(systemPrompt: string): string {
+  return systemPrompt.slice(0, systemPrompt.indexOf('</system_prompt>'));
+}
+
+function section(systemPrompt: string, name: string): string {
+  const start = systemPrompt.indexOf(`<${name}>`);
+  const end = systemPrompt.indexOf(`</${name}>`, start);
+  return start === -1 || end === -1 ? '' : systemPrompt.slice(start, end);
+}
+
+describe("Pi's tools and rules sections under the Sandpiper prompt", () => {
+  it('renders tool snippets and guidelines in Pi sections, not in the Sandpiper prompt', async () => {
+    const recording = await startSession({ extensions: [sandpiperPromptExtension, createTurnControlExtension()] });
+
+    await recording.prompt('hello');
+
+    const systemPrompt = recording.requests[0]?.systemPrompt ?? '';
+    expect(section(systemPrompt, 'tools')).toContain('- done: Silently finish the current turn');
+    expect(section(systemPrompt, 'rules')).toContain(
+      '- Do not use done for normal user requests, errors, uncertainty, or when follow-up work remains.',
+    );
+    expect(sandpiperBlock(systemPrompt)).not.toContain('<tools>');
+    expect(sandpiperBlock(systemPrompt)).not.toContain('Guidelines:');
+  });
+
+  it('leaves hidden tools out of the prompt', async () => {
+    const recording = await startSession({ extensions: [sandpiperPromptExtension, hiddenHelperExtension] });
+    recording.extensionApi.setActiveTools([
+      ...recording.extensionApi.getActiveTools(),
+      'hidden_helper',
+      'orchestrator',
+    ]);
+
+    await recording.prompt('hello');
+
+    const systemPrompt = recording.requests[0]?.systemPrompt ?? '';
+    expect(section(systemPrompt, 'tools')).toContain('- read:');
+    expect(systemPrompt).not.toContain('HIDDEN-HELPER-SNIPPET');
+    expect(systemPrompt).not.toContain('HIDDEN-HELPER-GUIDELINE');
+  });
+
+  it('updates the tool sections between user prompts', async () => {
+    const recording = await startSession();
+    await recording.prompt('hello');
+    recording.extensionApi.setActiveTools(recording.extensionApi.getActiveTools().filter((name) => name !== 'write'));
+
+    await recording.prompt('next');
+
+    expect(section(recording.requests[0]?.systemPrompt ?? '', 'tools')).toContain('- write:');
+    expect(section(recording.requests[1]?.systemPrompt ?? '', 'tools')).not.toContain('- write:');
+  });
+
+  it('updates the tool sections within a run', async () => {
+    const recording = await startSession({
+      extensions: [sandpiperPromptExtension, dropWriteToolExtension],
+      responses: [{ toolCall: 'drop_write' }, 'text'],
+    });
+
+    await recording.prompt('hello');
+
+    const [before, after] = recording.requests;
+    expect(section(before?.systemPrompt ?? '', 'tools')).toContain('- write:');
+    expect(section(after?.systemPrompt ?? '', 'tools')).not.toContain('- write:');
+    expect(getCurrentTools(after?.messages ?? []).map((tool) => tool.name)).not.toContain('write');
+    expect(isSandpiperPrompt(after?.systemPrompt ?? '')).toBe(true);
+  });
+
+  it('updates the tool sections during an idle synthetic turn', async () => {
+    const recording = await startSession({
+      extensions: [sandpiperPromptExtension, dropWriteToolExtension],
+      responses: ['text', { toolCall: 'drop_write' }, 'text'],
+    });
+    await recording.prompt('hello');
+
+    await recording.triggerSyntheticTurn();
+
+    const last = recording.requests[2];
+    expect(section(recording.requests[1]?.systemPrompt ?? '', 'tools')).toContain('- write:');
+    expect(section(last?.systemPrompt ?? '', 'tools')).not.toContain('- write:');
+    expect(getCurrentTools(last?.messages ?? []).map((tool) => tool.name)).not.toContain('write');
+    expect(isSandpiperPrompt(last?.systemPrompt ?? '')).toBe(true);
   });
 });
 
