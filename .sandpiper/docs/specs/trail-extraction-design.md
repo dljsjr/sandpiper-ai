@@ -62,7 +62,7 @@ surface demands it; Trail's does not.
 
 The `tasks` key inside `.sandpiper/settings.json` is dropped entirely.
 
-### Path resolution **[recommended — agreed in substance, not explicitly ratified]**
+### Path resolution **[settled — ratified 2026-10-06]**
 
 Config discovery and the tasks-dir value both resolve against the **project root**, which
 is what `--dir` already means today:
@@ -75,6 +75,9 @@ const tasksDir = join(base, '.sandpiper', 'tasks');   // helpers.ts:27
 `--dir` points at the *container*, not at the tasks directory, so no behavior change is
 required. Since discovery does not walk up, the project root is always either `--dir` or
 cwd.
+
+Task-directory paths can be absolute or relative. Relative paths resolve against the
+project root, not the configuration file's directory. Absolute paths are used as given.
 
 ### Config content **[settled]**
 
@@ -109,7 +112,11 @@ a bumped version, so the version check fires first and produces a useful message
 New top-level command. `storage init` is removed and folded into it — the `storage`
 subcommand has poor discoverability and is confusing for most use cases.
 
-- Emits `./.trail/config.json` with **all defaults explicitly populated**.
+- Emits `./.trail/config.json` with **all required values explicitly populated**.
+  Initialization flags can select non-default values. Unspecified values use defaults in
+  the newly emitted file. This does not relax strict parsing of existing configuration.
+- Flags control initialization. An interactive terminal wizard is deferred, as ratified
+  on 2026-10-06.
 - **Never overwrites.** If a config already exists at any candidate path, `initialize` is a
   no-op consumer and fails loudly. An existing file means either `initialize` already ran or
   the user deliberately bootstrapped their own — neither is Trail's to clobber.
@@ -146,7 +153,16 @@ It must carry the whole `version_control` block forward, not just the tasks dir.
   that can damage something rather than merely annoy.
 - `reinforced-guidance` and `waymark` run `auto_commit: true`; everything else does not.
 
-## Depending on Trail without publishing to npm **[recommended]**
+## TCL board relocation **[settled — ratified 2026-10-06]**
+
+Move the entire TCL board to Trail, including closed tickets and history. Preserve task
+keys and check inbound references. Relocation still waits for the consumer and migration
+prerequisites.
+
+## Depending on Trail without publishing to npm **[deferred — 2026-10-06]**
+
+Doug deferred the consumption decision. The ranking below remains a recommendation,
+not authorization for a consumer cutover.
 
 Because the dependency is a build artifact rather than a module, this is not a
 module-resolution problem. Ranked:
