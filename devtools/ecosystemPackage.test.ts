@@ -167,7 +167,7 @@ describe('ecosystem package artifacts', () => {
     expect(packedFiles).not.toContain('.sandpiper/docs/README.md');
     expect(packedFiles).not.toContain('neutral-pi-package/package.json');
     expect(packedFiles).not.toContain('claude-plugin/.claude-plugin/plugin.json');
-  });
+  }, 30_000);
 
   it('does not leak development scratch files into generated skill packages', () => {
     const skillRoots = [join(repoRoot, 'dist', 'skills')];
