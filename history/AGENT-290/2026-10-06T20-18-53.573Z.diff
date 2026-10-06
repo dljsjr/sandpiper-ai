@@ -1,0 +1,33 @@
+===================================================================
+--- a/AGENT-290.md
++++ b/AGENT-290.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-05T21:08:10.437Z
+-updated_at: 2026-10-06T20:16:59.238Z
++updated_at: 2026-10-06T20:18:53.570Z
+ related:
+   - AGENT-289
+   - TOOLS-27
+ ---
+@@ -46,8 +46,9 @@
+ - --export of a session to HTML works from the narrowed Pi assets.
+ Joint check with migrated pi-claude-code-cli-provider (PCCP-304 joint build pnrqvzuy, claude-cli/haiku, RPC): user prompt, tool call, background-process wake, mid-run tool change (tools/list_changed; next user frame carried one <system_prompt_update> for tools), Tattler wake from a live 0.85 peer, and resume of a copied 0.85 session all pass. Found and fixed on the PCCP side: stream events used snake_case content_index/tool_call (PCCP-325). Resume placement (a pre-1.0 session's first system message lands after the legacy history) is fixed in PCCP-327. Final rerun on the complete PCCP-304 build zlxmrsts: user prompt, a bash tool call, and resume of a copied 0.85 session all pass; on resume, CC's system prompt carries <system_prompt> and no update frame is sent.
+ Cutover (2026-10-06): Doug merged the migration into the default workspace (jj new vnrpqnus xmuwpwpm), and PCCP mainline moved to the PCCP-304 line (PCCP-327 at @-). First live session on it: the trail agent (~/git/trail), Pi 1.0.4, claude-cli/claude-opus-5.5. Claude Code got the full Sandpiper system prompt and all tools; Tattler, bash, and read work. Session: ~/.sandpiper/agent/sessions/--Users-dstephen-git-trail--/2026-10-06T20-11-52-135Z_01a112d8-0fc7-736e-b2ef-e03bc05585c7.jsonl
+ /export checked live (Doug, 2026-10-06; ~/pi-1.0.4-migration-export.html and .jsonl from the trail session): the HTML embeds the Sandpiper system prompt with no Pi default; the JSONL has exactly one system message (Sandpiper preamble plus tools/rules/cwd, 15 tools); after a tattler:pending-batch wake, six more assistant turns ran with no reverting system message.
++Idle synthetic run checked live (2026-10-06 20:18, same trail session file, idle when woken): a tattler:pending-batch wake ran three model calls (bash, send_peer_message, final reply) and no system message was appended, so Shape B held across turns 2 and 3 on the real runtime.
+ Remaining: Doug's interactive check of the fullscreen Chorus room UI and the Tattler pending-batch and diagnostics entry renderers. Then forget the pi1 jj workspace and remove ../sandpiper-ai-pi1.
+ 
+ ---
+ 
+@@ -92,4 +93,8 @@
+ 
+ ## 2026-10-06T20:16:59.239Z
+ 
+ - **description**: 33 lines → updated (34 lines)
++
++## 2026-10-06T20:18:53.573Z
++
++- **description**: 34 lines → updated (35 lines)
