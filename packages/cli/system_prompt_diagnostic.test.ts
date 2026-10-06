@@ -58,6 +58,9 @@ describe('system prompt diagnostic', () => {
       providerProbe,
       `export default function providerProbe(pi) {
   pi.on('before_provider_request', () => process.exit(97));
+  pi.on('before_agent_start', (event) => {
+    event.systemPromptOptions.sections.diagnostic_probe = 'extension section text';
+  });
 }
 `,
     );
@@ -86,8 +89,11 @@ describe('system prompt diagnostic', () => {
         },
       );
 
-      expect(output).toContain('<system_prompt>');
+      expect(output.startsWith('<system_prompt>')).toBe(true);
       expect(output).toContain('<identity>diagnostic identity</identity>');
+      expect(output).toContain(`</system_prompt>\n\n`);
+      expect(output).toContain(`<cwd>\n${repoRoot}\n</cwd>`);
+      expect(output).toContain('<diagnostic_probe>\nextension section text\n</diagnostic_probe>');
       expect(output).toContain('<birdup>diagnostic append</birdup>');
       expect(output).toContain('<available_tools>');
       expect(output).toContain('<available_skills>');

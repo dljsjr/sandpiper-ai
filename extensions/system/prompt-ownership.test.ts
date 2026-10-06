@@ -50,6 +50,7 @@ beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-ownership-'));
   mkdirSync(join(root, 'project'));
   mkdirSync(join(root, 'agent'));
+  mkdirSync(join(root, 'home'));
   vi.stubEnv('HOME', join(root, 'home'));
   vi.stubEnv('PI_CODING_AGENT_DIR', join(root, 'agent'));
 });
@@ -58,6 +59,7 @@ afterEach(() => {
   for (const recording of open) recording.dispose();
   open = [];
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
   rmSync(root, { recursive: true, force: true });
 });
 
@@ -164,5 +166,21 @@ describe('Sandpiper prompt ownership on Pi 1.0', () => {
       '',
       expect.stringContaining('You are an expert coding assistant'),
     ]);
+  });
+});
+
+describe('SANDPIPER_DUMP_SYSTEM_PROMPT', () => {
+  it('dumps the prompt the provider receives, including the sections Pi adds', async () => {
+    const dumped: string[] = [];
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      dumped.push(args.map(String).join(' '));
+    });
+    vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+    const recording = await startSession({ extensions: [(pi) => registerStartupPromptHooks(pi, true)] });
+
+    await recording.prompt('hello');
+
+    expect(dumped).toEqual([`system prompt:\n ${recording.requests[0]?.systemPrompt}`]);
+    expect(dumped[0]).toContain(`<cwd>\n${join(root, 'project')}\n</cwd>`);
   });
 });

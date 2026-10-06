@@ -1,10 +1,19 @@
 import { join } from 'node:path';
-import { InMemoryCredentialStore } from '@earendil-works/pi-ai';
+import {
+  type Api,
+  type AssistantMessage,
+  createAssistantMessageEventStream,
+  getCurrentSystemPrompt,
+  InMemoryCredentialStore,
+  type Model,
+  type TranscriptContext,
+} from '@earendil-works/pi-ai';
 import {
   type CreateAgentSessionRuntimeFactory,
   createAgentSessionFromServices,
   createAgentSessionRuntime,
   createAgentSessionServices,
+  type ExtensionFactory,
   getAgentDir,
   hasTrustRequiringProjectResources,
   ModelRuntime,
@@ -16,6 +25,8 @@ import {
 import { createSandpiperExtensionFactories } from './sandpiper_resources.js';
 
 const DIAGNOSTIC_COMMAND = '__sandpiper-system-prompt';
+const CAPTURE_PROVIDER = 'sandpiper-prompt-capture';
+const CAPTURE_MODEL = 'capture';
 
 export interface SystemPromptDiagnosticOptions {
   readonly args: readonly string[];
@@ -41,6 +52,65 @@ function resolveProjectTrust(cwd: string, agentDir: string, override: boolean | 
   if (override !== undefined) return override;
   if (!hasTrustRequiringProjectResources(cwd)) return true;
   return new ProjectTrustStore(agentDir).get(cwd) === true;
+}
+
+function emptyReply(model: Model<Api>): AssistantMessage {
+  return {
+    role: 'assistant',
+    content: [],
+    api: model.api,
+    provider: model.provider,
+    model: model.id,
+    usage: {
+      input: 0,
+      output: 0,
+      cacheRead: 0,
+      cacheWrite: 0,
+      totalTokens: 0,
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+    },
+    stopReason: 'stop',
+    timestamp: Date.now(),
+  };
+}
+
+// An in-process provider that records the system prompt of the first request and answers with an
+// empty reply, so the diagnostic shows exactly what Pi sends without credentials or network.
+function createPromptCaptureExtension(onPrompt: (prompt: string) => void): ExtensionFactory {
+  let captured = false;
+  return (pi) => {
+    pi.registerProvider(CAPTURE_PROVIDER, {
+      name: 'Sandpiper prompt capture',
+      baseUrl: 'http://sandpiper-prompt-capture.invalid',
+      apiKey: 'unused',
+      api: 'openai-completions',
+      models: [
+        {
+          id: CAPTURE_MODEL,
+          name: 'Sandpiper prompt capture',
+          reasoning: false,
+          input: ['text'],
+          cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+          contextWindow: 128_000,
+          maxTokens: 4096,
+        },
+      ],
+      streamSimple: (model: Model<Api>, context: TranscriptContext) => {
+        if (!captured) {
+          captured = true;
+          onPrompt(getCurrentSystemPrompt(context.messages));
+        }
+        const reply = emptyReply(model);
+        const stream = createAssistantMessageEventStream();
+        queueMicrotask(() => {
+          stream.push({ type: 'start', partial: reply });
+          stream.push({ type: 'done', reason: 'stop', message: reply });
+          stream.end();
+        });
+        return stream;
+      },
+    });
+  };
 }
 
 export async function renderSystemPrompt(
@@ -70,16 +140,20 @@ export async function renderSystemPrompt(
   });
   let renderedPrompt: string | undefined;
   let identitySource: string | undefined;
-  const extensionFactories = createSandpiperExtensionFactories(options.resourceRoot, {
-    checkForUpdates: async () => [],
-    systemPromptDiagnostic: {
-      commandName: DIAGNOSTIC_COMMAND,
-      onPrompt: (prompt, sources) => {
-        renderedPrompt = prompt;
-        identitySource = sources.identity;
+  const extensionFactories = [
+    ...createSandpiperExtensionFactories(options.resourceRoot, {
+      checkForUpdates: async () => [],
+      systemPromptDiagnostic: {
+        commandName: DIAGNOSTIC_COMMAND,
+        onPrompt: (_prompt, sources) => {
+          identitySource = sources.identity;
+        },
       },
-    },
-  });
+    }),
+    createPromptCaptureExtension((prompt) => {
+      renderedPrompt = prompt;
+    }),
+  ];
 
   const createRuntime: CreateAgentSessionRuntimeFactory = async ({
     cwd,
@@ -151,6 +225,12 @@ export async function renderSystemPrompt(
     });
     json = runtime.session.extensionRunner.getFlagValues().get('json') === true;
     await runtime.session.prompt(`/${DIAGNOSTIC_COMMAND}`);
+    const captureModel = runtime.session.modelRuntime.getModel(CAPTURE_PROVIDER, CAPTURE_MODEL);
+    if (!captureModel) {
+      throw new Error('Sandpiper prompt capture provider is not registered');
+    }
+    await runtime.session.setModel(captureModel);
+    await runtime.session.prompt('Render the system prompt.');
   } finally {
     await runtime.dispose();
   }

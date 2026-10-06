@@ -2,6 +2,7 @@ import { appendFileSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, normalize, resolve } from 'node:path';
+import { getCurrentSystemPrompt } from '@earendil-works/pi-ai';
 import {
   type BuildSystemPromptOptions,
   type ExtensionAPI,
@@ -155,19 +156,14 @@ export function registerStartupPromptHooks(
     });
   }
 
-  let lastKnownSystemPrompt: string | undefined;
-  pi.on('before_agent_start', async (event, ctx) => {
-    const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
-    const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions, sessionStartDate);
-    if (result.prompt === undefined) {
-      return;
-    }
-
-    const finalSystemPrompt = await applyResolvedContributions(result.prompt);
-
-    if (dumpSystemPrompt) {
-      // console.error('base prompt:\n', event.systemPrompt);
-      console.error('system prompt:\n', finalSystemPrompt);
+  if (dumpSystemPrompt) {
+    // Dump at request time rather than in before_agent_start, so the output includes the sections
+    // Pi renders after Sandpiper's prompt (tools, rules, cwd, and extension sections).
+    let dumped = false;
+    pi.on('context_with_system', (event, ctx) => {
+      if (dumped) return;
+      dumped = true;
+      console.error('system prompt:\n', getCurrentSystemPrompt(event.messages));
       ctx.shutdown();
       // ctx.shutdown() only exits reliably in modes that wire a real shutdown
       // handler (tui, rpc). Pi's print mode -- forced whenever stdin/stdout
@@ -177,7 +173,18 @@ export function registerStartupPromptHooks(
       // shortly after as a fallback for that case; harmless when shutdown()
       // already worked, since the process is gone before this fires.
       setTimeout(() => process.exit(0), 200);
+    });
+  }
+
+  let lastKnownSystemPrompt: string | undefined;
+  pi.on('before_agent_start', async (event, ctx) => {
+    const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
+    const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions, sessionStartDate);
+    if (result.prompt === undefined) {
+      return;
     }
+
+    const finalSystemPrompt = await applyResolvedContributions(result.prompt);
 
     lastKnownSystemPrompt = lastKnownSystemPrompt ?? finalSystemPrompt;
     if (lastKnownSystemPrompt !== finalSystemPrompt) {
