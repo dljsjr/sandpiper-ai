@@ -26,6 +26,13 @@ Out of scope:
 
 ### Ownership
 
+> **Under discussion (2026-10-06): replacing the guard with a small local `bun patch` of `@earendil-works/pi-coding-agent`.** Doug runs only the uncompiled standalone, which loads the patched `dist/core/agent-session.js`. The patch would be provider-neutral, redone on every Pi bump, and removed when upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). Candidate shapes:
+>
+> - **Run `before_agent_start` for idle `triggerTurn` turns.** This needs a lock over the async preparation window to prevent concurrent runs, and leaves Esc during preparation as a gap. It also has to define what `prompt` means for a turn nobody typed. An empty-string sentinel was rejected as a hack. Passing the message text, or adding an explicit trigger field to the event, are the remaining options.
+> - **Triggered runs never rewrite prompt sections.** They keep the prompt the transcript already records (written by the ownership steps below) and apply only tool loadout changes. This adds no hook semantics. A brand-new session whose first turn is a wake still gets Pi's default prompt for that run; 0.85 behaves the same way. Not yet prototyped.
+>
+> Provider-specific prompt text, such as a clause declaring `pi-claude-code-cli-provider`'s synthetic update frames to be system updates, belongs to that provider's extension, contributed only while it is active. It does not go in Sandpiper's prompt.
+
 The Sandpiper identity extension (`extensions/system/startup-hooks.ts`) owns the prompt through Pi's custom base prompt, not a forced prompt.
 
 In `before_agent_start`, the extension:
