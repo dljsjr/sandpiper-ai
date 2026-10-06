@@ -174,11 +174,21 @@ function resolvePiPackageDir(): string {
   return dirname(dirname(upstreamPiDistEntrypoint));
 }
 
+// The only directories Pi resolves under PI_PACKAGE_DIR at runtime: getThemesDir(),
+// getInteractiveAssetsDir(), and getExportTemplateDir() in Pi's config.ts. Pi's code itself
+// loads from node_modules.
+const PI_RUNTIME_ASSET_DIRS = [
+  ['dist', 'modes', 'interactive', 'theme'],
+  ['dist', 'modes', 'interactive', 'assets'],
+  ['dist', 'core', 'export-html'],
+] as const;
+
 function copyPiRuntimeAssets(): void {
   const piPackageDir = resolvePiPackageDir();
   console.log('⚙ Copying Pi runtime assets');
-  copyTree(join(piPackageDir, 'dist', 'modes'), join(DIST_DIR, 'dist', 'modes'));
-  copyTree(join(piPackageDir, 'dist', 'core'), join(DIST_DIR, 'dist', 'core'));
+  for (const segments of PI_RUNTIME_ASSET_DIRS) {
+    copyTree(join(piPackageDir, ...segments), join(DIST_DIR, ...segments));
+  }
 }
 
 async function ensureSkillReviewGuide(): Promise<void> {
