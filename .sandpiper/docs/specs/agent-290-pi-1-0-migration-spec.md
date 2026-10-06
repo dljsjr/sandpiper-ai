@@ -79,14 +79,22 @@ Open design (AGENT-295, AGENT-296): keep the `<tools>` block current within runs
 - The guard derives a separate tools section patch from each transcript tool delta. It must be deterministic so request prefixes stay stable. It would not appear in the session file.
 - Upstream support for per-request section rendering, as Pi Durable's `section()` provides.
 
-Provider constraint (Claude Code 2.1.290, reported by the `pi-claude-code-cli-provider` agent from a decompiled binary; cache costs not yet measured):
+Provider constraint (Claude Code 2.1.290, reported by the `pi-claude-code-cli-provider` agent from a decompiled binary and live probes):
 
 - Claude Code's system prompt is fixed per process, and its recorded prompt snapshot is replayed on `--resume` until compaction. Measured on 2.1.290: a resumed session launched with a new appended prompt still answered from the old one. With `systemPromptSnapshot: false` it used the new prompt and re-cached the prefix. The provider applies a prompt or section change in one of two ways:
   - an append-only user-side insertion: the cache survives, but the model sees user-turn context
   - a restart with the snapshot off: a correct system prompt, at the cost of a full cache rebuild
-- Tool changes go through `mcp_set_servers` in-process. With inline tool announcements off, a swap may rewrite the tool list and break the prefix cache.
+- Tool changes go through `mcp_set_servers` in-process and keep the prefix cache warm. Measured on Opus 5.5 with CC 2.1.290 and a ~12K-token prompt:
 
-So with this provider, every change to Sandpiper's prompt text is expensive, and tool changes may be. Under consideration: a Sandpiper protocol clause, like the existing system-notification protocol, that gives framed user-side prompt updates system authority. That would make the cache-preserving path semantically correct, with the same prompt-injection exposure the notification protocol has.
+  | Turn                | cache_read | cache_create |
+  | ------------------- | ---------- | ------------ |
+  | Baseline            | 11,897     | 43           |
+  | After a tool add    | 11,940     | 179          |
+  | After a tool remove | 12,163     | 45           |
+
+  Claude Code announces an added tool inline as a deferred tool, so only the new definition is new input. Not yet tested: the model calling a tool added mid-session.
+
+So with this provider, every change to Sandpiper's prompt text is expensive, and tool changes are cheap. That favors keeping Sandpiper's prompt text constant for the session and moving the tool list and guidelines out of the prompt text, so tool changes travel only as tool deltas. Under consideration: a Sandpiper protocol clause, like the existing system-notification protocol, that gives framed user-side prompt updates system authority. That would make the cache-preserving path semantically correct, with the same prompt-injection exposure the notification protocol has.
 
 ### Invariants
 
