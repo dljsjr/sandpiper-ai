@@ -1,15 +1,15 @@
 # AGENT-290 Pi 1.0 migration work plan
 
-- **Diátaxis mode**: How-to plan
+- **Diátaxis mode**: How-to plan (archived 2026-10-06; the migration is complete)
 - **Status**: Complete (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30; the interactive renderer checks were dropped, and regressions get filed as bugs.
 - **Task**: AGENT-290
-- **Related**: [migration spec](agent-290-pi-1-0-migration-spec.md), [discovery notes](agent-290-pi-1-0-discovery.md)
+- **Related**: [migration spec](../docs/specs/agent-290-pi-1-0-migration-spec.md), [discovery notes](../docs/specs/agent-290-pi-1-0-discovery.md)
 
 This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people run day to day, and coordinates with the `pi-claude-code-cli-provider` migration.
 
 ## Before you start
 
-- Read the [migration spec](agent-290-pi-1-0-migration-spec.md). Each step below implements one of its sections.
+- Read the [migration spec](../docs/specs/agent-290-pi-1-0-migration-spec.md). Each step below implements one of its sections.
 - Work in a dedicated jj workspace, for example `jj workspace add ../sandpiper-ai-pi1`, so the default workspace keeps running Sandpiper on Pi 0.85.1 until the end-to-end check in step 10 passes. When the work is merged, run `jj workspace forget` and remove the directory.
 - Make one jj change per subtask, with `Refs: AGENT-<n>` in the description.
 - Tests are part of the subtask they verify. Write them first, red on stock behavior, in the same change.
@@ -45,21 +45,13 @@ The `pi-claude-code-cli-provider` migration runs in its own repository with its 
 | Ready artifact      | AGENT-295 and AGENT-296 landed                                                                               | Provider passes its own tests against Pi 1.0.4 |
 | Integration         | AGENT-290's end-to-end check runs Sandpiper with the migrated provider                                       | Same checkpoint                                |
 
-Coordinate over Tattler. The contract between the lanes is the [provider-facing request shape](agent-290-pi-1-0-migration-spec.md#provider-facing-request-shape). If either lane needs to change it, agree on the change over Tattler, then update the spec before implementing.
+Coordinate over Tattler. The contract between the lanes is the [provider-facing request shape](../docs/specs/agent-290-pi-1-0-migration-spec.md#provider-facing-request-shape). If either lane needs to change it, agree on the change over Tattler, then update the spec before implementing.
 
 The provider can develop against plain Pi 1.0.4 before Sandpiper's prompt work lands. The request has the same structure under plain Pi; only the sections present and their text differ.
 
 ## After phase 1: adoption candidates
 
-These were discussed but are not authorized. Each needs the user's go-ahead before it becomes a task:
-
-- Render Sandpiper's blocks as Pi sections instead of one preamble, so changes travel as per-section updates.
-- Remove the synthetic-runs part of the local Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The prompt regression tests from AGENT-295 should still pass without it.
-- Declare `outputSchema` and return `structuredContent` from Sandpiper tools that return data.
-- Add tool `annotations` (`readOnlyHint` and related hints) to Sandpiper tools.
-- Register rarely used Sandpiper tools with `exposure: "deferred"` and enable `tool_search`, so their snippets and guidelines leave the `tools` and `rules` sections until the model loads them. Under `pi-claude-code-cli-provider`, a tool loaded mid-run is not callable until the Claude Code turn ends (PCCP-304 tracks the fix), so wait for that before adopting.
-- Register turn-control tools (`done`, `tattler_receive`) with `exposure: "model-only"` if codemode scripts calling them becomes a measured problem: calls from scripts ignore `terminate`.
-- Replace `mcporter` in the web-search Parallel adapter with `pi.registerMcpServer()`.
+Moved to the [migration spec](../docs/specs/agent-290-pi-1-0-migration-spec.md#adoption-candidates).
 
 ## If something goes wrong
 

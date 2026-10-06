@@ -3,7 +3,7 @@
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented and merged (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30.
 - **Task**: AGENT-290 (subtasks AGENT-293 and AGENT-295 to AGENT-302)
-- **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](agent-290-pi-1-0-migration-work-plan.md)
+- **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](../../archive/agent-290-pi-1-0-migration-work-plan.md) (archived)
 
 ## Scope
 
@@ -11,7 +11,7 @@ Phase 1 of the migration: run Sandpiper on `@earendil-works/pi-coding-agent` 1.0
 
 Out of scope:
 
-- adoption of new Pi 1.0 capabilities (listed as candidates in the work plan)
+- adoption of new Pi 1.0 capabilities (see [Adoption candidates](#adoption-candidates))
 - the build and distribution redesign (AGENT-301)
 - the `pi-claude-code-cli-provider` migration, which happens in that repository
 
@@ -156,13 +156,24 @@ Only the test doubles and the integration mock provider change. AGENT-293 lists 
 
 Production extension code needs no other API changes: `tsc` against Pi 1.0.3 reports errors only in those files.
 
-## Open items
+## Follow-up
 
-| Item                                                                                               | Owner                                          |
-| -------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Bun OAuth and Bedrock setup in the compiled standalone app; codemode skipped there (needs a patch) | AGENT-299                                      |
-| Defaults for fullscreen TUI, `/bug`, startup header, built-in extensions, telemetry                | AGENT-300 (decided 2026-10-06; header remains) |
-| CLI versus Pi-package artifacts, host-provided dependency warning, asset copying                   | AGENT-301                                      |
+| Item                                                                                                        | Where       |
+| ----------------------------------------------------------------------------------------------------------- | ----------- |
+| Which delivery modes to keep; CLI versus Pi-package artifacts; `"*"` host peers; where the Pi patch applies | TOOLS-30    |
+| Codemode in the compiled standalone app (needs Pi's embedded QuickJS path, which Pi does not export)        | Not planned |
+
+### Adoption candidates
+
+These were discussed but are not authorized. Each needs Doug's go-ahead before it becomes a task:
+
+- Render Sandpiper's blocks as Pi sections instead of one preamble, so changes travel as per-section updates.
+- Remove the synthetic-runs part of the local Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The tests in `extensions/system/prompt-ownership.test.ts` should still pass without it.
+- Declare `outputSchema` and return `structuredContent` from Sandpiper tools that return data.
+- Add tool `annotations` (`readOnlyHint` and related hints) to Sandpiper tools.
+- Register rarely used Sandpiper tools with `exposure: "deferred"` and enable `tool_search`, so their snippets and guidelines leave the `tools` and `rules` sections until the model loads them. `pi-claude-code-cli-provider` delivers mid-run tool additions through `tools/list_changed` since PCCP-304, so a loaded tool is callable in the same run.
+- Register turn-control tools (`done`, `tattler_receive`) with `exposure: "model-only"` if codemode scripts calling them becomes a measured problem: calls from scripts ignore `terminate`.
+- Replace `mcporter` in the web-search Parallel adapter with `pi.registerMcpServer()`.
 
 ## Provider-facing request shape
 

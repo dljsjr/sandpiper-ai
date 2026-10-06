@@ -20,6 +20,7 @@ Read this before changing build scripts, package metadata, distribution assembly
 - Keep package manifests npm-installable: no `catalog:` specs; root local workspace dependencies use `workspace:*`; package-level internal and registry dependencies use exact versions only.
 - Use `bun run check:deps` for source manifest policy and ecosystem package tests for generated artifact policy.
 - For distribution health, use `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`.
+- Sandpiper patches `@earendil-works/pi-coding-agent` locally (`patches/`, `patchedDependencies`). Every Pi version bump must redo the patch and rerun `extensions/system/prompt-ownership.test.ts`; follow "Local Pi patch" in `docs/dev/build-system.md`.
 
 ## What to Run
 

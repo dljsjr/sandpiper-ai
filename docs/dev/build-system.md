@@ -59,6 +59,18 @@ Package manifests stay compatible with both Bun local development and npm instal
 
 `bun run check:deps` enforces source manifest policy with Syncpack. Ecosystem package tests enforce generated package policy.
 
+## Local Pi patch
+
+Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`, saved under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`. It changes Pi's compiled `dist/core/agent-session.js` and `dist/core/system-prompt.js` so that Sandpiper's system prompt reaches turns started by extensions, and so that Pi keeps its `tools` and `rules` sections under Sandpiper's custom prompt. The [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md) describes the behavior.
+
+The patch applies wherever this repository installs its own dependencies: repository runs (the root `sandpiper` bin and `bun run sandpiper-dev`), the generated `dist/` runtime, and the compiled standalone app, which bundles the patched files. A `sandpiper-ai` package installed from npm resolves Pi from the installer's dependency tree and runs unpatched.
+
+The patch is tied to an exact Pi version, so every Pi upgrade must redo it:
+
+1. Bump the pins, then run `bun patch @earendil-works/pi-coding-agent` and reapply the changes marked `Sandpiper local patch` in the old patch file.
+2. Run `bun patch --commit 'node_modules/@earendil-works/pi-coding-agent'`. Delete any `.bun-tag-*` file entries Bun adds to the new patch file, and remove the previous version's patch file if Bun leaves it in `patches/`.
+3. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts`, then the full gates.
+
 ## Distribution assembly
 
 `devtools/assembleDistribution.ts` assembles generated artifacts. It:
