@@ -17,18 +17,18 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 
 ## Steps
 
-| Step                                     | Subtask   | Depends on                 | Verify with                                                                                                                  |
-| ---------------------------------------- | --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 1. Bump Pi pins, fix test doubles        | AGENT-293 | none                       | `bun check`; `bun run test`; `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`                                |
-| 2. Prompt ownership and Shape B Pi patch | AGENT-295 | 1                          | Its prompt regression tests fail on stock Pi, then pass; full suite green                                                    |
-| 3. Pi tool sections under Sandpiper      | AGENT-296 | 2                          | Its tests show Pi's `rules` carries the 0.85.1 guidelines and both sections track tool changes; full suite green             |
-| 4. Diagnostic renders the sent prompt    | AGENT-297 | 2                          | `sandpiper-system-prompt --approve` output equals the prompt captured by a recording provider                                |
-| 5. AutoTOON nested calls                 | AGENT-298 | 1                          | New AutoTOON tests; full suite green                                                                                         |
-| 6. Compiled app runtime setup            | AGENT-299 | 1                          | `bun run test:standalone-app` plus a codemode check in the compiled binary, or a recorded decision to disable codemode there |
-| 7. Inherited Pi 1.0 defaults             | AGENT-300 | 1                          | User decisions recorded on the task; behavior checked live                                                                   |
-| 8. Build and distribution topology       | AGENT-301 | 1                          | Agreed topology; distribution gate green                                                                                     |
-| 9. Docs and playbooks                    | AGENT-302 | 2                          | Consistency sweep of touched docs                                                                                            |
-| 10. End-to-end check                     | AGENT-290 | 1 to 9, provider migration | The done criteria in AGENT-290 pass on the built runtime                                                                     |
+| Step                                     | Subtask   | Depends on                 | Verify with                                                                                                      |
+| ---------------------------------------- | --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 1. Bump Pi pins, fix test doubles        | AGENT-293 | none                       | `bun check`; `bun run test`; `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`                    |
+| 2. Prompt ownership and Shape B Pi patch | AGENT-295 | 1                          | Its prompt regression tests fail on stock Pi, then pass; full suite green                                        |
+| 3. Pi tool sections under Sandpiper      | AGENT-296 | 2                          | Its tests show Pi's `rules` carries the 0.85.1 guidelines and both sections track tool changes; full suite green |
+| 4. Diagnostic renders the sent prompt    | AGENT-297 | 2                          | `sandpiper-system-prompt --approve` output equals the prompt captured by a recording provider                    |
+| 5. AutoTOON nested calls                 | AGENT-298 | 1                          | New AutoTOON tests; full suite green                                                                             |
+| 6. Compiled app runtime setup            | AGENT-299 | 1                          | `bun run test:standalone-app` with OAuth and Bedrock setup checked in the compiled binary                        |
+| 7. Inherited Pi 1.0 defaults             | AGENT-300 | 1                          | User decisions recorded on the task; behavior checked live                                                       |
+| 8. Build and distribution topology       | AGENT-301 | 1                          | Agreed topology; distribution gate green                                                                         |
+| 9. Docs and playbooks                    | AGENT-302 | 2                          | Consistency sweep of touched docs                                                                                |
+| 10. End-to-end check                     | AGENT-290 | 1 to 9, provider migration | The done criteria in AGENT-290 pass on the built runtime                                                         |
 
 Steps 2 and 5 can run in parallel after step 1. Step 3 follows step 2 because both change the same patch file. Do steps 1 to 3 and 5 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
 

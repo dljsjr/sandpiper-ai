@@ -158,11 +158,11 @@ Production extension code needs no other API changes: `tsc` against Pi 1.0.3 rep
 
 ## Open items
 
-| Item                                                                                | Owner                            |
-| ----------------------------------------------------------------------------------- | -------------------------------- |
-| Codemode and Bun OAuth in the compiled standalone app                               | AGENT-299                        |
-| Defaults for fullscreen TUI, `/bug`, startup header, built-in extensions, telemetry | AGENT-300 (needs user decisions) |
-| CLI versus Pi-package artifacts, host-provided dependency warning, asset copying    | AGENT-301                        |
+| Item                                                                                               | Owner                                          |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Bun OAuth and Bedrock setup in the compiled standalone app; codemode skipped there (needs a patch) | AGENT-299                                      |
+| Defaults for fullscreen TUI, `/bug`, startup header, built-in extensions, telemetry                | AGENT-300 (decided 2026-10-06; header remains) |
+| CLI versus Pi-package artifacts, host-provided dependency warning, asset copying                   | AGENT-301                                      |
 
 ## Provider-facing request shape
 
