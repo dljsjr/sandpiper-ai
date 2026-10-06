@@ -30,7 +30,7 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 | 9. Docs and playbooks                    | AGENT-302 | 2                          | Consistency sweep of touched docs                                                                                |
 | 10. End-to-end check                     | AGENT-290 | 1 to 9, provider migration | The done criteria in AGENT-290 pass on the built runtime                                                         |
 
-Steps 2 and 5 can run in parallel after step 1. Step 3 follows step 2 because both change the same patch file. Do steps 1 to 3 and 5 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
+AGENT-295 builds an in-process test harness with a recording provider; AGENT-296 and AGENT-297 reuse it. Steps 2 and 5 can run in parallel after step 1. Step 3 follows step 2 because both change the same patch file. Do steps 1 to 3 and 5 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
 
 ## Coordinating with the provider migration
 
