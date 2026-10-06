@@ -6,7 +6,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.484Z
-updated_at: 2026-10-06T18:23:49.789Z
+updated_at: 2026-10-06T18:36:12.078Z
 depends_on:
   - AGENT-295
 ---
@@ -20,8 +20,9 @@ Steps:
 2. Render by running one turn against an in-process capture provider, with no credentials or network, and taking getCurrentSystemPrompt() of the first request.
 3. Keep --json's source metadata. Mark Pi-rendered sections as generated.
 4. Make SANDPIPER_DUMP_SYSTEM_PROMPT=1 print the same text.
-5. Birdup's `--edit-prompt` runs `sandpiper-system-prompt` (~/git/birdup/src/birdup/cli.py). Confirm its prompt projection still loads, with Pi's sections as read-only regions.
-6. Gates, then one jj change with `Refs: AGENT-297`.
+5. Gates, then one jj change with `Refs: AGENT-297`.
+
+Out of scope (Doug, 2026-10-06): Birdup's `--edit-prompt` runs `sandpiper-system-prompt` and may need changes. That waits until after the migration, at low priority.
 
 Done when: `sandpiper-system-prompt --approve` output equals the prompt captured by a recording provider, bun check is clean, and bun run test is green.
 
@@ -32,3 +33,7 @@ Done when: `sandpiper-system-prompt --approve` output equals the prompt captured
 ## 2026-10-06T18:23:49.789Z
 
 - **description**: 1 line → updated (11 lines)
+
+## 2026-10-06T18:36:12.079Z
+
+- **description**: 11 lines → updated (12 lines)
