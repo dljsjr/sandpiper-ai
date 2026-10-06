@@ -1,7 +1,7 @@
 # AGENT-290 Pi 1.0 migration work plan
 
 - **Diátaxis mode**: How-to plan
-- **Status**: Steps 1 to 9 done (AGENT-301's packaging decisions moved to TOOLS-30); step 10: headless and joint provider checks pass, Doug's interactive dogfood pending
+- **Status**: Complete (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30; the interactive renderer checks were dropped, and regressions get filed as bugs.
 - **Task**: AGENT-290
 - **Related**: [migration spec](agent-290-pi-1-0-migration-spec.md), [discovery notes](agent-290-pi-1-0-discovery.md)
 
