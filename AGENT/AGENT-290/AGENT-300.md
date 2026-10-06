@@ -1,12 +1,13 @@
 ---
 title: "Decide and apply Sandpiper defaults for inherited Pi 1.0 behavior"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.705Z
-updated_at: 2026-10-06T19:21:18.066Z
+updated_at: 2026-10-06T20:31:00.024Z
 depends_on:
   - AGENT-293
 ---
@@ -69,3 +70,8 @@ Steps:
 ## 2026-10-06T19:21:18.070Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:31:00.025Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

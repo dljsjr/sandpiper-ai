@@ -1,12 +1,13 @@
 ---
 title: "ecosystemPackage dist/ test times out under full-suite load"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: LOW
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T16:15:39.470Z
-updated_at: 2026-10-06T19:15:27.058Z
+updated_at: 2026-10-06T20:31:00.272Z
 ---
 
 # ecosystemPackage dist/ test times out under full-suite load
@@ -25,3 +26,8 @@ devtools/ecosystemPackage.test.ts > 'emits a publishable Sandpiper Pi/npm packag
 ## 2026-10-06T19:15:27.059Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:31:00.272Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

@@ -1,12 +1,13 @@
 ---
 title: "Migrate Sandpiper to Pi 1.0 SDK architecture"
-status: IN PROGRESS
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-05T21:08:10.437Z
-updated_at: 2026-10-06T20:27:06.219Z
+updated_at: 2026-10-06T20:31:02.527Z
 related:
   - AGENT-289
   - TOOLS-27
@@ -49,7 +50,7 @@ Cutover (2026-10-06): Doug merged the migration into the default workspace (jj n
 /export checked live (Doug, 2026-10-06; ~/pi-1.0.4-migration-export.html and .jsonl from the trail session): the HTML embeds the Sandpiper system prompt with no Pi default; the JSONL has exactly one system message (Sandpiper preamble plus tools/rules/cwd, 15 tools); after a tattler:pending-batch wake, six more assistant turns ran with no reverting system message.
 Idle synthetic run checked live (2026-10-06 20:18, same trail session file, idle when woken): a tattler:pending-batch wake ran three model calls (bash, send_peer_message, final reply) and no system message was appended, so Shape B held across turns 2 and 3 on the real runtime.
 Real 0.85-era resume checked live (2026-10-06): this AGENT-290 session (1,218 entries, started on 0.85.1) continued on Pi 1.0.4 via --continue. Pi wrote its only system message at message 1073 of 1076 (after the legacy history), with the Sandpiper preamble plus tools/rules/cwd and 15 tools. Through PCCP-327, Claude Code received it as the real system prompt with bridge rule 6, and no preamble update frame was sent.
-Remaining: Doug's interactive check of the fullscreen Chorus room UI and the Tattler pending-batch and diagnostics entry renderers. Then forget the pi1 jj workspace and remove ../sandpiper-ai-pi1.
+Closed (Doug, 2026-10-06): the remaining interactive checks (fullscreen Chorus room UI, Tattler pending-batch and diagnostics entry renderers) were dropped. Regressions found later get filed as new bugs. Packaging decisions continue in TOOLS-30.
 
 ---
 
@@ -103,3 +104,16 @@ Remaining: Doug's interactive check of the fullscreen Chorus room UI and the Tat
 ## 2026-10-06T20:27:06.220Z
 
 - **description**: 35 lines → updated (36 lines)
+
+## 2026-10-06T20:30:59.485Z
+
+- **description**: updated
+
+## 2026-10-06T20:30:59.548Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:31:02.528Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

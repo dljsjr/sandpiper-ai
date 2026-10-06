@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-293.md
++++ b/AGENT-293.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Bump Pi pins to 1.0.4 and fix test doubles"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-06T02:57:59.152Z
+-updated_at: 2026-10-06T18:58:22.438Z
++updated_at: 2026-10-06T20:30:59.649Z
+ ---
+ 
+ # Bump Pi pins to 1.0.4 and fix test doubles
+ 
+@@ -47,4 +48,9 @@
+ 
+ ## 2026-10-06T18:58:22.439Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-06T20:30:59.650Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

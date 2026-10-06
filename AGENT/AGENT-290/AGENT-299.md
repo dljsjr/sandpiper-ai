@@ -1,12 +1,13 @@
 ---
 title: "Standalone compiled app: Pi 1.0 Bun runtime setup parity"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.631Z
-updated_at: 2026-10-06T19:18:40.072Z
+updated_at: 2026-10-06T20:30:59.962Z
 depends_on:
   - AGENT-293
 ---
@@ -37,3 +38,8 @@ Done when: bun run test:standalone-app passes with a check that OAuth and Bedroc
 ## 2026-10-06T19:18:40.073Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:30:59.962Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

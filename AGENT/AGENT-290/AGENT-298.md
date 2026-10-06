@@ -1,12 +1,13 @@
 ---
 title: "AutoTOON: skip nested tool calls and preserve structuredContent"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.557Z
-updated_at: 2026-10-06T19:16:36.264Z
+updated_at: 2026-10-06T20:30:59.899Z
 depends_on:
   - AGENT-293
 ---
@@ -40,3 +41,8 @@ Done when: those tests pass, bun check is clean, and bun run test is green.
 ## 2026-10-06T19:16:36.265Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:30:59.900Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

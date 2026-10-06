@@ -1,6 +1,7 @@
 ---
 title: "Reassess build and distribution topology for Pi 1.0"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: MEDIUM
 assignee: AGENT
@@ -8,7 +9,7 @@ reporter: AGENT
 created_at: 2026-10-06T02:57:59.778Z
 related:
   - TOOLS-30
-updated_at: 2026-10-06T20:03:09.436Z
+updated_at: 2026-10-06T20:31:00.086Z
 depends_on:
   - AGENT-293
 ---
@@ -58,3 +59,8 @@ Status (2026-10-06): proposal written at .sandpiper/docs/specs/agent-301-build-t
 ## 2026-10-06T20:03:09.437Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:31:00.086Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

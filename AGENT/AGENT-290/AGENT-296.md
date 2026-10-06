@@ -1,12 +1,13 @@
 ---
 title: "Let Pi render its tools and rules sections under Sandpiper's prompt"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.409Z
-updated_at: 2026-10-06T19:15:26.609Z
+updated_at: 2026-10-06T20:30:59.772Z
 depends_on:
   - AGENT-295
 ---
@@ -56,3 +57,8 @@ History (2026-10-06): absorbed the tool-guideline coverage from AGENT-294. Repla
 ## 2026-10-06T19:15:26.610Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-06T20:30:59.773Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
