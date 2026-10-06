@@ -25,6 +25,7 @@ import {
   type AssistantMessageEventStream,
   type Context,
   createAssistantMessageEventStream,
+  type JsonObject,
   type Model,
   type SimpleStreamOptions,
 } from '@earendil-works/pi-ai';
@@ -46,7 +47,7 @@ export const MOCK_SCRIPT_ENV_VAR = 'SANDPIPER_INTEGRATION_MOCK_SCRIPT';
  * against the extension under test (stopReason "toolUse"). */
 export type MockScriptStep =
   | { readonly type: 'text'; readonly text: string }
-  | { readonly type: 'toolCall'; readonly toolName: string; readonly arguments: Record<string, unknown> };
+  | { readonly type: 'toolCall'; readonly toolName: string; readonly arguments: JsonObject };
 
 export type MockScript = readonly MockScriptStep[];
 
@@ -105,7 +106,7 @@ function emitToolCallStep(
   stream: AssistantMessageEventStream,
   output: AssistantMessage,
   toolName: string,
-  toolArguments: Record<string, unknown>,
+  toolArguments: JsonObject,
 ): void {
   mockToolCallSequence += 1;
   const toolCallId = `mock-tool-call-${mockToolCallSequence}`;

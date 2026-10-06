@@ -65,6 +65,7 @@ function createExtensionCapture(): {
       getFlag: vi.fn(() => false) as ExtensionAPI['getFlag'],
       on: ((event: string) => {
         events.push(event);
+        return () => {};
       }) as ExtensionAPI['on'],
       registerCommand: ((name: string) => {
         commands.push(name);

@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionContext, ToolDefinition } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI, ExtensionToolContext, ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { describe, expect, test } from 'vitest';
 import { registerTurnControlTool } from './turn-control-tool.js';
 
@@ -29,7 +29,7 @@ describe('turn control tool', () => {
 
   test('terminates the current turn with provider-safe content and no rendering', async () => {
     const tool = captureTool();
-    const result = await tool.execute('tool-call-id', {}, undefined, undefined, {} as ExtensionContext);
+    const result = await tool.execute('tool-call-id', {}, undefined, undefined, {} as ExtensionToolContext);
 
     expect(result).toEqual({
       content: [{ type: 'text', text: '(no response needed)' }],

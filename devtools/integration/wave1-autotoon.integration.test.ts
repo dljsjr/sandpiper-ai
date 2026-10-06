@@ -9,6 +9,7 @@
 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { JsonObject } from '@earendil-works/pi-ai';
 import { describe, expect, it } from 'vitest';
 import { encodeMockScript, MOCK_SCRIPT_ENV_VAR } from './mock-provider.js';
 import { PROBE_TOOL_NAME } from './probe-tool.js';
@@ -23,7 +24,7 @@ const PROBE_TOOL_PATH = join(integrationDir, 'probe-tool.ts');
 const TOON_HEADER = '[TOON]\n';
 
 /** A JSON payload well over autotoon's 256-byte MIN_JSON_BYTES threshold. */
-function largeJsonArguments(): Record<string, unknown> {
+function largeJsonArguments(): JsonObject {
   return {
     items: Array.from({ length: 20 }, (_, index) => ({ id: index, label: `padding-item-${index}` })),
   };
