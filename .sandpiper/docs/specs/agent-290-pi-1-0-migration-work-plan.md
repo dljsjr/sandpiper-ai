@@ -30,7 +30,7 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 | 10. Docs and playbooks                 | AGENT-302 | 3                           | Consistency sweep of touched docs                                                                                            |
 | 11. End-to-end dogfood                 | AGENT-303 | 3 to 10, provider migration | Checklist in AGENT-303 passes on the built runtime                                                                           |
 
-Steps 3, 4, and 6 can run in parallel after their dependencies. Do steps 1 to 4 and 6 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle wakes run on Pi's default prompt.
+Steps 3, 4, and 6 can run in parallel after their dependencies. Do steps 1 to 4 and 6 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
 
 ## Coordinating with the provider migration
 

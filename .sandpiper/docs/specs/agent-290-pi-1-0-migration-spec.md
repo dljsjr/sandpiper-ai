@@ -24,12 +24,20 @@ Out of scope:
 
 ## System prompt
 
+Goal: every provider request carries Sandpiper's prompt, whatever started the turn. The mechanism is secondary.
+
+A _synthetic turn_ is a run started by an extension rather than by user input, for example `pi.sendMessage(..., { triggerTurn: true })` from a background-process exit, Tattler, or Chorus. An _idle synthetic turn_ starts while no run is active.
+
 ### Ownership
 
 > **Under discussion (2026-10-06): replacing the guard with a small local `bun patch` of `@earendil-works/pi-coding-agent`.** Doug runs only the uncompiled standalone, which loads the patched `dist/core/agent-session.js`. The patch would be provider-neutral, redone on every Pi bump, and removed when upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). Candidate shapes:
 >
-> - **Run `before_agent_start` for idle `triggerTurn` turns.** This needs a lock over the async preparation window to prevent concurrent runs, and leaves Esc during preparation as a gap. It also has to define what `prompt` means for a turn nobody typed. An empty-string sentinel was rejected as a hack. Passing the message text, or adding an explicit trigger field to the event, are the remaining options.
-> - **Triggered runs never rewrite prompt sections.** They keep the prompt the transcript already records (written by the ownership steps below) and apply only tool loadout changes. This adds no hook semantics. A brand-new session whose first turn is a wake still gets Pi's default prompt for that run; 0.85 behaves the same way. Not yet prototyped.
+> - **Shape A: run `before_agent_start` for idle `triggerTurn` turns.** This needs a lock over the async preparation window to prevent concurrent runs, and leaves Esc during preparation as a gap. It also has to define what `prompt` means for a turn nobody typed. An empty-string sentinel was rejected as a hack. Passing the message text, or adding an explicit trigger field to the event, are the remaining options.
+> - **Shape B: triggered runs never rewrite prompt sections.** They keep the prompt the transcript already records (written by the ownership steps below) and apply only tool loadout changes. This adds no hook semantics. A brand-new session whose first turn is a synthetic turn still gets Pi's default prompt for that run; 0.85 behaves the same way. Not yet prototyped.
+>   Shape B does not close the first-turn gap: a new session has no recorded prompt until its first user-prompted run. The peer-supervisor direction would make synthetic first turns common, for example a launched peer that gets its work over Tattler. Ways to close it:
+>   - Make Sandpiper's prompt part of Pi's base prompt options, which every run falls back to. This is the root fix, but it needs a patch hook for an extension-supplied base prompt, because the prompt's inputs exist only after Pi loads. Not yet sized.
+>   - Run preparation only when the transcript has no prompt yet.
+>   - Avoid synthetic first turns: launchers send the first work as a real prompt (RPC `prompt`), or Tattler holds messages until a prompt is recorded.
 >
 > Provider-specific prompt text, such as a clause declaring `pi-claude-code-cli-provider`'s synthetic update frames to be system updates, belongs to that provider's extension, contributed only while it is active. It does not go in Sandpiper's prompt.
 
@@ -66,20 +74,20 @@ The identity extension registers a `context_with_system` handler that runs on ev
 | When it is active              | Only while Sandpiper owns the prompt. It does nothing when the user supplied a custom prompt (`ctx.getSystemPromptOptions().customPrompt` is set).                                                                                                                         |
 | Recognizing Sandpiper's prompt | A `preamble` that starts with `<system_prompt>`                                                                                                                                                                                                                            |
 | Reverting patches              | For each system message, track the replayed `preamble`. A message whose `sections` patch moves the preamble from a Sandpiper prompt to anything else loses its `sections` and `content`; its `toolsAdded` and `toolsRemoved` stay. A message left with nothing is dropped. |
-| No Sandpiper prompt yet        | If the replayed preamble is not a Sandpiper prompt, as when a new session's first turn is an idle wake, the request carries a Sandpiper prompt rendered from `ctx.getSystemPromptOptions()` in place of Pi's default sections.                                             |
+| No Sandpiper prompt yet        | If the replayed preamble is not a Sandpiper prompt, as when a new session's first turn is an idle synthetic turn, the request carries a Sandpiper prompt rendered from `ctx.getSystemPromptOptions()` in place of Pi's default sections.                                   |
 | Everything else                | Non-system messages, tool declarations, and Pi's `cwd` and extension sections pass through unchanged.                                                                                                                                                                      |
 
-The guard affects only the outgoing request. Pi may still record a reverting patch in the session file after a multi-turn idle wake; the next user-prompted run records Sandpiper's prompt again.
+The guard affects only the outgoing request. Pi may still record a reverting patch in the session file after a multi-turn idle synthetic turn; the next user-prompted run records Sandpiper's prompt again.
 
 ### Mid-session tool changes
 
 Sandpiper must support changes to the active tool set during a session. Sources include `pi.setActiveTools()` (Navigator adds its tools and removes `edit` and `write` while watching), lazy tool registration, and `tool_search` loading deferred tools.
 
-| Aspect                       | Behavior under this spec                                                                                                                                       |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tool declarations            | Pi records `toolsAdded`/`toolsRemoved` deltas before the next request; the guard passes them through unchanged.                                                |
-| Sandpiper's `<tools>` block  | Rendered into the preamble in `before_agent_start`, so it catches up at the next user-prompted run, and the change travels as an update of the whole preamble. |
-| Within a run or an idle wake | Declarations change immediately; the `<tools>` text stays stale until the next user prompt.                                                                    |
+| Aspect                                 | Behavior under this spec                                                                                                                                       |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tool declarations                      | Pi records `toolsAdded`/`toolsRemoved` deltas before the next request; the guard passes them through unchanged.                                                |
+| Sandpiper's `<tools>` block            | Rendered into the preamble in `before_agent_start`, so it catches up at the next user-prompted run, and the change travels as an update of the whole preamble. |
+| Within a run or an idle synthetic turn | Declarations change immediately; the `<tools>` text stays stale until the next user prompt.                                                                    |
 
 Open design (AGENT-295, AGENT-296): keep the `<tools>` block current within runs without resending the whole prompt for each change. Candidates:
 
@@ -109,15 +117,15 @@ Sandpiper's prompt must declare that these frames are system prompt updates, lik
 
 The AGENT-294 regression tests assert these. "Sandpiper prompt" means a replayed system prompt whose preamble starts with `<system_prompt>`.
 
-| Invariant                                                                           | Applies to                                                                                                  |
-| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Every provider request carries the Sandpiper prompt                                 | User-prompted runs, idle triggered runs on every turn, wakes before the first user prompt, resumed sessions |
-| No request contains Pi's default preamble text                                      | All requests                                                                                                |
-| `session.state.systemPrompt`, which `/export` renders, carries the Sandpiper prompt | After any user-prompted run                                                                                 |
-| Each request extends the previous request byte-for-byte                             | Consecutive requests without a deliberate prompt or tool change, including across idle wakes                |
-| The `<tools>` guidelines match those rendered on Pi 0.85.1 for the same tools       | Prompt rendering                                                                                            |
-| Extension sections reach the provider                                               | For example a test extension setting `sections.mcp_servers`                                                 |
-| After an active-tool change, request declarations match the active tools            | Changes between user prompts, within a run, and during an idle wake                                         |
+| Invariant                                                                           | Applies to                                                                                                            |
+| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Every provider request carries the Sandpiper prompt                                 | User-prompted runs, idle triggered runs on every turn, synthetic turns before the first user prompt, resumed sessions |
+| No request contains Pi's default preamble text                                      | All requests                                                                                                          |
+| `session.state.systemPrompt`, which `/export` renders, carries the Sandpiper prompt | After any user-prompted run                                                                                           |
+| Each request extends the previous request byte-for-byte                             | Consecutive requests without a deliberate prompt or tool change, including across idle synthetic turns                |
+| The `<tools>` guidelines match those rendered on Pi 0.85.1 for the same tools       | Prompt rendering                                                                                                      |
+| Extension sections reach the provider                                               | For example a test extension setting `sections.mcp_servers`                                                           |
+| After an active-tool change, request declarations match the active tools            | Changes between user prompts, within a run, and during an idle synthetic turn                                         |
 
 ### Diagnostics
 
