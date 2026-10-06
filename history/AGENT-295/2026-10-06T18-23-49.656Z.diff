@@ -1,0 +1,55 @@
+===================================================================
+--- a/AGENT-295.md
++++ b/AGENT-295.md
+@@ -5,25 +5,34 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-06T02:57:59.333Z
+-updated_at: 2026-10-06T15:49:53.307Z
++updated_at: 2026-10-06T18:23:49.656Z
+ depends_on:
+   - AGENT-293
+ ---
+ 
+ # Implement prompt ownership and the Shape B Pi patch
+ 
+-Implement the System prompt section of .sandpiper/docs/specs/agent-290-pi-1-0-migration-spec.md (Ownership and Synthetic runs) in extensions/system/startup-hooks.ts and packages/core.
++Implement the System prompt section of .sandpiper/docs/specs/agent-290-pi-1-0-migration-spec.md (Ownership, and the synthetic-runs part of Local Pi patch) in extensions/system/startup-hooks.ts and packages/core.
+ 
+-Ownership: in before_agent_start, set systemPromptOptions.customPrompt to the rendered Sandpiper prompt, clear the inputs Sandpiper renders itself (appendSystemPrompt, contextFiles, skills), stop returning systemPrompt, and drop cwd from the environment block.
++Steps:
++1. Test harness. Build an in-process harness: createAgentSession with the real createSandpiperIdentityExtension(), a temp agent dir, an in-memory or temp SessionManager, and a recording provider that captures each request's TranscriptContext. Start from the scratch probes /tmp/sp-pi1/probe-hybrid.ts and /tmp/sp-pi1/probe-sections.ts. They are scratch and may be gone after a reboot; the pattern is createAgentSession plus a provider registered in-process. AGENT-296 and AGENT-297 reuse this harness, so put it where both can import it.
++2. Tests, red on stock 1.0.4. Assert the spec's Invariants except the tool-section rows, which belong to AGENT-296. Cover user-prompted runs, idle synthetic runs including a second turn, the first-turn gap as the documented exception, a resumed session, session.state.systemPrompt as /export renders it, byte-for-byte request prefix stability across idle synthetic turns, and an extension-added section such as mcp_servers. Confirm each fails for the reason the invariant names.
++3. Ownership in extensions/system/startup-hooks.ts:
++   - In before_agent_start, set systemPromptOptions.customPrompt to the rendered prompt.
++   - Clear appendSystemPrompt, contextFiles, and skills.
++   - Return nothing.
++   - Leave toolSnippets, toolGuidelines, and promptGuidelines intact; Pi's rules section needs them in AGENT-296.
++   - Keep the lastKnownSystemPrompt canary.
++   - Drop <cwd> from environmentBlock() in packages/core/src/system-prompt.ts.
++   Sandpiper's own tool block stays until AGENT-296 removes it.
++4. Shape B. Run `bun patch @earendil-works/pi-coding-agent` and edit dist/core/agent-session.js. In prepareNextTurnWithContext, when _runSystemPromptOptions is undefined (a run that skipped before_agent_start), keep the transcript's recorded sections instead of diffing base options against them, and still apply tool loadout changes. Then check whether a synthetic run's first turn also reverts on 1.0.4. The 1.0.3 probe saw the revert only from turn 2. Commit the patch file and the patchedDependencies entry.
++5. Distribution. Confirm the built runtime loads the patched agent-session.js: distribution copies Pi's dist/core from node_modules.
++6. Gates, then one jj change with `Refs: AGENT-295`.
+ 
+-Shape B: ship a local `bun patch` of @earendil-works/pi-coding-agent (dist/core/agent-session.js, saved under patches/ with a patchedDependencies entry) so idle synthetic runs keep the prompt the transcript records and apply only tool loadout changes. before_agent_start semantics stay unchanged.
++Done when: the new tests pass, bun check is clean, bun run test is green, and the distribution gate is green.
+ 
+-Tests first, red on stock Pi: turn the AGENT-290 discovery probes into Vitest tests against the real Sandpiper identity extension and an in-process recording provider, asserting the spec's Invariants. Cover user-prompted runs, idle synthetic runs including a second turn, a synthetic turn before the first user prompt (the documented first-turn gap), a resumed session, session.state.systemPrompt as /export renders it, byte-for-byte request prefix stability, and an extension-added section such as mcp_servers. Tests must not touch real user state.
+-
+-Done when: the new tests pass, bun check is clean, and bun run test is green.
+-
+ History (2026-10-06): absorbed AGENT-294, because tests are part of the implementation they verify. The earlier context_with_system guard design is superseded by Shape B; see the spec's Ownership decision note.
+ 
+ ---
+ 
+@@ -39,4 +48,8 @@
+ 
+ ## 2026-10-06T15:49:53.307Z
+ 
+ - **description**: 3 lines → updated (11 lines)
++
++## 2026-10-06T18:23:49.656Z
++
++- **description**: 11 lines → updated (20 lines)

@@ -6,11 +6,28 @@ priority: HIGH
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.557Z
-updated_at: 2026-10-06T02:57:59.557Z
+updated_at: 2026-10-06T18:23:49.852Z
 depends_on:
   - AGENT-293
 ---
 
 # AutoTOON: skip nested tool calls and preserve structuredContent
 
-extensions/autotoon/autotoon.ts rewrites JSON text in every non-error tool_result. In Pi 1.0, codemode scripts' nested calls (event.parentToolCallId set) also emit tool_result, and replacing content without returning structuredContent drops the structured result. Skip nested calls and return event.structuredContent alongside converted content. Add tests for both.
+extensions/autotoon/autotoon.ts rewrites JSON text in every non-error tool_result. In Pi 1.0, codemode scripts' nested calls (event.parentToolCallId set) also emit tool_result, and replacing content without returning structuredContent drops the structured result. Skip nested calls and return event.structuredContent alongside converted content.
+
+This must land before MCP servers or codemode are used on Pi 1.0. Adding an MCP server with default exposure turns codemode on automatically, and every MCP call goes through Pi's tool pipeline, so AutoTOON sees it.
+
+Steps:
+1. Tests first: a nested call (parentToolCallId set) passes through unchanged; a converted top-level result keeps structuredContent; error results stay unchanged.
+2. Implement in extensions/autotoon/autotoon.ts.
+3. Gates, then one jj change with `Refs: AGENT-298`.
+
+Done when: those tests pass, bun check is clean, and bun run test is green.
+
+---
+
+# Activity Log
+
+## 2026-10-06T18:23:49.852Z
+
+- **description**: 1 line → updated (10 lines)

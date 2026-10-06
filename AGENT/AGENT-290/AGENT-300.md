@@ -6,7 +6,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.705Z
-updated_at: 2026-10-06T17:41:48.407Z
+updated_at: 2026-10-06T18:23:49.917Z
 depends_on:
   - AGENT-293
 ---
@@ -37,7 +37,13 @@ Built-in extension interactions (checked against Pi v1.0.4 source and docs, 2026
 - llama.cpp: registers a provider and /llama, with no startup handlers. Inert until /login llama.cpp.
 - No name conflicts: no Sandpiper command or tool is named codemode, tool_search, mcp, or llama.
 
-Remaining work after AGENT-293: the startup header.
+Remaining work, after AGENT-293: the startup header.
+
+Steps:
+1. In the Sandpiper system extension's session_start, call ctx.ui.setHeader() with a component showing `sandpiper vX` plus compact key hints, built with the exported keyHint, rawKeyHint, and keyText helpers.
+2. Check what the custom header loses compared with Pi's built-in one, in particular the expandable startup help and the loaded-resources list. Keep the compact hints at least; tell Doug if anything useful disappears.
+3. Check it live in fullscreen and regular TUI modes. setHeader is a no-op in RPC mode.
+4. One jj change with `Refs: AGENT-300`.
 
 ---
 
@@ -50,3 +56,7 @@ Remaining work after AGENT-293: the startup header.
 ## 2026-10-06T17:41:48.408Z
 
 - **description**: updated
+
+## 2026-10-06T18:23:49.918Z
+
+- **description**: 25 lines → updated (31 lines)
