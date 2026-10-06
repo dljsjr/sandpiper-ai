@@ -10,27 +10,27 @@ This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people 
 ## Before you start
 
 - Read the [migration spec](agent-290-pi-1-0-migration-spec.md). Each step below implements one of its sections.
-- Work in a dedicated jj workspace, for example `jj workspace add ../sandpiper-ai-pi1`, so the default workspace keeps running Sandpiper on Pi 0.85.1 until AGENT-303 passes. When the work is merged, run `jj workspace forget` and remove the directory.
+- Work in a dedicated jj workspace, for example `jj workspace add ../sandpiper-ai-pi1`, so the default workspace keeps running Sandpiper on Pi 0.85.1 until the end-to-end check in step 10 passes. When the work is merged, run `jj workspace forget` and remove the directory.
 - Make one jj change per subtask, with `Refs: AGENT-<n>` in the description.
+- Tests are part of the subtask they verify. Write them first, red on stock behavior, in the same change.
 - Target `1.0.3`. If `1.0.4` reaches npm mid-migration, bump in its own change and rerun every gate below.
 
 ## Steps
 
-| Step                                     | Subtask   | Depends on                  | Verify with                                                                                                                  |
-| ---------------------------------------- | --------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| 1. Bump Pi pins, fix test doubles        | AGENT-293 | none                        | `bun check`; `bun run test`; `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`                                |
-| 2. Write prompt regression tests (red)   | AGENT-294 | 1                           | The new tests fail on stock behavior for the reasons the spec's invariants name                                              |
-| 3. Prompt ownership and Shape B Pi patch | AGENT-295 | 2                           | AGENT-294 tests pass; full suite green                                                                                       |
-| 4. Tool guidelines and hidden tools      | AGENT-296 | 2                           | Guidelines block matches Pi 0.85.1 output for the same tools                                                                 |
-| 5. Diagnostic renders the sent prompt    | AGENT-297 | 3                           | `sandpiper-system-prompt --approve` output equals the prompt captured by a recording provider                                |
-| 6. AutoTOON nested calls                 | AGENT-298 | 1                           | New AutoTOON tests; full suite green                                                                                         |
-| 7. Compiled app runtime setup            | AGENT-299 | 1                           | `bun run test:standalone-app` plus a codemode check in the compiled binary, or a recorded decision to disable codemode there |
-| 8. Inherited Pi 1.0 defaults             | AGENT-300 | 1                           | User decisions recorded on the task; behavior checked live                                                                   |
-| 9. Build and distribution topology       | AGENT-301 | 1                           | Agreed topology; distribution gate green                                                                                     |
-| 10. Docs and playbooks                   | AGENT-302 | 3                           | Consistency sweep of touched docs                                                                                            |
-| 11. End-to-end dogfood                   | AGENT-303 | 3 to 10, provider migration | Checklist in AGENT-303 passes on the built runtime                                                                           |
+| Step                                     | Subtask   | Depends on                 | Verify with                                                                                                                  |
+| ---------------------------------------- | --------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| 1. Bump Pi pins, fix test doubles        | AGENT-293 | none                       | `bun check`; `bun run test`; `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`                                |
+| 2. Prompt ownership and Shape B Pi patch | AGENT-295 | 1                          | Its prompt regression tests fail on stock Pi, then pass; full suite green                                                    |
+| 3. Tool guidelines and hidden tools      | AGENT-296 | 1                          | Its tests show the guidelines block matches Pi 0.85.1 output for the same tools; full suite green                            |
+| 4. Diagnostic renders the sent prompt    | AGENT-297 | 2                          | `sandpiper-system-prompt --approve` output equals the prompt captured by a recording provider                                |
+| 5. AutoTOON nested calls                 | AGENT-298 | 1                          | New AutoTOON tests; full suite green                                                                                         |
+| 6. Compiled app runtime setup            | AGENT-299 | 1                          | `bun run test:standalone-app` plus a codemode check in the compiled binary, or a recorded decision to disable codemode there |
+| 7. Inherited Pi 1.0 defaults             | AGENT-300 | 1                          | User decisions recorded on the task; behavior checked live                                                                   |
+| 8. Build and distribution topology       | AGENT-301 | 1                          | Agreed topology; distribution gate green                                                                                     |
+| 9. Docs and playbooks                    | AGENT-302 | 2                          | Consistency sweep of touched docs                                                                                            |
+| 10. End-to-end check                     | AGENT-290 | 1 to 9, provider migration | The done criteria in AGENT-290 pass on the built runtime                                                                     |
 
-Steps 3, 4, and 6 can run in parallel after their dependencies. Do steps 1 to 4 and 6 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
+Steps 2, 3, and 5 can run in parallel after step 1. Do steps 1 to 3 and 5 before anyone uses the Pi 1.0 build as a daily driver: without them, the model loses the tool guidelines and idle synthetic turns run on Pi's default prompt.
 
 ## Coordinating with the provider migration
 
@@ -43,7 +43,7 @@ The `pi-claude-code-cli-provider` migration runs in its own repository with its 
 | Touchpoints         | `extensions/system/`, `packages/core/`, `extensions/autotoon/`, manifests                                    | The provider's stream and replay code          |
 | Integration hazards | The provider-facing request shape (system messages, sections, tool deltas) and the Pi version both sides pin | Same                                           |
 | Ready artifact      | AGENT-295 and AGENT-296 landed                                                                               | Provider passes its own tests against Pi 1.0.3 |
-| Integration         | AGENT-303 runs Sandpiper with the migrated provider                                                          | Same checkpoint                                |
+| Integration         | AGENT-290's end-to-end check runs Sandpiper with the migrated provider                                       | Same checkpoint                                |
 
 Coordinate over Tattler. The contract between the lanes is the [provider-facing request shape](agent-290-pi-1-0-migration-spec.md#provider-facing-request-shape). If either lane needs to change it, agree on the change over Tattler, then update the spec before implementing.
 
@@ -54,7 +54,7 @@ The provider can develop against plain Pi 1.0.3 before Sandpiper's prompt work l
 These were discussed but are not authorized. Each needs the user's go-ahead before it becomes a task:
 
 - Render Sandpiper's blocks as Pi sections instead of one preamble, so changes travel as per-section updates.
-- Remove the Shape B Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The AGENT-294 tests should still pass without it.
+- Remove the Shape B Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The prompt regression tests from AGENT-295 should still pass without it.
 - Declare `outputSchema` and return `structuredContent` from Sandpiper tools that return data.
 - Add tool `annotations` (`readOnlyHint` and related hints) to Sandpiper tools.
 - Replace `mcporter` in the web-search Parallel adapter with `pi.registerMcpServer()`.
@@ -63,4 +63,4 @@ These were discussed but are not authorized. Each needs the user's go-ahead befo
 
 - Undo jj operations with `jj op log` and `jj op restore <op-id>`. Because the work happens in a separate workspace, the default workspace is unaffected.
 - Sessions touched by Pi 1.0 contain `role: "system"` entries. Do not resume them with the 0.85.1 build.
-- The Shape B patch targets compiled Pi output (`patches/` via `bun patch`). Redo it and rerun the AGENT-294 tests on every Pi bump.
+- The Shape B patch targets compiled Pi output (`patches/` via `bun patch`). Redo it and rerun the prompt regression tests on every Pi bump.

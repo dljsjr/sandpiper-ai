@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Draft
-- **Task**: AGENT-290 (subtasks AGENT-293 to AGENT-303)
+- **Task**: AGENT-290 (subtasks AGENT-293 and AGENT-295 to AGENT-302)
 - **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](agent-290-pi-1-0-migration-work-plan.md)
 
 ## Scope
@@ -120,7 +120,7 @@ The clause declaring these frames to be system prompt updates lives in the provi
 
 ### Invariants
 
-The AGENT-294 regression tests assert these. "Sandpiper prompt" means a replayed system prompt whose preamble starts with `<system_prompt>`.
+The regression tests in AGENT-295 and AGENT-296 assert these. "Sandpiper prompt" means a replayed system prompt whose preamble starts with `<system_prompt>`.
 
 | Invariant                                                                           | Applies to                                                                                              |
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
