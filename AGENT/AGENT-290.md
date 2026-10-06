@@ -6,7 +6,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-05T21:08:10.437Z
-updated_at: 2026-10-06T19:29:27.644Z
+updated_at: 2026-10-06T19:42:59.157Z
 related:
   - AGENT-289
   - TOOLS-27
@@ -44,7 +44,8 @@ End-to-end progress (2026-10-06, built dist/sandpiper from the pi1 workspace at 
 - RPC mode, Tattler wake from a live 0.85 Sandpiper peer: delivered as <tattler_inbox>, with the Sandpiper prompt and no reverting system message.
 - TUI (pty capture), fullscreen and regular: Sandpiper header, key hints, and the loaded-resources list render; no Pi logo.
 - --export of a session to HTML works from the narrowed Pi assets.
-Remaining: live interactive dogfood by Doug (fullscreen Chorus room UI, Tattler pending-batch and diagnostics entry renderers, /export from the TUI), and the joint run with migrated pi-claude-code-cli-provider (PCCP-304).
+Joint check with migrated pi-claude-code-cli-provider (PCCP-304 joint build pnrqvzuy, claude-cli/haiku, RPC): user prompt, tool call, background-process wake, mid-run tool change (tools/list_changed; next user frame carried one <system_prompt_update> for tools), Tattler wake from a live 0.85 peer, and resume of a copied 0.85 session all pass. Found and fixed on the PCCP side: stream events used snake_case content_index/tool_call (PCCP-325). Open on the PCCP side: a resumed pre-1.0 session gets its first system message after the legacy history, so CC starts with an empty system prompt and receives Sandpiper's prompt as an update frame.
+Remaining: live interactive dogfood by Doug (fullscreen Chorus room UI, Tattler pending-batch and diagnostics entry renderers, /export from the TUI).
 
 ---
 
@@ -74,3 +75,7 @@ Remaining: live interactive dogfood by Doug (fullscreen Chorus room UI, Tattler 
 ## 2026-10-06T19:29:27.644Z
 
 - **description**: 23 lines → updated (31 lines)
+
+## 2026-10-06T19:42:59.158Z
+
+- **description**: 31 lines → updated (32 lines)
