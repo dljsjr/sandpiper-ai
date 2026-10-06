@@ -1,0 +1,47 @@
+diff --git a/node_modules/@earendil-works/pi-coding-agent/.bun-tag-cf30bf89d5a3976 b/.bun-tag-cf30bf89d5a3976
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/core/agent-session.js b/dist/core/agent-session.js
+index ec5f44ee70d8fd75496cd2dc490563b8fa2c703e..a1c2f63f093110937c7e1df51d6a91801e55e3b9 100644
+--- a/dist/core/agent-session.js
++++ b/dist/core/agent-session.js
+@@ -539,6 +539,11 @@ export class AgentSession {
+             const context = await this._compactBeforeNextAssistantResponse(turn.context);
+             const previousSnapshot = await previousPrepareNextTurnWithContext?.({ ...turn, context }, signal);
+             const nextContext = previousSnapshot?.context ?? context;
++            // Sandpiper local patch (Shape B, pi#5581): a run that skipped before_agent_start, such as
++            // an extension's triggerTurn while idle, keeps the prompt sections the transcript records
++            // instead of diffing Pi's base options against them. Only the tool loadout changes.
++            const keepRecordedPrompt = this._runSystemPromptOptions === undefined &&
++                getCurrentSystemMessage(nextContext.messages)?.sections !== undefined;
+             const runOptions = this._runSystemPromptOptions ?? this._baseSystemPromptOptions;
+             const options = normalizeBuildSystemPromptOptions({
+                 ...runOptions,
+@@ -546,9 +551,12 @@ export class AgentSession {
+                 toolSnippets: { ...this._baseSystemPromptOptions.toolSnippets, ...runOptions.toolSnippets },
+                 toolGuidelines: { ...this._baseSystemPromptOptions.toolGuidelines, ...runOptions.toolGuidelines },
+             });
+-            const updateMessage = this._preparePromptAndToolLoadout(options, nextContext.messages);
++            const updateMessage = keepRecordedPrompt
++                ? this._applyToolLoadoutKeepingRecordedPrompt(options)
++                : this._preparePromptAndToolLoadout(options, nextContext.messages);
+             // Keep session.systemPrompt and ctx.getSystemPrompt() in step with what the provider sees.
+-            this._runSystemPromptOptions = options;
++            if (!keepRecordedPrompt)
++                this._runSystemPromptOptions = options;
+             return {
+                 ...previousSnapshot,
+                 context: {
+@@ -1286,6 +1294,12 @@ export class AgentSession {
+             toolGuidelines: Object.fromEntries(this._toolPromptGuidelines),
+         });
+     }
++    /** Sandpiper local patch (Shape B): apply the tool loadout and leave the recorded prompt sections alone. */
++    _applyToolLoadoutKeepingRecordedPrompt(options) {
++        options.selectedTools = this._applyToolLoadout(options.selectedTools).map((tool) => tool.name);
++        options.hiddenTools = [...this._hiddenDeclarations];
++        return undefined;
++    }
+     /**
+      * Apply a prompt and tool loadout for the next request. Sets the executable tools and
+      * returns a system message patching the prompt sections the model currently has (replayed

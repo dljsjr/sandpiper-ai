@@ -191,9 +191,14 @@ export function registerStartupPromptHooks(
       );
     }
 
-    return {
-      systemPrompt: finalSystemPrompt,
-    };
+    // Own the prompt through Pi's custom base prompt so the transcript records it; a returned
+    // systemPrompt would apply to this run only and leave /export and synthetic runs on Pi's
+    // default. Sandpiper renders these inputs itself, so Pi must not render them again.
+    const options = event.systemPromptOptions;
+    options.customPrompt = finalSystemPrompt;
+    options.appendSystemPrompt = '';
+    options.contextFiles = [];
+    options.skills = [];
   });
 }
 

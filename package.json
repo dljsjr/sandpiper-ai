@@ -97,5 +97,8 @@
     "vitest": "5.0.0"
   },
   "license": "MIT",
-  "type": "module"
+  "type": "module",
+  "patchedDependencies": {
+    "@earendil-works/pi-coding-agent@1.0.4": "patches/@earendil-works%2Fpi-coding-agent@1.0.4.patch"
+  }
 }

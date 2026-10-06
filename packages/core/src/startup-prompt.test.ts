@@ -27,7 +27,7 @@ describe('startup prompt operations', () => {
     expect(prompt).toBeUndefined();
   });
 
-  it('builds prompt context from cwd, package metadata, and version control', async () => {
+  it('builds prompt context from package metadata and the version control detected in cwd', async () => {
     const dependencies = createDependencies({
       detectVersionControl: vi.fn(() => ({
         system: 'jj' as const,
@@ -47,7 +47,8 @@ describe('startup prompt operations', () => {
       dependencies,
     );
 
-    expect(prompt).toContain('"cwd":"/repo"');
+    expect(prompt).not.toContain('"cwd"');
+    expect(dependencies.detectVersionControl).toHaveBeenCalledWith('/repo', { fileExists: dependencies.fileExists });
     expect(prompt).toContain('"sessionStartDate":"2026-09-08"');
     expect(prompt).toContain('"piCodingAgentPackage":"/pi/package"');
     expect(prompt).toContain('"piCodingAgentVersion":"1.2.3"');

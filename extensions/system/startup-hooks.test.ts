@@ -67,6 +67,10 @@ function createStartupPromptHookStub(
   };
 }
 
+function beforeAgentStartEvent(systemPromptOptions: Record<string, unknown> = {}) {
+  return { systemPrompt: 'base prompt', systemPromptOptions: { ...systemPromptOptions } };
+}
+
 function createPromptSessionContext(entries: readonly unknown[] = []) {
   return {
     cwd: '/repo',
@@ -117,14 +121,27 @@ describe('startup hooks', () => {
       throw new Error('before_agent_start handler not registered');
     }
 
-    const result = (await handler(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      createPromptSessionContext(sessionEntries),
-    )) as { systemPrompt: string };
+    const event = beforeAgentStartEvent();
+    const result = await handler(event, createPromptSessionContext(sessionEntries));
 
-    expect(result.systemPrompt).toContain('"agentDir":"/agent"');
-    expect(result.systemPrompt).toContain('"cwd":"/repo"');
+    expect(result).toBeUndefined();
+    expect(event.systemPromptOptions.customPrompt).toContain('"agentDir":"/agent"');
+    expect(event.systemPromptOptions.customPrompt).toContain('"cwd":"/repo"');
     expect(mockGetAgentDir).toHaveBeenCalled();
+  });
+
+  it('clears the inputs Sandpiper renders itself so Pi does not render them again', async () => {
+    const { pi, handlers, sessionEntries } = createStartupPromptHookStub();
+    registerStartupPromptHooks(pi);
+    const event = beforeAgentStartEvent({
+      appendSystemPrompt: 'appended',
+      contextFiles: [{ path: '/repo/AGENTS.md', content: 'rules' }],
+      skills: [{ name: 'jj' }],
+    });
+
+    await handlers.get('before_agent_start')?.(event, createPromptSessionContext(sessionEntries));
+
+    expect(event.systemPromptOptions).toMatchObject({ appendSystemPrompt: '', contextFiles: [], skills: [] });
   });
 
   it('persists one local session start date and reuses it across later turns', async () => {
@@ -207,12 +224,10 @@ describe('startup hooks', () => {
       getContent: () => '<memory source="yaams">recent facts</memory>',
     });
 
-    const result = (await beforeAgentStart(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      sessionContext,
-    )) as { systemPrompt: string };
+    const event = beforeAgentStartEvent();
+    await beforeAgentStart(event, sessionContext);
 
-    expect(result.systemPrompt).toBe(
+    expect(event.systemPromptOptions.customPrompt).toBe(
       '<system_prompt>sandpiper</system_prompt>\n\n<memory source="yaams">recent facts</memory>',
     );
   });
@@ -275,12 +290,10 @@ describe('startup hooks', () => {
       getContent: () => '<footer>tail</footer>',
     });
 
-    const result = (await handlers.get('before_agent_start')?.(
-      { systemPrompt: 'base prompt', systemPromptOptions: {} },
-      sessionContext,
-    )) as { systemPrompt: string };
+    const event = beforeAgentStartEvent();
+    await handlers.get('before_agent_start')?.(event, sessionContext);
 
-    expect(result.systemPrompt).toBe(
+    expect(event.systemPromptOptions.customPrompt).toBe(
       '<header>first</header>\n\n<system_prompt>sandpiper</system_prompt>\n\n<footer>tail</footer>',
     );
   });

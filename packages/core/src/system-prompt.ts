@@ -125,7 +125,6 @@ export interface SandpiperBaseSystemPromptOptions {
 }
 
 export interface SandpiperSystemPromptOptions {
-  readonly cwd?: string;
   readonly piCodingAgentPackage?: string;
   readonly piCodingAgentVersion?: string;
   readonly sandpiperCodingAgentPackage?: string;
@@ -271,7 +270,6 @@ export function systemNotificationProtocolBlock(): string {
 
 export function environmentBlock(options: {
   readonly sessionStartDate: string;
-  readonly cwd: string;
   readonly platform: string;
   readonly versionControl?: SandpiperVersionControlContext;
 }): string {
@@ -289,7 +287,6 @@ export function environmentBlock(options: {
   return buildXml({
     environment: {
       session_start_date: options.sessionStartDate,
-      cwd: options.cwd,
       platform: options.platform,
       version_control: versionControlAttrs,
     },
@@ -300,9 +297,6 @@ export async function buildSandpiperSystemPrompt(
   options: SandpiperSystemPromptOptions,
   originalPromptOptions: SandpiperBaseSystemPromptOptions,
 ) {
-  const resolvedCwd = options.cwd ?? process.cwd();
-  const promptCwd = resolvedCwd.replace(/\\/g, '/');
-
   const sessionStartDate = options.sessionStartDate ?? formatLocalDate(new Date());
 
   const harnessDocsContent =
@@ -318,7 +312,6 @@ export async function buildSandpiperSystemPrompt(
   ${userProfileContent ? `\n${userProfileContent}` : ''}${toolGuidanceBlock(originalPromptOptions)}${harnessDocsContent}${skillsContent ? `\n${skillsContent}` : ''}${injectedContextContent ? `\n${injectedContextContent}` : ''}${userAppended ? `\n${userAppendedPromptBlock(userAppended)}` : ''}
   ${systemNotificationProtocolBlock()}${environmentBlock({
     sessionStartDate,
-    cwd: promptCwd,
     platform: options.platform ?? process.platform,
     versionControl: options.versionControl,
   })}</system_prompt>`;
@@ -335,7 +328,6 @@ export async function buildSandpiperSystemPrompt(
       systemNotificationProtocolContentBlock: systemNotificationProtocolBlock(),
       dynamicEnvironmentBlock: environmentBlock({
         sessionStartDate,
-        cwd: promptCwd,
         platform: options.platform ?? process.platform,
         versionControl: options.versionControl,
       }),
