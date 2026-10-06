@@ -30,7 +30,7 @@ A _synthetic turn_ is a run started by an extension rather than by user input, f
 
 ### Ownership
 
-> **Under discussion (2026-10-06): replacing the guard with a small local `bun patch` of `@earendil-works/pi-coding-agent`.** Doug runs only the uncompiled standalone, which loads the patched `dist/core/agent-session.js`. The patch would be provider-neutral, redone on every Pi bump, and removed when upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). Candidate shapes:
+> **Decided (2026-10-06): Shape B replaces the guard, with no patch for the first-turn gap.** Rationale: parity with today's behavior at the smallest patch. Sandpiper carries a small local `bun patch` of `@earendil-works/pi-coding-agent`. Doug runs only the uncompiled standalone, which loads the patched `dist/core/agent-session.js`. The patch would be provider-neutral, redone on every Pi bump, and removed when upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). Shapes considered:
 >
 > - **Shape A: run `before_agent_start` for idle `triggerTurn` turns.** This needs a lock over the async preparation window to prevent concurrent runs, and leaves Esc during preparation as a gap. It also has to define what `prompt` means for a turn nobody typed. An empty-string sentinel was rejected as a hack. Passing the message text, or adding an explicit trigger field to the event, are the remaining options.
 > - **Shape B: triggered runs never rewrite prompt sections.** They keep the prompt the transcript already records (written by the ownership steps below) and apply only tool loadout changes. This adds no hook semantics. A brand-new session whose first turn is a synthetic turn still gets Pi's default prompt for that run; 0.85 behaves the same way. Not yet prototyped.
@@ -38,6 +38,12 @@ A _synthetic turn_ is a run started by an extension rather than by user input, f
 >   - Make Sandpiper's prompt part of Pi's base prompt options, which every run falls back to. This is the root fix, but it needs a patch hook for an extension-supplied base prompt, because the prompt's inputs exist only after Pi loads. Not yet sized.
 >   - Run preparation only when the transcript has no prompt yet.
 >   - Avoid synthetic first turns: launchers send the first work as a real prompt (RPC `prompt`), or Tattler holds messages until a prompt is recorded.
+>
+> Decision details:
+>
+> - **Patch:** Shape B. Idle synthetic runs keep the prompt the transcript records and apply only tool loadout changes; `before_agent_start` semantics are unchanged. The ownership steps below record Sandpiper's prompt in the transcript. The [Guard](#guard) section and guard-specific invariants are superseded; AGENT-295 implements the patch and revises the invariants and tests.
+> - **First-turn gap:** handled by option 3. Whatever launches a fresh session for work, such as the future peer supervisor, gives it its first task as a real prompt (RPC `prompt`). No patch.
+> - **Option 1:** an extension-supplied base prompt API. Deferred as an input to the planned ground-up harness, which should support system prompt sections natively.
 >
 > Provider-specific prompt text, such as a clause declaring `pi-claude-code-cli-provider`'s synthetic update frames to be system updates, belongs to that provider's extension, contributed only while it is active. It does not go in Sandpiper's prompt.
 
