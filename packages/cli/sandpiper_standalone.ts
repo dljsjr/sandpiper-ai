@@ -83,6 +83,11 @@ if (process.env.SANDPIPER_PRINT_PI_VERSION === '1') {
   console.error(`using pi-coding-agent version: ${piMetadata.version}\n`);
 }
 
+if (standalonePaths.packageDirSource === 'app-bundle') {
+  // Loaded only in the compiled app, so other runs do not pay for Bedrock's SDK at startup.
+  await import('./compiled_runtime_setup.js');
+}
+
 const { loadPiMain } = await import('./deferred_pi_import.js');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
 const main = await loadPiMain();

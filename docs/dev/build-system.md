@@ -117,6 +117,8 @@ Runtime npm dependencies resolve from the workspace install. Pi internals look f
 
 The standalone assembler bundles `css-tree` JSON/package metadata through a Bun build plugin and leaves optional `canvas` external so jsdom can treat it as unavailable instead of requiring a native sidecar.
 
+At startup the compiled executable registers Pi's Bun OAuth flows and Bedrock provider (`packages/cli/compiled_runtime_setup.ts`), as Pi's own Bun binary does. Codemode does not work in the compiled app: it needs Pi's embedded QuickJS wasm path, which Pi does not export.
+
 ## Claude Code plugin artifact
 
 `bun run build:claude-plugin` writes `dist/claude-plugin/` with:
