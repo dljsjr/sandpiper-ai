@@ -20,7 +20,7 @@ import {
   sendAgentMessage,
   shutdownTattlerServer,
 } from './tattler-ipc';
-import { createTattlerPendingInboxNotifier } from './tattler-pending-cue';
+import { createTattlerPendingInboxNotifier, trackAgentRun } from './tattler-pending-cue';
 import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueRequest } from './tattler-pi-events';
 import {
   buildMessage,
@@ -169,7 +169,11 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
 export default async function (pi: ExtensionAPI) {
   const pendingInbox = createTattlerPendingInbox();
   let activeContext: Pick<ExtensionContext, 'isIdle'> | undefined;
-  const pendingInboxNotifier = createTattlerPendingInboxNotifier(pi, () => pendingInbox.counts().total);
+  const pendingInboxNotifier = createTattlerPendingInboxNotifier(
+    pi,
+    () => pendingInbox.counts().total,
+    trackAgentRun(pi),
+  );
   registerTattlerPendingInboxHooks(pi, pendingInbox, {
     onPendingInboxEmpty: pendingInboxNotifier.reset,
   });
