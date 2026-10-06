@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-27.md
++++ b/TOOLS-27.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Restore clean workspace installs without an existing Bun lockfile"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-09-10T20:52:17.775Z
+-updated_at: 2026-09-10T20:52:35.951Z
++updated_at: 2026-09-10T21:25:25.922Z
+ ---
+ 
+ # Restore clean workspace installs without an existing Bun lockfile
+ 
+@@ -19,4 +19,8 @@
+ ## 2026-09-10T20:52:35.952Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → Piper
++
++## 2026-09-10T21:25:25.923Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

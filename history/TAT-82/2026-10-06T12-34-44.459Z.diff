@@ -1,0 +1,34 @@
+===================================================================
+--- a/TAT-82.md
++++ b/TAT-82.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Mid-turn Tattler pending-inbox cue never reaches the model"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: "pi-claude-code-cli-agent"
+ created_at: 2026-10-06T12:29:08.478Z
+-updated_at: 2026-10-06T12:29:08.478Z
++updated_at: 2026-10-06T12:34:44.459Z
+ related:
+   - AGENT-290
+ ---
+ 
+@@ -17,4 +17,13 @@
+ 
+ Evidence (reported by the pi-claude-code-cli-provider agent, verified against Pi source v0.84.0 vs v0.84.2): Aug 6-7 sessions on Pi 0.84.0, 13 of 13 cues followed by tattler_receive; 2026-10-06 on Pi 0.85.1, 0 of 2, and the cues never reached the provider request. Sandpiper crossed 0.84.2 in 'bump deps' (2026-09-08). Under pi-claude-code-cli-provider the deferred cue is lost entirely (PCCP-side issue tracked there).
+ 
+ Fix direction: send the cue with triggerTurn true while the agent is streaming, which routes to agent.steer. The cue is only sent while the agent is busy, but busy is not always streaming (for example compaction or retry backoff). In that window triggerTurn true would start a run, so the fix must check streaming state rather than rely on isIdle. Add a regression test that asserts the cue is steered into a running loop.
++
++---
++
++# Activity Log
++
++## 2026-10-06T12:34:44.459Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

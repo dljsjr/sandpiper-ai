@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-82.md
++++ b/TAT-82.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Mid-turn Tattler pending-inbox cue never reaches the model"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: "pi-claude-code-cli-agent"
+ created_at: 2026-10-06T12:29:08.478Z
+-updated_at: 2026-10-06T12:38:10.925Z
++updated_at: 2026-10-06T15:47:02.387Z
+ related:
+   - AGENT-290
+ ---
+ 
+@@ -30,4 +31,9 @@
+ 
+ ## 2026-10-06T12:38:10.926Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-06T15:47:02.388Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

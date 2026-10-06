@@ -1,0 +1,37 @@
+===================================================================
+--- a/AGENT-290.md
++++ b/AGENT-290.md
+@@ -5,13 +5,31 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-10-05T21:08:10.437Z
+-updated_at: 2026-10-05T21:08:10.437Z
++updated_at: 2026-10-05T21:12:55.703Z
+ related:
+   - AGENT-289
+   - TOOLS-27
+ ---
+ 
+ # Migrate Sandpiper to Pi 1.0 SDK architecture
+ 
+-Upgrade Sandpiper from @earendil-works/pi-* 0.85.1 to Pi 1.0.x using the new SDK-like architecture. Begin with discovery: read the installed/upstream Pi 1.0 documentation and examples, inventory changed or removed APIs across adapters/extensions/CLI/TUI/session handling, and write a migration design before editing. Treat the verified pre-1.0 commits for AGENT-289 and TOOLS-27 as the baseline. Reassess build/distribution and clean-output design during the migration rather than refactoring the 0.85 build first.
++Upgrade Sandpiper from @earendil-works/pi-* 0.85.1 to Pi 1.0.x using the new SDK-like architecture.
++
++Begin with discovery, not edits:
++
++1. Read the installed Pi 1.0.3 package at `/Users/dstephen/.local/share/mise/installs/npm-earendil-works-pi-coding-agent/latest/node_modules/@earendil-works/pi-coding-agent/`. Start with `README.md`, `docs/index.md`, `docs/sdk.md`, `docs/extensions.md`, `docs/packages.md`, `docs/sessions.md`, `docs/session-format.md`, and `docs/message-types.md`, then inspect relevant examples. Do not use the repository's `node_modules` docs as the migration authority; they remain at 0.85.1 until the upgrade. Note: the global package manifest reports 1.0.3 while `pi --version` currently reports the misleading value 0.0.1.
++2. Inventory Sandpiper's Pi integration surfaces before changing dependencies: package manifests, CLI/bootstrap code, Pi adapters, extensions and lifecycle hooks, custom tools, TUI, providers/models, session persistence, RPC/headless paths, distribution assembly, standalone app, and tests.
++3. Compare 0.85.1 behavior and types against 1.0.3, identifying removed APIs, compatibility bridges that can disappear, and new SDK-owned responsibilities.
++4. Write a migration design and executable work plan before implementation. Preserve behavior unless a deliberate Pi 1.0 architectural change supersedes it; divide the migration into independently verifiable increments.
++5. Reassess build/distribution and clean-output design during the migration rather than refactoring the 0.85 build first.
++
++Verified baseline: AGENT-289 change `tovpqyxx` / `5351f91f`; TOOLS-27 change `sovyuuyx` / `c4c0ae97`. The sterile pre-upgrade tree passed a frozen install, an uncached package build, `bun check`, the full distribution gate, and 126 files / 1,152 Vitest tests.
++
++---
++
++# Activity Log
++
++## 2026-10-05T21:12:55.705Z
++
++- **description**: 1 line → updated (11 lines)

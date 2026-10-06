@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-289.md
++++ b/AGENT-289.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Persist the session start date for stable system prompts"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: "Piper"
+ reporter: USER
+ created_at: 2026-09-09T15:41:22.344Z
+-updated_at: 2026-09-10T21:25:25.857Z
++updated_at: 2026-10-05T21:09:12.163Z
+ ---
+ 
+ # Persist the session start date for stable system prompts
+ 
+@@ -31,4 +32,9 @@
+ 
+ ## 2026-09-10T21:25:25.858Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-05T21:09:12.164Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

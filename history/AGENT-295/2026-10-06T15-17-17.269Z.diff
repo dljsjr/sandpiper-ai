@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-295.md
++++ b/AGENT-295.md
+@@ -1,16 +1,24 @@
+ ---
+-title: "Implement hybrid system prompt ownership with a context_with_system guard"
++title: "Implement prompt ownership and the Shape B Pi patch"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-06T02:57:59.333Z
+-updated_at: 2026-10-06T02:57:59.333Z
++updated_at: 2026-10-06T15:17:17.268Z
+ depends_on:
+   - AGENT-294
+ ---
+ 
+-# Implement hybrid system prompt ownership with a context_with_system guard
++# Implement prompt ownership and the Shape B Pi patch
+ 
+ Implement the System prompt section of .sandpiper/docs/specs/agent-290-pi-1-0-migration-spec.md in extensions/system/startup-hooks.ts and packages/core: set systemPromptOptions.customPrompt to the rendered Sandpiper prompt in before_agent_start, clear the inputs Sandpiper renders itself, stop returning systemPrompt, drop cwd from the environment block, and add the context_with_system guard. Done when the AGENT-290 prompt regression tests pass.
++
++---
++
++# Activity Log
++
++## 2026-10-06T15:17:17.269Z
++
++- **title**: Implement hybrid system prompt ownership with a context_with_system guard → Implement prompt ownership and the Shape B Pi patch
