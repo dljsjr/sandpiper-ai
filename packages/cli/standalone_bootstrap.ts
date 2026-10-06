@@ -334,6 +334,7 @@ export function configurePiEnvironment(options: PiEnvironmentOptions, env: NodeJ
   env.PI_CODING_AGENT_VERSION = options.piVersion;
   env.PI_PACKAGE_DIR = options.packageDir;
   env.PI_SKIP_VERSION_CHECK = '1';
+  env.PI_TELEMETRY ??= '0';
   env.SANDPIPER_CODING_AGENT_PACKAGE = options.packageDir;
 }
 

@@ -19,6 +19,8 @@ This means:
 - If both are set, `SANDPIPER_*` wins
 - Internal code always reads through Sandpiper-first lookup
 
+Before mirroring, the runtime sets `PI_TELEMETRY=0` when it is unset, which turns off Pi's install telemetry and provider attribution headers. Set `SANDPIPER_TELEMETRY=1` or `PI_TELEMETRY=1` to opt back in. While either variable is set, Pi ignores the `enableInstallTelemetry` setting.
+
 ## Reading Environment Variables
 
 ### Use `resolveEnvVar()` for Mirrored Variables

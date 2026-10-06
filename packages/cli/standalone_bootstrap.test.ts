@@ -241,6 +241,19 @@ describe('standalone bootstrap', () => {
     expect(env.PI_CODING_AGENT_PACKAGE).toBe('/pi-package');
     expect(env.PI_CODING_AGENT_VERSION).toBe('0.70.2');
     expect(env.SANDPIPER_CODING_AGENT_PACKAGE).toBe('/bundle');
+    expect(env.PI_TELEMETRY).toBe('0');
+  });
+
+  it.each([
+    ['PI_TELEMETRY', '1'],
+    ['SANDPIPER_TELEMETRY', '1'],
+  ])('lets %s opt back in to Pi install telemetry', (key, value) => {
+    const env: Record<string, string | undefined> = { [key]: value };
+
+    configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '0.70.2' }, env);
+    mirrorPiSandpiperEnvironment(env);
+
+    expect(env.PI_TELEMETRY).toBe('1');
   });
 
   it('mirrors user-facing Pi and Sandpiper environment variables', () => {
