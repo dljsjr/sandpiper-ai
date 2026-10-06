@@ -104,7 +104,8 @@ These are hard rules for agent sessions. Matched recovery paths for each are in 
 
 4. **Verify after every graph restructuring.** After `rebase`, `squash`, `split`, `abandon`, `edit`,
    or any bookmark move, run `jj log -r 'main@origin..visible_heads()'` (or equivalent) to confirm
-   the shape is what you expected. Do not chain multiple restructures without verifying. Run graph-
+   the shape is what you expected. Read it as a graph: `--no-graph` hides merge edges and extra
+   parents, so a leftover merge parent looks like a linear history. Do not chain multiple restructures without verifying. Run graph-
    mutating jj commands one at a time rather than bundling several into one shell script; jj conflicts
    are recorded successfully and may not stop a script before later mutations compound the state.
 
