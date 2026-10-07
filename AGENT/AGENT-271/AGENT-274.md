@@ -1,12 +1,13 @@
 ---
 title: "Verify and document Markdown prompt editing"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-08-11T17:23:30.804Z
-updated_at: 2026-08-11T17:50:56.432Z
+updated_at: 2026-10-07T15:09:48.132Z
 ---
 
 # Verify and document Markdown prompt editing
@@ -20,3 +21,8 @@ Cover editor behavior and bundling with automated tests, exercise the Glimpse WK
 ## 2026-08-11T17:50:56.433Z
 
 - **status**: NOT STARTED → NEEDS REVIEW
+
+## 2026-10-07T15:09:48.132Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

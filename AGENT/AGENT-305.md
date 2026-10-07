@@ -1,12 +1,13 @@
 ---
 title: "sandpiper-system-prompt stdout is polluted by extension output during the capture turn"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-07T14:03:51.944Z
-updated_at: 2026-10-07T14:05:09.802Z
+updated_at: 2026-10-07T15:09:48.555Z
 related:
   - AGENT-297
 ---
@@ -27,3 +28,8 @@ Since AGENT-297, sandpiper-system-prompt runs one turn against an in-process cap
 ## 2026-10-07T14:05:09.806Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:48.556Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

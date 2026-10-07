@@ -1,12 +1,13 @@
 ---
 title: "Reconcile Birdup after removing agency prompt block"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-08-11T21:26:48.667Z
-updated_at: 2026-10-07T14:12:45.049Z
+updated_at: 2026-10-07T15:09:48.426Z
 related:
   - AGENT-271
 ---
@@ -42,3 +43,8 @@ Complete and verify the user's removal of Birdup's agency prompt block. Remove s
 ## 2026-10-07T14:12:45.051Z
 
 - **description**: updated
+
+## 2026-10-07T15:09:48.427Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

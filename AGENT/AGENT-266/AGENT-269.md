@@ -1,12 +1,13 @@
 ---
 title: "Add Glimpse prompt editor and end-to-end verification"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: "Piper"
 reporter: AGENT
 created_at: 2026-08-10T22:22:24.233Z
-updated_at: 2026-08-11T14:44:10.366Z
+updated_at: 2026-10-07T15:09:47.760Z
 ---
 
 # Add Glimpse prompt editor and end-to-end verification
@@ -43,3 +44,8 @@ Group multiple editable ranges from one source into one sidebar entry with first
 ## 2026-08-11T00:58:31.835Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:47.761Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

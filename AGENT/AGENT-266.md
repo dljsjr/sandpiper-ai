@@ -1,12 +1,13 @@
 ---
 title: "Add source-mapped system prompt editor"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-08-10T22:22:17.300Z
-updated_at: 2026-08-11T14:44:10.437Z
+updated_at: 2026-10-07T15:09:47.841Z
 ---
 
 # Add source-mapped system prompt editor
@@ -42,3 +43,8 @@ Open the fully rendered Birdup/Sandpiper system prompt in Glimpse, allow edits o
 ## 2026-08-11T00:58:31.894Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:47.842Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

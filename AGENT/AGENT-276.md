@@ -1,12 +1,13 @@
 ---
 title: "Fix truncated SELF.md rendering in prompt editor"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-08-11T20:49:49.350Z
-updated_at: 2026-08-11T20:56:14.751Z
+updated_at: 2026-10-07T15:09:48.360Z
 related:
   - AGENT-271
   - AGENT-275
@@ -28,3 +29,8 @@ The CodeMirror prompt editor renders only the footer of Roux's SELF.md source re
 ## 2026-08-11T20:56:14.756Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:48.361Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

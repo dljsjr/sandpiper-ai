@@ -1,12 +1,13 @@
 ---
 title: "Interleave prompt editor navigation in rendered order"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-08-11T20:39:58.528Z
-updated_at: 2026-08-11T20:45:00.380Z
+updated_at: 2026-10-07T15:09:48.290Z
 related:
   - AGENT-271
 ---
@@ -27,3 +28,8 @@ Replace the separate editable-source and locked/generated navigation groups with
 ## 2026-08-11T20:45:00.386Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:48.290Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

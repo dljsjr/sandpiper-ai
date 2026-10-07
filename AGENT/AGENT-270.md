@@ -1,12 +1,13 @@
 ---
 title: "Keep inline XML tag references editable in prompt editor"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-08-11T16:42:48.062Z
-updated_at: 2026-08-11T16:43:30.319Z
+updated_at: 2026-10-07T15:09:47.919Z
 related:
   - AGENT-269
 ---
@@ -31,3 +32,8 @@ The prompt markup projector mistakes inline prose references such as `<agency>` 
 ## 2026-08-11T16:43:30.320Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:47.920Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

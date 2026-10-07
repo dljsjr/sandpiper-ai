@@ -1,12 +1,13 @@
 ---
 title: "Add Markdown-aware system prompt source editing"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-08-11T17:23:22.231Z
-updated_at: 2026-08-11T17:50:56.488Z
+updated_at: 2026-10-07T15:09:48.201Z
 related:
   - AGENT-266
 ---
@@ -27,3 +28,8 @@ Replace plain prompt-source editing controls with framework-free CodeMirror 6 Ma
 ## 2026-08-11T17:50:56.489Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:48.202Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

@@ -1,12 +1,13 @@
 ---
 title: "Align Birdup and its prompt editor with the Pi 1.0 migration"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-07T14:03:51.864Z
-updated_at: 2026-10-07T14:14:39.800Z
+updated_at: 2026-10-07T15:09:48.492Z
 related:
   - AGENT-290
   - AGENT-266
@@ -35,3 +36,8 @@ Done when: birdup's tests and prompt editor work against the Pi 1.0 output (live
 ## 2026-10-07T14:14:39.801Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-07T15:09:48.492Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
