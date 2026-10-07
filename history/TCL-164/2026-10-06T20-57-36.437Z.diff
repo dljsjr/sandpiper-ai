@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-164.md
++++ b/TCL-164.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "task update fails on relationship fields written after updated_at"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-06T15:51:30.619Z
+-updated_at: 2026-10-06T20:51:02.500Z
++updated_at: 2026-10-06T20:57:36.436Z
+ ---
+ 
+ # task update fails on relationship fields written after updated_at
+ 
+@@ -68,4 +68,9 @@
+ 
+ ## 2026-10-06T20:51:02.500Z
+ 
+ - **description**: 9 lines → updated (50 lines)
++
++## 2026-10-06T20:57:36.437Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

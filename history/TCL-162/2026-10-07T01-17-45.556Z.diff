@@ -1,0 +1,44 @@
+===================================================================
+--- a/TCL-162.md
++++ b/TCL-162.md
+@@ -7,9 +7,9 @@
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:36.615Z
+ blocked_by:
+   - TCL-161
+-updated_at: 2026-10-07T01:17:45.409Z
++updated_at: 2026-10-07T01:17:45.555Z
+ ---
+ 
+ # Fold storage init into initialize
+ 
+@@ -48,8 +48,20 @@
+ ## Doug's decision — 2026-10-06
+ 
+ Use flags on `initialize` to control how storage is initialized, including non-default modes. An interactive terminal wizard is deferred. Emit a complete configuration, using explicit defaults for unspecified initialization options, and preserve the refusal to overwrite any existing configuration candidate. Strict parsing of existing files does not gain defaults. The authoritative design is updated. The non-default bootstrap entry-point decision is resolved; implementation is not yet claimed complete.
+ 
++## Implementation and verification — 2026-10-06
++
++Committed `rtyrwmou` / `96548aea`: initialize accepts --tasks-dir, --branch, --repo, --no-vcs, --auto-commit, --auto-push. It constructs and strictly parses a complete v2 config, validates shared non-inline location safety, bootstraps via the existing VcsRunner seam, and writes configuration last. Defaults apply only to the newly emitted file. Disabled mode refuses explicit VCS settings; auto-push requires auto-commit.
++
++Removed storage init. Empty/occupied/existing-marker/Git/jj/external dispatch cases moved to initialize-bootstrap tests, not dropped. Real Git/jj checkout-state regressions now use direct initialize flags. Occupied task trees preserve bytes and still provide usable migration advice. A real local external clone creates a usable configured store. Existing candidates refuse before VCS calls; all three are rechecked after bootstrap and canonical creation uses exclusive wx. Race and bootstrap-failure regressions prevent configuration overwrite/emission.
++
++Observed disabled-mode and Git-bootstrap failures before implementation. Public commands/configuration/storage docs now describe actual flags. Four JSON examples parse; 24 relative links resolve. Full gate: 584 tests / 37 files, typecheck/build pass.
++
++Built CLI disabled configured store with spaces creates/lists tasks without creating the default dir; repeated initialize preserves config bytes; storage init is unknown. Actual Git separate-checkout --auto-commit commits only tasks while project HEAD and untracked WIP remain unchanged. Scratch `/tmp/trail-initialize-flags.0vXF5o`, `/tmp/trail-initialize-autocommit.ZKm8R1`. Optional read-only review requested. No consumer/live-board/cutover/publishing changes.
++
++Marked NEEDS REVIEW with --force solely because TCL-161 is implemented but itself awaiting Doug's final review. No dependency was removed and TCL-161 was not closed or changed. Final closure of TCL-162 remains Doug's decision.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -76,4 +88,8 @@
+ 
+ ## 2026-10-07T01:17:45.410Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-07T01:17:45.556Z
++
++- **description**: 35 lines → updated (47 lines)

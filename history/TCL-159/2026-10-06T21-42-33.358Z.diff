@@ -1,0 +1,42 @@
+===================================================================
+--- a/TCL-159.md
++++ b/TCL-159.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:34.055Z
+-updated_at: 2026-10-06T21:40:33.294Z
++updated_at: 2026-10-06T21:42:33.357Z
+ ---
+ 
+ # Migrate Trail docs out of sandpiper-ai into the standalone repo
+ 
+@@ -41,8 +41,18 @@
+ After the extraction completes and the harvest is done, what remains here is historical: move it to `.sandpiper/archive/`.
+ 
+ **Unrelated to placement and more urgent than it:** the record is uncommitted, living in exactly one working copy, while being the authority for TCL-146, 157, 161, 162 and 163. One `rm` and the settled design is gone.
+ 
++## Safe current-runtime documentation correction — 2026-10-06
++
++Corrected only documents already in Trail; this is a partial implementation, not the gated design-record harvest or cross-repository consolidation. The README no longer claims the old Sandpiper package is the standalone installation. It documents building the actual executable from source and creates project metadata before its first task.
++
++Updated all task/history paths to `.trail/tasks`, startup examples to `initialize`, the tutorial to work without a VCS prerequisite, and command reference to the actual initialize and external-migration refusal behavior. Added a current version-1 configuration reference with first-match candidates, exact version matching, required keys, and the disabled discriminant. The storage guide now uses complete, strictly valid configurations rather than partial examples that fail at runtime. Removed Sandpiper integration backlinks from Trail's public landing page.
++
++Verification: all four JSON examples pass `parseStorageConfig`; all 20 relative documentation links resolve; no Sandpiper/npx/npm-install references remain in README/docs. Rebuilt executable directly ran the tutorial's initialize/project/create/pickup/review/final/archive/index workflow on `/tmp/trail-docs-smoke.cD1WtZ`. Full suite: 528 tests / 33 files, `bun run check`, and `bun run build` pass.
++
++No future task-directory key, proposed initialize bootstrap interface, or migration behavior was documented as implemented. No Sandpiper docs were moved, deleted, duplicated, or harvested. Full consolidation remains blocked by TCL-162 and TCL-163, per the ruling above; this ticket remains IN PROGRESS rather than being reported finished.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -53,4 +63,8 @@
+ ## 2026-10-06T21:40:33.295Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-06T21:42:33.358Z
++
++- **description**: 30 lines → updated (40 lines)

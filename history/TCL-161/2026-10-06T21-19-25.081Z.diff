@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-161.md
++++ b/TCL-161.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Consider .trail.json and trail.json as additional config candidates"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:35.849Z
+-updated_at: 2026-08-13T03:45:04.386Z
++updated_at: 2026-10-06T21:19:25.080Z
+ ---
+ 
+ # Consider .trail.json and trail.json as additional config candidates
+ 
+@@ -42,4 +42,9 @@
+ ## 2026-08-13T03:45:04.392Z
+ 
+ - **priority**: LOW → HIGH
+ - **description**: 7 lines → updated (23 lines)
++
++## 2026-10-06T21:19:25.081Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

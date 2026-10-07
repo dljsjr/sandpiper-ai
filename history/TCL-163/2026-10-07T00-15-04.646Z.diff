@@ -1,0 +1,36 @@
+===================================================================
+--- a/TCL-163.md
++++ b/TCL-163.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-13T03:32:51.575Z
+-updated_at: 2026-10-07T00:11:38.036Z
++updated_at: 2026-10-07T00:15:04.645Z
+ related:
+   - TCL-151
+   - TCL-157
+ ---
+@@ -83,8 +83,12 @@
+ ## Real Git WIP-preservation gate
+ 
+ `kovzxvkn` / `5c65b998` adds actual Git integration regressions for separate and external modes with tasks_dir='.', auto_commit=true, and auto_push=true. CLI refuses before changing HEAD, porcelain status, or unrelated wip.txt bytes. Both pass; full suite now 569 tests / 36 files plus typecheck. Production build already passed on unchanged source before this test-only commit. Latest independent-review comments referenced the older migrate-only guard; the global config boundary and this real-Git protection check are later corrections. Left NEEDS REVIEW.
+ 
++## Independent final review — PASS
++
++sandpiper-agent reran both original reproductions against the built CLI containing `kqqnpvlm` / `7b01738f`: project/task creation with non-inline root storage refuses, HEAD remains unchanged, and wip.txt stays untracked; ancestor migration refuses with repository/sentinel intact and no backup directory created. The reviewer cleared the blocker and confirmed nothing further remains on TCL-163. Doug's review is still pending; status remains NEEDS REVIEW.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -119,4 +123,8 @@
+ 
+ ## 2026-10-07T00:11:38.037Z
+ 
+ - **description**: 65 lines → updated (69 lines)
++
++## 2026-10-07T00:15:04.646Z
++
++- **description**: 69 lines → updated (73 lines)

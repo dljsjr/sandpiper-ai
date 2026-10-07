@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-163.md
++++ b/TCL-163.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Make the task tree location configurable so configs can point at existing storage"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-13T03:32:51.575Z
+-updated_at: 2026-10-06T22:33:57.332Z
++updated_at: 2026-10-06T23:12:57.549Z
+ related:
+   - TCL-151
+   - TCL-157
+ ---
+@@ -60,4 +60,9 @@
+ 
+ ## 2026-10-06T22:33:57.337Z
+ 
+ - **description**: 31 lines → updated (35 lines)
++
++## 2026-10-06T23:12:57.550Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

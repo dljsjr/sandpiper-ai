@@ -1,0 +1,36 @@
+===================================================================
+--- a/TCL-162.md
++++ b/TCL-162.md
+@@ -7,9 +7,9 @@
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:36.615Z
+ blocked_by:
+   - TCL-161
+-updated_at: 2026-10-06T21:33:22.274Z
++updated_at: 2026-10-06T22:33:57.536Z
+ ---
+ 
+ # Fold storage init into initialize
+ 
+@@ -44,8 +44,12 @@
+ TCL-161 is implemented, so the shared candidate-aware overwrite safeguard is available. The bootstrap removal itself still needs a design clarification: `initialize` must emit default inline configuration and refuse every existing config, but the old `storage init` bootstraps only a preconfigured non-default branch or external repository. The current `storage sync/push/pull` commands do not bootstrap missing workspaces. Simply moving the old handler after writing defaults makes its non-default branches unreachable; deleting the old command would remove the only supported bootstrap workflow.
+ 
+ No new flags, config-input source, implicit initialization, or overwrite exception were invented while Doug was away. Left NOT STARTED pending the non-default bootstrap entry-point decision. The occupied/empty-directory safeguards and VcsRunner seam remain intact.
+ 
++## Doug's decision — 2026-10-06
++
++Use flags on `initialize` to control how storage is initialized, including non-default modes. An interactive terminal wizard is deferred. Emit a complete configuration, using explicit defaults for unspecified initialization options, and preserve the refusal to overwrite any existing configuration candidate. Strict parsing of existing files does not gain defaults. The authoritative design is updated. The non-default bootstrap entry-point decision is resolved; implementation is not yet claimed complete.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -59,4 +63,8 @@
+ 
+ ## 2026-10-06T21:33:22.275Z
+ 
+ - **description**: 25 lines → updated (31 lines)
++
++## 2026-10-06T22:33:57.537Z
++
++- **description**: 31 lines → updated (35 lines)

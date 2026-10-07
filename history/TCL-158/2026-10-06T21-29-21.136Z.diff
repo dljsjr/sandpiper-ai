@@ -1,0 +1,28 @@
+===================================================================
+--- a/TCL-158.md
++++ b/TCL-158.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Purge sandpiper naming from Trail test fixtures (106 refs, 7 files)"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:32.882Z
+-updated_at: 2026-10-06T21:23:19.688Z
++updated_at: 2026-10-06T21:29:21.136Z
+ ---
+ 
+ # Purge sandpiper naming from Trail test fixtures (106 refs, 7 files)
+ 
+@@ -38,4 +38,8 @@
+ ## 2026-10-06T21:23:19.689Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-06T21:29:21.136Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

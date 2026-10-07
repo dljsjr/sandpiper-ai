@@ -1,0 +1,38 @@
+===================================================================
+--- a/TCL-155.md
++++ b/TCL-155.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:00:23.405Z
+-updated_at: 2026-10-06T21:13:18.807Z
++updated_at: 2026-10-06T21:33:46.289Z
+ ---
+ 
+ # Bracket in a task title wedges the board, and index update cannot repair it
+ 
+@@ -94,8 +94,14 @@
+ **Sequencing is now tracked in TCL-156 and is not optional.** 4.x reads 2.3.x output; 2.3.x cannot read 4.x output. Every consumer — including the bundled tasks skill script, which is a build artifact rather than a dependency declaration — must be on 4.x before any 4.x Trail writes a real board.
+ 
+ Still open here: `index update` should survive an unparseable index rather than dying on it. That is independent of any version bump — a hand-edit or an older writer can still produce one, and today that state is terminal for the board.
+ 
++## Repair implementation and verification — 2026-10-06
++
++Committed `lvqmxwto` / `153279a3`. Normal index reads stay strict. `index update` alone opts into recovery from TOON decoding failures; filesystem errors and unsupported future schema versions still fail. Recursive number scanning preserves archived subtasks and moved tombstone IDs when rebuilding an unreadable index, without following symlink directories.
++
++Independent read-only review passed: decoder-only recovery and archived-number preservation were confirmed. Optional diagnostic/options-object suggestions were not added to this bug fix. Final cumulative gate: 524 tests / 33 files pass and `bun run check` passes. Left NEEDS REVIEW for Doug. TCL-156 now separately verifies the actual reader artifacts against keyed-tabular 4.x scratch indexes; no live cutover was performed.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -117,4 +123,8 @@
+ 
+ ## 2026-10-06T21:13:18.807Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-06T21:33:46.289Z
++
++- **description**: 83 lines → updated (89 lines)

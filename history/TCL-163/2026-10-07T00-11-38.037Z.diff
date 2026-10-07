@@ -1,0 +1,36 @@
+===================================================================
+--- a/TCL-163.md
++++ b/TCL-163.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-13T03:32:51.575Z
+-updated_at: 2026-10-07T00:04:21.015Z
++updated_at: 2026-10-07T00:11:38.036Z
+ related:
+   - TCL-151
+   - TCL-157
+ ---
+@@ -79,8 +79,12 @@
+ The config-resolution tests demonstrated red (separate and external root configs were accepted) before the correction. Coverage proves no direct VCS commit calls, no mutation of existing task bytes/index creation, valid inline/disabled root stores, valid absolute outside-root checkout paths, intermediate symlink ancestors, and a future configuration file through a parent symlink.
+ 
+ Gate: 567 tests / 35 files, typecheck/build pass. Built CLI rejects both storage migration and task creation against the real-Git ancestor scratch without changing repository/config/sentinel or creating task/index files. Existing scratch `/tmp/trail-ancestor-safety.L5h8st`. NEEDS REVIEW remains; optional final read-only review requested. TCL-162's first tasks-dir flag remains uncommitted separately; remaining initialization flags/old-command removal are not yet implemented.
+ 
++## Real Git WIP-preservation gate
++
++`kovzxvkn` / `5c65b998` adds actual Git integration regressions for separate and external modes with tasks_dir='.', auto_commit=true, and auto_push=true. CLI refuses before changing HEAD, porcelain status, or unrelated wip.txt bytes. Both pass; full suite now 569 tests / 36 files plus typecheck. Production build already passed on unchanged source before this test-only commit. Latest independent-review comments referenced the older migrate-only guard; the global config boundary and this real-Git protection check are later corrections. Left NEEDS REVIEW.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -111,4 +115,8 @@
+ 
+ ## 2026-10-07T00:04:21.016Z
+ 
+ - **description**: 57 lines → updated (65 lines)
++
++## 2026-10-07T00:11:38.037Z
++
++- **description**: 65 lines → updated (69 lines)

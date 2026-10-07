@@ -1,0 +1,36 @@
+===================================================================
+--- a/TCL-161.md
++++ b/TCL-161.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:35.849Z
+-updated_at: 2026-10-06T21:21:11.746Z
++updated_at: 2026-10-06T21:40:33.451Z
+ ---
+ 
+ # Consider .trail.json and trail.json as additional config candidates
+ 
+@@ -34,8 +34,12 @@
+ ## Correction to this ticket's original framing
+ 
+ Filed 2026-08-12 as "*Consider* `.trail.json` and `trail.json` as additional config candidates" at LOW priority, with reasoning arguing precedence might never be needed and independently re-deriving "first-found is the cheaper and more honest answer." That was a settled design decision demoted to speculation and then reinvented. The source of the error was TCL-146's deferred list, which paraphrases the settled decision as an optional extra; the design record wins over the ticket.
+ 
++## Independent review and diagnostic follow-up — 2026-10-06
++
++Independent review passed first-match precedence and initialize refusal against the authoritative design. One concrete finding was corrected in `lrpwwkwn` / `3b2f0e84`: `storage migrate` now names the actual winning configuration path in its inline-mode refusal, or the canonical path when no configuration exists. Four red-to-green regressions cover all three candidates and the absent-file case; migrate tests and typecheck pass. The optional dangling-symlink observation did not change the existing existence-check contract.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -51,4 +55,8 @@
+ 
+ ## 2026-10-06T21:21:11.747Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-06T21:40:33.452Z
++
++- **description**: 23 lines → updated (27 lines)

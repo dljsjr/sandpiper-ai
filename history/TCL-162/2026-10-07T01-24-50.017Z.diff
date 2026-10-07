@@ -1,0 +1,34 @@
+===================================================================
+--- a/TCL-162.md
++++ b/TCL-162.md
+@@ -7,9 +7,9 @@
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:36.615Z
+ blocked_by:
+   - TCL-161
+-updated_at: 2026-10-07T01:21:22.685Z
++updated_at: 2026-10-07T01:24:50.016Z
+ ---
+ 
+ # Fold storage init into initialize
+ 
+@@ -66,8 +66,10 @@
+ Independent review passed no-overwrite/shared-location safety/bootstrap-failure probes but found that --auto-commit in default inline mode silently did nothing. Two new cases failed red before the fix. initialize now requires a named --branch or --repo when --auto-commit is selected; --auto-push already requires --auto-commit. Existing-file parsing remains unchanged.
+ 
+ Final full gate: 586 tests / 37 files, typecheck/build pass. Built CLI refuses inline --auto-commit before creating any .trail directory. First implementation `rtyrwmou` /96548aea; review-fix commit recorded in session output. Actual separated-task-commit scratch `/tmp/trail-initialize-autocommit.ZKm8R1`. NEEDS REVIEW remains.
+ 
++Review correction commit: `ylszvynn` / `256a59c9`. Final clean working change: `kluymxyn` / `e0966da2`. Independent review passed safety/no-overwrite/bootstrap failure; its one flag-intent finding was corrected with red/green regressions and a built-CLI refusal probe. Latest gates remain 586 tests, typecheck/build.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -102,4 +104,8 @@
+ 
+ ## 2026-10-07T01:21:22.686Z
+ 
+ - **description**: 47 lines → updated (53 lines)
++
++## 2026-10-07T01:24:50.017Z
++
++- **description**: 53 lines → updated (55 lines)

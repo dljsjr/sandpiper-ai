@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-159.md
++++ b/TCL-159.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Migrate Trail docs out of sandpiper-ai into the standalone repo"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:34.055Z
+-updated_at: 2026-08-13T04:01:15.511Z
++updated_at: 2026-10-06T21:40:33.294Z
+ ---
+ 
+ # Migrate Trail docs out of sandpiper-ai into the standalone repo
+ 
+@@ -48,4 +48,9 @@
+ 
+ ## 2026-08-13T04:01:15.514Z
+ 
+ - **description**: 7 lines → updated (30 lines)
++
++## 2026-10-06T21:40:33.295Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

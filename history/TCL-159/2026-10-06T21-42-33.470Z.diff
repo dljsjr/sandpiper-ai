@@ -1,0 +1,36 @@
+===================================================================
+--- a/TCL-159.md
++++ b/TCL-159.md
+@@ -5,9 +5,12 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:31:34.055Z
+-updated_at: 2026-10-06T21:42:33.357Z
++blocked_by:
++  - TCL-162
++  - TCL-163
++updated_at: 2026-10-06T21:42:33.470Z
+ ---
+ 
+ # Migrate Trail docs out of sandpiper-ai into the standalone repo
+ 
+@@ -18,9 +21,8 @@
+ Watch for docs that describe the pre-extraction world: `.sandpiper/tasks` paths, `sandpiper-tasks` command names, and the config shape before TCL-148/149. Moving a stale doc just relocates the staleness.
+ 
+ Deferred out of TCL-146; filed 2026-08-12 when that ticket reached review.
+ 
+-
+ ## Ruling on the extraction design record (2026-08-12)
+ 
+ `.sandpiper/docs/specs/trail-extraction-design.md` **splits — it does not move whole, and not yet.**
+ 
+@@ -67,4 +69,8 @@
+ 
+ ## 2026-10-06T21:42:33.358Z
+ 
+ - **description**: 30 lines → updated (40 lines)
++
++## 2026-10-06T21:42:33.470Z
++
++- **blocked_by**: (none) → TCL-162, TCL-163

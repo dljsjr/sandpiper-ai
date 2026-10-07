@@ -1,0 +1,40 @@
+===================================================================
+--- a/TCL-151.md
++++ b/TCL-151.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T19:48:07.207Z
+-updated_at: 2026-10-06T21:23:19.620Z
++updated_at: 2026-10-06T21:29:21.409Z
+ ---
+ 
+ # Mutation with malformed config writes the task, prints success, then crashes
+ 
+@@ -65,8 +65,16 @@
+ (b) is cheap and may be sufficient. (a) is correct and expensive. Recording both deliberately so the expensive option is not the only one written down.
+ 
+ Found during TCL-146 slice review, 2026-08-12. Not a blocker for the standalone extraction.
+ 
++## Implementation and verification — 2026-10-06
++
++Committed `nvtnrmsz` / `70a3e1cf`. The shared task-tree path entry point now strictly resolves configuration before a command can read or write the tree. This prevents the reported save/success-output/late-config-error sequence without masking errors after saving or introducing config defaults. No TCL-163 path semantics were selected.
++
++The original create regression failed red with `Created AGENT-3` before the error. Six mutation regressions now cover create/update/pickup/complete/move/archive, including unchanged task bytes and no new index or archive. Real scratch CLI task and project creation both refused malformed configuration before creating files/directories. Reproduction retained at `/tmp/trail-config-preflight.DiulER`.
++
++Full suite: 524 tests / 33 files pass; `bun run check` passes. Optional independent read-only review requested. Left NEEDS REVIEW for Doug.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -77,4 +85,8 @@
+ 
+ ## 2026-10-06T21:23:19.621Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-06T21:29:21.410Z
++
++- **description**: 54 lines → updated (62 lines)
