@@ -61,6 +61,10 @@ describe('system prompt diagnostic', () => {
   pi.on('before_agent_start', (event) => {
     event.systemPromptOptions.sections.diagnostic_probe = 'extension section text';
   });
+  // Terminal notification extensions write escapes like this one when a turn ends.
+  pi.on('agent_end', () => {
+    process.stdout.write('\\x1b]777;notify;probe;\\x07');
+  });
 }
 `,
     );
