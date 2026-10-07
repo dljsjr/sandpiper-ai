@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -70,7 +70,7 @@ describe('system prompt diagnostic', () => {
     );
 
     try {
-      const output = execFileSync(
+      const run = spawnSync(
         bunExecutable,
         [
           'run',
@@ -92,7 +92,10 @@ describe('system prompt diagnostic', () => {
           timeout: 30_000,
         },
       );
+      const output = run.stdout;
 
+      expect(run.status).toBe(0);
+      expect(run.stderr).not.toContain(']777;notify');
       expect(output.startsWith('<system_prompt>')).toBe(true);
       expect(output).toContain('<identity>diagnostic identity</identity>');
       expect(output).toContain(`</system_prompt>\n\n`);

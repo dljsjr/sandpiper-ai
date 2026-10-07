@@ -44,15 +44,22 @@ async function writeStdout(text: string): Promise<void> {
   });
 }
 
-// Rendering runs a real turn, so extensions may write to stdout (terminal notifications on
-// agent_end, for example). Send that to stderr so stdout carries only the diagnostic's output.
-async function withStdoutRedirectedToStderr<T>(render: () => Promise<T>): Promise<T> {
+// Rendering runs a real turn against a capture provider, so extensions may write to stdout in
+// response to it (terminal notifications on agent_end, for example). That output belongs to a
+// turn nobody asked for: drop it, so stdout carries only the diagnostic's output and stderr only
+// real warnings.
+async function withExtensionStdoutDiscarded<T>(render: () => Promise<T>): Promise<T> {
   const stdoutWrite = process.stdout.write;
   const consoleLog = console.log;
   const consoleInfo = console.info;
-  process.stdout.write = process.stderr.write.bind(process.stderr) as typeof process.stdout.write;
-  console.log = console.error;
-  console.info = console.error;
+  const discardWrite = (_chunk: unknown, encodingOrCallback?: unknown, callback?: unknown): boolean => {
+    const done = typeof encodingOrCallback === 'function' ? encodingOrCallback : callback;
+    if (typeof done === 'function') queueMicrotask(() => done());
+    return true;
+  };
+  process.stdout.write = discardWrite as typeof process.stdout.write;
+  console.log = () => {};
+  console.info = () => {};
   try {
     return await render();
   } finally {
@@ -111,7 +118,7 @@ if (args.includes('--help') || args.includes('-h')) {
     mirrorPiSandpiperEnvironment(process.env);
 
     const { renderSystemPrompt } = await import('./system_prompt_diagnostic.js');
-    const result = await withStdoutRedirectedToStderr(() =>
+    const result = await withExtensionStdoutDiscarded(() =>
       renderSystemPrompt({
         args,
         cwd: process.cwd(),
