@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-156.md
++++ b/TCL-156.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Roll toon 4.1.1 to every board consumer before any 4.x Trail writes a board"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:21:00.749Z
+-updated_at: 2026-10-06T21:33:22.144Z
++updated_at: 2026-10-07T15:46:45.360Z
+ related:
+   - TCL-155
+ ---
+ 
+@@ -74,4 +75,9 @@
+ 
+ ## 2026-10-06T21:33:22.145Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-07T15:46:45.361Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

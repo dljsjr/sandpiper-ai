@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-145.md
++++ b/TCL-145.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Frontmatter edit guard falsely refuses plain scalars containing ampersand or asterisk"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T18:58:51.006Z
+-updated_at: 2026-10-06T21:33:46.827Z
++updated_at: 2026-10-07T15:46:45.040Z
+ ---
+ 
+ # Frontmatter edit guard falsely refuses plain scalars containing ampersand or asterisk
+ 
+@@ -40,4 +41,9 @@
+ 
+ ## 2026-10-06T21:33:46.828Z
+ 
+ - **description**: 9 lines → updated (13 lines)
++
++## 2026-10-07T15:46:45.040Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

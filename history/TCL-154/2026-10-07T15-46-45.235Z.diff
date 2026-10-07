@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-154.md
++++ b/TCL-154.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "bun test runs the wrong runner and reports a convincing false red"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T21:53:07.967Z
+-updated_at: 2026-10-06T21:33:46.468Z
++updated_at: 2026-10-07T15:46:45.234Z
+ ---
+ 
+ # bun test runs the wrong runner and reports a convincing false red
+ 
+@@ -57,4 +58,9 @@
+ 
+ ## 2026-10-06T21:33:46.469Z
+ 
+ - **description**: 22 lines → updated (26 lines)
++
++## 2026-10-07T15:46:45.235Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

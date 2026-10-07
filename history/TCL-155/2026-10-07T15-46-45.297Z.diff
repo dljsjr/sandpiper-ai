@@ -1,0 +1,30 @@
+===================================================================
+--- a/TCL-155.md
++++ b/TCL-155.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Bracket in a task title wedges the board, and index update cannot repair it"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: "Roux"
+ created_at: 2026-08-12T22:00:23.405Z
+-updated_at: 2026-10-06T21:33:46.289Z
++updated_at: 2026-10-07T15:46:45.297Z
+ ---
+ 
+ # Bracket in a task title wedges the board, and index update cannot repair it
+ 
+@@ -127,4 +128,9 @@
+ 
+ ## 2026-10-06T21:33:46.289Z
+ 
+ - **description**: 83 lines → updated (89 lines)
++
++## 2026-10-07T15:46:45.297Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
