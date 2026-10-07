@@ -27,8 +27,8 @@ Sandpiper is a distribution of the Pi coding agent with additional tools for sha
 ## Task system
 
 - [Task overview](features/tasks/README.md)
-- [Task storage modes](features/tasks/storage-guide.md)
-- [Task storage architecture](features/tasks/architecture.md)
+- [Bundled task storage reference](features/tasks/storage-guide.md)
+- [Task documentation ownership](features/tasks/architecture.md)
 
 ## Package and extension entrypoints
 

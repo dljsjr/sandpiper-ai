@@ -1,205 +1,69 @@
-# Trail Extraction — Design Record
+# Why Trail is separate from Sandpiper
 
-Status: design record · Diátaxis: explanation + normative decisions · 2026-08-12
+This record explains the Trail extraction and the Sandpiper work that remains. Doug settled the original decisions on 2026-08-12 and ratified paths and initialization flags on 2026-10-06.
 
-Record of the decisions behind extracting `packages/trail` into a standalone repository.
-Decisions marked **[settled]** were ruled by Doug in the 2026-08-12 design session.
-Items marked **[recommended]** are proposals that have not been ratified — do not treat
-them as agreed.
+Trail's implemented runtime contract now lives in its own documentation. This record is not a second configuration or command reference.
 
-## The finding that shapes everything
+## Original coupling
 
-**Trail has no code coupling to Sandpiper.** Its five dependencies are all third-party
-(`commander`, `@commander-js/extra-typings`, `@toon-format/toon`, `diff`, `yaml`), it
-imports nothing from the workspace, and nothing in sandpiper-ai imports it as a library —
-it appears only in turbo build filters, the lockfile, docs, and devtools tests.
+The extraction survey found no code imports between Trail and the rest of Sandpiper. Trail's five dependencies were third-party packages: `commander`, `@commander-js/extra-typings`, `@toon-format/toon`, `diff`, and `yaml`.
 
-What actually couples them is **16 hardcoded path literals** (plus about as many doc
-comments) in `helpers.ts`, `storage-cmd.ts` (5×), `migrate.ts` (4×), `storage-config.ts`
-(2×), `editor.ts`, and `index.ts`. They all spell one unnamed concept: *the task tree
-lives at `<root>/.sandpiper/tasks`, configured by `.sandpiper-tasks.json` or the `tasks`
-key in `.sandpiper/settings.json`.*
+The coupling came from sixteen path literals for `.sandpiper/tasks`, legacy configuration filenames, build filters, distribution assembly, and documentation. Extracting Trail required a project-root configuration boundary rather than library dependency changes.
 
-So this is not an untangling job. It is mostly introducing the constant that was never
-introduced — worth doing on its own merits, since today changing that convention is a
-16-site sweep with no compiler help.
+The executable was already a portable Node.js bundle. Sandpiper consumed a built file during assembly, not Trail as an imported library. This made distribution ownership distinct from module resolution.
 
-Two supporting facts:
+Earlier TCL-69 work renamed the public interface but retained the old layout internally. The later standalone work introduced Trail's configuration candidates, exact version matching, configurable task paths, and initialization flags.
 
-- **`dist/trail` is a portable Node bundle, not a native binary** — `#!/usr/bin/env node`,
-  built `--target=node`, ~243KB. No build matrix, no per-platform artifacts.
-- **sandpiper-ai's dependency on Trail is a build-artifact dependency, not a code
-  dependency.** It needs a *file* at assembly time (`assembleDistribution.ts` copies
-  `dist/packages/trail/trail` to six destinations) and a skill directory. It never resolves
-  the module.
+## Runtime documentation ownership
 
-## Decisions
+The standalone Trail repository owns these documents:
 
-### Branding **[settled]**
+| Trail document                                  | Subject                                                                                    |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `docs/configuration.md`                         | Configuration discovery, version-2 fields, path resolution, and initialization guarantees. |
+| `docs/commands.md`                              | Initialization flags and the command surface.                                              |
+| `docs/task-format.md` and `docs/consistency.md` | Task files, history, numbering, relationships, and mutation guards.                        |
+| `docs/architecture.md`                          | Reasons for complete configuration, one-file precedence, and separate checkouts.           |
 
-Drop all Sandpiper branding from Trail. No aliases, no backwards compatibility, and Trail
-does not know the old config format exists — not even for migration. The `sandpiper-tasks`
-invocation alias in `index.ts` goes away with it.
+These are repository-and-path locators, not dependencies on a local checkout. Trail's docs do not link back to Sandpiper's extraction record.
 
-Compatibility is a separate deliberate act performed by a separate tool. It is never
-something the main binary quietly performs.
+The configuration candidates, configurable task location, and folded initialization command are implemented. The old example that suggested `trail migrate-config` did not name a real command and is not part of the runtime contract.
 
-### Config resolution **[settled]**
+## Sandpiper adoption
 
-Candidates, highest precedence first. **First match wins.** No merging, no walking up the
-directory tree, no environment variable override.
+Sandpiper owns the [board adoption specification](trail-board-adoption.md). The planned tool converts effective legacy configuration into a complete Trail configuration. It keeps task files in their existing directory.
 
-1. `./.trail.json`
-2. `./trail.json`
-3. `./.trail/config.json`
+This separates adoption from physical relocation. It also keeps knowledge of Sandpiper's legacy formats outside Trail. The tool must preserve disabled version control, complete effective values, and live task workspaces.
 
-Multiple candidates present is deliberate and legal, not an error: it lets a user clone a
-repo carrying a version-controlled Trail config and shadow it with a local, uncommitted one
-— e.g. working on a fork and tracking their own work on a separate board. Prior art is
-mise's `mise.toml` / `mise.local.toml` family, cited as an existence proof that layered
-filenames are fine, **not** as a template. Mise merges hierarchically because mise's
-surface demands it; Trail's does not.
+The migration tool must be available before or with consumer cutover. Updating the consumer first leaves existing boards inaccessible to the new configuration reader.
 
-The `tasks` key inside `.sandpiper/settings.json` is dropped entirely.
+## Skill distribution
 
-### Path resolution **[settled — ratified 2026-10-06]**
+A skill directory can be installed without the surrounding repository. Removing duplicate authored product docs does not remove its need for local reference files.
 
-Config discovery and the tasks-dir value both resolve against the **project root**, which
-is what `--dir` already means today:
+Doug approved single-source authoring with skill-local copies during assembly. The [skill assembly contract](trail-skill-assembly.md) requires documentation that matches the executable's source revision. It does not select how the executable is installed.
 
-```ts
-.option('-d, --dir <path>', 'Path to the directory containing .sandpiper/tasks (defaults to cwd)')
-const tasksDir = join(base, '.sandpiper', 'tasks');   // helpers.ts:27
-```
+Until that assembly and consumer change, the legacy package docs and installed skill references remain local to their current bundle. They are not the source for new standalone behavior.
 
-`--dir` points at the *container*, not at the tasks directory, so no behavior change is
-required. Since discovery does not walk up, the project root is always either `--dir` or
-cwd.
+## Consumer method remains deferred
 
-Task-directory paths can be absolute or relative. Relative paths resolve against the
-project root, not the configuration file's directory. Absolute paths are used as given.
+Doug deferred the consumption decision on 2026-10-06. The original ranking remains a recommendation, not approval:
 
-### Config content **[settled]**
+1. Pinned vendoring fits a build-artifact dependency. The existing vendor tooling supports similar skill and executable assets.
+2. A Git dependency conflicts with the current package-policy gate and needs assembly to locate the executable and skill assets.
+3. A `file:` dependency fits the current policy but depends on a local path.
+4. A submodule adds jj workflow constraints. Its support requires investigation before adoption.
 
-- Default tasks dir is `./.trail/tasks`. Overriding it is a key in the config file.
-- **Every key must be present. A missing key is an error.** No fallbacks, no inferred
-  defaults, no merge-with-defaults pass. `resolveStorageConfig`'s `mergeWithDefaults` is
-  deleted, not ported.
-- No reserved escape-hatch key. Trail is simple; its config stays simple.
+No recommendation authorizes publishing, pushing, or a consumer cutover. The documentation assembly boundary applies whichever consumer method is selected.
 
-### Config versioning **[settled]**
+## Board relocation
 
-The config carries a `version` integer. Trail carries its own expected version. **The two
-must match exactly** — a file both newer *and* older than the binary is a loud error naming
-the fix:
+Doug approved moving the entire TCL board to Trail, including closed tickets and history. Task keys must remain unchanged. Relocation must account for inbound references.
 
-```
-config version 1, trail expects 2 — run `trail migrate-config`
-```
+Relocation waits for consumer and migration prerequisites. In-place adoption does not authorize moving task directories or replacing live jj workspaces.
 
-Accepting an older version was rejected because it requires the binary to know which keys a
-past version lacked and supply them itself — the inferred fallback outlawed above, merely
-relocated into the parser. `min_version`-style declarations (mise's approach) were
-considered and rejected as surface disproportionate to Trail's complexity.
+## Remaining extraction work
 
-Side effect worth knowing: with the version check first, strictness about *unknown* keys
-comes free and well-diagnosed. Any config carrying keys Trail does not know will also carry
-a bumped version, so the version check fires first and produces a useful message instead of
-`unexpected key "auto_stash"`.
+TCL-159 covers documentation consolidation. TCL-157 covers Sandpiper's adoption tool. TCL-160 covers the full TCL board relocation. TCL-146 remains the overall extraction and cutover work item.
 
-### `initialize` **[settled]**
-
-New top-level command. `storage init` is removed and folded into it — the `storage`
-subcommand has poor discoverability and is confusing for most use cases.
-
-- Emits `./.trail/config.json` with **all required values explicitly populated**.
-  Initialization flags can select non-default values. Unspecified values use defaults in
-  the newly emitted file. This does not relax strict parsing of existing configuration.
-- Flags control initialization. An interactive terminal wizard is deferred, as ratified
-  on 2026-10-06.
-- **Never overwrites.** If a config already exists at any candidate path, `initialize` is a
-  no-op consumer and fails loudly. An existing file means either `initialize` already ran or
-  the user deliberately bootstrapped their own — neither is Trail's to clobber.
-
-## Migration tool **[settled]**
-
-A separate, throwaway CLI. It exists because we are currently Trail's only consumers; it is
-our migration, not a Trail feature.
-
-**It does not live in the Trail repo.** Keeping it in sandpiper-ai is what lets it read
-`.sandpiper-tasks.json` and `.sandpiper/settings.json` — Sandpiper's formats — without Trail
-ever knowing they existed. That ownership boundary is the whole reason Trail gets to be
-compat-free.
-
-Interface: `--tasks-dir`, and an optional `--config-file`. It emits `./.trail/config.json`
-with the tasks-dir key pointed at the existing `./.sandpiper/tasks`. **Tasks are not
-moved** — the point is to make old directories work in place, which keeps the migration
-reversible and decouples "adopt standalone Trail" from "reorganize every repo".
-
-It must carry the whole `version_control` block forward, not just the tasks dir. Surveyed
-2026-08-12 across the twelve boards on this machine:
-
-- **Eleven have a storage config**, so `--config-file` is the common case, not the rare one.
-  It should *discover* the old config, with the flag as an override.
-- **Five of twelve are partial** (missing `enabled`, `auto_push`, or both) — today's
-  `mergeWithDefaults` is doing real work, so the old file is not a reliable source of every
-  key.
-- **`herdr` keeps its config in `.sandpiper/settings.json`**, not `.sandpiper-tasks.json`.
-  Read both or it silently flips from `enabled: false` to enabled.
-- **Seven of eleven task dirs are live jj workspaces** (`navigator`,
-  `pi-claude-code-cli-provider`, `reinforced-guidance`, `sandpiper-ai`,
-  `task-storage-spike`, `waymark`, `yaams`). Defaults say `mode.branch: "@"` (inline).
-  Handing a fresh "you are inline" config to a real jj workspace is the one outcome here
-  that can damage something rather than merely annoy.
-- `reinforced-guidance` and `waymark` run `auto_commit: true`; everything else does not.
-
-## TCL board relocation **[settled — ratified 2026-10-06]**
-
-Move the entire TCL board to Trail, including closed tickets and history. Preserve task
-keys and check inbound references. Relocation still waits for the consumer and migration
-prerequisites.
-
-## Depending on Trail without publishing to npm **[deferred — 2026-10-06]**
-
-Doug deferred the consumption decision. The ranking below remains a recommendation,
-not authorization for a consumer cutover.
-
-Because the dependency is a build artifact rather than a module, this is not a
-module-resolution problem. Ranked:
-
-1. **Vendor it.** One line in `vendor.txt` pointing at a pinned ref of the Trail repo,
-   pulling `SKILL.md` + the built `trail`. `devtools/vendor.ts` already does exactly this
-   shape for the `pdf` and `skill-creator` skills. No npm, no lockfile entry, no dependency
-   policy change, works under jj. Cost: Trail commits its built bundle — defensible for a
-   repo whose deliverable *is* that bundle.
-2. **Git dependency** (`git+ssh://…#v0.1.0`). Trips our own gate —
-   `devtools/ecosystemPackage.ts` accepts only `file:`, exact semver, and allowlisted
-   `workspace:` — and leans on install-time `prepare` scripts removed in TOOLS-15. Would
-   still need assembly code reaching into `node_modules` to place the skill.
-3. **`file:` path dep.** Permitted by the policy today, but only works on one machine.
-4. **Git submodule + workspace entry.** Avoid. jj's submodule support is the weak spot, and
-   we are jj-exclusive. Verify before believing this ranking.
-
-## Sequencing **[recommended]**
-
-**Do the decoupling in place, before the directory moves.** Introduce the config module,
-generalize the roots, implement the new resolution and version rules, delete
-`mergeWithDefaults` — all inside the monorepo, where the vitest suite, the distribution
-smoke tests, and `assembleDistribution.ts` already exercise it. Get that green. *Then* the
-physical move is a file copy plus a `vendor.txt` line, with nothing left to debug.
-
-Inverted, every failure is ambiguous between "the extraction broke it" and "the
-generalization broke it," and you are bisecting a repo split. There is no CI here to catch
-it — there is no `.github/workflows`, so the distribution tests run only when run by hand.
-
-Ordering constraint: the migration tool ships **before or with** the cutover. The moment
-Trail stops reading `.sandpiper/tasks`, every board on this machine is dark until migration
-runs against it.
-
-## Prior work
-
-TCL-69 and its subtasks (TCL-122 rename, TCL-123 binary, TCL-127 distribution verification,
-TCL-128 package directory groundwork) are COMPLETE, but the rename was **surface-deep**: new
-name outside, `.sandpiper` everywhere inside. There is no `.trail` string anywhere in the
-package today. None of those tickets touch path generalization, config resolution, or the
-external-repo dependency — which is where the actual work is.
+The migration and consumer work still use this record. It stays active in Sandpiper until the extraction finishes. Archiving it now removes guidance that those work items still need.

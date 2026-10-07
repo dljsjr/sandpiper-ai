@@ -14,13 +14,16 @@ Read this before changing the task CLI, task storage, task skills, or task docs.
 - `index.toon` is derived state. Task files on disk are the source of truth.
 - Storage behavior must support inline, separate-branch, and external-repo modes.
 - Tests must not touch real user state or production task stores.
-- Keep `packages/resources/skills/sandpiper/tasks/references/storage.md` in sync with public storage docs when storage behavior changes.
-- Keep Trail package docs package-local: `packages/trail/README.md` is the standalone npm package entrypoint. Root `docs/features/tasks/**` covers Sandpiper integration and should link to package docs rather than being extracted into the npm package.
+- Author current Trail product documentation in the standalone Trail repository. Keep `docs/features/tasks/**` focused on Sandpiper integration, not another product manual.
+- Keep installed skills self-contained. Their local reference copies must match the executable's source revision; do not replace them with links outside the skill directory.
+- The current `packages/trail/docs/` and task skill references describe the legacy bundled CLI. Preserve those local copies until assembly and consumer cutover change together. Do not apply standalone initialization advice to the legacy executable.
 
 ## References
 
 - Public feature overview: `docs/features/tasks/README.md`
 - Storage guide: `docs/features/tasks/storage-guide.md`
-- Architecture: `docs/features/tasks/architecture.md`
-- Trail CLI package: `packages/trail/README.md`
+- Documentation ownership: `docs/features/tasks/architecture.md`
+- Assembly contract: `.sandpiper/docs/specs/trail-skill-assembly.md`
+- Board adoption: `.sandpiper/docs/specs/trail-board-adoption.md`
+- Legacy Trail CLI package: `packages/trail/README.md`
 - Skill spec: `packages/resources/skills/sandpiper/tasks/references/SPEC.md`

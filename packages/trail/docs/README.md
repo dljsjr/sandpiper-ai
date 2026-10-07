@@ -1,6 +1,8 @@
-# Trail documentation
+# Legacy Trail documentation
 
-Trail is a plaintext task tracker for project work. It stores tasks as Markdown files with YAML frontmatter under `.sandpiper/tasks/` and provides a `trail` CLI for creating, querying, updating, and archiving them.
+These local pages describe the executable currently built by Sandpiper's Trail package. It stores task files under `.sandpiper/tasks/`. The pages remain with that executable until consumer cutover.
+
+Current product documentation is authored in the standalone Trail repository under `docs/`. Its configuration and initialization differ from this legacy bundle. Sandpiper's assembly contract requires documentation that matches the executable's revision.
 
 ## Start here
 

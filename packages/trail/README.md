@@ -1,81 +1,22 @@
-# Trail CLI
+# Legacy Trail package in Sandpiper
 
-Trail is a plaintext task tracker built on Markdown files with YAML frontmatter. It stores work items in `.sandpiper/tasks/` so humans, agents, and normal filesystem tools can inspect the project backlog without a database service.
+This package builds the Trail executable currently bundled with Sandpiper. It still reads `.sandpiper/tasks/` and the legacy Sandpiper configuration files. It is not the standalone Trail repository.
 
-Trail is distributed as `@sandpiper-ai/trail` and installs a `trail` executable. Sandpiper may also ship a `sandpiper-tasks` compatibility command during the migration, but `trail` is the standalone package interface.
+The standalone repository owns current product documentation under `docs/`. Its `initialize` command and version-2 configuration do not apply to this legacy executable.
 
-## Install
+## Bundled documentation
 
-```bash
-npm install -g @sandpiper-ai/trail
-trail --help
-```
+The [local documentation](docs/README.md) remains with this package to describe its legacy runtime. Sandpiper's integration page is `docs/features/tasks/README.md` in the Sandpiper repository.
 
-For one-off use without a global install:
-
-```bash
-npx @sandpiper-ai/trail --help
-```
-
-## Quick start
-
-Create a task store, then create a task:
-
-```bash
-mkdir -p .sandpiper/tasks
-trail task create -p APP -t "Implement feature X" --priority HIGH --reporter USER
-```
-
-Pick it up, mark it ready for review, then finalize it:
-
-```bash
-trail task pickup APP-1
-trail task complete APP-1
-trail task complete APP-1 --final --resolution DONE
-```
-
-Use `WONTFIX` instead of `DONE` when the work is no longer needed.
-
-## Documentation
-
-- [Getting started](docs/getting-started.md) — create a project and walk one task through the lifecycle.
-- [Workflows](docs/workflows.md) — common task, project, archive, and query workflows.
-- [Storage](docs/storage.md) — inline, separate-branch, and external-repository task storage.
-- [Commands](docs/commands.md) — command and option reference.
-- [Task format](docs/task-format.md) — Markdown files, frontmatter fields, activity logs, and indexes.
-
-## Common commands
-
-```bash
-trail task list
-trail task list -p APP --top-level
-trail task show APP-1
-trail task summary
-
-trail task update APP-1 --priority MEDIUM
-trail task move APP-1 -k BUG
-trail task archive -p APP
-
-trail project list
-trail index update
-```
-
-Use structured output for scripts and agent tooling:
-
-```bash
-trail -f json task list -s IN_PROGRESS
-trail -f toon task show APP-1 --metadata-only
-```
-
-## Storage modes
-
-By default, task files live inline on the current branch. For busy repositories, Trail can keep tasks on a separate branch or in an external repository. See [Storage](docs/storage.md) for configuration and migration steps.
+The current tasks skill keeps its own local references so that it works without this repository. Sandpiper records the assembly contract in `.sandpiper/docs/specs/trail-skill-assembly.md`. That contract requires matching documentation copies for the eventual standalone consumer.
 
 ## Development
 
-```bash
-bun run build    # tsc + bun build -> dist/trail
-bun run test     # package Vitest suite
+From this package directory, the existing build and test commands are:
+
+```sh
+bun run build
+bun run test
 ```
 
-Core logic is framework-independent. The CLI layer is a thin Commander wrapper around the task, project, storage, indexing, and formatting modules.
+Consumer packaging and cutover remain deferred. This documentation change does not rebuild or replace Sandpiper's bundled executable.

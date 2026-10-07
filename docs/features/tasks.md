@@ -1,16 +1,9 @@
-# Task Management
+# Task management
 
-Sandpiper includes Trail, a markdown-based task tracker designed for project-local work. Use the `trail` CLI to manage tasks stored under `.sandpiper/tasks/`; the files can still be read by humans, agents, and normal filesystem tools.
+Sandpiper includes Trail and a self-contained tasks skill for project work tracking. The current bundle stores tasks under `.sandpiper/tasks/`.
 
-Use the task system to track work items, bugs, subtasks, status, ownership, and relationships between pieces of work.
+[Tasks in Sandpiper](tasks/README.md) describes the installed interface and its local references. [Bundled task storage](tasks/storage-guide.md) describes the legacy configuration that this executable reads.
 
-## Start here
+[Task documentation ownership](tasks/architecture.md) explains why Trail authors the product docs and Sandpiper includes matching local copies in its skill.
 
-- [Task overview](tasks/README.md) — create, list, update, and complete tasks.
-- [Storage modes](tasks/storage-guide.md) — keep tasks inline, on a separate branch, or in an external repository.
-- [Storage architecture](tasks/architecture.md) — design rationale and indexing model.
-
-## Related docs
-
-- [Session standup](standup.md)
-- [Directory layout](../concepts/directory-layout.md)
+Related features include [session standup](standup.md) and the [directory layout](../concepts/directory-layout.md).
