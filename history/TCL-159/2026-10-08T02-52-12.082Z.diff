@@ -1,0 +1,46 @@
+===================================================================
+--- a/TCL-159.md
++++ b/TCL-159.md
+@@ -8,9 +8,9 @@
+ created_at: 2026-08-12T22:31:34.055Z
+ blocked_by:
+   - TCL-162
+   - TCL-163
+-updated_at: 2026-10-08T02:11:10.315Z
++updated_at: 2026-10-08T02:52:12.081Z
+ ---
+ 
+ # Migrate Trail docs out of sandpiper-ai into the standalone repo
+ 
+@@ -75,8 +75,22 @@
+ Scratch: /tmp/trail-docs-tutorial.sh1D1m; /tmp/trail-docs-project-show.xjfjjv; /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/trail-docs-tcl159.0VvCPG. Verifier /tmp/trail-docs-tcl159-check.mjs, test log /tmp/trail-tcl159-gate.log.
+ 
+ Canonical content/integration consolidation is ready for Doug's review. Future generated-copy assembly remains part of the deferred consumer transition, not a completed delivery here. Doug will handle reviews; no further peer-review requests were sent after his instruction.
+ 
++## Full Trail-only documentation pass
++
++Doug requested accuracy, voice, style, and Diátaxis across all documentation, not only extraction-related sections. Scope was explicitly confirmed as Trail only. Read all ten authored Markdown pages fully: README.md and all nine docs/*.md pages. No authored AGENTS, playbooks, or internal docs exist in this checkout; generated standup remains continuity data.
++
++Commit `xqqkvzlk` / `f8155694` reviews/revises the entire set. README is now an orientation/build/short-start entrypoint instead of another command dump. The tutorial has a safe chained directory setup, one path, and explicit visible results. Workflows are independent goal-based recipes with preconditions and a separate bulk-change section. Full configuration examples moved from the storage how-to into the configuration reference. Architecture stays explanation, command/schema/consistency/file pages stay reference. Terminology, conditional instructions, active voice, sentence length, and formatting were reviewed throughout. No doc-standards.md or new playbooks; applied both requested skills and the librarian's human-facing/Diátaxis/curation/revision/sweep guidance. The three longest prose sentences are 20, 20, and 18 words, with identifiers counted as one.
++
++Additional accuracy corrections: minimum Node.js 22.12.0 follows the installed Commander 15 engine contract. Explicit raw output differs from default task lines/progress messages. Only the listed commands implement structured output; summary ignores format, and an empty project list prints plain text. Search ordering/default LOW-first priority, relevance/desc behavior, search-limit-before-filter ordering, parent display context, parent search scope, and editor precedence now match source. Auto-commit triggers only creation, non-interactive updates, pickup, and completion; not move/archive/editor/project/index. It commits the entire task checkout, and VCS failure does not undo prior task writes. Migration keeps tasks_dir unchanged, backups are removed only after success, and external task repositories hold project directories at their root. Normal index queries check counts, not every file's contents. A blank relationship differs from a quoted empty scalar; duplicate keys retain the first supported value.
++
++Reproduced one separate runtime defect: title edits can replace a frontmatter comment instead of the body heading. The documentation now states that limitation; filed a separate top-level BUG related to TCL-159. No source fix was attempted and the audit remains parked.
++
++Verification: all ten pages have working navigation, 45 local links/anchors, four strict v2 JSON examples, three parsed Markdown examples, and 108 documented flags matched against built help. Executed the literal README quick start and every tutorial block. All 36 workflow code blocks ran in independent fixture stores with their documented preconditions; editor examples used a local no-interaction stub. Real Git probes verified separate initialization, automatic commit triggers and non-triggers, byte-preserving migration, external cloning/refusal, and no-op pull/push/sync. Full gate: 586 Vitest tests / 37 files, TypeScript check, build, all pass. All ten Markdown files formatted and full diff inspected. No runtime source, package/configuration/tooling files, Sandpiper docs, skill files, consumer assembly, or live task location changed.
++
++Verifier /tmp/trail-docs-full-pass.mjs; gate log /tmp/trail-full-docs-gate.log; latest scratch /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/trail-full-docs.hfiytD. Doug handles review; no peer requests. Ready for review, not final closure.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -115,4 +129,8 @@
+ 
+ ## 2026-10-08T02:11:10.318Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
++
++## 2026-10-08T02:52:12.082Z
++
++- **description**: 61 lines → updated (75 lines)
