@@ -1,0 +1,42 @@
+===================================================================
+--- a/AGENT-306.md
++++ b/AGENT-306.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-10-16T16:14:05.652Z
+-updated_at: 2026-10-16T16:16:01.759Z
++updated_at: 2026-10-16T16:30:24.399Z
+ related:
+   - AGENT-290
+ ---
+ 
+@@ -43,11 +43,27 @@
+ 
+ No impact
+ - Theme schema validation at startup (Sandpiper ships no themes; Doug uses built-in dark). Terminal.setProgramStatus is required, but Sandpiper implements no Terminal. The experimental server/client removal doesn't affect us (we don't use it). Provider/model catalog fixes.
+ 
++Decisions (Doug, 2026-10-16)
++- Birdup clock.ts and persona_latch.ts firing on wake turns: fine as is.
++- Program status: use Pi's built-in OSC 7501 and remove the mitsuhiko notify extension from ~/.sandpiper/agent/settings.json packages once on 1.1.0+ (not before: 1.0.4 has no program status). Future work may build on it.
++- agent_settled.aborted: possibly useful for PCCP; not a Sandpiper priority.
++- Tool timing and padding, and theme colors: audit renderers for hardcoded padding and colors that should use outputPad and theme tokens.
++
++Renderer audit, first pass (2026-10-16)
++- Sandpiper: tool renderers in skill-loading-tool, web-fetch, tattler-receive, chorus, and turn-control (empty). Only tattler-inbox-renderer and chorus-ui apply outputPad. skill-loading-tool.ts:449 hardcodes bold (\x1b[1m … \x1b[22m) inside theme.fg instead of theme.bold. diagnostics-hooks.ts:55 uses a fixed Text padding of 1.
++- PCCP (non-bundled): claude-cc-widget.ts:126-130 hardcodes raw ANSI green/yellow/red/faint for the usage bar (candidates: success/warning/error/dim theme tokens). claude-tool-renderers and the mirror renderer don't use outputPad.
++- reinforced-guidance (non-bundled): fixed Text paddings in its panel; no raw colors.
++- pi-yaams, Birdup pi-ext: nothing found.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-16T16:16:01.759Z
+ 
+ - **description**: 1 line → updated (30 lines)
++
++## 2026-10-16T16:30:24.403Z
++
++- **description**: 30 lines → updated (42 lines)
