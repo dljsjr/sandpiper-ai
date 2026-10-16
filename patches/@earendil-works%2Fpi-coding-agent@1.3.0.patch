@@ -1,0 +1,17 @@
+diff --git a/dist/core/system-prompt.js b/dist/core/system-prompt.js
+index 83bf10846ff4ea275e73b29c54739af89d8c6028..4d07d845f9f507839a3572f8cb1b5aab357f387a 100644
+--- a/dist/core/system-prompt.js
++++ b/dist/core/system-prompt.js
+@@ -77,6 +77,12 @@ export function buildSystemPromptSections(input) {
+     const promptSections = {};
+     if (customPrompt) {
+         promptSections.preamble = customPrompt;
++        // Sandpiper local patch: a custom preamble keeps Pi's tools and rules sections, so the tool
++        // list and guidelines stay current as tools change. Only docs goes with the default preamble.
++        const visibleTools = declaredTools.filter((name) => !!toolSnippets[name]);
++        const tools = visibleTools.length > 0 ? visibleTools.map((name) => `- ${name}: ${toolSnippets[name]}`).join("\n") : "(none)";
++        promptSections.tools = `${tools}\n\nIn addition to the tools above, you may have access to other custom tools depending on the project.`;
++        promptSections.rules = buildRules(declaredTools, toolGuidelines, promptGuidelines);
+     }
+     else {
+         promptSections.preamble =

@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/skill-loading-tool.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.0.4.patch`
+- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/skill-loading-tool.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.3.0.patch`
 - **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (decisions and invariants), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md)
 - **Supersedes**: archived April 2026 parsing-plan notes
 
@@ -17,12 +17,9 @@ Sandpiper owns Pi's base prompt through Pi's custom base prompt. In the system e
 
 Pi renders its own sections after Sandpiper's text: `tools` and `rules` (the tool list and every active tool's guidelines), `cwd`, and extension sections such as `mcp_servers`. Pi re-renders them before every model call and sends only changed sections.
 
-Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` with two parts:
+Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` so that a `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble.
 
-- **Synthetic runs.** A run that skips `before_agent_start`, such as an extension's idle `triggerTurn`, keeps the prompt sections the transcript records and re-renders only `tools` and `rules`. Stock Pi reverts to its default prompt from the second turn of such a run ([pi#5581](https://github.com/earendil-works/pi/issues/5581)).
-- **Tool sections.** A `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble.
-
-A fresh session whose first run is synthetic has no recorded prompt, so it runs on Pi's own prompt until its first user-prompted run. Whatever launches a session for work gives it its first task as a real prompt.
+Runs started by extensions, such as an idle `triggerTurn`, emit `before_agent_start` like prompted runs (Pi 1.2.0+), so they carry the Sandpiper prompt too, including a fresh session's first run.
 
 ```text
 extensions/system/startup-hooks.ts

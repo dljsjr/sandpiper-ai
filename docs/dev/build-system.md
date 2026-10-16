@@ -61,7 +61,7 @@ Package manifests stay compatible with both Bun local development and npm instal
 
 ## Local Pi patch
 
-Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`, saved under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`. It changes Pi's compiled `dist/core/agent-session.js` and `dist/core/system-prompt.js` so that Sandpiper's system prompt reaches turns started by extensions, and so that Pi keeps its `tools` and `rules` sections under Sandpiper's custom prompt. The [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md) describes the behavior.
+Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`, saved under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`. It changes Pi's compiled `dist/core/system-prompt.js` so that Pi keeps its `tools` and `rules` sections under Sandpiper's custom prompt. The [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md) describes the behavior.
 
 The patch applies wherever this repository installs its own dependencies: repository runs (the root `sandpiper` bin and `bun run sandpiper-dev`), the generated `dist/` runtime, and the compiled standalone app, which bundles the patched files. A `sandpiper-ai` package installed from npm resolves Pi from the installer's dependency tree and runs unpatched.
 

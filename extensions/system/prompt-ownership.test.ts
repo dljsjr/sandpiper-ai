@@ -158,15 +158,15 @@ describe('Sandpiper prompt ownership on Pi 1.0', () => {
     }
   });
 
-  it("leaves a fresh session's synthetic first run on Pi's own prompt (documented first-turn gap)", async () => {
+  it("sends the Sandpiper prompt on a fresh session's synthetic first run", async () => {
     const recording = await startSession({ responses: ['toolCall', 'text'] });
 
     await recording.triggerSyntheticTurn();
 
-    expect(recording.requests.map((request) => request.systemPrompt.slice(0, 40))).toEqual([
-      '',
-      expect.stringContaining('You are an expert coding assistant'),
-    ]);
+    expect(recording.requests).toHaveLength(2);
+    for (const request of recording.requests) {
+      expect(isSandpiperPrompt(request.systemPrompt)).toBe(true);
+    }
   });
 });
 

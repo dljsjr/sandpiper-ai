@@ -150,11 +150,9 @@ For verification, use:
 - `SANDPIPER_DUMP_SYSTEM_PROMPT` — Sandpiper dumps the final assembled prompt and exits
 - A `before_provider_request` hook that captures the actual provider payload — this is the strongest proof, since it shows the exact bytes sent to the model
 
-### Turns started by extensions skip `before_agent_start`
+### Turns started by extensions
 
-Pi emits `before_agent_start` only for prompted runs (`AgentSession.prompt()`, which `pi.sendUserMessage` also uses). A run started by `pi.sendMessage(..., { triggerTurn: true })` while the agent is idle, as Tattler, Chorus, and background-process wakes do, never emits it, so contributions are not re-resolved on those turns.
-
-On Pi 1.0, Sandpiper's prompt still reaches those turns. Sandpiper records its prompt, contributions included, in the session transcript through Pi's custom base prompt, and Sandpiper's local Pi patch keeps the recorded prompt for runs that skip `before_agent_start` (upstream [pi#5581](https://github.com/earendil-works/pi/issues/5581)). The exception is a fresh session whose first run is such a turn: no prompt is recorded yet, so that run uses Pi's own prompt. See the [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md).
+Since Pi 1.2.0, a run started by `pi.sendMessage(..., { triggerTurn: true })` while the agent is idle, as Tattler, Chorus, and background-process wakes do, emits `before_agent_start` with `messageType: "custom"`. Sandpiper's prompt, contributions included, reaches those turns the same way it reaches prompted runs, including a fresh session whose first run is such a turn. Earlier Pi versions skipped the hook for these runs (upstream [pi#5581](https://github.com/earendil-works/pi/issues/5581)). See the [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md).
 
 The CC bridge `begin_turn` drift handling (described above) is a separate improvement but was not the live root cause.
 
