@@ -6,7 +6,7 @@ priority: HIGH
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-10-16T16:14:05.652Z
-updated_at: 2026-10-16T16:30:24.399Z
+updated_at: 2026-10-16T17:04:44.940Z
 related:
   - AGENT-290
 ---
@@ -22,6 +22,9 @@ Must do on the bump
 - Update prompt-ownership.test.ts: the first-turn-gap test's expectation flips (a synthetic first run now gets the Sandpiper prompt).
 - BeforeAgentStartEvent is now a union on messageType ("user" carries prompt/images; "custom" carries message). Sandpiper's handlers don't read prompt or images. tattler-inbox-hooks now also drains the pending inbox on custom runs, which is beneficial. startup-hooks re-renders the prompt on wakes (cheap; the canary is unchanged if inputs are).
 - Compiled app: add autoloadDotenv: false next to autoloadBunfig: false in devtools/standaloneSandpiperApp.ts (Pi 1.1.0 #10473 fixed the same in its own binary). Moot if TOOLS-30 drops the compiled app.
+
+- The npm global-install smoke test (devtools/npmPackageInstallSmoke.test.ts) currently fails on 1.0.4: pi-coding-agent 1.0.4 declares @earendil-works/pi-codemode as ^1.0.4, so a fresh npm install resolves pi-codemode 1.3.0, which removed MCP_TYPESCRIPT_PREAMBLE. The lockfile keeps local runs on 1.0.4. Pi 1.3.0 pins its own packages exactly (#10865), so the bump fixes it. Expect this one red test until then.
+- Provider: PCCP pins 1.0.4 exactly and needs its own bump (check the ai 1.1.0 AssistantMessageEventStream change). Doug: no tight lockstep coordination needed this time.
 
 Verify with tests during the bump
 - 1.2.0 counts the session as busy from the start of run setup (isIdle false during before_agent_start; sendMessage queues into the starting run). Tattler queues to the pending inbox when !isIdle, and the cue uses triggerTurn only between agent_start and agent_settled. A message arriving during setup may sit in the pending inbox until the next turn. Write a test for this window.
@@ -67,3 +70,7 @@ Renderer audit, first pass (2026-10-16)
 ## 2026-10-16T16:30:24.403Z
 
 - **description**: 30 lines → updated (42 lines)
+
+## 2026-10-16T17:04:44.941Z
+
+- **description**: 42 lines → updated (45 lines)

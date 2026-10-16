@@ -1,12 +1,12 @@
 ---
 title: "Skill tool metrics DB ignores agent dir; integration tests write real ~/.sandpiper skill metrics"
-status: NOT STARTED
+status: NEEDS REVIEW
 kind: BUG
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-05T21:47:30.704Z
-updated_at: 2026-10-05T21:47:30.704Z
+updated_at: 2026-10-16T17:04:44.699Z
 related:
   - AGENT-290
 ---
@@ -18,3 +18,16 @@ extensions/system/skill-loading-tool.ts hardcodes SKILL_METRICS_DB_PATH to join(
 Evidence (2026-10-05): during a scratch run of bun run test, ~/.sandpiper/agent/skill_metrics.sqlite3 row jj|filesystem advanced to count 3 with last_seen_at 2026-10-05T21:39:22.714Z, five seconds after the suite started. The count shows earlier suite runs did the same.
 
 Violates the repo invariant that tests must not touch real user state. Fix direction: derive the metrics path from the agent dir (getAgentDir()/env) so isolated spawns write into their temp agent dir; add an integration assertion that the real path is untouched.
+
+---
+
+# Activity Log
+
+## 2026-10-16T17:03:12.643Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-16T17:04:44.700Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
