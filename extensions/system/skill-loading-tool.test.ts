@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AgentToolResult, ExtensionAPI, SlashCommandInfo, ToolDefinition } from '@earendil-works/pi-coding-agent';
@@ -353,6 +353,29 @@ describe('registerSkillLoadingTool', () => {
     const result = await executeSkillTool(pi, { name: 'skill:jj' }, operations);
 
     expect(result.details).toMatchObject({ name: 'jj', path: skillPath });
+  });
+
+  it('records skill activations in the session agent directory, not the home directory', async () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-skill-metrics-agent-dir-'));
+    const homeDir = join(tempDir, 'home');
+    const agentDir = join(tempDir, 'agent');
+    mkdirSync(homeDir);
+    vi.stubEnv('HOME', homeDir);
+    vi.stubEnv('PI_CODING_AGENT_DIR', agentDir);
+    vi.resetModules();
+    try {
+      // Import after stubbing HOME so a path captured at module load could not reach the real home.
+      const { recordSkillActivationCount: record } = await import('./skill-loading-tool.js');
+
+      record({ name: 'jj', source: 'filesystem' });
+
+      expect(existsSync(join(agentDir, 'skill_metrics.sqlite3'))).toBe(true);
+      expect(existsSync(join(homeDir, '.sandpiper'))).toBe(false);
+    } finally {
+      vi.unstubAllEnvs();
+      vi.resetModules();
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   it('increments skill activation counts in sqlite', () => {

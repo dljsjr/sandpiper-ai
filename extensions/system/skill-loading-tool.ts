@@ -1,7 +1,6 @@
 import type { Dirent } from 'node:fs';
 import { mkdirSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
-import { homedir } from 'node:os';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { Type } from '@earendil-works/pi-ai';
 import type {
@@ -11,7 +10,7 @@ import type {
   Theme,
   ToolDefinition,
 } from '@earendil-works/pi-coding-agent';
-import { keyHint, parseFrontmatter } from '@earendil-works/pi-coding-agent';
+import { getAgentDir, keyHint, parseFrontmatter } from '@earendil-works/pi-coding-agent';
 import { Text } from '@earendil-works/pi-tui';
 import Database from 'better-sqlite3';
 
@@ -26,8 +25,6 @@ const WELL_KNOWN_CONTENT_SECTIONS = [
   { directory: 'scripts', sectionTag: 'scripts', itemTag: 'script' },
   { directory: 'assets', sectionTag: 'assets', itemTag: 'asset' },
 ] as const;
-
-const SKILL_METRICS_DB_PATH = join(homedir(), '.sandpiper', 'agent', 'skill_metrics.sqlite3');
 
 type SkillRenderTheme = Pick<Theme, 'fg'>;
 
@@ -113,7 +110,10 @@ const defaultOperations: SkillLoadingToolOperations = {
   recordSkillActivation: recordSkillActivationCount,
 };
 
-export function recordSkillActivationCount(event: SkillActivationEvent, dbPath = SKILL_METRICS_DB_PATH): void {
+export function recordSkillActivationCount(
+  event: SkillActivationEvent,
+  dbPath = join(getAgentDir(), 'skill_metrics.sqlite3'),
+): void {
   mkdirSync(dirname(dbPath), { recursive: true });
 
   const database = new Database(dbPath);
