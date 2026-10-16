@@ -10,19 +10,21 @@ let appBundleDir: string;
 let executable: string;
 let buildTempDir: string;
 
-function runAppHelp(cwd: string): string {
+function runAppHelp(cwd: string, unsetEnv: readonly string[] = []): string {
   const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-runtime-'));
 
   try {
     const agentDir = join(tempDir, 'agent');
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      SANDPIPER_CODING_AGENT_DIR: agentDir,
+      PI_OFFLINE: '1',
+    };
+    for (const name of unsetEnv) delete env[name];
     return execFileSync(executable, ['--help', '--no-context-files'], {
       cwd,
       encoding: 'utf-8',
-      env: {
-        ...process.env,
-        SANDPIPER_CODING_AGENT_DIR: agentDir,
-        PI_OFFLINE: '1',
-      },
+      env,
     });
   } finally {
     rmSync(tempDir, { recursive: true, force: true });
@@ -98,6 +100,25 @@ describe('standalone Sandpiper app runtime smoke', () => {
       const output = runAppHelp(projectDir);
 
       expect(output).toContain('sandpiper - AI coding assistant');
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('ignores a .env file in the launch cwd (upstream Pi #10473)', () => {
+    // Compiled Bun binaries load .env files from the launch cwd by default, leaking a project's
+    // environment into Sandpiper. FORCE_COLOR makes a loaded .env visible as ANSI in --help.
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-app-dotenv-'));
+
+    try {
+      const projectDir = join(tempDir, 'project');
+      mkdirSync(projectDir, { recursive: true });
+      writeFileSync(join(projectDir, '.env'), 'FORCE_COLOR=1\n');
+
+      const output = runAppHelp(projectDir, ['FORCE_COLOR', 'NO_COLOR']);
+
+      expect(output).toContain('sandpiper - AI coding assistant');
+      expect(output).not.toContain('\x1b[');
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

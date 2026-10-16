@@ -68,6 +68,7 @@ interface BunBuildPlugin {
 
 interface BunCompileOptions {
   readonly autoloadBunfig?: boolean;
+  readonly autoloadDotenv?: boolean;
 }
 
 interface BunBuildOptions {
@@ -257,8 +258,10 @@ export async function buildStandaloneSandpiperApp(options: BuildStandaloneSandpi
     // --no-compile-autoload-bunfig CLI flag) -- no need to shell out to `bun build --compile`
     // the way upstream's scripts/build-binaries.sh does. This file hand-rolls a minimal ambient
     // Bun type locally (see BunBuildOptions above) rather than depending on bun-types, so
-    // BunCompileOptions widens `compile` to accept this one field.
-    compile: { autoloadBunfig: false },
+    // BunCompileOptions widens `compile` to accept these fields.
+    // Pi #10473: autoloadDotenv likewise defaults to true and would load a launch-cwd .env into
+    // Sandpiper's environment.
+    compile: { autoloadBunfig: false, autoloadDotenv: false },
     external: ['canvas'],
     plugins: [cssTreeBundledDataPlugin(options.repoRoot)],
   });
