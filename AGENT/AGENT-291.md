@@ -1,12 +1,13 @@
 ---
 title: "Skill tool metrics DB ignores agent dir; integration tests write real ~/.sandpiper skill metrics"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-05T21:47:30.704Z
-updated_at: 2026-10-16T17:04:44.699Z
+updated_at: 2026-10-16T17:08:15.207Z
 related:
   - AGENT-290
 ---
@@ -31,3 +32,8 @@ Violates the repo invariant that tests must not touch real user state. Fix direc
 ## 2026-10-16T17:04:44.700Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-16T17:08:15.208Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE
