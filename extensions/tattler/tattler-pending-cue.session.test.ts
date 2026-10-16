@@ -70,9 +70,18 @@ function assistantMessage(model: Model<Api>, toolCall: boolean): AssistantMessag
   };
 }
 
-// A provider whose first response calls a tool that delivers a Tattler message to this session's
-// own socket while the run is active; later responses end the turn. Records every request.
-function createProbeExtension(requests: string[]) {
+async function deliverPeerMessageToSelf(pi: ExtensionAPI): Promise<void> {
+  const ownIdentity = await requestOwnIdentity(pi);
+  await sendAgentMessage(
+    ownIdentity,
+    buildMessage('tattler.agent-message.v0', { message: 'hello from a peer', from: 'peer' }),
+  );
+}
+
+// A provider that records every request. With firstResponseCallsTool, its first response calls a
+// tool that delivers a Tattler message to this session's own socket while the run is active; every
+// other response ends the turn.
+function createProbeExtension(requests: string[], firstResponseCallsTool: boolean) {
   return (pi: ExtensionAPI) => {
     pi.registerTool({
       name: DELIVER_TOOL,
@@ -80,11 +89,7 @@ function createProbeExtension(requests: string[]) {
       description: 'Test fixture: delivers a Tattler message to this session while it is busy.',
       parameters: Type.Object({}),
       async execute() {
-        const ownIdentity = await requestOwnIdentity(pi);
-        await sendAgentMessage(
-          ownIdentity,
-          buildMessage('tattler.agent-message.v0', { message: 'hello from a peer', from: 'peer' }),
-        );
+        await deliverPeerMessageToSelf(pi);
         return { content: [{ type: 'text', text: 'delivered' }], details: {} };
       },
     });
@@ -107,7 +112,7 @@ function createProbeExtension(requests: string[]) {
       ],
       streamSimple: (model: Model<Api>, context: Context) => {
         requests.push(JSON.stringify(context.messages));
-        const output = assistantMessage(model, requests.length === 1);
+        const output = assistantMessage(model, firstResponseCallsTool && requests.length === 1);
         const stream = createAssistantMessageEventStream();
         queueMicrotask(() => {
           stream.push({ type: 'start', partial: output });
@@ -120,52 +125,75 @@ function createProbeExtension(requests: string[]) {
   };
 }
 
+// Delivers a Tattler message from its before_agent_start handler. Registered after Tattler, so it
+// runs once Tattler's own handler has drained the pending inbox: the run is starting but not yet
+// running, and Pi 1.2.0+ counts the session as busy.
+function deliverDuringRunSetup(pi: ExtensionAPI): void {
+  pi.on('before_agent_start', async () => {
+    await deliverPeerMessageToSelf(pi);
+  });
+}
+
+async function promptProbeSession(extensionFactories: Array<(pi: ExtensionAPI) => void>): Promise<void> {
+  // Unix domain socket paths are capped around ~104 bytes on macOS; keep the runtime dir short.
+  setEnv('XDG_RUNTIME_DIR', tempDir('/tmp', 'tt-'));
+  setEnv('TATTLER_RUNTIME_NAMESPACE', 'tt-cue');
+  setEnv('PI_OFFLINE', '1');
+  setEnv('PI_SKIP_VERSION_CHECK', '1');
+  const agentDir = tempDir(tmpdir(), 'sandpiper-tattler-cue-');
+  const cwd = tempDir(tmpdir(), 'sandpiper-tattler-cue-cwd-');
+
+  const settingsManager = SettingsManager.inMemory();
+  const resourceLoader = new DefaultResourceLoader({
+    cwd,
+    agentDir,
+    settingsManager,
+    extensionFactories: [tattlerExtension, ...extensionFactories],
+    noExtensions: true,
+    noSkills: true,
+    noPromptTemplates: true,
+    noThemes: true,
+    noContextFiles: true,
+  });
+  await resourceLoader.reload();
+
+  const { session } = await createAgentSession({
+    cwd,
+    agentDir,
+    resourceLoader,
+    settingsManager,
+    sessionManager: SessionManager.inMemory(cwd),
+  });
+
+  try {
+    await session.bindExtensions({ mode: 'print' });
+    const model = session.modelRuntime.getModel('probe', 'probe-1');
+    if (!model) throw new Error('probe model was not registered');
+    await session.setModel(model);
+
+    await session.prompt('start');
+  } finally {
+    session.dispose();
+  }
+}
+
 describe('Tattler pending inbox cue in a real Pi session', () => {
   it('reaches the model in the same run when a peer message arrives mid-run', async () => {
-    // Unix domain socket paths are capped around ~104 bytes on macOS; keep the runtime dir short.
-    setEnv('XDG_RUNTIME_DIR', tempDir('/tmp', 'tt-'));
-    setEnv('TATTLER_RUNTIME_NAMESPACE', 'tt-cue');
-    setEnv('PI_OFFLINE', '1');
-    setEnv('PI_SKIP_VERSION_CHECK', '1');
-    const agentDir = tempDir(tmpdir(), 'sandpiper-tattler-cue-');
-    const cwd = tempDir(tmpdir(), 'sandpiper-tattler-cue-cwd-');
-
     const requests: string[] = [];
-    const settingsManager = SettingsManager.inMemory();
-    const resourceLoader = new DefaultResourceLoader({
-      cwd,
-      agentDir,
-      settingsManager,
-      extensionFactories: [tattlerExtension, createProbeExtension(requests)],
-      noExtensions: true,
-      noSkills: true,
-      noPromptTemplates: true,
-      noThemes: true,
-      noContextFiles: true,
-    });
-    await resourceLoader.reload();
 
-    const { session } = await createAgentSession({
-      cwd,
-      agentDir,
-      resourceLoader,
-      settingsManager,
-      sessionManager: SessionManager.inMemory(cwd),
-    });
+    await promptProbeSession([createProbeExtension(requests, true)]);
 
-    try {
-      await session.bindExtensions({ mode: 'print' });
-      const model = session.modelRuntime.getModel('probe', 'probe-1');
-      if (!model) throw new Error('probe model was not registered');
-      await session.setModel(model);
+    expect(requests).toHaveLength(2);
+    expect(requests[0]).not.toContain(CUE_TEXT);
+    expect(requests[1]).toContain(CUE_TEXT);
+  });
 
-      await session.prompt('start');
+  it('reaches the model in the same run when a peer message arrives during run setup', async () => {
+    const requests: string[] = [];
 
-      expect(requests).toHaveLength(2);
-      expect(requests[0]).not.toContain(CUE_TEXT);
-      expect(requests[1]).toContain(CUE_TEXT);
-    } finally {
-      session.dispose();
-    }
+    await promptProbeSession([createProbeExtension(requests, false), deliverDuringRunSetup]);
+
+    expect(requests).toHaveLength(1);
+    expect(requests[0]).toContain(CUE_TEXT);
   });
 });
