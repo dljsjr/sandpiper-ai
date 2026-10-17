@@ -100,6 +100,10 @@ function resolvePiCliPath(): string {
   return join(packageDir, 'dist', 'cli.js');
 }
 
+function withoutPiAndSandpiperVariables(source: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  return Object.fromEntries(Object.entries(source).filter(([name]) => !/^(PI|SANDPIPER)_/.test(name)));
+}
+
 /**
  * Build (but do not run) an isolated pi/sandpiper invocation. Callers pass the returned
  * command/args/env/cwd to child_process.spawn/spawnSync/execFileSync -- this function never
@@ -113,8 +117,10 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
 
   const env: NodeJS.ProcessEnv = {
     // Inherit the caller's environment first (including PATH) so the op-shim tripwire prefix
-    // and any other outer-process env stay intact for the spawned child.
-    ...process.env,
+    // and any other outer-process env stay intact for the spawned child. The caller's own Pi and
+    // Sandpiper variables are dropped: inside a Sandpiper session they carry that session's
+    // package identity (PI_PACKAGE_DIR makes stock pi run as sandpiper) and session state.
+    ...withoutPiAndSandpiperVariables(process.env),
     ...options.env,
     // Both names, always -- entry:'pi' resolves APP_NAME="pi" (no Sandpiper piConfig in
     // scope, since raw pi never sees this repo's package.json), entry:'sandpiper' resolves

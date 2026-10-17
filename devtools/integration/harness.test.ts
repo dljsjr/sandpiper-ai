@@ -1,8 +1,31 @@
 import { existsSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MOCK_MODEL_ID, MOCK_PROVIDER_ID, prepareIsolatedSpawn } from './harness.js';
 
 describe('prepareIsolatedSpawn', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("does not pass the parent session's Pi and Sandpiper variables to the child", () => {
+    vi.stubEnv('PI_PACKAGE_DIR', '/parent/standalone-package');
+    vi.stubEnv('PI_SESSION_FILE', '/parent/session.jsonl');
+    vi.stubEnv('SANDPIPER_SESSION_ID', 'parent-session');
+    for (const entry of ['sandpiper', 'pi'] as const) {
+      const spawn = prepareIsolatedSpawn({ entry, env: { PI_EXAMPLE: 'kept' } });
+      try {
+        expect(spawn.env.PI_PACKAGE_DIR).toBeUndefined();
+        expect(spawn.env.PI_SESSION_FILE).toBeUndefined();
+        expect(spawn.env.SANDPIPER_SESSION_ID).toBeUndefined();
+        expect(spawn.env.PI_EXAMPLE).toBe('kept');
+        expect(spawn.env.PI_CODING_AGENT_DIR).toBe(spawn.agentDir);
+        expect(spawn.env.PATH).toBe(process.env.PATH);
+      } finally {
+        spawn.cleanup();
+      }
+    }
+  });
+
   it('sets both agent-dir env var names to the same fresh temp dir, regardless of entry mode', () => {
     for (const entry of ['sandpiper', 'pi'] as const) {
       const spawn = prepareIsolatedSpawn({ entry });
