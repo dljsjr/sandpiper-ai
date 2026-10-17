@@ -361,7 +361,10 @@ describe('registerSkillLoadingTool', () => {
     const agentDir = join(tempDir, 'agent');
     mkdirSync(homeDir);
     vi.stubEnv('HOME', homeDir);
+    // Pi reads <APP_NAME>_CODING_AGENT_DIR, and APP_NAME is sandpiper when PI_PACKAGE_DIR points at
+    // Sandpiper's package, so stub both names.
     vi.stubEnv('PI_CODING_AGENT_DIR', agentDir);
+    vi.stubEnv('SANDPIPER_CODING_AGENT_DIR', agentDir);
     vi.resetModules();
     try {
       // Import after stubbing HOME so a path captured at module load could not reach the real home.
