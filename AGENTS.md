@@ -44,7 +44,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
   — do not change the gate to fail on warnings.
 - Use `bun run test:vitest -- <testpath>` for focused Vitest runs.
 - Use `bun run test` for the full Vitest gate.
-- Before claiming distribution health, run `rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution`.
+- Before claiming distribution health, run `rm -rf dist && bun run test:distribution`.
 - Only use safe auto-fixes; no suppressions without asking.
 
 ## Repository Map

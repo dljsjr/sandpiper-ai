@@ -25,7 +25,7 @@ bun run test                      # Full Vitest gate
 Before claiming distribution health, run the clean distribution gate:
 
 ```bash
-rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution
+rm -rf dist && bun run test:distribution
 ```
 
 Do not use bare `bun test` as the repository health gate; it invokes Bun's test runner, not the Vitest suite configured for this repo.

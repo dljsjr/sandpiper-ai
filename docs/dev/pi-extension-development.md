@@ -78,5 +78,5 @@ bun run test:vitest -- <testpath>
 Before claiming distribution health, run:
 
 ```bash
-rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution
+rm -rf dist && bun run test:distribution
 ```

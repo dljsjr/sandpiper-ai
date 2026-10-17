@@ -38,7 +38,7 @@ Do not use bare `bun test` as the repository health gate; it invokes Bun's test 
 Before claiming distribution health, remove the old generated artifact and run the full distribution gate:
 
 ```bash
-rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution
+rm -rf dist && bun run test:distribution
 ```
 
 This prepares generated artifacts and runs distribution invariant tests, standalone runtime checks, standalone app-bundle checks, and Claude plugin checks.

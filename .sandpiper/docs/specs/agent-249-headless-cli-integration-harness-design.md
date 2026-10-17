@@ -254,7 +254,7 @@ the *configs*.
 **Proof this already bit the repo once**: `packages/trail/vitest.setup.ts` sets
 `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM`/`JJ_CONFIG` for Trail's git/jj-spawning integration
 tests — but that setup file is inert from root. The root `test:vitest` script's env prefix
-(`env -u PI_PACKAGE_DIR GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
+(`env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
 JJ_CONFIG="$PWD/packages/trail/test-fixtures/jj-test-config.toml" vitest run`) hardcodes exactly
 those same values at the *shell* level to compensate. That's the "proven pattern" AGENT-249
 points at, and it's a workaround forced by the gap, not a design to imitate wholesale (it doesn't
