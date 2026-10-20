@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-111.md
++++ b/TOOLS-111.md
+@@ -5,17 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T05:36:37.419Z
+-updated_at: 2026-11-11T21:09:13.455Z
++updated_at: 2026-11-11T21:22:51.553Z
+ related:
+   - TOOLS-92
+   - TOOLS-109
+   - TOOLS-110
+ ---
+ 
+ # Collapse the workspace packages into one root manifest
+ 
++## bunfig.toml removed (2026-11-11)
++
++Doug chose to delete it after the probe below. Change tmozzwzk / 42eaf738 follows sntvwxtp and removes bunfig.toml, its description in docs/dev/build-system.md and its trigger in the build playbook. Reason: for a lockfile with configVersion 1, Bun defaults to the isolated linker with workspaces and the hoisted linker without them; the root manifest has no workspaces. Gate in an isolated checkout: frozen install (166 top-level node_modules entries, no .bun store), clean bun check, full serial suite 65 files, 535 tests passed in 43s. Logs: /tmp/sandpiper-tools126.aXQgrZ/bunfig-rm.
++
+ ## Full gate passed; bunfig question answered (2026-11-11)
+ 
+ oykttyqt / 1b33b8ff: 65 files, 535 tests passed in 77s, including the real offline packed CLI test. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards. Logs: /tmp/sandpiper-tools126.aXQgrZ/gates (summary.tsv).
+ 
+@@ -107,4 +111,8 @@
+ 
+ ## 2026-11-11T21:09:13.455Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-11T21:22:51.554Z
++
++- **description**: 56 lines → updated (60 lines)

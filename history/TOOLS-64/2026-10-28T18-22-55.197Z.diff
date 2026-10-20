@@ -1,0 +1,36 @@
+===================================================================
+--- a/TOOLS-64.md
++++ b/TOOLS-64.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T17:55:43.501Z
+-updated_at: 2026-10-28T18:13:33.639Z
++updated_at: 2026-10-28T18:22:55.196Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+@@ -25,8 +25,12 @@
+ Tracker finding: a combined related-fields/description update was rejected with a non-round-trippable updated_at error. A quote-only experiment did not help and was completely reverted; byte comparison verified the original task before a plain CLI completion succeeded. No raw timestamp-format change remains and no Trail implementation was changed.
+ 
+ TOOLS-64 and children await user review, not final-completed. SOP redesign TOOLS-68 remains NOT STARTED. Four other skill discussions and broader resources/build work stay open.
+ 
++## User acceptance — 2026-10-28
++
++The user accepted the unbundling/archival result and directed the discussion to the next skill. Final-complete only TOOLS-64 and its three children. The independent SOP redesign in TOOLS-68 and all remaining skill decisions stay open.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -41,4 +45,8 @@
+ 
+ ## 2026-10-28T18:13:33.640Z
+ 
+ - **description**: 1 line → updated (11 lines)
++
++## 2026-10-28T18:22:55.197Z
++
++- **description**: 11 lines → updated (15 lines)

@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -1,7 +1,7 @@
+ ---
+ title: "Review and resolve the remaining bundled skills"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+@@ -9,9 +9,9 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T22:06:43.076Z
++updated_at: 2026-10-28T22:07:28.416Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -184,4 +184,8 @@
+ 
+ ## 2026-10-28T22:06:43.076Z
+ 
+ - **description**: 69 lines → updated (79 lines)
++
++## 2026-10-28T22:07:28.416Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,69 @@
+---
+title: "Unbundle mutation-testing and retain survivor interpretation in developer guidance"
+status: COMPLETE
+resolution: DONE
+kind: TASK
+priority: MEDIUM
+assignee: AGENT
+reporter: USER
+created_at: 2026-10-28T20:43:02.607Z
+updated_at: 2026-10-28T22:06:43.473Z
+related:
+  - TOOLS-57
+  - TOOLS-30
+---
+
+# Unbundle mutation-testing and retain survivor interpretation in developer guidance
+
+## Accepted closeout — 2026-10-28
+
+User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
+
+Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
+
+Mutation-testing original remains unchanged in the incubator (7 files/46,303 bytes). Existing greenfield policy is unchanged.
+
+## Earlier implementation record
+
+## Implementation verified — ready for review
+
+- Complete seven-file mutation-testing archive is preserved unchanged at ~/git/skills-incubator/skills/mutation-testing (46,303 bytes; files 0644, directories 0755). Bundled source/stage/packed copy removed.
+- Developer testing guidance retains evidence-based survivor classification, meaningful test gaps and demonstrated equivalence; no production changes or meaningless tests solely for mutation score. No fixed scores, ratchets, CI schedules or blanket method exclusions imported. Existing TDD, infrastructure restrictions and Greenfield policy are byte-identical.
+- Catalogue docs/tests now expect jj-only built-ins. Retired the owned Claude link/provisioner, corrected the planned Stryker spec pointer, and replaced exactly one Muninn hard-load line; all other lens bytes/mode unchanged. Conditional installed-skill references remain optional.
+- Independent review and all gates pass. Implementation is complete and ready for user review, not yet accepted. jj remains undecided; TOOLS-57/30 stay open.
+
+Verification: full baseline 87 files/640 tests passed. One source-catalogue case baseline GREEN → expected extra-skill RED → archive/resource deletion GREEN. Refactor assessment found no new code structure needing simplification. Updated stale diagnostic contract (2 passing tests), then packed absence assertion demonstrated stale-build RED. Normal rebuild/full gate GREEN: bun check clean, 87 files/640 tests passed, bun run pack:cli passed. Actual tarball contains jj only. No framework installed or generated artifact edited by hand.
+
+Evidence: ~/.sandpiper/agent/backups/mutation-unbundle-20261028-iBKlK2/ contains before.json, archive-verified.json, preservation-after.json and exact deployment/guide/lens backups. Independent read-only mutation-audit (ce39ccc2f023) PASS: archive paths/bytes/modes, prior archives/settings/independent Claude copy unchanged, no archive autoload, no active hard mutation-skill dependencies, guidance scoped, and actual tarball jj-only.
+
+Local revisions: Sandpiper rxxrqtmu / b6cb20e9; canonical global guidance zxpnrzns / a68124e9; Dotfiles snkyrupt / 97537ddb. Muninn single-line user-state patch is not version-controlled; exact backup/preservation proof retained. No push or release.
+
+## Original scope record
+
+User approved preserving the complete current mutation-testing skill unchanged in ~/git/skills-incubator/skills/mutation-testing and removing it from Sandpiper built-ins. Retain the small survivor-interpretation guardrail in developer testing guidance, without importing fixed scores, quarterly ratchets, CI schedules or blanket method exclusions. Preserve unrelated existing testing policies, installed independent copies, historical records and prior archives. Update active routing, deployment, catalogue and package expectations; no archive auto-loading or new framework installation. Use autonomous one-behavior/test RED→GREEN→REFACTOR cycles. Implementation ends at NEEDS REVIEW; jj and broader resource decisions remain open.
+
+---
+
+# Activity Log
+
+## 2026-10-28T20:43:11.464Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-28T20:59:21.373Z
+
+- **description**: 1 line → updated (16 lines)
+
+## 2026-10-28T20:59:22.069Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-28T22:06:41.724Z
+
+- **description**: 16 lines → updated (26 lines)
+
+## 2026-10-28T22:06:43.473Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

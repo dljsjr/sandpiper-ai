@@ -2,7 +2,7 @@
 title: "Durable Tattler message log + per-agent read cursors"
 status: NOT STARTED
 kind: TASK
-priority: HIGH
+priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-05-27T15:45:09.783Z
@@ -14,7 +14,7 @@ related:
   - TAT-39
   - TAT-50
   - TAT-79
-updated_at: 2026-05-27T20:32:18.375Z
+updated_at: 2026-11-19T20:49:09.495Z
 ---
 
 # Durable Tattler message log + per-agent read cursors
@@ -33,6 +33,10 @@ Key invariants:
 - C1 schema gates Track 2 but not Track 3
 
 TUI overhaul (decoupling from session-broker) is captured in Track 2/3. Protocol spec docs remain protocol-only by design.
+
+## Parked in backlog triage (2026-11-19)
+
+Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
 
 ---
 
@@ -55,3 +59,8 @@ TUI overhaul (decoupling from session-broker) is captured in Track 2/3. Protocol
 ## 2026-05-27T20:32:18.376Z
 
 - **related**: TAT-68, TAT-69, TAT-10, TAT-39, TAT-50 → TAT-68, TAT-69, TAT-10, TAT-39, TAT-50, TAT-79
+
+## 2026-11-19T20:49:09.495Z
+
+- **priority**: HIGH → LOW
+- **description**: 14 lines → updated (18 lines)

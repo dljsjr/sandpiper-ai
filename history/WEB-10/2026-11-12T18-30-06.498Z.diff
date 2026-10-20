@@ -1,0 +1,37 @@
+===================================================================
+--- a/WEB-10.md
++++ b/WEB-10.md
+@@ -5,13 +5,23 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.144Z
+-updated_at: 2026-11-12T18:27:29.218Z
++updated_at: 2026-11-12T18:30:06.497Z
+ ---
+ 
+ # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+ 
++## One rendering parameter, explicit default (2026-11-12)
++
++Doug's correction to the section below: implicitly coupled fields with a fallback lead models to make unintuitive tool calls; determinism is best. Commit "Offer rendering as one parameter with an explicit default". It supersedes the "render plus a list" schema and the sorted-id default described below.
++
++- One renderer: render (boolean). Two or more: renderer only, an enum of "none" and the ids, default "none" (a normal fetch). No render field alongside it.
++- Nothing is chosen for the caller. If a render switch reaches the tool while several renderers are loaded, the call fails and lists them. An unknown name fails and lists them.
++- The id "none" is reserved; a registration under it is ignored.
++
++Verification, isolated checkout: failing tests first; bun check clean; full serial suite 71 files, 635 tests passed, including the real-session test, which now asserts that with two renderers the tool has renderer (first value "none") and no render property. Needs bun run build to go live.
++
+ ## Final shape: bundled renderer extensions, the call chooses (2026-11-12)
+ 
+ Change in the commit "Bundle renderers as extensions and let the call choose", on top of lykonvxu. This section supersedes the selection rules in the sections below. SANDPIPER_WEB_FETCH_RENDERER no longer exists, and web_fetch has no built-in renderer.
+ 
+@@ -140,4 +150,8 @@
+ 
+ ## 2026-11-12T18:27:29.219Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
++
++## 2026-11-12T18:30:06.498Z
++
++- **description**: 73 lines → updated (83 lines)

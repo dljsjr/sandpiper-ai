@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-54.md
++++ b/TOOLS-54.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Replace global orientation, playbook, role and bundled skill guidance"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:04.000Z
+-updated_at: 2026-10-27T23:36:18.548Z
++updated_at: 2026-10-27T23:52:36.516Z
+ ---
+ 
+ # Replace global orientation, playbook, role and bundled skill guidance
+ 
+@@ -28,4 +29,9 @@
+ 
+ ## 2026-10-27T23:36:18.549Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-27T23:52:36.517Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

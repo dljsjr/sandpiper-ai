@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-88.md
++++ b/TOOLS-88.md
+@@ -1,17 +1,26 @@
+ ---
+ title: "Archive and unbundle all prompt templates"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:39:57.636Z
+-updated_at: 2026-10-28T22:39:57.636Z
++updated_at: 2026-10-28T22:40:54.253Z
+ related:
+   - TOOLS-58
+   - TOOLS-30
+ ---
+ 
+ # Archive and unbundle all prompt templates
+ 
+ User approved retiring all six unused prompt templates and chose ~/git/sandpiper-archive/prompts as their external cold archive. Preserve all original filenames, bytes and modes unchanged in a separate jj-managed archive repository; no prompt registration/autoload/install. Remove bundled copies and update staging, bootstrap, owned path discovery, tests and documentation for zero built-in prompts while preserving custom prompt support. Existing skills archives, settings and WIP jj replacement remain untouched. Themes decision TOOLS-59 and unrelated work remain open. Use autonomous individual RED→GREEN→REFACTOR cycles; finish at NEEDS REVIEW pending acceptance.
++
++---
++
++# Activity Log
++
++## 2026-10-28T22:40:54.254Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

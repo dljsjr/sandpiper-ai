@@ -1,0 +1,30 @@
+===================================================================
+--- a/WEB-22.md
++++ b/WEB-22.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "web_search runs shell commands from project-local settings without a trust check"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T22:44:14.588Z
+-updated_at: 2026-11-11T19:21:12.410Z
++updated_at: 2026-11-11T21:54:01.639Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -100,4 +101,9 @@
+ 
+ ## 2026-11-11T19:21:12.411Z
+ 
+ - **description**: 47 lines → updated (51 lines)
++
++## 2026-11-11T21:54:01.639Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

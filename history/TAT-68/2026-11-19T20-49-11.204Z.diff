@@ -1,0 +1,36 @@
+===================================================================
+--- a/TAT-68.md
++++ b/TAT-68.md
+@@ -9,9 +9,9 @@
+ 
+ related:
+   - TAT-73
+   - TAT-70
+-updated_at: 2026-05-27T16:41:46.822Z
++updated_at: 2026-11-19T20:49:11.204Z
+ ---
+ 
+ # Pending inbox re-delivers already-handled messages after abort+resume
+ 
+@@ -31,8 +31,12 @@
+ **Fix locus:** Durable-rooms v1 slice — per-agent cursor in a SQLite cursors table, advanced on tool-call SUCCESS (atomicity boundary), so delivered-but-uncommitted messages re-deliver on resume (correct) while committed messages never re-deliver (kills the bug). See TAT-73.
+ 
+ Distinct from TAT-64/TAT-65 (render-delay) and TAT-37 (message loss on abort). TAT-68 is over-delivery on abort+resume; TAT-37 is under-delivery.
+ 
++## Kept in backlog triage (2026-11-19)
++
++The durable log (TAT-73) was meant to fix this, but v1 is long-term. Next: check whether it still reproduces after abort and resume; if it does, fix it in the current pending inbox (`tattler-inbox-persistence.ts`).
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -46,4 +50,8 @@
+ 
+ ## 2026-05-27T16:41:46.824Z
+ 
+ - **description**: 1 line → updated (16 lines)
++
++## 2026-11-19T20:49:11.204Z
++
++- **description**: 16 lines → updated (20 lines)

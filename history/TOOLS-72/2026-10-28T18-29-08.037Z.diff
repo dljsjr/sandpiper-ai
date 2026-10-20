@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-72.md
++++ b/TOOLS-72.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Remove mandatory routing and retired deployment of bundled refactoring"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:29:07.647Z
+-updated_at: 2026-10-28T18:29:07.647Z
++updated_at: 2026-10-28T18:29:08.036Z
+ ---
+ 
+ # Remove mandatory routing and retired deployment of bundled refactoring
+ 
+ Inventory active global/project guidance, retained skills/prompts and deployment templates/links. Make retired skill references conditional or route to existing guidance. Preserve unrelated procedures and historical/archive copies. If a deployed link targets the removed Sandpiper bundle, back up and retire only that link and its provisioner; never register the archive as a replacement.
++
++---
++
++# Activity Log
++
++## 2026-10-28T18:29:08.037Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

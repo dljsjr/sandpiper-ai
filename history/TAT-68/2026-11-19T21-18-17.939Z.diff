@@ -1,0 +1,36 @@
+===================================================================
+--- a/TAT-68.md
++++ b/TAT-68.md
+@@ -9,9 +9,9 @@
+ 
+ related:
+   - TAT-73
+   - TAT-70
+-updated_at: 2026-11-19T21:08:26.173Z
++updated_at: 2026-11-19T21:18:17.939Z
+ ---
+ 
+ # Pending inbox re-delivers already-handled messages after abort+resume
+ 
+@@ -43,8 +43,12 @@
+ Why the recorded scenario does not happen now: `markBatchDelivered()` runs on the batch's `message_end`, which Pi emits when the run starts, before any mid-turn abort can land. A batch whose `message_end` never fires is released at `agent_end` and re-delivered, which is correct because the model never saw it.
+ 
+ Candidate for the original May sighting, unconfirmed: the old `tattler_receive` path, an `agent_end` + 25 ms `isIdle()` poll that `vowplvzt` replaced with `agent_settled`.
+ 
++## Closed (2026-11-19)
++
++Cannot reproduce on current code; Doug has no recent sighting. Reopen with the triggering steps if it recurs.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -71,4 +75,8 @@
+ 
+ ## 2026-11-19T21:08:26.173Z
+ 
+ - **description**: 20 lines → updated (28 lines)
++
++## 2026-11-19T21:18:17.939Z
++
++- **description**: 28 lines → updated (32 lines)

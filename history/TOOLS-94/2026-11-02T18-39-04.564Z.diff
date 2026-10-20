@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-94.md
++++ b/TOOLS-94.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-11-02T18:35:58.620Z
+-updated_at: 2026-11-02T18:35:58.620Z
++updated_at: 2026-11-02T18:39:04.560Z
+ ---
+ 
+ # Make the repository root the CLI product and reduce the build to one Bun invocation
+ 
++## Execution hold
++
++Doug explicitly paused sub-agent execution while he fixes a fling bug. Work breakdown and ownership are complete in .sandpiper/docs/specs/build-simplification-work-plan.md. No implementation or worker launch occurred. Do not retry fling or substitute solo implementation during this hold. Model and thinking inheritance remain selected for the eventual workers.
++
++## Work item
++
+ User authorized a work breakdown and implementation of the recommended root-product-package/one-Bun-build design from TOOLS-92. This is NOT the no-build TypeScript alternative. Read .sandpiper/docs/specs/build-simplification-exploration.md and the work plan when available.
+ 
+ Shared invariants: preserve consumer name sandpiper-ai-cli, current version/piConfig, both command names and existing packages/cli/bin launcher paths (the user's workspace launcher can depend on them). One root product manifest; no nested duplicate CLI product manifest. Root dist owns built entrypoints/chunks. Source module folders stay intact. The root product directly owns docs/license; no staging, generated metadata, custom pack wrapper or compiled executable. Default optional owned resource path is productRoot/packages/resources in both source and built modes; packaged absence valid, explicit resource-root override must remain an existing directory. Custom/global/project/package resources and normal settings behavior remain supported. Pinned patched Pi dependency and offline/read-only installation remain mandatory. Align Bun toolchain declarations with the proven1.4.4 packing behavior without unrelated dependency upgrades.
+ 
+@@ -19,4 +25,12 @@
+ 
+ Ownership: root package.json, bun.lock, bunfig.toml/mise.toml as needed, turbo.json removal, workspace package metadata/type-export configuration, root build-output policy, packages/cli/bin/* shims and removal of packages/cli/package.json. Preserve the old bin source paths instead of adding compatibility wrappers or moving the user's launcher. Coordinate any tsconfig edit through the lead. Do not edit runtime bootstrap, tests, docs or devtools helpers.
+ 
+ Deliver: accurate build/runtime dependency declarations (current portable external runtime dependencies bundled, source-build dependencies available in workspace), no Turbo/core emission prerequisite, one explicit root-dist cleanup+Bun build, ordinary Bun pack with declared outputs/docs/license and existing consumer identity. Core/capability module boundaries survive; type exports point at source when emission is removed. No installation lifecycle builds. A clean dependency-install and lockfile update must be scheduled with the lead to avoid concurrent node_modules mutation. Provide test/experiment evidence and any assumptions for dependent runtime and test workers.
++
++---
++
++# Activity Log
++
++## 2026-11-02T18:39:04.564Z
++
++- **description**: 9 lines → updated (15 lines)

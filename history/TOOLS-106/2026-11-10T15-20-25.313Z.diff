@@ -1,0 +1,38 @@
+===================================================================
+--- a/TOOLS-106.md
++++ b/TOOLS-106.md
+@@ -5,15 +5,24 @@
+ priority: MEDIUM
+ assignee: "session-vars"
+ reporter: USER
+ created_at: 2026-11-09T23:33:26.773Z
+-updated_at: 2026-11-09T23:43:52.422Z
++updated_at: 2026-11-10T15:20:25.313Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Remove session PID files and keep the session variables process-wide
+ 
++## History squashed (2026-11-10)
++
++Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits:
++
++- 3d8ef138 refactor: Stop writing session PID files (84 files / 731 tests; includes the document changes)
++- 41748e35 fix: Clear SANDPIPER_SESSION_FILE when a session has no file (84 / 731)
++
++The tree at the new tip is identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing.
++
+ ## Delivered, awaiting review (2026-11-09)
+ 
+ Agent session-vars (Sonnet 5.5, high) delivered three commits from an isolated jj workspace. They sit on the main working line above b1f138d1. The main bookmark is unchanged and root dist was not rebuilt.
+ 
+@@ -65,4 +74,8 @@
+ 
+ ## 2026-11-09T23:43:52.422Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-10T15:20:25.313Z
++
++- **description**: 36 lines → updated (45 lines)

@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,14 +5,14 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-10-28T14:17:40.199Z
++updated_at: 2026-10-28T14:20:52.578Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
+-## Review status correction — 2026-10-27
++## Review status correction — 2026-10-28
+ 
+ Returned to NEEDS REVIEW after premature lead final-completion during bookkeeping. The implemented mechanical cleanup and its test evidence are retained below, but they do not finish or approve the parent's remaining resources review. Final completion requires actual review/acceptance, not only a passing repository gate.
+ 
+ ## Earlier implementation and verification history
+@@ -69,4 +69,8 @@
+ ## 2026-10-28T14:17:40.200Z
+ 
+ - **status**: COMPLETE → NEEDS REVIEW
+ - **description**: 9 lines → updated (15 lines)
++
++## 2026-10-28T14:20:52.578Z
++
++- **description**: updated

@@ -1,0 +1,34 @@
+===================================================================
+--- a/TAT-73.md
++++ b/TAT-73.md
+@@ -10,9 +10,9 @@
+   - TAT-71
+   - TAT-72
+ related:
+   - TAT-68
+-updated_at: 2026-05-27T15:53:42.503Z
++updated_at: 2026-10-19T19:27:14.255Z
+ ---
+ 
+ # C3: Per-agent read cursor (Tattler layer) — persistence + advance-on-handle
+ 
+@@ -24,8 +24,10 @@
+ - Partial tool-call failure: cursor stays at pre-call position
+ - New agent initialization: cursor starts at log HEAD, not seq 0
+ - TAT-68 re-delivery bug no longer reproduces
+ 
++Acceptance (moved from TAT-56, 2026-10-19): add a real-session regression test for abort recovery: messages that arrive while a run is active accumulate in the inbox, the run is aborted (Escape path, which clears Pi's steer queue), and the next run delivers them exactly once without re-delivering on later runs. TAT-56 verified this behavior live on Pi 1.3.0; see its description for the probe setup. Cover TAT-68's re-delivery case with the same harness.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -45,4 +47,8 @@
+ 
+ ## 2026-05-27T15:53:42.504Z
+ 
+ - **description**: 1 line → updated (8 lines)
++
++## 2026-10-19T19:27:14.259Z
++
++- **description**: 8 lines → updated (10 lines)

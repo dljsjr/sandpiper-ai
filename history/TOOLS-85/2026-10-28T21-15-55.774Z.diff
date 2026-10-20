@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-85.md
++++ b/TOOLS-85.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Verify skill-free built-ins and self-contained skill RPC coverage"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.470Z
+-updated_at: 2026-10-28T21:15:55.470Z
++updated_at: 2026-10-28T21:15:55.774Z
+ ---
+ 
+ # Verify skill-free built-ins and self-contained skill RPC coverage
+ 
+ Use autonomous one-behavior/test RED→GREEN→REFACTOR. Adapt source discovery, diagnostic and packed contracts for zero built-ins; preserve custom/Trail skill support. Replace the skill RPC smoke test dependency on bundled jj with an isolated repo fixture, using its existing mock-provider harness. No production-state tests or live provider calls.
++
++---
++
++# Activity Log
++
++## 2026-10-28T21:15:55.774Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

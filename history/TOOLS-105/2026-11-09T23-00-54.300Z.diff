@@ -1,0 +1,45 @@
+===================================================================
+--- a/TOOLS-105.md
++++ b/TOOLS-105.md
+@@ -5,15 +5,31 @@
+ priority: MEDIUM
+ assignee: "prompt-trim"
+ reporter: USER
+ created_at: 2026-11-09T22:57:46.443Z
+-updated_at: 2026-11-09T22:57:46.536Z
++updated_at: 2026-11-09T23:00:54.299Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Remove resolveEnvVar and read PI_OFFLINE directly for the update check
+ 
++## Delivered, awaiting review (2026-11-09)
++
++Agent prompt-trim delivered three commits from its isolated jj workspace. They sit on the main working line above be2b28a3. The main bookmark is unchanged and root dist was not rebuilt.
++
++- 35437ac7 fix: Skip the update check whenever Pi is offline
++- bf275ec4 refactor: Remove resolveEnvVar
++- 5f3c7d30 docs: Describe environment reads without resolveEnvVar
++
++Red run before the fix: with SANDPIPER_OFFLINE=true and PI_OFFLINE=1 the new test failed with "expected true to be false", which is the stale-value defect.
++
++Verification by the agent and repeated by the coordinator in the agent's workspace: bun check clean; bun run test 85 files / 739 tests pass (745 + 3 new - 9 from the deleted env.test.ts). No source file still imports the helper.
++
++The migration call site keeps both reads inline with no behavior change. The public doc statement about --offline and PI_OFFLINE=true was checked against Pi's main.js by the coordinator.
++
++Left as is: the Testing section of docs/dev/env-vars.md still shows a direct PI_OFFLINE read as its example of a test that depends on the real environment.
++
+ ## Decision
+ 
+ Doug approved on 2026-11-09, during the TOOLS-92 review: remove resolveEnvVar, and have the update check read PI_OFFLINE directly. Inventory row K-14d in .sandpiper/docs/specs/retained-surface-inventory.md.
+ 
+@@ -39,4 +55,8 @@
+ ## 2026-11-09T22:57:46.537Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → prompt-trim
++
++## 2026-11-09T23:00:54.300Z
++
++- **description**: 18 lines → updated (34 lines)

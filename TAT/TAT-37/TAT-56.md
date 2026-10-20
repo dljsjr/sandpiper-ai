@@ -1,17 +1,22 @@
 ---
 title: "Test abort plus next prompt drains Tattler inbox"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: SUBTASK
 priority: HIGH
 assignee: "Huginn"
 reporter: USER
 created_at: 2026-05-25T19:12:27.325Z
-updated_at: 2026-05-25T19:12:57.122Z
+updated_at: 2026-10-19T19:29:30.907Z
 ---
 
 # Test abort plus next prompt drains Tattler inbox
 
 After the pending inbox/before_agent_start fix, cover the user recovery path: provider busy/hung, inbound messages accumulate in Tattler inbox, user aborts, user sends any next prompt, and before_agent_start injects one durable batch before the prompt proceeds.
+
+Verified 2026-10-19 on Pi 1.3.0 / Sandpiper main, in a real interactive sandpiper instance driven through herdr (isolated agent dir; probe provider whose first request blocks until aborted; Escape pressed mid-request; then two more prompts). Live result: a Tattler message sent while the session was busy was saved in the tattler:pending-inbox snapshot; after Escape, the next user prompt's request contained the <tattler_inbox> batch (drained by before_agent_start), exactly once; the following request did not re-inject it. No automated regression test written yet.
+
+Closed 2026-10-19: behavior verified live (above). The automated regression test moved to TAT-73's acceptance criteria.
 
 ---
 
@@ -20,3 +25,16 @@ After the pending inbox/before_agent_start fix, cover the user recovery path: pr
 ## 2026-05-25T19:12:57.123Z
 
 - **assignee**: UNASSIGNED → Huginn
+
+## 2026-10-19T19:13:31.450Z
+
+- **description**: 1 line → updated (3 lines)
+
+## 2026-10-19T19:27:14.468Z
+
+- **description**: 3 lines → updated (5 lines)
+
+## 2026-10-19T19:29:30.907Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: DONE

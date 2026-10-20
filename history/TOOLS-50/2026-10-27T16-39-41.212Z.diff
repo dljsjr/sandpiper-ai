@@ -1,0 +1,45 @@
+===================================================================
+--- a/TOOLS-50.md
++++ b/TOOLS-50.md
+@@ -5,21 +5,39 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-27T16:34:47.211Z
+-updated_at: 2026-10-27T16:34:52.946Z
++updated_at: 2026-10-27T16:39:41.207Z
+ related:
+   - TOOLS-47
+ ---
+ 
+ # Record the approved standalone journal v1 design
+ 
+-Record the design decisions from the standup replacement discussion as a reference and continuity checkpoint. Target implementation repository: /Users/dstephen/git/agent-journal, not created yet. CLI and skill are named journal and are harness agnostic. This task covers the design record only, not implementation, repository scaffolding, release machinery, or deletion of legacy standup data. Preserve the existing standup file unchanged.
++Saved the agreed design in .sandpiper/docs/specs/agent-journal-v1-spec.md and indexed it in .sandpiper/docs/README.md. Target repository: /Users/dstephen/git/agent-journal, not created. CLI and skill: journal. Implementation has not been requested or started; this task is the design checkpoint only. Preserve .sandpiper/standup.md unchanged, including during continuity checkpointing.
+ 
++Approved contract: 500 normalized content characters; one quoted positional argument with newlines replaced by spaces and outer whitespace trimmed; empty/oversized entries rejected; 200 retained entries; newest-first Markdown with local-day headers and timestamp offsets; optional explicit author attribution; author filtering before default latest-matching-day selection; default 20 returned entries; positive --limit override; omission counts; mutually exclusive --date and inclusive --since; explicit dates override the latest-day selection.
++
++Date implementation: ISO format gate/native handling first, then Chrono only as fallback. Calendar normalization is deliberately accepted, with no separate leap-year/day-count validator. Preserve local date semantics rather than blindly parsing date-only input as UTC. Chrono must yield exactly one complete, non-range match; its end field can be null. Custom Chrono parser ordering is not a short-circuit. User offered /Users/dstephen/git/pi-yaams/datom-model/codec/metadata.ts as a regex-first reference; that file was inspected but not modified.
++
++Configuration: --dir overrides AGENT_JOURNAL_DIR, otherwise .agent-journal/ relative to CWD; fixed journal.md filename. Sandpiper supplies an absolute .sandpiper directory through the environment before children start, preserving a user-supplied value. No harness-specific behavior belongs in the standalone CLI or skill.
++
++Locking: Node opens a persistent sidecar lock file and passes it as child fd 3 to /usr/bin/lockf on macOS or /usr/bin/flock on Linux. The utility exits after acquiring the shared open-file-description lock, retained by the Node fd. Keep the lock through the entire read/modify/atomic-replacement transaction and release by closing the fd. No native npm addon, FFI, SQLite, PID registry, stale-file cleanup, or lock-file unlink. Linux remotes already have flock according to the user; Linux execution still needs verification. Exact lock timeout is not selected.
++
++Local feasibility artifacts: /tmp/standup-date-probe.dh7Iui/probe.mjs (chrono-node 2.10.3); /tmp/standup-review-20261026.DvihBZ/probe.mjs and barrier.cjs (review reproductions); /tmp/standup-lockf-probe.YMEAK6 (descriptor-lock fixture; successful reproduction command is in this session transcript). The spec records the mechanics independently of temporary files.
++
++Remaining mechanical details: serialized Markdown metadata, author matching particulars, empty/missing-file output, character counting unit, minimum Node version and dependency installation layout, and legacy code/skill transition scope. Do not create implementation or release work merely because this design checkpoint exists. No legacy migration/deletion is authorized.
++
++Verification: spec index and local reference checks passed; root bun check passed dependency policy, TypeScript and Biome with zero warnings. Existing review TOOLS-47 remains NEEDS REVIEW; do not sweep unrelated tasks.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-27T16:34:52.947Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-27T16:39:41.212Z
++
++- **description**: 1 line → updated (15 lines)

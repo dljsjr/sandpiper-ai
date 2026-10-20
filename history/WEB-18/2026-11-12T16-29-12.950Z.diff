@@ -1,0 +1,30 @@
+===================================================================
+--- a/WEB-18.md
++++ b/WEB-18.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "web_fetch: raw markdown served as text/plain bypasses structure parsing, breaking markdown_section/css_selector"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-06-23T20:12:02.717Z
+-updated_at: 2026-11-11T22:39:36.606Z
++updated_at: 2026-11-12T16:29:12.949Z
+ ---
+ 
+ # web_fetch: raw markdown served as text/plain bypasses structure parsing, breaking markdown_section/css_selector
+ 
+@@ -49,4 +50,9 @@
+ 
+ ## 2026-11-11T22:39:36.606Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-12T16:29:12.950Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

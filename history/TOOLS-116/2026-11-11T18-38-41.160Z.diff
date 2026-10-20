@@ -1,0 +1,44 @@
+===================================================================
+--- a/TOOLS-116.md
++++ b/TOOLS-116.md
+@@ -5,16 +5,30 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T18:19:02.833Z
+-updated_at: 2026-11-11T18:25:03.029Z
++updated_at: 2026-11-11T18:38:41.159Z
+ related:
+   - TOOLS-30
+   - TOOLS-112
+ ---
+ 
+ # Runtime Pi import smoke test times out on a quiet machine
+ 
++## Investigation complete, correction not yet authorized (2026-11-11)
++
++Collected consolidated fling_done reports and closed both agents; their clean checkouts were removed. No product/test/timeout changes.
++
++Verified mechanism: the /tmp extension has no ancestor node_modules. Pi/jiti tries native Bun import before applying host aliases. Bun auto-installs and executes a second published Pi graph; PI_OFFLINE does not disable Bun runtime auto-install. Fresh fixture cache and recursive cleanup make the smoke test non-hermetic.
++
++Measured exact fixture: child3.068s, cleanup1.631s,17,946entries/137.6MB. CPU profile shows60 executed fixture-cache module URLs including a second Pi1.5.2 config.js. Diagnostic --no-install preserves the marker via host-alias fallback: child1.686s, cleanup53.95ms, no downloaded package graph (675transpiler/cache entries). Independent fake-package/alias probe confirms native import bypass and fast alias fallback. Historical37.55s/15.42s tails were not phase-profiled; exact latency split remains unknown. Actual installed jiti is2.7.0 despite its2.6.1 debug banner; no observed version mismatch is claimed.
++
++Smallest proposed test-only correction: insert --no-install before the built bin path in runSandpiperBin in packages/cli/standalone_cli_smoke.test.ts:46. Preserve the actual bin, fixture location, runtime Pi import,15s timeout and no retries. Requires user approval because current scope was investigation. Then rerun focused and remaining full gates.
++
++Do not change production launcher, global bunfig or Pi loader for this narrow correction. The corresponding production native-first host-alias bypass is an upstream Pi/jiti integration finding, recorded here; no upstream task/issue created. Do not claim packedCli downloaded: its installed consumer has node_modules and was not measured as tainted.
++
++Evidence: /tmp/sandpiper-import-timing-20261111/ (phase-summary.json, final-exact.*, final-profile.*, CPU profiles, final-noinstall.*, final-focused.log); /tmp/sandpiper-import-trace-probe/ (independent safe no-install alias probe); /tmp/sandpiper-import-trace-jiti.cjs (read-only expanded implementation). Full reports are in this session's agent results. No more network-capable probes are needed.
++
+ ## Observed failure
+ 
+ packages/cli/standalone_cli_smoke.test.ts:89, loads a user extension with a runtime Pi import through the built sandpiper bin, can exceed its existing 15000 ms limit on a quiet machine.
+ 
+@@ -49,4 +63,8 @@
+ ## 2026-11-11T18:25:03.030Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-11T18:38:41.160Z
++
++- **description**: 27 lines → updated (41 lines)

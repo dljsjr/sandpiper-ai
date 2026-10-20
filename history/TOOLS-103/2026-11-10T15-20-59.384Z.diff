@@ -1,0 +1,40 @@
+===================================================================
+--- a/TOOLS-103.md
++++ b/TOOLS-103.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: "prompt-trim"
+ reporter: USER
+ created_at: 2026-11-09T21:51:36.370Z
+-updated_at: 2026-11-10T15:20:25.435Z
++updated_at: 2026-11-10T15:20:59.383Z
+ related:
+   - TOOLS-92
+   - TAT-70
+ ---
+@@ -15,13 +15,13 @@
+ # Replace better-sqlite3 with the built-in node:sqlite module
+ 
+ ## History squashed (2026-11-10)
+ 
+-Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits:
++Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits, by jj change id (stable across rewrites) with the commit id at the time of writing:
+ 
+-- 1d1d6570 refactor: Replace better-sqlite3 with node:sqlite (84 files / 733 tests)
++- rvqwortq (69e32384) refactor: Replace better-sqlite3 with node:sqlite; 84 files / 733 tests
+ 
+-The tree at the new tip is identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing.
++Source and tests at the new tip are identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing with the counts shown.
+ 
+ ## Delivered, awaiting review (2026-11-09)
+ 
+ Agent prompt-trim (Sonnet 5.5, high) delivered three commits from an isolated jj workspace. After the coordinator combined the lines they are:
+@@ -95,4 +95,8 @@
+ 
+ ## 2026-11-10T15:20:25.436Z
+ 
+ - **description**: 53 lines → updated (61 lines)
++
++## 2026-11-10T15:20:59.384Z
++
++- **description**: updated

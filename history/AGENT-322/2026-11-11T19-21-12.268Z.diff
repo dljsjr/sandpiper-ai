@@ -1,0 +1,33 @@
+===================================================================
+--- a/AGENT-322.md
++++ b/AGENT-322.md
+@@ -5,15 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T23:39:42.912Z
+-updated_at: 2026-11-11T18:15:17.024Z
++updated_at: 2026-11-11T19:21:12.267Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Context-usage notes reach the model with escaped tags
+ 
++## Corrected hermetic full gate passed (2026-11-11)
++
++With the approved mwqvznwo smoke guard inherited, independent frozen install, zero-warning check and unfiltered full suite passed: 71 files/568 tests. Actual offline/read-only packed CLI checks included. Exact command: bun run test --maxWorkers 1 --no-file-parallelism. No timeout changes or retries. Status NEEDS REVIEW, not accepted. Logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik/03-mrrwutsk/.
++
+ ## Full verification passed (2026-11-11)
+ 
+ mrrwutsk: independent frozen install, zero-warning bun check, and full `bun run test --maxWorkers 1 --no-file-parallelism` passed: 71 files / 568 tests. No filters, exclusions or timeout changes; real offline/read-only packed CLI checks included. Fresh start load was below8. Independent code review found no outstanding actionable findings. Status is NEEDS REVIEW, not user-accepted COMPLETE. Logs: /tmp/sandpiper-gate-first-four-full.3QipCL/mrrwutsk/. Earlier implementation checkpoints below preceded this full gate.
+ 
+@@ -71,4 +75,8 @@
+ 
+ ## 2026-11-11T18:15:17.028Z
+ 
+ - **description**: 30 lines → updated (34 lines)
++
++## 2026-11-11T19:21:12.268Z
++
++- **description**: 34 lines → updated (38 lines)

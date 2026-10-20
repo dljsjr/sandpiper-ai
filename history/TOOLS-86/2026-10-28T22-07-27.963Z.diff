@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-86.md
++++ b/TOOLS-86.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Retire jj skill deployment and hard routing without adopting the WIP replacement"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.551Z
+-updated_at: 2026-10-28T22:07:27.862Z
++updated_at: 2026-10-28T22:07:27.962Z
+ ---
+ 
+ # Retire jj skill deployment and hard routing without adopting the WIP replacement
+ 
+@@ -40,4 +41,9 @@
+ 
+ ## 2026-10-28T22:07:27.863Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-28T22:07:27.963Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

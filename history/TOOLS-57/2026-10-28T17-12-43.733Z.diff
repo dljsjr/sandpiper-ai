@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -7,9 +7,9 @@
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.280Z
+ depends_on:
+   - TOOLS-60
+-updated_at: 2026-10-28T16:53:39.092Z
++updated_at: 2026-10-28T17:12:43.733Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -26,8 +26,10 @@
+ User response: declined the keep-all-six confirmation and chose to discuss changes. No keep/remove/extract decisions are approved yet. This task remains IN PROGRESS; do not treat the recommendation above as acceptance.
+ 
+ Approved projects decision: remove the bundled projects skill, convert the global registry into a Markdown routing index, and rewire active guidance directly to it. Implementation is tracked by TOOLS-60. The user requested one-by-one discussion; no decisions about the other five skills are approved.
+ 
++Projects implementation is now ready for review under TOOLS-60 and children TOOLS-61/62/63. One of six shipping decisions is resolved: remove projects skill and use the direct Markdown project index. The other five skill discussions remain open. This subtask and the broader build task remain IN PROGRESS.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -47,4 +49,8 @@
+ ## 2026-10-28T16:53:39.093Z
+ 
+ - **description**: 11 lines → updated (13 lines)
+ - **depends_on**: (none) → TOOLS-60
++
++## 2026-10-28T17:12:43.733Z
++
++- **description**: 13 lines → updated (15 lines)

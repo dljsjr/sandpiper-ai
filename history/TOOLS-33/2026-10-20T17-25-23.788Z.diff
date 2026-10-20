@@ -1,0 +1,38 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -1,21 +1,19 @@
+ ---
+ title: "Implement and verify the approved build simplification"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-10-20T16:38:59.540Z
++updated_at: 2026-10-20T17:25:23.788Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
+-Implemented the approved workspace-only topology. The root build now emits the two CLI entrypoints under packages/cli/dist/standalone, builds Trail and standup package outputs, and syncs their local skill helpers. Removed the neutral Pi package, generated npm/Pi assembly, compiled app, Claude plugin, and vendoring updater. Simplified runtime branches and updated active docs.
++Implement the approved workspace-only topology, then simplify resources after review. Remove all third-party skills. Move first-party on-demand skills to ~/git/skills-incubator/skills/. Flatten retained first-party runtime skills directly under packages/resources/skills/. Update discovery, tests, documentation, and helper synchronization. Verify the complete runtime and build flow.
+ 
+-Verification: bun check; bun run test (124 files, 1,220 tests); focused workspace CLI/integration tests; direct sandpiper, system-prompt, Trail, and standup bin smokes; stale-reference sweep.
+-
+ ---
+ 
+ # Activity Log
+ 
+@@ -30,4 +28,9 @@
+ 
+ ## 2026-10-20T16:38:59.541Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-20T17:25:23.788Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++- **description**: 3 lines → updated (1 line)

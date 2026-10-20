@@ -1,0 +1,45 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -9,28 +9,19 @@
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-20T16:38:59.602Z
++updated_at: 2026-10-20T16:39:13.789Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
+-Simplify Sandpiper's build and distribution system after the Pi 1.0 migration (AGENT-290).
++Retain only Sandpiper's workspace runtime and local helper builds. Keep sandpiper, sandpiper-system-prompt, Trail, standup, the local Pi patch, extensions/resources, and current configuration behavior. Keep builds explicit and package-owned output beside its package.
+ 
+-Background, from two earlier sessions:
+-- 2026-10-05 (AGENT-289/TOOLS-27 session): Doug pointed out that cleaning must be recursive because the build creates nested dist dirs. We agreed to freeze the 0.85 build and defer build-layout and clean redesign, since Pi 1.0 might change the machinery. The agent's sketch then was to keep package-owned output beside each package and treat the root dist/ as staging, not to flatten everything.
+-- 2026-10-06 (AGENT-290 planning session): Doug said Sandpiper carries a lot of technical debt from delivering itself several ways: Pi package, uncompiled standalone, compiled Bun standalone, and Claude Code plugin/extensions. Nobody else uses them, and Doug uses only the uncompiled standalone. The long-term plan is his own ground-up harness.
++Remove the unused neutral Pi package, generated npm/Pi package assembly, compiled Bun app, Claude plugin, and broken vendoring updater. Keep checked-in third-party skill snapshots and licenses.
+ 
+-So the simplification is mainly about which delivery modes to keep, with the build reshaped around them. Questions carried over from AGENT-301 (proposal: .sandpiper/docs/specs/agent-301-build-topology-proposal.md), which may become moot once delivery modes are chosen:
+-- A. dist/ is both the npm CLI (Pi in dependencies) and a Pi package (`pi` manifest), which Pi 1.0 warns about.
+-- B. Exact host peers in the Pi-package manifests (repository root, plugins/pi/extensions) block installs into other Pi versions; Pi asks for "*".
+-- C. Done 2026-10-06: where the local Pi patch applies (repository runs, generated dist/, the compiled app; not an npm install) is documented under "Local Pi patch" in docs/dev/build-system.md, together with the steps to redo it on a Pi bump.
++The audit and approved topology are recorded in TOOLS-31 and TOOLS-32. The superseded AGENT-301 proposal is archived at .sandpiper/archive/agent-301-build-topology-proposal.md. Implementation and verification are recorded in TOOLS-33.
+ 
+-Already done under AGENT-301: Pi asset copy narrowed to the three directories Pi resolves (8.6 MB to 1.2 MB); clean.ts removes .turbo, recurses without a depth limit, and never follows symlinks.
+-
+-Vendoring audit (added 2026-10-19 triage, folds in TOOLS-1 and TOOLS-2): audit devtools/vendor.ts and vendor.txt as part of this work, with removing vendoring entirely as an option. Findings so far: vendor.txt has two entries, both github.com/anthropics/skills tree/main (unpinned); their destinations (./packages/resources/skills/on_demand/third-party/...) are stale, since the real directory is packages/resources/skills-on-demand/third-party/; one entry is Anthropic's skill-creator, which Doug is replacing with a new skill-creator built separately. Also: AGENT-318 notes the compiled standalone app may still embed build-time absolute paths.
+-
+ ---
+ 
+ # Activity Log
+ 
+@@ -57,4 +48,8 @@
+ 
+ ## 2026-10-20T16:38:59.603Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-20T16:39:13.790Z
++
++- **description**: 14 lines → updated (5 lines)

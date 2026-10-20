@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-337.md
++++ b/AGENT-337.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Integration harness spawns publish Tattler endpoints into the real runtime directory"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-19T21:18:34.676Z
+-updated_at: 2026-11-19T21:23:28.828Z
++updated_at: 2026-11-20T02:07:58.912Z
+ ---
+ 
+ # Integration harness spawns publish Tattler endpoints into the real runtime directory
+ 
+@@ -29,4 +30,9 @@
+ ## 2026-11-19T21:23:28.828Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **description**: 1 line → updated (5 lines)
++
++## 2026-11-20T02:07:58.912Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: UNRESOLVED → DONE

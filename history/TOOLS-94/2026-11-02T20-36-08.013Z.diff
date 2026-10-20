@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-94.md
++++ b/TOOLS-94.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T18:35:58.620Z
+-updated_at: 2026-11-02T20:25:33.153Z
++updated_at: 2026-11-02T20:36:08.012Z
+ ---
+ 
+ # Make the repository root the CLI product and reduce the build to one Bun invocation
+ 
++## Approved launcher compatibility update
++
++Read-only audit found ~/.local/bin/sandpiper invokes repo/node_modules/.bin/sandpiper. An isolated offline Bun1.4.4 fixture confirmed root packages do not get a self-bin link. Doug explicitly approved changing ONLY that target to packages/cli/bin/sandpiper in both the deployed launcher and canonical dotfiles/dot_local/bin/executable_sandpiper AFTER verifying the new build. Parent owns both updates, source-ownership/dirty-state checks, exact backups and preservation proof. Preserve every other byte/argument-handling difference between source and deployed copies. No external edits by workers, no compatibility shim workspace, global links or install hooks. Shared install/first build/bin switch remains lead-serialized.
++
++## Earlier work item and coordination record
++
+ ## Execution hold lifted
+ 
+ Doug fixed fling and explicitly authorized launching agents with model inheritance. Earlier hold instructions below are superseded. Follow .sandpiper/docs/specs/build-simplification-work-plan.md and its ownership rules. Initial lanes94/95/97 start read-only until lead GO;96 follows94/95 and98 follows all four. The94 worker also owns new devtools/rootProductMetadata.test.ts for TDD of package/bin contracts. No commits, shared installs or full integration builds without lead coordination.
+ 
+@@ -48,4 +54,8 @@
+ ## 2026-11-02T20:25:33.160Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-02T20:36:08.013Z
++
++- **description**: 21 lines → updated (27 lines)

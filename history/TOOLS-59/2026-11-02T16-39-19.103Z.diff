@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Review and resolve the themes resource scaffold"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-10-28T14:17:40.460Z
++updated_at: 2026-11-02T16:39:19.098Z
+ ---
+ 
+ # Review and resolve the themes resource scaffold
+ 
+ Review packages/resources/themes, currently a README-only scaffold, and its role in resource discovery/staging. Record the user's decision about retaining or changing this surface. Apply and verify any approved change, including portable packaging where relevant, before requesting acceptance. Do not remove the scaffold merely because it currently contains no theme files.
++
++---
++
++# Activity Log
++
++## 2026-11-02T16:39:19.103Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,35 @@
+===================================================================
+--- a/AGENT-321.md
++++ b/AGENT-321.md
+@@ -5,15 +5,21 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T22:33:19.263Z
+-updated_at: 2026-11-11T17:03:39.257Z
++updated_at: 2026-11-11T17:32:16.190Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # System prompt changes mid-session when jj colocation detection times out
+ 
++## Implementation checkpoint (2026-11-11)
++
++Change xykrywto caches VCS, USER.md and identity input per session, resets the detector baseline, and still renders current Pi options. Worker reproduced the three unstable-input failures and baseline reset, then passed 155 focused tests and 13 non-dump real-Pi cases. Independent review found no actionable issue. Full/per-commit quiet-machine gates are pending.
++
++Status remains IN PROGRESS. This checkpoint is not verified completion or user acceptance.
++
+ ## Decision (Doug, 2026-11-11)
+ 
+ Detect once per session and reuse the result. Apply this to everything Sandpiper reads for the system prompt, not only version control. Not started.
+ 
+@@ -95,4 +101,8 @@
+ ## 2026-11-11T17:03:39.263Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-11T17:32:16.193Z
++
++- **description**: 66 lines → updated (72 lines)

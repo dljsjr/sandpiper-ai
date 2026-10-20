@@ -1,0 +1,45 @@
+===================================================================
+--- a/AGENT-332.md
++++ b/AGENT-332.md
+@@ -6,21 +6,29 @@
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-11-17T20:58:49.510Z
+-updated_at: 2026-11-18T18:34:57.322Z
++updated_at: 2026-11-18T18:56:58.274Z
+ ---
+ 
+ # Archive the completed Pi migration spec and Pi 1.5 audit, moving live content out first
+ 
+ ## Outcome (lzmnmnns)
+ 
+ Both documents moved to `.sandpiper/archive/` with a pointer line; still-live content (request invariants, request shape, the prompt-change canary, provider neutrality) moved into `sandpiper-system-prompt.md`; one AutoTOON sentence into `docs/features/autotoon-architecture.md`; inbound links fixed. Defects found in the audit filed as AGENT-333 and AGENT-334.
+ 
+-Open: six unauthorized adoption candidates remain only in the archived documents (Pi sections instead of one preamble; outputSchema/structuredContent; tool annotations; model-only `done`; render-context keyText()/keyHint(); pi-mcp 1.5.1 helpers). The documentation playbook names no home for such ideas.
++## Follow-up sweep (utxlrtlo, ktyptnsy)
+ 
+-Other non-archived docs that look completed or outdated (not edited): `pi-1-0-prompt-sections.md` (says current for Pi 1.0.x), `mailbox-coordination-architecture-notes.md`, `web-fetch-prd.md`, `agent-249-headless-cli-integration-harness-design.md`, `build-simplification-work-plan.md`, `build-simplification-exploration.md`, `retained-surface-inventory.md`, `web-search-mcp-transport-investigation.md`. One broken link in `.sandpiper/archive/agent-301-build-topology-proposal.md` (`../../../docs/dev/build-system.md` should be `../../docs/...`).
++Doug ruled the open questions from the first pass a manufactured decision: outdated docs get updated or archived without asking. Done:
+ 
++- The six unauthorized adoption candidates now live in `.sandpiper/docs/specs/pi-adoption-candidates.md`, each with its checked state and trigger; the documentation playbook names `.sandpiper/docs/` as the home for idea lists.
++- `pi-1-0-prompt-sections.md` renamed to `pi-prompt-sections.md` and brought to Pi 1.5.2.
++- Seven finished specs and three TOOLS-30 handoff notes archived after moving live content into the web-fetch, web-search and integration READMEs and `docs/dev/build-system.md`.
++- Background process sketch archived; `.sandpiper/docs/specs/background-processes.md` written from the code; AGENT-335 filed.
++- Broken archive links fixed, including the AGENT-301 build-system link.
++
++No open questions remain.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -35,4 +43,8 @@
+ ## 2026-11-18T18:34:57.322Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-11-18T18:56:58.280Z
++
++- **description**: 7 lines → updated (15 lines)

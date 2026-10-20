@@ -1,16 +1,22 @@
 ---
 title: "ProcessManager: add configurable buffer size limits to prevent unbounded memory growth"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-27T22:50:01.097Z
-updated_at: 2026-04-01T16:30:37.029Z
+updated_at: 2026-11-19T20:14:37.153Z
 ---
 
 # ProcessManager: add configurable buffer size limits to prevent unbounded memory growth
 
+## Outcome (rkumpsxo)
+
+Per Doug (2026-11-19): a fixed byte-based cap, spilling to a temp file like Pi's bash and read tools, using Pi's own `OutputAccumulator` rather than a copy. The local Pi patch exports it from Pi's root (Pi 1.5.2 does not, and its exports map blocks a direct import). `ProcessManager` takes a `createOutputBuffer` factory so it stays free of Pi imports; the system extension passes Pi's accumulator. Limits are Pi's: the last 2000 lines or 50 KB shown, the whole stream in `$TMPDIR/sandpiper-bg-<id>-<stream>-<hex>.log` (mode 0600, never deleted) once it passes either. Files are flushed before exit handlers run. `check_background_process` shows totals and the bash tool's `[Showing lines a-b of n. Full output: <path>]` note. Side effects: blank lines are kept and lines no longer split at chunk boundaries; `clear_buffer` starts a fresh buffer.
+
+Checks: bun check clean, 91 files/855 tests, dist rebuilt. Tool-level test runs a 3000-line process through the real accumulator; isolated RPC E2E through the real runtime gave the note and a 28,893-byte file with every line. Docs: background-processes.md, build-system.md (patch list and post-upgrade test list).
 
 ---
 
@@ -19,3 +25,18 @@ updated_at: 2026-04-01T16:30:37.029Z
 ## 2026-04-01T16:30:37.029Z
 
 - **priority**: LOW → MEDIUM
+
+## 2026-11-19T19:18:43.702Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-11-19T19:25:43.483Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **description**: added (5 lines)
+
+## 2026-11-19T20:14:37.153Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

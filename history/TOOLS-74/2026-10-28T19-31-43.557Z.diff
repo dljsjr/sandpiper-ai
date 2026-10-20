@@ -1,0 +1,41 @@
+===================================================================
+--- a/TOOLS-74.md
++++ b/TOOLS-74.md
+@@ -5,22 +5,24 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.352Z
+-updated_at: 2026-10-28T19:31:43.415Z
++updated_at: 2026-10-28T19:31:43.556Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+ 
+ # Unbundle TDD skill and preserve autonomous red-green-refactor in developer guidance
+ 
+-User approved moving test-driven-development out of the harness and relying on developer-role guidance. Preserve the complete skill unchanged at ~/git/skills-incubator/skills/test-driven-development and remove the Sandpiper-owned bundled copy. The user explicitly corrected the review: showing one failing test and getting user confirmation before production code is an essential guard against bulk tests/bulk implementation, not ceremony. Preserve one behavior -> one test -> observed RED for the expected reason -> user confirmation -> minimum GREEN -> refactor -> repeat; keep the refactor phase without expanding into a refactoring-policy redesign. First demonstrate one focused catalogue RED test and STOP for user confirmation before any shipped-resource/global-guidance changes. No new TDD SOP rewrite, new framework, archive auto-loading, or decisions about mutation-testing/jj are approved. Verification and final acceptance belong to this parent.
++## Current scope correction — 2026-10-28
+ 
+-## Intentional RED checkpoint — 2026-10-28
++The assistant incorrectly imported the archived skill's literal human-confirmation clause. The user clarified that routine TDD is AUTONOMOUS: write one test for one behavior, run it and verify RED for the expected reason, implement minimum GREEN, refactor, then write the next test. Do not batch tests and then batch implementation. No human approval gate is required per cycle. Genuine scope/requirements/destructive-action rules remain unchanged.
+ 
+-Focused baseline passed: bun run test:vitest -- packages/cli/standalone_resource_discovery.test.ts --testNamePattern false (1 passed, 1 skipped). Changed only the expected source catalogue by removing test-driven-development. The same single-case run now fails for the expected reason: actual catalogue still contains test-driven-development while expected catalogue is jj + mutation-testing. No shipped resources, archive, deployment links or global developer guidance changed. Await explicit user confirmation of this RED before the minimal production resource change and GREEN. Do not batch additional tests or implementation before that confirmation.
++Move the complete test-driven-development skill unchanged to ~/git/skills-incubator/skills/test-driven-development and remove the Sandpiper bundled copy. Rely on developer-role guidance for the essential autonomous TDD loop, preserving the refactor phase. Update active dependencies/catalogue/deployment without adding archive auto-loading, a new framework, a new TDD rewrite project, or decisions about mutation-testing/jj.
+ 
++Current checkpoint: one source catalogue case passed before the assertion change, then failed for the expected extra test-driven-development entry. Only its expected list and continuation records changed; no source skill/archive/global-role/deployment edits occurred yet. Continue directly to the minimal resource change and GREEN; do not ask for routine test confirmation. Earlier mistaken human-gate wording is retained only in task history.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -35,4 +37,8 @@
+ 
+ ## 2026-10-28T19:31:43.416Z
+ 
+ - **title**: Unbundle the TDD skill while preserving the RED-confirmation workflow in developer guidance → Unbundle TDD skill and preserve autonomous red-green-refactor in developer guidance
++
++## 2026-10-28T19:31:43.557Z
++
++- **description**: 5 lines → updated (7 lines)

@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,13 +9,19 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T20:35:43.469Z
++updated_at: 2026-10-28T20:46:21.172Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
++## Current approved mutation-testing decision — 2026-10-28
++
++User agreed to preserve the seven-file mutation-testing skill unchanged in the incubator and unbundle it. Retain the core survivor-interpretation rule in developer testing guidance; do not import score or CI policies. Implementation is TOOLS-79–82 and is not yet accepted. Existing unrelated testing/greenfield policies and independent installed copies remain unchanged. No new framework installation, archive auto-loading or separate SOP rewrite is authorized. jj remains undecided; this task and TOOLS-30 stay open.
++
++## Earlier status records
++
+ ## Current acceptance and discussion — 2026-10-28
+ 
+ User accepted the TDD implementation and related identity-routing repair ("Nice, next?"). TOOLS-74–78 are COMPLETE/DONE. Four of the original six skill outcomes are now accepted: projects, code-review, refactoring and test-driven-development. TDD remains autonomous; no routine human approval gate was introduced.
+ 
+@@ -140,4 +146,8 @@
+ 
+ ## 2026-10-28T20:35:43.470Z
+ 
+ - **description**: 43 lines → updated (51 lines)
++
++## 2026-10-28T20:46:21.173Z
++
++- **description**: 51 lines → updated (57 lines)

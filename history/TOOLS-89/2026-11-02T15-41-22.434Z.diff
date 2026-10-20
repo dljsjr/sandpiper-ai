@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-89.md
++++ b/TOOLS-89.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Preserve all six prompts in the external Sandpiper archive"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:40:53.924Z
+-updated_at: 2026-11-02T15:41:22.350Z
++updated_at: 2026-11-02T15:41:22.433Z
+ ---
+ 
+ # Preserve all six prompts in the external Sandpiper archive
+ 
+@@ -50,4 +51,9 @@
+ 
+ ## 2026-11-02T15:41:22.351Z
+ 
+ - **description**: 13 lines → updated (19 lines)
++
++## 2026-11-02T15:41:22.434Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-53.md
++++ b/TOOLS-53.md
+@@ -5,13 +5,14 @@
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:03.927Z
+-updated_at: 2026-10-27T22:59:26.941Z
++updated_at: 2026-10-27T23:00:53.879Z
+ ---
+ 
+ # Remove bundled standup runtime and wire stable Journal directory defaults
+ 
++Runtime slice: shared configurePiEnvironment defaults AGENT_JOURNAL_DIR only when undefined, before imports in runtime and diagnostic. Child cwd and empty/relative/absolute override tests; bootstrap 14/14 plus staging 1/1 pass. Removed legacy CLI/skill/helper wiring. Staging skips orphan skill directories after upgrade. bun check clean. Red evidence and check logs: /private/tmp/journal-cutover-jt1zotyw/runtime-{red,check}.txt and staging-red.txt. Runtime checkpoint momxtoxk; reviewer requested directly. Full post-change gate pending.
+ 
+ ---
+ 
+ # Activity Log
+@@ -19,4 +20,8 @@
+ ## 2026-10-27T22:59:26.942Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → cutover-dev
++
++## 2026-10-27T23:00:53.879Z
++
++- **description**: added (1 line)

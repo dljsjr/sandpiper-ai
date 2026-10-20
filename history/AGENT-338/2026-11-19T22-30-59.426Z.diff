@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-338.md
++++ b/AGENT-338.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Fix delivery timing of the model and context usage notifications, and rework their shape"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-19T21:37:10.819Z
+-updated_at: 2026-11-19T21:37:10.819Z
++updated_at: 2026-11-19T22:30:59.426Z
+ ---
+ 
+ # Fix delivery timing of the model and context usage notifications, and rework their shape
+ 
+ extensions/system/context-management.ts sends model changes and context usage as hidden system notifications from turn_end with deliverAs nextTurn. Doug sees deliveries at odd times and wants the shape revisited: slimmer and more informative, for example tokens left in the window, since 80% of 500k differs from 80% of 1M.
++
++---
++
++# Activity Log
++
++## 2026-11-19T22:30:59.426Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-58.md
++++ b/TOOLS-58.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Review and resolve bundled prompt templates"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.381Z
+-updated_at: 2026-10-28T20:11:32.078Z
++updated_at: 2026-10-28T22:40:54.178Z
+ ---
+ 
+ # Review and resolve bundled prompt templates
+ 
+@@ -33,4 +33,9 @@
+ 
+ ## 2026-10-28T20:11:32.079Z
+ 
+ - **description**: 5 lines → updated (7 lines)
++
++## 2026-10-28T22:40:54.178Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

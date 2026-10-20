@@ -1,0 +1,47 @@
+===================================================================
+--- a/TOOLS-92.md
++++ b/TOOLS-92.md
+@@ -1,19 +1,31 @@
+ ---
+ title: "Audit retained build, runtime and toolchain complexity against simplification scope"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T17:42:31.696Z
+ related:
+   - TOOLS-93
+-updated_at: 2026-11-09T20:29:48.739Z
++updated_at: 2026-11-10T15:33:37.012Z
+ ---
+ 
+ # Audit retained build, runtime and toolchain complexity against simplification scope
+ 
++## Current state: in progress (2026-11-10)
++
++Doug pointed out that this ticket has open questions and should not sit in NEEDS REVIEW. Status is IN PROGRESS.
++
++Decided: Section 2 of .sandpiper/docs/specs/retained-surface-inventory.md (retained surfaces). Its approved changes were implemented under TOOLS-103 to TOOLS-107.
++
++Not yet decided: Section 3 (tracked by existing tasks), Section 4 (Batch A, 18 leftovers), Section 5 (Batch B, tradeoff decisions), Section 6 (Batch C, document corrections) and Section 7 (Batch L, local leftovers).
++
++Known gap in coverage: Section 2 was rewritten around "what fails without it" after Doug rejected "something references it" as a reason to keep a surface. That stricter pass covered the build and toolchain, the runtime dependencies, the core modules and devtools. The modules inside the extensions (system, web-fetch, web-search, Tattler, Chorus, AutoTOON) were accepted in the first pass because they are reachable from a registered entrypoint, and they have no rows. They have not had the stricter pass.
++
++This ticket closes when every row has a decision and the coverage gap is either closed or explicitly accepted.
++
+ ## Inventory ready for decisions (2026-11-09)
+ 
+ The deliverable now exists: .sandpiper/docs/specs/retained-surface-inventory.md (Reference). It replaces the pre-implementation classifications in build-simplification-exploration.md.
+ 
+@@ -99,4 +111,9 @@
+ ## 2026-11-09T20:29:48.744Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **description**: 40 lines → updated (52 lines)
++
++## 2026-11-10T15:33:37.013Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++- **description**: 52 lines → updated (64 lines)

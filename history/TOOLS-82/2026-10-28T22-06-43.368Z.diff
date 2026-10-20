@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-82.md
++++ b/TOOLS-82.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Retire mutation skill routing and deployment"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.387Z
+-updated_at: 2026-10-28T22:06:42.236Z
++updated_at: 2026-10-28T22:06:43.368Z
+ ---
+ 
+ # Retire mutation skill routing and deployment
+ 
+@@ -54,4 +55,9 @@
+ 
+ ## 2026-10-28T22:06:42.237Z
+ 
+ - **description**: 13 lines → updated (23 lines)
++
++## 2026-10-28T22:06:43.368Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

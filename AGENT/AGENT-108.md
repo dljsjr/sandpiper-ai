@@ -1,15 +1,20 @@
 ---
 title: "Make standup CLI command tests cwd-independent"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: BUG
 priority: HIGH
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-04-28T18:37:45.963Z
-updated_at: 2026-05-12T16:12:00.568Z
+updated_at: 2026-11-12T19:39:41.215Z
 ---
 
 # Make standup CLI command tests cwd-independent
+
+Current disposition (TOOLS-51): the bundled standup CLI and its command tests are removed. Do not implement or run the retired helper workflow below. The original report is preserved as historical evidence; it was already stale at TOOLS-47 review. Parent review retains authority over this ticket status.
+
+## Historical report (not current instructions)
 
 # Bug — `sandpiper-standup-cli` tests are implicitly cwd-dependent
 
@@ -95,3 +100,12 @@ The `bun x` form is recommended as the default because it is cwd-independent, la
 ## 2026-05-12T16:12:00.569Z
 
 - **status**: IN PROGRESS → NOT STARTED
+
+## 2026-10-27T23:08:54.717Z
+
+- **description**: 68 lines → updated (72 lines)
+
+## 2026-11-12T19:39:41.216Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

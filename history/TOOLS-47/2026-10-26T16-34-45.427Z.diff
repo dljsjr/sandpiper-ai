@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-47.md
++++ b/TOOLS-47.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Review standup CLI, skill, and documentation for safety and complexity"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-26T16:34:35.175Z
+-updated_at: 2026-10-26T16:34:35.175Z
++updated_at: 2026-10-26T16:34:45.427Z
+ ---
+ 
+ # Review standup CLI, skill, and documentation for safety and complexity
+ 
+ Review the existing standup CLI, bundled skill, public documentation, and internal guidance to support a discussion about simplification or removal. Prioritize accidental data loss, concurrency, preservation of handoffs, and maintenance/cognitive cost. Reproduce material findings only in temporary fixtures. Deliver evidence-backed findings and distinguish current behavior from stale contracts. No production fixes, redesign, cleanup of real standup data, or removal is authorized.
++
++---
++
++# Activity Log
++
++## 2026-10-26T16:34:45.428Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

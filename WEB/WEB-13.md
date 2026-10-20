@@ -1,12 +1,13 @@
 ---
 title: "Spike: browser automation tool for interactive and JS-heavy pages"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:33:28.199Z
-updated_at: 2026-04-01T15:33:42.994Z
+updated_at: 2026-11-12T19:39:41.137Z
 related:
   - WEB-10
 ---
@@ -54,3 +55,8 @@ Re-evaluate when:
 ## 2026-04-01T15:33:42.994Z
 
 - **description**: added (33 lines)
+
+## 2026-11-12T19:39:41.138Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

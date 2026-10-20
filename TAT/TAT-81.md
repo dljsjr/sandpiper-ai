@@ -1,12 +1,13 @@
 ---
 title: "Tattler socket/tmpfile bringup is not reload-aware (clobbers live session on /reload)"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-06-30T06:07:56.880Z
-updated_at: 2026-06-30T06:07:56.880Z
+updated_at: 2026-11-19T20:49:11.678Z
 ---
 
 # Tattler socket/tmpfile bringup is not reload-aware (clobbers live session on /reload)
@@ -18,3 +19,21 @@ Observed 2026-06-30 by Doug: reloaded the reinforced-guidance extension cleanly,
 Same bug family as the reinforced-guidance daemon restart issue (RG, commit 4b42e159): bringup code that only imagined ONE lifecycle (cold launch) and never the second one (reload). Likely fix shape is symmetric: on bringup, check for an existing socket/descriptor first — reuse if healthy, only tear down + rebuild if stale/dead. Make reload idempotent w.r.t. the Tattler socket/tmpfile rather than assume-fresh.
 
 Repro: start a session with Tattler up, run /reload, then check whether the agent's Tattler socket is still live / the agent is still reachable by a peer.
+
+## Outcome (2026-11-19 triage)
+
+Fixed by `vosuowwk` (2026-08-10, "fix(tattler): survive /reload and /new without EEXIST/stale-socket failures"): session_shutdown now awaits the socket close and unlinks the socket file, and session_start clears a stale identity file. `extensions/tattler/index.test.ts` covers /reload, /new with a fixed --tattler-id, and identity-file cleanup. The fix was never linked to this task.
+
+---
+
+# Activity Log
+
+## 2026-11-19T20:49:11.577Z
+
+- **status**: NOT STARTED → NEEDS REVIEW
+- **description**: 7 lines → updated (11 lines)
+
+## 2026-11-19T20:49:11.678Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

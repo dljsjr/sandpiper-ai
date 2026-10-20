@@ -1,0 +1,47 @@
+---
+title: "Review standup CLI, skill, and documentation for safety and complexity"
+status: COMPLETE
+resolution: DONE
+kind: TASK
+priority: MEDIUM
+assignee: AGENT
+reporter: USER
+created_at: 2026-10-26T16:34:35.175Z
+updated_at: 2026-10-28T01:17:06.153Z
+---
+
+# Review standup CLI, skill, and documentation for safety and complexity
+
+Reviewed the standup CLI, its skill, public docs, internal design/playbooks, and runtime/build connections. Findings are in .sandpiper/docs/specs/standup-review-2026-10-26.md (indexed in .sandpiper/docs/README.md). Reproduced successful concurrent lost updates, silent loss from unrecognized or mixed Markdown and accepted whitespace IDs, non-round-trippable read output, blanket cleanup with unknown liveness, and empty-input replacement. Confirmed the historical destructive-read behavior is fixed. All mutations used temporary HOME/XDG/project fixtures. Focused suite: 7 files / 52 tests pass; source/test Biome check clean. No runtime/skill fixes, redesign, real-data cleanup, or removal authorized or performed. No future implementation work is implied by this review.
+
+## Bookkeeping acceptance — 2026-10-27
+
+Accepted this completed review deliverable, not an unfixed implementation. The retained standup safety report records the reproductions, measurements, limitations and documentation findings. The subsequent approved Journal design and completed TOOLS-51 cutover replaced the reviewed implementation and active guidance; no standup repair or saved-note migration is implied.
+
+Current verification: bun check passed with zero errors/warnings; bun run test rebuilt package output and passed 87 files / 640 tests, including packed-install, cache-restoration and temporary Trail bridge regressions. Closure requested during the return to build/packaging simplification. Original historical verification is retained above.
+
+---
+
+# Activity Log
+
+## 2026-10-26T16:34:45.428Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-26T16:42:54.347Z
+
+- **description**: updated
+
+## 2026-10-26T16:43:29.562Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-28T01:17:06.091Z
+
+- **description**: 1 line → updated (7 lines)
+
+## 2026-10-28T01:17:06.154Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

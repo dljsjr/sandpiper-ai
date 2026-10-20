@@ -1,0 +1,23 @@
+===================================================================
+--- a/AGENT-310.md
++++ b/AGENT-310.md
+@@ -5,9 +5,18 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-16T17:17:57.360Z
+-updated_at: 2026-10-16T17:17:57.360Z
++updated_at: 2026-10-16T17:24:46.629Z
+ ---
+ 
+ # Flip the first-turn-gap prompt-ownership test
+ 
++Renamed and flipped: "sends the Sandpiper prompt on a fresh session's synthetic first run" asserts both requests start with <system_prompt>. Red on 1.0.4 (verified in the workspace before the bump), green on stock and patched 1.3.0. Docs updated: docs/dev/build-system.md, docs/dev/prompt-contributions.md, .sandpiper/docs/specs/sandpiper-system-prompt.md; stale comment in extensions/system/startup-hooks.ts.
++
++---
++
++# Activity Log
++
++## 2026-10-16T17:24:46.630Z
++
++- **description**: added (1 line)

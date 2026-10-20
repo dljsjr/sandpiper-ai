@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-58.md
++++ b/TOOLS-58.md
+@@ -5,20 +5,26 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.381Z
+-updated_at: 2026-10-28T18:13:33.751Z
++updated_at: 2026-10-28T18:38:19.946Z
+ ---
+ 
+ # Review and resolve bundled prompt templates
+ 
+ Review the six retained prompt templates under packages/resources/prompts as part of the unfinished resources review. Record the user's decisions about what ships and where it belongs. Apply any approved changes and verify affected prompt discovery, staging, documentation and packed behavior before requesting acceptance. Do not assume that templates should be kept, removed or extracted.
+ 
+ Dependency maintenance under TOOLS-64 only made the deleted code-review skill optional in code-review/self-reflect prompts. This is not completion of the prompt review. The retained code-review prompt still prescribes quantitative analysis, a health summary and positive findings; assess those existing requirements during this review and coordinate with the deferred SOP rethink in TOOLS-68. No removal/rewrite decisions about these procedures are approved.
+ 
++TOOLS-69 additionally made self-reflect's refactoring-skill mapping optional. The refactor prompt itself had no deleted-skill prerequisite and remains unchanged. These are dependency-maintenance edits only, not completion or acceptance of the pending prompt review.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-28T18:13:33.751Z
+ 
+ - **description**: 1 line → updated (3 lines)
++
++## 2026-10-28T18:38:19.947Z
++
++- **description**: 3 lines → updated (5 lines)

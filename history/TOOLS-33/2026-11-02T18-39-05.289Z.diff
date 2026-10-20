@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T18:35:59.205Z
++updated_at: 2026-11-02T18:39:05.288Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Work breakdown complete; implementation not started
++
++TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/docs/specs/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
++
++Doug paused sub-agents because he is fixing a fling bug. No worker was launched or queued, no implementation was substituted, and no product code changed. No launch retries during the hold. This parent remains open; planning completion is not implementation acceptance.
++
++## Earlier planning and scope history
++
+ ## Implementation resumed
+ 
+ User authorized the recommended root-product-package/one-Bun-build implementation. New granular siblings TOOLS-94/TOOLS-95/TOOLS-96/TOOLS-97/TOOLS-98 track the work under30. Existing test-gap/doc findings are included, not forgotten. Sub-agent launch availability must be established before claiming workers are running. No final acceptance/closure is inferred from this authorization.
+ 
+@@ -173,4 +181,8 @@
+ ## 2026-11-02T18:35:59.206Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ - **description**: 76 lines → updated (82 lines)
++
++## 2026-11-02T18:39:05.289Z
++
++- **description**: 82 lines → updated (90 lines)

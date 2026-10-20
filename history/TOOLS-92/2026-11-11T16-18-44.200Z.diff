@@ -1,0 +1,44 @@
+===================================================================
+--- a/TOOLS-92.md
++++ b/TOOLS-92.md
+@@ -7,25 +7,23 @@
+ reporter: USER
+ created_at: 2026-11-02T17:42:31.696Z
+ related:
+   - TOOLS-93
+-updated_at: 2026-11-10T22:47:35.795Z
++updated_at: 2026-11-11T16:18:44.197Z
+ ---
+ 
+ # Audit retained build, runtime and toolchain complexity against simplification scope
+ 
+-## Current state: in progress, inventory refreshed (2026-11-10)
++## Audit complete, awaiting review (2026-11-11)
+ 
+-Sections 2 and 3 of .sandpiper/docs/specs/retained-surface-inventory.md are decided and delivered (TOOLS-93, TOOLS-103 to TOOLS-107, AGENT-319, AGENT-320).
++Every row of .sandpiper/docs/specs/retained-surface-inventory.md has a decision from Doug. The Decision column names the task that carries out each approved change.
+ 
+-On 2026-11-10 the coordinator re-ran the check behind every remaining row against the tree after the Shell Relay removal and the Pi 1.5.2 update. Two more read-only audit runs applied the stricter test (what stops working, and for whom, if this is removed) to the extensions, packages/core and packages/cli. That closes the coverage gap recorded earlier.
++Done and signed off: TOOLS-93 (Shell Relay), TOOLS-103 to TOOLS-108, TOOLS-115 (documents), AGENT-319 and AGENT-320 (Pi 1.5.2), and the local cleanup in Batch L.
+ 
+-Open rows: Section 4 (Batch A) 20, Section 5 (Batch B) 21 plus 3 parked by Doug (B-5 ast-grep, B-6 Knip, B-16 Markdown formatting), Section 6 (Batch C) 15, Section 7 (Batch L) 5.
++Approved and not started: TOOLS-109 (DuckDuckGo adapter), TOOLS-110 (.pi migration), TOOLS-111 (one manifest, Knip in the gate, one Vitest config), TOOLS-112 (logo files, Commander guidance, standup log, test:standalone), TOOLS-113 (ast-grep), TOOLS-114 (Markdown gate). TOOLS-30 stays open until these are done.
+ 
+-Defects found and filed: AGENT-321 (system prompt changes mid-session when jj colocation detection times out) and WEB-22 (web_search runs shell commands from project-local settings without a trust check). Two more defects sit inside decision rows: B-23 (read returns TOON for JSON files) and B-19 (context-usage notes arrive with escaped tags).
++Defects found during the review, each with its own task: AGENT-321 (prompt changes mid-session; approach not chosen), AGENT-322 (escaped tags in context notes), AGENT-323 (AutoTOON rewrites read results), WEB-22 (project settings trust). Backlog: WEB-23 (llms.txt probe).
+ 
+-This ticket closes when every row has a decision.
+-
+ ## Inventory ready for decisions (2026-11-09)
+ 
+ The deliverable now exists: .sandpiper/docs/specs/retained-surface-inventory.md (Reference). It replaces the pre-implementation classifications in build-simplification-exploration.md.
+ 
+@@ -120,4 +118,8 @@
+ 
+ ## 2026-11-10T22:47:35.801Z
+ 
+ - **description**: updated
++
++## 2026-11-11T16:18:44.200Z
++
++- **description**: 64 lines → updated (62 lines)

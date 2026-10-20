@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-43.md
++++ b/TOOLS-43.md
+@@ -1,17 +1,26 @@
+ ---
+ title: "Replace the temporary archived Trail skill bridge with standalone integration"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-26T14:44:09.351Z
+-updated_at: 2026-10-26T14:44:09.351Z
++updated_at: 2026-11-19T16:56:25.804Z
+ related:
+   - TOOLS-42
+   - TOOLS-38
+ ---
+ 
+ # Replace the temporary archived Trail skill bridge with standalone integration
+ 
+ Temporary integration tracked by TOOLS-42 checks PATH for trail and hard-codes ~/git/skills-incubator/skills/trail for its skill. The archived skill is renamed from tasks to trail and its commands use PATH. This is a local development bridge, not the final portable integration. Remove the archived-skill hard-code once the user supplies the standalone Trail discovery/release contract. Replace it with the agreed PATH-first, managed-cache, stable-release strategy including matching CLI+skill, offline/atomic/integrity behavior, and explicit opt-out. Do not query undocumented Trail flags or contact the standalone Trail agent; the user coordinates that work. Keep this ticket open after the bridge implementation is ready for review.
++
++---
++
++# Activity Log
++
++## 2026-11-19T16:56:25.804Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

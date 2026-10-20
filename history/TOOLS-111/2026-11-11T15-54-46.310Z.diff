@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-111.md
++++ b/TOOLS-111.md
+@@ -5,17 +5,21 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-11-11T05:36:37.419Z
+-updated_at: 2026-11-11T05:36:37.419Z
++updated_at: 2026-11-11T15:54:46.308Z
+ related:
+   - TOOLS-92
+   - TOOLS-109
+   - TOOLS-110
+ ---
+ 
+ # Collapse the workspace packages into one root manifest
+ 
++## Added on 2026-11-10: Knip (inventory row B-6)
++
++Doug decided to repair Knip as part of this task and add it to the bun check gate. With one manifest the config needs one workspace, the two entrypoints packages/cli/sandpiper_standalone.ts and packages/cli/sandpiper_system_prompt.ts, and an ignore list for the dependencies the build leaves external (the Pi packages and jsdom). Remove the packages/cli workspace block and the stale ignore entries. The run must be clean before it joins the gate. Update the Verification section of AGENTS.md, which defines the gate.
++
+ ## Decision
+ 
+ Doug approved on 2026-11-10 (TOOLS-92 review, inventory rows B-27, B-3 and B-8): collapse the workspace packages into one root manifest, and use one root Vitest config. Not started. Do this after TOOLS-109 and TOOLS-110, which shrink what has to move.
+ 
+@@ -40,4 +44,12 @@
+ ## Not known yet
+ 
+ - Whether bunfig.toml still needs the hoisted linker for packing once there is one manifest. Test it; do not assume.
+ - The word "capability" also survives in extensions/system/neutral-capability-extension.ts, createNeutralCapabilityExtensionFactories and packages/core/src/background-process-capability.ts. Those are names, not packages. Report them; renaming is not part of this task.
++
++---
++
++# Activity Log
++
++## 2026-11-11T15:54:46.310Z
++
++- **description**: 26 lines → updated (30 lines)

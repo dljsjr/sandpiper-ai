@@ -2,13 +2,13 @@
 title: "Implement stable Tattler agent identity and directory"
 status: NOT STARTED
 kind: TASK
-priority: MEDIUM
+priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-05-15T03:13:38.326Z
 depends_on:
   - TAT-6
-updated_at: 2026-05-15T03:13:47.561Z
+updated_at: 2026-11-19T20:49:07.927Z
 ---
 
 # Implement stable Tattler agent identity and directory
@@ -25,6 +25,10 @@ Scope:
 
 Depends on: TAT-6 / v1 mini-spec.
 
+## Parked in backlog triage (2026-11-19)
+
+Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
+
 ---
 
 # Activity Log
@@ -32,3 +36,8 @@ Depends on: TAT-6 / v1 mini-spec.
 ## 2026-05-15T03:13:47.561Z
 
 - **depends_on**: (none) → TAT-6
+
+## 2026-11-19T20:49:07.927Z
+
+- **priority**: MEDIUM → LOW
+- **description**: 11 lines → updated (15 lines)

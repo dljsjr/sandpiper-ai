@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-100.md
++++ b/TOOLS-100.md
+@@ -1,17 +1,26 @@
+ ---
+ title: "Replace the internal Parallel MCP client with the standalone Pi client"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-03T01:50:55.871Z
+-updated_at: 2026-11-03T01:50:55.871Z
++updated_at: 2026-11-03T01:50:56.109Z
+ related:
+   - TOOLS-99
+   - TOOLS-92
+ ---
+ 
+ # Replace the internal Parallel MCP client with the standalone Pi client
+ 
+ User explicitly approved adoption as part of current overall simplification, with no deferral. Replace only mcporter library usage behind our own web_search facade with public @earendil-works/pi-mcp1.3.0. Preserve endpoint, provider selection, query/count mapping, stable application session_id, own tool/schema/result/error wrapper, anonymous Streamable HTTP path and15s tool-call bound. Keep upstream tools unregistered and avoid host MCP configuration/auth/cache. Handle connection/initialized-notification stalls and best-effort cleanup without new public flags or user-cancellation features. Autonomous one-behavior RED/GREEN cycles, real SDK plus hermetic transport fixtures. No live providers, user configuration, MCP server tool exposure, developer CLI removal, Shell Relay/Trail/SOP/archive/WIP changes.
++
++---
++
++# Activity Log
++
++## 2026-11-03T01:50:56.110Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

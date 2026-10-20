@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-93.md
++++ b/TOOLS-93.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Retire Shell Relay"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "relay-removal"
+ reporter: AGENT
+ created_at: 2026-11-02T18:19:44.026Z
+-updated_at: 2026-11-10T16:09:43.288Z
++updated_at: 2026-11-10T16:09:43.424Z
+ related:
+   - TOOLS-30
+   - TOOLS-92
+   - TOOLS-33
+@@ -68,4 +68,9 @@
+ 
+ - **priority**: LOW → MEDIUM
+ - **title**: Resolve the installer surface with the Shell Relay keep-or-retire decision → Retire Shell Relay
+ - **description**: 15 lines → updated (34 lines)
++
++## 2026-11-10T16:09:43.424Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → relay-removal

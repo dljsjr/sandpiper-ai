@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-122.md
++++ b/TOOLS-122.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Source CLI smoke cases exceed five-second limits during serial verification"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T19:17:58.400Z
+-updated_at: 2026-11-11T19:17:58.400Z
++updated_at: 2026-11-11T19:32:25.107Z
+ related:
+   - TOOLS-30
+   - TOOLS-113
+   - TOOLS-121
+@@ -15,4 +15,13 @@
+ 
+ # Source CLI smoke cases exceed five-second limits during serial verification
+ 
+ Corrected serial full verification passed the reference plus seven implementation units, then stopped at wvpsuuxu/18f9ae6f634d. All attempted frozen installs and bun check passed. Full suite exited1 after261.518s:65/66files,538/541tests passed. Three standalone_cli_smoke.test.ts source-entrypoint cases exceeded existing5000ms limits: line134 loads extension flags exactly once (13768ms), line140 persisted package-management settings (11556ms), line165 Pi metadata before import (12585ms). Built-bin runtime-Pi-import case passed with the approved --no-install correction. No cause attributed, no retries or timeout edits. The preceding112 unit passed66files/541tests.113 removes ast-grep/config/docs/script only; no runtime/test source changes in that unit. Do not claim a113-specific regression or assume load is the cause. Remaining consolidation and two Markdown unit full gates were not attempted; without-bunfig probe was skipped. Logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik/08-wvpsuuxu/full-test.log and summary.json. Investigation is NOT STARTED and requires Doug go. No source changes for this finding.
++
++---
++
++# Activity Log
++
++## 2026-11-11T19:32:25.113Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,13 +9,21 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T20:11:31.947Z
++updated_at: 2026-10-28T20:35:43.469Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
++## Current acceptance and discussion — 2026-10-28
++
++User accepted the TDD implementation and related identity-routing repair ("Nice, next?"). TOOLS-74–78 are COMPLETE/DONE. Four of the original six skill outcomes are now accepted: projects, code-review, refactoring and test-driven-development. TDD remains autonomous; no routine human approval gate was introduced.
++
++The requested next one-by-one discussion is mutation-testing (5 of 6), followed by jj. No inclusion, extraction or rewrite decision for mutation-testing or jj is approved. TOOLS-57 and TOOLS-30 remain IN PROGRESS; prompt/theme reviews remain separate.
++
++## Previous status records
++
+ ## Current implementation status — 2026-10-28
+ 
+ TDD unbundling and autonomous developer-role guidance are implemented and verified under TOOLS-74–77; TOOLS-78 fixes the overlooked identity-overlay callers. All are ready for user review, not final acceptance. Four shipping decisions have been made; projects/code-review/refactoring implementations were already accepted. Mutation-testing and jj remain undecided. This task and TOOLS-30 stay IN PROGRESS. Historical human-confirmation wording below is superseded by the explicit autonomous-TDD correction; it is not policy.
+ 
+@@ -128,4 +136,8 @@
+ 
+ ## 2026-10-28T20:11:31.947Z
+ 
+ - **description**: 39 lines → updated (43 lines)
++
++## 2026-10-28T20:35:43.470Z
++
++- **description**: 43 lines → updated (51 lines)

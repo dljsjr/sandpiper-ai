@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-326.md
++++ b/AGENT-326.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Declare Birdup prompt sections in one ordered list; editor discovers candidates from resources/prompts"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-12T20:41:43.964Z
+-updated_at: 2026-11-12T20:44:58.752Z
++updated_at: 2026-11-12T20:47:02.744Z
+ ---
+ 
+ # Declare Birdup prompt sections in one ordered list; editor discovers candidates from resources/prompts
+ 
+@@ -19,4 +19,8 @@
+ ## 2026-11-12T20:44:58.753Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-12T20:47:02.746Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

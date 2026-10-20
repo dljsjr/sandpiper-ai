@@ -1,0 +1,41 @@
+===================================================================
+--- a/TOOLS-106.md
++++ b/TOOLS-106.md
+@@ -5,23 +5,23 @@
+ priority: MEDIUM
+ assignee: "session-vars"
+ reporter: USER
+ created_at: 2026-11-09T23:33:26.773Z
+-updated_at: 2026-11-10T15:20:25.313Z
++updated_at: 2026-11-10T15:20:59.260Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Remove session PID files and keep the session variables process-wide
+ 
+ ## History squashed (2026-11-10)
+ 
+-Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits:
++Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits, by jj change id (stable across rewrites) with the commit id at the time of writing:
+ 
+-- 3d8ef138 refactor: Stop writing session PID files (84 files / 731 tests; includes the document changes)
+-- 41748e35 fix: Clear SANDPIPER_SESSION_FILE when a session has no file (84 / 731)
++- sqmlnukm (1db07192) refactor: Stop writing session PID files, including the document changes; 84 files / 731 tests
++- xkpqppnm (31a13417) fix: Clear SANDPIPER_SESSION_FILE when a session has no file; 84 / 731
+ 
+-The tree at the new tip is identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing.
++Source and tests at the new tip are identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing with the counts shown.
+ 
+ ## Delivered, awaiting review (2026-11-09)
+ 
+ Agent session-vars (Sonnet 5.5, high) delivered three commits from an isolated jj workspace. They sit on the main working line above b1f138d1. The main bookmark is unchanged and root dist was not rebuilt.
+@@ -78,4 +78,8 @@
+ 
+ ## 2026-11-10T15:20:25.313Z
+ 
+ - **description**: 36 lines → updated (45 lines)
++
++## 2026-11-10T15:20:59.261Z
++
++- **description**: updated

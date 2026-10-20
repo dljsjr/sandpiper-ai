@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-101.md
++++ b/TOOLS-101.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Replace application mcporter dependency declarations and bundled runtime closure"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-03T01:50:55.947Z
+-updated_at: 2026-11-03T02:26:13.384Z
++updated_at: 2026-11-09T19:42:59.303Z
+ related:
+   - TOOLS-99
+   - TOOLS-92
+ ---
+@@ -37,4 +38,9 @@
+ 
+ ## 2026-11-03T02:26:13.385Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-09T19:42:59.304Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

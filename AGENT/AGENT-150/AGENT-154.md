@@ -3,11 +3,11 @@ title: "Document ecosystem install certification paths"
 status: COMPLETE
 resolution: DONE
 kind: SUBTASK
-priority: P2
+priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-05-04T21:37:28.391Z
-updated_at: 2026-05-04T21:40:18.408Z
+updated_at: 2026-11-19T18:18:06.372Z
 ---
 
 # Document ecosystem install certification paths
@@ -26,3 +26,7 @@ updated_at: 2026-05-04T21:40:18.408Z
 
 - **status**: IN PROGRESS → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-19T18:18:06.372Z
+
+- **priority**: P2 → MEDIUM

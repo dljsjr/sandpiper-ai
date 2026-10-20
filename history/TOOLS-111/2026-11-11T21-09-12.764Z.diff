@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-111.md
++++ b/TOOLS-111.md
+@@ -5,17 +5,23 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T05:36:37.419Z
+-updated_at: 2026-11-11T19:21:13.632Z
++updated_at: 2026-11-11T21:09:12.763Z
+ related:
+   - TOOLS-92
+   - TOOLS-109
+   - TOOLS-110
+ ---
+ 
+ # Collapse the workspace packages into one root manifest
+ 
++## Full gate passed; bunfig question answered (2026-11-11)
++
++oykttyqt / 1b33b8ff: 65 files, 535 tests passed in 77s, including the real offline packed CLI test. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards. Logs: /tmp/sandpiper-tools126.aXQgrZ/gates (summary.tsv).
++
++Without-bunfig probe at the tip sntvwxtp / b28ec60f: with bunfig.toml deleted, a frozen install produced the same hoisted layout (166 top-level node_modules entries, no .bun store) and the full suite passed 65 files, 535 tests in 48s, packing included. With one manifest the hoisted-linker setting changes nothing. bunfig.toml is still in the tree; removing it and its mention in docs/dev/build-system.md awaits Doug. Logs: /tmp/sandpiper-tools126.aXQgrZ/bunfig-probe.
++
+ ## Final corrected queue checkpoint (2026-11-11)
+ 
+ Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. Full logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik; summary.json contains exact results. All agents/processes are stopped and checkouts removed.
+ 
+@@ -93,4 +99,8 @@
+ 
+ ## 2026-11-11T19:21:13.633Z
+ 
+ - **description**: 46 lines → updated (50 lines)
++
++## 2026-11-11T21:09:12.764Z
++
++- **description**: 50 lines → updated (56 lines)

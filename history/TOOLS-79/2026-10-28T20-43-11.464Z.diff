@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-79.md
++++ b/TOOLS-79.md
+@@ -1,17 +1,26 @@
+ ---
+ title: "Unbundle mutation-testing and retain survivor interpretation in developer guidance"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:02.607Z
+-updated_at: 2026-10-28T20:43:02.607Z
++updated_at: 2026-10-28T20:43:11.463Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+ 
+ # Unbundle mutation-testing and retain survivor interpretation in developer guidance
+ 
+ User approved preserving the complete current mutation-testing skill unchanged in ~/git/skills-incubator/skills/mutation-testing and removing it from Sandpiper built-ins. Retain the small survivor-interpretation guardrail in developer testing guidance, without importing fixed scores, quarterly ratchets, CI schedules or blanket method exclusions. Preserve unrelated existing testing policies, installed independent copies, historical records and prior archives. Update active routing, deployment, catalogue and package expectations; no archive auto-loading or new framework installation. Use autonomous one-behavior/test RED→GREEN→REFACTOR cycles. Implementation ends at NEEDS REVIEW; jj and broader resource decisions remain open.
++
++---
++
++# Activity Log
++
++## 2026-10-28T20:43:11.464Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

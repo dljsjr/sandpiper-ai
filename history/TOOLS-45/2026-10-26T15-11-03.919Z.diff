@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-45.md
++++ b/TOOLS-45.md
+@@ -5,13 +5,14 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-26T14:44:09.562Z
+-updated_at: 2026-10-26T14:53:17.568Z
++updated_at: 2026-10-26T15:11:03.918Z
+ ---
+ 
+ # Add PATH-gated resource discovery with hermetic tests
+ 
++Added a small Node-compatible filesystem executable probe and resource-discovery hook. If trail is executable on PATH, registers ~/git/skills-incubator/skills/trail; otherwise leaves the built-in catalogue unchanged. Rechecks PATH during resource reload. Does not execute trail or query any flags, and adds no downloads or new flags. Test-first focused coverage verifies absence, later PATH entries, no CLI invocation, non-executable files, directories, reload checks, and actual SDK discovery from hermetic HOME/PATH fixtures. Headless test HOME is now sandboxed so real archived user skills cannot leak into tests.
+ 
+ ---
+ 
+ # Activity Log
+@@ -19,4 +20,8 @@
+ ## 2026-10-26T14:53:17.572Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-26T15:11:03.919Z
++
++- **description**: added (1 line)

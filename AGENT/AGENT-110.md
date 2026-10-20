@@ -1,12 +1,13 @@
 ---
 title: "Normalize remaining dependency declarations"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-04-28T18:37:46.152Z
-updated_at: 2026-04-28T18:37:46.195Z
+updated_at: 2026-11-19T18:58:29.576Z
 ---
 
 # Normalize remaining dependency declarations
@@ -155,6 +156,10 @@ Not worth a dedicated audit pass. Best handled as a single small commit when nex
 ## Out of scope here
 - The `bun.lock` churn I was restoring from main earlier in the session was a separate issue (stale lockfile on main missing `sandpiper-standup-cli` workspace entries, regenerated on any `bun install`). That is a pre-existing main concern, not caused by or related to this dep convention work.
 
+## Closed in backlog triage (2026-11-19)
+
+The package and catalogs it names are gone; the single root package.json is exact-pinned.
+
 ---
 
 # Activity Log
@@ -162,3 +167,12 @@ Not worth a dedicated audit pass. Best handled as a single small commit when nex
 ## 2026-04-28T18:37:46.196Z
 
 - **description**: added (143 lines)
+
+## 2026-11-19T18:58:28.876Z
+
+- **description**: 143 lines → updated (147 lines)
+
+## 2026-11-19T18:58:29.576Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: UNRESOLVED → WONTFIX

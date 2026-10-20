@@ -1,0 +1,41 @@
+---
+title: "send_peer_message result says 'acknowledged by', which reads as the peer replying"
+status: COMPLETE
+resolution: DONE
+kind: BUG
+priority: MEDIUM
+assignee: AGENT
+reporter: USER
+created_at: 2026-11-18T20:56:25.022Z
+updated_at: 2026-11-18T21:44:58.461Z
+---
+
+# send_peer_message result says 'acknowledged by', which reads as the peer replying
+
+The model-facing result of send_peer_message is `message <id> acknowledged by <peer>` (extensions/tattler/index.ts). Models read this as the peer agent acknowledging the message, when it only means the protocol ACK: the peer's Tattler server parsed the frame and accepted it for local delivery. Doug asked for wording along the lines of 'message successfully delivered'.
+
+## Outcome (rxuvqoty)
+
+The result text is now `Message <id> delivered to <peer>. This confirms delivery only; any reply from <peer> arrives as a separate message.` `details` is unchanged (`{ messageIdAck }`), since only `content` reaches the model. A test in `extensions/tattler/index.test.ts` sends a real message between two isolated sessions over the socket and checks the text. The Tattler skill's dogfood step looks for the delivered result. bun check clean, full suite 91 files/838 tests, dist rebuilt. Live check needs a new sandpiper process.
+
+---
+
+# Activity Log
+
+## 2026-11-18T20:56:27.437Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-11-18T20:58:19.577Z
+
+- **description**: 1 line → updated (5 lines)
+
+## 2026-11-18T20:58:19.654Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-11-18T21:44:58.472Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

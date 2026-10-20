@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-95.md
++++ b/TOOLS-95.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Resolve runtime metadata and resources from the root product layout"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T18:35:58.704Z
+-updated_at: 2026-11-02T20:25:33.634Z
++updated_at: 2026-11-02T20:46:43.833Z
+ ---
+ 
+ # Resolve runtime metadata and resources from the root product layout
+ 
+@@ -48,4 +48,8 @@
+ ## 2026-11-02T20:25:33.636Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-02T20:46:43.834Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T16:57:37.510Z
++updated_at: 2026-11-02T16:59:53.481Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Current resource acceptance checkpoint
++
++User accepted TOOLS-59. Resource-review subtasks TOOLS-57 (skills), TOOLS-58 (prompts), and TOOLS-59 (optional themes/resources) are all COMPLETE/DONE. No resource inclusion decisions or implementation acceptances remain outstanding. Current verified gates remain bun check clean,87 files/649 tests, and pack:cli including resource-free readonly installation plus stock/custom theme checks.
++
++This overall implementation-review ticket remains NEEDS REVIEW and TOOLS-30 remains IN PROGRESS: the user approved closing59 only, not final overall build acceptance. Unrelated Trail integration, SOP rewrites and updater bug remain separate.
++
++## Earlier checkpoint history
++
+ ## Current final resource checkpoint — 2026-11-02
+ 
+ Skills and prompt extraction are accepted and COMPLETE. User's revised theme scope is implemented under TOOLS-59 and ready for acceptance: all owned builtin resource directories are optional, stock/custom themes preserved, and resource-free standalone install verified. Final gates: bun check clean,87 files/649 tests,pack:cli all pass.
+ 
+@@ -117,4 +125,8 @@
+ 
+ ## 2026-11-02T16:57:37.511Z
+ 
+ - **description**: 35 lines → updated (43 lines)
++
++## 2026-11-02T16:59:53.482Z
++
++- **description**: 43 lines → updated (51 lines)

@@ -1,0 +1,35 @@
+===================================================================
+--- a/WEB-25.md
++++ b/WEB-25.md
+@@ -5,13 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T23:14:34.492Z
+-updated_at: 2026-11-11T23:22:41.389Z
++updated_at: 2026-11-12T00:59:49.651Z
+ ---
+ 
+ # Find llms.txt through page link relations and path-scoped probes
+ 
++## Finding resolved (2026-11-11)
++
++Doug's decision, in his framing: only accept Markdown, rather than reject HTML. A 2xx answer counts only when its media type is text/markdown, text/x-markdown or text/plain; text/plain is included because every real llms.txt sampled is served that way. Anything else is reported missing with reason not-markdown. No extra request, no retry. Change in the commit "Accept only a Markdown answer as an llms.txt file"; media-type helpers now live in media-types.ts.
++
++Survey before the change, 14 path-scoped locations on 13 documentation sites: 11 correct 404s, 2 real files (Cloudflare /workers/llms.txt, Svelte /docs/svelte/llms.txt), and platform.claude.com alone answering 200 text/html. After the change the Anthropic docs page reports platform.claude.com/docs/llms.txt, a real text/plain file.
++
++Verification: failing tests first; bun check clean; full serial suite 66 files, 581 tests passed.
++
+ Design agreed with Doug (2026-11-11): keep 'any 2xx answer to HEAD counts as found'; do not read the file; do not retry failures or timeouts; run requests in parallel but still wait for the result.
+ 
+ ## Implemented (2026-11-11)
+ 
+@@ -38,4 +46,8 @@
+ 
+ ## 2026-11-11T23:22:41.391Z
+ 
+ - **description**: added (15 lines)
++
++## 2026-11-12T00:59:49.652Z
++
++- **description**: 15 lines → updated (23 lines)

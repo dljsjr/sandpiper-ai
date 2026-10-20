@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-90.md
++++ b/TOOLS-90.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:40:54.009Z
+-updated_at: 2026-10-28T22:58:06.120Z
++updated_at: 2026-11-02T15:41:22.548Z
+ ---
+ 
+ # Support zero bundled prompts across staging and runtime
+ 
++## User acceptance — 2026-10-28
++
++User accepted the five-ticket prompt-removal package ("Okay cool we can mark those done"). This ticket is COMPLETE/DONE. Existing verification and preservation evidence below remains valid; no code changes were needed for acceptance. TOOLS-33 stays open for the unresolved themes review.
++
++## Implementation and review record
++
+ ## Implementation verified — ready for review
+ 
+ Staging skips absent owned optional skills/prompts while retaining required themes/docs behavior. Bootstrap permits absent prompts/skills but still requires themes. Resource adapter omits nonexistent owned prompt paths; present/configured custom prompts are preserved. Source SDK fixture uses a real sandbox cwd/additionalPromptTemplatePaths and proves only its custom prompt remains with either PATH-gated Trail flag. Three new regressions bring total tests to645.
+ 
+@@ -40,4 +46,8 @@
+ 
+ ## 2026-10-28T22:58:06.121Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-02T15:41:22.548Z
++
++- **description**: 13 lines → updated (19 lines)

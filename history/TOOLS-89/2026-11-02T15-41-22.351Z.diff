@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-89.md
++++ b/TOOLS-89.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:40:53.924Z
+-updated_at: 2026-10-28T22:58:06.057Z
++updated_at: 2026-11-02T15:41:22.350Z
+ ---
+ 
+ # Preserve all six prompts in the external Sandpiper archive
+ 
++## User acceptance — 2026-10-28
++
++User accepted the five-ticket prompt-removal package ("Okay cool we can mark those done"). This ticket is COMPLETE/DONE. Existing verification and preservation evidence below remains valid; no code changes were needed for acceptance. TOOLS-33 stays open for the unresolved themes review.
++
++## Implementation and review record
++
+ ## Implementation verified — ready for review
+ 
+ Exact six-file original prompt tree copied and verified before source removal. Preserved names, bytes, hashes and modes. New separate jj archive repo contains only original prompts plus provenance README and original LICENSE; no package manifest/build/install. Archive committed; all prior archives/config/WIP/independent-copy fingerprints match.
+ 
+@@ -40,4 +46,8 @@
+ 
+ ## 2026-10-28T22:58:06.058Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-02T15:41:22.351Z
++
++- **description**: 13 lines → updated (19 lines)

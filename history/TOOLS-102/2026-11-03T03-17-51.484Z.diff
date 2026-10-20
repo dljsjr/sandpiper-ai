@@ -1,0 +1,36 @@
+===================================================================
+--- a/TOOLS-102.md
++++ b/TOOLS-102.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-03T01:50:56.027Z
+-updated_at: 2026-11-03T03:13:25.521Z
++updated_at: 2026-11-03T03:17:51.483Z
+ depends_on:
+   - TOOLS-100
+   - TOOLS-101
+ related:
+@@ -16,8 +16,12 @@
+ ---
+ 
+ # Verify and independently review native MCP web-search integration
+ 
++## Scoped implementation delivery
++
++Committed as porupuwp / a60efe94 on research baseline cc55849f. Sandpiper working copy is clean. Main remains4abe9b67, no push/release. User-approved native MCP adoption is IMPLEMENTED in current simplification;100–102 remain NEEDS REVIEW pending acceptance,30 remains IN PROGRESS.
++
+ ## Independent review complete; implementation ready for user review
+ 
+ Independent read-only mcp-review69c02530f41c reviewed full native adoption againstcc55849f and final timeout normalization, with no outstanding actionable findings. It independently ran35focused tests, web-search46tests before correction, corrected18transport cases and concurrency/SSE probe. No source edits/shared installs/builds/packs/provider calls. Final main AND fresh producer check/full86files671tests/pack pass, zero warnings and original test limits. Own actual packaged web_search works offline/read-only with fake MCP and unchanged schema/results, no upstream tools/config or sidecars. No retired dependency in clean tree or app JS/maps. Native adoption is implemented in current30, not a deferred candidate. User acceptance/parent closure remain separate. Reviewer and implementers closed.
+ 
+@@ -50,4 +54,8 @@
+ 
+ ## 2026-11-03T03:13:25.522Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-03T03:17:51.484Z
++
++- **description**: 13 lines → updated (17 lines)

@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-317.md
++++ b/AGENT-317.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-17T22:35:03.474Z
+-updated_at: 2026-10-17T22:43:02.199Z
++updated_at: 2026-10-19T17:30:03.049Z
+ ---
+ 
+ # Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill
+ 
+@@ -28,4 +29,9 @@
+ 
+ ## 2026-10-17T22:43:02.199Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-19T17:30:03.049Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-309.md
++++ b/AGENT-309.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Redo the local Pi patch for 1.3.0 (tools/rules half only)"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-16T17:17:57.278Z
+-updated_at: 2026-10-16T17:27:41.149Z
++updated_at: 2026-10-19T17:27:17.890Z
+ ---
+ 
+ # Redo the local Pi patch for 1.3.0 (tools/rules half only)
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-10-16T17:27:41.150Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-10-19T17:27:17.890Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

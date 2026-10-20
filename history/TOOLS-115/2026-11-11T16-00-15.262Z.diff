@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-115.md
++++ b/TOOLS-115.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Correct and archive documents from the retained-surface inventory"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "docs-fix"
+ reporter: USER
+ created_at: 2026-11-11T16:00:15.159Z
+-updated_at: 2026-11-11T16:00:15.159Z
++updated_at: 2026-11-11T16:00:15.262Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -25,4 +25,13 @@
+ ## Limits
+ 
+ - No reformatting of files that are not Prettier-clean; TOOLS-114 formats everything later.
+ - Documents that describe features with open tasks (TOOLS-109 to TOOLS-113, AGENT-321 to AGENT-323, WEB-22) are corrected to match the code as it is today, not as it will be.
++
++---
++
++# Activity Log
++
++## 2026-11-11T16:00:15.262Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → docs-fix

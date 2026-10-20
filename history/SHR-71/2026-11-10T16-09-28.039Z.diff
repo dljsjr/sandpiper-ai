@@ -1,0 +1,32 @@
+===================================================================
+--- a/SHR-71.md
++++ b/SHR-71.md
+@@ -1,7 +1,7 @@
+ ---
+ title: "Replace unbuffer-relay with @lydell/node-pty PTY adapter"
+-status: NOT STARTED
++status: COMPLETE
+ resolution: WONTFIX
+ kind: TASK
+ priority: LOW
+ assignee: UNASSIGNED
+@@ -10,9 +10,9 @@
+ related:
+   - SHR-68
+   - SHR-69
+   - SHR-99
+-updated_at: 2026-05-14T14:46:07.856Z
++updated_at: 2026-11-10T16:09:28.038Z
+ ---
+ 
+ # Replace unbuffer-relay with @lydell/node-pty PTY adapter
+ 
+@@ -60,4 +60,8 @@
+ 
+ ## 2026-05-14T14:46:07.857Z
+ 
+ - **related**: SHR-68, SHR-69 → SHR-68, SHR-69, SHR-99
++
++## 2026-11-10T16:09:28.039Z
++
++- **status**: NOT STARTED → COMPLETE

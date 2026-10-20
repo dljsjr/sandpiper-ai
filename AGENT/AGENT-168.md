@@ -1,14 +1,17 @@
 ---
 title: "startup-hooks.test.ts vi.mock factory fails: importOriginal is undefined"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-05-05T22:49:00.189Z
+
 related:
   - AGENT-93
-updated_at: 2026-05-06T04:07:01.418Z
+  - AGENT-166
+updated_at: 2026-10-19T18:06:45.853Z
 ---
 
 # startup-hooks.test.ts vi.mock factory fails: importOriginal is undefined
@@ -37,3 +40,16 @@ Pre-existing before the AGENT-93 extraction slices. Not introduced by AGENT-156 
 
 - **status**: IN PROGRESS → NOT STARTED
 - **assignee**: AGENT → UNASSIGNED
+
+## 2026-10-19T18:06:33.324Z
+
+- **related**: AGENT-93 → AGENT-93, AGENT-166
+
+## 2026-10-19T18:06:45.791Z
+
+- **status**: NOT STARTED → NEEDS REVIEW
+
+## 2026-10-19T18:06:45.854Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

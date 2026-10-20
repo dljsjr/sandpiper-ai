@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-109.md
++++ b/AGENT-109.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Add mutation testing quality gate"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-28T18:37:46.057Z
+-updated_at: 2026-11-19T18:58:28.690Z
++updated_at: 2026-11-19T18:58:29.576Z
+ ---
+ 
+ # Add mutation testing quality gate
+ 
+@@ -74,4 +75,9 @@
+ 
+ ## 2026-11-19T18:58:28.690Z
+ 
+ - **description**: 34 lines → updated (38 lines)
++
++## 2026-11-19T18:58:29.576Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: UNRESOLVED → WONTFIX

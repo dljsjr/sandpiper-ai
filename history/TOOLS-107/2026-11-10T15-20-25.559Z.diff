@@ -1,0 +1,38 @@
+===================================================================
+--- a/TOOLS-107.md
++++ b/TOOLS-107.md
+@@ -5,16 +5,24 @@
+ priority: MEDIUM
+ assignee: "prompt-trim"
+ reporter: USER
+ created_at: 2026-11-09T23:33:26.863Z
+-updated_at: 2026-11-09T23:49:40.799Z
++updated_at: 2026-11-10T15:20:25.558Z
+ related:
+   - TOOLS-92
+   - TOOLS-43
+ ---
+ 
+ # Remove the product-owned resources slot and its placeholder package
+ 
++## History squashed (2026-11-10)
++
++Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits:
++
++- 259ea4b6 refactor: Remove the product-owned resources location (84 files / 726 tests)
++
++The tree at the new tip is identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing.
++
+ ## Delivered, awaiting review (2026-11-09)
+ 
+ Agent prompt-trim delivered three commits from an isolated jj workspace. After the coordinator combined the lines they are:
+ 
+@@ -61,4 +69,8 @@
+ 
+ ## 2026-11-09T23:49:40.800Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-10T15:20:25.559Z
++
++- **description**: 31 lines → updated (39 lines)

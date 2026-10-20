@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-83.md
++++ b/TAT-83.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "send_peer_message result says 'acknowledged by', which reads as the peer replying"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-18T20:56:25.022Z
+-updated_at: 2026-11-18T20:58:19.653Z
++updated_at: 2026-11-18T21:44:58.461Z
+ ---
+ 
+ # send_peer_message result says 'acknowledged by', which reads as the peer replying
+ 
+@@ -32,4 +33,9 @@
+ 
+ ## 2026-11-18T20:58:19.654Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-18T21:44:58.472Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

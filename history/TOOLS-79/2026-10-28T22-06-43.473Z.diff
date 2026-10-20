@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-79.md
++++ b/TOOLS-79.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Unbundle mutation-testing and retain survivor interpretation in developer guidance"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:02.607Z
+-updated_at: 2026-10-28T22:06:41.723Z
++updated_at: 2026-10-28T22:06:43.473Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+@@ -60,4 +61,9 @@
+ 
+ ## 2026-10-28T22:06:41.724Z
+ 
+ - **description**: 16 lines → updated (26 lines)
++
++## 2026-10-28T22:06:43.473Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,32 @@
+===================================================================
+--- a/SHR-97.md
++++ b/SHR-97.md
+@@ -1,15 +1,16 @@
+ ---
+ title: "Shell relay returns empty output after ~50+ invocations in long session"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-03T20:46:22.153Z
+ related:
+   - SHR-99
+-updated_at: 2026-05-14T14:46:07.908Z
++updated_at: 2026-11-10T16:09:11.340Z
+ ---
+ 
+ # Shell relay returns empty output after ~50+ invocations in long session
+ 
+@@ -31,4 +32,9 @@
+ 
+ ## 2026-05-14T14:46:07.908Z
+ 
+ - **related**: (none) → SHR-99
++
++## 2026-11-10T16:09:11.341Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: WONTFIX

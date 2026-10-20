@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-58.md
++++ b/TOOLS-58.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Review and resolve bundled prompt templates"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.381Z
+-updated_at: 2026-11-02T15:41:23.090Z
++updated_at: 2026-11-02T15:41:23.154Z
+ ---
+ 
+ # Review and resolve bundled prompt templates
+ 
+@@ -76,4 +77,9 @@
+ 
+ ## 2026-11-02T15:41:23.091Z
+ 
+ - **description**: 23 lines → updated (29 lines)
++
++## 2026-11-02T15:41:23.155Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

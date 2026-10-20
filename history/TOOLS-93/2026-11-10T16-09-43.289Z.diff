@@ -1,0 +1,59 @@
+===================================================================
+--- a/TOOLS-93.md
++++ b/TOOLS-93.md
+@@ -1,21 +1,40 @@
+ ---
+-title: "Resolve the installer surface with the Shell Relay keep-or-retire decision"
++title: "Retire Shell Relay"
+ status: NOT STARTED
+ kind: TASK
+-priority: LOW
++priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-11-02T18:19:44.026Z
+-updated_at: 2026-11-02T18:27:57.949Z
++updated_at: 2026-11-10T16:09:43.288Z
+ related:
+   - TOOLS-30
+   - TOOLS-92
+   - TOOLS-33
+ ---
+ 
+-# Resolve the installer surface with the Shell Relay keep-or-retire decision
++# Retire Shell Relay
+ 
++## Decision: retire Shell Relay (2026-11-10)
++
++Doug decided to remove Shell Relay completely: delete all relevant code, clean up the documents, archive the SHR Trail project and close adjacent tickets. This task now tracks that removal.
++
++Scope:
++- extensions/shell-relay/ (37 files, 3,757 lines; 10 test files with about 138 tests), its workspace and lockfile entry, its Vitest project entry, and the commented-out wiring in packages/cli/sandpiper_resources.ts.
++- The --install-shell-integrations flag, in the system extension and in core, with packages/core/src/install-shell-integrations.ts and its test.
++- The preflight registration and collection machinery in packages/core/src/preflight.ts. Its only producer was Shell Relay. The diagnostics banner and the unmigrated-config warning stay, because the migration feature (inventory row B-2) is undecided.
++- packages/core/src/host-context.ts and paths.ts, which only the installer and the extension used (this also resolves inventory row A-3).
++- Documents: the public feature page, the playbook, the design spec and the extension README move to .sandpiper/archive/shell-relay/. Every live document that presents Shell Relay as a feature is corrected.
++
++Kept: SANDPIPER_SESSION_ID and SANDPIPER_SESSION_FILE (decided under TOOLS-106), the update check, the other migration flags, and the existing .sandpiper/archive/shell-relay/ history.
++
++Tracker work done by the coordinator on 2026-11-10: SHR project archived; its nine open tasks closed WONTFIX; AGENT-47 closed WONTFIX because its only motivating case was the relay extension as a second output consumer.
++
++Outside the repository and not changed: the fish configuration on this machine sources ~/.sandpiper/shell-integrations/relay.fish when it exists. The directory does not exist.
++
++Execution: one implementation agent (Fable 5.2, medium) in an isolated jj workspace.
++
+ ## Owner clarification: deferred capability decision, not packaging repair
+ 
+ Doug clarified that Shell Relay is intentionally disabled because it does not work well, and he is considering deprecating it entirely. No deprecation/removal decision is made yet.
+ 
+@@ -43,4 +62,10 @@
+ 
+ - **priority**: MEDIUM → LOW
+ - **title**: CLI shell integration installer cannot find its scripts in the packed package → Resolve the installer surface with the Shell Relay keep-or-retire decision
+ - **description**: 7 lines → updated (15 lines)
++
++## 2026-11-10T16:09:43.289Z
++
++- **priority**: LOW → MEDIUM
++- **title**: Resolve the installer surface with the Shell Relay keep-or-retire decision → Retire Shell Relay
++- **description**: 15 lines → updated (34 lines)

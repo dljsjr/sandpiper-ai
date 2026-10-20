@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,13 +9,23 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T21:17:58.726Z
++updated_at: 2026-10-28T22:06:43.076Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
++## Six-skill review accepted and complete — 2026-10-28
++
++User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
++
++All six outcomes are implemented and accepted. Sandpiper now bundles zero skills; five complete skills are preserved unchanged in the incubator, while projects was retired in favor of the preserved Markdown routing index. Custom/project/optional-package skill support remains. Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
++
++TOOLS-79–86 are being finalized with DONE. TOOLS-58 (six prompts) and TOOLS-59 (README-only themes scaffold) remain NOT STARTED, so TOOLS-30 stays IN PROGRESS and TOOLS-33 remains NEEDS REVIEW. No prompt/theme inclusion decisions were assumed.
++
++## Earlier decision and progress history
++
+ ## Current jj decision — 2026-10-28
+ 
+ User explicitly chose jj extraction and asked to check the believed incubator copy. No incubator jj exists; preserve the bundled 16-file/188,007-byte version there before removal under TOOLS-83–86. The separate replacement at ~/git/jujutsu-vcs-skill remains WIP (AGENT-67); do not install, edit or adopt it. All six inclusion decisions are now made, but jj implementation is in progress and mutation TOOLS-79–82 still awaits acceptance. Prompts/themes remain unreviewed; TOOLS-57/30 stay open.
+ 
+@@ -170,4 +180,8 @@
+ 
+ ## 2026-10-28T21:17:58.727Z
+ 
+ - **description**: 63 lines → updated (69 lines)
++
++## 2026-10-28T22:06:43.076Z
++
++- **description**: 69 lines → updated (79 lines)

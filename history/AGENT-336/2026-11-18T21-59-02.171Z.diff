@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-336.md
++++ b/AGENT-336.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Move Birdup's clock notification into Sandpiper"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-18T21:59:02.054Z
+-updated_at: 2026-11-18T21:59:02.054Z
++updated_at: 2026-11-18T21:59:02.170Z
+ ---
+ 
+ # Move Birdup's clock notification into Sandpiper
+ 
+ Birdup's src/birdup/pi-ext/clock.ts adds a hidden harness system notification with the current local time (and the time since the previous run) at the start of every agent run. Move it into Sandpiper so every session gets it, and remove it from Birdup (clock.ts, the --extension line in launch.py, and the launch tests). Improvements found while porting are run by Doug before they go in.
++
++---
++
++# Activity Log
++
++## 2026-11-18T21:59:02.171Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

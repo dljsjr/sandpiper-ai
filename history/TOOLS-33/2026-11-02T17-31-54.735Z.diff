@@ -1,0 +1,46 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,32 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T16:59:53.481Z
++updated_at: 2026-11-02T17:31:54.731Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Full simplification review — current findings
++
++Reviewed source range36bd8ebd331e through060903df040c: original build-topology retirement, portable CLI/asset patch, Trail extraction/temporary bridge, Journal cutover, resource extraction and optional-tree support. This is a same-agent integrated review; no independent reviewer was available. No code changes or closures performed.
++
++### Findings
++
++1. Medium — devtools/packedCli.test.ts:83 removes the entire installed resources tree before retired-skill/prompt absence assertions at117–133 and catalogue validation. Those assertions therefore cannot detect accidentally rebundled resources. Current package is clean by independent tar-entry inspection, but the regression test would accept such a change. Check installed packaged content before removal, then retain the resource-free startup checks.
++2. Low — devtools/integration/README.md:126–133 presents the compiled Bun binary smoke as deferred wave-2 work. That target was explicitly retired. Keep historical incident context, but describe the current source RPC lane and built-JS/packed-install coverage without implying compiled-binary support is planned.
++
++### Verification and preservation
++
++Fresh bun check, full87 files/649 tests and pack:cli all passed. Actual tarball16932 entries: only optional theme README under owned resources; no bundled skills/prompts, legacy helper docs or metadata sidecar. Ten current hash/mode/tree comparisons exactly match preserved baselines: prompt archive, five skill archives, global settings, WIP replacement skills, independent Claude review skill and archive LICENSE. All14 migrated project records still match every field/order; a later unrelated project entry remains untouched. No active obsolete build/vendor/helper routes found in the scoped residual scan. Earlier Journal note/guidance/closed-record preservation remains covered by its accepted independent evidence, not newly claimed to have been rerun.
++
++### Boundaries
++
++No new runtime blocker found in the reviewed simplification paths. Existing updater lifecycle defect87 remains separate and is not cleared by this review. Temporary PATH-gated hard-coded Trail bridge remains an accepted limitation under43. Accepted57/58/59 decisions and DONE states are unchanged. This overall review remains open with the two findings above;30 remains IN PROGRESS.
++
++## Earlier acceptance and implementation history
++
+ ## Current resource acceptance checkpoint
+ 
+ User accepted TOOLS-59. Resource-review subtasks TOOLS-57 (skills), TOOLS-58 (prompts), and TOOLS-59 (optional themes/resources) are all COMPLETE/DONE. No resource inclusion decisions or implementation acceptances remain outstanding. Current verified gates remain bun check clean,87 files/649 tests, and pack:cli including resource-free readonly installation plus stock/custom theme checks.
+ 
+@@ -129,4 +148,8 @@
+ 
+ ## 2026-11-02T16:59:53.482Z
+ 
+ - **description**: 43 lines → updated (51 lines)
++
++## 2026-11-02T17:31:54.735Z
++
++- **description**: 51 lines → updated (70 lines)

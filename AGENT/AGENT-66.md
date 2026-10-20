@@ -1,12 +1,13 @@
 ---
 title: "AutoTOON: re-introduce capability guidance / system-prompt injection"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-21T03:48:06.716Z
-updated_at: 2026-06-03T04:44:12.690Z
+updated_at: 2026-11-19T18:58:29.576Z
 related:
   - AGENT-51
 ---
@@ -20,7 +21,7 @@ Current state on feat/autotoon (txrxmuno):
 - No system-prompt guidance about TOON is injected
 - Model receives converted output without explicit instruction
 
-To revisit: design a general capability-guidance reintegration alongside the broader 'dynamic sections reintegration' work tracked in standup. When that's done, restore:
+To revisit: design a general capability-guidance reintegration alongside the broader 'dynamic sections reintegration' work recorded in historical continuity notes. Use current project docs and task records to establish the present scope. When that's done, restore:
 - An emit of capability_guidance:register_static (or whatever the new contract is) from extensions/autotoon/autotoon.ts
 - An AUTOTOON_SYSTEM_GUIDANCE block describing TOON to the model
 - Wiring through buildSandpiperSystemPrompt in packages/core/src/system-prompt.ts (currently has a declared-but-unused staticCapabilityGuidance option)
@@ -456,6 +457,10 @@ Net: **meaningfully better execution discipline this round**, and the remaining 
 
 After those, this is done.
 
+## Closed in backlog triage (2026-11-19)
+
+AutoTOON has converted output without prompt guidance since April, with no recorded model confusion.
+
 ---
 
 # Activity Log
@@ -477,3 +482,16 @@ After those, this is done.
 
 - **status**: IN PROGRESS → NOT STARTED
 - **assignee**: Huginn → UNASSIGNED
+
+## 2026-10-27T23:09:15.374Z
+
+- **description**: updated
+
+## 2026-11-19T18:58:28.322Z
+
+- **description**: 442 lines → updated (446 lines)
+
+## 2026-11-19T18:58:29.576Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: UNRESOLVED → WONTFIX

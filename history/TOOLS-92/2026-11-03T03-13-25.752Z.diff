@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-92.md
++++ b/TOOLS-92.md
+@@ -7,13 +7,19 @@
+ reporter: USER
+ created_at: 2026-11-02T17:42:31.696Z
+ related:
+   - TOOLS-93
+-updated_at: 2026-11-02T18:27:58.207Z
++updated_at: 2026-11-03T03:13:25.752Z
+ ---
+ 
+ # Audit retained build, runtime and toolchain complexity against simplification scope
+ 
++## Native MCP audit decision resolved
++
++User approved replacing application mcporter with standalone pi-mcp1.3.0 behind own web_search, without host MCP server-tool registration.100–102 implement and verify it in current30, now NEEDS REVIEW: main/fresh86/671, offline read-only own-tool proof, independent no-findings review.29obsolete records removed,184bundle modules vs453. Developer mise mcporter CLI remains. Earlier notes below about live application mcporter/unapproved adoption/no ticket are historical and superseded for this facet only. Broader retained-surface audit/other decisions are not automatically accepted or complete.
++
++## Earlier verification and scope record
++
+ ## Shell Relay scope clarification
+ 
+ Doug clarified that Shell Relay is deliberately disabled for poor behavior and is under consideration for deprecation. TOOLS-93 is now a low-priority deferred capability decision, not a packaging repair or build-design blocker. Do not add shell assets or revive its installer during build simplification. Removal remains unapproved.
+ 
+@@ -68,4 +74,8 @@
+ 
+ ## 2026-11-02T18:27:58.207Z
+ 
+ - **description**: 28 lines → updated (34 lines)
++
++## 2026-11-03T03:13:25.752Z
++
++- **description**: 34 lines → updated (40 lines)

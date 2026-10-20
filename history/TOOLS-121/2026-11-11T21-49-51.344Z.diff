@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-121.md
++++ b/TOOLS-121.md
+@@ -1,15 +1,16 @@
+ ---
+ title: "Independently rerun the corrected reference and implementation gates"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T18:45:09.987Z
+ blocked_by:
+   - TOOLS-122
+-updated_at: 2026-11-11T21:49:51.281Z
++updated_at: 2026-11-11T21:49:51.343Z
+ ---
+ 
+ # Independently rerun the corrected reference and implementation gates
+ 
+@@ -58,4 +59,9 @@
+ 
+ ## 2026-11-11T21:49:51.282Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-11T21:49:51.344Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

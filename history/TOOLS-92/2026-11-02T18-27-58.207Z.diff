@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-92.md
++++ b/TOOLS-92.md
+@@ -7,13 +7,19 @@
+ reporter: USER
+ created_at: 2026-11-02T17:42:31.696Z
+ related:
+   - TOOLS-93
+-updated_at: 2026-11-02T18:19:44.390Z
++updated_at: 2026-11-02T18:27:58.207Z
+ ---
+ 
+ # Audit retained build, runtime and toolchain complexity against simplification scope
+ 
++## Shell Relay scope clarification
++
++Doug clarified that Shell Relay is deliberately disabled for poor behavior and is under consideration for deprecation. TOOLS-93 is now a low-priority deferred capability decision, not a packaging repair or build-design blocker. Do not add shell assets or revive its installer during build simplification. Removal remains unapproved.
++
++## Earlier scope and exploration history
++
+ ## Exploration ready for review
+ 
+ User requested a fresh search for the simplest possible build, especially whether devtools is needed. Results and tradeoffs are in .sandpiper/docs/specs/build-simplification-exploration.md (Explanation). No application source/manifests/build scripts changed; no implementation authorized.
+ 
+@@ -58,4 +64,8 @@
+ 
+ ## 2026-11-02T18:19:44.391Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-02T18:27:58.207Z
++
++- **description**: 28 lines → updated (34 lines)

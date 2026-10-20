@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-75.md
++++ b/TOOLS-75.md
+@@ -5,19 +5,27 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.493Z
+-updated_at: 2026-10-28T18:57:43.721Z
++updated_at: 2026-10-28T18:58:59.168Z
+ ---
+ 
+ # Archive and remove the bundled test-driven-development skill
+ 
+ Preserve the whole current skill under ~/git/skills-incubator/skills/test-driven-development with exact bytes/modes and no destination overwrite or autoload. Drive the unbundled-catalogue behavior through one focused RED test, user confirmation, then the minimal resource change and GREEN. Update existing diagnostic/packed contracts deliberately for that approved behavior and verify actual package absence. Do not begin production edits before the user confirms the RED checkpoint.
+ 
++## Intentional RED checkpoint — 2026-10-28
++
++Focused baseline passed: bun run test:vitest -- packages/cli/standalone_resource_discovery.test.ts --testNamePattern false (1 passed, 1 skipped). Changed only the expected source catalogue by removing test-driven-development. The same single-case run now fails for the expected reason: actual catalogue still contains test-driven-development while expected catalogue is jj + mutation-testing. No shipped resources, archive, deployment links or global developer guidance changed. Await explicit user confirmation of this RED before the minimal production resource change and GREEN. Do not batch additional tests or implementation before that confirmation.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-28T18:57:43.722Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T18:58:59.169Z
++
++- **description**: 1 line → updated (5 lines)

@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-81.md
++++ b/TOOLS-81.md
+@@ -5,13 +5,25 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.310Z
+-updated_at: 2026-10-28T20:43:11.587Z
++updated_at: 2026-10-28T20:59:21.607Z
+ ---
+ 
+ # Retain mutation survivor interpretation without bundled-skill prerequisites
+ 
++## Implementation verified — ready for review
++
++Complete in zxpnrzns / a68124e9: removed retired skill intro/footer and retained only focused survivor interpretation. Meaningful gaps lead to better tests; equivalence requires evidence; exclusions require project-specific justification; score alone does not justify production changes or meaningless tests. Unrelated Key Rules/autonomous TDD, baseline rules, existing-project restrictions and Greenfield policy are byte-identical. No fixed-score/ratchet/CI-schedule/blanket-exclusion rules imported. Markdown and independent review pass.
++
++Verification: full baseline 87 files/640 tests passed. One source-catalogue case baseline GREEN → expected extra-skill RED → archive/resource deletion GREEN. Refactor assessment found no new code structure needing simplification. Updated stale diagnostic contract (2 passing tests), then packed absence assertion demonstrated stale-build RED. Normal rebuild/full gate GREEN: bun check clean, 87 files/640 tests passed, bun run pack:cli passed. Actual tarball contains jj only. No framework installed or generated artifact edited by hand.
++
++Evidence: ~/.sandpiper/agent/backups/mutation-unbundle-20261028-iBKlK2/ contains before.json, archive-verified.json, preservation-after.json and exact deployment/guide/lens backups. Independent read-only mutation-audit (ce39ccc2f023) PASS: archive paths/bytes/modes, prior archives/settings/independent Claude copy unchanged, no archive autoload, no active hard mutation-skill dependencies, guidance scoped, and actual tarball jj-only.
++
++Local revisions: Sandpiper rxxrqtmu / b6cb20e9; canonical global guidance zxpnrzns / a68124e9; Dotfiles snkyrupt / 97537ddb. Muninn single-line user-state patch is not version-controlled; exact backup/preservation proof retained. No push or release.
++
++## Original scope record
++
+ Keep developer testing guidance focused on meaningful survivor gaps, demonstrated equivalence and evidence-based interpretation. Do not change production solely to improve mutation score. Remove retired skill prerequisites without copying score thresholds, CI cadence or blanket method exclusions. Leave unrelated testing/greenfield policies unchanged.
+ 
+ ---
+ 
+@@ -20,4 +32,8 @@
+ ## 2026-10-28T20:43:11.587Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T20:59:21.608Z
++
++- **description**: 1 line → updated (13 lines)

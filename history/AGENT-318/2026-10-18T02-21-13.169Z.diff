@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-318.md
++++ b/AGENT-318.md
+@@ -1,16 +1,16 @@
+ ---
+ title: "packages/cli bundles bake build-time absolute paths; Turbo cache shared across worktrees replayed pi13 paths"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-18T00:28:10.470Z
+ related:
+   - TOOLS-30
+   - AGENT-307
+-updated_at: 2026-10-18T02:21:13.108Z
++updated_at: 2026-10-18T02:21:13.168Z
+ ---
+ 
+ # packages/cli bundles bake build-time absolute paths; Turbo cache shared across worktrees replayed pi13 paths
+ 
+@@ -42,4 +42,8 @@
+ 
+ ## 2026-10-18T02:21:13.109Z
+ 
+ - **description**: 10 lines → updated (11 lines)
++
++## 2026-10-18T02:21:13.169Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

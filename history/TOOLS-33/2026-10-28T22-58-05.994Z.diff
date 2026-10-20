@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-10-28T22:08:09.301Z
++updated_at: 2026-10-28T22:58:05.993Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Current resource checkpoint — 2026-10-28
++
++Skills review/extraction remains accepted and COMPLETE. All six prompt templates are now archived unchanged externally and unbundled under TOOLS-58/88–91, ready for user acceptance. Current code/package gates pass87 files/645 tests and bun check with no errors/warnings. Theme scaffold TOOLS-59 is still NOT STARTED and undecided. Overall acceptance remains pending; TOOLS-30 must stay IN PROGRESS.
++
++## Earlier checkpoint history
++
+ ## Current resource review checkpoint — 2026-10-28
+ 
+ Six-skill inclusion/extraction review is accepted and COMPLETE/DONE under TOOLS-57; mutation and jj implementation tickets TOOLS-79–86 are also COMPLETE/DONE. Current verification is bun check clean, 87 files/642 tests passing without unhandled errors, and packed-install/pack:cli passing with zero built-in skills.
+ 
+@@ -85,4 +91,8 @@
+ 
+ ## 2026-10-28T22:08:09.302Z
+ 
+ - **description**: 15 lines → updated (23 lines)
++
++## 2026-10-28T22:58:05.994Z
++
++- **description**: 23 lines → updated (29 lines)

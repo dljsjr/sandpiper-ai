@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-67.md
++++ b/AGENT-67.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Rewrite jj skill: research spike + restructure into SKILL.md + per-workflow reference docs"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-21T15:53:05.818Z
+-updated_at: 2026-10-17T18:10:32.319Z
++updated_at: 2026-10-17T18:23:21.419Z
+ ---
+ 
+ # Rewrite jj skill: research spike + restructure into SKILL.md + per-workflow reference docs
+ 
+@@ -26,4 +26,9 @@
+ 
+ ## 2026-10-17T18:10:32.323Z
+ 
+ - **description**: added (8 lines)
++
++## 2026-10-17T18:23:21.423Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

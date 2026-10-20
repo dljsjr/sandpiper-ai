@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-316.md
++++ b/AGENT-316.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Crawl the jj docs site into compact notes"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-17T18:23:21.562Z
+-updated_at: 2026-10-17T18:23:21.562Z
++updated_at: 2026-10-17T18:42:25.397Z
+ ---
+ 
+ # Crawl the jj docs site into compact notes
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-17T18:42:25.400Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

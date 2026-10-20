@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-120.md
++++ b/TOOLS-120.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Disable Bun auto-install in the built-bin smoke helper"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T18:45:09.884Z
+-updated_at: 2026-11-11T19:21:13.175Z
++updated_at: 2026-11-11T21:49:41.686Z
+ ---
+ 
+ # Disable Bun auto-install in the built-bin smoke helper
+ 
+@@ -34,4 +35,9 @@
+ 
+ ## 2026-11-11T19:21:13.176Z
+ 
+ - **description**: 1 line → updated (7 lines)
++
++## 2026-11-11T21:49:41.686Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

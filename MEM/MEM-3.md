@@ -1,12 +1,13 @@
 ---
 title: "Spike: Wax — single-file hybrid search index for Apple Silicon"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-26T04:30:07.828Z
-updated_at: 2026-03-29T00:37:46.888Z
+updated_at: 2026-10-19T19:39:07.969Z
 related:
   - MEM-2
 ---
@@ -66,3 +67,8 @@ Swift-native single-file persistence engine for AI agents on Apple platforms:
 ## 2026-03-26T04:31:38.888Z
 
 - **description**: 36 lines → updated (41 lines)
+
+## 2026-10-19T19:39:07.969Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

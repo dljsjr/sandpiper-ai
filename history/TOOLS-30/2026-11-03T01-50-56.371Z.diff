@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,13 +16,19 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
+-updated_at: 2026-11-02T22:18:42.600Z
++updated_at: 2026-11-03T01:50:56.370Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Native MCP client adoption is now in scope
++
++Doug explicitly approved replacing the internal mcporter application library with Pi standalone MCP client as part of current overall simplification, with no deferral. TOOLS-100 adapter,101dependency closure,102verification/independent review track implementation under this parent. Own web_search facade remains unchanged and upstream tools stay unregistered. Keep developer mise mcporter CLI and all other deferrals unchanged. No parent closure or automatic implementation acceptance.
++
++## Earlier implementation and scope history
++
+ ## Approved minimal-build implementation is ready for review
+ 
+ TOOLS-94–98 and TOOLS-33 are NEEDS REVIEW, not DONE. Root product/one Bun build/direct packing is implemented, current normal and clean-source gates pass85files/653tests, actual offline npm/read-only runtime/native probes pass, preservation holds, and independent inherited-model review found no outstanding actionable findings. See the work plan and98 for evidence/limits. This parent remains IN PROGRESS: implementation verification is not overall user acceptance. Accepted resource tasks57/58/59 stay COMPLETE/DONE;92 remains NEEDS REVIEW. Deferred Shell Relay93, Trail43, updater87 and unapproved runtime/toolchain decisions were not silently completed. No push or release.
+ 
+@@ -181,4 +187,8 @@
+ 
+ ## 2026-11-02T22:18:42.601Z
+ 
+ - **description**: 65 lines → updated (71 lines)
++
++## 2026-11-03T01:50:56.371Z
++
++- **description**: 71 lines → updated (77 lines)

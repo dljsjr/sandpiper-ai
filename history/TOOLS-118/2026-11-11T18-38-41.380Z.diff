@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-118.md
++++ b/TOOLS-118.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Trace runtime Pi import resolution and cache behavior"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "import-trace"
+ reporter: AGENT
+ created_at: 2026-11-11T18:25:03.205Z
+-updated_at: 2026-11-11T18:25:17.662Z
++updated_at: 2026-11-11T18:38:41.379Z
+ ---
+ 
+ # Trace runtime Pi import resolution and cache behavior
+ 
+@@ -20,4 +20,8 @@
+ ## 2026-11-11T18:25:17.663Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → import-trace
++
++## 2026-11-11T18:38:41.381Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

@@ -1,0 +1,42 @@
+===================================================================
+--- a/TAT-52.md
++++ b/TAT-52.md
+@@ -1,22 +1,26 @@
+ ---
+ title: "Render and test Chorus audience metadata"
+ status: NOT STARTED
+ kind: SUBTASK
+-priority: MEDIUM
++priority: LOW
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:00.679Z
+ depends_on:
+   - TAT-50
+   - TAT-51
+-updated_at: 2026-05-25T19:17:28.661Z
++updated_at: 2026-11-19T20:49:09.108Z
+ ---
+ 
+ # Render and test Chorus audience metadata
+ 
+ Render participant/audience metadata compactly where useful and add tests for broker stamping, local and remote delivery, batched inbox details, and backwards compatibility with existing room messages that lack participants.
+ 
++## Parked in backlog triage (2026-11-19)
++
++Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -26,4 +30,9 @@
+ 
+ ## 2026-05-25T19:17:28.661Z
+ 
+ - **depends_on**: (none) → TAT-50, TAT-51
++
++## 2026-11-19T20:49:09.108Z
++
++- **priority**: MEDIUM → LOW
++- **description**: 1 line → updated (5 lines)

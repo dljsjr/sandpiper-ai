@@ -1,0 +1,40 @@
+===================================================================
+--- a/WEB-10.md
++++ b/WEB-10.md
+@@ -5,13 +5,26 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.144Z
+-updated_at: 2026-11-12T16:37:56.592Z
++updated_at: 2026-11-12T16:43:23.290Z
+ ---
+ 
+ # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+ 
++## Implemented (2026-11-12)
++
++Change qnrztpnm. Doug approved a direct-binary adapter behind an explicit render parameter and asked that the browser be configurable, with obscura as a second example.
++
++- extensions/web-fetch/src/render.ts: RenderingFetchAdapter runs a browser command with execFile and an argument list, reads rendered HTML from stdout, and returns it as text/html. 30-second limit, 20 MB output cap. Only a normalized http or https URL is passed, so a URL cannot be read as an option or by a shell.
++- The browser is a command template, not a binary path, because browser CLIs differ: lightpanda and obscura share no wait or timeout flags. Contract: print rendered HTML on stdout, exit 0. Default is lightpanda with networkidle, an 8 s wait, a 20 s hard stop and private networks blocked. SANDPIPER_WEB_FETCH_RENDER_COMMAND overrides it; {url} is the placeholder, appended when absent; split on whitespace, no shell. An unresolved executable turns rendering off with no fallback.
++- render is in the tool schema only when a browser is found at session start. With render, the pipeline asks for HTML and does not follow the site's Markdown version.
++- The terminal line shows (rendered). New extensions/web-fetch/README.md documents the parameter and the command contract; the PRD has a Rendered fetch section.
++
++Not used from lightpanda: --json. It would give the final URL, status and headers, but only for that one browser; the shared stdout contract keeps one code path. A rendered result therefore reports the requested URL and status 200.
++
++Verification, isolated checkout: failing tests first, with shell-script stand-ins for the browser (URL with & and $(...) arrives as one argument and creates no file; option-like and file URLs are refused before the browser starts). bun check clean. Full serial suite 67 files, 602 tests passed. Live, new code: the demo shop page gives 2 loading placeholders without render and the full content with it, through lightpanda (0.8 s) and through obscura set by the variable (1.4 s). On the npm package page lightpanda fails cleanly with the Cloudflare challenge in the error; obscura exits 0 and returns the challenge page text. No new dependency; live after the next build.
++
+ ## Evaluation of @lightpanda/browser (2026-11-12)
+ 
+ Doug proposed the Lightpanda Node package. Findings, all measured:
+ 
+@@ -60,4 +73,8 @@
+ ## 2026-11-12T16:37:56.597Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-12T16:43:23.291Z
++
++- **description**: 29 lines → updated (42 lines)

@@ -1,0 +1,45 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -1,7 +1,7 @@
+ ---
+ title: "Simplify the build and distribution system after the Pi 1.0 migration"
+-status: COMPLETE
++status: IN PROGRESS
+ resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+@@ -10,13 +10,21 @@
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-28T01:17:04.240Z
++updated_at: 2026-10-28T14:17:40.127Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Current scope and status correction — 2026-10-27
++
++The broad build/packaging simplification is NOT complete. The user requested a review of what belongs in packages/resources, then the conversation focused on tasks/Trail and standup/Journal. The remaining resource decisions were never added to this task breakdown. The lead prematurely closed this parent and TOOLS-33 during bookkeeping by treating historical implementation notes and passing tests as sufficient acceptance. The bookkeeping acceptance recorded below does not approve the remaining resources or complete the overall work.
++
++Complete the remaining skills, prompt-template and themes review; record the user's keep/remove/extract decisions; implement any approved changes; verify the integrated build, resource discovery and portable package; then obtain user acceptance. Do not assume that any particular resource must stay, move or be removed. Build-command consolidation was only an agent suggestion, not agreed scope. TOOLS-43 still tracks final external Trail integration separately. Earlier completed extraction milestones and their evidence are preserved.
++
++## Earlier scope and verification history
++
+ Current boundary (TOOLS-51): the prior build simplification below is a historical review record. Its instruction to retain the bundled standup helper is superseded by the user-approved Journal cutover. Do not restore that helper or its skill/build wiring. Task status and original verification history remain unchanged.
+ 
+ ## Prior approved scope (historical)
+ 
+@@ -84,4 +92,9 @@
+ ## 2026-10-28T01:17:04.240Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-10-28T14:17:40.131Z
++
++- **status**: COMPLETE → IN PROGRESS
++- **description**: 15 lines → updated (23 lines)

@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-331.md
++++ b/AGENT-331.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Skills section names the skill or read tool without checking the model can use it"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-17T20:06:35.474Z
+-updated_at: 2026-11-17T20:07:03.654Z
++updated_at: 2026-11-17T20:17:57.553Z
+ ---
+ 
+ # Skills section names the skill or read tool without checking the model can use it
+ 
+@@ -30,4 +30,8 @@
+ ## 2026-11-17T20:07:03.655Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-17T20:17:57.553Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

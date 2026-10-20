@@ -1,0 +1,46 @@
+===================================================================
+--- a/TAT-78.md
++++ b/TAT-78.md
+@@ -1,17 +1,17 @@
+ ---
+ title: "Track 3: Refactor Chorus as consumer of Tattler durable primitives"
+ status: NOT STARTED
+ kind: TASK
+-priority: MEDIUM
++priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-27T15:51:59.546Z
+ blocked_by:
+   - TAT-70
+ related:
+   - TAT-69
+-updated_at: 2026-11-17T22:46:37.215Z
++updated_at: 2026-11-19T20:49:10.826Z
+ ---
+ 
+ # Track 3: Refactor Chorus as consumer of Tattler durable primitives
+ 
+@@ -23,8 +23,12 @@
+ 
+ - A room's broker socket can appear as a peer in `list_peers`. `extensions/chorus.ts` creates the broker socket as `<shortId>-chorus-<room>-<uuid>.sock` in the Tattler runtime directory. `listPeerSockets()` in `extensions/tattler/tattler-identity.ts` lists every live socket there that has no `.id` file, excluding only the caller's own socket, so the broker shows up as `session:<shortId>-chorus-<room>-<uuid>`. A broker-less Chorus removes the socket; until then, discovery could skip `-chorus-` sockets.
+ - Chorus registers `send_chorus_reply` (now `deferred`) and the `/agent` and `/chorus` commands in every session, whether or not a room opens. The inventory also counted about 450 lines inside `extensions/tattler/` that exist only to bridge to Chorus. Decide both as part of making Chorus a consumer of the Tattler log.
+ 
++## Parked in backlog triage (2026-11-19)
++
++Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -40,4 +44,9 @@
+ 
+ ## 2026-11-17T22:46:37.218Z
+ 
+ - **description**: updated
++
++## 2026-11-19T20:49:10.826Z
++
++- **priority**: MEDIUM → LOW
++- **description**: 8 lines → updated (12 lines)

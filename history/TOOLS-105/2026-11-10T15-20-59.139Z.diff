@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-105.md
++++ b/TOOLS-105.md
+@@ -5,22 +5,22 @@
+ priority: MEDIUM
+ assignee: "prompt-trim"
+ reporter: USER
+ created_at: 2026-11-09T22:57:46.443Z
+-updated_at: 2026-11-10T15:20:25.181Z
++updated_at: 2026-11-10T15:20:59.139Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Remove resolveEnvVar and read PI_OFFLINE directly for the update check
+ 
+ ## History squashed (2026-11-10)
+ 
+-Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits:
++Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits, by jj change id (stable across rewrites) with the commit id at the time of writing:
+ 
+-- 168397bb fix: Read PI_OFFLINE directly and remove resolveEnvVar (85 files / 739 tests)
++- vxyqxsuw (b78465b3) fix: Read PI_OFFLINE directly and remove resolveEnvVar; 85 files / 739 tests
+ 
+-The tree at the new tip is identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing.
++Source and tests at the new tip are identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing with the counts shown.
+ 
+ ## Delivered, awaiting review (2026-11-09)
+ 
+ Agent prompt-trim delivered three commits from its isolated jj workspace. They sit on the main working line above be2b28a3. The main bookmark is unchanged and root dist was not rebuilt.
+@@ -75,4 +75,8 @@
+ 
+ ## 2026-11-10T15:20:25.182Z
+ 
+ - **description**: 34 lines → updated (42 lines)
++
++## 2026-11-10T15:20:59.139Z
++
++- **description**: updated

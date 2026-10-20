@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,15 +5,17 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-10-20T17:25:23.788Z
++updated_at: 2026-10-20T17:31:02.611Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
+-Implement the approved workspace-only topology, then simplify resources after review. Remove all third-party skills. Move first-party on-demand skills to ~/git/skills-incubator/skills/. Flatten retained first-party runtime skills directly under packages/resources/skills/. Update discovery, tests, documentation, and helper synchronization. Verify the complete runtime and build flow.
++Implemented and verified the workspace-only topology and the approved resource cleanup. Removed every third-party skill. Moved age, ast-grep, skill-review, and toon byte-for-byte to ~/git/skills-incubator/skills/. Flattened the eight retained first-party skills directly under packages/resources/skills/. Updated resource discovery, helper synchronization, prompts, tests, playbooks, and public documentation.
+ 
++Verification: bun check; bun run test (124 files, 1,220 tests); focused resource and integration tests; direct Sandpiper, Trail, and standup command smokes; archived-file byte comparison; stale-path and third-party sweeps.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -33,4 +35,8 @@
+ ## 2026-10-20T17:25:23.788Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
+ - **description**: 3 lines → updated (1 line)
++
++## 2026-10-20T17:31:02.642Z
++
++- **description**: 1 line → updated (3 lines)

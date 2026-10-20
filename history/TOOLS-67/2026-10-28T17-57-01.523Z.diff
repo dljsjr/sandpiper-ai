@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-67.md
++++ b/TOOLS-67.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Remove active dependencies on the retired bundled code-review skill"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T17:55:43.797Z
+-updated_at: 2026-10-28T17:55:43.797Z
++updated_at: 2026-10-28T17:57:01.523Z
+ ---
+ 
+ # Remove active dependencies on the retired bundled code-review skill
+ 
+ Inventory active global/project guidance and retained prompts. Replace hard requirements on the deleted built-in with existing review guidance or optional installed-skill use, without redesigning SOPs/prompts. Distinguish generic code-review terminology, prompt names, fixtures, historical records and independent installed copies. Preserve unrelated guidance and user state.
++
++---
++
++# Activity Log
++
++## 2026-10-28T17:57:01.523Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

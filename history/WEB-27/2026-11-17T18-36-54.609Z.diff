@@ -1,0 +1,28 @@
+===================================================================
+--- a/WEB-27.md
++++ b/WEB-27.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Stop web-fetch renderer tests depending on subprocess timing"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-17T18:29:55.466Z
+-updated_at: 2026-11-17T18:30:16.150Z
++updated_at: 2026-11-17T18:36:54.608Z
+ ---
+ 
+ # Stop web-fetch renderer tests depending on subprocess timing
+ 
+@@ -30,4 +30,8 @@
+ ## 2026-11-17T18:30:16.151Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-17T18:36:54.609Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

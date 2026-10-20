@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-313.md
++++ b/AGENT-313.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Gates and live 1.3.0 check (prompt, Tattler wake, Chorus fullscreen)"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-16T17:17:57.601Z
+-updated_at: 2026-10-16T17:17:57.601Z
++updated_at: 2026-10-16T17:27:41.410Z
+ ---
+ 
+ # Gates and live 1.3.0 check (prompt, Tattler wake, Chorus fullscreen)
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-16T17:27:41.411Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

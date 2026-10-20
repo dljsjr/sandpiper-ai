@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-80.md
++++ b/TOOLS-80.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Preserve and remove the bundled mutation-testing skill"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.233Z
+-updated_at: 2026-10-28T22:06:41.893Z
++updated_at: 2026-10-28T22:06:43.170Z
+ ---
+ 
+ # Preserve and remove the bundled mutation-testing skill
+ 
+@@ -54,4 +55,9 @@
+ 
+ ## 2026-10-28T22:06:41.894Z
+ 
+ - **description**: 13 lines → updated (23 lines)
++
++## 2026-10-28T22:06:43.171Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

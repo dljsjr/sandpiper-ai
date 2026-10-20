@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Review and resolve the remaining bundled skills"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.280Z
+-updated_at: 2026-10-28T14:17:40.280Z
++updated_at: 2026-10-28T15:22:43.735Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+ Continue the interrupted resources review for the six retained skills: projects, code-review, refactoring, test-driven-development, mutation-testing and jj. Review their purpose, ownership and suitability as Sandpiper built-ins. Record the user's keep/remove/extract decisions; make no assumed selections. Apply any approved changes, update affected discovery/staging/docs/tests, and verify them before requesting acceptance. Inventory alone or green tests alone do not complete this subtask.
++
++---
++
++# Activity Log
++
++## 2026-10-28T15:22:43.739Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -5,13 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-11-02T16:41:50.972Z
++updated_at: 2026-11-02T16:43:31.799Z
+ ---
+ 
+ # Make built-in theme resources optional for the standalone CLI
+ 
++## Implementation checklist
++
++1. Resource-free bootstrap; retain validation for invalid explicit resource-root overrides.
++2. Optional owned theme paths in staging/discovery, preserving present and configured themes.
++3. Hermetic stock/custom/packed regressions and current docs.
++
++Keep all work in this existing ticket as requested. Trail cannot resolve this nested subtask as a parent for further subtasks, so no new tracking tickets were created. VCS checkpoint succeeded with command-local --config fsmonitor.backend=none; current changes are only this work's Journal entry. User fsmonitor.backend remains watchman; no persistent VCS config changes.
++
+ ## Approved implementation scope — 2026-11-02
+ 
+ User changed this existing ticket from theme-content review to making built-in resources optional. Permit a valid standalone install with no resources tree; skip absent owned theme paths in staging/discovery; preserve stock Pi asset resolution and custom theme loading. Explicit resource-root overrides must still reject invalid directories. Keep the README-only theme location as documentation; deleting it is not necessary for optional behavior and was not part of the user's latest approval. No theme design, engine rewrite, archive installation or unrelated updater fix.
+ 
+@@ -36,4 +44,8 @@
+ 
+ ## 2026-11-02T16:41:50.973Z
+ 
+ - **title**: Review and resolve the themes resource scaffold → Make built-in theme resources optional for the standalone CLI
++
++## 2026-11-02T16:43:31.800Z
++
++- **description**: 9 lines → updated (17 lines)

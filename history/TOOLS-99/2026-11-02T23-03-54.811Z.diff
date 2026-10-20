@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-99.md
++++ b/TOOLS-99.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Investigate native MCP transport behind Sandpiper web tools"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T23:03:48.440Z
+-updated_at: 2026-11-02T23:03:48.440Z
++updated_at: 2026-11-02T23:03:54.811Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Investigate native MCP transport behind Sandpiper web tools
+ 
+ User authorized investigation next, not replacement implementation. mcporter is an MCP client behind a Sandpiper-owned web-tool facade, not a substitute REST API. Trace current call sites and verify which tool uses it; compare pinned Pi1.3.0 MCP public APIs as an internal transport without exposing upstream tools, changing our tool contracts, requiring user MCP setup or reading real settings/credentials. Establish request/response, anonymous/auth, connection/timeout/cancellation/cleanup, config independence and package/bundle constraints. Use installed docs/types/source and hermetic localhost-only proof where useful; no live upstream calls, provider calls, production code edits, dependency changes or tool removals. Report recommendation, evidence, limits and genuinely open decisions before any adoption. Preserve standalone Trail bridge, disabled Shell Relay, developer tools, archives, WIP skills and accepted build/resource work.
++
++---
++
++# Activity Log
++
++## 2026-11-02T23:03:54.811Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

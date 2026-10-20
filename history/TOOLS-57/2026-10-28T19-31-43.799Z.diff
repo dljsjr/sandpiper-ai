@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,13 +9,19 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T18:57:43.837Z
++updated_at: 2026-10-28T19:31:43.798Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
++## Current TDD clarification — 2026-10-28
++
++User wants autonomous one-test RED/GREEN/REFACTOR cycles, not human approval between phases. The earlier human-gate interpretation below was the assistant's mistake. TDD unbundling is approved under TOOLS-74 with the core loop retained in developer-role guidance. Mutation-testing and jj remain undecided.
++
++## Earlier review history
++
+ Continue the interrupted resources review for the six retained skills: projects, code-review, refactoring, test-driven-development, mutation-testing and jj. Review their purpose, ownership and suitability as Sandpiper built-ins. Record the user's keep/remove/extract decisions; make no assumed selections. Apply any approved changes, update affected discovery/staging/docs/tests, and verify them before requesting acceptance. Inventory alone or green tests alone do not complete this subtask.
+ 
+ ## Ownership and shipping review — 2026-10-28
+ 
+@@ -110,4 +116,8 @@
+ 
+ ## 2026-10-28T18:57:43.838Z
+ 
+ - **description**: 31 lines → updated (33 lines)
++
++## 2026-10-28T19:31:43.799Z
++
++- **description**: 33 lines → updated (39 lines)

@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-80.md
++++ b/TOOLS-80.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Preserve and remove the bundled mutation-testing skill"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.233Z
+-updated_at: 2026-10-28T20:43:11.233Z
++updated_at: 2026-10-28T20:43:11.526Z
+ ---
+ 
+ # Preserve and remove the bundled mutation-testing skill
+ 
+ Preserve all seven original files, paths, bytes and modes in the incubator before deleting the source resource. Demonstrate one source-catalogue RED→GREEN cycle and verify generated/packed absence. No archive registration or content rewrite.
++
++---
++
++# Activity Log
++
++## 2026-10-28T20:43:11.526Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

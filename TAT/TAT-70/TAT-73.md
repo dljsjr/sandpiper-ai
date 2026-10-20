@@ -2,16 +2,18 @@
 title: "C3: Per-agent read cursor (Tattler layer) — persistence + advance-on-handle"
 status: NOT STARTED
 kind: SUBTASK
-priority: HIGH
+priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-05-27T15:45:30.357Z
 depends_on:
   - TAT-71
   - TAT-72
+
 related:
+  - TAT-56
   - TAT-68
-updated_at: 2026-05-27T15:53:42.503Z
+updated_at: 2026-11-19T20:49:09.865Z
 ---
 
 # C3: Per-agent read cursor (Tattler layer) — persistence + advance-on-handle
@@ -24,6 +26,12 @@ Acceptance criteria:
 - Partial tool-call failure: cursor stays at pre-call position
 - New agent initialization: cursor starts at log HEAD, not seq 0
 - TAT-68 re-delivery bug no longer reproduces
+
+Acceptance (moved from TAT-56, 2026-10-19): add a real-session regression test for abort recovery: messages that arrive while a run is active accumulate in the inbox, the run is aborted (Escape path, which clears Pi's steer queue), and the next run delivers them exactly once without re-delivering on later runs. TAT-56 verified this behavior live on Pi 1.3.0; see its description for the probe setup. Cover TAT-68's re-delivery case with the same harness.
+
+## Parked in backlog triage (2026-11-19)
+
+Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
 
 ---
 
@@ -46,3 +54,16 @@ Acceptance criteria:
 ## 2026-05-27T15:53:42.504Z
 
 - **description**: 1 line → updated (8 lines)
+
+## 2026-10-19T19:27:14.259Z
+
+- **description**: 8 lines → updated (10 lines)
+
+## 2026-10-19T19:29:36.769Z
+
+- **related**: TAT-68 → TAT-56, TAT-68
+
+## 2026-11-19T20:49:09.865Z
+
+- **priority**: HIGH → LOW
+- **description**: 10 lines → updated (14 lines)

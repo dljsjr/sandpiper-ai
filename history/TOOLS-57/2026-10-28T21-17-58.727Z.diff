@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,13 +9,19 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T20:59:21.824Z
++updated_at: 2026-10-28T21:17:58.726Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
++## Current jj decision — 2026-10-28
++
++User explicitly chose jj extraction and asked to check the believed incubator copy. No incubator jj exists; preserve the bundled 16-file/188,007-byte version there before removal under TOOLS-83–86. The separate replacement at ~/git/jujutsu-vcs-skill remains WIP (AGENT-67); do not install, edit or adopt it. All six inclusion decisions are now made, but jj implementation is in progress and mutation TOOLS-79–82 still awaits acceptance. Prompts/themes remain unreviewed; TOOLS-57/30 stay open.
++
++## Previous status records
++
+ ## Current implementation status — 2026-10-28
+ 
+ Approved mutation-testing extraction is implemented and verified under TOOLS-79–82, ready for user review but not yet accepted. Five inclusion decisions have been made; the first four implementations were already accepted. jj is the only undecided skill. TOOLS-57/30 remain IN PROGRESS. Prompt/theme review is separate; no jj or rewrite decision is implied.
+ 
+@@ -160,4 +166,8 @@
+ 
+ ## 2026-10-28T20:59:21.825Z
+ 
+ - **description**: 57 lines → updated (63 lines)
++
++## 2026-10-28T21:17:58.727Z
++
++- **description**: 63 lines → updated (69 lines)

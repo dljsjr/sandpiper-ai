@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-116.md
++++ b/TOOLS-116.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Runtime Pi import smoke test times out on a quiet machine"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T18:19:02.833Z
+-updated_at: 2026-11-11T19:21:13.014Z
++updated_at: 2026-11-11T21:49:41.756Z
+ related:
+   - TOOLS-30
+   - TOOLS-112
+ ---
+@@ -81,4 +82,9 @@
+ 
+ ## 2026-11-11T19:21:13.015Z
+ 
+ - **description**: 41 lines → updated (47 lines)
++
++## 2026-11-11T21:49:41.756Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

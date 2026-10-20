@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-62.md
++++ b/TOOLS-62.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Remove the bundled projects skill and update discovery and packaging contracts"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T16:53:38.895Z
+-updated_at: 2026-10-28T16:53:38.895Z
++updated_at: 2026-10-28T16:54:02.646Z
+ ---
+ 
+ # Remove the bundled projects skill and update discovery and packaging contracts
+ 
+ Use focused failing discovery/packed-catalogue assertions, remove the source skill, update relevant Sandpiper docs and expected built-in catalogues, then build and verify hermetically. Edit source, never generated dist.
++
++---
++
++# Activity Log
++
++## 2026-10-28T16:54:02.647Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

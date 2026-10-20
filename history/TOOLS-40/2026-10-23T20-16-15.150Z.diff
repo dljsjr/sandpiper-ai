@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-40.md
++++ b/TOOLS-40.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Remove public Trail docs and archive internal Trail material"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-23T20:11:39.576Z
+-updated_at: 2026-10-23T20:11:39.576Z
++updated_at: 2026-10-23T20:16:15.149Z
+ ---
+ 
+ # Remove public Trail docs and archive internal Trail material
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-23T20:16:15.150Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

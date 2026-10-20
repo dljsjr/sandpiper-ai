@@ -1,0 +1,48 @@
+===================================================================
+--- a/TOOLS-93.md
++++ b/TOOLS-93.md
+@@ -1,21 +1,29 @@
+ ---
+-title: "CLI shell integration installer cannot find its scripts in the packed package"
++title: "Resolve the installer surface with the Shell Relay keep-or-retire decision"
+ status: NOT STARTED
+ kind: TASK
+-priority: MEDIUM
++priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-11-02T18:19:44.026Z
+-updated_at: 2026-11-02T18:27:57.878Z
++updated_at: 2026-11-02T18:27:57.949Z
+ related:
+   - TOOLS-30
+   - TOOLS-92
+   - TOOLS-33
+ ---
+ 
+-# CLI shell integration installer cannot find its scripts in the packed package
++# Resolve the installer surface with the Shell Relay keep-or-retire decision
+ 
++## Owner clarification: deferred capability decision, not packaging repair
++
++Doug clarified that Shell Relay is intentionally disabled because it does not work well, and he is considering deprecating it entirely. No deprecation/removal decision is made yet.
++
++Do not restore Shell Relay, add its assets, or repair its installer as part of build simplification. This item is deferred pending the broader keep-or-retire decision. It does not block TOOLS-30/92's build design. If retained, evaluate the installer with that capability; if retired, remove its exposed installer surface as part of an explicitly approved retirement. Do not infer approval to delete it from this clarification.
++
++## Original observation and reproduction
++
+ The current CLI advertises --install-shell-integrations through extensions/system/migration-controls.ts. Its session_start handler calls the default core installer. packages/core/src/install-shell-integrations.ts:getSourceDir resolves PI_PACKAGE_DIR/extensions/shell-relay/shell-integration, but the current CLI tarball contains none of relay.fish/relay.bash/relay.zsh.
+ 
+ Reproduced during TOOLS-92: extracted the actual Bun-packed current CLI into an owned temporary directory, set PI_PACKAGE_DIR to that extracted package, then invoked the real installShellIntegrations with an explicit temporary target. It returned success:false and 'Shell integration source not found'. No real user shell integration or configuration was touched. The packed --help smoke does not test this behavior. Origin of the gap has not been dated.
+ 
+@@ -29,4 +37,10 @@
+ 
+ ## 2026-11-02T18:27:57.879Z
+ 
+ - **kind**: BUG → TASK
++
++## 2026-11-02T18:27:57.949Z
++
++- **priority**: MEDIUM → LOW
++- **title**: CLI shell integration installer cannot find its scripts in the packed package → Resolve the installer surface with the Shell Relay keep-or-retire decision
++- **description**: 7 lines → updated (15 lines)

@@ -1,0 +1,33 @@
+===================================================================
+--- a/WEB-22.md
++++ b/WEB-22.md
+@@ -5,15 +5,19 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T22:44:14.588Z
+-updated_at: 2026-11-11T17:32:17.616Z
++updated_at: 2026-11-11T17:58:20.108Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # web_search runs shell commands from project-local settings without a trust check
+ 
++## Independent check checkpoint (2026-11-11)
++
++Parent/gate independently passed frozen install and the revision-specific bun check with zero errors/warnings. All ten tasks are implemented and independently reviewed with no outstanding actionable findings. Full/per-commit full-test gates remain pending quiet load; no completion or acceptance is claimed.
++
+ ## Implementation checkpoint (2026-11-11)
+ 
+ Change zvooskpz gates project settings on current tool-context trust/cwd, preserving agent/env !command support. Real temporary-marker regression failed before the fix and passed after it; worker gate passed 50 focused tests. Independent review found no actionable issue. Full/per-commit quiet-machine gates are pending.
+ 
+@@ -72,4 +76,8 @@
+ 
+ ## 2026-11-11T17:32:17.619Z
+ 
+ - **description**: 33 lines → updated (39 lines)
++
++## 2026-11-11T17:58:20.108Z
++
++- **description**: 39 lines → updated (43 lines)

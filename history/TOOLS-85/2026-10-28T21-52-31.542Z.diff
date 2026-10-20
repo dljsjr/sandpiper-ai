@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-85.md
++++ b/TOOLS-85.md
+@@ -5,13 +5,23 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.470Z
+-updated_at: 2026-10-28T21:49:16.046Z
++updated_at: 2026-10-28T21:52:31.541Z
+ ---
+ 
+ # Verify skill-free built-ins and self-contained skill RPC coverage
+ 
++## Stopped at verification failure limit — 2026-10-28
++
++Third final gate stopped at TypeScript TS4104, packages/cli/standalone_resource_discovery.test.ts:50. Invalid assumption: createNeutralCapabilityExtensionFactories returns a mutable extension array; actual return type is readonly InlineExtension[], while DefaultResourceLoader expects InlineExtension[]. The fixture needs a mutable copy before assignment. No fourth patch/retry was made after the failure limit.
++
++Archive is complete: 16 original files/188,007 bytes with exact paths/modes at ~/git/skills-incubator/skills/jj. No previous incubator copy existed. Replacement skills and global settings still match captured fingerprints; WIP replacement was not edited/installed/adopted. Source/deployment removal, optional-routing docs and zero-built-in runtime changes are implemented but UNCOMMITTED across Sandpiper/global-guidance/Dotfiles; not ready for acceptance.
++
++Last runtime gate passed all 642 assertions, including offline packed install, but had an unrelated unhandled stale update callback. That production issue is separately TOOLS-87 NOT STARTED; fixture now uses neutral resource factories to avoid unrelated identity/updater work. Focused discovery tests pass; the final gate must be rerun only after resolving the readonly fixture type. Baseline was 87 files/640 tests; two new optional-directory regressions bring total642.
++
++Evidence: ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/ contains before.json, snapshot.mjs, archive-verified.json, guide/deployment backups and diagnostic-red.log. Do not mark83–86 complete or infer acceptance of79–82. Broader resource review remains open.
++
+ ## Verification fixture isolation — 2026-10-28
+ 
+ Second gate passed all 642 assertions and bun check, but caught an unrelated unhandled update-banner callback using stale pi after fixture session disposal. Production bug recorded separately as TOOLS-87, NOT STARTED; production updater code is not changed here. Resource discovery now uses existing neutral capability factories so this resource-only fixture does not start identity/update work. No unhandled error is suppressed; source discovery still exercises the shared resource-discovery implementation with both PATH-gated Trail variants. Focused two-case run passes. Third full gate follows.
+ 
+@@ -42,4 +52,8 @@
+ 
+ ## 2026-10-28T21:49:16.047Z
+ 
+ - **description**: 11 lines → updated (15 lines)
++
++## 2026-10-28T21:52:31.542Z
++
++- **description**: 15 lines → updated (25 lines)

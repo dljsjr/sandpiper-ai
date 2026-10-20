@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-70.md
++++ b/AGENT-70.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Add stop/kill tool to background process tooling"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: LOW
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-21T19:07:12.108Z
+-updated_at: 2026-11-19T19:50:00.170Z
++updated_at: 2026-11-19T20:14:37.153Z
+ ---
+ 
+ # Add stop/kill tool to background process tooling
+ 
+@@ -47,4 +48,9 @@
+ ## 2026-11-19T19:50:00.170Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **description**: 1 line → updated (9 lines)
++
++## 2026-11-19T20:14:37.153Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: UNRESOLVED → DONE

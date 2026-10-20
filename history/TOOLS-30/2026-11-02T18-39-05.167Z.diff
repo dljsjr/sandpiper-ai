@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,13 +16,21 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
+-updated_at: 2026-11-02T18:35:59.083Z
++updated_at: 2026-11-02T18:39:05.166Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Work breakdown complete; implementation not started
++
++TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/docs/specs/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
++
++Doug paused sub-agents because he is fixing a fling bug. No worker was launched or queued, no implementation was substituted, and no product code changed. No launch retries during the hold. This parent remains open; planning completion is not implementation acceptance.
++
++## Earlier planning and scope history
++
+ ## Approved implementation breakdown
+ 
+ User requested a work breakdown and sub-agent implementation of the recommended root-product-package/one-Bun-build target. The no-build TypeScript alternative is not selected. Work items: TOOLS-94 package/build, TOOLS-95 runtime loader, TOOLS-96 packaging regressions/helper removal, TOOLS-97 docs/legacy build guidance, TOOLS-98 integrated verification and independent review. Package/runtime/docs are initial parallel lanes; packaging tests follow runtime+package handoff; final verification follows all four. Preserve existing consumer package and launcher paths. Shell Relay93 remains deferred.
+ 
+@@ -159,4 +167,8 @@
+ 
+ ## 2026-11-02T18:35:59.084Z
+ 
+ - **description**: 51 lines → updated (57 lines)
++
++## 2026-11-02T18:39:05.167Z
++
++- **description**: 57 lines → updated (65 lines)

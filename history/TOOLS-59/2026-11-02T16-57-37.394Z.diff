@@ -1,0 +1,41 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -5,13 +5,27 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-11-02T16:43:31.799Z
++updated_at: 2026-11-02T16:57:37.390Z
+ ---
+ 
+ # Make built-in theme resources optional for the standalone CLI
+ 
++## Implementation verified — ready for review
++
++- Default source/installed resource trees may be absent. Bootstrap preserves the computed installed path rather than falling back to checkout resources. Explicit SANDPIPER_STANDALONE_RESOURCE_ROOT overrides must be existing directories; missing paths and files produce useful errors, while empty directories are valid.
++- Staging and owned resource discovery skip all absent builtin categories. Existing/present resources and configured external paths remain supported. No new sidecar, flag, SDK/theme-engine behavior or Pi asset-root patch.
++- Read-only offline installed CLI is tested after deleting its entire resources tree: --version, --help and prompt rendering work, and stock dark/light themes load through the installed Pi dependency. Isolated custom theme discovery also passes with no diagnostics, alongside custom prompts and both Trail variants.
++- Theme README is retained and describes optional documentation, not a runtime requirement. No theme files were designed/archived; no archives, WIP replacement or user configuration were changed.
++- Baseline87 files/645 tests passed. Individual expected RED→minimum GREEN cycles covered missing default roots, file overrides, absent theme discovery and absent source staging. Final bun check clean, full87 files/649 tests pass without unhandled errors, bun run pack:cli passes. Scoped diff self-review complete; no independent review claimed (fling unavailable outside a multiplexer).
++
++Local revision wluruuqq/a0f7173d. VCS Watchman initialization was stalled; all snapshot/commit commands used a documented command-local fsmonitor.backend=none override. User configuration still reads watchman. No persistent VCS configuration or daemon changes.
++
++Implementation is ready for acceptance, not final completion. TOOLS-33 remains NEEDS REVIEW and TOOLS-30 remains IN PROGRESS. Existing unrelated work remains open.
++
++## Original scope and implementation notes
++
+ ## Implementation checklist
+ 
+ 1. Resource-free bootstrap; retain validation for invalid explicit resource-root overrides.
+ 2. Optional owned theme paths in staging/discovery, preserving present and configured themes.
+@@ -48,4 +62,8 @@
+ 
+ ## 2026-11-02T16:43:31.800Z
+ 
+ - **description**: 9 lines → updated (17 lines)
++
++## 2026-11-02T16:57:37.394Z
++
++- **description**: 17 lines → updated (31 lines)

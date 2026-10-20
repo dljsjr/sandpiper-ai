@@ -1,0 +1,30 @@
+===================================================================
+--- a/WEB-26.md
++++ b/WEB-26.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Prefer the site's own Markdown version of a page"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T23:14:34.573Z
+-updated_at: 2026-11-11T23:22:42.418Z
++updated_at: 2026-11-12T16:29:12.805Z
+ ---
+ 
+ # Prefer the site's own Markdown version of a page
+ 
+@@ -38,4 +39,9 @@
+ 
+ ## 2026-11-11T23:22:42.419Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-12T16:29:12.806Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

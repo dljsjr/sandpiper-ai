@@ -1,0 +1,23 @@
+===================================================================
+--- a/AGENT-312.md
++++ b/AGENT-312.md
+@@ -5,9 +5,18 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-16T17:17:57.523Z
+-updated_at: 2026-10-16T17:17:57.523Z
++updated_at: 2026-10-16T17:24:46.758Z
+ ---
+ 
+ # Compiled app: autoloadDotenv false
+ 
++TOOLS-30 has not dropped the compiled app, so added compile.autoloadDotenv: false (Bun CompileBuildOptions, verified in bun.com/docs/bundler/executables) next to autoloadBunfig in devtools/standaloneSandpiperApp.ts. Red-first test in devtools/standaloneSandpiperAppRuntime.test.ts: a launch-cwd .env with FORCE_COLOR=1 put ANSI into --help output; with the fix it does not.
++
++---
++
++# Activity Log
++
++## 2026-10-16T17:24:46.759Z
++
++- **description**: added (1 line)

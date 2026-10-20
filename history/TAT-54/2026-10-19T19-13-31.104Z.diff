@@ -1,0 +1,29 @@
+===================================================================
+--- a/TAT-54.md
++++ b/TAT-54.md
+@@ -5,18 +5,24 @@
+ priority: HIGH
+ assignee: "Huginn"
+ reporter: USER
+ created_at: 2026-05-25T19:12:27.178Z
+-updated_at: 2026-05-25T19:12:57.013Z
++updated_at: 2026-10-19T19:13:31.100Z
+ ---
+ 
+ # Source-verify queued custom-message abort loss
+ 
+ Document and/or test the current failure mode: sendCustomMessage while streaming queues a role=custom object directly into core steer/followUp queues, not AgentSession's mirrored string queues; Escape/abort clearQueue can therefore drop it before message_start/end persistence. Distinguish this from already-persisted custom_message entries that are on the active branch/context.
+ 
++Verified 2026-10-19 on Pi 1.3.0 / Sandpiper main, in a real interactive sandpiper instance driven through herdr (isolated agent dir; probe provider whose first request blocks until aborted; Escape pressed mid-request; then two more prompts). Source: AgentSession.abort() itself does not clear queues; the TUI Escape handler and the extension abortHandler both call restoreQueuedMessagesToEditor -> clearAllQueues -> session.clearQueue(), which calls agent.clearAllQueues() (core steer/followUp queues) but returns only the mirrored user-text queues to the editor. Live result: a pi.sendMessage(custom, {deliverAs: 'steer', triggerTurn: true}) sent during the blocked request was never persisted and never reached a later request. Loss confirmed for interactive Escape (and extension ctx.abort() in the TUI). RPC/SDK abort (session.abort() without clearQueue) should leave the queue for the next run; source-verified only. Tattler is not exposed to this loss for agent messages: while busy they go to the persisted pending inbox and only the best-effort cue is steered (the cue was lost, the message was not). Chorus room-delivery path not checked.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-05-25T19:12:57.014Z
+ 
+ - **assignee**: UNASSIGNED → Huginn
++
++## 2026-10-19T19:13:31.104Z
++
++- **description**: 1 line → updated (3 lines)

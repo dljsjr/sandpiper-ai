@@ -1,0 +1,34 @@
+===================================================================
+--- a/AGENT-168.md
++++ b/AGENT-168.md
+@@ -1,7 +1,8 @@
+ ---
+ title: "startup-hooks.test.ts vi.mock factory fails: importOriginal is undefined"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+@@ -9,9 +10,9 @@
+ 
+ related:
+   - AGENT-93
+   - AGENT-166
+-updated_at: 2026-10-19T18:06:45.791Z
++updated_at: 2026-10-19T18:06:45.853Z
+ ---
+ 
+ # startup-hooks.test.ts vi.mock factory fails: importOriginal is undefined
+ 
+@@ -46,4 +47,9 @@
+ 
+ ## 2026-10-19T18:06:45.791Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-10-19T18:06:45.854Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

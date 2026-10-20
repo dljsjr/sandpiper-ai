@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-101.md
++++ b/TOOLS-101.md
+@@ -1,17 +1,26 @@
+ ---
+ title: "Replace application mcporter dependency declarations and bundled runtime closure"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-03T01:50:55.947Z
+-updated_at: 2026-11-03T01:50:55.947Z
++updated_at: 2026-11-03T01:51:48.386Z
+ related:
+   - TOOLS-99
+   - TOOLS-92
+ ---
+ 
+ # Replace application mcporter dependency declarations and bundled runtime closure
+ 
+ Adoption is approved in current simplification scope. Declare exact pi-mcp1.3.0 directly in web-search and root external runtime/bundled dependencies, remove web-search mcporter dependency, update root metadata regression, and regenerate lock through Bun without unrelated registry upgrades or patch changes. Preserve one root product/Bun build/direct packing and stable bins. Keep mise developer mcporter CLI unchanged. Lead serializes installs/build/output windows; no new wrappers, config, hooks or compatibility packages.
++
++---
++
++# Activity Log
++
++## 2026-11-03T01:51:48.387Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

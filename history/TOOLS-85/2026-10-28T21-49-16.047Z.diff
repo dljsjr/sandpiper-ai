@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-85.md
++++ b/TOOLS-85.md
+@@ -5,13 +5,17 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.470Z
+-updated_at: 2026-10-28T21:40:24.014Z
++updated_at: 2026-10-28T21:49:16.046Z
+ ---
+ 
+ # Verify skill-free built-ins and self-contained skill RPC coverage
+ 
++## Verification fixture isolation — 2026-10-28
++
++Second gate passed all 642 assertions and bun check, but caught an unrelated unhandled update-banner callback using stale pi after fixture session disposal. Production bug recorded separately as TOOLS-87, NOT STARTED; production updater code is not changed here. Resource discovery now uses existing neutral capability factories so this resource-only fixture does not start identity/update work. No unhandled error is suppressed; source discovery still exercises the shared resource-discovery implementation with both PATH-gated Trail variants. Focused two-case run passes. Third full gate follows.
++
+ ## Zero-built-in runtime regressions found and fixed
+ 
+ The first final gate passed bun check and 639/640 tests, but packed --version failed because npm omits the empty skills directory and bootstrap required all three resource categories. Added one focused failing regression; minimal bootstrap change now permits absent skills while still requiring prompts/themes. All 15 bootstrap cases pass.
+ 
+@@ -34,4 +38,8 @@
+ 
+ ## 2026-10-28T21:40:24.014Z
+ 
+ - **description**: 1 line → updated (11 lines)
++
++## 2026-10-28T21:49:16.047Z
++
++- **description**: 11 lines → updated (15 lines)

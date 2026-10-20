@@ -1,0 +1,34 @@
+===================================================================
+--- a/WEB-19.md
++++ b/WEB-19.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "web_fetch: markdown_section heading match too brittle (fails on bracketed/dated headings like '## [0.80.1] - 2026-06-23')"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-06-23T20:12:02.803Z
+-updated_at: 2026-06-23T20:12:02.803Z
++updated_at: 2026-11-11T22:34:34.582Z
+ ---
+ 
+ # web_fetch: markdown_section heading match too brittle (fails on bracketed/dated headings like '## [0.80.1] - 2026-06-23')
+ 
+@@ -22,4 +22,13 @@
+ - ignore trailing decorations (e.g. ' - 2026-06-23') for match purposes
+ - case-insensitive, whitespace-collapsed substring match as the default, with exact-match available if needed.
+ 
+ RELATED: pairs with the content-type bug above; verify against the WEB-16 contract to confirm whether brittle exact-match was intended (then this is an enhancement) or unintended (defect). Either way the current behavior makes the feature hard to drive without first reading the doc to discover exact heading strings, which defeats the point of targeted extraction.
++
++---
++
++# Activity Log
++
++## 2026-11-11T22:34:34.604Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

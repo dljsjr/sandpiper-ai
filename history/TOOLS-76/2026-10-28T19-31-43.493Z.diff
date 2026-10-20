@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-76.md
++++ b/TOOLS-76.md
+@@ -1,14 +1,22 @@
+ ---
+-title: "Preserve the per-behavior TDD confirmation checkpoint in developer guidance"
++title: "Preserve autonomous one-test red-green-refactor in developer guidance"
+ status: NOT STARTED
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.569Z
+-updated_at: 2026-10-28T18:57:43.569Z
++updated_at: 2026-10-28T19:31:43.493Z
+ ---
+ 
+-# Preserve the per-behavior TDD confirmation checkpoint in developer guidance
++# Preserve autonomous one-test red-green-refactor in developer guidance
+ 
+ Make the essential developer-role rule explicit: one behavior, one failing test, show/verify RED, get user confirmation before production code, minimum GREEN, refactor, repeat. No bulk tests followed by bulk implementation. Keep existing test-first/behavior-focused/BDD guidance rather than copying the whole tutorial into a role. The user values confirmation and did not authorize removing it. No broad refactoring or testing-SOP redesign.
++
++---
++
++# Activity Log
++
++## 2026-10-28T19:31:43.493Z
++
++- **title**: Preserve the per-behavior TDD confirmation checkpoint in developer guidance → Preserve autonomous one-test red-green-refactor in developer guidance

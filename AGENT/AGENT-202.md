@@ -1,12 +1,13 @@
 ---
 title: "Extract generalized system notifications package"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-05-18T14:46:42.639Z
-updated_at: 2026-05-18T14:46:42.639Z
+updated_at: 2026-11-19T18:58:29.576Z
 ---
 
 # Extract generalized system notifications package
@@ -28,3 +29,20 @@ Non-goals:
 - Do not fold this into Tattler core.
 - Do not build a new notification queue/dispatcher subsystem.
 - Do not rewrite Pi session context handling.
+
+## Closed in backlog triage (2026-11-19)
+
+A separate package conflicts with the one-root-package rule; Birdup keeps its own copy.
+
+---
+
+# Activity Log
+
+## 2026-11-19T18:58:29.090Z
+
+- **description**: 17 lines → updated (21 lines)
+
+## 2026-11-19T18:58:29.576Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: UNRESOLVED → WONTFIX

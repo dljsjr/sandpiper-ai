@@ -1,0 +1,42 @@
+---
+title: "Tattler leaves dead socket files behind when a session exits without session_shutdown"
+status: COMPLETE
+resolution: DONE
+kind: BUG
+priority: MEDIUM
+assignee: AGENT
+reporter: USER
+created_at: 2026-11-19T23:22:17.894Z
+updated_at: 2026-11-20T02:07:58.912Z
+---
+
+# Tattler leaves dead socket files behind when a session exits without session_shutdown
+
+Doug suspected Tattler leaks dead sockets on crash. Confirmed 2026-11-19: the real runtime directory ($TMPDIR/sandpiper) held 271 socket files, 264 dead (ECONNREFUSED), back to 2026-10-28; all 7 identity files were live. Isolated probe of exit paths: SIGTERM and SIGHUP clean up (Pi runs session_shutdown); process.exit, which Pi's emergencyTerminalExit and uncaughtCrash call, leaves the socket (the identity file goes, through tmp's exit handler); SIGKILL leaves both. Nothing ever removes another session's dead socket: session_start only unlinks a dead file at its own path, and listPeerSockets skips dead ones. Every list_peers and send_peer_message probes all of them.
+
+## Outcome (zwolokwp)
+
+- `extensions/tattler/index.ts`: an `exit` listener removes the session's socket with `unlinkSync` on `process.exit`; `session_shutdown` removes the listener, so `/reload` keeps one.
+- `sweepDeadEndpoints()` in `tattler-identity.ts`, run in the background at each session start: removes socket files that refuse connections and identity files whose socket is missing or refuses, once at least 10 s old (protects a session between bind and listen). Timeouts keep the file. `probeSocket()` in `tattler-ipc.ts` distinguishes refused from unknown; `isSocketAlive()` uses it.
+- Tests: `tattler-identity.test.ts` (real dead and live sockets, age guard, unreadable id file), exit-listener count across /reload in `index.test.ts`, `devtools/integration/tattler-endpoint-cleanup.integration.test.ts` (real session exits via process.exit, socket gone; failed before the fix). Probe confirmed a new session sweeps a SIGKILL leftover.
+- Docs: tattler-v0-dogfood-notes.md (cleanup paths; resolved open question), tattler skill re-test list.
+- bun check clean, 93 files/871 tests, dist rebuilt. The 264 existing dead sockets go at the next session start on the rebuilt code.
+
+---
+
+# Activity Log
+
+## 2026-11-19T23:22:22.209Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-11-19T23:26:25.076Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **description**: 1 line → updated (9 lines)
+
+## 2026-11-20T02:07:58.912Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

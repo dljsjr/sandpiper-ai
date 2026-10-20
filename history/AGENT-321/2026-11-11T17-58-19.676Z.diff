@@ -1,0 +1,33 @@
+===================================================================
+--- a/AGENT-321.md
++++ b/AGENT-321.md
+@@ -5,15 +5,19 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T22:33:19.263Z
+-updated_at: 2026-11-11T17:32:16.190Z
++updated_at: 2026-11-11T17:58:19.675Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # System prompt changes mid-session when jj colocation detection times out
+ 
++## Independent check checkpoint (2026-11-11)
++
++Parent/gate independently passed frozen install and the revision-specific bun check with zero errors/warnings. All ten tasks are implemented and independently reviewed with no outstanding actionable findings. Full/per-commit full-test gates remain pending quiet load; no completion or acceptance is claimed.
++
+ ## Implementation checkpoint (2026-11-11)
+ 
+ Change xykrywto caches VCS, USER.md and identity input per session, resets the detector baseline, and still renders current Pi options. Worker reproduced the three unstable-input failures and baseline reset, then passed 155 focused tests and 13 non-dump real-Pi cases. Independent review found no actionable issue. Full/per-commit quiet-machine gates are pending.
+ 
+@@ -105,4 +109,8 @@
+ 
+ ## 2026-11-11T17:32:16.193Z
+ 
+ - **description**: 66 lines → updated (72 lines)
++
++## 2026-11-11T17:58:19.676Z
++
++- **description**: 72 lines → updated (76 lines)

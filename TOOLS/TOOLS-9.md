@@ -1,12 +1,13 @@
 ---
 title: "Investigate upstream pi support for piConfig env var overrides"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-03-25T03:03:06.093Z
-updated_at: 2026-08-06T20:43:09.864Z
+updated_at: 2026-10-20T01:28:57.129Z
 ---
 
 # Investigate upstream pi support for piConfig env var overrides
@@ -14,6 +15,8 @@ updated_at: 2026-08-06T20:43:09.864Z
 During the deep dive on pi's config.js, we identified that adding PI_APP_NAME and PI_CONFIG_DIR_NAME env var overrides to config.js would eliminate the entire PI_PACKAGE_DIR + symlink dance. A 2-line upstream change. Low priority since the current approach works, but worth proposing if we build a relationship with the pi maintainer.
 
 VERIFIED 2026-08-06 at pi v0.84.0: still no upstream support. config.ts is mechanically unchanged (module-load-time read of package.json piConfig at getPackageDir(); APP_NAME/CONFIG_DIR_NAME derivation identical; only ENV_AGENT_DIR/ENV_SESSION_DIR are APP_NAME-derived). MainOptions is still { extensionFactories } only - no programmatic rebrand hook was added. Proposal remains valid. Companion upstream ask: AGENT-245 (derive bash session env prefix PI_SESSION_ID etc. from APP_NAME, added in pi 0.82.0 as hardcoded literals).
+
+Closed 2026-10-19: still no app-name/config-dir env override in Pi 1.3.0 config.js. Upstream-only change; per AGENTS.md we do not track upstream wishes as tasks.
 
 ---
 
@@ -26,3 +29,12 @@ VERIFIED 2026-08-06 at pi v0.84.0: still no upstream support. config.ts is mecha
 ## 2026-08-06T20:43:09.865Z
 
 - **description**: 1 line → updated (3 lines)
+
+## 2026-10-20T01:28:55.469Z
+
+- **description**: 3 lines → updated (5 lines)
+
+## 2026-10-20T01:28:57.130Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

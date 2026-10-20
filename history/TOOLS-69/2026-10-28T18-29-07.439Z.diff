@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-69.md
++++ b/TOOLS-69.md
+@@ -1,17 +1,26 @@
+ ---
+ title: "Unbundle refactoring and preserve it for a separate SOP rethink"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:29:07.329Z
+-updated_at: 2026-10-28T18:29:07.329Z
++updated_at: 2026-10-28T18:29:07.439Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+ 
+ # Unbundle refactoring and preserve it for a separate SOP rethink
+ 
+ User approved the same treatment as code-review during the one-by-one review: preserve the complete current refactoring skill unchanged at ~/git/skills-incubator/skills/refactoring, remove its Sandpiper-owned bundled copy, and defer the SOP rethink. Preserve every source file/byte/mode; do not overwrite an existing destination. Update source/system-prompt/packed catalogue expectations and active mandatory skill dependencies only. Remove retired Sandpiper-linked deployment/provisioning if present, but preserve independent installed copies and unrelated state. Retained-skill/prompt edits must be limited to optional dependency routing, not a new SOP or content rewrite. No archive auto-loading, new package/repo, or decisions about jj/mutation-testing/test-driven-development. Verification belongs to the parent; final completion awaits user acceptance.
++
++---
++
++# Activity Log
++
++## 2026-10-28T18:29:07.439Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

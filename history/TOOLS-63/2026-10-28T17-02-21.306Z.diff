@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-63.md
++++ b/TOOLS-63.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Route affected project guidance directly to the Markdown project index"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T16:53:38.969Z
+-updated_at: 2026-10-28T16:53:38.969Z
++updated_at: 2026-10-28T17:02:21.299Z
+ ---
+ 
+ # Route affected project guidance directly to the Markdown project index
+ 
+ Inventory active project guidance referring to the projects skill or projects.toon, resolve canonical owners and pre-existing work, update only current guidance, and classify historical/data references rather than rewriting them. Preserve portability and unrelated state.
++
++---
++
++# Activity Log
++
++## 2026-10-28T17:02:21.306Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

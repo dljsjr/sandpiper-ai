@@ -1,0 +1,47 @@
+---
+title: "Rebuild and verify the temporary Trail bridge"
+status: COMPLETE
+resolution: DONE
+kind: SUBTASK
+priority: MEDIUM
+assignee: AGENT
+reporter: AGENT
+created_at: 2026-10-26T14:44:09.652Z
+updated_at: 2026-10-28T01:17:05.648Z
+---
+
+# Rebuild and verify the temporary Trail bridge
+
+Verified clean bun check; full bun run test with 94 files and 687 passing tests; focused 21-test rerun; external archive SDK parsing with no diagnostics; and a rebuilt CLI diagnostic advertising trail from the real renamed archive using an isolated agent directory/project. The full gate rebuilds the harness and includes offline read-only npm packed-install verification. TOOLS-43 remains NOT STARTED as the follow-up/removal reminder. Adding the new inline built-in code requires one initial process restart; subsequent resource reloads recheck PATH and the archive. No standalone Trail edits or Tattler contact.
+
+## Bookkeeping acceptance — 2026-10-27
+
+Accepted the temporary PATH-gated archived Trail skill bridge. Current hermetic tests cover executable probing without invoking Trail and resource discovery. This session loads the renamed external trail skill. TOOLS-43 remains NOT STARTED; no standalone discovery/release contract, download strategy, or external Trail changes were inferred or implemented.
+
+Current verification: bun check passed with zero errors/warnings; bun run test rebuilt package output and passed 87 files / 640 tests, including packed-install, cache-restoration and temporary Trail bridge regressions. Closure requested during the return to build/packaging simplification. Original historical verification is retained above.
+
+---
+
+# Activity Log
+
+## 2026-10-26T15:00:57.450Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-26T15:11:04.040Z
+
+- **description**: added (1 line)
+
+## 2026-10-26T15:11:04.099Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-10-28T01:17:05.587Z
+
+- **description**: 1 line → updated (7 lines)
+
+## 2026-10-28T01:17:05.649Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

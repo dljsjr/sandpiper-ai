@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-324.md
++++ b/AGENT-324.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Reorganize Birdup so system prompt sections are easy to edit, without behavior change"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-12T20:41:38.244Z
+-updated_at: 2026-11-12T20:41:43.482Z
++updated_at: 2026-11-12T20:41:43.619Z
+ ---
+ 
+ # Reorganize Birdup so system prompt sections are easy to edit, without behavior change
+ 
+@@ -33,4 +33,9 @@
+ 
+ ## 2026-11-12T20:41:43.483Z
+ 
+ - **description**: added (15 lines)
++
++## 2026-11-12T20:41:43.620Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

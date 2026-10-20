@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,9 +9,9 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T18:22:55.569Z
++updated_at: 2026-10-28T18:29:07.849Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -40,8 +40,10 @@
+ Code-review unbundling/archival is implemented and awaits user review in TOOLS-64. Two original shipping decisions are made (projects and code-review); the other four skills remain undecided. Independent SOP redesign is deferred under TOOLS-68 and does not gate packaging cleanup.
+ 
+ User accepted code-review unbundling/archival; TOOLS-64 and its children are COMPLETE/DONE. Continue one-by-one with refactoring (3 of the original 6). No shipping, extraction or rewrite decision is approved for refactoring or the other three remaining skills.
+ 
++Approved refactoring decision: preserve unchanged under ~/git/skills-incubator/skills/refactoring, remove the bundled copy, and rethink its SOP separately. Unbundling is TOOLS-69; deferred rethink is TOOLS-73. Only dependency-routing maintenance in retained guidance is approved. No decision about the other three remaining skills is made.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -86,4 +88,8 @@
+ 
+ ## 2026-10-28T18:22:55.570Z
+ 
+ - **description**: 23 lines → updated (25 lines)
++
++## 2026-10-28T18:29:07.850Z
++
++- **description**: 25 lines → updated (27 lines)

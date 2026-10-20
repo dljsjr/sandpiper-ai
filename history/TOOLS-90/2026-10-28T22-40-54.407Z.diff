@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-90.md
++++ b/TOOLS-90.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Support zero bundled prompts across staging and runtime"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:40:54.009Z
+-updated_at: 2026-10-28T22:40:54.009Z
++updated_at: 2026-10-28T22:40:54.407Z
+ ---
+ 
+ # Support zero bundled prompts across staging and runtime
+ 
+ Use individual test-first cycles to preserve custom prompt support while removing default templates. Staging, bootstrap and owned resource-path discovery must accept missing optional prompt directories without hiding missing required themes or configured external errors. Preserve existing skill/Trail support and isolated tests.
++
++---
++
++# Activity Log
++
++## 2026-10-28T22:40:54.407Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

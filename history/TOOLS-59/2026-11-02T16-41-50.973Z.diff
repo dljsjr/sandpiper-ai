@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -1,16 +1,16 @@
+ ---
+-title: "Review and resolve the themes resource scaffold"
++title: "Make built-in theme resources optional for the standalone CLI"
+ status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-11-02T16:40:28.662Z
++updated_at: 2026-11-02T16:41:50.972Z
+ ---
+ 
+-# Review and resolve the themes resource scaffold
++# Make built-in theme resources optional for the standalone CLI
+ 
+ ## Approved implementation scope — 2026-11-02
+ 
+ User changed this existing ticket from theme-content review to making built-in resources optional. Permit a valid standalone install with no resources tree; skip absent owned theme paths in staging/discovery; preserve stock Pi asset resolution and custom theme loading. Explicit resource-root overrides must still reject invalid directories. Keep the README-only theme location as documentation; deleting it is not necessary for optional behavior and was not part of the user's latest approval. No theme design, engine rewrite, archive installation or unrelated updater fix.
+@@ -32,4 +32,8 @@
+ 
+ ## 2026-11-02T16:40:28.663Z
+ 
+ - **description**: 1 line → updated (9 lines)
++
++## 2026-11-02T16:41:50.973Z
++
++- **title**: Review and resolve the themes resource scaffold → Make built-in theme resources optional for the standalone CLI

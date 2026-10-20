@@ -2,13 +2,13 @@
 title: "Split Tattler package family and thin Pi binding"
 status: NOT STARTED
 kind: TASK
-priority: MEDIUM
+priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-05-15T03:13:38.440Z
 depends_on:
   - TAT-6
-updated_at: 2026-05-15T03:13:47.658Z
+updated_at: 2026-11-19T20:49:08.320Z
 ---
 
 # Split Tattler package family and thin Pi binding
@@ -23,6 +23,12 @@ Scope:
 
 Depends on: TAT-6 / v1 mini-spec.
 
+## Parked in backlog triage (2026-11-19)
+
+Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
+
+Conflict to re-decide when v1 starts: this repository now keeps one root `package.json` (AGENTS.md core invariants, after the TOOLS-30 simplification), so a separate Tattler package family needs a fresh decision.
+
 ---
 
 # Activity Log
@@ -30,3 +36,8 @@ Depends on: TAT-6 / v1 mini-spec.
 ## 2026-05-15T03:13:47.659Z
 
 - **depends_on**: (none) → TAT-6
+
+## 2026-11-19T20:49:08.320Z
+
+- **priority**: MEDIUM → LOW
+- **description**: 9 lines → updated (15 lines)

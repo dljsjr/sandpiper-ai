@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-61.md
++++ b/TOOLS-61.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Convert the project index and route global guidance directly to it"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T16:53:38.823Z
+-updated_at: 2026-10-28T16:53:38.823Z
++updated_at: 2026-10-28T16:56:15.602Z
+ ---
+ 
+ # Convert the project index and route global guidance directly to it
+ 
+ Preserve the complete current project directory in a backed-up Markdown routing table. Rewire global startup/workflow/role guidance without a projects skill dependency. Remove the old TOON file only after preservation and active consumers are verified.
++
++---
++
++# Activity Log
++
++## 2026-10-28T16:56:15.603Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

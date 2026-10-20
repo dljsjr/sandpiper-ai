@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-110.md
++++ b/TOOLS-110.md
+@@ -5,15 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-10T23:39:42.740Z
+-updated_at: 2026-11-11T18:15:17.508Z
++updated_at: 2026-11-11T19:21:12.700Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Retire the .pi to .sandpiper migration
+ 
++## Corrected hermetic full gate passed (2026-11-11)
++
++With the approved mwqvznwo smoke guard inherited, independent frozen install, zero-warning check and unfiltered full suite passed: 66 files/541 tests. Actual offline/read-only packed CLI checks included. Exact command: bun run test --maxWorkers 1 --no-file-parallelism. No timeout changes or retries. Status NEEDS REVIEW, not accepted. Logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik/06-wtvvzmpy/.
++
+ ## Full verification passed (2026-11-11)
+ 
+ wtvvzmpy: independent frozen install, zero-warning bun check, and full `bun run test --maxWorkers 1 --no-file-parallelism` passed: 66 files / 541 tests. No filters, exclusions or timeout changes; real offline/read-only packed CLI checks included. Fresh start load was below8. Independent code review found no outstanding actionable findings. Status is NEEDS REVIEW, not user-accepted COMPLETE. Logs: /tmp/sandpiper-gate-last-seven-full.ARdI8S/wtvvzmpy/. Earlier implementation checkpoints below preceded this full gate.
+ 
+@@ -68,4 +72,8 @@
+ 
+ ## 2026-11-11T18:15:17.509Z
+ 
+ - **description**: 27 lines → updated (31 lines)
++
++## 2026-11-11T19:21:12.701Z
++
++- **description**: 31 lines → updated (35 lines)

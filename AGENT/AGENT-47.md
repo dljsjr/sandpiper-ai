@@ -1,15 +1,20 @@
 ---
 title: "ProcessManager: design multi-consumer output broadcast pattern"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:52.812Z
-updated_at: 2026-06-03T04:44:12.486Z
+updated_at: 2026-11-10T16:08:54.439Z
 ---
 
 # ProcessManager: design multi-consumer output broadcast pattern
+
+## Closed with the Shell Relay retirement (2026-11-10)
+
+Doug decided to remove Shell Relay (TOOLS-93). This task existed because the relay extension would have been a second consumer of a background process output stream. With the extension gone there is one consumer, so the broadcast design is not needed. Reopen it if a second consumer appears.
 
 The background process framework design doc lists multiple consumers as an open question: 'if both the relay extension and a tool call want the same process's output, how do we handle that? Broadcast vs. single reader?'
 
@@ -48,3 +53,12 @@ The shell relay extension might want to consume a process's stdout stream for it
 
 - **status**: IN PROGRESS → NOT STARTED
 - **assignee**: Huginn → UNASSIGNED
+
+## 2026-11-10T16:08:54.317Z
+
+- **description**: 19 lines → updated (23 lines)
+
+## 2026-11-10T16:08:54.440Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

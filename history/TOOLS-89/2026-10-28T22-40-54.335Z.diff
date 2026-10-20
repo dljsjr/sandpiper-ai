@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-89.md
++++ b/TOOLS-89.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Preserve all six prompts in the external Sandpiper archive"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:40:53.924Z
+-updated_at: 2026-10-28T22:40:53.924Z
++updated_at: 2026-10-28T22:40:54.335Z
+ ---
+ 
+ # Preserve all six prompts in the external Sandpiper archive
+ 
+ Archive exact original filenames/bytes/modes under ~/git/sandpiper-archive/prompts before deleting bundled sources. Use a separate jj-managed cold archive repository, with provenance outside the unchanged prompt files. No archive autoload/registration and no unrelated state changes.
++
++---
++
++# Activity Log
++
++## 2026-10-28T22:40:54.335Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

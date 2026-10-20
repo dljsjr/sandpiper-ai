@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -5,13 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-11-02T16:39:19.098Z
++updated_at: 2026-11-02T16:40:28.662Z
+ ---
+ 
+ # Review and resolve the themes resource scaffold
+ 
++## Approved implementation scope — 2026-11-02
++
++User changed this existing ticket from theme-content review to making built-in resources optional. Permit a valid standalone install with no resources tree; skip absent owned theme paths in staging/discovery; preserve stock Pi asset resolution and custom theme loading. Explicit resource-root overrides must still reject invalid directories. Keep the README-only theme location as documentation; deleting it is not necessary for optional behavior and was not part of the user's latest approval. No theme design, engine rewrite, archive installation or unrelated updater fix.
++
++Initial repo checkpoint found normal jj status stuck in Watchman initialization. Cached status reports clean but is insufficient for edits; investigate a per-command fsmonitor bypass without changing user VCS configuration before touching source.
++
++## Earlier review scope
++
+ Review packages/resources/themes, currently a README-only scaffold, and its role in resource discovery/staging. Record the user's decision about retaining or changing this surface. Apply and verify any approved change, including portable packaging where relevant, before requesting acceptance. Do not remove the scaffold merely because it currently contains no theme files.
+ 
+ ---
+ 
+@@ -20,4 +28,8 @@
+ ## 2026-11-02T16:39:19.103Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-02T16:40:28.663Z
++
++- **description**: 1 line → updated (9 lines)

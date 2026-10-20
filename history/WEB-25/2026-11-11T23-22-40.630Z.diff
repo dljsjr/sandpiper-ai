@@ -1,0 +1,29 @@
+===================================================================
+--- a/WEB-25.md
++++ b/WEB-25.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Find llms.txt through page link relations and path-scoped probes"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T23:14:34.492Z
+-updated_at: 2026-11-11T23:14:34.492Z
++updated_at: 2026-11-11T23:22:40.629Z
+ ---
+ 
+ # Find llms.txt through page link relations and path-scoped probes
+ 
++
++---
++
++# Activity Log
++
++## 2026-11-11T23:22:40.630Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

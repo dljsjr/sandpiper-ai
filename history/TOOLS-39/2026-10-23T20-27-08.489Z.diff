@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-39.md
++++ b/TOOLS-39.md
+@@ -5,13 +5,14 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-23T20:11:39.501Z
+-updated_at: 2026-10-23T20:16:15.071Z
++updated_at: 2026-10-23T20:27:08.486Z
+ ---
+ 
+ # Remove Trail package, bundled skill, and build/test wiring
+ 
++Removed packages/trail, the bundled tasks skill and generated CLI copies, all adoption/migration source and tests, workspace dependency and build filters, Vitest project, Knip entries, and the obsolete ast-grep exception. Removed the unused root Commander dependency after deleting the adoption CLI. Shared helper staging now copies only standup; its CLI implementation is unchanged. Retained VCS isolation through a generic devtools/test-fixtures/jj-test-config.toml. Test-first focused tests failed on the old dependencies/catalogue and passed after removal.
+ 
+ ---
+ 
+ # Activity Log
+@@ -23,4 +24,8 @@
+ 
+ ## 2026-10-23T20:16:15.077Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-23T20:27:08.489Z
++
++- **description**: added (1 line)

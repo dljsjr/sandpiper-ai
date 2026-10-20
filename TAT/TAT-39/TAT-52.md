@@ -2,19 +2,25 @@
 title: "Render and test Chorus audience metadata"
 status: NOT STARTED
 kind: SUBTASK
-priority: MEDIUM
+priority: LOW
 assignee: "Huginn"
 reporter: USER
 created_at: 2026-05-25T19:12:00.679Z
 depends_on:
   - TAT-50
   - TAT-51
-updated_at: 2026-05-25T19:17:28.661Z
+updated_at: 2026-11-19T20:49:27.137Z
 ---
 
 # Render and test Chorus audience metadata
 
 Render participant/audience metadata compactly where useful and add tests for broker stamping, local and remote delivery, batched inbox details, and backwards compatibility with existing room messages that lack participants.
+
+## Parked in backlog triage (2026-11-19)
+
+Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
+
+Their parent, TAT-39, is COMPLETE, and Trail does not let a subtask of a completed task become active. When v1 starts, move these under TAT-70 or promote them.
 
 ---
 
@@ -27,3 +33,12 @@ Render participant/audience metadata compactly where useful and add tests for br
 ## 2026-05-25T19:17:28.661Z
 
 - **depends_on**: (none) → TAT-50, TAT-51
+
+## 2026-11-19T20:49:09.108Z
+
+- **priority**: MEDIUM → LOW
+- **description**: 1 line → updated (5 lines)
+
+## 2026-11-19T20:49:27.137Z
+
+- **description**: 5 lines → updated (7 lines)

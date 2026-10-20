@@ -1,0 +1,39 @@
+===================================================================
+--- a/WEB-10.md
++++ b/WEB-10.md
+@@ -5,13 +5,25 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.144Z
+-updated_at: 2026-04-01T16:30:37.312Z
++updated_at: 2026-11-12T16:33:47.870Z
+ ---
+ 
+ # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+ 
++## Evaluation of @lightpanda/browser (2026-11-12)
++
++Doug proposed the Lightpanda Node package. Findings, all measured:
++
++- The package (1.6.0, 2.3 KB wrapper, depends on yargs) builds a shell command string and runs it with execSync. With /bin/echo as the binary: the URL https://example.com/search?q=one&page=2 reached the binary as ...?q=one (the shell split it at &), and a URL containing $(touch marker) created the marker file. A URL comes from the model and may come from page content, so this is command execution from untrusted input, the WEB-22 class.
++- It calls process.exit(1) when the binary is missing, blocks the event loop for the whole fetch, and exposes 5 options. One flag it passes, --enable-external-stylesheets, is not in lightpanda 1.0.2.
++- The binary itself is suitable. Doug has 1.0.2 at /opt/homebrew/bin/lightpanda. fetch --dump html --json returns url, http_status, headers, error and bot_challenge, which map onto FetchResult. Useful flags: --wait-until networkidle, --wait-ms, --terminate-ms, --block-private-networks.
++- Rendering works: demo-browser.lightpanda.io/campfire-commerce/ gives "Loading..." through plain fetch and through the default --wait-until load, and the rendered content in about 0.6 s with --wait-until networkidle.
++- It is not a way past bot checks: www.npmjs.com/package/@lightpanda/browser reads correctly through plain web_fetch, while lightpanda gets a Cloudflare challenge (403, error BotChallenge).
++
++Recommendation: a second FetchAdapter that runs the installed binary directly with an argument array (no shell, no npm package), as an explicit opt-in. Awaiting Doug's decision.
++
+ The web-fetch PRD explicitly deferred JS rendering to v2 when 'real failure cases' arise. The FetchAdapter interface was designed to accommodate this: a LightpandaAdapter or PlaywrightAdapter could slot in without changing the pipeline or tool API.
+ 
+ ## Motivation
+ 
+@@ -39,4 +51,8 @@
+ 
+ ## 2026-04-01T16:30:37.312Z
+ 
+ - **priority**: LOW → MEDIUM
++
++## 2026-11-12T16:33:47.875Z
++
++- **description**: 17 lines → updated (29 lines)

@@ -1,12 +1,13 @@
 ---
 title: "Spike: SQLite index — trade-offs vs human-readable TOON index"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-23T03:18:38.806Z
-updated_at: 2026-03-29T00:37:46.889Z
+updated_at: 2026-10-19T19:39:07.904Z
 ---
 
 # Spike: SQLite index — trade-offs vs human-readable TOON index
@@ -32,3 +33,8 @@ This is an exploratory spike — the outcome should be a recommendation document
 ## 2026-03-23T03:19:16.411Z
 
 - **description**: added (13 lines)
+
+## 2026-10-19T19:39:07.904Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

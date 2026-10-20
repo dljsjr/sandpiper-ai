@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -15,13 +15,22 @@
+   - TOOLS-38
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+-updated_at: 2026-11-02T17:42:31.858Z
++  - TOOLS-93
++updated_at: 2026-11-02T18:19:44.324Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Current exploration checkpoint
++
++User requested a fresh build-minimization exploration. TOOLS-92 is ready for review, with an evidence-backed root-product-package proposal in .sandpiper/docs/specs/build-simplification-exploration.md. One direct Bun build plus standard packing can eliminate custom production devtools helpers, Turbo, core emission and staging. A no-build TypeScript package also works in smoke probes but increases the tarball from about39.8MB to52.9MB. These are proposals, not approved implementation.
++
++A real retained-asset gap is tracked by TOOLS-93: the advertised shell-integration installer cannot find scripts in the current tarball. Existing review findings33 remain open. Keep this parent IN PROGRESS. Accepted resource decisions57–59 remain DONE. No closed records or application source changed.
++
++## Earlier scope and implementation history
++
+ ## Current coverage correction — broader simplification is still open
+ 
+ User correctly challenged the claim that only overall signoff remains. Completed artifact/resource work is not evidence that every retained build/runtime/toolchain surface was audited. The last integrated review validated implemented changes and preservation, not completeness against the broader simplification goal. Withdraw the only-acceptance-remains claim.
+ 
+@@ -125,4 +134,9 @@
+ ## 2026-11-02T17:42:31.859Z
+ 
+ - **description**: 25 lines → updated (37 lines)
+ - **related**: TOOLS-1, TOOLS-2, AGENT-318 → TOOLS-1, TOOLS-2, AGENT-318, TOOLS-34, TOOLS-38, TOOLS-42, TOOLS-43, TOOLS-51
++
++## 2026-11-02T18:19:44.325Z
++
++- **description**: 37 lines → updated (45 lines)
++- **related**: TOOLS-1, TOOLS-2, AGENT-318, TOOLS-34, TOOLS-38, TOOLS-42, TOOLS-43, TOOLS-51 → TOOLS-1, TOOLS-2, AGENT-318, TOOLS-34, TOOLS-38, TOOLS-42, TOOLS-43, TOOLS-51, TOOLS-93

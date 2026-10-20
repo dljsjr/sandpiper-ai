@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-75.md
++++ b/TOOLS-75.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Archive and remove the bundled test-driven-development skill"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.493Z
+-updated_at: 2026-10-28T18:57:43.493Z
++updated_at: 2026-10-28T18:57:43.721Z
+ ---
+ 
+ # Archive and remove the bundled test-driven-development skill
+ 
+ Preserve the whole current skill under ~/git/skills-incubator/skills/test-driven-development with exact bytes/modes and no destination overwrite or autoload. Drive the unbundled-catalogue behavior through one focused RED test, user confirmation, then the minimal resource change and GREEN. Update existing diagnostic/packed contracts deliberately for that approved behavior and verify actual package absence. Do not begin production edits before the user confirms the RED checkpoint.
++
++---
++
++# Activity Log
++
++## 2026-10-28T18:57:43.722Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-41.md
++++ b/TOOLS-41.md
+@@ -5,13 +5,14 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-23T20:11:39.655Z
+-updated_at: 2026-10-23T20:24:06.945Z
++updated_at: 2026-10-23T20:27:08.637Z
+ ---
+ 
+ # Verify the reduced distribution and preserved local tooling
+ 
++Verified bun check with zero errors/warnings; full bun run test with 93 files and 681 remaining tests; bun run pack:cli; and explicit tarball inspection proving seven skills and no tasks skill, Trail dependency, or old public task docs. The offline read-only npm packed-install test passes and still exercises both Sandpiper CLIs and the standup helper. All six archived documents match original bytes. Local trail 0.0.1 remains usable after embedded source deletion; task tracking for this work uses that independent copied executable. Standup CLI source is untouched. No standalone Trail repo changes or Tattler contact. The PATH/cache/download integration is intentionally not part of this cleanup.
+ 
+ ---
+ 
+ # Activity Log
+@@ -19,4 +20,8 @@
+ ## 2026-10-23T20:24:06.946Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-23T20:27:08.638Z
++
++- **description**: added (1 line)

@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-292.md
++++ b/AGENT-292.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Integration harness passes the parent session PI_*/SANDPIPER_* env to spawned pi"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-05T21:47:30.780Z
+-updated_at: 2026-10-19T20:20:29.292Z
++updated_at: 2026-10-19T20:20:29.425Z
+ related:
+   - AGENT-290
+   - TOOLS-9
+ ---
+@@ -29,4 +29,9 @@
+ ## 2026-10-19T20:20:29.293Z
+ 
+ - **title**: Sandpiper leaks PI_PACKAGE_DIR into child processes, so nested pi runs as sandpiper → Integration harness passes the parent session PI_*/SANDPIPER_* env to spawned pi
+ - **description**: 5 lines → updated (7 lines)
++
++## 2026-10-19T20:20:29.426Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

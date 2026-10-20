@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-113.md
++++ b/TOOLS-113.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Remove ast-grep"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T15:54:45.887Z
+-updated_at: 2026-11-11T21:09:13.387Z
++updated_at: 2026-11-11T21:49:42.442Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -81,4 +82,9 @@
+ 
+ ## 2026-11-11T21:09:13.388Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-11T21:49:42.443Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

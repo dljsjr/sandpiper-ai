@@ -2,14 +2,14 @@
 title: "C4: read-from-cursor unread API and replay tool (Tattler layer)"
 status: NOT STARTED
 kind: SUBTASK
-priority: MEDIUM
+priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-05-27T15:45:33.856Z
 depends_on:
   - TAT-71
   - TAT-73
-updated_at: 2026-05-27T15:53:54.549Z
+updated_at: 2026-11-19T20:49:10.052Z
 ---
 
 # C4: read-from-cursor unread API and replay tool (Tattler layer)
@@ -22,6 +22,10 @@ Acceptance criteria:
 - Cursor advances on tool-call success (batch-atomic, per TAT-73 semantics)
 - No auto-deliver at turn start in MVP
 - Standalone TUI (TAT-77) can query unread count for display
+
+## Parked in backlog triage (2026-11-19)
+
+Tattler v1, with the durable message log folded into it, is the long-term goal and not current work (Doug). Parked at LOW. Design: `.sandpiper/docs/specs/durable-rooms-sizing.md` and `tat-72-audience-snapshot-design.md`, restored on 2026-11-19 from an abandoned change.
 
 ---
 
@@ -43,3 +47,8 @@ Acceptance criteria:
 ## 2026-05-27T15:53:54.549Z
 
 - **description**: 1 line → updated (8 lines)
+
+## 2026-11-19T20:49:10.052Z
+
+- **priority**: MEDIUM → LOW
+- **description**: 8 lines → updated (12 lines)

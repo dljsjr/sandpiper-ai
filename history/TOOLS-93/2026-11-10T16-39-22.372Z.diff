@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-93.md
++++ b/TOOLS-93.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Retire Shell Relay"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: "relay-removal"
+ reporter: AGENT
+ created_at: 2026-11-02T18:19:44.026Z
+-updated_at: 2026-11-10T16:39:22.269Z
++updated_at: 2026-11-10T16:39:22.371Z
+ related:
+   - TOOLS-30
+   - TOOLS-92
+   - TOOLS-33
+@@ -94,4 +94,8 @@
+ 
+ ## 2026-11-10T16:39:22.275Z
+ 
+ - **description**: 34 lines → updated (51 lines)
++
++## 2026-11-10T16:39:22.372Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

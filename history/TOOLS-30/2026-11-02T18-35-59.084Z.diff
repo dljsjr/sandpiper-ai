@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,13 +16,19 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
+-updated_at: 2026-11-02T18:27:58.080Z
++updated_at: 2026-11-02T18:35:59.083Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Approved implementation breakdown
++
++User requested a work breakdown and sub-agent implementation of the recommended root-product-package/one-Bun-build target. The no-build TypeScript alternative is not selected. Work items: TOOLS-94 package/build, TOOLS-95 runtime loader, TOOLS-96 packaging regressions/helper removal, TOOLS-97 docs/legacy build guidance, TOOLS-98 integrated verification and independent review. Package/runtime/docs are initial parallel lanes; packaging tests follow runtime+package handoff; final verification follows all four. Preserve existing consumer package and launcher paths. Shell Relay93 remains deferred.
++
++## Earlier exploration and scope history
++
+ ## Shell Relay scope clarification
+ 
+ Doug clarified that Shell Relay is deliberately disabled for poor behavior and is under consideration for deprecation. TOOLS-93 is now a low-priority deferred capability decision, not a packaging repair or build-design blocker. Do not add shell assets or revive its installer during build simplification. Removal remains unapproved.
+ 
+@@ -149,4 +155,8 @@
+ 
+ ## 2026-11-02T18:27:58.080Z
+ 
+ - **description**: 45 lines → updated (51 lines)
++
++## 2026-11-02T18:35:59.084Z
++
++- **description**: 51 lines → updated (57 lines)

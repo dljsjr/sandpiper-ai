@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-87.md
++++ b/TOOLS-87.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Scope asynchronous update banners to a live extension session"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-28T21:46:48.339Z
+-updated_at: 2026-11-10T22:20:41.232Z
++updated_at: 2026-11-10T22:20:49.308Z
+ related:
+   - TOOLS-83
+   - TOOLS-85
+ ---
+@@ -26,4 +26,8 @@
+ 
+ ## 2026-11-10T22:20:41.233Z
+ 
+ - **description**: 1 line → updated (5 lines)
++
++## 2026-11-10T22:20:49.309Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

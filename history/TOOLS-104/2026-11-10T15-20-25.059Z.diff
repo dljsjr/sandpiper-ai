@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-104.md
++++ b/TOOLS-104.md
+@@ -5,15 +5,25 @@
+ priority: MEDIUM
+ assignee: "prompt-trim"
+ reporter: USER
+ created_at: 2026-11-09T22:37:52.756Z
+-updated_at: 2026-11-09T22:46:30.397Z
++updated_at: 2026-11-10T15:20:25.058Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Trim the core system-prompt modules: fast-xml-parser, VCS detection, identity typos
+ 
++## History squashed (2026-11-10)
++
++Doug asked for one commit per atomic unit of work. The commit ids listed under "Delivered" below are superseded. Current commits:
++
++- feecb252 refactor: Build system prompt XML without fast-xml-parser (86 files / 746 tests)
++- d3b1bf0d fix: Correct two typos in the built-in identity prompt (86 / 746)
++- 72d510d5 refactor: Detect only jj and git for the system prompt (86 / 745)
++
++The tree at the new tip is identical to the tree that was gated before the squash. Each commit was then gated on its own in an isolated workspace: bun check clean and bun run test passing.
++
+ ## Delivered, awaiting review (2026-11-09)
+ 
+ Agent prompt-trim (Sonnet 5.5, high) delivered four commits from an isolated jj workspace. They now sit on the main working line above 69da93b2. The main bookmark is unchanged. Root dist was not rebuilt, so the running harness still uses the old build.
+ 
+@@ -65,4 +75,8 @@
+ 
+ ## 2026-11-09T22:46:30.397Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-10T15:20:25.059Z
++
++- **description**: 36 lines → updated (46 lines)

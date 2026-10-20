@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-338.md
++++ b/AGENT-338.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-19T21:37:10.819Z
+-updated_at: 2026-11-19T22:34:25.422Z
++updated_at: 2026-11-19T22:43:55.288Z
+ ---
+ 
+ # Fix delivery timing of the model and context usage notifications, and rework their shape
+ 
+@@ -25,8 +25,12 @@
+ Agreed with Doug: context usage as a `turn_end` custom_message entry (verified with a probe: joins the next request mid-run, adds no request after the last response); model at `before_agent_start` compared by provider and id; last reports read from the session branch (`sandpiper:model`, `sandpiper:context-usage`, details version 1), so only a compaction re-arms; bare elements `<contextUsage percentUsed tokensLeft contextWindow/>` (whole percent, k/M tokens) and `<model provider id name/>`; 50% instruction dropped; the 80% crossing also carries the save-your-work system notification; a separate protocol bullet.
+ 
+ Checks: bun check clean, 91 files/865 tests, 13 prompt snapshots changed by the bullet only, dist rebuilt. Isolated RPC E2E: model element in the first request, not repeated. Docs: extensions/README.md, sandpiper-system-prompt.md.
+ 
++## Follow-up: model report after compaction
++
++Agreed with Doug: a compaction starts both reports over, since its summary may drop the last model report; the next run names the model again (about 90 characters per compaction). A compaction mid-run waits for the next run; a report kept in the compaction tail can appear twice, accepted. Squashed into spxwptyk. bun check clean, 91 files/866 tests, dist rebuilt.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -38,4 +42,8 @@
+ ## 2026-11-19T22:34:25.422Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **description**: 1 line → updated (14 lines)
++
++## 2026-11-19T22:43:55.288Z
++
++- **description**: 14 lines → updated (18 lines)

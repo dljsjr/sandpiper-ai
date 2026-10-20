@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,18 +5,25 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-10-20T16:16:55.914Z
++updated_at: 2026-10-20T16:38:59.475Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++Implemented the approved workspace-only topology. The root build now emits the two CLI entrypoints under packages/cli/dist/standalone, builds Trail and standup package outputs, and syncs their local skill helpers. Removed the neutral Pi package, generated npm/Pi assembly, compiled app, Claude plugin, and vendoring updater. Simplified runtime branches and updated active docs.
+ 
++Verification: bun check; bun run test (124 files, 1,220 tests); focused workspace CLI/integration tests; direct sandpiper, system-prompt, Trail, and standup bin smokes; stale-reference sweep.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-20T16:16:55.915Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-20T16:38:59.476Z
++
++- **description**: added (3 lines)

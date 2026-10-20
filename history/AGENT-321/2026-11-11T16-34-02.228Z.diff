@@ -1,0 +1,37 @@
+===================================================================
+--- a/AGENT-321.md
++++ b/AGENT-321.md
+@@ -5,9 +5,9 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-11-10T22:33:19.263Z
+-updated_at: 2026-11-11T16:31:50.224Z
++updated_at: 2026-11-11T16:34:02.226Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -41,10 +41,12 @@
+ ## Evidence from one session
+ 
+ In the TOOLS-92 review session the prompt changed four times after the rebuild on 2026-11-10. Every change was the colocated_git attribute appearing or disappearing. Nothing else changed. Each change also made the Claude Code CLI provider resend about 28 KB of prompt into the conversation.
+ 
+-## Proposed shape, pending Doug's answer on USER.md and the identity file
++## Approved shape (Doug, 2026-11-11)
+ 
++Doug confirmed that USER.md and the identity file are frozen per session too. An edit to either takes effect on /reload or in a new session, not on the next message.
++
+ Cache the three inputs Sandpiper reads itself (version control, USER.md, the identity file) at the first build of a session, and keep building the prompt text from the cached inputs plus Pi's options. Refresh the cache at session_start, which fires for startup, reload, new, resume and fork. The failing test first: two builds in one session give identical text when the command result, USER.md or the identity file differs between them.
+ 
+ Related: the prompt-change detector compares against the first prompt of the process, not of the session (inventory row B-22, agent evidence). Check it while fixing this.
+ 
+@@ -84,4 +86,8 @@
+ 
+ ## 2026-11-11T16:31:50.225Z
+ 
+ - **description**: 29 lines → updated (64 lines)
++
++## 2026-11-11T16:34:02.228Z
++
++- **description**: 64 lines → updated (66 lines)

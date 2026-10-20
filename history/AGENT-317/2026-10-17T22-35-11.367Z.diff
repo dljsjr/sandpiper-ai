@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-317.md
++++ b/AGENT-317.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-17T22:35:03.474Z
+-updated_at: 2026-10-17T22:35:03.474Z
++updated_at: 2026-10-17T22:35:11.366Z
+ ---
+ 
+ # Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-17T22:35:11.367Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

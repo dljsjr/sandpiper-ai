@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-83.md
++++ b/TOOLS-83.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Unbundle jj while preserving the current skill and leaving its replacement WIP"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:13:13.263Z
+-updated_at: 2026-10-28T22:06:42.407Z
++updated_at: 2026-10-28T22:07:28.132Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+   - AGENT-67
+@@ -58,4 +58,8 @@
+ 
+ ## 2026-10-28T22:06:42.409Z
+ 
+ - **description**: 11 lines → updated (23 lines)
++
++## 2026-10-28T22:07:28.133Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

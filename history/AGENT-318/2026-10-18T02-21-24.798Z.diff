@@ -1,0 +1,45 @@
+===================================================================
+--- a/AGENT-318.md
++++ b/AGENT-318.md
+@@ -8,23 +8,24 @@
+ created_at: 2026-10-18T00:28:10.470Z
+ related:
+   - TOOLS-30
+   - AGENT-307
+-updated_at: 2026-10-18T02:21:13.168Z
++updated_at: 2026-10-18T02:21:24.798Z
+ ---
+ 
+ # packages/cli bundles bake build-time absolute paths; Turbo cache shared across worktrees replayed pi13 paths
+ 
+-## 2026-10-18T00:28:10.820Z
++Symptom (2026-10-17): every new `sandpiper` launch fails at startup with ENOENT for /Users/dstephen/git/sandpiper-ai-pi13/node_modules/jsdom/lib/jsdom/browser/default-stylesheet.css, after the pi13 jj workspace was removed. Reproduced with `bun run --bun node_modules/.bin/sandpiper --help`.
+ 
+-- **description**: added (10 lines)
+-- **related**: (none) → TOOLS-30, AGENT-307
++Root cause (two parts):
++1. Bundles are not relocatable. Bun's bundler inlines `__dirname`/`__filename` as build-time absolute paths. The packages/cli bundles (dist/chunks/sandpiper_resources-*.js, dist/chunks/system_prompt_diagnostic-*.js, dist/standalone/chunks/sandpiper_standalone-*.js) embed three absolute paths into node_modules: better-sqlite3/lib, jsdom/lib/jsdom/living/css/helpers (reads default-stylesheet.css at load), and jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js.
++2. Turborepo shares the local cache across Git worktrees when turbo.json sets no cacheDir (documented: https://turborepo.dev/docs/reference/configuration). jj 0.46 `workspace add` creates a Git worktree in colocated repos, so the AGENT-307 builds in ../sandpiper-ai-pi13 wrote to the default workspace's .turbo/cache. Entry b3e9c76a36a1dee2 (packages/cli build, created 2026-10-16 12:24 during the pi13 work, base sha ed93a550 plus the dirty bump) contains pi13 paths. After landing, the default workspace's sources hashed identically, so its 13:10 rebuild was a cache hit that restored the pi13-built dist.
+ 
+-## 2026-10-18T02:19:55.939Z
++Fix options:
++- Unblock: rebuild packages/cli without the cache (TURBO_FORCE=1) in the default workspace.
++- Guard: set "cacheDir": ".turbo/cache" in turbo.json to stop cross-worktree sharing (loses cache hits between workspaces).
++- Root fix: make bundles relocatable (externalize jsdom and better-sqlite3 from the bundles, or inline the asset/paths with a build plugin like devtools' cssTreeBundledDataPlugin). With relocatable outputs, cross-worktree cache sharing becomes safe again. Interacts with TOOLS-30 (build simplification) and the compiled app.
+ 
+-- **status**: NOT STARTED → IN PROGRESS
+-- **assignee**: UNASSIGNED → AGENT
+-
+ Done (2026-10-17, Doug chose option 1 only; no regression test, no cacheDir change): commit mtzooypr adds --external jsdom --external better-sqlite3 to build:sandpiper, build:system-prompt and build:standalone in packages/cli/package.json, matching the existing canvas/css-tree externals. dist/package.json already declares jsdom 30.0.1 and better-sqlite3 13.0.3, so npm installs resolve them. Verified: rg finds no repo absolute paths in any .js under packages/cli/dist or dist (was 3 per bundle); sandpiper --help starts (jsdom loads at startup); rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution EXIT=0 (incl. npmPackageInstallSmoke); bun check clean; bun run test:vitest -- packages/cli 31/31. Changing packages/cli/package.json changes its Turbo hash, so the stale cache entry b3e9c76a36a1dee2 can no longer be hit. Not covered: the compiled standalone app (devtools/standaloneSandpiperApp.ts) cannot use externals and may still embed build paths (TOOLS-30).
+ 
+ ---
+ 
+@@ -46,4 +47,8 @@
+ 
+ ## 2026-10-18T02:21:13.169Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-18T02:21:24.798Z
++
++- **description**: 11 lines → updated (12 lines)

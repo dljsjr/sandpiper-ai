@@ -1,0 +1,44 @@
+===================================================================
+--- a/WEB-10.md
++++ b/WEB-10.md
+@@ -5,13 +5,30 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.144Z
+-updated_at: 2026-11-12T17:27:42.380Z
++updated_at: 2026-11-12T17:34:44.783Z
+ ---
+ 
+ # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+ 
++## Redesigned: renderers register through an event bus channel (2026-11-12)
++
++Change lykonvxu, on top of qnrztpnm. Doug replaced the command-template variable with code renderers, modeled on the prompt-contribution channel. This section supersedes the configuration described under "Implemented" below; SANDPIPER_WEB_FETCH_RENDER_COMMAND no longer exists.
++
++Decisions (Doug): renderers are TypeScript and own output normalization; render stays a boolean; an environment variable picks the renderer by id. Agent proposal he accepted: no request/result messages on the bus, because pi.events is synchronous, returns nothing and drops unheard messages. The registration carries a render function that web_fetch calls directly.
++
++- Channel sandpiper:web-fetch-renderer. Registration: id, render(request, tools), optional acknowledge. Request: normalized http(s) url, timeoutMs. tools.run(executable, args) starts a process without a shell and returns stdout, stderr and exitCode. Result: html, optional url, statusCode, contentType, linkHeader, blocked.
++- Selection at the first before_agent_start: the id SANDPIPER_WEB_FETCH_RENDERER names (no match turns rendering off); else the first registered renderer; else the built-in one.
++- Built-in Lightpanda renderer (lightpanda-renderer.ts) reads the --json report: real final URL, status and Link header; a bot challenge becomes blocked; a named error is thrown.
++- Tool registration: at load, and again at the first before_agent_start with the final schema.
++
++Measured, not assumed: a tool first registered inside before_agent_start is declared but missing from the first prompt's tools section (mutation of index.ts fails the integration test with exactly that). Registering at load and again on the first run gives one system message with the final web_fetch schema in request 1, and the same single system message in requests 2 and 3.
++
++Test infrastructure change, additive and opt-in: the integration mock provider can append each request's context to a file (MOCK_RECORD_ENV_VAR). New devtools/integration/web-fetch-render.integration.test.ts and fixtures/renderer-fixture.ts.
++
++Verification, isolated checkout: bun check clean; full serial suite 69 files, 622 tests passed. Live through the new code: Lightpanda renders the demo shop page (0.5 s); docs.anthropic.com reports its final URL platform.claude.com/docs/en/intro and finds the right llms.txt; a 404 page returns "HTTP error: 404"; a Cloudflare challenge on the npm page is reported as blocked (one run got through, so that site is intermittent). The README's Obscura example, run unchanged, renders the demo page and reports the npm challenge as blocked. No new dependency; live after the next build.
++
+ ## Implemented (2026-11-12)
+ 
+ Change qnrztpnm. Doug approved a direct-binary adapter behind an explicit render parameter and asked that the browser be configurable, with obscura as a second example.
+ 
+@@ -85,4 +102,8 @@
+ 
+ ## 2026-11-12T17:27:42.386Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
++
++## 2026-11-12T17:34:44.784Z
++
++- **description**: 42 lines → updated (59 lines)

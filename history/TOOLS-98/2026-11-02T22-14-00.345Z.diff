@@ -1,0 +1,45 @@
+===================================================================
+--- a/TOOLS-98.md
++++ b/TOOLS-98.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T18:35:58.942Z
+-updated_at: 2026-11-02T21:53:55.874Z
++updated_at: 2026-11-02T22:14:00.344Z
+ depends_on:
+   - TOOLS-94
+   - TOOLS-95
+   - TOOLS-96
+@@ -17,16 +17,18 @@
+ # Verify and independently review the integrated minimal build
+ 
+ ## Current integrated evidence (independent review in progress)
+ 
+-All implementation lanes94–97 are NEEDS REVIEW and their workers are closed. Quiet main checkout: bun check zero errors/warnings;85files/652tests pass; pack:cli pass. Fresh tracked-source copy: frozen offline scripts-disabled install, identical85/652 full suite, check/pack pass, lock unchanged, no prior/emitted CLI/core/capability output. Existing live ignored output was not deleted.
++All implementation lanes94–97 are NEEDS REVIEW and their workers are closed. Quiet main checkout: bun check zero errors/warnings;85files/653tests pass; pack:cli pass. Fresh tracked-source copy: frozen offline scripts-disabled install, identical85/653 full suite, check/pack pass, lock unchanged, no prior/emitted CLI/core/capability output. Existing live ignored output was not deleted.
+ 
+ Real direct repack with previous root archive present produced identical16932-entry payload and identical SHA256 0001623f7e1e165929198241f62c42e1b5016a89903340d38e5cb21db4f46e4a; no nested archives. Empty-cache offline npm install with scripts disabled passed. Read-only CLI/SDK/stock-theme probes pass in packed regression. Extra installed read-only native SQLite query (SQLite3.53.4) and jsdom parsing probes pass with zero sidecars.
+ 
+-Evidence: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-minimal-build-preservation-zDYb63/{integrated-gates.json,final-closure.json,after.json}; final fresh source evidence at sandpiper-clean-install-bJDNnf/final-evidence/result.json under same temporary parent. Nine protected roots, exact launcher-only target updates, modes and three unrelated dirty dotfiles rechecked unchanged. Canonical launcher edit intentionally uncommitted beside unrelated dotfiles; no blanket commit.
++Evidence: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-minimal-build-preservation-zDYb63/{integrated-gates.json,final-closure.json,after.json}; final fresh source evidence at sandpiper-clean-install-bJDNnf/final-run-JRZSxV/evidence/result.json under same temporary parent. Nine protected roots, exact launcher-only target updates, modes and three unrelated dirty dotfiles rechecked unchanged. Canonical launcher edit intentionally uncommitted beside unrelated dotfiles; no blanket commit.
+ 
+-Independent inherited-model read-only reviewer build-review04648c65248f is active. No final acceptance inferred;30 remains open. No pushes/releases, Shell Relay changes, mcporter/toolchain removals, archive installs or WIP-skill edits.
++Parent caught and corrected a fixture issue: JITI_FS_CACHE path strings enabled the shared default cache. Four fixtures now disable it with false; a real SDK-anchored options regression demonstrated RED then GREEN. Both corrected quiet main and newly copied-source default gates pass85/653, with original timeouts and the identical product artifact.
+ 
++Independent inherited-model read-only reviewer build-review04648c65348f is active. No final acceptance inferred;30 remains open. No pushes/releases, Shell Relay changes, mcporter/toolchain removals, archive installs or WIP-skill edits.
++
+ Limits/findings: documented offline consumer recipe is npm, not Bun. An extra empty-cache Bun1.4.4 consumer install failed dependency-manifest resolution; no upstream-change task or workaround added. Main installed-tree tar includes122 paths absent in clean producer:112 files of a redundant SAME4.12.1 @smithy/node-http-handler copy plus10 old better-sqlite3 Makefile/gyp/stamp metadata, not missing/extra native binaries. Fresh full/native tests pass; no bit-reproducibility claim or pruning wrapper.
+ 
+ ## Previous task contract and coordination
+ 
+@@ -79,4 +81,8 @@
+ 
+ ## 2026-11-02T21:53:55.875Z
+ 
+ - **description**: 25 lines → updated (39 lines)
++
++## 2026-11-02T22:14:00.345Z
++
++- **description**: 39 lines → updated (41 lines)

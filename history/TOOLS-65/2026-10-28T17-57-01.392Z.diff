@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-65.md
++++ b/TOOLS-65.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Preserve the complete code-review skill in skills-incubator"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T17:55:43.647Z
+-updated_at: 2026-10-28T17:55:43.647Z
++updated_at: 2026-10-28T17:57:01.392Z
+ ---
+ 
+ # Preserve the complete code-review skill in skills-incubator
+ 
+ Copy the whole code-review directory to ~/git/skills-incubator/skills/code-review after checking ownership and destination absence. Verify every file, byte, relative path and mode against the pre-removal source. Preserve it as reference only; do not rewrite its instructions or install/register it.
++
++---
++
++# Activity Log
++
++## 2026-10-28T17:57:01.392Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

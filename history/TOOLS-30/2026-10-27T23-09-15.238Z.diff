@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -9,13 +9,17 @@
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-20T17:31:04.075Z
++updated_at: 2026-10-27T23:09:15.234Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++Current boundary (TOOLS-51): the prior build simplification below is a historical review record. Its instruction to retain the bundled standup helper is superseded by the user-approved Journal cutover. Do not restore that helper or its skill/build wiring. Task status and original verification history remain unchanged.
++
++## Prior approved scope (historical)
++
+ Retain only Sandpiper's workspace runtime and local helper builds. Keep sandpiper, sandpiper-system-prompt, Trail, standup, the local Pi patch, extensions/resources, and current configuration behavior. Keep builds explicit and package-owned output beside its package.
+ 
+ Remove the unused neutral Pi package, generated npm/Pi package assembly, compiled Bun app, Claude plugin, and broken vendoring updater. Keep checked-in third-party skill snapshots and licenses.
+ 
+@@ -60,4 +64,8 @@
+ 
+ ## 2026-10-20T17:31:04.079Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-27T23:09:15.238Z
++
++- **description**: 5 lines → updated (9 lines)

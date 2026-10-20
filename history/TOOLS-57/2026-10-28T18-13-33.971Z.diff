@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,9 +9,9 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T17:55:43.992Z
++updated_at: 2026-10-28T18:13:33.970Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -36,8 +36,10 @@
+ Code-review discussion: the user identifies it as an early custom skill with likely extraneous material, wants a drastic rework, values codified review SOPs, and questions both the current SOP quality and harness bundling. No keep/remove/extract decision or rewrite scope is approved yet. Do not treat moving the existing text unchanged as satisfying the requested rethink.
+ 
+ Approved code-review decision: unbundle it, preserve its complete current contents under ~/git/skills-incubator/skills/code-review, and handle a drastic SOP redesign separately. Unbundling is TOOLS-64; deferred SOP design is TOOLS-68. No auto-loading of the archive or decisions about the other four remaining skills are approved.
+ 
++Code-review unbundling/archival is implemented and awaits user review in TOOLS-64. Two original shipping decisions are made (projects and code-review); the other four skills remain undecided. Independent SOP redesign is deferred under TOOLS-68 and does not gate packaging cleanup.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -74,4 +76,8 @@
+ ## 2026-10-28T17:55:43.992Z
+ 
+ - **description**: 19 lines → updated (21 lines)
+ - **depends_on**: TOOLS-60 → TOOLS-60, TOOLS-64
++
++## 2026-10-28T18:13:33.971Z
++
++- **description**: 21 lines → updated (23 lines)

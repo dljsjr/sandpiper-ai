@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-64.md
++++ b/TOOLS-64.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Unbundle code-review and preserve it for an independent SOP redesign"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T17:55:43.501Z
+-updated_at: 2026-10-28T18:22:55.196Z
++updated_at: 2026-10-28T18:22:55.458Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+@@ -49,4 +50,9 @@
+ 
+ ## 2026-10-28T18:22:55.197Z
+ 
+ - **description**: 11 lines → updated (15 lines)
++
++## 2026-10-28T18:22:55.458Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

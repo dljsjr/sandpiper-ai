@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-38.md
++++ b/TOOLS-38.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Remove embedded Trail from Sandpiper distribution"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-23T20:11:12.404Z
+-updated_at: 2026-10-23T20:11:12.404Z
++updated_at: 2026-10-23T20:11:39.441Z
+ related:
+   - TOOLS-34
+ ---
+ 
+ # Remove embedded Trail from Sandpiper distribution
+ 
+ Remove the embedded Trail package, bundled tasks skill and executable copies, adoption/migration tooling, build/package/test wiring, and obsolete public Trail documentation. Archive wholly Trail-specific internal documents and update mixed-purpose documents. Preserve all local task data/history, task-tracking policy, and standup functionality. The in-repo Trail CLI was freshly compiled and copied to ~/.local/bin/trail with permission, replacing the wrapper; it is independent of this cleanup. Do not contact the standalone Trail agent through Tattler or change the standalone repo. The user coordinates Trail discovery/release contracts separately. Do not implement the future PATH/cache/download integration in this cleanup.
++
++---
++
++# Activity Log
++
++## 2026-10-23T20:11:39.441Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

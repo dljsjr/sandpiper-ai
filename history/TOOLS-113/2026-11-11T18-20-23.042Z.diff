@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-113.md
++++ b/TOOLS-113.md
+@@ -5,15 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T15:54:45.887Z
+-updated_at: 2026-11-11T17:58:20.676Z
++updated_at: 2026-11-11T18:20:23.042Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Remove ast-grep
+ 
++## Verification stopped at TOOLS-116 (2026-11-11)
++
++All ten approved implementations are committed and independently reviewed. Six tasks passed full per-commit gates and are NEEDS REVIEW. This task remains IN PROGRESS, not accepted. TOOLS-112 full gate hit the runtime-Pi-import smoke timeout at load below5. Controlled comparison passed that case on112 but reproduced it on the already-full-gated110 predecessor at load2.83. Relevant source/dependencies are identical; root cause is unknown, not a proven112 regression. No source or timeout was changed for the failure.113/111/114 full gates remain unattempted. TOOLS-116 holds exact evidence and is NOT STARTED pending Doug's go for broader diagnosis. Work is at rest.
++
+ ## Independent check checkpoint (2026-11-11)
+ 
+ Parent/gate independently passed frozen install and the revision-specific bun check with zero errors/warnings. All ten tasks are implemented and independently reviewed with no outstanding actionable findings. Full/per-commit full-test gates remain pending quiet load; no completion or acceptance is claimed.
+ 
+@@ -53,4 +57,8 @@
+ 
+ ## 2026-11-11T17:58:20.677Z
+ 
+ - **description**: 20 lines → updated (24 lines)
++
++## 2026-11-11T18:20:23.042Z
++
++- **description**: 24 lines → updated (28 lines)

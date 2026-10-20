@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-292.md
++++ b/AGENT-292.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Integration harness passes the parent session PI_*/SANDPIPER_* env to spawned pi"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-05T21:47:30.780Z
+-updated_at: 2026-10-19T20:21:58.413Z
++updated_at: 2026-10-19T20:21:58.530Z
+ related:
+   - AGENT-290
+   - TOOLS-9
+ ---
+@@ -40,4 +40,8 @@
+ 
+ ## 2026-10-19T20:21:58.414Z
+ 
+ - **description**: 7 lines → updated (9 lines)
++
++## 2026-10-19T20:21:58.531Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

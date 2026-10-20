@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-112.md
++++ b/TOOLS-112.md
+@@ -1,14 +1,15 @@
+ ---
+ title: "Remove the logo files, Commander guidance, standup log and test:standalone script"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T15:30:04.146Z
+ 
+-updated_at: 2026-11-11T19:21:12.859Z
++updated_at: 2026-11-11T21:49:42.370Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -80,4 +81,9 @@
+ 
+ ## 2026-11-11T19:21:12.860Z
+ 
+ - **description**: 26 lines → updated (30 lines)
++
++## 2026-11-11T21:49:42.371Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

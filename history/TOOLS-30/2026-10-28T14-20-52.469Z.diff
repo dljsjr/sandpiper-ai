@@ -1,0 +1,40 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -9,14 +9,14 @@
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-28T14:17:40.127Z
++updated_at: 2026-10-28T14:20:52.466Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
+-## Current scope and status correction — 2026-10-27
++## Current scope and status correction — 2026-10-28
+ 
+ The broad build/packaging simplification is NOT complete. The user requested a review of what belongs in packages/resources, then the conversation focused on tasks/Trail and standup/Journal. The remaining resource decisions were never added to this task breakdown. The lead prematurely closed this parent and TOOLS-33 during bookkeeping by treating historical implementation notes and passing tests as sufficient acceptance. The bookkeeping acceptance recorded below does not approve the remaining resources or complete the overall work.
+ 
+ Complete the remaining skills, prompt-template and themes review; record the user's keep/remove/extract decisions; implement any approved changes; verify the integrated build, resource discovery and portable package; then obtain user acceptance. Do not assume that any particular resource must stay, move or be removed. Build-command consolidation was only an agent suggestion, not agreed scope. TOOLS-43 still tracks final external Trail integration separately. Earlier completed extraction milestones and their evidence are preserved.
+@@ -38,8 +38,10 @@
+ Accepted the delivered build-topology and resource simplification. TOOLS-34 subsequently approved portable CLI packing; TOOLS-38/42 extracted Trail and retained its temporary external skill bridge; TOOLS-51 replaced bundled standup with standalone Journal. Those approved changes supersede the earlier helper-retention constraints, not the original completion evidence.
+ 
+ Current verification: bun check passed with zero errors/warnings; bun run test rebuilt package output and passed 87 files / 640 tests, including packed-install, cache-restoration and temporary Trail bridge regressions. Closure requested during the return to build/packaging simplification. Original historical verification is retained above.
+ 
++Local tracker limitation encountered during this repair: changing status retained the old DONE resolution, while --resolution with an empty value was a no-op. Used the documented exceptional storage-recovery path to remove only the two invalid resolution fields, then rebuilt the index. No standalone Trail implementation was changed.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -96,4 +98,8 @@
+ ## 2026-10-28T14:17:40.131Z
+ 
+ - **status**: COMPLETE → IN PROGRESS
+ - **description**: 15 lines → updated (23 lines)
++
++## 2026-10-28T14:20:52.469Z
++
++- **description**: 23 lines → updated (25 lines)

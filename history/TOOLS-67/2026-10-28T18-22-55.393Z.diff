@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-67.md
++++ b/TOOLS-67.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Remove active dependencies on the retired bundled code-review skill"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T17:55:43.797Z
+-updated_at: 2026-10-28T18:08:11.899Z
++updated_at: 2026-10-28T18:22:55.392Z
+ ---
+ 
+ # Remove active dependencies on the retired bundled code-review skill
+ 
+@@ -32,4 +33,9 @@
+ 
+ ## 2026-10-28T18:08:11.900Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-28T18:22:55.393Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

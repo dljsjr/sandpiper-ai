@@ -1,0 +1,63 @@
+===================================================================
+--- a/TOOLS-31.md
++++ b/TOOLS-31.md
+@@ -5,18 +5,58 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:02.858Z
+-updated_at: 2026-10-20T15:20:08.350Z
++updated_at: 2026-10-20T15:23:49.455Z
+ ---
+ 
+ # Audit delivery surfaces, build graph, and vendoring
+ 
++Audit completed 2026-10-20.
+ 
++Observed usage
++- Doug's normal launcher is ~/.local/bin/sandpiper. It runs the workspace-linked packages/cli/bin/sandpiper, which imports packages/cli/dist/standalone/sandpiper_standalone.js. This is the "standalone uncompiled" / workspace standalone: bundled JavaScript run by Bun, not the 81 MiB compiled Bun executable.
++- ~/.sandpiper/agent/settings.json does not install Sandpiper as a Pi package. The workspace runtime supplies Sandpiper extensions and resources through explicit factories in packages/cli/sandpiper_resources.ts.
++- ~/.claude/plugins/installed_plugins.json and ~/.claude/settings.json contain no Sandpiper Claude plugin or marketplace.
++- The repository has no release workflow or publish script for sandpiper-ai or sandpiper-claude-code-plugin.
++
++Current delivery surfaces and coupling
++1. Workspace standalone (used): packages/cli/bin/* -> packages/cli/dist/standalone/*.js. Keep.
++2. Root neutral Pi package (unused): root pi manifest -> plugins/pi/extensions. It exists only for loading this repository into stock Pi.
++3. Generated dist/ npm + Pi package (unused): devtools/assembleDistribution.ts and distPackageJson.ts copy/bundle resources, binaries, docs, Pi assets, and package metadata.
++4. Compiled Bun app (unused): devtools/standaloneSandpiperApp.ts emits an 81 MiB executable plus sidecars.
++5. Claude Code plugin (unused): devtools/claudeCodePlugin.ts, packages/adapter-claude-code, and .claude-plugin/marketplace.json build an npm/marketplace artifact.
++
++Cost and failure findings
++- Dedicated distribution/app/plugin implementation and tests total about 3,074 lines, before related docs and package metadata.
++- Current generated root dist/ is 29 MiB and packages/cli/dist is 17 MiB; the compiled app executable alone is 81 MiB.
++- bun run test always runs prepare:distribution first. That builds every package, assembles the unused npm/Pi package, downloads the skill-review PDF over the network, and rewrites ignored helper executables under packages/resources.
++- packages/cli build emits three overlapping bundle families. Only dist/standalone/* backs the workspace bin; dist/sandpiper and dist/sandpiper-system-prompt exist for the generated npm artifact.
++- The compiled app still embeds four checkout paths despite AGENT-318: photon-node, better-sqlite3/lib, jsdom's CSS helper directory, and jsdom's xhr-sync-worker.js. The compiled executable is not relocatable after its build checkout disappears. The existing runtime test cannot expose this because it builds and runs from the same checkout.
++
++Vendoring
++- vendor.txt and devtools/vendor.ts are manual-only; no install, build, or test path invokes them.
++- Both manifest destinations are stale (skills/on_demand instead of skills-on-demand), and both sources track unpinned main.
++- The actual pdf and skill-creator trees are checked in under packages/resources/skills-on-demand/third-party with their licenses. Running bun run vendor would write different, obsolete paths rather than update them.
++- Recommendation: keep any desired checked-in third-party skill snapshots, but delete the broken updater, manifest, script, and docs claims. The separately developed skill-creator can replace the checked-in Anthropic copy through normal reviewed source changes.
++
++Recommended target
++- Keep the workspace standalone, system-prompt diagnostic, package-owned outputs needed by local bins, and generated Trail/standup skill helpers.
++- Retire the unused Pi package surfaces (root neutral package plus generated npm/Pi artifact), compiled Bun app, and Claude plugin artifact.
++- Replace prepare:distribution with one focused workspace build that builds only local runtime/helper outputs and refreshes the skill helper copies. Make bun run test exercise the workspace runtime without assembling publishable artifacts or doing network I/O.
++- Keep generated output beside its owning package. Do not replace root dist/ with a new staging layout; after retiring the package artifact, root dist/ is needed only for the small runtime sidecar unless that is moved separately.
++- Delete the dead vendoring mechanism.
++
++This makes AGENT-301 questions A and B moot: there is no dual-role dist package and no Pi-package peer compatibility contract to maintain.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-20T15:20:08.350Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-20T15:23:49.458Z
++
++- **description**: added (36 lines)

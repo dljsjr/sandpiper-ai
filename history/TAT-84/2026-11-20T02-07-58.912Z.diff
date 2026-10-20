@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-84.md
++++ b/TAT-84.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Tattler leaves dead socket files behind when a session exits without session_shutdown"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-19T23:22:17.894Z
+-updated_at: 2026-11-19T23:26:25.076Z
++updated_at: 2026-11-20T02:07:58.912Z
+ ---
+ 
+ # Tattler leaves dead socket files behind when a session exits without session_shutdown
+ 
+@@ -33,4 +34,9 @@
+ ## 2026-11-19T23:26:25.076Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
+ - **description**: 1 line → updated (9 lines)
++
++## 2026-11-20T02:07:58.912Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: UNRESOLVED → DONE

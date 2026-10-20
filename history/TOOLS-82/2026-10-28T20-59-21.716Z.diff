@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-82.md
++++ b/TOOLS-82.md
+@@ -5,13 +5,25 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.387Z
+-updated_at: 2026-10-28T20:43:11.648Z
++updated_at: 2026-10-28T20:59:21.716Z
+ ---
+ 
+ # Retire mutation skill routing and deployment
+ 
++## Implementation verified — ready for review
++
++Complete: both catalogue READMEs and three existing contracts now expect jj-only built-ins. Planned Stryker spec uses generic methodology/tool docs; its plan remains otherwise unchanged. Backed up/retired only the owned Claude symlink and Dotfiles template. Muninn direct coordination found no live peer; scoped notice preceded the exact one-line load-route patch. Independent full diff confirms no other lens byte/mode changes. Existing conditional installed-skill references are intentionally optional, not archive registration. No SELF/IDENTITY/MEMORY edits or owner consent claimed.
++
++Verification: full baseline 87 files/640 tests passed. One source-catalogue case baseline GREEN → expected extra-skill RED → archive/resource deletion GREEN. Refactor assessment found no new code structure needing simplification. Updated stale diagnostic contract (2 passing tests), then packed absence assertion demonstrated stale-build RED. Normal rebuild/full gate GREEN: bun check clean, 87 files/640 tests passed, bun run pack:cli passed. Actual tarball contains jj only. No framework installed or generated artifact edited by hand.
++
++Evidence: ~/.sandpiper/agent/backups/mutation-unbundle-20261028-iBKlK2/ contains before.json, archive-verified.json, preservation-after.json and exact deployment/guide/lens backups. Independent read-only mutation-audit (ce39ccc2f023) PASS: archive paths/bytes/modes, prior archives/settings/independent Claude copy unchanged, no archive autoload, no active hard mutation-skill dependencies, guidance scoped, and actual tarball jj-only.
++
++Local revisions: Sandpiper rxxrqtmu / b6cb20e9; canonical global guidance zxpnrzns / a68124e9; Dotfiles snkyrupt / 97537ddb. Muninn single-line user-state patch is not version-controlled; exact backup/preservation proof retained. No push or release.
++
++## Original scope record
++
+ Update catalogue docs and existing regression contracts, retire the owned Claude symlink/provisioner, and correct active hard dependency routes. Preserve independent installed copies and identity lens content; coordinate and back up any private routing-only change. Verify packed discovery and archive preservation.
+ 
+ ---
+ 
+@@ -20,4 +32,8 @@
+ ## 2026-10-28T20:43:11.649Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T20:59:21.716Z
++
++- **description**: 1 line → updated (13 lines)

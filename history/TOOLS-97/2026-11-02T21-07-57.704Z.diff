@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-97.md
++++ b/TOOLS-97.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Document the single-product build and retire obsolete build-only guidance"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T18:35:58.865Z
+-updated_at: 2026-11-02T21:07:57.617Z
++updated_at: 2026-11-02T21:07:57.703Z
+ ---
+ 
+ # Document the single-product build and retire obsolete build-only guidance
+ 
+@@ -60,4 +60,8 @@
+ 
+ ## 2026-11-02T21:07:57.618Z
+ 
+ - **description**: 21 lines → updated (29 lines)
++
++## 2026-11-02T21:07:57.704Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

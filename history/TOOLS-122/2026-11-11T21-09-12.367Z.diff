@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-122.md
++++ b/TOOLS-122.md
+@@ -5,17 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T19:17:58.400Z
+-updated_at: 2026-11-11T20:44:25.580Z
++updated_at: 2026-11-11T21:09:12.366Z
+ related:
+   - TOOLS-30
+   - TOOLS-113
+   - TOOLS-121
+ ---
+ 
+ # Source CLI smoke cases exceed five-second limits during serial verification
+ 
++## Closed as moot by TOOLS-126 (2026-11-11)
++
++Doug chose to delete packages/cli/standalone_cli_smoke.test.ts because devtools/packedCli.test.ts already makes the same assertions against the installed tarball. This is a design decision, not a timing remedy: the cause of the historical 11 to 14 second tails remains unproved. The three failing cases no longer exist, and the proposed --no-install guard for the source helper is moot. The four remaining unit gates then passed; see TOOLS-126.
++
+ ## Session wrap (2026-11-11)
+ 
+ Paused at Doug's request because of high context. All agents/processes are stopped and temporary workspaces removed. All ten original implementations are committed/reviewed; seven are NEEDS REVIEW and three remain full-gate-blocked.122 investigation did not reproduce the historical timing tails. Doug noted sustained high laptop load; plausible context, not measured cause. The three source cases use inherited5s defaults versus15s for sibling CLI cases; no documented5s startup SLA. No timeout change or permanent source-helper no-install guard was approved/applied. Do not resume without new scope/go. Continuation: .sandpiper/notes/simplification-handoff.md.
+ 
+@@ -48,4 +52,8 @@
+ 
+ ## 2026-11-11T20:44:25.580Z
+ 
+ - **description**: 13 lines → updated (17 lines)
++
++## 2026-11-11T21:09:12.367Z
++
++- **description**: 17 lines → updated (21 lines)

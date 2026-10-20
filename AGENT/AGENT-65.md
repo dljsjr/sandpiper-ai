@@ -1,6 +1,7 @@
 ---
 title: "ProcessManager: add PTY spawn mode via @lydell/node-pty"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
@@ -10,7 +11,7 @@ related:
   - AGENT-28
   - AGENT-46
   - AGENT-47
-updated_at: 2026-04-16T21:27:03.352Z
+updated_at: 2026-11-19T18:58:29.576Z
 ---
 
 # ProcessManager: add PTY spawn mode via @lydell/node-pty
@@ -41,6 +42,10 @@ AGENT-15 implemented the background process framework MVP using `child_process.s
 - AGENT-15 — original background framework (completed without PTY)
 - SHR-71 — PTY adapter for shell_relay (WONTFIX — not needed for shell_relay)
 
+## Closed in backlog triage (2026-11-19)
+
+Needs a native dependency (node-pty) for an edge case; no need has come up.
+
 ---
 
 # Activity Log
@@ -52,3 +57,12 @@ AGENT-15 implemented the background process framework MVP using `child_process.s
 ## 2026-04-16T21:27:03.353Z
 
 - **related**: (none) → AGENT-28, AGENT-46, AGENT-47
+
+## 2026-11-19T18:58:28.137Z
+
+- **description**: 25 lines → updated (29 lines)
+
+## 2026-11-19T18:58:29.576Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: UNRESOLVED → WONTFIX

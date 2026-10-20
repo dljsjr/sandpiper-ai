@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-86.md
++++ b/TOOLS-86.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Retire jj skill deployment and hard routing without adopting the WIP replacement"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.551Z
+-updated_at: 2026-10-28T21:15:55.551Z
++updated_at: 2026-10-28T21:15:55.838Z
+ ---
+ 
+ # Retire jj skill deployment and hard routing without adopting the WIP replacement
+ 
+ Retire only the owned Claude symlink/provisioner. Make active global and Claude routes availability-aware, preserving jj-over-git and safe workspace/commit guidance with current CLI docs/help fallback. Leave the deferred AGENT-35 spec and existing JJ rewrite AGENT-67 alone. No new VCS tutorial, archive registration, replacement install or SOP project.
++
++---
++
++# Activity Log
++
++## 2026-10-28T21:15:55.838Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

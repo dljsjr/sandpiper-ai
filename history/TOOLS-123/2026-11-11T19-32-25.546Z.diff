@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-123.md
++++ b/TOOLS-123.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Measure source-entrypoint startup and cleanup safely"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T19:32:25.216Z
+-updated_at: 2026-11-11T19:32:25.216Z
++updated_at: 2026-11-11T19:32:25.545Z
+ ---
+ 
+ # Measure source-entrypoint startup and cleanup safely
+ 
+ Investigation only: phase-time the three failing source CLI paths with explicit Bun --no-install, exact isolated configuration and no real-user state. Compare failed pre-consolidation and final consolidated source. Attribute CPU/cache/cleanup work; no unsafe original network-capable probes, source fixes, retries or timeout changes.
++
++---
++
++# Activity Log
++
++## 2026-11-11T19:32:25.546Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

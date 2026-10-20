@@ -1,14 +1,38 @@
 ---
 title: "Extract Navigator dogfood observations from Tattler notes"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-05-20T07:07:55.099Z
-updated_at: 2026-05-20T07:07:55.099Z
+updated_at: 2026-11-19T20:14:37.153Z
 ---
 
 # Extract Navigator dogfood observations from Tattler notes
 
 Tattler v0 dogfood notes captured several valuable Navigator pair-programming observations: grounded style feedback, in-flight save handling, proactive comments, stale diagnostics, watch excludes, VCS event sources, avoiding duplicate navigator_comment/chat feedback, and durable note persistence. Move or synthesize these into Navigator-specific guidance/docs/tasks so Tattler-triggered readers do not ingest off-scope Navigator guidance.
+
+## Outcome (2026-11-19 triage)
+
+The extraction already existed: on 2026-05-19 the Navigator repository captured these observations in `~/git/navigator/.sandpiper/docs/specs/navigator-dogfood-feedback.md`, with NAV-51 to NAV-55 tracking them. Every observation in the Tattler notes is covered there. This change removes the duplicate "Navigator Dogfood Observations" and "Possible Navigator Guidance / Skill Work" sections and the three Navigator open questions from `.sandpiper/docs/specs/tattler-v0-dogfood-notes.md`, leaving a pointer. Navigator was also added to `~/.sandpiper/agent/projects.md` (Active false: not currently loaded).
+
+---
+
+# Activity Log
+
+## 2026-11-19T18:59:31.177Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-11-19T18:59:31.367Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+- **description**: 1 line → updated (5 lines)
+
+## 2026-11-19T20:14:37.153Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

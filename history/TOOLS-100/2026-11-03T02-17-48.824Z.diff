@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-100.md
++++ b/TOOLS-100.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Replace the internal Parallel MCP client with the standalone Pi client"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-03T01:50:55.871Z
+-updated_at: 2026-11-03T02:17:48.758Z
++updated_at: 2026-11-03T02:17:48.823Z
+ related:
+   - TOOLS-99
+   - TOOLS-92
+ ---
+@@ -33,4 +33,8 @@
+ 
+ ## 2026-11-03T02:17:48.759Z
+ 
+ - **description**: 1 line → updated (7 lines)
++
++## 2026-11-03T02:17:48.824Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

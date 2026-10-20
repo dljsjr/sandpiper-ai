@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-114.md
++++ b/TOOLS-114.md
+@@ -5,16 +5,20 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T15:54:46.048Z
+-updated_at: 2026-11-11T17:43:08.578Z
++updated_at: 2026-11-11T17:58:19.545Z
+ related:
+   - TOOLS-92
+   - TOOLS-112
+ ---
+ 
+ # Format Markdown once and add a Prettier check to the gate
+ 
++## Implementation and independent check checkpoint (2026-11-11)
++
++Changes zuylmqmn (format-only) and sntvwxtp (Prettier dependency/gate) implement the full recorded scope. Exact Prettier3.10.0 pin; lock adds only3lines. Independent revision-byte review proves all18 Markdown changes equal formatter(original), all54 selected files are clean, and all75 excluded tracked files are unchanged. Worker fixtures prove hidden guidance is checked and18 ignored areas stay unchanged. Parent independently passed frozen installs, bun check (zero errors/warnings) and the focused metadata regression for both units. Logs: /tmp/sandpiper-markdown-independent.zzPSEN. Full/heavy and per-unit full-test gates remain pending; status stays IN PROGRESS, not accepted.
++
+ ## Decision
+ 
+ Doug decided on 2026-11-10 (TOOLS-92 review, inventory row B-16): format the tracked Markdown once and add a Prettier check to the bun check gate. Do it after the Batch C archive moves and the TOOLS-112 deletions, so that files about to move or go are not reformatted first. Not started.
+ 
+@@ -38,4 +42,8 @@
+ ## 2026-11-11T17:43:08.580Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-11T17:58:19.546Z
++
++- **description**: 16 lines → updated (20 lines)

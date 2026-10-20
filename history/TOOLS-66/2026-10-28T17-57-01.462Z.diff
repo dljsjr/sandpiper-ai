@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-66.md
++++ b/TOOLS-66.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Remove bundled code-review and update discovery/package expectations"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T17:55:43.724Z
+-updated_at: 2026-10-28T17:55:43.724Z
++updated_at: 2026-10-28T17:57:01.461Z
+ ---
+ 
+ # Remove bundled code-review and update discovery/package expectations
+ 
+ Use focused failing tests before removal. Remove the Sandpiper source skill, update the catalogue README and source/built/packed tests, retain generic staging-fixture coverage, and verify the package has the other four built-in skills without code-review. No generated-file edits.
++
++---
++
++# Activity Log
++
++## 2026-10-28T17:57:01.462Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-55.md
++++ b/TOOLS-55.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Cut project guidance and Sandpiper public/internal docs over to Journal"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:04.074Z
+-updated_at: 2026-10-27T23:36:18.666Z
++updated_at: 2026-10-27T23:52:36.578Z
+ ---
+ 
+ # Cut project guidance and Sandpiper public/internal docs over to Journal
+ 
+@@ -28,4 +29,9 @@
+ 
+ ## 2026-10-27T23:36:18.667Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-27T23:52:36.578Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T22:18:42.461Z
++updated_at: 2026-11-03T03:13:25.872Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Current integrated implementation checkpoint
++
++Approved native MCP adoption100–102 is now implemented alongside the root-product build. Current full default gates are86files671tests, zero-warning check and pack in both normal and fresh offline producer layouts. Actual installed own web_search remains the facade; no upstream server tools/config, SDK dependency is explicit and retired application library absent. Packed read-only offline npm/mock-MCP proof and independent read-only review pass with no outstanding findings. This remains NEEDS REVIEW, not DONE;30 stays open and unrelated deferrals/acceptance remain separate.
++
++## Earlier verification and scope record
++
+ ## Current implementation checkpoint
+ 
+ TOOLS-94–97 are implemented and NEEDS REVIEW; their workers are closed. TOOLS-98 is active. Quiet normal and a new clean-source frozen/offline/scripts-disabled producer both pass bun check with zero warnings,85files/653tests, and pack:cli. No legacy output is needed or emitted. Actual root tarball is verified before mutation; repeat direct packing excludes the previous tarball, offline empty-cache npm/read-only CLI/SDK/theme/native SQLite/jsdom probes pass. Parent corrected Jiti cache flags through an actual RED/GREEN regression. Independent inherited read-only review is complete with no outstanding actionable findings or blockers. The Jiti correction was independently re-reviewed. No final acceptance inferred.
+ 
+@@ -205,4 +211,8 @@
+ 
+ ## 2026-11-02T22:18:42.462Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-03T03:13:25.873Z
++
++- **description**: 98 lines → updated (104 lines)

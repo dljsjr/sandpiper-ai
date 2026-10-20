@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-121.md
++++ b/TOOLS-121.md
+@@ -5,13 +5,17 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T18:45:09.987Z
+-updated_at: 2026-11-11T18:45:10.197Z
++updated_at: 2026-11-11T18:58:17.791Z
+ ---
+ 
+ # Independently rerun the corrected reference and implementation gates
+ 
++## Updated verification policy (2026-11-11)
++
++Corrected reference mwqvznwo passed all69 files/532 tests. Parent retired the old load<8 launch heuristic: it did not prevent the original network-dependent failure at load2.83, and the corrected full suite passed while load rose to40. Record load as data, not a gate. Preserve one worker, no file parallelism, every test/assertion and existing timeout; no filters or blind retries. Stop on any actual check/test failure. This changes scheduling only, not pass criteria. Remaining unit gates continue serially.
++
+ After test-only fix, verify corrected reference plus every implementation unit with frozen install, zero-warning check and full suite, one worker/no file parallelism, no filters/timeouts changes. Fresh load below8; no original unsafe smoke runs. Include actual offline/read-only packing and record all results.
+ 
+ ---
+ 
+@@ -20,4 +24,8 @@
+ ## 2026-11-11T18:45:10.197Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-11T18:58:17.793Z
++
++- **description**: 1 line → updated (5 lines)

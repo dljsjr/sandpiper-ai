@@ -1,0 +1,36 @@
+===================================================================
+--- a/TOOLS-60.md
++++ b/TOOLS-60.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T16:53:38.686Z
+-updated_at: 2026-10-28T17:12:43.625Z
++updated_at: 2026-10-28T17:32:56.323Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+@@ -23,8 +23,12 @@
+ Verification: three relevant tests failed first on the retained projects skill; final bun check zero errors/warnings, bun run test 87files/640tests, bun run pack:cli, five-entrypoint tarball/absence inspection, Prettier check, 14-record exact field/order/mode checks, exact unrelated-content preservation for deployed guidance/memory, and independent active-guidance scan. All preserved history/closed records remain historical rather than rewritten for keyword-zero.
+ 
+ TOOLS-60 and children are NEEDS REVIEW, not final-completed. TOOLS-57 remains IN PROGRESS for the other five skill discussions; TOOLS-30 and TOOLS-33 are not closed by this work. No prompt/theme or other skill decisions, new CLI/registry engine, publishing, or unrelated cleanup occurred.
+ 
++## User acceptance — 2026-10-28
++
++The user accepted the guidance locations, confirmed the skill was removed from the repository and packed output, and directed the discussion to the next skill. Final-complete only this projects implementation and its three children. The other five skill decisions and the broader build work remain open.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -39,4 +43,8 @@
+ 
+ ## 2026-10-28T17:12:43.626Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-28T17:32:56.324Z
++
++- **description**: 9 lines → updated (13 lines)

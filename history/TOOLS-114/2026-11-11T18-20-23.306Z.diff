@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-114.md
++++ b/TOOLS-114.md
+@@ -5,16 +5,20 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T15:54:46.048Z
+-updated_at: 2026-11-11T17:58:19.545Z
++updated_at: 2026-11-11T18:20:23.305Z
+ related:
+   - TOOLS-92
+   - TOOLS-112
+ ---
+ 
+ # Format Markdown once and add a Prettier check to the gate
+ 
++## Verification stopped at TOOLS-116 (2026-11-11)
++
++All ten approved implementations are committed and independently reviewed. Six tasks passed full per-commit gates and are NEEDS REVIEW. This task remains IN PROGRESS, not accepted. TOOLS-112 full gate hit the runtime-Pi-import smoke timeout at load below5. Controlled comparison passed that case on112 but reproduced it on the already-full-gated110 predecessor at load2.83. Relevant source/dependencies are identical; root cause is unknown, not a proven112 regression. No source or timeout was changed for the failure.113/111/114 full gates remain unattempted. TOOLS-116 holds exact evidence and is NOT STARTED pending Doug's go for broader diagnosis. Work is at rest.
++
+ ## Implementation and independent check checkpoint (2026-11-11)
+ 
+ Changes zuylmqmn (format-only) and sntvwxtp (Prettier dependency/gate) implement the full recorded scope. Exact Prettier3.10.0 pin; lock adds only3lines. Independent revision-byte review proves all18 Markdown changes equal formatter(original), all54 selected files are clean, and all75 excluded tracked files are unchanged. Worker fixtures prove hidden guidance is checked and18 ignored areas stay unchanged. Parent independently passed frozen installs, bun check (zero errors/warnings) and the focused metadata regression for both units. Logs: /tmp/sandpiper-markdown-independent.zzPSEN. Full/heavy and per-unit full-test gates remain pending; status stays IN PROGRESS, not accepted.
+ 
+@@ -46,4 +50,8 @@
+ 
+ ## 2026-11-11T17:58:19.546Z
+ 
+ - **description**: 16 lines → updated (20 lines)
++
++## 2026-11-11T18:20:23.306Z
++
++- **description**: 20 lines → updated (24 lines)

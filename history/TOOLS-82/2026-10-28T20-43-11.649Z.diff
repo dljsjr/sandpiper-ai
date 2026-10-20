@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-82.md
++++ b/TOOLS-82.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Retire mutation skill routing and deployment"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.387Z
+-updated_at: 2026-10-28T20:43:11.387Z
++updated_at: 2026-10-28T20:43:11.648Z
+ ---
+ 
+ # Retire mutation skill routing and deployment
+ 
+ Update catalogue docs and existing regression contracts, retire the owned Claude symlink/provisioner, and correct active hard dependency routes. Preserve independent installed copies and identity lens content; coordinate and back up any private routing-only change. Verify packed discovery and archive preservation.
++
++---
++
++# Activity Log
++
++## 2026-10-28T20:43:11.649Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

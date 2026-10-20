@@ -1,0 +1,34 @@
+===================================================================
+--- a/TAT-64.md
++++ b/TAT-64.md
+@@ -1,7 +1,8 @@
+ ---
+ title: "Investigate delayed rendering of tattler_receive batches"
+-status: NOT STARTED
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+@@ -11,9 +12,9 @@
+   - TAT-38
+   - TAT-59
+   - TAT-62
+   - TAT-65
+-updated_at: 2026-11-19T20:49:11.389Z
++updated_at: 2026-11-19T20:49:11.777Z
+ 
+ ---
+ 
+ # Investigate delayed rendering of tattler_receive batches
+@@ -36,4 +37,9 @@
+ 
+ ## 2026-11-19T20:49:11.389Z
+ 
+ - **description**: 1 line → updated (5 lines)
++
++## 2026-11-19T20:49:11.777Z
++
++- **status**: NOT STARTED → COMPLETE
++- **resolution**: UNRESOLVED → WONTFIX

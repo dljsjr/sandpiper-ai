@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-167.md
++++ b/AGENT-167.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Triage pre-existing full-suite test failures"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-05T22:48:35.835Z
+-updated_at: 2026-10-19T18:06:45.916Z
++updated_at: 2026-10-19T18:06:45.978Z
+ ---
+ 
+ # Triage pre-existing full-suite test failures
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-10-19T18:06:45.916Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-10-19T18:06:45.978Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

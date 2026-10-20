@@ -1,0 +1,27 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,11 +16,12 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
++
+ blocked_by:
+-  - TOOLS-116
+-updated_at: 2026-11-11T18:20:22.775Z
++  - TOOLS-122
++updated_at: 2026-11-11T19:17:58.710Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
+@@ -221,4 +222,8 @@
+ 
+ ## 2026-11-11T18:20:22.776Z
+ 
+ - **description**: 85 lines → updated (89 lines)
++
++## 2026-11-11T19:17:58.711Z
++
++- **blocked_by**: TOOLS-116 → TOOLS-122

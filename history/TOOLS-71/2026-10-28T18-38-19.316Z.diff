@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-71.md
++++ b/TOOLS-71.md
+@@ -5,19 +5,27 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:29:07.573Z
+-updated_at: 2026-10-28T18:29:07.974Z
++updated_at: 2026-10-28T18:38:19.315Z
+ ---
+ 
+ # Remove bundled refactoring and verify the three-skill package
+ 
+ First run focused failing source/diagnostic/packed contract tests. Remove only the bundled source skill, update catalogue/readme/test expectations, build and verify the actual tarball contains the other three skills and no refactoring directory. Do not edit generated output.
+ 
++## Implementation and verification — 2026-10-28
++
++Implemented in Sandpiper kylsozsk/b9943057. Removed all 11 bundled refactoring files, catalogue/readme claims and expected catalogue entries. Four focused tests failed first on retained refactoring presence; final bun check clean, bun run test 87 files/640 tests, and bun run pack:cli pass. Offline, script-disabled, read-only packed installation outside checkout passes. Actual tarball has exactly jj, mutation-testing, test-driven-development and no refactoring directory. Staged and packed TDD contents exactly match source, including its optional dependency sentence. No generated output was hand-edited.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-28T18:29:07.974Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T18:38:19.316Z
++
++- **description**: 1 line → updated (5 lines)

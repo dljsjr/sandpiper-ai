@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,15 +16,17 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
+-updated_at: 2026-11-03T03:13:25.635Z
++updated_at: 2026-11-09T16:53:08.534Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
+ ## Native MCP adoption implemented in current simplification
+ 
++Session continuation entrypoint: .sandpiper/notes/simplification-handoff.md. Native implementation is committed as a60efe94; no coding action or worker remains queued. This is a documentation-only handoff, not acceptance or new scope.
++
+ User explicitly required adoption, and100–102 are now NEEDS REVIEW after completed implementation, main/fresh86files671tests, zero-warning checks/pack, actual offline read-only OWN web_search MCP proof and independent review with no outstanding findings.29obsolete lock records removed with no retained pin changes; application bundle184modules vs453. Own tool boundary remains, server tools unregistered, developer mise mcporter CLI intact. This is not another postponed investigation.99research remains accepted DONE. Parent stays IN PROGRESS and other implementation acceptance/deferrals remain separate. No pushes/releases or main move.
+ 
+ ## Earlier verification and scope record
+ 
+@@ -201,4 +203,8 @@
+ 
+ ## 2026-11-03T03:13:25.636Z
+ 
+ - **description**: 77 lines → updated (83 lines)
++
++## 2026-11-09T16:53:08.535Z
++
++- **description**: 83 lines → updated (85 lines)

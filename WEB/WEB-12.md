@@ -1,12 +1,13 @@
 ---
 title: "Spike: site crawling with robots.txt respect and conservative rate limiting"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.206Z
-updated_at: 2026-04-01T15:30:39.721Z
+updated_at: 2026-11-12T19:39:41.028Z
 ---
 
 # Spike: site crawling with robots.txt respect and conservative rate limiting
@@ -37,3 +38,8 @@ Return: a list of fetched+extracted pages, or stream them as discovered.
 ## 2026-04-01T15:30:39.721Z
 
 - **description**: added (18 lines)
+
+## 2026-11-12T19:39:41.029Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: WONTFIX

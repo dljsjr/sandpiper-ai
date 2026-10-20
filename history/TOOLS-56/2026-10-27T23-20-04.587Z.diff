@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-56.md
++++ b/TOOLS-56.md
+@@ -5,13 +5,14 @@
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:04.149Z
+-updated_at: 2026-10-27T23:09:34.424Z
++updated_at: 2026-10-27T23:20:04.583Z
+ ---
+ 
+ # Adopt Journal globally and rebuild the reduced distribution
+ 
++Journal adopted globally with built CLI normal install: only ../../git/agent-journal appended; all 5 existing packages/order and all other settings unchanged. Deployed catalogue resolves external journal skill and no standup. Both built entrypoints/default+absolute/relative/empty env plus different-cwd child: 8/8. Reviewer found Turbo cache overlay upgrade blocker after prior full gate: stale removed CLI docs/resources survived hits. Added pre-Turbo cleanup of owned packages/cli/dist+docs in both supported root build paths, no new helper. Real-Turbo hermetic regression RED reproduced retained page, GREEN 2/2 after fix; packed test now rejects old page. bun check clean224files. Source checkpoint unsrunny; final upgraded cache-hit build/full/pack re-verification pending. Evidence /private/tmp/journal-cutover-jt1zotyw/{cache-red,cache-green,cache-check}.txt, global-install-delta.json, deployed-resource-catalogue.json, launch-env-after.json.
+ 
+ ---
+ 
+ # Activity Log
+@@ -19,4 +20,8 @@
+ ## 2026-10-27T23:09:34.428Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → cutover-dev
++
++## 2026-10-27T23:20:04.587Z
++
++- **description**: added (1 line)

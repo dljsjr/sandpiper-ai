@@ -1,0 +1,44 @@
+===================================================================
+--- a/TOOLS-92.md
++++ b/TOOLS-92.md
+@@ -5,13 +5,29 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T17:42:31.696Z
+-updated_at: 2026-11-02T17:57:00.141Z
++related:
++  - TOOLS-93
++updated_at: 2026-11-02T18:19:44.206Z
+ ---
+ 
+ # Audit retained build, runtime and toolchain complexity against simplification scope
+ 
++## Exploration ready for review
++
++User requested a fresh search for the simplest possible build, especially whether devtools is needed. Results and tradeoffs are in .sandpiper/docs/specs/build-simplification-exploration.md (Explanation). No application source/manifests/build scripts changed; no implementation authorized.
++
++Recommendation: one root product package, one direct Bun build for both entrypoints, ordinary Bun packing. This can remove Turbo, separate core emission, resources/docs staging and all three production devtools helpers (151 lines), while retaining test infrastructure and module boundaries. Root-owned docs/license/assets eliminate cross-package staging instead of moving it to new scripts. Preserve current consumer package/bin identity unless explicitly renamed.
++
++Evidence: Bun1.4.4 direct workspace pack includes patched runtime deps even under a separate hoisted-workspace fixture; it omits a parent LICENSE and a symlinked LICENSE. npm workspace packing still omits deps. Source typecheck succeeds without core dist. Two owned prototypes pass offline --ignore-scripts installs, readonly version/help, capture-provider diagnostics without external model calls, and user-extension runtime SDK imports. Bundled root prototype: one Bun invocation, no Turbo/core emit/staging/pack wrapper,16931 entries/39788927 bytes. Direct TS source prototype: no app build,24775 entries/52872269 bytes, no first-party tests,190 dependency tests. This is feasibility evidence, not a full-regression or clean-install certification.
++
++Live dependencies and decision candidates are classified in the note: mcporter still bundled/used, SQLite/JSDOM have real consumers, mise tools are developer tooling, Shell Relay remains dormant but public install flag exists. The concrete missing shell-asset bug is TOOLS-93. No runtime features or tools were removed. Build/pack test gap and stale compiled-binary docs in33 remain open.
++
++Sub-agent attempt failed: no terminal multiplexer. Available Sonnet route is only claude-cli/claude-sonnet, not a verified5.5 entry. This is a solo exploration, not an independent Sonnet review. Additional validation before adoption includes fresh install declarations, Bun version policy, full tests/TUI/custom resources/package management, and packaging retained non-code assets.
++
++## Original coverage brief
++
+ The user challenged the completeness of TOOLS-30 after the agent incorrectly claimed only overall acceptance remained. This task is a scope/coverage audit, not authorization to remove dependencies or change runtime behavior. Audit what remains, not only what earlier changes removed.
+ 
+ Deliverable: one concrete inventory mapping retained build/runtime/toolchain surfaces to purpose, source owner, package/bundle/output, prior discussion/decision, existing task, and keep/replace/remove/defer status. Distinguish recovered decisions, unapproved proposals, unreviewed candidates and completed work. Preserve all accepted resource outcomes and immutable closed records.
+ 
+@@ -33,4 +49,9 @@
+ ## 2026-11-02T17:57:00.146Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-02T18:19:44.207Z
++
++- **description**: 14 lines → updated (28 lines)
++- **related**: (none) → TOOLS-93

@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-13.md
++++ b/TOOLS-13.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-03-30T19:31:59.329Z
+-updated_at: 2026-03-30T19:31:59.372Z
++updated_at: 2026-10-20T01:28:55.867Z
+ ---
+ 
+ # Verify source-loaded extension dependency resolution in publish-style installs
+ 
+@@ -16,11 +16,17 @@
+ Follow-up work should verify that source-loaded extensions such as web-fetch and shell-relay still resolve their runtime dependencies correctly when sandpiper is installed outside the repo/workspace context, and should document or adjust packaging if that assumption breaks.
+ 
+ This is intentionally backlog work — do not block the current cleanup on it.
+ 
++Closed 2026-10-19: covered by devtools/npmPackageInstallSmoke.test.ts ('installs globally without lifecycle scripts and runs from an immutable package directory'), which loads the source extensions from an npm global install. It passed on 2026-10-19 with jsdom and better-sqlite3 externalized (AGENT-318), which would fail at startup if dependencies did not resolve in that layout.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-03-30T19:31:59.372Z
+ 
+ - **description**: added (5 lines)
++
++## 2026-10-20T01:28:55.874Z
++
++- **description**: 5 lines → updated (7 lines)

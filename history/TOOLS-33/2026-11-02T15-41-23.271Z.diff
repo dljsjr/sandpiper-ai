@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-10-28T22:58:05.993Z
++updated_at: 2026-11-02T15:41:23.270Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Current resource acceptance — 2026-10-28
++
++User accepted the prompt-removal package: TOOLS-58 and TOOLS-88–91 are COMPLETE/DONE. Skills remain accepted and complete. Theme scaffold TOOLS-59 is the remaining undecided resource review. This overall task remains NEEDS REVIEW and TOOLS-30 remains IN PROGRESS; prompt acceptance does not close overall build acceptance.
++
++## Earlier checkpoint history
++
+ ## Current resource checkpoint — 2026-10-28
+ 
+ Skills review/extraction remains accepted and COMPLETE. All six prompt templates are now archived unchanged externally and unbundled under TOOLS-58/88–91, ready for user acceptance. Current code/package gates pass87 files/645 tests and bun check with no errors/warnings. Theme scaffold TOOLS-59 is still NOT STARTED and undecided. Overall acceptance remains pending; TOOLS-30 must stay IN PROGRESS.
+ 
+@@ -95,4 +101,8 @@
+ 
+ ## 2026-10-28T22:58:05.994Z
+ 
+ - **description**: 23 lines → updated (29 lines)
++
++## 2026-11-02T15:41:23.271Z
++
++- **description**: 29 lines → updated (35 lines)

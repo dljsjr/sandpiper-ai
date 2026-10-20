@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -9,9 +9,9 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T18:49:23.979Z
++updated_at: 2026-10-28T18:57:43.837Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -46,8 +46,10 @@
+ Refactoring unbundling/archival is implemented and awaits user review in TOOLS-69; its SOP rethink is deferred as TOOLS-73. Three original shipping decisions are made (projects, code-review, refactoring). Remaining undecided skills are jj, mutation-testing and test-driven-development. TDD received only an optional-dependency sentence, not a shipping/content-review decision.
+ 
+ User accepted refactoring implementation; TOOLS-69 and children are COMPLETE/DONE. Continue one-by-one with test-driven-development (4 of the original 6), followed by the still-undecided mutation-testing and jj. No TDD shipping or rewrite decision is approved yet.
+ 
++Approved TDD decision: move the full skill to the incubator and rely on developer-role guidance. Preserve the user-confirmed RED checkpoint and one-behavior red-green-refactor loop; the earlier criticism of that checkpoint as unnecessary overhead was incorrect. Implementation is TOOLS-74. First pause at one demonstrated RED test for user confirmation before production changes. No TDD rewrite is authorized; mutation-testing and jj remain undecided.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -104,4 +106,8 @@
+ 
+ ## 2026-10-28T18:49:23.980Z
+ 
+ - **description**: 29 lines → updated (31 lines)
++
++## 2026-10-28T18:57:43.838Z
++
++- **description**: 31 lines → updated (33 lines)

@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-125.md
++++ b/TOOLS-125.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Reconcile source CLI timing diagnosis and remedy boundaries"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T19:32:25.435Z
+-updated_at: 2026-11-11T19:32:25.435Z
++updated_at: 2026-11-11T19:32:25.727Z
+ ---
+ 
+ # Reconcile source CLI timing diagnosis and remedy boundaries
+ 
+ Combine phase measurements and source trace, establish the cause or remaining doubtful assumption, record exact evidence and narrow remedy. Investigation only; obtain approval for any source/test/timeout policy change.
++
++---
++
++# Activity Log
++
++## 2026-11-11T19:32:25.728Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

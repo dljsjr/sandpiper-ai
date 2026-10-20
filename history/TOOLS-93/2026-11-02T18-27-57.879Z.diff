@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-93.md
++++ b/TOOLS-93.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "CLI shell integration installer cannot find its scripts in the packed package"
+ status: NOT STARTED
+-kind: BUG
++kind: TASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-11-02T18:19:44.026Z
+-updated_at: 2026-11-02T18:19:44.026Z
++updated_at: 2026-11-02T18:27:57.878Z
+ related:
+   - TOOLS-30
+   - TOOLS-92
+   - TOOLS-33
+@@ -21,4 +21,12 @@
+ 
+ Decision required: if this public flag remains supported, include its owned assets and add an isolated installed-behavior regression. If Shell Relay support is intentionally retired, remove the public surface through an explicit approved change instead. The recommended root-package prototype can ship these source assets through the package file list without a staging helper, but does not include them yet. Do not silently drop the capability or add automatic installation.
+ 
+ Evidence: .sandpiper/docs/specs/build-simplification-exploration.md and /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-build-explore-NadbqC/shell-asset-probe.json. No bug fix implemented.
++
++---
++
++# Activity Log
++
++## 2026-11-02T18:27:57.879Z
++
++- **kind**: BUG → TASK

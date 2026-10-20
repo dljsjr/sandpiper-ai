@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -19,13 +19,17 @@
+   - TOOLS-93
+ 
+ blocked_by:
+   - TOOLS-122
+-updated_at: 2026-11-11T19:21:48.539Z
++updated_at: 2026-11-11T20:44:25.430Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Session wrap (2026-11-11)
++
++Paused at Doug's request because of high context. All agents/processes are stopped and temporary workspaces removed. All ten original implementations are committed/reviewed; seven are NEEDS REVIEW and three remain full-gate-blocked.122 investigation did not reproduce the historical timing tails. Doug noted sustained high laptop load; plausible context, not measured cause. The three source cases use inherited5s defaults versus15s for sibling CLI cases; no documented5s startup SLA. No timeout change or permanent source-helper no-install guard was approved/applied. Do not resume without new scope/go. Continuation: .sandpiper/notes/simplification-handoff.md.
++
+ ## Current delivery and verification checkpoint (2026-11-11)
+ 
+ All ten approved implementations and the separate one-line hermetic smoke correction are committed and independently reviewed. Corrected reference69/532 and seven original task full gates passed. Seven original tasks are NEEDS REVIEW. TOOLS-113 then stopped the serial queue with three existing5-second source-CLI timeouts, root cause unassigned. Consolidation and both Markdown full gates were not attempted. TOOLS-113/111/114 remain IN PROGRESS. TOOLS-116 correction is NEEDS REVIEW; broader verification121 now belongs under this parent and is blocked by new NOT STARTED bug122. No timeout/source workaround or blind retry. All agents/checkouts/processes closed. Handoff: .sandpiper/notes/simplification-handoff.md. Main bookmark/live installation unchanged.
+ 
+@@ -234,4 +238,8 @@
+ 
+ ## 2026-11-11T19:21:48.540Z
+ 
+ - **description**: 89 lines → updated (93 lines)
++
++## 2026-11-11T20:44:25.431Z
++
++- **description**: 93 lines → updated (97 lines)

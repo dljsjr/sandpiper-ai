@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-34.md
++++ b/TOOLS-34.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Make the Sandpiper CLI portable and npm-packable"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-20T19:19:36.669Z
+-updated_at: 2026-10-20T19:19:36.669Z
++updated_at: 2026-10-20T19:19:49.842Z
+ related:
+   - TOOLS-30
+ ---
+ 
+ # Make the Sandpiper CLI portable and npm-packable
+ 
+ Implement the approved portable CLI package: stage built-in skills, prompts, themes, helper executables, and Sandpiper docs beside the built runtime; replace the generated Pi sidecar with a small local patch separating Sandpiper metadata from Pi assets; include patched Pi through bundledDependencies when packing. Preserve source development and configuration behavior. Verify the actual tarball outside the checkout with isolated state and no install scripts or network. Do not publish to a registry.
++
++---
++
++# Activity Log
++
++## 2026-10-20T19:19:49.843Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

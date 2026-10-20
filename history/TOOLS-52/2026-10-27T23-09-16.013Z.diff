@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-52.md
++++ b/TOOLS-52.md
+@@ -5,14 +5,14 @@
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:03.850Z
+-updated_at: 2026-10-27T22:59:26.864Z
++updated_at: 2026-10-27T23:09:16.012Z
+ ---
+ 
+ # Inventory legacy continuity guidance, source ownership and concurrent changes
+ 
+-Initial broad source scan: /private/tmp/journal-cutover-jt1zotyw/{matches.txt,files.json,repo-state.json,eligible-review.json,protected-record-candidates.json}. These are triage candidates, not final automatic inclusion/exclusion: broad search includes symlink aliases, immutable Fling logs, frozen experimental corpora, saved notes and unrelated stand-up phrases. Review semantics before edits. Closed task directories were excluded from rg; use Trail for task reads/status and never edit pre-existing COMPLETE records. Registered projects plus all ~/git were searched. User approved full cutover and explicit global Journal install; saved note contents remain protected. Pre-existing dirty targets checkpointed unchanged and separate: global guidance ozmtsmnp/983185df (AGENTS,USER,version_control edits); Birdup puruqyrk/6027c2ed (existing18-path work); RG oqpznkzo/5060b8fc (slides). No user edits discarded or folded into migration. Global source owner is ~/.sandpiper/agent/identities/Piper/global-guidance (global paths are aliases). Dotfiles is jj/clean; skills-incubator and identity roots have no jj and need byte backups/explicit diffs for authorized guidance edits. StreamObserver stand-up oracle is unrelated; navigator gitignore protects old note data, not active flow. Additional source review remains before final classification.
++Inventory source ownership and note/closed-ticket/unrelated-WIP protection supplied by parent, verified baseline by reviewer. Semantic triage in /private/tmp/journal-cutover-jt1zotyw/contexts.txt and dedup-paths.txt (not exemption lists). Runtime review accepted momxtoxk/cd49634f. Global/per-project slices reviewed directly, with durable-loss findings fixed. Unversioned exact backups/diffs tracked there. Relevant open AGENT-108 and TOOLS-30 now explicitly historical/superseded, status preserved; AGENT-66 old continuity pointer updated. Closed records untouched. Final residual audit pending.
+ 
+ ---
+ 
+ # Activity Log
+@@ -24,4 +24,8 @@
+ ## 2026-10-27T22:59:26.868Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → cutover-dev
++
++## 2026-10-27T23:09:16.013Z
++
++- **description**: updated

@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-85.md
++++ b/TOOLS-85.md
+@@ -5,13 +5,23 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.470Z
+-updated_at: 2026-10-28T21:15:55.774Z
++updated_at: 2026-10-28T21:40:24.014Z
+ ---
+ 
+ # Verify skill-free built-ins and self-contained skill RPC coverage
+ 
++## Zero-built-in runtime regressions found and fixed
++
++The first final gate passed bun check and 639/640 tests, but packed --version failed because npm omits the empty skills directory and bootstrap required all three resource categories. Added one focused failing regression; minimal bootstrap change now permits absent skills while still requiring prompts/themes. All 15 bootstrap cases pass.
++
++Installed Pi source confirms explicit nonexistent skill paths emit diagnostics. Added a separate focused failing resource-adapter regression, then omit only absent builtin skill paths. Updated the existing positive mapping fixture to use a real temporary skills directory. All five adapter cases pass; no SDK event/API signature changes. Full gate rerun follows.
++
++The filesystem RPC skill case also demonstrated missing-fixture RED → add standalone fixture GREEN with the existing isolated mock provider. Source discovery RED → preserved/deleted resource GREEN. No live provider calls, replacement adoption or test access to production user state.
++
++## Original scope
++
+ Use autonomous one-behavior/test RED→GREEN→REFACTOR. Adapt source discovery, diagnostic and packed contracts for zero built-ins; preserve custom/Trail skill support. Replace the skill RPC smoke test dependency on bundled jj with an isolated repo fixture, using its existing mock-provider harness. No production-state tests or live provider calls.
+ 
+ ---
+ 
+@@ -20,4 +30,8 @@
+ ## 2026-10-28T21:15:55.774Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T21:40:24.014Z
++
++- **description**: 1 line → updated (11 lines)

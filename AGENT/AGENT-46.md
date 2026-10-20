@@ -1,12 +1,13 @@
 ---
 title: "ProcessManager: add process restart / auto-restart support"
-status: NOT STARTED
+status: COMPLETE
+resolution: WONTFIX
 kind: TASK
 priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:52.779Z
-updated_at: 2026-04-01T15:30:48.405Z
+updated_at: 2026-11-19T18:58:29.576Z
 ---
 
 # ProcessManager: add process restart / auto-restart support
@@ -28,6 +29,10 @@ The current ProcessManager has no restart API. Restart semantics are currently l
 - `.sandpiper/docs/background-process-framework-design.md` — Open Questions section, item 2
 - AGENT-28 — related: buffer size limits
 
+## Closed in backlog triage (2026-11-19)
+
+No need has come up; a caller can start the same id again after an exit.
+
 ---
 
 # Activity Log
@@ -35,3 +40,12 @@ The current ProcessManager has no restart API. Restart semantics are currently l
 ## 2026-04-01T15:30:48.405Z
 
 - **description**: added (16 lines)
+
+## 2026-11-19T18:58:27.950Z
+
+- **description**: 16 lines → updated (20 lines)
+
+## 2026-11-19T18:58:29.576Z
+
+- **status**: NOT STARTED → COMPLETE
+- **resolution**: UNRESOLVED → WONTFIX

@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-56.md
++++ b/TOOLS-56.md
+@@ -5,14 +5,14 @@
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:04.149Z
+-updated_at: 2026-10-27T23:20:04.583Z
++updated_at: 2026-10-27T23:34:53.527Z
+ ---
+ 
+ # Adopt Journal globally and rebuild the reduced distribution
+ 
+-Journal adopted globally with built CLI normal install: only ../../git/agent-journal appended; all 5 existing packages/order and all other settings unchanged. Deployed catalogue resolves external journal skill and no standup. Both built entrypoints/default+absolute/relative/empty env plus different-cwd child: 8/8. Reviewer found Turbo cache overlay upgrade blocker after prior full gate: stale removed CLI docs/resources survived hits. Added pre-Turbo cleanup of owned packages/cli/dist+docs in both supported root build paths, no new helper. Real-Turbo hermetic regression RED reproduced retained page, GREEN 2/2 after fix; packed test now rejects old page. bun check clean224files. Source checkpoint unsrunny; final upgraded cache-hit build/full/pack re-verification pending. Evidence /private/tmp/journal-cutover-jt1zotyw/{cache-red,cache-green,cache-check}.txt, global-install-delta.json, deployed-resource-catalogue.json, launch-env-after.json.
++Completed real global adoption through freshly built normal Sandpiper install. Exactly ../../git/agent-journal appended after all5 existing packages in original order; every other settings value unchanged, exact private0600 before/after snapshots retained. Deployed catalogue resolves /Users/dstephen/git/agent-journal/skills/journal/SKILL.md and no standup. Standalone executable0755 passed isolated real-Node write/read; standalone check+42tests pass. Reviewer found and reproduced cache-hit overlay upgrade defect; fixed by pre-Turbo cleanup of only owned CLI dist/docs in both root build commands. Actual-root-script real-Turbo regression failed before fix and passes2/2, with remote cache explicitly disabled in fixtures. Reviewer independently proved both cache-hit upgrade paths remove old page/skill/helper and restore current outputs/catalogue. Final developer and reviewer bun check clean; full87files/640tests pass; pack succeeds16985entries, no retired page/skill/helper and no rebundledJournal; staged old-flow matches0. Earlier unchanged5000ms smoke timeouts retained honestly; focused8/8 and final full reruns pass without timeout/suppression changes. Evidence root /private/tmp/journal-cutover-jt1zotyw: global-install-delta.json, deployed-resource-catalogue.json, standalone-executable-smoke.json, distribution-verification.json, cache-red.txt, cache-green.txt, cache-hermetic-check.txt, hermetic-final-test.txt, hermetic-final-pack.txt. Final source c9fc7a05.
+ 
+ ---
+ 
+ # Activity Log
+@@ -24,4 +24,8 @@
+ 
+ ## 2026-10-27T23:20:04.587Z
+ 
+ - **description**: added (1 line)
++
++## 2026-10-27T23:34:53.528Z
++
++- **description**: updated

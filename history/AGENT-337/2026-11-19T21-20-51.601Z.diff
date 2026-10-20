@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-337.md
++++ b/AGENT-337.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Integration harness spawns publish Tattler endpoints into the real runtime directory"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-19T21:18:34.676Z
+-updated_at: 2026-11-19T21:18:34.676Z
++updated_at: 2026-11-19T21:20:51.601Z
+ ---
+ 
+ # Integration harness spawns publish Tattler endpoints into the real runtime directory
+ 
+ devtools/integration/harness.ts isolates HOME, the agent dirs and git/jj config, but not the Tattler runtime directory: it neither sets XDG_RUNTIME_DIR nor TATTLER_RUNTIME_NAMESPACE, and inherits TMPDIR. Every entry:'sandpiper' spawn loads Tattler, which publishes a socket and identity file in the real runtime directory (on macOS, $TMPDIR/sandpiper). Live sessions can then list and message test sessions, and a test session can receive real peer messages. That breaks the repo rule that tests must not touch real user state. Found 2026-11-19 while probing TAT-68, which had to set XDG_RUNTIME_DIR and TATTLER_RUNTIME_NAMESPACE by hand. Fix: prepareIsolatedSpawn sets XDG_RUNTIME_DIR to a short per-spawn directory (Unix socket paths are capped near 104 bytes on macOS, so not under the long agentDir) and removes it on close; add an isolation assertion next to the config-isolation canary.
++
++---
++
++# Activity Log
++
++## 2026-11-19T21:20:51.601Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

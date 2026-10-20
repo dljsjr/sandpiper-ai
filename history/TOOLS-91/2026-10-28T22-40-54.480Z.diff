@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-91.md
++++ b/TOOLS-91.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Retire prompt routing and update distribution documentation"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T22:40:54.094Z
+-updated_at: 2026-10-28T22:40:54.094Z
++updated_at: 2026-10-28T22:40:54.479Z
+ ---
+ 
+ # Retire prompt routing and update distribution documentation
+ 
+ Find active owned prompt deployment/routing assumptions, preserve independent copies, and update source/packed regression contracts and documentation. Keep theme review TOOLS-59 and other deferred work open. Verify no archived prompts or test fixture enter the shipped package.
++
++---
++
++# Activity Log
++
++## 2026-10-28T22:40:54.480Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

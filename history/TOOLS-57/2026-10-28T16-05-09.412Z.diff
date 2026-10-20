@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.280Z
+-updated_at: 2026-10-28T15:26:05.383Z
++updated_at: 2026-10-28T16:05:09.408Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -20,8 +20,10 @@
+ projects is Sandpiper-specific: it owns instructions for ~/.sandpiper/agent/projects.toon and refers to optional external Journal. code-review, refactoring, test-driven-development and mutation-testing are generic coding-workflow guidance that can function as opinionated Sandpiper defaults. jj is generic VCS guidance with an existing separately owned rewrite under AGENT-67/AGENT-317 in ~/git/jujutsu-vcs-skill; do not duplicate that work here.
+ 
+ Recommendation, NOT yet approved: retain all six as current bundled defaults; handle any jj replacement through the existing rewrite. Extracting Markdown alone does not remove Trail/standup-style executable build complexity. This review concerns inclusion and ownership, not a rewrite or full technical validation of every skill reference. No skill contents, discovery behavior, or package wiring changed. Await the user's shipping/ownership decision before marking this subtask complete.
+ 
++User response: declined the keep-all-six confirmation and chose to discuss changes. No keep/remove/extract decisions are approved yet. This task remains IN PROGRESS; do not treat the recommendation above as acceptance.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -32,4 +34,8 @@
+ 
+ ## 2026-10-28T15:26:05.387Z
+ 
+ - **description**: 1 line → updated (9 lines)
++
++## 2026-10-28T16:05:09.412Z
++
++- **description**: 9 lines → updated (11 lines)

@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-11-02T16:57:37.587Z
++updated_at: 2026-11-02T16:59:53.290Z
+ ---
+ 
+ # Make built-in theme resources optional for the standalone CLI
+ 
++## User acceptance
++
++User explicitly approved TOOLS-59 and requested closure. Implementation is COMPLETE/DONE: all owned builtin resource directories are optional; resource-free standalone installation, stock/custom theme support and invalid explicit resource-root diagnostics are verified. Existing clean649-test/check/packaging evidence remains valid. No code changes were needed for acceptance.
++
++## Implementation and scope history
++
+ ## Implementation verified — ready for review
+ 
+ - Default source/installed resource trees may be absent. Bootstrap preserves the computed installed path rather than falling back to checkout resources. Explicit SANDPIPER_STANDALONE_RESOURCE_ROOT overrides must be existing directories; missing paths and files produce useful errors, while empty directories are valid.
+ - Staging and owned resource discovery skip all absent builtin categories. Existing/present resources and configured external paths remain supported. No new sidecar, flag, SDK/theme-engine behavior or Pi asset-root patch.
+@@ -70,4 +76,8 @@
+ 
+ ## 2026-11-02T16:57:37.588Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-02T16:59:53.291Z
++
++- **description**: 31 lines → updated (37 lines)

@@ -1,0 +1,41 @@
+===================================================================
+--- a/WEB-10.md
++++ b/WEB-10.md
+@@ -5,13 +5,27 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:49.144Z
+-updated_at: 2026-11-12T18:15:28.573Z
++updated_at: 2026-11-12T18:23:58.417Z
+ ---
+ 
+ # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
+ 
++## Final shape: bundled renderer extensions, the call chooses (2026-11-12)
++
++Change in the commit "Bundle renderers as extensions and let the call choose", on top of lykonvxu. This section supersedes the selection rules in the sections below. SANDPIPER_WEB_FETCH_RENDERER no longer exists, and web_fetch has no built-in renderer.
++
++Doug's decisions: no built-in renderer; Lightpanda and Obscura are both bundled extensions that register on the channel only when their CLI is on PATH; the schema follows the registered renderers (none: nothing; one: render; several: render plus a list); the env var is scrapped. He rejected defaulting to whichever extension loaded first.
++
++Agent choices: the list parameter is named renderer; with several renderers and no name, the first id in sorted order is the default and the parameter description names it; naming a renderer implies render; an unknown name fails with the loaded ids. No settings.json key was added: with the per-call choice there is no stated need.
++
++- extensions/web-fetch/src/renderer-extensions.ts wraps each bundled renderer in an inline extension; packages/cli/sandpiper_resources.ts loads web-fetch-lightpanda and web-fetch-obscura.
++- obscura-renderer.ts: Cloudflare challenge pages (marker _cf_chl_opt) are reported as blocked. Obscura prints no response details, so a 404 page comes back as content with status 200.
++- The terminal line shows "(rendered with <id>)" when a call names a renderer.
++
++Verification, isolated checkout: bun check clean; full serial suite 71 files, 629 tests passed. The integration test now registers two fixture renderers, calls one by name, and still finds one unchanged system message across three requests. Live through the new code with both browsers installed: order lightpanda, obscura; render without a name used lightpanda (0.8 s); renderer obscura rendered the same page (1.7 s); both report the npm page's Cloudflare challenge as blocked; an unknown name lists the loaded ids. Needs bun run build to go live.
++
+ ## Redesigned: renderers register through an event bus channel (2026-11-12)
+ 
+ Change lykonvxu, on top of qnrztpnm. Doug replaced the command-template variable with code renderers, modeled on the prompt-contribution channel. This section supersedes the configuration described under "Implemented" below; SANDPIPER_WEB_FETCH_RENDER_COMMAND no longer exists.
+ 
+@@ -114,4 +128,8 @@
+ 
+ ## 2026-11-12T18:15:28.578Z
+ 
+ - **status**: NEEDS REVIEW → IN PROGRESS
++
++## 2026-11-12T18:23:58.418Z
++
++- **description**: 59 lines → updated (73 lines)

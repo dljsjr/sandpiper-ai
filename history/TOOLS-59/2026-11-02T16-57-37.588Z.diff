@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-59.md
++++ b/TOOLS-59.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Make built-in theme resources optional for the standalone CLI"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.460Z
+-updated_at: 2026-11-02T16:57:37.390Z
++updated_at: 2026-11-02T16:57:37.587Z
+ ---
+ 
+ # Make built-in theme resources optional for the standalone CLI
+ 
+@@ -66,4 +66,8 @@
+ 
+ ## 2026-11-02T16:57:37.394Z
+ 
+ - **description**: 17 lines → updated (31 lines)
++
++## 2026-11-02T16:57:37.588Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

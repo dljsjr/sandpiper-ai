@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-108.md
++++ b/TOOLS-108.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Remove the Batch A leftovers from the retained-surface inventory"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "batch-a-code, batch-a-config"
+ reporter: USER
+ created_at: 2026-11-10T22:55:16.255Z
+-updated_at: 2026-11-10T22:55:16.255Z
++updated_at: 2026-11-10T22:55:16.339Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -32,4 +32,13 @@
+ - A-10 keeps the .turbo entries until inventory row L-1 deletes the local cache.
+ - A-11 is limited to the two nested .gitignore files for now. The root .gitignore lines for /packages/cli/docs/ and *.tsbuildinfo still hide untracked files in the main checkout (inventory row L-2). Removing the lines first would make jj start tracking those files. The lines go when L-2 is done.
+ - A-21 rests on audit-agent evidence. The implementing agent verifies each item and leaves anything that has a caller.
+ - A-20 removes ProcessManager.kill, which has no caller today. AGENT-70 (a stop tool for background processes) would add it back.
++
++---
++
++# Activity Log
++
++## 2026-11-10T22:55:16.339Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → batch-a-code, batch-a-config

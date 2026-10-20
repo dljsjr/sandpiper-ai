@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-116.md
++++ b/TOOLS-116.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Runtime Pi import smoke test times out on a quiet machine"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-11T18:19:02.833Z
+-updated_at: 2026-11-11T18:19:02.833Z
++updated_at: 2026-11-11T18:25:03.029Z
+ related:
+   - TOOLS-30
+   - TOOLS-112
+ ---
+@@ -40,4 +40,13 @@
+ Full failure: /tmp/sandpiper-gate-last-seven-full.ARdI8S/rlkqszyn/full-test.log
+ Controlled comparison: /tmp/sandpiper-gate-rlk-diagnosis.S0st6c/ (both commands, output, loads, dependency comparisons and empty exact-source diff).
+ 
+ Implementation of the ten approved tasks is committed and reviewed. Six are NEEDS REVIEW after full gates. TOOLS-112 and the later113/111/114 units await verification. No code is changed for this finding. Investigation of this separate blocker requires Doug's go; task remains NOT STARTED.
++
++---
++
++# Activity Log
++
++## 2026-11-11T18:25:03.030Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

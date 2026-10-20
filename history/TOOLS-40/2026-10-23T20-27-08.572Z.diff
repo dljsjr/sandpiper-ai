@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-40.md
++++ b/TOOLS-40.md
+@@ -5,13 +5,14 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-23T20:11:39.576Z
+-updated_at: 2026-10-23T20:24:06.876Z
++updated_at: 2026-10-23T20:27:08.571Z
+ ---
+ 
+ # Remove public Trail docs and archive internal Trail material
+ 
++Removed obsolete public task feature pages, package references, and the Trail-specific sprint-status prompt. Updated retained prompts to use a configured project tracker rather than a bundled tasks skill. Archived five Trail-only design/spec/audit documents plus the task feature playbook; byte comparison against the previous revision confirms all six are unchanged. Updated mixed-purpose internal specs, public build/CLI docs, indexes, and local AGENTS guidance. Local repository task policy remains and routes to installed trail. Task data/history and historical standups were not cleaned up or migrated. Verified 73 local Markdown links.
+ 
+ ---
+ 
+ # Activity Log
+@@ -23,4 +24,8 @@
+ 
+ ## 2026-10-23T20:24:06.877Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-23T20:27:08.572Z
++
++- **description**: added (1 line)

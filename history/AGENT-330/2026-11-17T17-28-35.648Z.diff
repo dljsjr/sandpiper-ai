@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-330.md
++++ b/AGENT-330.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Defer bundled extension tools and list deferred tools inside <tools>"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-17T17:07:11.974Z
+-updated_at: 2026-11-17T17:07:53.524Z
++updated_at: 2026-11-17T17:28:35.642Z
+ ---
+ 
+ # Defer bundled extension tools and list deferred tools inside <tools>
+ 
+@@ -39,4 +39,8 @@
+ ## 2026-11-17T17:07:53.526Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-17T17:28:35.648Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

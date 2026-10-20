@@ -1,0 +1,36 @@
+===================================================================
+--- a/TOOLS-109.md
++++ b/TOOLS-109.md
+@@ -5,16 +5,22 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-10T23:39:42.625Z
+-updated_at: 2026-11-11T17:03:39.950Z
++updated_at: 2026-11-11T17:32:18.129Z
+ related:
+   - TOOLS-92
+   - TOOLS-108
+ ---
+ 
+ # Remove the DuckDuckGo search adapter
+ 
++## Implementation checkpoint (2026-11-11)
++
++Change uwwxxmml removes DDG, fixture/test, extension-only jsdom declarations and shared unused timeout/signal options. SCOUT moved unchanged to .sandpiper/archive/web-search-ddg-scout-2026-06.md (not previously moved by115). Worker passed 39 focused tests, frozen install and clean check. Independent review found no actionable issue. Full/per-commit quiet-machine gates are pending.
++
++Status remains IN PROGRESS. This checkpoint is not verified completion or user acceptance.
++
+ ## Decision
+ 
+ Doug approved removing the DuckDuckGo search adapter on 2026-11-10 (TOOLS-92 review, inventory row B-1). Not started.
+ 
+@@ -38,4 +44,8 @@
+ ## 2026-11-11T17:03:39.951Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-11T17:32:18.131Z
++
++- **description**: 16 lines → updated (22 lines)

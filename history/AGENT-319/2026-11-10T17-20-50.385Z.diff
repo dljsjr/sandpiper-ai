@@ -1,0 +1,44 @@
+===================================================================
+--- a/AGENT-319.md
++++ b/AGENT-319.md
+@@ -5,13 +5,30 @@
+ priority: HIGH
+ assignee: "pi-audit"
+ reporter: USER
+ created_at: 2026-11-10T16:09:43.550Z
+-updated_at: 2026-11-10T16:57:02.323Z
++updated_at: 2026-11-10T17:20:50.382Z
+ ---
+ 
+ # Update the Pi dependency from 1.3.0 to 1.5.2
+ 
++## Delivered, awaiting review (2026-11-10)
++
++Agent pi-audit delivered two commits from its isolated workspace, now on the working line. The main bookmark is unchanged; the main checkout's node_modules and dist are not updated.
++
++- change zuouullt: build: Update Pi to 1.5.2 (24 files). Four pins, patch carried with four hunks, Type imported from typebox in 12 files, typebox 1.3.27 declared, version literals in two tests, the redundant default-preamble assertion deleted, patch procedure in docs/dev/build-system.md hardened.
++- change oqutxtqn: refactor: Use Pi's native update check (19 files, 380 lines removed). Fifth patch hunk passes PI_CODING_AGENT_VERSION to the native check; update-check.ts, the update banner, the checkForUpdates plumbing, shouldCheckForUpdates and the PI_SKIP_VERSION_CHECK line in the bootstrap are gone.
++
++Verification by the agent and repeated by the coordinator at each commit in the agent's workspace: commit 1 bun check clean, 71 files / 559 tests; commit 2 bun check clean, 70 files / 549 tests. The installed interactive-mode.js line 873 carries the patched call.
++
++Finding that needs a decision: pi.dev reads the client version from the User-Agent, and Sandpiper sends its own package version. The coordinator reproduced it: with pi/0.0.1 the model catalog endpoint returns 404 and latest-version returns the legacy package at 0.73.1; with pi/1.5.2 the catalog returns 200 and latest-version returns 1.5.2. So the remote model catalog never reaches Sandpiper. A one-line hunk in dist/utils/pi-user-agent.js would fix the catalog, the tool download and the version check User-Agent together. Provider requests use a different place.
++
++For review:
++- PI_SKIP_VERSION_CHECK is no longer exempt from mirroring, so SANDPIPER_SKIP_VERSION_CHECK=1 now also turns the native check off.
++- The build bundles its own copy of typebox 1.3.27, the same version Pi resolves.
++- Packed tarball: 28,491,145 bytes, up 846,593 from 27,644,552.
++- web-search-mcp-transport-investigation.md lines 40 and 88 now say 1.5.2.
++
+ ## Decisions after the audit (Doug, 2026-11-10)
+ 
+ - Target version: 1.5.2.
+ - Replace Sandpiper's own update check with Pi's native check, using one more hunk in the local patch that passes PI_CODING_AGENT_VERSION to the check. Delete packages/core/src/update-check.ts, the update banner in extensions/system/diagnostics-hooks.ts, the plumbing around them, and the PI_SKIP_VERSION_CHECK=1 that the bootstrap sets. TOOLS-87 is a bug in the deleted code and closes with it.
+@@ -41,4 +58,8 @@
+ ## 2026-11-10T16:57:02.324Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → pi-audit
++
++## 2026-11-10T17:20:50.385Z
++
++- **description**: 17 lines → updated (34 lines)

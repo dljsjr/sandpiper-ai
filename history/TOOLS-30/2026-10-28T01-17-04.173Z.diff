@@ -1,0 +1,38 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -9,9 +9,9 @@
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-27T23:09:15.234Z
++updated_at: 2026-10-28T01:17:04.173Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
+@@ -24,8 +24,14 @@
+ Remove the unused neutral Pi package, generated npm/Pi package assembly, compiled Bun app, Claude plugin, and broken vendoring updater. Keep checked-in third-party skill snapshots and licenses.
+ 
+ The audit and approved topology are recorded in TOOLS-31 and TOOLS-32. The superseded AGENT-301 proposal is archived at .sandpiper/archive/agent-301-build-topology-proposal.md. Implementation and verification are recorded in TOOLS-33.
+ 
++## Bookkeeping acceptance — 2026-10-27
++
++Accepted the delivered build-topology and resource simplification. TOOLS-34 subsequently approved portable CLI packing; TOOLS-38/42 extracted Trail and retained its temporary external skill bridge; TOOLS-51 replaced bundled standup with standalone Journal. Those approved changes supersede the earlier helper-retention constraints, not the original completion evidence.
++
++Current verification: bun check passed with zero errors/warnings; bun run test rebuilt package output and passed 87 files / 640 tests, including packed-install, cache-restoration and temporary Trail bridge regressions. Closure requested during the return to build/packaging simplification. Original historical verification is retained above.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -68,4 +74,8 @@
+ 
+ ## 2026-10-27T23:09:15.238Z
+ 
+ - **description**: 5 lines → updated (9 lines)
++
++## 2026-10-28T01:17:04.173Z
++
++- **description**: 9 lines → updated (15 lines)

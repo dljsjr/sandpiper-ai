@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-75.md
++++ b/TOOLS-75.md
+@@ -5,19 +5,15 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.493Z
+-updated_at: 2026-10-28T18:58:59.168Z
++updated_at: 2026-10-28T19:31:43.621Z
+ ---
+ 
+ # Archive and remove the bundled test-driven-development skill
+ 
+-Preserve the whole current skill under ~/git/skills-incubator/skills/test-driven-development with exact bytes/modes and no destination overwrite or autoload. Drive the unbundled-catalogue behavior through one focused RED test, user confirmation, then the minimal resource change and GREEN. Update existing diagnostic/packed contracts deliberately for that approved behavior and verify actual package absence. Do not begin production edits before the user confirms the RED checkpoint.
++Preserve the entire current skill at ~/git/skills-incubator/skills/test-driven-development with exact bytes/modes and no destination overwrite or autoload. Remove its Sandpiper-owned bundled copy. The intended source-catalogue RED is already demonstrated: expected jj + mutation-testing; actual additionally includes test-driven-development. Proceed autonomously to the minimal production resource change, GREEN, and a refactor check. Then update existing diagnostic/packed contracts deliberately for that same approved behavior. The previous requirement to wait for user confirmation was an assistant mistake, not user policy.
+ 
+-## Intentional RED checkpoint — 2026-10-28
+-
+-Focused baseline passed: bun run test:vitest -- packages/cli/standalone_resource_discovery.test.ts --testNamePattern false (1 passed, 1 skipped). Changed only the expected source catalogue by removing test-driven-development. The same single-case run now fails for the expected reason: actual catalogue still contains test-driven-development while expected catalogue is jj + mutation-testing. No shipped resources, archive, deployment links or global developer guidance changed. Await explicit user confirmation of this RED before the minimal production resource change and GREEN. Do not batch additional tests or implementation before that confirmation.
+-
+ ---
+ 
+ # Activity Log
+ 
+@@ -28,4 +24,8 @@
+ 
+ ## 2026-10-28T18:58:59.169Z
+ 
+ - **description**: 1 line → updated (5 lines)
++
++## 2026-10-28T19:31:43.622Z
++
++- **description**: 5 lines → updated (1 line)

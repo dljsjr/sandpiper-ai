@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-65.md
++++ b/AGENT-65.md
+@@ -9,9 +9,9 @@
+ related:
+   - AGENT-28
+   - AGENT-46
+   - AGENT-47
+-updated_at: 2026-04-16T21:27:03.352Z
++updated_at: 2026-11-19T18:58:28.137Z
+ ---
+ 
+ # ProcessManager: add PTY spawn mode via @lydell/node-pty
+ 
+@@ -40,8 +40,12 @@
+ - `packages/core/src/process-manager.ts` — current implementation (child mode only)
+ - AGENT-15 — original background framework (completed without PTY)
+ - SHR-71 — PTY adapter for shell_relay (WONTFIX — not needed for shell_relay)
+ 
++## Closed in backlog triage (2026-11-19)
++
++Needs a native dependency (node-pty) for an edge case; no need has come up.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -51,4 +55,8 @@
+ 
+ ## 2026-04-16T21:27:03.353Z
+ 
+ - **related**: (none) → AGENT-28, AGENT-46, AGENT-47
++
++## 2026-11-19T18:58:28.137Z
++
++- **description**: 25 lines → updated (29 lines)

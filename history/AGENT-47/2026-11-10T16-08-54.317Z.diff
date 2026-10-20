@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-47.md
++++ b/AGENT-47.md
+@@ -5,13 +5,17 @@
+ priority: LOW
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-04-01T15:29:52.812Z
+-updated_at: 2026-06-03T04:44:12.486Z
++updated_at: 2026-11-10T16:08:54.316Z
+ ---
+ 
+ # ProcessManager: design multi-consumer output broadcast pattern
+ 
++## Closed with the Shell Relay retirement (2026-11-10)
++
++Doug decided to remove Shell Relay (TOOLS-93). This task existed because the relay extension would have been a second consumer of a background process output stream. With the extension gone there is one consumer, so the broadcast design is not needed. Reopen it if a second consumer appears.
++
+ The background process framework design doc lists multiple consumers as an open question: 'if both the relay extension and a tool call want the same process's output, how do we handle that? Broadcast vs. single reader?'
+ 
+ Currently the ProcessManager buffers stdout/stderr per process and exposes them through `get(id)` → `readStdout()` / `readStderr()`. This is a single-reader model — whoever calls readStdout gets the same buffered content, but there's no fan-out.
+ 
+@@ -47,4 +51,8 @@
+ ## 2026-06-03T04:44:12.486Z
+ 
+ - **status**: IN PROGRESS → NOT STARTED
+ - **assignee**: Huginn → UNASSIGNED
++
++## 2026-11-10T16:08:54.317Z
++
++- **description**: 19 lines → updated (23 lines)

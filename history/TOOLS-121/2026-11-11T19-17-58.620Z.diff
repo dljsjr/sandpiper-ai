@@ -1,0 +1,25 @@
+===================================================================
+--- a/TOOLS-121.md
++++ b/TOOLS-121.md
+@@ -5,9 +5,11 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T18:45:09.987Z
+-updated_at: 2026-11-11T18:58:17.791Z
++blocked_by:
++  - TOOLS-122
++updated_at: 2026-11-11T19:17:58.619Z
+ ---
+ 
+ # Independently rerun the corrected reference and implementation gates
+ 
+@@ -32,4 +34,8 @@
+ 
+ ## 2026-11-11T19:17:58.537Z
+ 
+ - **parent**: TOOLS-116 → TOOLS-30
++
++## 2026-11-11T19:17:58.620Z
++
++- **blocked_by**: (none) → TOOLS-122

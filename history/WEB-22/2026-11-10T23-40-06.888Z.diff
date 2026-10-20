@@ -1,0 +1,33 @@
+===================================================================
+--- a/WEB-22.md
++++ b/WEB-22.md
+@@ -5,15 +5,19 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-11-10T22:44:14.588Z
+-updated_at: 2026-11-10T23:17:21.599Z
++updated_at: 2026-11-10T23:40:06.876Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # web_search runs shell commands from project-local settings without a trust check
+ 
++## Decision (Doug, 2026-11-10)
++
++Fix it with the project trust check: read <cwd>/.sandpiper/settings.json only when ExtensionContext.isProjectTrusted() returns true, and always read the agent directory settings.json. Keep the resolver and its "!command" support. Not started.
++
+ ## Facts added on 2026-11-10
+ 
+ - Doug keeps his Brave key in settings as a "!command" value that reads from his 1Password vault. The resolver and its "!command" support stay. Reading the key from the environment only is not an option.
+ - Pi resolves "!command" values too, for provider keys, MCP headers and credentials. The difference is trust: Pi's SettingsManager does not load a project's settings at all until the project is trusted (dist/core/settings-manager.js:257-259). The web-search resolver reads the project file directly and skips that check.
+@@ -49,4 +53,8 @@
+ 
+ ## 2026-11-10T23:17:21.600Z
+ 
+ - **description**: 21 lines → updated (29 lines)
++
++## 2026-11-10T23:40:06.888Z
++
++- **description**: 29 lines → updated (33 lines)

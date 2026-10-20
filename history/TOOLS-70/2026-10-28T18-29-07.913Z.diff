@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-70.md
++++ b/TOOLS-70.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Preserve the complete refactoring skill in skills-incubator"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:29:07.501Z
+-updated_at: 2026-10-28T18:29:07.501Z
++updated_at: 2026-10-28T18:29:07.912Z
+ ---
+ 
+ # Preserve the complete refactoring skill in skills-incubator
+ 
+ Archive the full skill directory at ~/git/skills-incubator/skills/refactoring only after confirming destination absence and ownership. Verify all relative entries, file bytes, modes and directory modes against the pre-removal source. Preserve it as reference only without rewriting, registering or loading it.
++
++---
++
++# Activity Log
++
++## 2026-10-28T18:29:07.913Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

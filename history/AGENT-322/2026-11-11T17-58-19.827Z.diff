@@ -1,0 +1,33 @@
+===================================================================
+--- a/AGENT-322.md
++++ b/AGENT-322.md
+@@ -5,15 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T23:39:42.912Z
+-updated_at: 2026-11-11T17:32:16.614Z
++updated_at: 2026-11-11T17:58:19.826Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Context-usage notes reach the model with escaped tags
+ 
++## Independent check checkpoint (2026-11-11)
++
++Parent/gate independently passed frozen install and the revision-specific bun check with zero errors/warnings. All ten tasks are implemented and independently reviewed with no outstanding actionable findings. Full/per-commit full-test gates remain pending quiet load; no completion or acceptance is claimed.
++
+ ## Implementation checkpoint (2026-11-11)
+ 
+ Change mrrwutsk removes nested notification markup and resets the 10% counter after successful compaction. Worker reproduced both markup failures and compaction reset failure, then passed 28 focused tests. Session-change claim was refuted against Pi lifecycle: factories are recreated. Independent review found no actionable issue. Full/per-commit quiet-machine gates are pending.
+ 
+@@ -51,4 +55,8 @@
+ 
+ ## 2026-11-11T17:32:16.617Z
+ 
+ - **description**: 20 lines → updated (26 lines)
++
++## 2026-11-11T17:58:19.827Z
++
++- **description**: 26 lines → updated (30 lines)

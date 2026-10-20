@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-53.md
++++ b/TOOLS-53.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Remove bundled standup runtime and wire stable Journal directory defaults"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:03.927Z
+-updated_at: 2026-10-27T22:15:03.927Z
++updated_at: 2026-10-27T22:59:26.941Z
+ ---
+ 
+ # Remove bundled standup runtime and wire stable Journal directory defaults
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-27T22:59:26.942Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → cutover-dev

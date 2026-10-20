@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-311.md
++++ b/AGENT-311.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Tattler test for the 1.2.0 busy-during-setup window"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-16T17:17:57.441Z
+-updated_at: 2026-10-16T17:27:41.280Z
++updated_at: 2026-10-19T17:27:18.024Z
+ ---
+ 
+ # Tattler test for the 1.2.0 busy-during-setup window
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-10-16T17:27:41.280Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-10-19T17:27:18.025Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

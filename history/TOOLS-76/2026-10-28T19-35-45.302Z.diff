@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-76.md
++++ b/TOOLS-76.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Preserve autonomous one-test red-green-refactor in developer guidance"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.569Z
+-updated_at: 2026-10-28T19:31:43.686Z
++updated_at: 2026-10-28T19:35:45.301Z
+ ---
+ 
+ # Preserve autonomous one-test red-green-refactor in developer guidance
+ 
+@@ -23,4 +23,9 @@
+ 
+ ## 2026-10-28T19:31:43.686Z
+ 
+ - **description**: updated
++
++## 2026-10-28T19:35:45.302Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

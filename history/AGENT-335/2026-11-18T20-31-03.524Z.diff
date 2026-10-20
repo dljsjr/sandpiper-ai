@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-335.md
++++ b/AGENT-335.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Background process exit notification fires twice when the command cannot start"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: LOW
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-17T22:50:12.699Z
+-updated_at: 2026-11-18T20:31:03.435Z
++updated_at: 2026-11-18T20:31:03.523Z
+ ---
+ 
+ # Background process exit notification fires twice when the command cannot start
+ 
+@@ -36,4 +36,8 @@
+ 
+ ## 2026-11-18T20:31:03.439Z
+ 
+ - **description**: 5 lines → updated (13 lines)
++
++## 2026-11-18T20:31:03.524Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

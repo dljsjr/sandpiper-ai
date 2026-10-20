@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-78.md
++++ b/TOOLS-78.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Identity lenses still hard-load retired workflow skills"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-28T19:48:44.051Z
+-updated_at: 2026-10-28T20:11:31.823Z
++updated_at: 2026-10-28T20:11:32.376Z
+ related:
+   - TOOLS-74
+   - TOOLS-77
+   - TOOLS-64
+@@ -38,4 +38,8 @@
+ 
+ ## 2026-10-28T20:11:31.823Z
+ 
+ - **description**: 1 line → updated (9 lines)
++
++## 2026-10-28T20:11:32.377Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

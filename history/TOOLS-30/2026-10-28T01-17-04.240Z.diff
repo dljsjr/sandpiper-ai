@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -1,7 +1,8 @@
+ ---
+ title: "Simplify the build and distribution system after the Pi 1.0 migration"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+@@ -9,9 +10,9 @@
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-28T01:17:04.173Z
++updated_at: 2026-10-28T01:17:04.240Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
+@@ -78,4 +79,9 @@
+ 
+ ## 2026-10-28T01:17:04.173Z
+ 
+ - **description**: 9 lines → updated (15 lines)
++
++## 2026-10-28T01:17:04.240Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

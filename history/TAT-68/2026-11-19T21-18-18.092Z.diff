@@ -1,0 +1,34 @@
+===================================================================
+--- a/TAT-68.md
++++ b/TAT-68.md
+@@ -1,7 +1,8 @@
+ ---
+ title: "Pending inbox re-delivers already-handled messages after abort+resume"
+-status: IN PROGRESS
++status: COMPLETE
++resolution: WONTFIX
+ kind: BUG
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+@@ -9,9 +10,9 @@
+ 
+ related:
+   - TAT-73
+   - TAT-70
+-updated_at: 2026-11-19T21:18:17.939Z
++updated_at: 2026-11-19T21:18:18.092Z
+ ---
+ 
+ # Pending inbox re-delivers already-handled messages after abort+resume
+ 
+@@ -79,4 +80,9 @@
+ 
+ ## 2026-11-19T21:18:17.939Z
+ 
+ - **description**: 28 lines → updated (32 lines)
++
++## 2026-11-19T21:18:18.092Z
++
++- **status**: IN PROGRESS → COMPLETE
++- **resolution**: UNRESOLVED → WONTFIX

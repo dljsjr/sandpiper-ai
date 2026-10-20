@@ -1,0 +1,29 @@
+===================================================================
+--- a/AGENT-329.md
++++ b/AGENT-329.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Remove dead code, stale comments and duplicated path joining"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-12T20:41:44.441Z
+-updated_at: 2026-11-12T20:41:44.441Z
++updated_at: 2026-11-12T20:52:27.451Z
+ ---
+ 
+ # Remove dead code, stale comments and duplicated path joining
+ 
++
++---
++
++# Activity Log
++
++## 2026-11-12T20:52:27.452Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

@@ -1,0 +1,37 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -5,9 +5,11 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T14:17:40.280Z
+-updated_at: 2026-10-28T16:05:09.408Z
++depends_on:
++  - TOOLS-60
++updated_at: 2026-10-28T16:53:39.092Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+@@ -22,8 +24,10 @@
+ Recommendation, NOT yet approved: retain all six as current bundled defaults; handle any jj replacement through the existing rewrite. Extracting Markdown alone does not remove Trail/standup-style executable build complexity. This review concerns inclusion and ownership, not a rewrite or full technical validation of every skill reference. No skill contents, discovery behavior, or package wiring changed. Await the user's shipping/ownership decision before marking this subtask complete.
+ 
+ User response: declined the keep-all-six confirmation and chose to discuss changes. No keep/remove/extract decisions are approved yet. This task remains IN PROGRESS; do not treat the recommendation above as acceptance.
+ 
++Approved projects decision: remove the bundled projects skill, convert the global registry into a Markdown routing index, and rewire active guidance directly to it. Implementation is tracked by TOOLS-60. The user requested one-by-one discussion; no decisions about the other five skills are approved.
++
+ ---
+ 
+ # Activity Log
+ 
+@@ -38,4 +42,9 @@
+ 
+ ## 2026-10-28T16:05:09.412Z
+ 
+ - **description**: 9 lines → updated (11 lines)
++
++## 2026-10-28T16:53:39.093Z
++
++- **description**: 11 lines → updated (13 lines)
++- **depends_on**: (none) → TOOLS-60

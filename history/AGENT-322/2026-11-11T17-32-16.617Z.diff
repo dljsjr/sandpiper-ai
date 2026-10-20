@@ -1,0 +1,35 @@
+===================================================================
+--- a/AGENT-322.md
++++ b/AGENT-322.md
+@@ -5,15 +5,21 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T23:39:42.912Z
+-updated_at: 2026-11-11T17:03:39.477Z
++updated_at: 2026-11-11T17:32:16.614Z
+ related:
+   - TOOLS-92
+ ---
+ 
+ # Context-usage notes reach the model with escaped tags
+ 
++## Implementation checkpoint (2026-11-11)
++
++Change mrrwutsk removes nested notification markup and resets the 10% counter after successful compaction. Worker reproduced both markup failures and compaction reset failure, then passed 28 focused tests. Session-change claim was refuted against Pi lifecycle: factories are recreated. Independent review found no actionable issue. Full/per-commit quiet-machine gates are pending.
++
++Status remains IN PROGRESS. This checkpoint is not verified completion or user acceptance.
++
+ ## Defect
+ 
+ extensions/system/context-management.ts sends the model hidden context-usage notes. The 50% and 80% notes wrap their text in <info> and <important> tags and pass it as the notification's instructions. formatSystemNotification escapes instruction text (packages/core/src/system-notification.ts), so the model receives the tags as text:
+ 
+@@ -41,4 +47,8 @@
+ ## 2026-11-11T17:03:39.478Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-11T17:32:16.617Z
++
++- **description**: 20 lines → updated (26 lines)

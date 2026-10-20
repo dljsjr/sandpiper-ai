@@ -1,0 +1,31 @@
+===================================================================
+--- a/AGENT-108.md
++++ b/AGENT-108.md
+@@ -5,13 +5,17 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-28T18:37:45.963Z
+-updated_at: 2026-05-12T16:12:00.568Z
++updated_at: 2026-10-27T23:08:54.712Z
+ ---
+ 
+ # Make standup CLI command tests cwd-independent
+ 
++Current disposition (TOOLS-51): the bundled standup CLI and its command tests are removed. Do not implement or run the retired helper workflow below. The original report is preserved as historical evidence; it was already stale at TOOLS-47 review. Parent review retains authority over this ticket status.
++
++## Historical report (not current instructions)
++
+ # Bug — `sandpiper-standup-cli` tests are implicitly cwd-dependent
+ 
+ ## Summary
+ All of `packages/sandpiper-standup-cli/src/commands/*.test.ts` invoke the built CLI as `node dist/sandpiper-standup ...` via `execSync`. That path is bare-relative and only resolves when the test runner is started from `packages/sandpiper-standup-cli/`. Running vitest from the repo root (e.g. `bun x vitest run` or a workspace-wide `bun run test`) crashes every one of them with `MODULE_NOT_FOUND`.
+@@ -94,4 +98,8 @@
+ 
+ ## 2026-05-12T16:12:00.569Z
+ 
+ - **status**: IN PROGRESS → NOT STARTED
++
++## 2026-10-27T23:08:54.717Z
++
++- **description**: 68 lines → updated (72 lines)

@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-36.md
++++ b/TOOLS-36.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Stage built-in resources and pack the patched runtime dependency"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T19:19:50.031Z
+-updated_at: 2026-10-20T19:19:50.031Z
++updated_at: 2026-10-20T19:26:11.699Z
+ ---
+ 
+ # Stage built-in resources and pack the patched runtime dependency
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-20T19:26:11.700Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

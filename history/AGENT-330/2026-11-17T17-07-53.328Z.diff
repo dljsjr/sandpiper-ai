@@ -1,0 +1,38 @@
+===================================================================
+--- a/AGENT-330.md
++++ b/AGENT-330.md
+@@ -5,9 +5,33 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-11-17T17:07:11.974Z
+-updated_at: 2026-11-17T17:07:11.974Z
++updated_at: 2026-11-17T17:07:53.326Z
+ ---
+ 
+ # Defer bundled extension tools and list deferred tools inside <tools>
+ 
++Defer most tools that Sandpiper's bundled extensions register, and tell the model they exist.
++
++## Why
++
++Pi's `tool_search` can load any tool with `exposure: 'deferred'`, but nothing advertises deferred extension tools: `tool_search`'s description lists no tools, and `<mcp_servers>` covers MCP servers only. Claude Code lists deferred tool names in a message; Codex lists sources in `tool_search`'s description. Tool changes already reach the model as appended system messages (tool declaration deltas plus changed-section patches), so no prompt rewrite is involved.
++
++## Plan
++
++1. Pi patch (`dist/core/system-prompt.js` and `.d.ts`): a `deferredTools: string[]` option carried through `normalizeBuildSystemPromptOptions`; the patched custom-preamble branch renders a `<deferred_tools>` block inside `<tools>` listing deferred tools not yet active (name plus the tool's snippet), only when `tool_search` is declared.
++2. `extensions/system`: set `deferredTools` in `before_agent_start` (before the user-custom-prompt early return) from `pi.getAllTools()`, exposure `deferred` and no namespace (MCP stays under `<mcp_servers>`); activate `tool_search` when any such tool is registered, mirroring Pi's MCP `ensureDiscoveryActive`.
++3. Mark deferred: `list_peers`, `send_peer_message`, `tattler_receive`, `send_chorus_reply`, `start_background_process`, `check_background_process`, `web_fetch`, `web_search`. Keep loaded: `skill`, `done`, `ask_questions`.
++4. Tests: unit tests on the patched renderer; an end-to-end test with `prompt-recording-harness` (scripted `tool_search` call with arguments) showing a loaded tool moving from the deferred block to the main list; a resumed-session check that `web_fetch` re-registration does not unload it.
++
++## Out of scope
++
++The skills-instruction bug (naming `skill`/`read` without checking reachability) and the section-based prompt restructure.
++
++---
++
++# Activity Log
++
++## 2026-11-17T17:07:53.328Z
++
++- **description**: added (16 lines)

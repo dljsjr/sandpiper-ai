@@ -1,0 +1,35 @@
+===================================================================
+--- a/TOOLS-74.md
++++ b/TOOLS-74.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T18:57:43.352Z
+-updated_at: 2026-10-28T18:57:43.433Z
++updated_at: 2026-10-28T18:58:59.055Z
+ related:
+   - TOOLS-57
+   - TOOLS-30
+ ---
+@@ -15,12 +15,20 @@
+ # Unbundle the TDD skill while preserving the RED-confirmation workflow in developer guidance
+ 
+ User approved moving test-driven-development out of the harness and relying on developer-role guidance. Preserve the complete skill unchanged at ~/git/skills-incubator/skills/test-driven-development and remove the Sandpiper-owned bundled copy. The user explicitly corrected the review: showing one failing test and getting user confirmation before production code is an essential guard against bulk tests/bulk implementation, not ceremony. Preserve one behavior -> one test -> observed RED for the expected reason -> user confirmation -> minimum GREEN -> refactor -> repeat; keep the refactor phase without expanding into a refactoring-policy redesign. First demonstrate one focused catalogue RED test and STOP for user confirmation before any shipped-resource/global-guidance changes. No new TDD SOP rewrite, new framework, archive auto-loading, or decisions about mutation-testing/jj are approved. Verification and final acceptance belong to this parent.
+ 
++## Intentional RED checkpoint — 2026-10-28
++
++Focused baseline passed: bun run test:vitest -- packages/cli/standalone_resource_discovery.test.ts --testNamePattern false (1 passed, 1 skipped). Changed only the expected source catalogue by removing test-driven-development. The same single-case run now fails for the expected reason: actual catalogue still contains test-driven-development while expected catalogue is jj + mutation-testing. No shipped resources, archive, deployment links or global developer guidance changed. Await explicit user confirmation of this RED before the minimal production resource change and GREEN. Do not batch additional tests or implementation before that confirmation.
++
+ ---
+ 
+ # Activity Log
+ 
+ ## 2026-10-28T18:57:43.433Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T18:58:59.055Z
++
++- **description**: 1 line → updated (5 lines)

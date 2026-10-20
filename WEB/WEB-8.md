@@ -1,27 +1,33 @@
 ---
 title: "Wire ctx.signal into web_fetch for user-cancellable fetches"
-status: NOT STARTED
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
-assignee: UNASSIGNED
+assignee: AGENT
 reporter: AGENT
 created_at: 2026-03-30T02:04:34.128Z
-updated_at: 2026-03-30T02:04:45.101Z
+updated_at: 2026-11-12T19:52:18.880Z
 ---
 
 # Wire ctx.signal into web_fetch for user-cancellable fetches
 
-The `web_fetch` tool currently ignores the `signal` parameter in its `execute` function. `SimpleFetchAdapter` creates its own `AbortController` with a 30s timeout, but there is no way to cancel an in-flight HTTP request when the user presses Escape mid-turn.
+`web_fetch` ignored the agent turn's abort signal, so pressing Escape mid-fetch waited out the 30-second limit (page request, or a renderer's browser command).
 
-With pi 0.63.2, `ctx.signal` is now available in extension tool handlers — it is the active agent turn's AbortSignal, fired on user cancellation. Wiring it in would let Escape immediately abort a slow or hanging fetch instead of waiting up to 30 seconds.
+## Done (change kotlnqvp)
 
-## Changes Required
+- `FetchOptions.signal`; `SimpleFetchAdapter` composes it with its own 30 s timer via `AbortSignal.any`. Timeout behaviour unchanged.
+- `RendererFetchAdapter` passes the signal to `tools.run`; `runCommand` gives it to `execFile` and rejects with the abort reason (Node and Bun both report `ABORT_ERR`, which previously would have read as "could not start").
+- `fetchAndExtract` passes the signal to the page request and the Markdown alternate request, and re-throws after them, because the alternate request turns any failure, an abort included, into a fallback to the HTML page.
+- `executeWebFetchTool` takes `signal` in its dependencies; `index.ts` forwards `execute`'s signal.
+- llms.txt HEAD probes deliberately keep only their 3 s limit: results are cached for the process, and an aborted probe would be cached as unknown.
+- README: cancel behaviour, and the `tools.run` contract (work a renderer does outside `tools.run` is not stopped).
 
-- `FetchOptions` gains an optional `signal?: AbortSignal` field
-- `SimpleFetchAdapter.fetch()` composes the external signal with its own timeout using `AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)])`
-- The `web_fetch` tool `execute()` passes its `signal` argument (the `ctx.signal` from the tool signature) through to the adapter
-- Existing timeout behaviour is unchanged when no external signal is provided
-- Tests cover the signal composition path (cancelled before timeout, timed out without external signal)
+## Verification
+
+- Focused RED→GREEN tests in fetch, render, pipeline, tool-operation, index.
+- End-to-end probe through the real registered tool against a hanging local server: returns 202 ms after abort with `Failed to fetch …: The operation was aborted.`
+- `bun check` clean; full suite 71 files / 642 tests passed.
 
 ---
 
@@ -30,3 +36,21 @@ With pi 0.63.2, `ctx.signal` is now available in extension tool handlers — it 
 ## 2026-03-30T02:04:45.101Z
 
 - **description**: added (11 lines)
+
+## 2026-11-12T19:39:41.295Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-11-12T19:46:03.417Z
+
+- **description**: 11 lines → updated (16 lines)
+
+## 2026-11-12T19:46:03.553Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-11-12T19:52:18.881Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

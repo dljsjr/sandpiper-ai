@@ -1,0 +1,36 @@
+===================================================================
+--- a/TOOLS-100.md
++++ b/TOOLS-100.md
+@@ -5,16 +5,22 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-03T01:50:55.871Z
+-updated_at: 2026-11-03T01:50:56.109Z
++updated_at: 2026-11-03T02:17:48.758Z
+ related:
+   - TOOLS-99
+   - TOOLS-92
+ ---
+ 
+ # Replace the internal Parallel MCP client with the standalone Pi client
+ 
++## Adapter handoff evidence
++
++Native standalone client now replaces the application runtime import, with no host MCP configuration/server-tool registration. Same query/count/parser/provider/clientInfo/application session_id contract. Three autonomous RED/GREEN cycles: forbidden retired runtime -> real native wire/output; native30s initialize regression -> existing60s budget; stalled initialized-notification ->60s guard, abort and joined best-effort close. Permanent tests use real pinned SDK and fake HTTP only.12 transport cases plus14 existing parser/provider tests pass (3files26tests), full tsc and scoped Biome pass. No user cancellation feature added, no live provider or real configuration used. Shared build/pack/fresh-install/independent review remain under102 after101 handoff.
++
++## Approved scope
++
+ User explicitly approved adoption as part of current overall simplification, with no deferral. Replace only mcporter library usage behind our own web_search facade with public @earendil-works/pi-mcp1.3.0. Preserve endpoint, provider selection, query/count mapping, stable application session_id, own tool/schema/result/error wrapper, anonymous Streamable HTTP path and15s tool-call bound. Keep upstream tools unregistered and avoid host MCP configuration/auth/cache. Handle connection/initialized-notification stalls and best-effort cleanup without new public flags or user-cancellation features. Autonomous one-behavior RED/GREEN cycles, real SDK plus hermetic transport fixtures. No live providers, user configuration, MCP server tool exposure, developer CLI removal, Shell Relay/Trail/SOP/archive/WIP changes.
+ 
+ ---
+ 
+@@ -23,4 +29,8 @@
+ ## 2026-11-03T01:50:56.110Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-03T02:17:48.759Z
++
++- **description**: 1 line → updated (7 lines)

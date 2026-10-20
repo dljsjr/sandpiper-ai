@@ -1,0 +1,32 @@
+---
+title: "Remove the notify package from Doug's settings (confirm first)"
+status: COMPLETE
+resolution: DONE
+kind: SUBTASK
+priority: MEDIUM
+assignee: UNASSIGNED
+reporter: AGENT
+created_at: 2026-10-16T17:17:57.678Z
+updated_at: 2026-10-19T17:27:18.228Z
+---
+
+# Remove the notify package from Doug's settings (confirm first)
+
+Doug confirmed 2026-10-16. Removed the git:github.com/mitsuhiko/agent-stuff package entry (extensions/notify.ts) from ~/.sandpiper/agent/settings.json; Pi 1.3.0's built-in OSC 7501 program status replaces it. Backup of the prior file: /tmp/settings.json.pre-AGENT-314. Takes effect on the next Sandpiper start.
+
+---
+
+# Activity Log
+
+## 2026-10-16T17:47:47.084Z
+
+- **description**: added (1 line)
+
+## 2026-10-16T17:47:47.168Z
+
+- **status**: NOT STARTED → NEEDS REVIEW
+
+## 2026-10-19T17:27:18.228Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

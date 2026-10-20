@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-80.md
++++ b/TOOLS-80.md
+@@ -5,13 +5,25 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T20:43:11.233Z
+-updated_at: 2026-10-28T20:43:11.526Z
++updated_at: 2026-10-28T20:59:21.496Z
+ ---
+ 
+ # Preserve and remove the bundled mutation-testing skill
+ 
++## Implementation verified — ready for review
++
++Complete: all seven original files, exact relative paths, bytes and modes preserved before deleting source. Independent pre-removal SHA-256 baseline matches the archive; total 46,303 bytes, files 0644, dirs 0755. Source/staged/packed copy absent. Prior archives, global settings and independent Claude code-review copy unchanged; no archive registration added.
++
++Verification: full baseline 87 files/640 tests passed. One source-catalogue case baseline GREEN → expected extra-skill RED → archive/resource deletion GREEN. Refactor assessment found no new code structure needing simplification. Updated stale diagnostic contract (2 passing tests), then packed absence assertion demonstrated stale-build RED. Normal rebuild/full gate GREEN: bun check clean, 87 files/640 tests passed, bun run pack:cli passed. Actual tarball contains jj only. No framework installed or generated artifact edited by hand.
++
++Evidence: ~/.sandpiper/agent/backups/mutation-unbundle-20261028-iBKlK2/ contains before.json, archive-verified.json, preservation-after.json and exact deployment/guide/lens backups. Independent read-only mutation-audit (ce39ccc2f023) PASS: archive paths/bytes/modes, prior archives/settings/independent Claude copy unchanged, no archive autoload, no active hard mutation-skill dependencies, guidance scoped, and actual tarball jj-only.
++
++Local revisions: Sandpiper rxxrqtmu / b6cb20e9; canonical global guidance zxpnrzns / a68124e9; Dotfiles snkyrupt / 97537ddb. Muninn single-line user-state patch is not version-controlled; exact backup/preservation proof retained. No push or release.
++
++## Original scope record
++
+ Preserve all seven original files, paths, bytes and modes in the incubator before deleting the source resource. Demonstrate one source-catalogue RED→GREEN cycle and verify generated/packed absence. No archive registration or content rewrite.
+ 
+ ---
+ 
+@@ -20,4 +32,8 @@
+ ## 2026-10-28T20:43:11.526Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-28T20:59:21.497Z
++
++- **description**: 1 line → updated (13 lines)

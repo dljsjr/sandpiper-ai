@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-32.md
++++ b/TOOLS-32.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Define the minimal target build and distribution topology"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:02.937Z
+-updated_at: 2026-10-20T16:16:37.109Z
++updated_at: 2026-10-20T16:40:06.694Z
+ ---
+ 
+ # Define the minimal target build and distribution topology
+ 
+@@ -59,4 +60,9 @@
+ 
+ ## 2026-10-20T16:16:37.109Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-10-20T16:40:06.694Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

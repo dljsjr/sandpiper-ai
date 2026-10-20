@@ -1,0 +1,50 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -5,17 +5,35 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-06T20:03:05.349Z
++
+ related:
+   - TOOLS-1
+   - TOOLS-2
+   - AGENT-318
+-updated_at: 2026-10-28T14:20:52.466Z
++  - TOOLS-34
++  - TOOLS-38
++  - TOOLS-42
++  - TOOLS-43
++  - TOOLS-51
++updated_at: 2026-11-02T17:42:31.858Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Current coverage correction — broader simplification is still open
++
++User correctly challenged the claim that only overall signoff remains. Completed artifact/resource work is not evidence that every retained build/runtime/toolchain surface was audited. The last integrated review validated implemented changes and preservation, not completeness against the broader simplification goal. Withdraw the only-acceptance-remains claim.
++
++TOOLS-92 now tracks the missing retained-surface audit and discussion-to-task reconciliation. mcporter runtime code is still bundled (62 source-map modules) and its mise tool remains; the Pi-native replacement was parked as an unapproved adoption candidate, not an implementation task. Vendor machinery really was removed in22df897e; Dash was already no longer bundled during the earlier triage. Do not conflate these three facts.
++
++Related top-level packaging/extraction tickets34/38/42/43/51 are now explicitly linked here; parent-only child counts were not a complete work inventory. Deliberate deferrals and new removal decisions need explicit classification. No removal of live runtime behavior or independently installed tools is authorized merely by this audit.
++
++Keep this parent IN PROGRESS. Accepted57/58/59 remain COMPLETE/DONE. Closed historical records are unchanged.33's two review findings remain open, but they are not the whole remaining scope.
++
++## Earlier scope and implementation history
++
+ ## Current scope and status correction — 2026-10-28
+ 
+ The broad build/packaging simplification is NOT complete. The user requested a review of what belongs in packages/resources, then the conversation focused on tasks/Trail and standup/Journal. The remaining resource decisions were never added to this task breakdown. The lead prematurely closed this parent and TOOLS-33 during bookkeeping by treating historical implementation notes and passing tests as sufficient acceptance. The bookkeeping acceptance recorded below does not approve the remaining resources or complete the overall work.
+ 
+@@ -102,4 +120,9 @@
+ 
+ ## 2026-10-28T14:20:52.469Z
+ 
+ - **description**: 23 lines → updated (25 lines)
++
++## 2026-11-02T17:42:31.859Z
++
++- **description**: 25 lines → updated (37 lines)
++- **related**: TOOLS-1, TOOLS-2, AGENT-318 → TOOLS-1, TOOLS-2, AGENT-318, TOOLS-34, TOOLS-38, TOOLS-42, TOOLS-43, TOOLS-51

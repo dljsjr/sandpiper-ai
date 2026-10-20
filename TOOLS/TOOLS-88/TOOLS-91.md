@@ -1,0 +1,59 @@
+---
+title: "Retire prompt routing and update distribution documentation"
+status: COMPLETE
+resolution: DONE
+kind: SUBTASK
+priority: MEDIUM
+assignee: AGENT
+reporter: USER
+created_at: 2026-10-28T22:40:54.094Z
+updated_at: 2026-11-02T15:41:22.800Z
+---
+
+# Retire prompt routing and update distribution documentation
+
+## User acceptance — 2026-10-28
+
+User accepted the five-ticket prompt-removal package ("Okay cool we can mark those done"). This ticket is COMPLETE/DONE. Existing verification and preservation evidence below remains valid; no code changes were needed for acceptance. TOOLS-33 stays open for the unresolved themes review.
+
+## Implementation and review record
+
+## Implementation verified — ready for review
+
+Source/packed absence contracts and root/package/build/CLI docs reflect no bundled prompts or skills and optional resource directories. Initial external-route scan found no owned Claude/global prompt deployment requiring removal. System-prompt contribution APIs/docs are unrelated and unchanged. No old templates/test fixture/archive are packaged; no theme decision assumed.
+
+Verification: baseline87 files/642 tests passed. Individual expected RED→minimum GREEN→refactor assessment cycles covered zero defaults with a configured custom prompt, missing source prompt staging, missing prompts/skills bootstrap, and omitted absent owned prompt paths. Packed absence RED confirmed stale built templates, then normal builds fixed it. Final bun check clean; full87 files/645 tests pass without unhandled errors; bun run pack:cli passes. Actual tarball has no builtin prompt/skill definitions, archive paths or fixture-prompt. Theme scaffold remains unchanged.
+
+Exact before/after manifests and preservation checks: ~/.sandpiper/agent/backups/prompts-unbundle-20261028-I93Jj7/{before.json,archive-verified.json,preservation-after.json}. Independent read-only prompts-audit 0dff7f54fbaf PASS: original six filenames/bytes/SHA-256/modes, license/provenance, no active retired-template routes, corrected active docs, isolated custom prompt support, and final tarball. Five prior skill archives, global settings, WIP jj replacement skills and independent Claude copy are unchanged.
+
+Local revisions: Sandpiper qswrsxnm/bcd004aa; external sandpiper-archive tpmzonpn/cb8fe70c. Both are committed locally; no remote, install, archive registration or project-index change. Archive README and original license are outside the six preserved prompt files.
+
+## Original scope
+
+Find active owned prompt deployment/routing assumptions, preserve independent copies, and update source/packed regression contracts and documentation. Keep theme review TOOLS-59 and other deferred work open. Verify no archived prompts or test fixture enter the shipped package.
+
+---
+
+# Activity Log
+
+## 2026-10-28T22:40:54.480Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-10-28T22:58:05.770Z
+
+- **description**: 1 line → updated (13 lines)
+
+## 2026-10-28T22:58:06.185Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-11-02T15:41:22.734Z
+
+- **description**: 13 lines → updated (19 lines)
+
+## 2026-11-02T15:41:22.800Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: DONE

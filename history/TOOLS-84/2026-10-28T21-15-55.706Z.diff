@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-84.md
++++ b/TOOLS-84.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Preserve the bundled jj skill unchanged in the incubator"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.382Z
+-updated_at: 2026-10-28T21:15:55.382Z
++updated_at: 2026-10-28T21:15:55.705Z
+ ---
+ 
+ # Preserve the bundled jj skill unchanged in the incubator
+ 
+ No existing incubator jj copy was found. Archive all 16 files/188,007 bytes with exact paths and modes before removing source. Preserve prior archives, independent copies and the WIP jujustu-vcs-skill replacement untouched. No installation or archive auto-loading.
++
++---
++
++# Activity Log
++
++## 2026-10-28T21:15:55.706Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

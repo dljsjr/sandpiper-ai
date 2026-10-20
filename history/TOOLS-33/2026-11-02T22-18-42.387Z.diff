@@ -1,0 +1,31 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,16 +5,16 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T22:16:28.066Z
++updated_at: 2026-11-02T22:18:42.386Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
+ ## Current implementation checkpoint
+ 
+-TOOLS-94–97 are implemented and NEEDS REVIEW; their workers are closed. TOOLS-98 is active. Quiet normal and a new clean-source frozen/offline/scripts-disabled producer both pass bun check with zero warnings,85files/653tests, and pack:cli. No legacy output is needed or emitted. Actual root tarball is verified before mutation; repeat direct packing excludes the previous tarball, offline empty-cache npm/read-only CLI/SDK/theme/native SQLite/jsdom probes pass. Parent corrected Jiti cache flags through an actual RED/GREEN regression. Independent inherited read-only reviewer is finalizing; no final acceptance inferred.
++TOOLS-94–97 are implemented and NEEDS REVIEW; their workers are closed. TOOLS-98 is active. Quiet normal and a new clean-source frozen/offline/scripts-disabled producer both pass bun check with zero warnings,85files/653tests, and pack:cli. No legacy output is needed or emitted. Actual root tarball is verified before mutation; repeat direct packing excludes the previous tarball, offline empty-cache npm/read-only CLI/SDK/theme/native SQLite/jsdom probes pass. Parent corrected Jiti cache flags through an actual RED/GREEN regression. Independent inherited read-only review is complete with no outstanding actionable findings or blockers. The Jiti correction was independently re-reviewed. No final acceptance inferred.
+ 
+ Both earlier findings are addressed: payload assertions run before installation without destructive resource deletion, and integration docs preserve compiled-binary history without suggesting its revival. Archives/settings/WIP/independent copies and exact launcher-only approved changes match baselines. TOOLS-30 stays open; unrelated updater87, Trail43, Shell Relay93 and unapproved dependency/toolchain decisions are not completed by this change. See work plan and TOOLS-98 for detailed evidence and installer limits.
+ 
+ ## Earlier planning and scope history (superseded checkpoints)
+@@ -197,4 +197,8 @@
+ 
+ ## 2026-11-02T22:16:28.067Z
+ 
+ - **description**: 90 lines → updated (98 lines)
++
++## 2026-11-02T22:18:42.387Z
++
++- **description**: updated

@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-31.md
++++ b/TOOLS-31.md
+@@ -1,13 +1,22 @@
+ ---
+ title: "Audit delivery surfaces, build graph, and vendoring"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:02.858Z
+-updated_at: 2026-10-20T15:20:02.858Z
++updated_at: 2026-10-20T15:20:08.350Z
+ ---
+ 
+ # Audit delivery surfaces, build graph, and vendoring
+ 
++
++---
++
++# Activity Log
++
++## 2026-10-20T15:20:08.350Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

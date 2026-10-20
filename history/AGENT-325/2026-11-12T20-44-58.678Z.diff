@@ -1,0 +1,27 @@
+===================================================================
+--- a/AGENT-325.md
++++ b/AGENT-325.md
+@@ -1,13 +1,21 @@
+ ---
+ title: "Pin launch argv, payloads and --init output with characterization tests"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-11-12T20:41:43.784Z
+-updated_at: 2026-11-12T20:41:43.784Z
++updated_at: 2026-11-12T20:44:58.677Z
+ ---
+ 
+ # Pin launch argv, payloads and --init output with characterization tests
+ 
++
++---
++
++# Activity Log
++
++## 2026-11-12T20:44:58.678Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

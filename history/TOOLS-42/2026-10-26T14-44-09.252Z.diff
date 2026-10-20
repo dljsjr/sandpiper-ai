@@ -1,0 +1,32 @@
+===================================================================
+--- a/TOOLS-42.md
++++ b/TOOLS-42.md
+@@ -1,16 +1,25 @@
+ ---
+ title: "Temporarily load the archived Trail skill when trail is on PATH"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: TASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-26T14:43:53.558Z
+-updated_at: 2026-10-26T14:43:53.558Z
++updated_at: 2026-10-26T14:44:09.251Z
+ related:
+   - TOOLS-38
+ ---
+ 
+ # Temporarily load the archived Trail skill when trail is on PATH
+ 
+ Rename ~/git/skills-incubator/skills/tasks to trail and change its skill name to trail. Verify no skill-root path dependencies need migration; change bundled CLI instructions/examples to use trail from PATH so the temporary integration really uses the selected external tool. In Sandpiper resource discovery, add the hard-coded archived skill directory only when an executable named trail is available on PATH. No new flags, downloads, release management, or Trail skill discovery commands. Keep built-in skills available when trail is absent. Add hermetic tests and rebuild so the harness can reload while standalone Trail is in flight. Do not contact the Trail agent.
++
++---
++
++# Activity Log
++
++## 2026-10-26T14:44:09.252Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

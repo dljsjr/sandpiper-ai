@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-166.md
++++ b/AGENT-166.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Fix startup-hooks Vitest mock failure"
+-status: NOT STARTED
++status: NEEDS REVIEW
+ kind: BUG
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-05-05T22:48:35.783Z
+-updated_at: 2026-05-05T22:48:42.143Z
++updated_at: 2026-10-19T18:06:45.657Z
+ ---
+ 
+ # Fix startup-hooks Vitest mock failure
+ 
+@@ -19,4 +19,8 @@
+ 
+ ## 2026-05-05T22:48:42.143Z
+ 
+ - **description**: added (1 line)
++
++## 2026-10-19T18:06:45.658Z
++
++- **status**: NOT STARTED → NEEDS REVIEW

@@ -1,0 +1,36 @@
+===================================================================
+--- a/TOOLS-98.md
++++ b/TOOLS-98.md
+@@ -5,9 +5,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T18:35:58.942Z
+-updated_at: 2026-11-02T22:18:42.255Z
++updated_at: 2026-11-02T22:22:26.187Z
+ depends_on:
+   - TOOLS-94
+   - TOOLS-95
+   - TOOLS-96
+@@ -15,8 +15,12 @@
+ ---
+ 
+ # Verify and independently review the integrated minimal build
+ 
++## Scoped delivery revision
++
++Sandpiper implementation committed as vnwpkwyp / 4abe9b67 (parent00841d95). Working copy clean after commit. Canonical dotfiles launcher edit intentionally remains uncommitted beside unrelated preserved user work. No push/release or final task acceptance.
++
+ ## Current integrated evidence (independent review complete; user acceptance pending)
+ 
+ All implementation lanes94–97 are NEEDS REVIEW and their workers are closed. Quiet main checkout: bun check zero errors/warnings;85files/653tests pass; pack:cli pass. Fresh tracked-source copy: frozen offline scripts-disabled install, identical85/653 full suite, check/pack pass, lock unchanged, no prior/emitted CLI/core/capability output. Existing live ignored output was not deleted.
+ 
+@@ -93,4 +97,8 @@
+ 
+ ## 2026-11-02T22:18:42.256Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-02T22:22:26.188Z
++
++- **description**: 41 lines → updated (45 lines)

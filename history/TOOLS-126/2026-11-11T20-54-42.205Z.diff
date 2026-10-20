@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-126.md
++++ b/TOOLS-126.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Delete the redundant standalone CLI smoke tests"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T20:54:39.469Z
+-updated_at: 2026-11-11T20:54:39.469Z
++updated_at: 2026-11-11T20:54:42.204Z
+ ---
+ 
+ # Delete the redundant standalone CLI smoke tests
+ 
+ Doug decided on design grounds, not as a timing remedy: packages/cli/standalone_cli_smoke.test.ts spawns six CLI processes whose assertions devtools/packedCli.test.ts already makes against the installed tarball (--version, --help flag, runtime Pi import), or that test Pi rather than Sandpiper (list reads settings). Delete the file. Keep the one uncovered property, single registration of --identity by default, as an assertion on the packed test's existing --help output with no new spawn. Accepted loss: the source entrypoint (bun run sandpiper-dev) has no startup test. Place the change directly after mwqvznwo so every simplification unit is gated without the file.
++
++---
++
++# Activity Log
++
++## 2026-11-11T20:54:42.205Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

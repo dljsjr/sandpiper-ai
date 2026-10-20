@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-120.md
++++ b/TOOLS-120.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Disable Bun auto-install in the built-bin smoke helper"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-11T18:45:09.884Z
+-updated_at: 2026-11-11T18:45:09.884Z
++updated_at: 2026-11-11T18:45:10.099Z
+ ---
+ 
+ # Disable Bun auto-install in the built-bin smoke helper
+ 
+ Approved test-only correction: insert Bun --no-install before the built bin path in runSandpiperBin. Preserve fixture, runtime Pi import, existing timeout and no retries. No product launcher/global config/Pi loader change. Verify focused case and full corrected reference without network-capable probes.
++
++---
++
++# Activity Log
++
++## 2026-11-11T18:45:10.100Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT

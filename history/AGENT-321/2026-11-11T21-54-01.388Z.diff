@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-321.md
++++ b/AGENT-321.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "System prompt changes mid-session when jj colocation detection times out"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: BUG
+ priority: HIGH
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-10T22:33:19.263Z
+-updated_at: 2026-11-11T19:21:12.117Z
++updated_at: 2026-11-11T21:54:01.387Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -133,4 +134,9 @@
+ 
+ ## 2026-11-11T19:21:12.118Z
+ 
+ - **description**: 80 lines → updated (84 lines)
++
++## 2026-11-11T21:54:01.388Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE

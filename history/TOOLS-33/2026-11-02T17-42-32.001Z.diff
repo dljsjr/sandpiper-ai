@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -5,13 +5,19 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T17:31:54.731Z
++updated_at: 2026-11-02T17:42:32.000Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Scope-completeness correction
++
++The user challenged the broader simplification coverage. The review below was of implemented changes, not an exhaustive audit of everything retained. It does not support the claim that only final acceptance remains. TOOLS-92 under30 tracks remaining runtime/build/toolchain inventory and recovery of missed decisions/tasks, notably still-bundled mcporter. Accepted resource outcomes stay closed; this review's two findings remain valid. Overall final acceptance is premature until coverage is reconciled. No code changes were made for this correction.
++
++## Review and implementation history
++
+ ## Full simplification review — current findings
+ 
+ Reviewed source range36bd8ebd331e through060903df040c: original build-topology retirement, portable CLI/asset patch, Trail extraction/temporary bridge, Journal cutover, resource extraction and optional-tree support. This is a same-agent integrated review; no independent reviewer was available. No code changes or closures performed.
+ 
+@@ -152,4 +158,8 @@
+ 
+ ## 2026-11-02T17:31:54.735Z
+ 
+ - **description**: 51 lines → updated (70 lines)
++
++## 2026-11-02T17:42:32.001Z
++
++- **description**: 70 lines → updated (76 lines)

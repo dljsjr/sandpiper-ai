@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,13 +16,19 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
+-updated_at: 2026-11-02T18:39:05.166Z
++updated_at: 2026-11-02T22:18:42.600Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Approved minimal-build implementation is ready for review
++
++TOOLS-94–98 and TOOLS-33 are NEEDS REVIEW, not DONE. Root product/one Bun build/direct packing is implemented, current normal and clean-source gates pass85files/653tests, actual offline npm/read-only runtime/native probes pass, preservation holds, and independent inherited-model review found no outstanding actionable findings. See the work plan and98 for evidence/limits. This parent remains IN PROGRESS: implementation verification is not overall user acceptance. Accepted resource tasks57/58/59 stay COMPLETE/DONE;92 remains NEEDS REVIEW. Deferred Shell Relay93, Trail43, updater87 and unapproved runtime/toolchain decisions were not silently completed. No push or release.
++
++## Earlier scope and implementation history
++
+ ## Work breakdown complete; implementation not started
+ 
+ TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/docs/specs/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
+ 
+@@ -171,4 +177,8 @@
+ 
+ ## 2026-11-02T18:39:05.167Z
+ 
+ - **description**: 57 lines → updated (65 lines)
++
++## 2026-11-02T22:18:42.601Z
++
++- **description**: 65 lines → updated (71 lines)

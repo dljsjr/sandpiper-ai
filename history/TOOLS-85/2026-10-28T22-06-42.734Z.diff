@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-85.md
++++ b/TOOLS-85.md
+@@ -5,13 +5,25 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.470Z
+-updated_at: 2026-10-28T21:52:31.541Z
++updated_at: 2026-10-28T22:06:42.734Z
+ ---
+ 
+ # Verify skill-free built-ins and self-contained skill RPC coverage
+ 
++## Accepted and verified closeout — 2026-10-28
++
++Zero-built-in source/packed discovery verified. Individual RED→GREEN regressions cover missing optional skills category and absent owned discovery path; present/custom/Trail skill support remains. RPC filesystem coverage now uses its own fixture and the unchanged isolated mock provider. Resource-only discovery uses neutral factories with a mutable array copy; no unhandled error is suppressed and production updater code is unchanged.
++
++Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
++
++User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
++
++Implementation changes: Sandpiper qmkzynrn, canonical guidance klxvrytv, Dotfiles vtwqyzno. Historical failure-limit checkpoints below are superseded by this successful closeout on the user's explicit resumption request.
++
++## Earlier scope and progress record
++
+ ## Stopped at verification failure limit — 2026-10-28
+ 
+ Third final gate stopped at TypeScript TS4104, packages/cli/standalone_resource_discovery.test.ts:50. Invalid assumption: createNeutralCapabilityExtensionFactories returns a mutable extension array; actual return type is readonly InlineExtension[], while DefaultResourceLoader expects InlineExtension[]. The fixture needs a mutable copy before assignment. No fourth patch/retry was made after the failure limit.
+ 
+@@ -56,4 +68,8 @@
+ 
+ ## 2026-10-28T21:52:31.542Z
+ 
+ - **description**: 15 lines → updated (25 lines)
++
++## 2026-10-28T22:06:42.734Z
++
++- **description**: 25 lines → updated (37 lines)

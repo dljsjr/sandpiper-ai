@@ -1,0 +1,33 @@
+===================================================================
+--- a/TOOLS-30.md
++++ b/TOOLS-30.md
+@@ -16,13 +16,19 @@
+   - TOOLS-42
+   - TOOLS-43
+   - TOOLS-51
+   - TOOLS-93
+-updated_at: 2026-11-02T18:19:44.324Z
++updated_at: 2026-11-02T18:27:58.080Z
+ ---
+ 
+ # Simplify the build and distribution system after the Pi 1.0 migration
+ 
++## Shell Relay scope clarification
++
++Doug clarified that Shell Relay is deliberately disabled for poor behavior and is under consideration for deprecation. TOOLS-93 is now a low-priority deferred capability decision, not a packaging repair or build-design blocker. Do not add shell assets or revive its installer during build simplification. Removal remains unapproved.
++
++## Earlier scope and exploration history
++
+ ## Current exploration checkpoint
+ 
+ User requested a fresh build-minimization exploration. TOOLS-92 is ready for review, with an evidence-backed root-product-package proposal in .sandpiper/docs/specs/build-simplification-exploration.md. One direct Bun build plus standard packing can eliminate custom production devtools helpers, Turbo, core emission and staging. A no-build TypeScript package also works in smoke probes but increases the tarball from about39.8MB to52.9MB. These are proposals, not approved implementation.
+ 
+@@ -139,4 +145,8 @@
+ ## 2026-11-02T18:19:44.325Z
+ 
+ - **description**: 37 lines → updated (45 lines)
+ - **related**: TOOLS-1, TOOLS-2, AGENT-318, TOOLS-34, TOOLS-38, TOOLS-42, TOOLS-43, TOOLS-51 → TOOLS-1, TOOLS-2, AGENT-318, TOOLS-34, TOOLS-38, TOOLS-42, TOOLS-43, TOOLS-51, TOOLS-93
++
++## 2026-11-02T18:27:58.080Z
++
++- **description**: 45 lines → updated (51 lines)

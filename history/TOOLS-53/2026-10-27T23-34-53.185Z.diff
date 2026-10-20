@@ -1,0 +1,29 @@
+===================================================================
+--- a/TOOLS-53.md
++++ b/TOOLS-53.md
+@@ -5,14 +5,14 @@
+ priority: MEDIUM
+ assignee: "cutover-dev"
+ reporter: AGENT
+ created_at: 2026-10-27T22:15:03.927Z
+-updated_at: 2026-10-27T23:00:53.879Z
++updated_at: 2026-10-27T23:34:53.184Z
+ ---
+ 
+ # Remove bundled standup runtime and wire stable Journal directory defaults
+ 
+-Runtime slice: shared configurePiEnvironment defaults AGENT_JOURNAL_DIR only when undefined, before imports in runtime and diagnostic. Child cwd and empty/relative/absolute override tests; bootstrap 14/14 plus staging 1/1 pass. Removed legacy CLI/skill/helper wiring. Staging skips orphan skill directories after upgrade. bun check clean. Red evidence and check logs: /private/tmp/journal-cutover-jt1zotyw/runtime-{red,check}.txt and staging-red.txt. Runtime checkpoint momxtoxk; reviewer requested directly. Full post-change gate pending.
++Removed packages/sandpiper-standup-cli, bundled standup skill/helper, helper sync and build/test/lock/knip wiring. Kept generic session lifecycle/PID infrastructure. Shared configurePiEnvironment now defaults AGENT_JOURNAL_DIR to absolute launch cwd/.sandpiper only when undefined, before imports in both entrypoints. Empty/relative/absolute values preserved exactly. Test-first: recorded failing default, then 14 bootstrap tests and staging test passed. Staging rejects orphan skill directories left by upgrades, retaining valid nested assets. Both actual built entrypoints + changed-cwd child passed 8 absent/override cases with fake HOME/agent dirs. Runtime slice independently reviewed. Final bun check clean; full gate 87files/640tests passes in developer and reviewer workspaces. Evidence: launch-env-after.json, runtime-red.txt, cache-hermetic-check.txt, hermetic-final-test.txt under /private/tmp/journal-cutover-jt1zotyw.
+ 
+ ---
+ 
+ # Activity Log
+@@ -24,4 +24,8 @@
+ 
+ ## 2026-10-27T23:00:53.879Z
+ 
+ - **description**: added (1 line)
++
++## 2026-10-27T23:34:53.185Z
++
++- **description**: updated

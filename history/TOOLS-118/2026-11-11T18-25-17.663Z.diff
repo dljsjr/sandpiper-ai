@@ -1,0 +1,30 @@
+===================================================================
+--- a/TOOLS-118.md
++++ b/TOOLS-118.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Trace runtime Pi import resolution and cache behavior"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+-assignee: UNASSIGNED
++assignee: "import-trace"
+ reporter: AGENT
+ created_at: 2026-11-11T18:25:03.205Z
+-updated_at: 2026-11-11T18:25:03.205Z
++updated_at: 2026-11-11T18:25:17.662Z
+ ---
+ 
+ # Trace runtime Pi import resolution and cache behavior
+ 
+ Investigate only. Trace wrapper, runtime resolver, Pi/jiti loader and sandbox environment. Verify APIs against installed docs/source. Identify evidence-backed causes and tests distinguishing them; no speculative fixes or product edits.
++
++---
++
++# Activity Log
++
++## 2026-11-11T18:25:17.663Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → import-trace

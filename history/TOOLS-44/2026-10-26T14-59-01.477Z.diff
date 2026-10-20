@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-44.md
++++ b/TOOLS-44.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Rename the archived skill and align its commands with PATH"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-26T14:44:09.474Z
+-updated_at: 2026-10-26T14:45:21.630Z
++updated_at: 2026-10-26T14:59:01.474Z
+ ---
+ 
+ # Rename the archived skill and align its commands with PATH
+ 
+@@ -19,4 +19,8 @@
+ ## 2026-10-26T14:45:21.633Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-10-26T14:59:01.477Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

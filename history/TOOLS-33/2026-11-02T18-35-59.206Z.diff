@@ -1,0 +1,39 @@
+===================================================================
+--- a/TOOLS-33.md
++++ b/TOOLS-33.md
+@@ -1,17 +1,23 @@
+ ---
+ title: "Implement and verify the approved build simplification"
+-status: NEEDS REVIEW
++status: IN PROGRESS
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-10-20T15:20:03.012Z
+-updated_at: 2026-11-02T17:42:32.000Z
++updated_at: 2026-11-02T18:35:59.205Z
+ ---
+ 
+ # Implement and verify the approved build simplification
+ 
++## Implementation resumed
++
++User authorized the recommended root-product-package/one-Bun-build implementation. New granular siblings TOOLS-94/TOOLS-95/TOOLS-96/TOOLS-97/TOOLS-98 track the work under30. Existing test-gap/doc findings are included, not forgotten. Sub-agent launch availability must be established before claiming workers are running. No final acceptance/closure is inferred from this authorization.
++
++## Earlier review history
++
+ ## Scope-completeness correction
+ 
+ The user challenged the broader simplification coverage. The review below was of implemented changes, not an exhaustive audit of everything retained. It does not support the claim that only final acceptance remains. TOOLS-92 under30 tracks remaining runtime/build/toolchain inventory and recovery of missed decisions/tasks, notably still-bundled mcporter. Accepted resource outcomes stay closed; this review's two findings remain valid. Overall final acceptance is premature until coverage is reconciled. No code changes were made for this correction.
+ 
+@@ -162,4 +168,9 @@
+ 
+ ## 2026-11-02T17:42:32.001Z
+ 
+ - **description**: 70 lines → updated (76 lines)
++
++## 2026-11-02T18:35:59.206Z
++
++- **status**: NEEDS REVIEW → IN PROGRESS
++- **description**: 76 lines → updated (82 lines)

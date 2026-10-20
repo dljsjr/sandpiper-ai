@@ -1,0 +1,28 @@
+===================================================================
+--- a/TOOLS-85.md
++++ b/TOOLS-85.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Verify skill-free built-ins and self-contained skill RPC coverage"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-10-28T21:15:55.470Z
+-updated_at: 2026-10-28T22:06:42.734Z
++updated_at: 2026-10-28T22:07:27.597Z
+ ---
+ 
+ # Verify skill-free built-ins and self-contained skill RPC coverage
+ 
+@@ -72,4 +72,8 @@
+ 
+ ## 2026-10-28T22:06:42.734Z
+ 
+ - **description**: 25 lines → updated (37 lines)
++
++## 2026-10-28T22:07:27.598Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

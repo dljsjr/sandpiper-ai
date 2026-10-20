@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-312.md
++++ b/AGENT-312.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Compiled app: autoloadDotenv false"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: SUBTASK
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: AGENT
+ created_at: 2026-10-16T17:17:57.523Z
+-updated_at: 2026-10-16T17:27:41.345Z
++updated_at: 2026-10-19T17:27:18.091Z
+ ---
+ 
+ # Compiled app: autoloadDotenv false
+ 
+@@ -23,4 +24,9 @@
+ 
+ ## 2026-10-16T17:27:41.345Z
+ 
+ - **status**: NOT STARTED → NEEDS REVIEW
++
++## 2026-10-19T17:27:18.091Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: DONE
