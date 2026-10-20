@@ -44,6 +44,12 @@ function clean(dir: string): void {
   }
 }
 
+const stagedDocs = join(ROOT, 'packages', 'cli', 'docs');
+if (existsSync(stagedDocs)) {
+  console.log(`rm ${stagedDocs}`);
+  rmSync(stagedDocs, { recursive: true, force: true });
+}
+
 clean(ROOT);
 
 // Also clean bun.lock if requested

@@ -2,6 +2,24 @@
   "name": "sandpiper-ai-cli",
   "version": "0.0.1",
   "type": "module",
+  "license": "MIT",
+  "piConfig": {
+    "name": "sandpiper",
+    "configDir": ".sandpiper",
+    "bin": "sandpiper"
+  },
+  "files": [
+    "bin/",
+    "dist/standalone/",
+    "docs/"
+  ],
+  "bundledDependencies": [
+    "@earendil-works/pi-ai",
+    "@earendil-works/pi-coding-agent",
+    "@earendil-works/pi-tui",
+    "better-sqlite3",
+    "jsdom"
+  ],
   "author": {
     "name": "Doug Stephen",
     "email": "dljs.jr@dougstephenjr.com"
@@ -12,13 +30,13 @@
   },
   "dependencies": {
     "@earendil-works/pi-ai": "1.3.0",
-    "@earendil-works/pi-coding-agent": "1.3.0"
-  },
-  "peerDependencies": {
-    "@silvia-odwyer/photon-node": "0.3.4"
+    "@earendil-works/pi-coding-agent": "1.3.0",
+    "@earendil-works/pi-tui": "1.3.0",
+    "better-sqlite3": "13.0.3",
+    "jsdom": "30.0.1"
   },
   "scripts": {
     "build": "rm -rf dist && mkdir -p dist && tsc --noEmit && bun run build:standalone",
-    "build:standalone": "mkdir -p dist/standalone && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external jsdom --external better-sqlite3 --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts ./sandpiper_system_prompt.ts --outdir ./dist/standalone"
+    "build:standalone": "mkdir -p dist/standalone && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external jsdom --external better-sqlite3 --external '@earendil-works/*' --external '@mariozechner/*' ./sandpiper_standalone.ts ./sandpiper_system_prompt.ts --outdir ./dist/standalone && bun ../../devtools/stageCliResources.ts"
   }
 }

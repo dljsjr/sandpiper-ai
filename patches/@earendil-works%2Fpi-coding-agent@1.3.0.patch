@@ -1,3 +1,51 @@
+diff --git a/dist/config.js b/dist/config.js
+index 62eb303e5ca396e4107081868790506673344faa..75c19361d6d079a42978619cc63341326a2f239f 100644
+--- a/dist/config.js
++++ b/dist/config.js
+@@ -330,12 +330,17 @@ export function getPackageDir() {
+  * - For Node.js (dist/): dist/modes/interactive/theme/
+  * - For source (src/): src/modes/interactive/theme/
+  */
++// Sandpiper local patch: product metadata and Pi-owned runtime assets can live in separate packages.
++function getCodingAgentPackageDir() {
++    const envDir = process.env.PI_CODING_AGENT_PACKAGE;
++    return envDir ? normalizePath(envDir) : getPackageDir();
++}
+ export function getThemesDir() {
+     if (isBunBinary) {
+-        return join(getPackageDir(), "theme");
++        return join(getCodingAgentPackageDir(), "theme");
+     }
+     // Theme is in modes/interactive/theme/ relative to src/ or dist/
+-    const packageDir = getPackageDir();
++    const packageDir = getCodingAgentPackageDir();
+     const srcOrDist = existsSync(join(packageDir, "src")) ? "src" : "dist";
+     return join(packageDir, srcOrDist, "modes", "interactive", "theme");
+ }
+@@ -347,9 +352,9 @@ export function getThemesDir() {
+  */
+ export function getExportTemplateDir() {
+     if (isBunBinary) {
+-        return join(getPackageDir(), "export-html");
++        return join(getCodingAgentPackageDir(), "export-html");
+     }
+-    const packageDir = getPackageDir();
++    const packageDir = getCodingAgentPackageDir();
+     const srcOrDist = existsSync(join(packageDir, "src")) ? "src" : "dist";
+     return join(packageDir, srcOrDist, "core", "export-html");
+ }
+@@ -381,9 +386,9 @@ export function getChangelogPath() {
+  */
+ export function getInteractiveAssetsDir() {
+     if (isBunBinary) {
+-        return join(getPackageDir(), "assets");
++        return join(getCodingAgentPackageDir(), "assets");
+     }
+-    const packageDir = getPackageDir();
++    const packageDir = getCodingAgentPackageDir();
+     const srcOrDist = existsSync(join(packageDir, "src")) ? "src" : "dist";
+     return join(packageDir, srcOrDist, "modes", "interactive", "assets");
+ }
 diff --git a/dist/core/system-prompt.js b/dist/core/system-prompt.js
 index 83bf10846ff4ea275e73b29c54739af89d8c6028..4d07d845f9f507839a3572f8cb1b5aab357f387a 100644
 --- a/dist/core/system-prompt.js

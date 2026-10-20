@@ -3,6 +3,7 @@
   "ui": "stream",
   "noUpdateNotifier": true,
   "globalPassThroughEnv": [
+    "BUN_EXECUTABLE",
     "TMPDIR",
     "XDG_RUNTIME_DIR",
     "TATTLER_RUNTIME_NAMESPACE",
@@ -20,6 +21,23 @@
     "packages/capability-autotoon/package.json"
   ],
   "tasks": {
+    "sandpiper-ai-cli#build": {
+      "dependsOn": [
+        "^build",
+        "@sandpiper-ai/trail#build",
+        "sandpiper-standup-cli#build"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "!**/*.test.ts",
+        "$TURBO_ROOT$/extensions/**/*.ts",
+        "$TURBO_ROOT$/packages/resources/**",
+        "$TURBO_ROOT$/docs/**",
+        "$TURBO_ROOT$/devtools/stageCliResources.ts",
+        "$TURBO_ROOT$/devtools/syncSkillHelpers.ts"
+      ],
+      "outputs": ["dist/**", "docs/**"]
+    },
     "build": {
       "inputs": [
         "$TURBO_DEFAULT$",

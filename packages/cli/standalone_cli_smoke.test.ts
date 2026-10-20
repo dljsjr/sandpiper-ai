@@ -14,6 +14,9 @@ interface PackageMetadata {
   readonly bin?: Record<string, string>;
   readonly dependencies?: Record<string, string>;
   readonly scripts?: Record<string, string>;
+  readonly bundledDependencies?: readonly string[];
+  readonly piConfig?: { readonly name: string; readonly configDir: string; readonly bin: string };
+  readonly files?: readonly string[];
 }
 
 function readPackageJson(path: string): PackageMetadata {
@@ -82,6 +85,19 @@ describe('standalone Sandpiper CLI smoke', () => {
     expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@earendil-works/*'");
     expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@mariozechner/*'");
     expect(cliPackage.scripts?.['build:standalone']).toContain('--splitting');
+    expect(cliPackage.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
+    expect(cliPackage.files).toEqual(expect.arrayContaining(['bin/', 'dist/standalone/', 'docs/']));
+    expect(cliPackage.bundledDependencies).toEqual(
+      expect.arrayContaining([
+        '@earendil-works/pi-coding-agent',
+        '@earendil-works/pi-ai',
+        '@earendil-works/pi-tui',
+        'better-sqlite3',
+        'jsdom',
+      ]),
+    );
+    expect(cliPackage.dependencies?.['better-sqlite3']).toBe('13.0.3');
+    expect(cliPackage.dependencies?.jsdom).toBe('30.0.1');
   });
 
   it('runs the normal sandpiper bin through the standalone runtime', () => {
@@ -187,16 +203,16 @@ export default function runtimeImportProbe(pi) {
   });
 
   it('configures Pi package metadata before importing Pi', () => {
-    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-sidecar-'));
-    const sidecarPackageDir = join(tempDir, 'package');
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-package-metadata-'));
+    const metadataPackageDir = join(tempDir, 'package');
     const expectedVersion = '9.8.7';
 
     try {
-      mkdirSync(sidecarPackageDir);
+      mkdirSync(metadataPackageDir);
       writeFileSync(
-        join(sidecarPackageDir, 'package.json'),
+        join(metadataPackageDir, 'package.json'),
         JSON.stringify({
-          name: 'sandpiper-standalone-sidecar',
+          name: 'sandpiper-metadata-probe',
           version: expectedVersion,
           piConfig: {
             name: 'sandpiper',
@@ -209,8 +225,8 @@ export default function runtimeImportProbe(pi) {
       const output = runStandalone(
         ['--version'],
         standaloneEnv({
-          SANDPIPER_STANDALONE_RESOURCE_ROOT: repoRoot,
-          SANDPIPER_STANDALONE_PACKAGE_DIR: sidecarPackageDir,
+          SANDPIPER_STANDALONE_RESOURCE_ROOT: join(repoRoot, 'packages', 'resources'),
+          SANDPIPER_STANDALONE_PACKAGE_DIR: metadataPackageDir,
           SANDPIPER_CODING_AGENT_DIR: join(tempDir, 'agent'),
         }),
       );

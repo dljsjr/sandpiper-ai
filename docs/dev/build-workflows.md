@@ -6,8 +6,8 @@ Use this guide to select the build and verification commands for a change. For t
 
 | You changed | Build command |
 | --- | --- |
-| Extension source under `extensions/` | No build; Sandpiper loads the TypeScript source |
-| Skills, prompts, themes, or other files under `packages/resources/` | No build |
+| Built-in extension source under `extensions/` | `bun run build:standalone` |
+| Skills, prompts, themes, or other files under `packages/resources/` | `bun run build:standalone` to refresh the built runtime |
 | `packages/core/` | `bun --filter sandpiper-ai-core build` |
 | `packages/cli/` | `bun run build:standalone` |
 | `packages/trail/` | `bun run build` so the task skill receives the new executable |
@@ -37,13 +37,39 @@ Do not use bare `bun test` as the repository gate. It invokes Bun's test runner 
 bun run build
 ```
 
-This command builds core declarations, the Sandpiper runtime, Trail, and the standup helper. It then refreshes the helper executable copies in the task and standup skills.
+This command builds core declarations, the Sandpiper runtime, Trail, and the standup helper. The CLI build copies the helpers into source skills, then stages resources and documentation in the CLI package.
 
 Use this narrower command when only the Sandpiper runtime changed:
 
 ```sh
 bun run build:standalone
 ```
+
+## Pack the CLI
+
+Run from the repository root:
+
+```sh
+bun run pack:cli
+```
+
+The command builds the runtime and creates `packages/cli/dist/sandpiper-ai-cli-0.0.1.tgz`. The filename follows the CLI package version.
+
+The tarball includes built-in resources and patched runtime dependencies. The pack wrapper uses a temporary directory to expose hoisted workspace dependencies to `bun pm pack`. It removes that directory after packing. Do not pack `packages/cli` directly, because pack tools omit its hoisted dependencies.
+
+With Bun and Node installed, install the tarball without installation scripts:
+
+```sh
+npm install --global --ignore-scripts ./packages/cli/dist/sandpiper-ai-cli-0.0.1.tgz
+```
+
+Make sure that the package works outside the checkout:
+
+```sh
+bun run test:vitest -- devtools/packedCli.test.ts
+```
+
+This test installs offline with an empty npm cache and disabled scripts. It runs both commands and the helper scripts from a read-only installation.
 
 ## Smoke-test built commands
 

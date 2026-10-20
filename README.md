@@ -2,7 +2,7 @@
 
 A powerful pair programming coding agent built on [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Sandpiper wraps pi with opinionated extensions, skills, and customizations that create a deeply integrated development companion — one that can see your terminal, manage your tasks, and maintain context across sessions.
 
-Sandpiper runs from this Bun workspace. The repository builds the local `sandpiper` runtime, its system-prompt diagnostic, and the helper executables used by the task and standup skills.
+The repository builds the `sandpiper` runtime, its system-prompt diagnostic, and the helper executables used by the task and standup skills. The CLI also runs from a packed npm installation without a source checkout.
 
 ## What Sandpiper Adds
 
@@ -75,9 +75,12 @@ sandpiper-ai/
 
 ```bash
 bun run build             # Build all required workspace output
-bun run build:standalone  # Build only sandpiper and sandpiper-system-prompt
+bun run build:standalone  # Build the CLI and its helper prerequisites
 bun run build:packages    # Build package-owned output through Turbo
+bun run pack:cli          # Create an npm-compatible CLI tarball
 ```
+
+See [Pack the CLI](docs/dev/build-workflows.md#pack-the-cli) for tarball installation and verification. The installed CLI requires Bun. Its helper scripts require Node.
 
 ## Development
 
@@ -128,9 +131,9 @@ A small number of package/runtime variables are set automatically by sandpiper a
 | Variable                            | Purpose                                             |
 | ----------------------------------- | --------------------------------------------------- |
 | `SANDPIPER_CODING_AGENT_PACKAGE`    | Path to the Sandpiper package root, including shipped public docs |
-| `PI_CODING_AGENT_PACKAGE`           | Path to the wrapped pi-coding-agent package         |
+| `PI_CODING_AGENT_PACKAGE`           | Path to Pi code, themes, UI assets, and export templates |
 | `PI_CODING_AGENT_VERSION`           | Version of the underlying pi-coding-agent           |
-| `PI_PACKAGE_DIR`                    | Package directory for loading extensions and skills |
+| `PI_PACKAGE_DIR`                    | Real CLI package root for product metadata and documentation |
 | `PI_SKIP_VERSION_CHECK`             | Suppresses pi's built-in update check               |
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` intentionally point to different package roots.

@@ -1,30 +1,25 @@
 # Build system reference
 
-Sandpiper runs from this Bun workspace. Build output stays beside the package that owns it. The build does not assemble a release package at the repository root.
+Sandpiper builds in this Bun workspace and runs from either the checkout or a packed CLI installation. Build output stays beside the package that owns it.
 
 Use this page to understand the build structure. For commands, see [How to build and verify Sandpiper changes](build-workflows.md).
 
 ## Pipeline
 
-`bun run build` has two stages:
-
-1. Turborepo builds the required package outputs.
-2. `devtools/syncSkillHelpers.ts` copies the built Trail and standup executables into their local skill directories.
-
-`bun install` only installs dependencies. It does not run either stage.
+`bun run build` runs the package graph through Turborepo. The CLI build waits for Trail and standup, then stages their executables, built-in resources, and documentation. `bun install` only installs dependencies and applies the local Pi patch. It does not build Sandpiper.
 
 ## Package output
 
 | Package | Build output |
 | --- | --- |
-| `packages/cli/` | `sandpiper`, `sandpiper-system-prompt`, and shared JavaScript chunks under `dist/standalone/` |
+| `packages/cli/` | Runtime entrypoints, shared chunks, and `resources/` under `dist/standalone/`. Public documentation under ignored `docs/`. Packed tarballs under `dist/`. |
 | `packages/core/` | TypeScript declarations under `dist/` |
 | `packages/trail/` | Bundled Trail executable at `dist/trail` |
 | `packages/sandpiper-standup-cli/` | Bundled standup executable at `dist/sandpiper-standup` |
 
-Pi loads extensions from source TypeScript through jiti. Extensions do not have a separate build step.
+The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti.
 
-The runtime may create `dist/standalone-package/package.json` when it starts from a source checkout. This small ignored sidecar gives Pi the package metadata it needs. It is not a release artifact.
+The runtime reads metadata from the real CLI `package.json`. A local Pi patch resolves Pi-owned assets from the coding-agent dependency instead. Startup creates no package sidecar and does not write into the installation.
 
 ## Task orchestration
 
@@ -35,14 +30,14 @@ The root `build:packages` script uses Turborepo to build these packages:
 - `@sandpiper-ai/trail`
 - `sandpiper-ai-cli`
 
-`turbo.json` defines dependency order and caches package-local `dist/**` output. The root `build` script then runs `sync:skill-helpers`.
+`turbo.json` defines dependency order and caches package-local output. CLI cache inputs include resources, public documentation, extension source, and staging scripts. Its outputs include `dist/**` and generated `docs/**`.
 
 The helper sync copies:
 
 - `packages/trail/dist/trail` to `packages/resources/skills/tasks/scripts/trail`
 - `packages/sandpiper-standup-cli/dist/sandpiper-standup` to `packages/resources/skills/standup/scripts/sandpiper-standup`
 
-Both copies are marked executable.
+Both copies are marked executable. The root build repeats the helper sync after Turbo to restore ignored source copies even on cache hits.
 
 ## Dependency resolution
 
@@ -69,13 +64,26 @@ The source manifest policy is:
 
 Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`. The patch is stored under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`.
 
-The patch changes Pi's compiled `dist/core/system-prompt.js`. It keeps Pi's `tools` and `rules` sections when Sandpiper supplies a custom prompt. The [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md) describes the behavior.
+The patch changes two Pi modules:
 
-The patch applies to Sandpiper runs from this workspace. It is tied to an exact Pi version. Redo it after each Pi upgrade:
+- `dist/core/system-prompt.js` preserves the tools and rules sections when Sandpiper supplies a custom prompt.
+- `dist/config.js` resolves themes, UI assets, and HTML export templates from `PI_CODING_AGENT_PACKAGE`. Product metadata still comes from `PI_PACKAGE_DIR`.
+
+The patch applies during workspace installation. The packed CLI includes the patched dependency through `bundledDependencies`. Consumer installations do not inherit root patch declarations.
+
+The patch is tied to an exact Pi version. Redo it after each Pi upgrade:
 
 1. Update the version pins. Run `bun patch @earendil-works/pi-coding-agent` and reapply the changes marked `Sandpiper local patch` in the old patch file.
 2. Run `bun patch --commit 'node_modules/@earendil-works/pi-coding-agent'`. Delete `.bun-tag-*` entries from the new patch file. Remove the old version's patch file if Bun leaves it under `patches/`.
-3. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts`, then run the full checks.
+3. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts packages/cli/pi_asset_paths.test.ts`, then run the full checks.
+
+## CLI tarball
+
+`bun run pack:cli` builds the CLI and writes its tarball under `packages/cli/dist/`. The installed package includes skills, prompts, themes, public docs, and runtime dependencies. It requires Bun and Node, but no source checkout or installation scripts.
+
+`devtools/packCli.ts` copies publishable files into a temporary directory and links the workspace dependency root there. `bun pm pack` then includes the dependencies named in `bundledDependencies`. This temporary link compensates for pack tools that omit hoisted dependencies when run directly in a workspace package. The wrapper removes the temporary directory after packing.
+
+`devtools/packedCli.test.ts` installs the tarball offline with an empty npm cache and disabled scripts. It runs both CLI commands and helper scripts from a read-only installation outside the checkout.
 
 ## Verification
 

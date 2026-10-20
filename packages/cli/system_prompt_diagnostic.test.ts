@@ -19,8 +19,7 @@ function diagnosticEnv(agentDir: string): NodeJS.ProcessEnv {
     PI_OFFLINE: '1',
     SANDPIPER_CODING_AGENT_DIR: agentDir,
     SANDPIPER_SESSION_DIR: join(agentDir, 'sessions'),
-    SANDPIPER_STANDALONE_PACKAGE_DIR: join(testRoot, 'standalone-package'),
-    SANDPIPER_STANDALONE_RESOURCE_ROOT: repoRoot,
+    SANDPIPER_STANDALONE_RESOURCE_ROOT: join(repoRoot, 'packages', 'resources'),
   };
   delete env.PI_PACKAGE_DIR;
   delete env.PI_CODING_AGENT_PACKAGE;

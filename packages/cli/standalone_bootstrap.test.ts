@@ -7,9 +7,12 @@ import {
   defaultStandaloneMainArgs,
   findPackageRoot,
   mirrorPiSandpiperEnvironment,
-  prepareStandalonePackageDir,
   resolveStandalonePaths,
 } from './standalone_bootstrap.js';
+
+function createResources(root: string): void {
+  for (const directory of ['skills', 'prompts', 'themes']) mkdirSync(join(root, directory), { recursive: true });
+}
 
 describe('standalone bootstrap', () => {
   it('finds the nearest package root by package name', () => {
@@ -18,92 +21,71 @@ describe('standalone bootstrap', () => {
       writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
       const nested = join(dir, 'packages', 'cli');
       mkdirSync(nested, { recursive: true });
-
       expect(findPackageRoot(nested, 'sandpiper-ai')).toBe(dir);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it('uses explicit standalone resource and package directory overrides', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
+  it('uses the installed CLI package and staged resources without a repository root', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-installed-bootstrap-'));
     try {
-      const resourceRoot = join(dir, 'resources');
-      const packageDir = join(dir, 'bundle');
-      mkdirSync(resourceRoot, { recursive: true });
-      mkdirSync(packageDir, { recursive: true });
+      const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
+      const startDir = join(packageDir, 'dist', 'standalone');
+      const resourceRoot = join(startDir, 'resources');
+      createResources(resourceRoot);
+      const manifest = JSON.stringify({ name: 'sandpiper-ai-cli', version: '1.2.3' });
+      writeFileSync(join(packageDir, 'package.json'), manifest);
+      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
+      expect(readFileSync(join(packageDir, 'package.json'), 'utf8')).toBe(manifest);
+      expect(existsSync(join(dir, 'dist', 'standalone-package'))).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 
+  it('loads checkout resources when running the source entrypoint', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-source-bootstrap-'));
+    try {
+      const packageDir = join(dir, 'packages', 'cli');
+      mkdirSync(packageDir, { recursive: true });
+      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
+      const resourceRoot = join(dir, 'packages', 'resources');
+      createResources(resourceRoot);
+      expect(resolveStandalonePaths({ startDir: packageDir, env: {} })).toEqual({ packageDir, resourceRoot });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('does not silently fall back to checkout resources when built resources are missing', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-missing-resources-'));
+    try {
+      const packageDir = join(dir, 'packages', 'cli');
+      mkdirSync(join(packageDir, 'dist', 'standalone'), { recursive: true });
+      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
+      createResources(join(dir, 'packages', 'resources'));
+      expect(() => resolveStandalonePaths({ startDir: join(packageDir, 'dist', 'standalone'), env: {} })).toThrow(
+        'Sandpiper resources are missing',
+      );
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('accepts existing package and resource directory overrides without generating files', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-bootstrap-overrides-'));
+    try {
+      const packageDir = join(dir, 'metadata');
+      const resourceRoot = join(dir, 'resources');
+      mkdirSync(packageDir);
+      createResources(resourceRoot);
       const paths = resolveStandalonePaths({
         startDir: join(dir, 'ignored'),
-        env: {
-          SANDPIPER_STANDALONE_RESOURCE_ROOT: resourceRoot,
-          SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir,
-        },
+        env: { SANDPIPER_STANDALONE_RESOURCE_ROOT: resourceRoot, SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir },
       });
-
-      expect(paths.resourceRoot).toBe(resourceRoot);
-      expect(paths.packageDir).toBe(packageDir);
-      expect(paths.packageDirSource).toBe('override');
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('defaults package metadata to the generated standalone package directory', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
-    try {
-      writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
-      const nested = join(dir, 'packages', 'cli');
-      mkdirSync(nested, { recursive: true });
-
-      const paths = resolveStandalonePaths({
-        startDir: nested,
-        env: {},
-      });
-
-      expect(paths.resourceRoot).toBe(dir);
-      expect(paths.packageDir).toBe(join(dir, 'dist', 'standalone-package'));
-      expect(paths.packageDirSource).toBe('generated');
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('prepares a generated package directory without root Pi resources', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
-    try {
-      const resourceRoot = join(dir, 'repo');
-      const packageDir = join(dir, 'package');
-      const piPackageDir = join(dir, 'pi');
-      mkdirSync(join(resourceRoot, 'docs'), { recursive: true });
-      mkdirSync(join(piPackageDir, 'dist', 'modes'), { recursive: true });
-      mkdirSync(join(piPackageDir, 'dist', 'core'), { recursive: true });
-      writeFileSync(
-        join(resourceRoot, 'package.json'),
-        JSON.stringify({
-          name: 'sandpiper-ai',
-          version: '1.2.3',
-          piConfig: { name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' },
-          pi: { extensions: ['./extensions/system.ts'] },
-        }),
-      );
-
-      prepareStandalonePackageDir({ packageDir, resourceRoot, piPackageDir });
-
-      const generated = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf-8')) as {
-        version?: string;
-        pi?: unknown;
-        piConfig?: { name?: string; configDir?: string; bin?: string };
-      };
-      expect(generated.version).toBe('1.2.3');
-      expect(generated.pi).toBeUndefined();
-      expect(generated.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
-      expect(existsSync(join(packageDir, 'docs'))).toBe(true);
-      // shell-relay is temporarily disabled (df04a14d); its shell-integration symlink step is commented
-      // out in prepareStandalonePackageDir, so it should not appear in the generated package.
-      expect(existsSync(join(packageDir, 'extensions', 'shell-relay', 'shell-integration'))).toBe(false);
-      expect(existsSync(join(packageDir, 'dist', 'modes'))).toBe(true);
-      expect(existsSync(join(packageDir, 'dist', 'core'))).toBe(true);
+      expect(paths).toEqual({ packageDir, resourceRoot });
+      expect(existsSync(join(packageDir, 'package.json'))).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -121,20 +103,11 @@ describe('standalone bootstrap', () => {
 
   it('sets Pi environment before importing Pi', () => {
     const env: Record<string, string | undefined> = {};
-
-    configurePiEnvironment(
-      {
-        packageDir: '/bundle',
-        piPackageDir: '/pi-package',
-        piVersion: '0.70.2',
-      },
-      env,
-    );
-
+    configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '1.3.0' }, env);
     expect(env.PI_PACKAGE_DIR).toBe('/bundle');
     expect(env.PI_SKIP_VERSION_CHECK).toBe('1');
     expect(env.PI_CODING_AGENT_PACKAGE).toBe('/pi-package');
-    expect(env.PI_CODING_AGENT_VERSION).toBe('0.70.2');
+    expect(env.PI_CODING_AGENT_VERSION).toBe('1.3.0');
     expect(env.SANDPIPER_CODING_AGENT_PACKAGE).toBe('/bundle');
     expect(env.PI_TELEMETRY).toBe('0');
   });
@@ -144,10 +117,8 @@ describe('standalone bootstrap', () => {
     ['SANDPIPER_TELEMETRY', '1'],
   ])('lets %s opt back in to Pi install telemetry', (key, value) => {
     const env: Record<string, string | undefined> = { [key]: value };
-
-    configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '0.70.2' }, env);
+    configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '1.3.0' }, env);
     mirrorPiSandpiperEnvironment(env);
-
     expect(env.PI_TELEMETRY).toBe('1');
   });
 
@@ -161,9 +132,7 @@ describe('standalone bootstrap', () => {
       PI_CODING_AGENT_PACKAGE: '/pi-package',
       PI_PACKAGE_DIR: '/explicit-package-dir',
     };
-
     mirrorPiSandpiperEnvironment(env);
-
     expect(env.SANDPIPER_OFFLINE).toBe('1');
     expect(env.PI_FOO).toBe('sandpiper-value');
     expect(env.SANDPIPER_FOO).toBe('sandpiper-value');

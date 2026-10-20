@@ -30,7 +30,7 @@ describe('standalone Sandpiper resource discovery', () => {
       const resourceLoader = new DefaultResourceLoader({
         cwd: repoRoot,
         agentDir,
-        extensionFactories: createSandpiperExtensionFactories(repoRoot),
+        extensionFactories: createSandpiperExtensionFactories(join(repoRoot, 'packages', 'resources')),
         noExtensions: true,
         noSkills: true,
         noPromptTemplates: true,

@@ -33,7 +33,9 @@ Sandpiper does not include third-party or on-demand skills in this package.
 | `tasks` | Manage project work through Trail |
 | `test-driven-development` | Apply test-driven and behavior-driven development |
 
-The runtime adds this directory through `resources_discover`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
+The source runtime adds this directory through `resources_discover`. The built runtime uses its copy under `packages/cli/dist/standalone/resources/skills/`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
+
+Run `bun run build:standalone` after changing these files to refresh the built runtime.
 
 ## Skill contents
 

@@ -6,7 +6,7 @@ Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlog
 
 `sandpiper_standalone.ts` is the normal `sandpiper` runtime. It:
 
-1. Resolves Sandpiper resource/package sidecar paths.
+1. Resolves the CLI package and its resource directory without writing to the installation.
 2. Configures `PI_PACKAGE_DIR`, `PI_CODING_AGENT_PACKAGE`, `PI_CODING_AGENT_VERSION`, `SANDPIPER_CODING_AGENT_PACKAGE`, and mirrored user-facing `SANDPIPER_*` env vars before importing Pi.
 3. Imports Pi through `deferred_pi_import.ts`.
 4. Calls `main(args, { extensionFactories })` with Sandpiper identity/capability factories and explicit resource discovery.
@@ -19,7 +19,8 @@ Set `SANDPIPER_PRINT_PI_VERSION=1` to write the active Pi version to stderr befo
 
 ```bash
 bun run build             # Build all required workspace output and skill helpers
-bun run build:standalone  # Build the two CLI entrypoints and shared chunks
+bun run build:standalone  # Build the CLI, helper prerequisites, and staged resources
+bun run pack:cli          # Build and create an npm-compatible tarball
 ```
 
 Builds are explicit; dependency installation does not build runtime bundles.
@@ -43,7 +44,11 @@ bun run sandpiper-built -- --help
 bun run test:standalone
 ```
 
-The source and built entrypoints both use the repository as the resource root. They can create a lightweight package-metadata sidecar under `dist/standalone-package/`. Built-in Sandpiper extensions and resources come from explicit extension factories and `resources_discover`.
+The source entrypoints use `packages/resources/`. Built entrypoints use `dist/standalone/resources/` inside the CLI package. Built-in extensions and resources load through explicit extension factories and `resources_discover`. The built runtime requires no source checkout and creates no metadata sidecar.
+
+`SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, points directly to a directory containing `skills/`, `prompts/`, and `themes/`. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
+
+The CLI requires Bun. Its Trail and standup helper scripts require Node. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
@@ -77,7 +82,7 @@ birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux
 
 | File | Purpose |
 |------|---------|
-| `sandpiper_standalone.ts` | Normal Sandpiper runtime entrypoint — sets sidecar package metadata before loading Pi and injects Sandpiper factories/resources |
+| `sandpiper_standalone.ts` | Normal runtime entrypoint that selects installed package metadata before loading Pi and registers built-in extensions and resources |
 | `sandpiper_system_prompt.ts` | Diagnostic entrypoint that configures the Sandpiper runtime and renders the prompt without a model request |
 | `system_prompt_diagnostic.ts` | SDK-based diagnostic session orchestration |
 | `bin/sandpiper` | Stable workspace bin shim for the normal runtime |
@@ -86,4 +91,6 @@ birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux
 
 ## Pi asset resolution
 
-Pi expects its own templates and other assets relative to the installed coding-agent package. The Sandpiper runtime sets `PI_CODING_AGENT_PACKAGE` before importing Pi and uses the lightweight Sandpiper sidecar for `PI_PACKAGE_DIR`.
+Sandpiper sets two separate package paths before importing Pi. `PI_PACKAGE_DIR` points to the real CLI package for branding, version, documentation, and `.sandpiper` configuration. `PI_CODING_AGENT_PACKAGE` points to the installed Pi dependency for themes, UI assets, and HTML export templates. A local Bun patch separates these paths.
+
+The published tarball includes the patched Pi dependency through `bundledDependencies`. Consumers do not need to apply patches or run installation scripts.

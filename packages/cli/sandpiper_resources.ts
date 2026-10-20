@@ -26,12 +26,10 @@ function inlineExtension(name: string, factory: ExtensionFactory): InlineExtensi
 }
 
 export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperResourcePaths {
-  const resourcesRoot = join(resourceRoot, 'packages', 'resources');
-
   return {
-    skillPaths: [join(resourcesRoot, 'skills')],
-    promptPaths: [join(resourcesRoot, 'prompts')],
-    themePaths: [join(resourcesRoot, 'themes')],
+    skillPaths: [join(resourceRoot, 'skills')],
+    promptPaths: [join(resourceRoot, 'prompts')],
+    themePaths: [join(resourceRoot, 'themes')],
   };
 }
 

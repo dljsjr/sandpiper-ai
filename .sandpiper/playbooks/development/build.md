@@ -11,9 +11,10 @@ Read this before you change build scripts, package metadata, or generated output
 
 - Edit source, not generated files under `dist/` or package `dist/` directories.
 - `bun install` installs dependencies only. It must not build Sandpiper.
-- Run `bun run build` to build all package-owned outputs and refresh local skill helper executables.
+- Run `bun run build` to build package-owned outputs, refresh helpers, and stage built-in resources and public docs in the CLI package.
+- Use `bun run pack:cli` for an npm-compatible tarball. Do not pack the workspace subpackage directly: pack tools omit its hoisted dependencies.
 - Keep output beside the package that owns it.
-- Extensions load from source TypeScript through Pi. Do not add an extension build step.
+- The CLI bundles built-in extensions. Pi loads additional user/project extensions from source TypeScript. Do not add a separate extension build step.
 - Keep root local dependencies on `workspace:*`. Keep package-level internal and registry dependencies on exact versions.
 - Run `bun run check:deps` after package metadata changes.
 - Sandpiper patches `@earendil-works/pi-coding-agent` locally through `patches/` and `patchedDependencies`. Redo the patch after each Pi version change. Follow "Local Pi patch" in `docs/dev/build-system.md`.
@@ -23,7 +24,8 @@ Read this before you change build scripts, package metadata, or generated output
 | Need | Command |
 | --- | --- |
 | All workspace outputs and skill helpers | `bun run build` |
-| Sandpiper CLI bundle only | `bun run build:standalone` |
+| Sandpiper CLI, helper prerequisites, and staged resources | `bun run build:standalone` |
+| Build and pack the portable CLI without publishing | `bun run pack:cli` |
 | Package build graph only | `bun run build:packages` |
 | Refresh Trail and standup skill helpers after package builds | `bun run sync:skill-helpers` |
 | Remove dependencies, output, and caches | `bun run clean` |
@@ -34,6 +36,8 @@ Read this before you change build scripts, package metadata, or generated output
 - `turbo.json` defines the package build graph and cache inputs.
 - `packages/cli/package.json` builds the workspace runtime and system prompt diagnostic.
 - `devtools/syncSkillHelpers.ts` copies Trail and standup executables from package output into the local skills.
+- `devtools/stageCliResources.ts` stages resources and public documentation in the CLI package.
+- `devtools/packCli.ts` packs the CLI and its patched runtime dependencies through a temporary package directory.
 - `packages/*/package.json` defines package-owned output.
 
 ## Verification

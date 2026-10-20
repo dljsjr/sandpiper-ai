@@ -19,6 +19,8 @@ Each package with generated output has its own `build` script. It runs `tsc` for
 
 ## Output
 
-Built output stays in each package's `dist/` directory. `bun run build` runs the required package build graph and refreshes the Trail and standup executable copies used by local skills.
+Built output stays in each package's `dist/` directory. The CLI build also stages public documentation under its ignored `docs/` directory. `bun run build` refreshes the local helper executables and stages the built-in resources in the CLI package.
+
+`bun run pack:cli` creates an npm-compatible tarball under `packages/cli/dist/`. It includes the patched Pi runtime and does not publish to a registry.
 
 Packages that produce CLI binaries are linked into `node_modules/.bin/` by Bun when listed as dependencies of the root package. For generated binaries, prefer a stable checked-in `bin/` shim as the package `bin` target so dependency installation does not require build artifacts to exist.

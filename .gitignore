@@ -9,6 +9,7 @@ references/*
 # output
 out
 dist
+/packages/cli/docs/
 *.tgz
 
 # code coverage

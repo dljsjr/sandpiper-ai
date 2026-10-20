@@ -6,7 +6,6 @@ import { fileURLToPath } from 'node:url';
 import {
   configurePiEnvironment,
   mirrorPiSandpiperEnvironment,
-  prepareStandalonePackageDir,
   resolveStandalonePaths,
 } from './standalone_bootstrap.js';
 
@@ -86,14 +85,6 @@ if (args.includes('--help') || args.includes('-h')) {
       env: process.env,
     });
     const piMetadata = resolvePiMetadata();
-
-    if (standalonePaths.packageDirSource === 'generated') {
-      prepareStandalonePackageDir({
-        packageDir: standalonePaths.packageDir,
-        resourceRoot: standalonePaths.resourceRoot,
-        piPackageDir: piMetadata.packageDir,
-      });
-    }
 
     configurePiEnvironment(
       {
