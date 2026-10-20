@@ -7,9 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-27T15:34:32.864Z
-depends_on:
-  - TCL-70
-updated_at: 2026-03-27T15:41:43.736Z
+updated_at: 2026-10-20T21:40:53.633Z
 ---
 
 # Inject project metadata triggers into system prompt
@@ -28,8 +26,6 @@ Proposed format:
   </project>
 </available_projects>
 ```
-
-Depends on TCL-70 (when_to_file → when_to_read rename).
 
 ---
 
@@ -52,3 +48,7 @@ Depends on TCL-70 (when_to_file → when_to_read rename).
 
 - **status**: IN PROGRESS → COMPLETE
 - **resolution**: DONE
+
+## 2026-10-20T21:40:53.639Z
+
+- **content**: updated via editor

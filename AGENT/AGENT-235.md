@@ -7,7 +7,7 @@ priority: HIGH
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-08-06T20:41:29.829Z
-updated_at: 2026-08-07T22:05:56.067Z
+updated_at: 2026-10-20T21:40:53.402Z
 ---
 
 # Pi 0.84.0 version upgrade and capability adoption
@@ -28,7 +28,7 @@ Reverted deliberately: AGENT-240 (constrainedSampling strict:'prefer') - adopted
 
 Closed WONTFIX: AGENT-219 (asset-path helpers - adopting them would have regressed the harness_docs block, since PI_PACKAGE_DIR is deliberately repointed at Sandpiper's own package dir), AGENT-245 (upstream ask, no longer ticketed per the new AGENTS.md rule).
 
-Bugs found and fixed en route, none of which were in scope at the start: AGENT-248 (dumpSystemPrompt hung in every headless context), TCL-143 (trail's first auto_push failed without upstream tracking - only ever passed on machines with push.autoSetupRemote), AGENT-256 (chorus widget starving the fullscreen transcript). Plus a stale .turbo cache restoring 5-month-old dist content, which had been masquerading as distribution-invariant test failures.
+Bugs found and fixed en route, none of which were in scope at the start: AGENT-248 (dumpSystemPrompt hung in every headless context), AGENT-256 (chorus widget starving the fullscreen transcript). Plus a stale .turbo cache restoring 5-month-old dist content, which had been masquerading as distribution-invariant test failures.
 
 Verification: full suite green, distribution green, system prompt byte-identical across the bump apart from the version string, session format compatible, fullscreen confirmed in live dogfood. Every change reviewed adversarially and independently reproduced before landing.
 
@@ -48,3 +48,7 @@ Verification: full suite green, distribution green, system prompt byte-identical
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-10-20T21:40:53.413Z
+
+- **content**: updated via editor

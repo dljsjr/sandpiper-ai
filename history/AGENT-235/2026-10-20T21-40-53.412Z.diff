@@ -1,0 +1,34 @@
+===================================================================
+--- a/AGENT-235.md
++++ b/AGENT-235.md
+@@ -6,9 +6,9 @@
+ priority: HIGH
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-08-06T20:41:29.829Z
+-updated_at: 2026-08-07T22:05:56.067Z
++updated_at: 2026-10-20T21:40:53.402Z
+ ---
+ 
+ # Pi 0.84.0 version upgrade and capability adoption
+ 
+@@ -27,9 +27,9 @@
+ Reverted deliberately: AGENT-240 (constrainedSampling strict:'prefer') - adopted, then found to hard-fail on strict-supporting providers because pi gates on model capability without inspecting schema shape; reverted under AGENT-254 with the mechanism recorded, re-adoption tracked as AGENT-255 once the integration harness can validate strict schemas headlessly.
+ 
+ Closed WONTFIX: AGENT-219 (asset-path helpers - adopting them would have regressed the harness_docs block, since PI_PACKAGE_DIR is deliberately repointed at Sandpiper's own package dir), AGENT-245 (upstream ask, no longer ticketed per the new AGENTS.md rule).
+ 
+-Bugs found and fixed en route, none of which were in scope at the start: AGENT-248 (dumpSystemPrompt hung in every headless context), TCL-143 (trail's first auto_push failed without upstream tracking - only ever passed on machines with push.autoSetupRemote), AGENT-256 (chorus widget starving the fullscreen transcript). Plus a stale .turbo cache restoring 5-month-old dist content, which had been masquerading as distribution-invariant test failures.
++Bugs found and fixed en route, none of which were in scope at the start: AGENT-248 (dumpSystemPrompt hung in every headless context), AGENT-256 (chorus widget starving the fullscreen transcript). Plus a stale .turbo cache restoring 5-month-old dist content, which had been masquerading as distribution-invariant test failures.
+ 
+ Verification: full suite green, distribution green, system prompt byte-identical across the bump apart from the version string, session format compatible, fullscreen confirmed in live dogfood. Every change reviewed adversarially and independently reproduced before landing.
+ 
+ ---
+@@ -47,4 +47,8 @@
+ ## 2026-08-07T22:05:56.070Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-10-20T21:40:53.413Z
++
++- **content**: updated via editor

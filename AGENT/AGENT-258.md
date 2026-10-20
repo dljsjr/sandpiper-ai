@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "sandpiper-dev"
 reporter: USER
 created_at: 2026-08-08T01:16:47.296Z
-updated_at: 2026-08-10T17:37:46.142Z
+updated_at: 2026-10-20T21:40:53.519Z
 ---
 
 # Add root vitest workspace config so per-package configs apply from root
@@ -20,7 +20,7 @@ Consequence today: settings that must apply during root runs are hoisted into th
 
 Why this is a sprint rather than a drive-by: adding the root config activates all six dormant configs simultaneously and changes suite-wide test resolution - setup files, environment, includes, timeouts, pools - for packages whose configs have never once run under the root invocation. Expect surprises in whichever packages have drifted furthest. Sequence deliberately: land the config with everything effectively inert, then enable per-package settings one package at a time with a full-suite run between each, rather than flipping all six at once and bisecting the fallout.
 
-Scope notes: decide workspace vs projects form against the pinned vitest version's supported API; migrate the root-script env hoists back into the packages that own them once the config proves out, leaving the root script minimal; keep GIT_CONFIG/JJ_CONFIG isolation working continuously throughout - never regress it mid-migration, since that isolation is what keeps test runs from touching the developer's real VCS credentials. Coordinate with TCL-144 if that lands first: it reduces trail's dependence on real git/jj and therefore some of the pressure that makes this hoisting necessary.
+Scope notes: decide workspace vs projects form against the pinned vitest version's supported API; migrate the root-script env hoists back into the packages that own them once the config proves out, leaving the root script minimal; keep GIT_CONFIG/JJ_CONFIG isolation working continuously throughout - never regress it mid-migration, since that isolation is what keeps test runs from touching the developer's real VCS credentials.
 
 ---
 
@@ -39,3 +39,7 @@ Scope notes: decide workspace vs projects form against the pinned vitest version
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-10-20T21:40:53.526Z
+
+- **content**: updated via editor

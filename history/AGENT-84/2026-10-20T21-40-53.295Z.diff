@@ -1,0 +1,27 @@
+===================================================================
+--- a/AGENT-84.md
++++ b/AGENT-84.md
+@@ -6,13 +6,12 @@
+ priority: HIGH
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:52.924Z
+-updated_at: 2026-04-30T04:06:13.888Z
+ related:
+   - AGENT-16
+   - AGENT-82
+-  - TCL-111
++updated_at: 2026-10-20T21:40:53.289Z
+ ---
+ 
+ # Plan package-first multi-distribution refactor
+ 
+@@ -70,4 +69,8 @@
+ ## 2026-04-30T04:06:13.889Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-10-20T21:40:53.295Z
++
++- **content**: updated via editor
