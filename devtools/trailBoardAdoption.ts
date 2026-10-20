@@ -1,4 +1,17 @@
-import { lstatSync, readFileSync, realpathSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import {
+  linkSync,
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  realpathSync,
+  rmdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 const trailConfigFiles = ['.trail.json', 'trail.json', '.trail/config.json'] as const;
@@ -24,6 +37,8 @@ export interface AdoptedTrailConfig {
 
 export interface BoardAdoptionPlan {
   readonly disposition: 'create' | 'already-adopted';
+  readonly options: BoardAdoptionOptions;
+  readonly inputState: string;
   readonly rootDir: string;
   readonly tasksPath: string;
   readonly configPath: string;
@@ -48,8 +63,9 @@ export function planBoardAdoption(options: BoardAdoptionOptions): BoardAdoptionP
   }
   assertStorageLocation(rootDir, tasksPath, versionControl);
   const existingConfigPaths = readExistingConfigurations(rootDir, tasksPath, versionControl);
-  return {
+  const plan = {
     disposition: existingConfigPaths.length ? 'already-adopted' : 'create',
+    options: { ...options, rootDir },
     rootDir,
     tasksPath,
     configPath: join(rootDir, '.trail', 'config.json'),
@@ -60,7 +76,51 @@ export function planBoardAdoption(options: BoardAdoptionOptions): BoardAdoptionP
       tasks_dir: options.tasksDir,
       version_control: versionControl,
     },
-  };
+  } satisfies Omit<BoardAdoptionPlan, 'inputState'>;
+  return { ...plan, inputState: inputState(plan) };
+}
+
+export function applyBoardAdoption(plan: BoardAdoptionPlan): void {
+  const current = refreshUnchangedPlan(plan);
+  if (current.disposition === 'already-adopted') return;
+  const parent = dirname(current.configPath);
+  const createdParent = mkdirSync(parent, { recursive: true });
+  let staging: string | undefined;
+  try {
+    staging = mkdtempSync(join(parent, '.trail-adoption-'));
+    const file = join(staging, 'config.json');
+    writeFileSync(file, `${JSON.stringify(current.config, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
+    refreshUnchangedPlan(current);
+    // A rename could overwrite a concurrent configuration; a direct write could expose partial JSON.
+    linkSync(file, current.configPath);
+  } finally {
+    if (staging) rmSync(staging, { recursive: true, force: true });
+    if (createdParent && !hasEntry(current.configPath) && readdirSync(createdParent).length === 0) {
+      rmdirSync(createdParent);
+    }
+  }
+}
+
+function refreshUnchangedPlan(plan: BoardAdoptionPlan): BoardAdoptionPlan {
+  const current = planBoardAdoption(plan.options);
+  if (JSON.stringify(current) !== JSON.stringify(plan)) {
+    throw new Error('Adoption inputs changed after planning. Run a new dry run before applying.');
+  }
+  return current;
+}
+
+function inputState(plan: Omit<BoardAdoptionPlan, 'inputState'>): string {
+  const directories = [plan.rootDir, plan.tasksPath].map((path) => {
+    const stat = statSync(path, { bigint: true });
+    return [realpathSync(path), `${stat.dev}:${stat.ino}`];
+  });
+  const files = [...(plan.legacySource ? [plan.legacySource] : []), ...plan.existingConfigPaths].map((path) => [
+    path,
+    createHash('sha256').update(readFileSync(path)).digest('hex'),
+  ]);
+  return createHash('sha256')
+    .update(JSON.stringify({ directories, files, destination: physicalLocation(plan.configPath) }))
+    .digest('hex');
 }
 
 function hasEntry(path: string): boolean {

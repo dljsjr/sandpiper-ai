@@ -90,6 +90,7 @@
     "@biomejs/biome": "2.5.13",
     "@types/better-sqlite3": "9.6.0",
     "@types/node": "26.5.0",
+    "commander": "15.0.0",
     "knip": "6.35.1",
     "syncpack": "15.3.3",
     "turbo": "2.10.12",
