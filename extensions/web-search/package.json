@@ -9,8 +9,7 @@
   },
   "dependencies": {
     "jsdom": "30.0.1",
-    "mcporter": "0.13.10",
-    "sandpiper-ai-core": "0.0.1"
+    "mcporter": "0.13.10"
   },
   "devDependencies": {
     "@types/jsdom": "30.0.0"

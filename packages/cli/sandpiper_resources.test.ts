@@ -1,5 +1,3 @@
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ExtensionAPI, InlineExtension } from '@earendil-works/pi-coding-agent';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -109,24 +107,6 @@ describe('Sandpiper resource adapter', () => {
     expect(paths.skillPaths).not.toContain(join('/repo', 'packages', 'resources', 'skills-on-demand'));
     expect(paths.promptPaths).toEqual([join('/repo', 'packages', 'resources', 'prompts')]);
     expect(paths.themePaths).toEqual([join('/repo', 'packages', 'resources', 'themes')]);
-  });
-
-  it('prefers packaged top-level resource roots when they exist', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-resource-root-'));
-    try {
-      mkdirSync(join(dir, 'skills'), { recursive: true });
-      mkdirSync(join(dir, 'prompts'), { recursive: true });
-      mkdirSync(join(dir, 'themes'), { recursive: true });
-
-      const paths = resolveSandpiperResourcePaths(dir);
-
-      expect(paths.skillPaths).toEqual([join(dir, 'skills', 'sandpiper'), join(dir, 'skills', 'third-party')]);
-      expect(paths.skillPaths).not.toContain(join(dir, 'skills-on-demand'));
-      expect(paths.promptPaths).toEqual([join(dir, 'prompts')]);
-      expect(paths.themePaths).toEqual([join(dir, 'themes')]);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {

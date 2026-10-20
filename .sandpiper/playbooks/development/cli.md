@@ -17,7 +17,7 @@ Read this before changing command-line tools or package `bin` metadata.
 
 ## Current CLI Packages
 
-- `packages/cli/` — `sandpiper` runtime wrapper and standalone app bundle
+- `packages/cli/` — `sandpiper` runtime wrapper and system prompt diagnostic
 - `packages/trail/` — Trail task management CLI
 - `packages/sandpiper-standup-cli/` — standup/session-continuity CLI
 

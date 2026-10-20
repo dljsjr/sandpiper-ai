@@ -1,6 +1,6 @@
 ---
 name: Pi Extension Development
-read_when: Pi extension, extension lifecycle, pi.events, tool registration, custom tools, TUI, registerMessageRenderer, providers, ExtensionAPI, getFlag, SDK, plugins/pi/extensions, extensions/system, extensions/shell-relay
+read_when: Pi extension, extension lifecycle, pi.events, tool registration, custom tools, TUI, registerMessageRenderer, providers, ExtensionAPI, getFlag, SDK, extensions/system, extensions/shell-relay
 ---
 
 # Pi Extension Development
@@ -19,7 +19,6 @@ Read this before changing Pi extensions, custom tools, TUI behavior, provider ad
 ## Current Extension Surfaces
 
 - `extensions/system/` — Sandpiper identity, system prompt, migration controls, diagnostics, session continuity, system capabilities
-- `plugins/pi/extensions/` — neutral Pi adapter surface without Sandpiper identity/startup behavior
 - `extensions/shell-relay/` — shared terminal extension
 - `extensions/autotoon/` — compatibility bridge to `packages/capability-autotoon/`
 

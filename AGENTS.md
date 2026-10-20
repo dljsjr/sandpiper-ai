@@ -1,6 +1,6 @@
 # Sandpiper Development Guidelines
 
-This repository is the Sandpiper source tree: a package-first Bun/Node monorepo that ships Sandpiper runtime packages, Pi package adapters, Claude Code adapters, extensions, skills, prompts, themes, docs, and developer tooling.
+This repository is the Sandpiper source tree: a Bun/Node monorepo for the local Sandpiper runtime, extensions, skills, prompts, themes, docs, and developer tooling.
 
 ## Start Here
 
@@ -14,7 +14,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 - Edit source, not generated artifacts. Do not hand-edit `dist/` or package `dist/` output.
 - Use Bun as the preferred runtime, package manager, and script runner.
 - Run workspace installs from the repo root.
-- Keep package manifests npm-installable: no `catalog:` specs; root local workspace dependencies use `workspace:*`; package-level internal and registry dependencies use exact versions only; verify with `bun run check:deps`.
+- Keep workspace dependency specifications consistent: no `catalog:` specs; root local dependencies use `workspace:*`; package-level internal and registry dependencies use exact versions; verify with `bun run check:deps`.
 - Keep application code runtime-agnostic between Node and Bun unless the code is explicitly dev tooling.
 - Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
@@ -27,7 +27,7 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 | Working on...                                                                                          | Read first                                                   |
 | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
 | Documentation, `README.md`, `AGENTS.md`, `.sandpiper/docs`, `.sandpiper/playbooks`, docs cleanup       | `.sandpiper/playbooks/documentation/index.md`                |
-| Build system, package metadata, `dist/`, distribution assembly, standalone app, Claude plugin artifact | `.sandpiper/playbooks/development/build-and-distribution.md` |
+| Build system, package metadata, package `dist/` output, local helper assembly                       | `.sandpiper/playbooks/development/build.md`                  |
 | TypeScript, tests, linting, verification, code-health rules                                            | `.sandpiper/playbooks/development/typescript-and-tests.md`   |
 | Environment variables, config paths, `PI_*`, `SANDPIPER_*`                                             | `.sandpiper/playbooks/development/env-vars.md`               |
 | CLI tools, Commander commands, package `bin` entries, bundled executables                              | `.sandpiper/playbooks/development/cli.md`                    |
@@ -44,7 +44,6 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
   — do not change the gate to fail on warnings.
 - Use `bun run test:vitest -- <testpath>` for focused Vitest runs.
 - Use `bun run test` for the full Vitest gate.
-- Before claiming distribution health, run `rm -rf dist && bun run test:distribution`.
 - Only use safe auto-fixes; no suppressions without asking.
 
 ## Repository Map
@@ -56,10 +55,9 @@ This repository is the Sandpiper source tree: a package-first Bun/Node monorepo 
 | `.sandpiper/docs/`      | Active internal specs, PRDs, design notes, and implementation plans                             |
 | `.sandpiper/archive/`   | Historical, completed, superseded, or stale docs                                                |
 | `extensions/`           | Sandpiper Pi extension source and compatibility bridges                                         |
-| `plugins/pi/`           | Neutral Pi package adapter surface                                                              |
-| `packages/`             | Built/distributed workspace packages                                                            |
+| `packages/`             | Workspace packages and package-owned build output                                                |
 | `packages/resources/`   | Shared skills, prompts, and themes                                                              |
-| `devtools/`             | Development-only build, distribution, and vendoring utilities                                   |
+| `devtools/`             | Development-only build and project utilities                                                     |
 
 ## Public Documentation
 

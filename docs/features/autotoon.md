@@ -53,7 +53,7 @@ When you see `[TOON]` at the start of tool output, you're looking at converted d
 AutoTOON intercepts the `tool_result` event, converts JSON to TOON when beneficial (256–100,000 bytes, actually shorter), and injects the result. It never touches error results.
 
 **Implementation**: `packages/capability-autotoon/src/core.ts` and `packages/capability-autotoon/src/pi-extension.ts`  
-**Legacy Pi package bridge**: `extensions/autotoon/autotoon.ts`  
+**Pi extension entrypoint**: `extensions/autotoon/autotoon.ts`  
 **Guidance injection**: Deferred. AutoTOON currently performs conversion only.
 
 ## Related Documentation

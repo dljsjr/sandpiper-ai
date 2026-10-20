@@ -7,9 +7,8 @@ Sandpiper builds on Pi's extension system. When you change extension behavior in
 | Surface                         | Use for                                                                                                                                                    |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `extensions/system/`            | Sandpiper identity, startup behavior, system prompt assembly, diagnostics, migration controls, session continuity, and Sandpiper-owned system capabilities |
-| `plugins/pi/extensions/`        | Neutral Pi package adapters that expose shared capabilities without Sandpiper identity or startup behavior                                                 |
 | `extensions/shell-relay/`       | Shell Relay's Zellij-backed shared terminal tools, commands, runtime, and shell integrations                                                               |
-| `extensions/autotoon/`          | Legacy compatibility bridge to the package-first AutoTOON adapter                                                                                          |
+| `extensions/autotoon/`          | Pi entrypoint for AutoTOON                                                                                                                                |
 | `packages/capability-autotoon/` | Host-neutral AutoTOON transform and Pi adapter source of truth                                                                                             |
 
 Keep entrypoints thin. Put reusable logic in package-owned modules or extension-local framework-independent modules, then wire that logic to Pi APIs at the edge.
@@ -53,19 +52,11 @@ linked to the answer twice.
 
 For upstream source browsing, see the [Pi coding-agent package](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent).
 
-## Keep source and generated artifacts separate
+## Work from source
 
-Extension sources live in `extensions/`, `plugins/pi/extensions/`, and package-owned source directories. Generated artifacts under `dist/` are assembled by the build tooling and should not be edited by hand.
+Extension sources live in `extensions/` and package-owned source directories. Pi loads their TypeScript source through jiti, so extension changes do not need a build step.
 
-After extension source changes, run:
-
-```bash
-bun run prepare:distribution
-```
-
-If you changed package-owned built output, `prepare:distribution` builds the package graph first and then reassembles the distribution.
-
-See [Build system](build-system.md) for the full build and distribution workflow.
+If you changed a package that emits output, run its package build or `bun run build`. See [Build system](build-system.md) for the workspace build flow.
 
 ## Verify behavior
 
@@ -75,8 +66,9 @@ Use focused tests while working:
 bun run test:vitest -- <testpath>
 ```
 
-Before claiming distribution health, run:
+Before completion, run:
 
 ```bash
-rm -rf dist && bun run test:distribution
+bun check
+bun run test
 ```

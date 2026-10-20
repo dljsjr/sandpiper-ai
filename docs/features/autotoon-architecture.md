@@ -10,8 +10,7 @@ AutoTOON currently does conversion only. It does not inject model guidance about
 | ------------------------------------------------------------ | ------------------------------------------------ |
 | `packages/capability-autotoon/src/core.ts`                   | Host-neutral JSON→TOON transform source of truth |
 | `packages/capability-autotoon/src/pi-extension.ts`           | Pi `tool_result` adapter                         |
-| `packages/adapter-claude-code/src/autotoon-post-tool-use.ts` | Claude Code hook adapter                         |
-| `extensions/autotoon/autotoon.ts`                            | Legacy Pi package compatibility bridge           |
+| `extensions/autotoon/autotoon.ts`                            | Pi extension entrypoint                          |
 
 ## Conversion pipeline
 

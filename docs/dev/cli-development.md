@@ -161,31 +161,27 @@ describe("CLI", () => {
 
 Unit tests alone miss argument parsing bugs. E2E tests alone are slower and harder to debug. **Both layers are required.**
 
-## Build and Installation
+## Build and local use
 
-CLI packages that emit bundled binaries or type declarations need to be built before distribution assembly. Dependency installation itself does not build Sandpiper artifacts.
+CLI packages that emit bundled executables or type declarations must be built before local use. Dependency installation does not build Sandpiper output.
 
 ### When to Build
 
 Build a CLI package when:
 
-- It emits a bundled binary (e.g., `packages/cli/dist/sandpiper`)
+- It emits a bundled runtime (for example, `packages/cli/dist/standalone/sandpiper_standalone.js`)
 - It emits TypeScript declarations (`.d.ts` files)
 - It uses a bundler (Bun build, esbuild, Rollup, etc.)
 
 ### Build Process
 
-Run the distribution preparation script:
+Build all required workspace output:
 
 ```bash
-bun run prepare:distribution
+bun run build
 ```
 
-This command runs the Turbo-backed package build graph and then `devtools/assembleDistribution.ts` assembles the generated Pi/npm package at `dist/`.
-
-### Why Build Then Assemble?
-
-Package builds emit distributable artifacts (binaries, declarations). Distribution assembly copies those artifacts, resources, docs, package metadata, and Pi runtime assets into the final generated package structure. Both phases are required for CLI packages, but they are explicit build steps rather than install lifecycle hooks.
+This command runs the Turbo-backed package build graph. It then refreshes the Trail and standup executable copies used by their local skills. To build only the Sandpiper runtime, run `bun run build:standalone`.
 
 ## Tools and Conventions
 

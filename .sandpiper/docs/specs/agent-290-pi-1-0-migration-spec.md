@@ -3,7 +3,7 @@
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented and merged (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30.
 - **Task**: AGENT-290 (subtasks AGENT-293 and AGENT-295 to AGENT-302)
-- **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](../../archive/agent-290-pi-1-0-migration-work-plan.md) (archived)
+- **Related**: [discovery notes](../../archive/agent-290-pi-1-0-discovery.md) (archived rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](../../archive/agent-290-pi-1-0-migration-work-plan.md) (archived)
 
 ## Scope
 
@@ -12,15 +12,15 @@ Phase 1 of the migration: run Sandpiper on `@earendil-works/pi-coding-agent` 1.0
 Out of scope:
 
 - adoption of new Pi 1.0 capabilities (see [Adoption candidates](#adoption-candidates))
-- the build and distribution redesign (AGENT-301)
+- the build-topology simplification completed later under TOOLS-30
 - the `pi-claude-code-cli-provider` migration, which happens in that repository
 
 ## Versions
 
 | Item                                                 | Requirement                                                                                                                  |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, `extensions/*`, `plugins/pi/extensions`). Published to npm 2026-10-05. |
-| Version policy                                       | Exact versions, as enforced by `bun run check:deps`. Pi's recommendation of `"*"` peer ranges is deferred to AGENT-301.      |
+| `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, and `extensions/*`). Published to npm 2026-10-05. |
+| Version policy                                       | Exact versions, as enforced by `bun run check:deps`.                                                                         |
 
 ## System prompt
 
@@ -30,7 +30,7 @@ A _synthetic turn_ is a run started by an extension rather than by user input, f
 
 ### Ownership
 
-> **Decided (2026-10-06): Shape B replaces the guard, with no patch for the first-turn gap.** Rationale: parity with today's behavior at the smallest patch. Sandpiper carries a small local `bun patch` of `@earendil-works/pi-coding-agent`. Doug runs only the uncompiled standalone, which loads the patched `dist/core/agent-session.js`. The patch would be provider-neutral, redone on every Pi bump, and removed when upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). Shapes considered:
+> **Decided (2026-10-06): Shape B replaces the guard, with no patch for the first-turn gap.** Rationale: parity with today's behavior at the smallest patch. Sandpiper carries a small local `bun patch` of `@earendil-works/pi-coding-agent`. The workspace runtime loads the patched `dist/core/agent-session.js`. The patch would be provider-neutral, redone on every Pi bump, and removed when upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). Shapes considered:
 >
 > - **Shape A: run `before_agent_start` for idle `triggerTurn` turns.** This needs a lock over the async preparation window to prevent concurrent runs, and leaves Esc during preparation as a gap. It also has to define what `prompt` means for a turn nobody typed. An empty-string sentinel was rejected as a hack. Passing the message text, or adding an explicit trigger field to the event, are the remaining options.
 > - **Shape B: triggered runs never rewrite prompt sections.** They keep the prompt the transcript already records (written by the ownership steps below) and apply only tool loadout changes. This adds no hook semantics. A brand-new session whose first turn is a synthetic turn still gets Pi's default prompt for that run; 0.85 behaves the same way. Not yet prototyped.
@@ -158,10 +158,9 @@ Production extension code needs no other API changes: `tsc` against Pi 1.0.3 rep
 
 ## Follow-up
 
-| Item                                                                                                        | Where       |
-| ----------------------------------------------------------------------------------------------------------- | ----------- |
-| Which delivery modes to keep; CLI versus Pi-package artifacts; `"*"` host peers; where the Pi patch applies | TOOLS-30    |
-| Codemode in the compiled standalone app (needs Pi's embedded QuickJS path, which Pi does not export)        | Not planned |
+| Item | Where |
+| --- | --- |
+| Retain only the workspace runtime and local helper builds | TOOLS-30 |
 
 ### Adoption candidates
 

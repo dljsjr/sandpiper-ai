@@ -4,29 +4,23 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ## Contents
 
-| Extension                                                | Description                                                                                                               |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| [`system/`](system/)                                     | Composed Sandpiper extension package — identity plus neutral system capabilities for generated Sandpiper package behavior |
-| [`../plugins/pi/extensions/`](../plugins/pi/extensions/) | Neutral Pi provider adapters — neutral capabilities/resources without Sandpiper identity or startup behavior              |
-| [`autotoon/`](autotoon/)                                 | Compatibility bridge to the package-first AutoTOON Pi adapter in `packages/capability-autotoon/`                          |
-| [`shell-relay/`](shell-relay/)                           | Shared terminal session between user and agent via Zellij                                                                 |
+| Extension | Description |
+| --- | --- |
+| [`system/`](system/) | Sandpiper identity, lifecycle behavior, and core tools |
+| [`autotoon/`](autotoon/) | Pi entrypoint for the AutoTOON capability in `packages/capability-autotoon/` |
+| [`shell-relay/`](shell-relay/) | Shared terminal session between user and agent through Zellij |
 
-### system/ and neutral Pi adapters
+### system/
 
-`system/` is the composed Sandpiper extension package. Generated Sandpiper Pi artifacts load it through `extensions/system/package.json`, which keeps the repository root from acting as the canonical Pi package manifest. It loads both:
+`system/` owns Sandpiper identity and startup behavior, prompt assembly, session continuity, diagnostics, the model-callable `skill` tool, background process tools, and completion hooks.
 
-- Sandpiper identity/startup behavior: prompt assembly, session continuity, migration / shell-integration controls, diagnostics, and update banners.
-- Neutral system capabilities: the model-callable `skill` loading tool, background process tools, and completion/shutdown hooks.
-
-`plugins/pi/extensions/` contains the neutral Pi provider adapters. Its `capabilities.ts` entrypoint intentionally omits Sandpiper identity flags, prompt hooks, migration controls, diagnostics, and update banners. Neutral Pi package assembly loads those provider adapters instead of `system/`.
-
-The entrypoints are intentionally thin glue layers. Framework-independent logic is extracted into `packages/core/`, while Pi-specific wiring helpers live under `extensions/system/`.
+The entrypoints are intentionally thin glue layers. Framework-independent logic belongs in `packages/core/` or focused extension-local modules. Pi-specific system wiring lives under `extensions/system/`.
 
 As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic into `packages/core/` or focused extension-local modules rather than expanding a single large file.
 
 ### autotoon
 
-`autotoon/` preserves the legacy Pi package entrypoint path. The source of truth now lives in `packages/capability-autotoon/`: `src/core.ts` contains the host-neutral JSON→TOON transform, while `src/pi-extension.ts` contains the Pi `tool_result` adapter.
+`autotoon/` is the Pi entrypoint. The source of truth lives in `packages/capability-autotoon/`: `src/core.ts` contains the host-neutral JSON→TOON transform, while `src/pi-extension.ts` contains the Pi `tool_result` adapter.
 
 ### shell-relay
 
@@ -36,6 +30,6 @@ A multi-module extension providing a shared terminal session. See its own [READM
 
 Extensions are TypeScript modules that export a default function receiving the `ExtensionAPI`. They can register tools, subscribe to events, add commands, and interact with users.
 
-Directory extensions (like `system/` and `shell-relay/`) load from source via Pi's jiti runtime and declare their entry point in `package.json` under the `pi.extensions` key. Top-level compatibility bridge files may exist for explicit local experiments, but generated package manifests should prefer directory/package entrypoints.
+Sandpiper registers its built-in extensions explicitly in `packages/cli/sandpiper_resources.ts`. Directory extensions can also declare an entrypoint in `package.json` under `pi.extensions` for direct local Pi experiments.
 
 For the full extension API, see the [pi extensions documentation](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/extensions.md).

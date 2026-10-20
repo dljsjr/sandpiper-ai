@@ -1,43 +1,50 @@
 # Build system reference
 
-Sandpiper is a Bun workspace that emits several generated artifacts: a Sandpiper Pi/npm package assembly, a standalone Sandpiper app bundle, and a Claude Code plugin package.
+Sandpiper runs from this Bun workspace. Build output stays beside the package that owns it. The build does not assemble a release package at the repository root.
 
-Use this page as a reference for how the build system is structured. For action-oriented commands, see [How to build and verify Sandpiper changes](build-workflows.md).
+Use this page to understand the build structure. For commands, see [How to build and verify Sandpiper changes](build-workflows.md).
 
-## Pipeline stages
+## Pipeline
 
-Sandpiper's build system has three main stages:
+`bun run build` has two stages:
 
-1. **Package builds** compile TypeScript, emit declarations, and bundle package-owned binaries.
-2. **Dependency hoisting** installs workspace dependencies into the root `node_modules/`.
-3. **Distribution assembly** copies source and generated outputs into the final artifacts under `dist/`.
+1. Turborepo builds the required package outputs.
+2. `devtools/syncSkillHelpers.ts` copies the built Trail and standup executables into their local skill directories.
 
-## Package builds
+`bun install` only installs dependencies. It does not run either stage.
 
-Only packages that emit distributable artifacts need package build steps.
+## Package output
 
-| Package                           | Build output                                                                                         |
-| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `packages/cli/`                   | Bundled `sandpiper` runtime, standalone alias target, standalone app bundle support files, Pi assets |
-| `packages/core/`                  | TypeScript declarations and package dist artifacts                                                   |
-| `packages/trail/`   | Bundled Trail CLI (`@sandpiper-ai/trail`)                                                   |
-| `packages/sandpiper-standup-cli/` | Bundled `sandpiper-standup` CLI                                                                      |
-| `packages/adapter-claude-code/`   | TypeScript declarations and Claude plugin AutoTOON hook bundle                                       |
+| Package | Build output |
+| --- | --- |
+| `packages/cli/` | `sandpiper`, `sandpiper-system-prompt`, and shared JavaScript chunks under `dist/standalone/` |
+| `packages/core/` | TypeScript declarations under `dist/` |
+| `packages/trail/` | Bundled Trail executable at `dist/trail` |
+| `packages/sandpiper-standup-cli/` | Bundled standup executable at `dist/sandpiper-standup` |
 
-Extensions are not bundled as runtime entrypoints. Pi loads extension source TypeScript through jiti.
+Pi loads extensions from source TypeScript through jiti. Extensions do not have a separate build step.
+
+The runtime may create `dist/standalone-package/package.json` when it starts from a source checkout. This small ignored sidecar gives Pi the package metadata it needs. It is not a release artifact.
 
 ## Task orchestration
 
-Turborepo orchestrates cacheable package build tasks. The root `build:packages` script runs `turbo run build` for the distributable package set used by `prepare:distribution`:
+The root `build:packages` script uses Turborepo to build these packages:
 
 - `sandpiper-ai-core`
 - `sandpiper-standup-cli`
 - `@sandpiper-ai/trail`
 - `sandpiper-ai-cli`
 
-`turbo.json` defines package `build` tasks with dependency-aware ordering (`^build`) and caches package-local `dist/**` outputs. It does not replace Syncpack dependency policy, root Vitest runs, or distribution assembly. `devtools/assembleDistribution.ts` owns generated `dist/` assembly after package builds finish.
+`turbo.json` defines dependency order and caches package-local `dist/**` output. The root `build` script then runs `sync:skill-helpers`.
 
-## Dependency hoisting
+The helper sync copies:
+
+- `packages/trail/dist/trail` to `packages/resources/skills/sandpiper/tasks/scripts/trail`
+- `packages/sandpiper-standup-cli/dist/sandpiper-standup` to `packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup`
+
+Both copies are marked executable.
+
+## Dependency resolution
 
 The workspace uses Bun's hoisted linker:
 
@@ -47,113 +54,42 @@ The workspace uses Bun's hoisted linker:
 linker = "hoisted"
 ```
 
-Extension dependencies resolve from the root `node_modules/`. Generated artifacts do not contain per-extension `node_modules/` directories.
+Extension dependencies resolve from the root `node_modules/` directory.
 
-Package manifests stay compatible with both Bun local development and npm installation:
+The source manifest policy is:
 
-- Do not use Bun catalog dependency protocols (`catalog:`) in package manifests.
-- The root router package uses `workspace:*` for local workspace dependencies so Bun and npm workspace commands remain monorepo-aware.
-- Workspace package manifests use npm-compatible exact versions for internal package dependencies because npm rejects nested workspace protocol specs during root installs.
-- Registry dependencies, dev dependencies, and peer dependencies use exact versions only: no wildcards, tags, caret ranges, or tilde ranges.
-- Generated package artifacts may use tested `file:` dependencies for copied support packages.
+- Do not use `catalog:` dependency specifications.
+- Use `workspace:*` for local dependencies in the root package.
+- Use exact versions for package-level internal and registry dependencies.
+- Do not use wildcards, tags, caret ranges, or tilde ranges.
 
-`bun run check:deps` enforces source manifest policy with Syncpack. Ecosystem package tests enforce generated package policy.
+`bun run check:deps` enforces this policy with Syncpack.
 
 ## Local Pi patch
 
-Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`, saved under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`. It changes Pi's compiled `dist/core/system-prompt.js` so that Pi keeps its `tools` and `rules` sections under Sandpiper's custom prompt. The [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md) describes the behavior.
+Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`. The patch is stored under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`.
 
-The patch applies wherever this repository installs its own dependencies: repository runs (the root `sandpiper` bin and `bun run sandpiper-dev`), the generated `dist/` runtime, and the compiled standalone app, which bundles the patched files. A `sandpiper-ai` package installed from npm resolves Pi from the installer's dependency tree and runs unpatched.
+The patch changes Pi's compiled `dist/core/system-prompt.js`. It keeps Pi's `tools` and `rules` sections when Sandpiper supplies a custom prompt. The [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md) describes the behavior.
 
-The patch is tied to an exact Pi version, so every Pi upgrade must redo it:
+The patch applies to Sandpiper runs from this workspace. It is tied to an exact Pi version. Redo it after each Pi upgrade:
 
-1. Bump the pins, then run `bun patch @earendil-works/pi-coding-agent` and reapply the changes marked `Sandpiper local patch` in the old patch file.
-2. Run `bun patch --commit 'node_modules/@earendil-works/pi-coding-agent'`. Delete any `.bun-tag-*` file entries Bun adds to the new patch file, and remove the previous version's patch file if Bun leaves it in `patches/`.
-3. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts`, then the full gates.
+1. Update the version pins. Run `bun patch @earendil-works/pi-coding-agent` and reapply the changes marked `Sandpiper local patch` in the old patch file.
+2. Run `bun patch --commit 'node_modules/@earendil-works/pi-coding-agent'`. Delete `.bun-tag-*` entries from the new patch file. Remove the old version's patch file if Bun leaves it under `patches/`.
+3. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts`, then run the full checks.
 
-## Distribution assembly
+## Verification
 
-`devtools/assembleDistribution.ts` assembles generated artifacts. It:
+Use `bun check` for dependency policy, type checks, structural rules, and lint. Use `bun run test` for the full Vitest suite.
 
-1. Recreates the generated `dist/` package root.
-2. Copies extension source trees, shared resources, public `docs/`, and README content.
-3. Preserves extension `src/` trees so package-local `pi.extensions` entries resolve.
-4. Generates `dist/package.json` with artifact-owned Pi package metadata and an npm `files` whitelist.
-5. Materializes Pi internal runtime assets under `dist/dist/modes` and `dist/dist/core` so npm-packed installs do not depend on symlinks.
-6. Copies skill helper executables into packaged skill script directories.
+When command output changes, build first and smoke-test the workspace bins:
 
-Dependency installation does not build or assemble artifacts. Run `bun run prepare:distribution` explicitly when generated artifacts are needed.
-
-## Repository root as neutral Pi surface
-
-The repository root is intentionally still an installable neutral Pi package surface. Root `package.json` keeps its `pi` manifest routed through provider/package-owned paths:
-
-- `plugins/pi/extensions`
-- `packages/resources/skills/...`
-- `packages/resources/prompts`
-- `packages/resources/themes`
-
-Sandpiper runtime branding lives in root `piConfig` and the `sandpiper` bin. Vanilla Pi resource loading is covered by the root Pi package smoke test and must not load Sandpiper identity, system-prompt, migration, diagnostics, or update behavior.
-
-Root assembly retirement removed top-level implementation ownership; it did not remove the root package's routing and branding role.
-
-## Generated `dist/` package
-
-`dist/` is the generated Sandpiper Pi/npm package assembly. It is not source and is not a dependency manager.
-
-`dist/` contains:
-
-- extension source trees
-- skills, prompts, and themes copied from `packages/resources/`
-- public documentation copied from top-level `docs/`
-- package-owned binaries
-- `dist/package.json` with `pi` resource paths and the `sandpiper` bin
-
-`dist/` does not contain:
-
-- `.sandpiper/` operational state, tasks, reviews, internal playbooks, or active specs
-- `node_modules/`
-- bundled extension runtime output
-- nested generated package artifacts such as `claude-plugin` or standalone packages
-
-Runtime npm dependencies resolve from the workspace install. Pi internals look for assets under `<PI_PACKAGE_DIR>/dist/*`, so the generated package materializes Pi's `modes/` and `core/` assets under `dist/dist/` before packing.
-
-## Standalone app bundle
-
-`bun run build:standalone-app` writes `dist/standalone-sandpiper/` with:
-
-- a compiled `sandpiper` executable
-- Sandpiper sidecar package metadata
-- bundled resources, support packages, and public docs
-- Pi internal assets
-
-The standalone assembler bundles `css-tree` JSON/package metadata through a Bun build plugin and leaves optional `canvas` external so jsdom can treat it as unavailable instead of requiring a native sidecar.
-
-At startup the compiled executable registers Pi's Bun OAuth flows and Bedrock provider (`packages/cli/compiled_runtime_setup.ts`), as Pi's own Bun binary does. Codemode does not work in the compiled app: it needs Pi's embedded QuickJS wasm path, which Pi does not export.
-
-## Claude Code plugin artifact
-
-`bun run build:claude-plugin` writes `dist/claude-plugin/` with:
-
-- Claude plugin metadata
-- copied skills, commands, and themes
-- materialized helper CLIs
-- hook configuration
-- bundled `hooks/autotoon-post-tool-use.js`
-- npm package metadata for `sandpiper-claude-code-plugin`
-
-The plugin package is intentionally self-contained because marketplace-installed Claude plugins are copied into Claude's plugin cache. The plugin manifest does not include Sandpiper `piConfig` or Pi package metadata; Claude-specific hook glue lives in `packages/adapter-claude-code/` and adapts host-neutral capability code.
-
-The repository root also contains `.claude-plugin/marketplace.json`, which validates as a Claude marketplace and points marketplace installs at the npm plugin package.
-
-## Supported install roots
-
-| Ecosystem path                                      | Source root                                                  | Invariant                                                                                                                      |
-| --------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| Source workspace clone                              | Repository root                                              | Root `package.json` is npm-installable, local workspace deps use root-only `workspace:*`, registry specs are exact, and Pi package routing points only at provider/package-owned paths |
-| `pi install npm:sandpiper-ai` / `pi install <dist>` | Published/local package built from `dist/`                   | `dist/package.json` owns Sandpiper `piConfig`, Sandpiper `pi` paths, npm-compatible runtime deps, and `file:` support packages |
-| Neutral Pi local install surface                    | Repository root                                              | Root `pi` routes through neutral adapters/resources and does not load Sandpiper identity hooks                                 |
-| Claude plugin marketplace/npm install               | `.claude-plugin/marketplace.json` plus `dist/claude-plugin/` | Claude marketplace and plugin manifests validate, and plugin package metadata has author/repository/license and no `private`   |
+```sh
+bun run build
+./node_modules/.bin/sandpiper --help
+./node_modules/.bin/sandpiper-system-prompt --help
+packages/resources/skills/sandpiper/tasks/scripts/trail --help
+packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup --help
+```
 
 ## Related docs
 

@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
@@ -22,24 +21,17 @@ export interface SandpiperResourcePaths {
   readonly themePaths: readonly string[];
 }
 
-function resolveResourceTypeRoot(resourceRoot: string, resourceType: 'skills' | 'prompts' | 'themes'): string {
-  const packagedRoot = join(resourceRoot, resourceType);
-  return existsSync(packagedRoot) ? packagedRoot : join(resourceRoot, 'packages', 'resources', resourceType);
-}
-
 function inlineExtension(name: string, factory: ExtensionFactory): InlineExtension {
   return { name, factory };
 }
 
 export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperResourcePaths {
-  const skillsRoot = resolveResourceTypeRoot(resourceRoot, 'skills');
-  const promptsRoot = resolveResourceTypeRoot(resourceRoot, 'prompts');
-  const themesRoot = resolveResourceTypeRoot(resourceRoot, 'themes');
+  const resourcesRoot = join(resourceRoot, 'packages', 'resources');
 
   return {
-    skillPaths: [join(skillsRoot, 'sandpiper'), join(skillsRoot, 'third-party')],
-    promptPaths: [promptsRoot],
-    themePaths: [themesRoot],
+    skillPaths: [join(resourcesRoot, 'skills', 'sandpiper'), join(resourcesRoot, 'skills', 'third-party')],
+    promptPaths: [join(resourcesRoot, 'prompts')],
+    themePaths: [join(resourcesRoot, 'themes')],
   };
 }
 

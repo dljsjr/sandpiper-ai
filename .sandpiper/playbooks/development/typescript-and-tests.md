@@ -31,7 +31,6 @@ read_when: writing TypeScript, changing tests, running checks, verification, lin
 | Safe auto-fix     | `bun check --write`                                              |
 | Focused Vitest    | `bun run test:vitest -- <testpath>`                              |
 | Full suite        | `bun run test`                                                   |
-| Distribution gate | `rm -rf dist && bun run test:distribution`                       |
 | Structural rules  | `bun check:ast-grep`                                             |
 
 `bun check` output must be clean: zero errors and zero warnings. Use targeted tests while developing, then run the appropriate gate for the touched area.

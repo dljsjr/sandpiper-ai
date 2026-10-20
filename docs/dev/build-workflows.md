@@ -1,142 +1,89 @@
 # How to build and verify Sandpiper changes
 
-Use this guide to choose the right build or verification command after changing Sandpiper source files.
-
-For the build pipeline and generated artifact layout, see [Build system reference](build-system.md).
+Use this guide to select the build and verification commands for a change. For the pipeline and output layout, see [Build system reference](build-system.md).
 
 ## Choose the command
 
-| You changed...                                                          | Run                                                                                              |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Extension source under `extensions/` or `plugins/pi/extensions/`        | `bun run prepare:distribution`                                                                   |
-| Skills, prompts, themes, or other resources under `packages/resources/` | `bun run prepare:distribution`                                                                   |
-| `packages/core/`                                                        | `bun run prepare:distribution`                                                                   |
-| `packages/cli/`                                                         | `bun run prepare:distribution`                                                                   |
-| `packages/trail/` (`@sandpiper-ai/trail`)                 | `bun run prepare:distribution`                                                                   |
-| `packages/sandpiper-standup-cli/`                                       | `bun run prepare:distribution`                                                                   |
-| `packages/adapter-claude-code/`                                         | `bun --filter sandpiper-adapter-claude-code build` then `bun run build:claude-plugin`            |
-| Build system or package metadata                                        | `bun run prepare:distribution`, targeted tests, and the distribution gate before claiming health |
+| You changed | Build command |
+| --- | --- |
+| Extension source under `extensions/` | No build; Sandpiper loads the TypeScript source |
+| Skills, prompts, themes, or other files under `packages/resources/` | No build |
+| `packages/core/` | `bun --filter sandpiper-ai-core build` |
+| `packages/cli/` | `bun run build:standalone` |
+| `packages/trail/` | `bun run build` so the task skill receives the new executable |
+| `packages/sandpiper-standup-cli/` | `bun run build` so the standup skill receives the new executable |
+| Root build scripts, package metadata, or several packages | `bun run build` |
 
 ## Run tests while developing
 
-Use focused Vitest runs for fast feedback:
+Run the smallest relevant Vitest suite first:
 
-```bash
+```sh
 bun run test:vitest -- <testpath>
 ```
 
-Use the full Vitest gate when you need repository-wide confidence:
+Run both repository gates before completion:
 
-```bash
+```sh
+bun check
 bun run test
 ```
 
-Do not use bare `bun test` as the repository health gate; it invokes Bun's test runner, not the Vitest suite configured for this repo.
+Do not use bare `bun test` as the repository gate. It invokes Bun's test runner instead of the configured Vitest suite.
 
-## Certify distribution health
+## Build all local output
 
-Before claiming distribution health, remove the old generated artifact and run the full distribution gate:
-
-```bash
-rm -rf dist && bun run test:distribution
+```sh
+bun run build
 ```
 
-This prepares generated artifacts and runs distribution invariant tests, standalone runtime checks, standalone app-bundle checks, and Claude plugin checks.
+This command builds core declarations, the Sandpiper runtime, Trail, and the standup helper. It then refreshes the helper executable copies in the task and standup skills.
 
-## Rebuild after extension changes
+Use this narrower command when only the Sandpiper runtime changed:
 
-Extensions load from source TypeScript through Pi's jiti runtime. They do not need an extension package build, but generated artifacts need to be reassembled:
-
-```bash
-bun run prepare:distribution
-```
-
-## Rebuild after package changes
-
-Packages that emit binaries or declarations need package builds first. `prepare:distribution` runs the Turborepo-backed package build graph and then assembles generated artifacts:
-
-```bash
-bun run prepare:distribution
-```
-
-`build:packages` runs the distributable package build graph through Turbo and caches package-local `dist/` outputs when you only need package builds.
-
-## Rebuild shared resources
-
-Skills, prompts, themes, and shared resource files are copied into generated artifacts:
-
-```bash
-bun run prepare:distribution
-```
-
-## Smoke-test generated entrypoints
-
-Standalone dogfood binary:
-
-```bash
+```sh
 bun run build:standalone
+```
+
+## Smoke-test built commands
+
+```sh
 ./node_modules/.bin/sandpiper --help
+./node_modules/.bin/sandpiper-system-prompt --help
+packages/resources/skills/sandpiper/tasks/scripts/trail --help
+packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup --help
 ```
 
-Standalone app bundle:
-
-```bash
-bun run build:standalone-app
-bun run test:standalone-app
-./dist/standalone-sandpiper/sandpiper --help
-```
-
-Claude Code plugin artifact:
-
-```bash
-bun run build:claude-plugin
-bun run test:claude-plugin
-```
-
-## Check ecosystem install metadata
-
-Use npm dry-run installs to verify package metadata without running lifecycle scripts:
-
-```bash
-bun run prepare:distribution
-npm install --ignore-scripts --package-lock=false --dry-run
-npm install --ignore-scripts --package-lock=false --dry-run --prefix dist
-```
-
-Validate Claude plugin manifests after building the plugin artifact:
-
-```bash
-bun run build:claude-plugin
-claude plugin validate .
-claude plugin validate dist/claude-plugin
-```
+These commands exercise the same workspace paths used for local development.
 
 ## Repair common problems
 
-### Extension not found after changes
+### Sandpiper has not been built
 
-Run distribution assembly again:
+Run:
 
-```bash
-bun run prepare:distribution
+```sh
+bun run build
 ```
 
-Extension source trees must be copied into generated artifacts for `pi.extensions` entries to resolve.
+The package bin shims require `packages/cli/dist/standalone/` output.
 
-### Module not found for an npm dependency
+### A helper skill uses old behavior
 
-Run a workspace install from the repository root:
+Rebuild the workspace:
 
-```bash
+```sh
+bun run build
+```
+
+This rebuilds Trail and standup before it copies their executables into the skill directories.
+
+### A dependency cannot be resolved
+
+Install dependencies from the repository root:
+
+```sh
 bun install
 ```
 
-Extensions resolve dependencies from the hoisted root `node_modules/`, not from per-extension directories.
-
-### Binary not updated after package changes
-
-Build the package first, then reassemble generated artifacts:
-
-```bash
-bun run prepare:distribution
-```
+Extensions resolve dependencies from the hoisted root `node_modules/` directory.

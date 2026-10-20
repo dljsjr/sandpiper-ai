@@ -1,6 +1,6 @@
 # AutoTOON Capability
 
-Package-first source for AutoTOON.
+Shared AutoTOON implementation for the Sandpiper runtime.
 
 ## Modules
 
@@ -9,7 +9,7 @@ Package-first source for AutoTOON.
 | `src/core.ts` | Host-neutral JSON→TOON transform constants and `tryConvertJsonToToon(...)`. No Pi imports. |
 | `src/pi-extension.ts` | Pi adapter that registers the `tool_result` hook and applies the core transform to text blocks. |
 
-`extensions/autotoon/autotoon.ts` is a compatibility bridge for the legacy root Pi package path.
+`extensions/autotoon/autotoon.ts` is the Pi extension entrypoint.
 
 ## Commands
 

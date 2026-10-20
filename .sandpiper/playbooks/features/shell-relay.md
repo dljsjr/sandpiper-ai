@@ -13,7 +13,6 @@ Read this before changing the Shell Relay extension, shell integration scripts, 
 - Keep Pi-specific wiring in `index.ts` and registration/runtime modules under `src/tools/`, `src/commands/`, and `src/runtime.ts`.
 - Shell integration scripts live in `extensions/shell-relay/shell-integration/`.
 - The extension loads from `src/index.ts` through the package-local `pi.extensions` entry.
-- `assembleDistribution.ts` copies the source tree and assets into generated artifacts; do not edit generated copies.
 
 ## Module Map
 

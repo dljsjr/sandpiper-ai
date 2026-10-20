@@ -8,9 +8,10 @@ Thanks for working on Sandpiper. This guide covers the local development workflo
 git clone https://github.com/dljsjr/sandpiper-ai.git
 cd sandpiper-ai
 bun install
+bun run build
 ```
 
-Sandpiper uses Bun for package management and scripts. Run workspace installs from the repository root.
+Sandpiper uses Bun for package management and scripts. Run workspace installs from the repository root. Installation does not build generated output.
 
 ## Development checks
 
@@ -22,11 +23,6 @@ bun run test:vitest -- <testpath> # Focused Vitest run
 bun run test                      # Full Vitest gate
 ```
 
-Before claiming distribution health, run the clean distribution gate:
-
-```bash
-rm -rf dist && bun run test:distribution
-```
 
 Do not use bare `bun test` as the repository health gate; it invokes Bun's test runner, not the Vitest suite configured for this repo.
 
@@ -39,11 +35,10 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 | Path                  | Purpose                                                                        |
 | --------------------- | ------------------------------------------------------------------------------ |
 | `docs/`               | Public Sandpiper documentation                                                 |
-| `packages/`           | Workspace packages that are built and distributed                              |
+| `packages/`           | Workspace packages and package-owned build output                              |
 | `extensions/`         | Sandpiper Pi extensions and compatibility entrypoints                          |
-| `plugins/pi/`         | Neutral Pi package adapter surface                                             |
 | `packages/resources/` | Shared skills, prompts, and themes                                             |
-| `devtools/`           | Development-only build and distribution tooling                                |
+| `devtools/`           | Development-only build and project tooling                                     |
 | `.sandpiper/`         | Project-local agent state, tasks, playbooks, active specs, notes, and archives |
 
 ## Useful docs

@@ -14,7 +14,7 @@ resources/
     └── third-party/     # Vendored on-demand skills
 ```
 
-Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills are shipped in generated artifacts but are intentionally omitted from `pi.skills` manifests and `resources_discover` skill paths.
+Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills remain in the workspace but are intentionally omitted from `resources_discover` skill paths.
 
 ## Hot First-Party Skills
 
@@ -31,7 +31,7 @@ Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills are s
 
 ## On-Demand Skills
 
-These skills are useful enough to distribute, but too niche or too expensive to keep in the hot catalogue by default.
+These skills are useful but too niche or too expensive to keep in the hot catalogue by default.
 
 | Skill           | Location                           | Description                                                                  |
 | --------------- | ---------------------------------- | ---------------------------------------------------------------------------- |
@@ -48,7 +48,7 @@ At runtime, hot skills are listed in the agent's available-skills catalogue. The
 
 When a hot skill matches the user's request, acquired context, or the action the agent is about to take, the agent should load the skill before continuing. In Sandpiper, use the `skill` tool with the exact catalogue name. In a harness without a skill-loading tool, read the matching `SKILL.md` from the catalogue location instead.
 
-On-demand skills are not advertised in the runtime catalogue. They remain filesystem-loadable from the distribution tree for explicit, intentional use.
+On-demand skills are not advertised in the runtime catalogue. They remain filesystem-loadable from the workspace for explicit, intentional use.
 
 ## Convention
 
@@ -58,8 +58,8 @@ Each skill is a directory containing:
 - `scripts/` — optional companion scripts (CLIs, helpers)
 - `references/` — optional reference docs (specs, cheat sheets)
 
-Hot skills are auto-discovered by pi from directories listed in the root `package.json` under the `pi.skills` key and from Sandpiper resource discovery. On-demand skills are copied by distribution assembly but omitted from those manifests.
+The Sandpiper runtime exposes hot skills through explicit resource discovery. On-demand skills are omitted from that discovery path.
 
-## Vendoring
+## Third-party snapshots
 
-Third-party skills are listed in `vendor.txt` and downloaded via `bun run vendor`. They should not be edited directly — changes will be overwritten on the next vendor run.
+Third-party skills are checked-in snapshots. Keep their source attribution and license files with the snapshot. There is no automatic updater.

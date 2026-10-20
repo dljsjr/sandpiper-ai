@@ -8,7 +8,6 @@ import {
   mirrorPiSandpiperEnvironment,
   prepareStandalonePackageDir,
   resolveStandalonePaths,
-  type StandalonePaths,
 } from './standalone_bootstrap.js';
 
 interface PiMetadata {
@@ -16,17 +15,7 @@ interface PiMetadata {
   readonly version: string;
 }
 
-function resolvePiMetadata(standalonePaths: StandalonePaths): PiMetadata {
-  if (standalonePaths.packageDirSource === 'app-bundle') {
-    const packageJson = JSON.parse(readFileSync(join(standalonePaths.packageDir, 'package.json'), 'utf-8')) as {
-      piCodingAgentVersion?: string;
-    };
-    if (packageJson.piCodingAgentVersion === undefined) {
-      throw new Error('Standalone app package.json is missing piCodingAgentVersion');
-    }
-    return { packageDir: standalonePaths.packageDir, version: packageJson.piCodingAgentVersion };
-  }
-
+function resolvePiMetadata(): PiMetadata {
   const piDistDir = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
   const piPackageDir = dirname(piDistDir);
   const packageJson = JSON.parse(readFileSync(join(piPackageDir, 'package.json'), 'utf-8')) as {
@@ -94,10 +83,9 @@ if (args.includes('--help') || args.includes('-h')) {
     const scriptDir = dirname(fileURLToPath(import.meta.url));
     const standalonePaths = resolveStandalonePaths({
       startDir: scriptDir,
-      executablePath: process.execPath,
       env: process.env,
     });
-    const piMetadata = resolvePiMetadata(standalonePaths);
+    const piMetadata = resolvePiMetadata();
 
     if (standalonePaths.packageDirSource === 'generated') {
       prepareStandalonePackageDir({

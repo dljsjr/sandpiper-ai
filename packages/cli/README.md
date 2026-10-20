@@ -13,15 +13,13 @@ Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlog
 
 This path does not install Sandpiper into Pi to load its own behavior.
 
-The runtime intentionally writes `using pi-coding-agent version: <version>` to stdout before delegating to Pi. This makes the embedded Pi version visible in every Sandpiper launch and is asserted by CLI smoke tests.
+Set `SANDPIPER_PRINT_PI_VERSION=1` to write the active Pi version to stderr before Sandpiper starts.
 
 ## Build
 
 ```bash
-bun run build            # tsc + build sandpiper runtime bundles
-bun run build:sandpiper     # build packages/cli/dist/sandpiper
-bun run build:system-prompt # build packages/cli/dist/sandpiper-system-prompt
-bun run build:standalone    # build importable bundles for both workspace bin shims
+bun run build             # Build all required workspace output and skill helpers
+bun run build:standalone  # Build the two CLI entrypoints and shared chunks
 ```
 
 Builds are explicit; dependency installation does not build runtime bundles.
@@ -35,7 +33,7 @@ Use explicit package scripts or paths when testing. The user's `$PATH` may conta
 bun run sandpiper-dev -- --help
 
 # Build and run the normal runtime bundle
-bun run build:sandpiper-cli
+bun run build:standalone
 bun run sandpiper-built -- --help
 
 # Workspace-linked bin after bun install
@@ -45,17 +43,7 @@ bun run sandpiper-built -- --help
 bun run test:standalone
 ```
 
-The standalone app bundle is built separately:
-
-```bash
-bun run build:standalone-app
-bun run test:standalone-app
-./dist/standalone-sandpiper/sandpiper --help
-```
-
-`build:standalone-app` writes `dist/standalone-sandpiper/` with a compiled `sandpiper` executable, Sandpiper sidecar `package.json`, copied resources/support packages, and Pi internal assets. Its Bun build plugin bundles `css-tree`'s JSON/package metadata into the executable; `canvas` remains external so jsdom treats it as unavailable instead of requiring a native sidecar.
-
-Packaged runtime bundles use the prebuilt package root when the installed package contains `sandpiper`, `docs/`, and Pi runtime assets under `dist/modes` and `dist/core`. Source-mode entrypoints can still generate a lightweight package-metadata sidecar under `dist/standalone-package/` when no prebuilt package layout exists. The compiled app bundle resolves package metadata and resources relative to `dirname(process.execPath)`, so it does not need `SANDPIPER_STANDALONE_RESOURCE_ROOT` or `SANDPIPER_STANDALONE_PACKAGE_DIR` in normal use. All modes preserve Sandpiper branding/config defaults without loading the legacy root Pi manifest a second time. Built-in Sandpiper extensions/resources come from explicit extension factories and `resources_discover`; source mode can still defer to a configured legacy Sandpiper package to avoid duplicate resources while package-management commands operate on normal Sandpiper global/project settings files.
+The source and built entrypoints both use the repository as the resource root. They can create a lightweight package-metadata sidecar under `dist/standalone-package/`. Built-in Sandpiper extensions and resources come from explicit extension factories and `resources_discover`.
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
@@ -96,6 +84,6 @@ birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux
 | `bin/sandpiper-system-prompt` | Stable workspace bin shim for the system prompt diagnostic |
 | `deferred_pi_import.ts` | Load-order shim so Sandpiper imports Pi only after package metadata env vars are set |
 
-## Pi Asset Resolution
+## Pi asset resolution
 
-Pi expects themes, export templates, and other assets relative to its package directory. The Sandpiper runtime configures `PI_PACKAGE_DIR` before importing Pi, and distribution assembly materializes Pi's internal `modes/` and `core/` directories under the generated package's `dist/` directory.
+Pi expects its own templates and other assets relative to the installed coding-agent package. The Sandpiper runtime sets `PI_CODING_AGENT_PACKAGE` before importing Pi and uses the lightweight Sandpiper sidecar for `PI_PACKAGE_DIR`.

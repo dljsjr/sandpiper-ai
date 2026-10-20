@@ -2,7 +2,7 @@
 
 A powerful pair programming coding agent built on [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Sandpiper wraps pi with opinionated extensions, skills, and customizations that create a deeply integrated development companion — one that can see your terminal, manage your tasks, and maintain context across sessions.
 
-Sandpiper is a package-first monorepo with multiple install surfaces: the normal `sandpiper` runtime, a neutral Pi package surface, and a Claude Code plugin artifact. The repository root is a router/workspace package; implementation resources live under `packages/` and provider-specific adapter directories.
+Sandpiper runs from this Bun workspace. The repository builds the local `sandpiper` runtime, its system-prompt diagnostic, and the helper executables used by the task and standup skills.
 
 ## What Sandpiper Adds
 
@@ -21,21 +21,14 @@ On top of pi's core functionality, Sandpiper provides:
 
 ## Quick Start
 
-Sandpiper requires [pi](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent) and [bun](https://bun.sh) to be installed first.
-
-Install pi globally:
-
-```bash
-npm install -g @earendil-works/pi-coding-agent
-```
-
-Then clone and set up sandpiper:
+Sandpiper requires [Bun](https://bun.sh). Clone and set up the workspace:
 
 ```bash
 git clone https://github.com/dljsjr/sandpiper-ai.git
 cd sandpiper-ai
-bun install          # Install deps + build workspace packages
-bun sandpiper        # Launch sandpiper (interactive mode)
+bun install          # Install dependencies only
+bun run build        # Build the runtime and local helpers
+bun sandpiper        # Launch Sandpiper in interactive mode
 ```
 
 > **Note:** `bun install` may need to run twice on a clean checkout due to a [known issue with workspace bin linking](https://github.com/oven-sh/bun/issues/19782). This is a bun behavior, not a sandpiper bug.
@@ -66,27 +59,24 @@ sandpiper-ai/
 ├── extensions/          # Pi extension packages and compatibility entrypoints
 │   ├── system/          # Sandpiper identity + system capabilities
 │   └── shell-relay/     # Shared terminal via Zellij
-├── packages/            # Workspace packages (built + distributed)
+├── packages/            # Workspace packages and package-owned output
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
 │   ├── resources/       # Shared skills, prompts, and themes
-│   ├── trail/  # Trail task management CLI
+│   ├── trail/           # Trail task management CLI
 │   ├── sandpiper-standup-cli/ # Standup/session-continuity CLI
 │   └── core/            # Shared utilities
-├── plugins/             # Provider install surfaces
-│   └── pi/              # Neutral Pi package adapters
 ├── ast-grep/            # Structural code analysis rules
-├── devtools/            # Build scripts (not distributed)
-└── dist/                # Distribution output (generated)
+└── devtools/            # Build and project utilities
 ```
 
 ## Building
 
-`bun install` installs dependencies only. Build and distribution artifacts are explicit:
+`bun install` installs dependencies only. `bun run build` builds the workspace runtime and helper executables:
 
 ```bash
-bun run build:packages        # Build distributable package outputs through Turbo
-bun run build                 # Build the sandpiper CLI package through Turbo
-bun run prepare:distribution  # Assemble the generated dist/ package
+bun run build             # Build all required workspace output
+bun run build:standalone  # Build only sandpiper and sandpiper-system-prompt
+bun run build:packages    # Build package-owned output through Turbo
 ```
 
 ## Development
@@ -94,9 +84,8 @@ bun run prepare:distribution  # Assemble the generated dist/ package
 ```bash
 bun check                         # Dependency policy + type-check + lint
 bun run check:deps                # Syncpack dependency version policy
-bun run test                      # Full Vitest gate; prepares dist and unsets PI_PACKAGE_DIR
-bun run test:vitest -- <testpath> # Focused Vitest run without distribution prep
-bun run test:distribution         # Package/distribution smoke gate
+bun run test                      # Full Vitest gate; unsets PI_PACKAGE_DIR
+bun run test:vitest -- <testpath> # Focused Vitest run
 bun check --write                 # Auto-fix formatting
 bun check:ast-grep                # Structural code analysis
 bun run clean                     # Remove node_modules, dist, caches

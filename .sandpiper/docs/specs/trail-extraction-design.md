@@ -8,9 +8,9 @@ Trail's implemented runtime contract now lives in its own documentation. This re
 
 The extraction survey found no code imports between Trail and the rest of Sandpiper. Trail's five dependencies were third-party packages: `commander`, `@commander-js/extra-typings`, `@toon-format/toon`, `diff`, and `yaml`.
 
-The coupling came from sixteen path literals for `.sandpiper/tasks`, legacy configuration filenames, build filters, distribution assembly, and documentation. Extracting Trail required a project-root configuration boundary rather than library dependency changes.
+The original coupling came from sixteen path literals for `.sandpiper/tasks`, legacy configuration filenames, build filters, the former release packaging, and documentation. Extracting Trail required a project-root configuration boundary rather than library dependency changes.
 
-The executable was already a portable Node.js bundle. Sandpiper consumed a built file during assembly, not Trail as an imported library. This made distribution ownership distinct from module resolution.
+The executable was already a portable Node.js bundle. Sandpiper now builds it from `packages/trail/` and copies it directly into the local tasks skill.
 
 Earlier TCL-69 work renamed the public interface but retained the old layout internally. The later standalone work introduced Trail's configuration candidates, exact version matching, configurable task paths, and initialization flags.
 
@@ -37,24 +37,15 @@ This separates adoption from physical relocation. It also keeps knowledge of San
 
 The migration tool must be available before or with consumer cutover. Updating the consumer first leaves existing boards inaccessible to the new configuration reader.
 
-## Skill distribution
+## Local skill helper
 
-A skill directory can be installed without the surrounding repository. Removing duplicate authored product docs does not remove its need for local reference files.
+Sandpiper retains the legacy Trail package for its workspace runtime. `bun run build` builds `packages/trail/dist/trail`, then copies it to `packages/resources/skills/sandpiper/tasks/scripts/trail`.
 
-Doug approved single-source authoring with skill-local copies during assembly. The [skill assembly contract](trail-skill-assembly.md) requires documentation that matches the executable's source revision. It does not select how the executable is installed.
+The skill's local references describe that legacy executable. They are not the source for new standalone Trail behavior.
 
-Until that assembly and consumer change, the legacy package docs and installed skill references remain local to their current bundle. They are not the source for new standalone behavior.
+## Future consumer changes
 
-## Consumer method remains deferred
-
-Doug deferred the consumption decision on 2026-10-06. The original ranking remains a recommendation, not approval:
-
-1. Pinned vendoring fits a build-artifact dependency. The existing vendor tooling supports similar skill and executable assets.
-2. A Git dependency conflicts with the current package-policy gate and needs assembly to locate the executable and skill assets.
-3. A `file:` dependency fits the current policy but depends on a local path.
-4. A submodule adds jj workflow constraints. Its support requires investigation before adoption.
-
-No recommendation authorizes publishing, pushing, or a consumer cutover. The documentation assembly boundary applies whichever consumer method is selected.
+The current delivery topology does not publish, vendor, or install Trail from its standalone repository. A future consumer cutover requires a separate design and task. It must change the executable and matching task-skill documentation together.
 
 ## Board relocation
 

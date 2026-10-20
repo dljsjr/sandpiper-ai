@@ -6,7 +6,6 @@ import {
   configurePiEnvironment,
   defaultStandaloneMainArgs,
   findPackageRoot,
-  hasConfiguredSandpiperPackage,
   mirrorPiSandpiperEnvironment,
   prepareStandalonePackageDir,
   resolveStandalonePaths,
@@ -45,61 +44,6 @@ describe('standalone bootstrap', () => {
       expect(paths.resourceRoot).toBe(resourceRoot);
       expect(paths.packageDir).toBe(packageDir);
       expect(paths.packageDirSource).toBe('override');
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('resolves package metadata to the executable directory for compiled app bundles', () => {
-    const paths = resolveStandalonePaths({
-      startDir: '/$bunfs/root',
-      executablePath: '/tmp/sandpiper-app/sandpiper',
-      env: {},
-    });
-
-    expect(paths.resourceRoot).toBe('/tmp/sandpiper-app');
-    expect(paths.packageDir).toBe('/tmp/sandpiper-app');
-    expect(paths.packageDirSource).toBe('app-bundle');
-  });
-
-  it('detects app bundles from sidecar package metadata without Bun virtual filesystem paths', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
-    try {
-      const appDir = join(dir, 'app');
-      mkdirSync(appDir, { recursive: true });
-      writeFileSync(join(appDir, 'package.json'), JSON.stringify({ piCodingAgentVersion: '0.74.0' }));
-
-      const paths = resolveStandalonePaths({
-        startDir: '/future-bunfs/root',
-        executablePath: join(appDir, 'sandpiper'),
-        env: {},
-      });
-
-      expect(paths.resourceRoot).toBe(appDir);
-      expect(paths.packageDir).toBe(appDir);
-      expect(paths.packageDirSource).toBe('app-bundle');
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('uses a prebuilt package root when the packaged runtime asset layout is present', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
-    try {
-      writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
-      writeFileSync(join(dir, 'sandpiper'), '#!/usr/bin/env bun\n');
-      mkdirSync(join(dir, 'docs'), { recursive: true });
-      mkdirSync(join(dir, 'dist', 'modes'), { recursive: true });
-      mkdirSync(join(dir, 'dist', 'core'), { recursive: true });
-
-      const paths = resolveStandalonePaths({
-        startDir: dir,
-        env: {},
-      });
-
-      expect(paths.resourceRoot).toBe(dir);
-      expect(paths.packageDir).toBe(dir);
-      expect(paths.packageDirSource).toBe('prebuilt-package');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -173,55 +117,6 @@ describe('standalone bootstrap', () => {
       '/tmp/skill',
     ]);
     expect(defaultStandaloneMainArgs(['install', 'npm:@example/pkg'], {})).toEqual(['install', 'npm:@example/pkg']);
-  });
-
-  it('detects an installed Sandpiper package in settings', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
-    try {
-      const resourceRoot = join(dir, 'sandpiper-ai');
-      const distRoot = join(resourceRoot, 'dist');
-      const agentDir = join(dir, 'agent');
-      mkdirSync(distRoot, { recursive: true });
-      mkdirSync(agentDir, { recursive: true });
-      writeFileSync(join(resourceRoot, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
-      writeFileSync(join(distRoot, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
-      writeFileSync(join(agentDir, 'settings.json'), JSON.stringify({ packages: [join(resourceRoot, 'dist')] }));
-
-      expect(
-        hasConfiguredSandpiperPackage({
-          resourceRoot,
-          cwd: dir,
-          env: { SANDPIPER_CODING_AGENT_DIR: agentDir },
-        }),
-      ).toBe(true);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('ignores unrelated installed packages in settings', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
-    try {
-      const resourceRoot = join(dir, 'sandpiper-ai');
-      const packageRoot = join(dir, 'third-party');
-      const agentDir = join(dir, 'agent');
-      mkdirSync(resourceRoot, { recursive: true });
-      mkdirSync(packageRoot, { recursive: true });
-      mkdirSync(agentDir, { recursive: true });
-      writeFileSync(join(resourceRoot, 'package.json'), JSON.stringify({ name: 'sandpiper-ai' }));
-      writeFileSync(join(packageRoot, 'package.json'), JSON.stringify({ name: 'third-party-pi-package' }));
-      writeFileSync(join(agentDir, 'settings.json'), JSON.stringify({ packages: [packageRoot] }));
-
-      expect(
-        hasConfiguredSandpiperPackage({
-          resourceRoot,
-          cwd: dir,
-          env: { SANDPIPER_CODING_AGENT_DIR: agentDir },
-        }),
-      ).toBe(false);
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
   });
 
   it('sets Pi environment before importing Pi', () => {

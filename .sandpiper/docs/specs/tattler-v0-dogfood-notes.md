@@ -2,19 +2,16 @@
 
 These notes are the curated active summary for the Tattler v0 validation spike.
 The chronological session notes in
-`tattler-v0-dogfood-session-2026-05-19.md` are source material; when the two
-files overlap, prefer this document for current guidance.
+`../../archive/tattler-v0-dogfood-session-2026-05-19.md` are source material;
+when the two files overlap, prefer this document for current guidance.
 
 ## Current Tattler v0 Direction
 
 - Build v0 as the smallest useful validation slice, not the full Tattler MVP.
-- Implement v0 directly as a single-file Pi/Sandpiper extension:
-  `plugins/pi/extensions/tattler.ts`.
-- Keep the file explicitly marked as disposable/upgradeable:
-  - Tattler v0 validation spike.
-  - Intentionally single-file and not a stable API.
-  - Do not extend into v1 architecture without extracting core/runtime
-    boundaries.
+- Keep the Pi entrypoint at `extensions/tattler/index.ts`.
+- Keep v0 explicitly marked as a validation spike, not a stable API.
+- Do not extend into v1 architecture without preserving the existing
+  core/runtime boundaries.
 - Validate live same-host agent messaging before building the durable v1 system:
   stable identity, handles, agent directory, claim locks, handshakes, receipt
   logs, schemas, package split, durable logs, or broadcast.

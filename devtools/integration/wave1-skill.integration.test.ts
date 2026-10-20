@@ -1,5 +1,4 @@
-// AGENT-253 wave-1 coverage: the `skill` tool (plugins/pi/extensions/skill-loading.ts),
-// isolated -- only this one extension loaded via entry:'pi' + --no-extensions, nothing else.
+// AGENT-253 wave-1 coverage: the workspace runtime's `skill` tool.
 // Real observable behavior asserted (not just exit code): the actual SKILL.md content for a
 // real skill in this repo's catalogue, delivered through a real RPC tool_execution_end event
 // for a real filesystem read pi's tool machinery performed.
@@ -17,10 +16,9 @@ import { startRpcSession } from './rpc-driver.js';
 
 const SMOKE_TIMEOUT_MS = 60_000;
 const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const SKILL_PATH = join(repoRoot, 'plugins', 'pi', 'extensions', 'skill-loading.ts');
 const JJ_SKILL_DIR = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'jj');
 
-describe('wave 1: skill tool, isolated (AGENT-253)', () => {
+describe('wave 1: workspace skill tool (AGENT-253)', () => {
   it(
     'loads a real skill file from the filesystem through the real skill tool, via a real RPC session',
     async () => {
@@ -34,8 +32,7 @@ describe('wave 1: skill tool, isolated (AGENT-253)', () => {
       ]);
 
       const session = startRpcSession({
-        entry: 'pi',
-        extraExtensions: [SKILL_PATH],
+        entry: 'sandpiper',
         env: { [MOCK_SCRIPT_ENV_VAR]: script },
         commandTimeoutMs: SMOKE_TIMEOUT_MS,
       });
@@ -82,8 +79,7 @@ describe('wave 1: skill tool, isolated (AGENT-253)', () => {
       ]);
 
       const session = startRpcSession({
-        entry: 'pi',
-        extraExtensions: [SKILL_PATH],
+        entry: 'sandpiper',
         env: { [MOCK_SCRIPT_ENV_VAR]: script },
         commandTimeoutMs: SMOKE_TIMEOUT_MS,
       });

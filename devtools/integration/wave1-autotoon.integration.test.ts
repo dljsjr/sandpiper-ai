@@ -1,4 +1,4 @@
-// AGENT-253 wave-1 coverage: autotoon (plugins/pi/extensions/autotoon.ts), isolated and
+// AGENT-253 wave-1 coverage: autotoon (extensions/autotoon/autotoon.ts), isolated and
 // combinatoric. Real observable behavior: the actual TOON_HEADER-prefixed, TOON-encoded text
 // autotoon's pi.on('tool_result', ...) hook produces, delivered through a real RPC
 // tool_execution_end event for a real tool_result pi's own hook pipeline transformed.
@@ -18,7 +18,7 @@ import { startRpcSession } from './rpc-driver.js';
 const SMOKE_TIMEOUT_MS = 60_000;
 const integrationDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = dirname(dirname(integrationDir));
-const AUTOTOON_PATH = join(repoRoot, 'plugins', 'pi', 'extensions', 'autotoon.ts');
+const AUTOTOON_PATH = join(repoRoot, 'extensions', 'autotoon', 'autotoon.ts');
 const PROBE_TOOL_PATH = join(integrationDir, 'probe-tool.ts');
 
 const TOON_HEADER = '[TOON]\n';

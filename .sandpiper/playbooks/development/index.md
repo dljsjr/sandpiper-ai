@@ -2,7 +2,7 @@
 
 | Working on...                                                                                            | Read                        |
 | -------------------------------------------------------------------------------------------------------- | --------------------------- |
-| Build scripts, package metadata, `dist/`, distribution assembly, standalone app, Claude plugin artifacts | `build-and-distribution.md` |
+| Build scripts, package metadata, package `dist/` output, workspace bins, skill helper assembly | `build.md` |
 | TypeScript, tests, linting, verification, code health rules                                              | `typescript-and-tests.md`   |
 | Environment variables, config paths, `PI_*` / `SANDPIPER_*` behavior                                     | `env-vars.md`               |
 | CLI tools, Commander commands, package `bin` entries, bundled executables                                | `cli.md`                    |

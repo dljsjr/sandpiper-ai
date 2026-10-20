@@ -9,9 +9,6 @@
     "url": "https://github.com/dljsjr/sandpiper-ai.git"
   },
   "private": true,
-  "keywords": [
-    "pi-package"
-  ],
   "bin": {
     "sandpiper": "./packages/cli/bin/sandpiper",
     "sandpiper-system-prompt": "./packages/cli/bin/sandpiper-system-prompt"
@@ -21,21 +18,6 @@
     "configDir": ".sandpiper",
     "bin": "sandpiper"
   },
-  "pi": {
-    "extensions": [
-      "./plugins/pi/extensions"
-    ],
-    "skills": [
-      "./packages/resources/skills/sandpiper",
-      "./packages/resources/skills/third-party"
-    ],
-    "prompts": [
-      "./packages/resources/prompts"
-    ],
-    "themes": [
-      "./packages/resources/themes"
-    ]
-  },
   "scripts": {
     "check:biome-fmt": "biome format",
     "check:biome-lint": "biome lint",
@@ -43,43 +25,35 @@
     "check:tsc": "tsc --noEmit",
     "check:ast-grep": "ast-grep scan",
     "check": "bun run check:deps && bun run check:tsc && bun run check:biome-check",
-    "test": "bun run prepare:distribution && bun run test:vitest",
+    "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/packages/trail/test-fixtures/jj-test-config.toml\" vitest run",
-    "test:standalone": "bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts",
-    "test:distribution": "bun run prepare:distribution && bun run test:vitest -- devtools/distribution-invariants.test.ts devtools/distribution-smoke.test.ts devtools/ecosystemPackage.test.ts devtools/npmPackageInstallSmoke.test.ts devtools/rootPiPackageSmoke.test.ts && bun run test:standalone && bun run test:standalone-app && bun run test:claude-plugin",
-    "test:standalone-app": "bun run test:vitest -- devtools/standaloneSandpiperApp.test.ts && bun run test:vitest -- devtools/standaloneSandpiperAppCompile.test.ts && bun run test:vitest -- devtools/standaloneSandpiperAppRuntime.test.ts",
-    "test:claude-plugin": "bun run prepare:distribution && bun --filter sandpiper-adapter-claude-code build && bun run test:vitest -- packages/adapter-claude-code/src/autotoon-post-tool-use.test.ts devtools/claudeCodePlugin.test.ts devtools/claudeCodePluginHookSmoke.test.ts",
-    "build:sandpiper-cli": "bun --filter sandpiper-ai-cli build:sandpiper",
-    "build:system-prompt-cli": "bun --filter sandpiper-ai-cli build:system-prompt",
-    "prepare:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts",
-    "build:standalone-app": "bun run --bun devtools/standaloneSandpiperApp.ts --compile",
-    "prepare:claude-plugin": "bun run prepare:distribution && bun --bun devtools/claudeCodePlugin.ts",
-    "build:claude-plugin": "bun run prepare:distribution && bun --bun devtools/claudeCodePlugin.ts --build",
-    "prepare:distribution": "bun run build:packages && bun --bun devtools/assembleDistribution.ts",
+    "test:standalone": "bun run build:standalone && bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts",
     "build:packages": "turbo run build --filter=sandpiper-ai-core --filter=sandpiper-standup-cli --filter=@sandpiper-ai/trail --filter=sandpiper-ai-cli",
-    "build": "turbo run build --filter=sandpiper-ai-cli",
-    "build:standalone": "bun --filter sandpiper-ai-cli build:standalone",
-    "vendor": "bun --bun devtools/vendor.ts",
+    "sync:skill-helpers": "bun --bun devtools/syncSkillHelpers.ts",
+    "build": "rm -rf dist && bun run build:packages && bun run sync:skill-helpers",
+    "build:standalone": "bun --filter sandpiper-ai-cli build",
     "clean": "bun devtools/clean.ts",
     "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
-    "sandpiper-built": "bun ./packages/cli/dist/sandpiper",
+    "sandpiper-built": "bun ./packages/cli/bin/sandpiper",
     "system-prompt-dev": "bun run --bun ./packages/cli/sandpiper_system_prompt.ts",
-    "system-prompt-built": "bun ./packages/cli/dist/sandpiper-system-prompt",
+    "system-prompt-built": "bun ./packages/cli/bin/sandpiper-system-prompt",
     "check:knip": "knip",
     "check:knip:production": "knip --production",
     "check:deps": "syncpack lint"
   },
   "workspaces": [
     "packages/*",
-    "extensions/*",
-    "plugins/pi/extensions"
+    "extensions/*"
   ],
   "dependencies": {
     "@sandpiper-ai/trail": "workspace:*",
     "better-sqlite3": "13.0.3",
     "sandpiper-ai-cli": "workspace:*",
     "sandpiper-ai-core": "workspace:*",
-    "sandpiper-standup-cli": "workspace:*"
+    "sandpiper-standup-cli": "workspace:*",
+    "sanitize-filename": "1.6.4",
+    "tmp": "0.2.7",
+    "uuid": "14.0.2"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "1.3.0",

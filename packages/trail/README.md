@@ -8,7 +8,7 @@ The standalone repository owns current product documentation under `docs/`. Its 
 
 The [local documentation](docs/README.md) remains with this package to describe its legacy runtime. Sandpiper's integration page is `docs/features/tasks/README.md` in the Sandpiper repository.
 
-The current tasks skill keeps its own local references so that it works without this repository. Sandpiper records the assembly contract in `.sandpiper/docs/specs/trail-skill-assembly.md`. That contract requires matching documentation copies for the eventual standalone consumer.
+The current tasks skill keeps local references that describe this executable. `bun run build` builds `packages/trail/dist/trail` and refreshes the skill's executable copy.
 
 ## Development
 
@@ -19,4 +19,4 @@ bun run build
 bun run test
 ```
 
-Consumer packaging and cutover remain deferred. This documentation change does not rebuild or replace Sandpiper's bundled executable.
+The root build copies the result to `packages/resources/skills/sandpiper/tasks/scripts/trail` for local skill use.

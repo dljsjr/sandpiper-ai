@@ -6,11 +6,9 @@ import { fileURLToPath } from 'node:url';
 import {
   configurePiEnvironment,
   defaultStandaloneMainArgs,
-  hasConfiguredSandpiperPackage,
   mirrorPiSandpiperEnvironment,
   prepareStandalonePackageDir,
   resolveStandalonePaths,
-  type StandalonePaths,
 } from './standalone_bootstrap.js';
 
 interface PiMetadata {
@@ -18,23 +16,7 @@ interface PiMetadata {
   readonly version: string;
 }
 
-interface StandaloneAppPackageJson {
-  readonly piCodingAgentVersion?: string;
-}
-
-function resolvePiMetadata(standalonePaths: StandalonePaths): PiMetadata {
-  if (standalonePaths.packageDirSource === 'app-bundle') {
-    const packageJson = JSON.parse(
-      readFileSync(join(standalonePaths.packageDir, 'package.json'), 'utf-8'),
-    ) as StandaloneAppPackageJson;
-
-    if (packageJson.piCodingAgentVersion === undefined) {
-      throw new Error('Standalone app package.json is missing piCodingAgentVersion');
-    }
-
-    return { packageDir: standalonePaths.packageDir, version: packageJson.piCodingAgentVersion };
-  }
-
+function resolvePiMetadata(): PiMetadata {
   const upstreamPiDistDir = dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent')));
   const upstreamPiPackageDir = dirname(upstreamPiDistDir);
   const piPackageJson = JSON.parse(readFileSync(join(upstreamPiPackageDir, 'package.json'), 'utf-8')) as {
@@ -54,10 +36,9 @@ process.env.AI_AGENT = 'sandpiper';
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const standalonePaths = resolveStandalonePaths({
   startDir: scriptDir,
-  executablePath: process.execPath,
   env: process.env,
 });
-const piMetadata = resolvePiMetadata(standalonePaths);
+const piMetadata = resolvePiMetadata();
 
 if (standalonePaths.packageDirSource === 'generated') {
   prepareStandalonePackageDir({
@@ -83,25 +64,10 @@ if (process.env.SANDPIPER_PRINT_PI_VERSION === '1') {
   console.error(`using pi-coding-agent version: ${piMetadata.version}\n`);
 }
 
-if (standalonePaths.packageDirSource === 'app-bundle') {
-  // Loaded only in the compiled app, so other runs do not pay for Bedrock's SDK at startup.
-  await import('./compiled_runtime_setup.js');
-}
-
 const { loadPiMain } = await import('./deferred_pi_import.js');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
 const main = await loadPiMain();
 
-const extensionFactories =
-  standalonePaths.packageDirSource !== 'app-bundle' &&
-  hasConfiguredSandpiperPackage({
-    resourceRoot: standalonePaths.resourceRoot,
-    cwd: process.cwd(),
-    env: process.env,
-  })
-    ? []
-    : createSandpiperExtensionFactories(standalonePaths.resourceRoot);
-
 await main(defaultStandaloneMainArgs(process.argv.slice(2), process.env), {
-  extensionFactories,
+  extensionFactories: createSandpiperExtensionFactories(standalonePaths.resourceRoot),
 });

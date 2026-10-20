@@ -76,13 +76,9 @@ describe('standalone Sandpiper CLI smoke', () => {
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-system-prompt'))).toBe(true);
     expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(false);
     expect(cliPackage.scripts).not.toHaveProperty('preinstall');
-    expect(cliPackage.scripts?.build).toContain('build:sandpiper');
-    expect(cliPackage.scripts?.build).toContain('build:system-prompt');
     expect(cliPackage.scripts?.build).toContain('build:standalone');
-    expect(cliPackage.scripts?.['build:sandpiper']).toContain("--external '@earendil-works/*'");
-    expect(cliPackage.scripts?.['build:sandpiper']).toContain("--external '@mariozechner/*'");
-    expect(cliPackage.scripts?.['build:sandpiper']).toContain('--splitting');
-    expect(cliPackage.scripts?.['build:sandpiper']).toContain('--entry-naming sandpiper');
+    expect(cliPackage.scripts).not.toHaveProperty('build:sandpiper');
+    expect(cliPackage.scripts).not.toHaveProperty('build:system-prompt');
     expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@earendil-works/*'");
     expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@mariozechner/*'");
     expect(cliPackage.scripts?.['build:standalone']).toContain('--splitting');
@@ -162,10 +158,13 @@ export default function runtimeImportProbe(pi) {
   it('allows package-management commands to use persisted settings', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-smoke-'));
     const agentDir = join(tempDir, 'agent');
+    const packageRoot = join(tempDir, 'third-party-package');
 
     try {
       mkdirSync(agentDir, { recursive: true });
-      writeFileSync(join(agentDir, 'settings.json'), JSON.stringify({ packages: [join(repoRoot, 'dist')] }));
+      mkdirSync(packageRoot, { recursive: true });
+      writeFileSync(join(packageRoot, 'package.json'), JSON.stringify({ name: 'third-party-package', pi: {} }));
+      writeFileSync(join(agentDir, 'settings.json'), JSON.stringify({ packages: [packageRoot] }));
 
       const output = runStandalone(
         ['list'],
@@ -175,69 +174,7 @@ export default function runtimeImportProbe(pi) {
       );
 
       expect(output).toContain('User packages:');
-      expect(output).toContain(join(repoRoot, 'dist'));
-    } finally {
-      rmSync(tempDir, { recursive: true, force: true });
-    }
-  });
-
-  it('loads installed third-party packages while avoiding duplicate legacy Sandpiper resources', () => {
-    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-smoke-'));
-    const agentDir = join(tempDir, 'agent');
-    const legacySandpiperPackage = join(tempDir, 'legacy-sandpiper-package');
-    const thirdPartyPackage = join(tempDir, 'third-party-package');
-
-    try {
-      mkdirSync(join(legacySandpiperPackage, 'extensions'), { recursive: true });
-      mkdirSync(join(thirdPartyPackage, 'extensions'), { recursive: true });
-      mkdirSync(agentDir, { recursive: true });
-      writeFileSync(
-        join(legacySandpiperPackage, 'package.json'),
-        JSON.stringify({ name: 'sandpiper-ai', pi: { extensions: ['./extensions/system.js'] } }),
-      );
-      writeFileSync(
-        join(legacySandpiperPackage, 'extensions', 'system.js'),
-        `export default function system(pi) {
-  pi.registerFlag('migrate-pi-configs', {
-    description: 'Marker flag registered by a legacy Sandpiper package',
-    type: 'boolean',
-    default: false,
-  });
-  pi.registerFlag('install-shell-integrations', {
-    description: 'Marker flag registered by a legacy Sandpiper package',
-    type: 'boolean',
-    default: false,
-  });
-}
-`,
-      );
-      writeFileSync(join(thirdPartyPackage, 'package.json'), JSON.stringify({ name: 'third-party-package' }));
-      writeFileSync(
-        join(thirdPartyPackage, 'extensions', 'probe.js'),
-        `export default function probe(pi) {
-  pi.registerFlag('third-party-probe', {
-    description: 'Marker flag registered by an installed third-party package',
-    type: 'boolean',
-    default: false,
-  });
-}
-`,
-      );
-      writeFileSync(
-        join(agentDir, 'settings.json'),
-        JSON.stringify({ packages: [legacySandpiperPackage, thirdPartyPackage] }),
-      );
-
-      const output = runStandalone(
-        ['--help'],
-        standaloneEnv({
-          SANDPIPER_CODING_AGENT_DIR: agentDir,
-        }),
-      );
-
-      expect(countFlagLines(output, '--migrate-pi-configs')).toBe(1);
-      expect(countFlagLines(output, '--install-shell-integrations')).toBe(1);
-      expect(countFlagLines(output, '--third-party-probe')).toBe(1);
+      expect(output).toContain(packageRoot);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }

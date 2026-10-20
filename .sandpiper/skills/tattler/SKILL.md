@@ -2,7 +2,7 @@
 name: tattler
 description: >-
   Work on Tattler, Sandpiper's local agent-to-agent messaging spike. Use when editing
-  plugins/pi/extensions/tattler.ts, discussing Tattler v0/v1, peer discovery, UDS
+  extensions/tattler/index.ts, discussing Tattler v0/v1, peer discovery, UDS
   sockets, ACK/ERR frames, agent-message wire format, identity files, agent directory,
   list_peers/send_peer_message tools, multi-agent dogfood, or TAT-* Tattler tasks.
 ---
@@ -27,7 +27,7 @@ For current Tattler context, read:
 
 - `.sandpiper/docs/specs/tattler-v0-dogfood-notes.md` for the curated active
   summary.
-- `.sandpiper/docs/specs/tattler-v0-dogfood-session-2026-05-19.md` only when
+- `.sandpiper/archive/tattler-v0-dogfood-session-2026-05-19.md` only when
   reviewing original dogfood chronology/evidence or preserving findings from it.
 
 For v1 architecture work, route to the broader design/task surfaces instead of
@@ -43,7 +43,7 @@ stretching v0 guidance:
 
 Treat v0 as a same-host, live-session validation slice:
 
-- Keep `plugins/pi/extensions/tattler.ts` as the implementation surface unless
+- Keep `extensions/tattler/index.ts` as the Pi entrypoint unless
   the user explicitly asks to start the v1 extraction.
 - Prefer small behavior slices over package architecture, durable logs,
   broadcast, stable identity, or handshake work.
@@ -105,7 +105,7 @@ area touched:
   bun run test:vitest -- packages/core/src/system-notification.test.ts extensions/web-fetch/src/index.test.ts
   ```
 
-- If touching only `tattler.ts`, run the single-file lint/type checks below.
+- If touching only `extensions/tattler/index.ts`, run the single-file lint/type checks below.
 
 Always run the repo gate before claiming the slice is ready:
 
@@ -113,14 +113,14 @@ Always run the repo gate before claiming the slice is ready:
 bun check
 ```
 
-When touching `tattler.ts`, use this focused single-file type/lint pass when full
+When touching `extensions/tattler/index.ts`, use this focused single-file type/lint pass when full
 `bun check` is not yet practical:
 
 ```sh
-bun x biome check plugins/pi/extensions/tattler.ts
+bun x biome check extensions/tattler/index.ts
 bun x tsc --noEmit --ignoreConfig --allowImportingTsExtensions \
   --moduleResolution bundler --module esnext --target esnext --strict \
-  --skipLibCheck plugins/pi/extensions/tattler.ts
+  --skipLibCheck extensions/tattler/index.ts
 ```
 
 ## Review Heuristics

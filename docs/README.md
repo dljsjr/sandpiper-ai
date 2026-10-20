@@ -1,6 +1,6 @@
 # Sandpiper Documentation
 
-Sandpiper is a distribution of the Pi coding agent with additional tools for shared terminals, task tracking, session continuity, skills, prompt templates, themes, and multi-surface packaging.
+Sandpiper is a local coding-agent workspace built on Pi. It adds tools for shared terminals, task tracking, session continuity, skills, prompt templates, and themes.
 
 ## Start here
 
@@ -18,7 +18,7 @@ Sandpiper is a distribution of the Pi coding agent with additional tools for sha
 ## Development
 
 - [Build workflows](dev/build-workflows.md) - choose the right build or verification command after a change.
-- [Build system reference](dev/build-system.md) - package builds, generated artifacts, and distribution layout.
+- [Build system reference](dev/build-system.md) - package builds, local helper assembly, and generated output.
 - [CLI development](dev/cli-development.md) - Commander patterns and bundled CLI packages.
 - [Environment variables](dev/env-vars.md) - `SANDPIPER_*` / `PI_*` mirroring and config lookup.
 - [Pi extension development](dev/pi-extension-development.md) - how Sandpiper uses Pi extension surfaces and where to check Pi API docs.
@@ -34,6 +34,5 @@ Sandpiper is a distribution of the Pi coding agent with additional tools for sha
 
 - [Packages](../packages/README.md)
 - [Extensions](../extensions/README.md)
-- [Neutral Pi plugin surface](../plugins/pi/README.md)
 
 Agent operating rules for this repository live in [AGENTS.md](../AGENTS.md) and `.sandpiper/playbooks/`; they are separate from the public documentation.

@@ -50,8 +50,9 @@ Confirmed directly from `pi --help` (installed 0.84.0 binary):
 loads — and `-e` is documented repeatable. Smoke-verified (static, no model call):
 
 ```
-node dist/cli.js --no-extensions --no-skills --no-prompt-templates --no-themes --no-context-files \
-  -e plugins/pi/extensions/skill-loading.ts -p "..." < /dev/null
+node node_modules/@earendil-works/pi-coding-agent/dist/cli.js \
+  --no-extensions --no-skills --no-prompt-templates --no-themes --no-context-files \
+  -e extensions/autotoon/autotoon.ts -p "..." < /dev/null
 ```
 
 successfully loaded exactly the one extension file (see [§3 incident log](#incident-log-and-postmortem-what-actually-happened-and-what-didnt)
@@ -61,9 +62,8 @@ was torn down, see that section).
 
 **Two distinct entry modes, per AGENT-249's own framing, confirmed as genuinely different:**
 1. `sandpiper` (the wrapper: `packages/cli/sandpiper_standalone.ts`) — always loads Sandpiper's
-   own package-manifest extension set (`pi.extensions` in `package.json`) plus whatever
-   `-e`/`--no-extensions` add/remove on top. Good for "does Sandpiper's real bundle behave",
-   not for single-extension isolation.
+   explicit built-in extension and resource set plus whatever `-e`/`--no-extensions` add/remove
+   on top. Good for "does Sandpiper's real runtime behave", not for single-extension isolation.
 2. Raw `pi` binary (`node node_modules/@earendil-works/pi-coding-agent/dist/cli.js`, bypassing
    `sandpiper_standalone.ts` entirely) with `--no-extensions -e <one file>` — true isolation,
    since Sandpiper's manifest never enters the picture. **This is the isolation/combinatoric
@@ -267,7 +267,7 @@ every package).
 suite currently depends on zero-config root behavior working as-is). Instead:
 
 - New directory: `devtools/integration/` (sibling to `devtools/`'s existing
-  distribution/smoke-test precedent — both are "drive the real thing end-to-end" test classes,
+  process smoke-test precedent — both are "drive the real thing end-to-end" test classes,
   and `devtools/` is already the established home for tests that spawn real processes/binaries).
 - **Isolation-by-construction, not per-test discipline** (AGENT-249's explicit requirement): a
   single shared helper, `devtools/integration/harness.ts`'s `prepareIsolatedSpawn()`. It is the
@@ -281,9 +281,7 @@ suite currently depends on zero-config root behavior working as-is). Instead:
   canary, which deliberately omits it). No test file constructs its own `spawn()` call.
 - Because this lives under the default include glob, it *is* swept by a bare `bun run test`
   today — confirmed no existing mechanism in this repo actually excludes suites from the default
-  sweep (`test:distribution`/`test:standalone` are convenience subset scripts for targeted CI
-  staging, not exclusions; their files are *also* part of the default 117-file sweep already).
-  Given wave 1 is only 2-3 extensions with a fast in-process mock (no real subprocess network
+  sweep. Given wave 1 is only 2-3 extensions with a fast in-process mock (no real subprocess network
   wait, no real model latency), this is likely fine to leave in the default gate — revisit only
   if real measured latency argues otherwise once AGENT-253 lands actual tests.
 
@@ -299,9 +297,9 @@ split-across-chunks cases a real spawn can't reliably be made to exercise on dem
 Recommending **skill + autotoon** as the committed wave-1 pair, both zero-external-dependency and
 both directly exercised by the confirmed `tool_execution_*` RPC events:
 
-- **`skill` tool** (`plugins/pi/extensions/skill-loading.ts`) — pure, no external deps, already
-  used as this doc's own static smoke-test extension. Simplest possible first case: load skill,
-  invoke tool via RPC `prompt`, assert `tool_execution_end.result` against the mock's scripted
+- **`skill` tool** (`extensions/system/skill-loading-tool.ts`) — pure, no external deps, and
+  loaded by the workspace Sandpiper runtime. Simplest possible first case: load a skill, invoke
+  the tool via RPC `prompt`, and assert `tool_execution_end.result` against the mock's scripted
   tool-call response.
 - **`autotoon`** — tool-result JSON→TOON transform is directly observable in
   `tool_execution_end.result` without needing any UI/renderer assertions, and it's a genuinely
@@ -322,11 +320,6 @@ both directly exercised by the confirmed `tool_execution_*` RPC events:
   AGENT-249's own note; their mock adapters (e.g. `DdgSearchAdapter` already visible in
   `extensions/web-search/src/ddg-adapter.test.ts`) may allow *unit*-level inclusion later but add
   nothing RPC-specific to prove in wave 1.
-- The compiled-binary variant of `entry:'sandpiper'` (running the actual compiled standalone
-  app bundle rather than source) stayed OPTIONAL per the coordinator's ruling and was evaluated,
-  not skipped by default: the compiled binary isn't currently built in this environment, and
-  building it is a real `bun compile` step, not something a skip-if-not-built test can make
-  cheap on its own. Left as named wave-2 scope, per the same ruling.
 
 ### The AGENT-237(e) payoff, realized
 

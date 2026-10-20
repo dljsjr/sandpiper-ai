@@ -6,7 +6,6 @@
   "dependencies": {
     "@mozilla/readability": "0.6.0",
     "jsdom": "30.0.1",
-    "sandpiper-ai-core": "0.0.1",
     "turndown": "7.2.4"
   },
   "devDependencies": {

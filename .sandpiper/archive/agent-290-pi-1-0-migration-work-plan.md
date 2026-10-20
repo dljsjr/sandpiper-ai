@@ -3,7 +3,7 @@
 - **Diátaxis mode**: How-to plan (archived 2026-10-06; the migration is complete)
 - **Status**: Complete (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30; the interactive renderer checks were dropped, and regressions get filed as bugs.
 - **Task**: AGENT-290
-- **Related**: [migration spec](../docs/specs/agent-290-pi-1-0-migration-spec.md), [discovery notes](../docs/specs/agent-290-pi-1-0-discovery.md)
+- **Related**: [migration spec](../docs/specs/agent-290-pi-1-0-migration-spec.md), [discovery notes](agent-290-pi-1-0-discovery.md)
 
 This plan moves Sandpiper to Pi 1.0 without breaking the Sandpiper build people run day to day, and coordinates with the `pi-claude-code-cli-provider` migration.
 
