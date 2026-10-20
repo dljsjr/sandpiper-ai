@@ -1,23 +1,25 @@
 # Trail board adoption specification
 
-This specification covers TCL-157. The migration tool is not implemented. It belongs in Sandpiper, not Trail.
+This specification covers TCL-157. Sandpiper implements the utility in `devtools/adoptTrailBoard.ts`. Its planning and writing module is `devtools/trailBoardAdoption.ts`.
 
 The tool adopts existing boards in place. It does not move tasks, rewrite their Markdown, or replace their version control workspace.
 
 ## Interface
 
-The planned interface accepts these values:
+The interface accepts these values:
 
-| Value           | Purpose                                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------------------------ |
-| Project root    | Root for legacy configuration discovery and Trail configuration output.                                      |
-| `--tasks-dir`   | Existing task directory. Relative values resolve against the project root. Absolute values remain supported. |
-| `--config-file` | Optional override for the legacy configuration source.                                                       |
-| `--dry-run`     | Report the planned configuration without changing files or VCS state.                                        |
+| Value           | Purpose                                                                                                               |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `--dir`         | Project root for discovery and output. Defaults to the current directory.                                             |
+| `--tasks-dir`   | Required existing task directory. Relative values resolve against the project root. Absolute values remain supported. |
+| `--config-file` | Optional override for the legacy configuration source.                                                                |
+| `--dry-run`     | Report the planned configuration without changing files or VCS state.                                                 |
 
 VCS means a version control system, such as Git or jj.
 
-The output is `<project-root>/.trail/config.json`. It uses Trail's version-2 schema and points `tasks_dir` at the existing task directory. The default legacy location is `.sandpiper/tasks`.
+The output is `<project-root>/.trail/config.json`. It uses Trail's version-2 schema and points `tasks_dir` at the existing task directory. `.sandpiper/tasks` is the usual legacy location, not an implicit choice by the utility.
+
+The CLI reports JSON with the result, selected source, task directory, configuration path, existing candidates, and complete configuration. An already-adopted result identifies the existing configuration file. [Usage and recovery](../../../devtools/README.md#trail-board-adoption) cover operator commands.
 
 ## Legacy discovery
 
@@ -29,6 +31,8 @@ Without an override, discover the legacy sources in their existing precedence:
 
 An existing higher-priority source wins. The tool carries forward the effective configuration rather than treating a partial file as a complete schema.
 
+An explicit override can contain a standalone `version_control` object or a settings wrapper with `tasks`. Ambiguous overrides cause an error. Malformed selected sources and unsupported shapes cause an error rather than the old reader's silent fallback. Valid partial values still use legacy defaults.
+
 ## Configuration preservation
 
 The emitted file must contain `version`, `tasks_dir`, and a complete `version_control` object. Its values must preserve the effective legacy behavior.
@@ -37,7 +41,7 @@ When version control is enabled, preserve the branch, optional repository, autom
 
 When version control is disabled, emit exactly `{ "enabled": false }` inside `version_control`. In particular, `herdr` must remain disabled.
 
-The task directory must pass Trail's path and separate-checkout safety rules. Do not turn a live task workspace into an inline store by replacing its configuration with defaults.
+The task directory must pass Trail's path and separate-checkout safety rules. Separate storage requires an existing checkout and a matching Git or jj backend at the project root. A marked independent checkout cannot silently become inline storage through default filling.
 
 ## File and workspace preservation
 
@@ -52,9 +56,13 @@ An existing index does not need rewriting merely because the configuration chang
 
 ## Existing configuration and repeat runs
 
-The tool must not overwrite a different Trail configuration. A repeat run against the result must leave task and workspace state unchanged.
+The tool inspects all three Trail candidates: `.trail.json`, `trail.json`, and `.trail/config.json`. Every existing candidate must be valid and equivalent to the requested task location and effective VCS values. Conflicting or malformed candidates cause refusal, even when a higher-priority candidate shadows them.
 
-The implementation must distinguish an already-adopted board from a conflicting destination configuration. Its dry run must describe the result without reserving keys, moving files, or changing VCS state.
+A repeat against equivalent configuration makes no changes. Path comparison uses physical directory locations, so equivalent relative and absolute paths do not require a rewrite.
+
+Apply rechecks configuration bytes and directory identities before writing and before installation. It stages complete JSON and uses an exclusive hard-link installation instead of an overwriting rename. The destination filesystem must support hard links. Failed installation does not replace existing configuration.
+
+Dry runs do not create directories, reserve keys, repair indexes, or change VCS state. The utility runs no VCS commands.
 
 ## Survey constraints
 

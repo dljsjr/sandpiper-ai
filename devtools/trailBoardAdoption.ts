@@ -83,7 +83,8 @@ export function planBoardAdoption(options: BoardAdoptionOptions): BoardAdoptionP
 export function applyBoardAdoption(plan: BoardAdoptionPlan): void {
   const current = refreshUnchangedPlan(plan);
   if (current.disposition === 'already-adopted') return;
-  const parent = dirname(current.configPath);
+  const destination = physicalLocation(current.configPath);
+  const parent = dirname(destination);
   const createdParent = mkdirSync(parent, { recursive: true });
   let staging: string | undefined;
   try {
@@ -92,10 +93,10 @@ export function applyBoardAdoption(plan: BoardAdoptionPlan): void {
     writeFileSync(file, `${JSON.stringify(current.config, null, 2)}\n`, { flag: 'wx', mode: 0o600 });
     refreshUnchangedPlan(current);
     // A rename could overwrite a concurrent configuration; a direct write could expose partial JSON.
-    linkSync(file, current.configPath);
+    linkSync(file, destination);
   } finally {
     if (staging) rmSync(staging, { recursive: true, force: true });
-    if (createdParent && !hasEntry(current.configPath) && readdirSync(createdParent).length === 0) {
+    if (createdParent && !hasEntry(destination) && readdirSync(createdParent).length === 0) {
       rmdirSync(createdParent);
     }
   }
@@ -165,6 +166,15 @@ function assertStorageLocation(rootDir: string, tasksPath: string, vc: AdoptedTr
     }
   }
   if (!checkout) throw new Error(`Separate task directory has no existing Git or jj checkout: ${tasksPath}`);
+  assertCheckoutBackend(rootDir, tasksPath);
+}
+
+function assertCheckoutBackend(rootDir: string, tasksPath: string): void {
+  const backend = hasEntry(join(rootDir, '.jj')) ? '.jj' : hasEntry(join(rootDir, '.git')) ? '.git' : undefined;
+  if (!backend) throw new Error(`Project root must be a Git or jj repository for separate storage: ${rootDir}`);
+  if (!hasEntry(join(tasksPath, backend))) {
+    throw new Error(`Task checkout backend does not match the project ${backend} backend: ${tasksPath}`);
+  }
 }
 
 function readExistingConfigurations(

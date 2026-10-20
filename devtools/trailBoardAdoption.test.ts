@@ -45,6 +45,7 @@ describe('board adoption planning', () => {
     writeFixtureFiles(rootDir, {
       '.sandpiper-tasks.json': JSON.stringify({ version_control: { mode: { branch: 'tasks' }, auto_commit: true } }),
       '.sandpiper/tasks/.jj/repo': 'isolated marker',
+      '.jj/repo': 'isolated root marker',
     });
     const before = fileManifest(rootDir);
 
@@ -82,6 +83,7 @@ describe('board adoption planning', () => {
       '.sandpiper-tasks.json': JSON.stringify({ version_control: { mode: { branch: 'ignored' } } }),
       'custom.json': JSON.stringify(override),
       '.sandpiper/tasks/.jj/repo': 'isolated marker',
+      '.jj/repo': 'isolated root marker',
     });
 
     const plan = planBoardAdoption({ rootDir, tasksDir: '.sandpiper/tasks', configFile: 'custom.json' });
@@ -100,6 +102,7 @@ describe('board adoption planning', () => {
         },
       }),
       '.sandpiper/tasks/.git': 'isolated marker',
+      '.git/HEAD': 'isolated root marker',
     });
 
     const plan = planBoardAdoption({ rootDir, tasksDir: '.sandpiper/tasks' });
@@ -329,6 +332,25 @@ describe('board adoption planning', () => {
 
     expect(fileManifest(rootDir)).toEqual(before);
   });
+
+  it.each(['git-with-jj', 'jj-with-git', 'missing-project-backend'])(
+    'refuses a checkout whose VCS backend cannot be used safely from the project: %s',
+    (kind) => {
+      writeFixtureFiles(rootDir, {
+        '.sandpiper-tasks.json': JSON.stringify({ version_control: { mode: { branch: 'tasks' }, auto_commit: true } }),
+        ...(kind === 'git-with-jj'
+          ? { '.git/HEAD': 'isolated root', '.sandpiper/tasks/.jj/repo': 'isolated task' }
+          : {}),
+        ...(kind === 'jj-with-git' ? { '.jj/repo': 'isolated root', '.sandpiper/tasks/.git': 'isolated task' } : {}),
+        ...(kind === 'missing-project-backend' ? { '.sandpiper/tasks/.jj/repo': 'isolated task' } : {}),
+      });
+      const before = fileManifest(rootDir);
+
+      expect(() => planBoardAdoption({ rootDir, tasksDir: '.sandpiper/tasks' })).toThrow(/backend|repository/i);
+
+      expect(fileManifest(rootDir)).toEqual(before);
+    },
+  );
 
   it('does not inspect a lower-priority malformed legacy source', () => {
     writeFixtureFiles(rootDir, {

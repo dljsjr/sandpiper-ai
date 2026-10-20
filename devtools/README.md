@@ -4,17 +4,44 @@ Development scripts and build utilities. Not distributed with the package.
 
 ## Scripts
 
-| Script | Purpose |
-|--------|---------|
-| `assembleDistribution.ts` | Assembles the generated `dist/` Sandpiper Pi/npm package with copied resources, package outputs, Pi runtime assets, helper CLIs, and npm metadata |
-| `vendor.ts` | Downloads vendored third-party skills from `vendor.txt` |
-| `distPackageJson.ts` | Generates `dist/package.json` with artifact-owned Sandpiper `piConfig` + `pi` resource paths |
-| `standaloneSandpiperApp.ts` | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable |
-| `claudeCodePlugin.ts` | Assembles `dist/claude-plugin/` resources/manifest and bundles Claude hook scripts |
-| `distribution-invariants.ts` | Shared helpers for distribution invariant and manifest smoke tests |
-| `ecosystemPackage.ts` | Shared helpers for npm/Pi/Claude install-compatibility checks |
-| `piPackageArtifactMetadata.ts` | Shared manifest/dependency generation for npm-installable Pi package artifacts |
-| `clean.ts` | Portable workspace clean (removes node_modules, dist, caches) |
+| Script                         | Purpose                                                                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assembleDistribution.ts`      | Assembles the generated `dist/` Sandpiper Pi/npm package with copied resources, package outputs, Pi runtime assets, helper CLIs, and npm metadata |
+| `vendor.ts`                    | Downloads vendored third-party skills from `vendor.txt`                                                                                           |
+| `distPackageJson.ts`           | Generates `dist/package.json` with artifact-owned Sandpiper `piConfig` + `pi` resource paths                                                      |
+| `standaloneSandpiperApp.ts`    | Assembles `dist/standalone-sandpiper/` metadata/resources and compiles the standalone app-bundle executable                                       |
+| `claudeCodePlugin.ts`          | Assembles `dist/claude-plugin/` resources/manifest and bundles Claude hook scripts                                                                |
+| `distribution-invariants.ts`   | Shared helpers for distribution invariant and manifest smoke tests                                                                                |
+| `ecosystemPackage.ts`          | Shared helpers for npm/Pi/Claude install-compatibility checks                                                                                     |
+| `piPackageArtifactMetadata.ts` | Shared manifest/dependency generation for npm-installable Pi package artifacts                                                                    |
+| `clean.ts`                     | Portable workspace clean (removes node_modules, dist, caches)                                                                                     |
+| `adoptTrailBoard.ts`           | Adopts one legacy task board in place by creating Trail v2 configuration                                                                          |
+
+## Trail board adoption
+
+Use this utility to make an existing Sandpiper board readable by standalone Trail. It keeps task files, history, indexes, and workspaces unchanged.
+
+From the Sandpiper checkout, inspect one board:
+
+```sh
+bun --bun devtools/adoptTrailBoard.ts --dir /path/to/project --tasks-dir .sandpiper/tasks --dry-run
+```
+
+Make sure that the source, task directory, and version control values match the board. Apply the same request without `--dry-run`:
+
+```sh
+bun --bun devtools/adoptTrailBoard.ts --dir /path/to/project --tasks-dir .sandpiper/tasks
+```
+
+The utility creates `.trail/config.json`. An equivalent repeat makes no changes. The task-directory argument is required. Relative paths resolve against `--dir`. Absolute paths remain supported.
+
+To override legacy discovery, add `--config-file <path>`. The source can be a standalone task configuration or a settings file with a `tasks` object.
+
+If configuration conflicts or inputs change, resolve the reported cause before running another dry run. Do not delete task files to resolve a configuration conflict.
+
+If a write fails, inspect the reported path. Staging keeps incomplete JSON out of the canonical path. A new dry run reports whether adoption completed before the error.
+
+This utility does not relocate boards or change installed consumers. The [adoption specification](../.sandpiper/docs/specs/trail-board-adoption.md) describes discovery, preservation, and refusal rules.
 
 ## Integration Tests
 
@@ -25,8 +52,8 @@ tests driven through real `pi`/`sandpiper` process spawns instead of mocked exte
 
 ## Configuration
 
-| File | Purpose |
-|------|---------|
+| File         | Purpose                                 |
+| ------------ | --------------------------------------- |
 | `vendor.txt` | Third-party skill sources for vendoring |
 
 ## Distribution Checks

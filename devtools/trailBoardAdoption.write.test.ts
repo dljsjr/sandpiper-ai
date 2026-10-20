@@ -11,7 +11,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fileManifest, writeBoardFixture, writeFixtureFiles } from './trailBoardAdoption.fixtures.js';
 import { applyBoardAdoption, planBoardAdoption } from './trailBoardAdoption.js';
@@ -147,6 +147,29 @@ describe('board adoption application', () => {
     expect(() => applyBoardAdoption(plan)).toThrow('trail.json');
 
     expect(fileManifest(rootDir)).toEqual({ ...before, 'trail.json': createHash('sha256').update('{').digest('hex') });
+  });
+
+  it('cleans only its physical staging directory when the configuration parent alias changes', () => {
+    const original = join(rootDir, 'config-a');
+    const replacement = join(rootDir, 'config-b');
+    mkdirSync(original);
+    mkdirSync(replacement);
+    actualFs.symlinkSync(original, join(rootDir, '.trail'), 'dir');
+    const plan = planBoardAdoption({ rootDir, tasksDir: '.sandpiper/tasks' });
+    let concurrentDirectory = '';
+    vi.mocked(writeFileSync).mockImplementationOnce((path, data, options) => {
+      actualFs.writeFileSync(path, data, options);
+      actualFs.unlinkSync(join(rootDir, '.trail'));
+      actualFs.symlinkSync(replacement, join(rootDir, '.trail'), 'dir');
+      concurrentDirectory = join(replacement, basename(dirname(String(path))));
+      mkdirSync(concurrentDirectory);
+      actualFs.writeFileSync(join(concurrentDirectory, 'keep'), 'concurrent data');
+    });
+
+    expect(() => applyBoardAdoption(plan)).toThrow(/changed/i);
+
+    expect(fileManifest(original)).toEqual({ '': 'directory' });
+    expect(readFileSync(join(concurrentDirectory, 'keep'), 'utf8')).toBe('concurrent data');
   });
 
   it('cannot replace a destination created after the final recheck', () => {
