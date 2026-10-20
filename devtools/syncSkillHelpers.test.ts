@@ -32,17 +32,8 @@ describe('syncSkillHelpers', () => {
 
     await syncSkillHelpers(repoRoot);
 
-    const taskScripts = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'tasks', 'scripts');
-    const standupScript = join(
-      repoRoot,
-      'packages',
-      'resources',
-      'skills',
-      'sandpiper',
-      'standup',
-      'scripts',
-      'sandpiper-standup',
-    );
+    const taskScripts = join(repoRoot, 'packages', 'resources', 'skills', 'tasks', 'scripts');
+    const standupScript = join(repoRoot, 'packages', 'resources', 'skills', 'standup', 'scripts', 'sandpiper-standup');
 
     expect(readFileSync(join(taskScripts, 'trail'), 'utf-8')).toContain('trail');
     expect(readFileSync(join(taskScripts, 'sandpiper-tasks'), 'utf-8')).toContain('trail');

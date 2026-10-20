@@ -8,7 +8,7 @@ import { findPackageRoot } from './standalone_bootstrap.js';
 const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai');
 
 describe('standalone Sandpiper resource discovery', () => {
-  it('loads bundled skills and prompts through resources_discover', async () => {
+  it('loads first-party skills and prompts through resources_discover', async () => {
     const agentDir = await mkdtemp(join(tmpdir(), 'sandpiper-standalone-resources-'));
     const previousPackageDir = process.env.PI_PACKAGE_DIR;
     const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
@@ -52,8 +52,16 @@ describe('standalone Sandpiper resource discovery', () => {
         const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
         const promptNames = resourceLoader.getPrompts().prompts.map((prompt) => prompt.name);
 
-        expect(skillNames).toContain('tasks');
-        expect(skillNames).toContain('standup');
+        expect(skillNames.sort()).toEqual([
+          'code-review',
+          'jj',
+          'mutation-testing',
+          'projects',
+          'refactoring',
+          'standup',
+          'tasks',
+          'test-driven-development',
+        ]);
         expect(promptNames).toContain('new-feature');
         expect(promptNames).toContain('code-review');
       } finally {

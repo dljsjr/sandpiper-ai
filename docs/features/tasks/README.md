@@ -8,7 +8,7 @@ The installed tasks skill includes its executable in `scripts/` and its referenc
 
 Sandpiper also includes `sandpiper-tasks` as a compatibility command. The `trail` name is the normal interface.
 
-For command usage and task fields, read the references inside the installed tasks skill. The source copies are [the task specification](../../../packages/resources/skills/sandpiper/tasks/references/SPEC.md) and [storage reference](../../../packages/resources/skills/sandpiper/tasks/references/storage.md).
+For command usage and task fields, read the references inside the installed tasks skill. The source copies are [the task specification](../../../packages/resources/skills/tasks/references/SPEC.md) and [storage reference](../../../packages/resources/skills/tasks/references/storage.md).
 
 ## Integration reference
 

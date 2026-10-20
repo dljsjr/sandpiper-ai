@@ -16,7 +16,7 @@ import { startRpcSession } from './rpc-driver.js';
 
 const SMOKE_TIMEOUT_MS = 60_000;
 const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const JJ_SKILL_DIR = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'jj');
+const JJ_SKILL_DIR = join(repoRoot, 'packages', 'resources', 'skills', 'jj');
 
 describe('wave 1: workspace skill tool (AGENT-253)', () => {
   it(
@@ -72,7 +72,7 @@ describe('wave 1: workspace skill tool (AGENT-253)', () => {
           toolName: 'skill',
           arguments: {
             source: 'filesystem',
-            path: join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper', 'does-not-exist'),
+            path: join(repoRoot, 'packages', 'resources', 'skills', 'does-not-exist'),
           },
         },
         { type: 'text', text: 'handled the error' },

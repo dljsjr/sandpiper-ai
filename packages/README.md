@@ -8,7 +8,7 @@ Workspace packages used by the local Sandpiper runtime.
 |---------|-------------|
 | [`cli/`](cli/) | Sandpiper CLI wrapper around pi-coding-agent |
 | [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON neutral transform and Pi adapter |
-| [`resources/`](resources/) | Shared skills, prompts, and themes |
+| [`resources/`](resources/) | First-party skills, prompts, and themes |
 | [`trail/`](trail/) | Trail task management CLI (markdown + YAML frontmatter) |
 | [`sandpiper-standup-cli/`](sandpiper-standup-cli/) | Session standup helper CLI |
 | [`core/`](core/) | Shared core utilities |

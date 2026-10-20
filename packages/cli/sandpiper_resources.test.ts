@@ -100,11 +100,7 @@ describe('Sandpiper resource adapter', () => {
   it('maps source resource roots through package-owned resources', () => {
     const paths = resolveSandpiperResourcePaths('/repo');
 
-    expect(paths.skillPaths).toEqual([
-      join('/repo', 'packages', 'resources', 'skills', 'sandpiper'),
-      join('/repo', 'packages', 'resources', 'skills', 'third-party'),
-    ]);
-    expect(paths.skillPaths).not.toContain(join('/repo', 'packages', 'resources', 'skills-on-demand'));
+    expect(paths.skillPaths).toEqual([join('/repo', 'packages', 'resources', 'skills')]);
     expect(paths.promptPaths).toEqual([join('/repo', 'packages', 'resources', 'prompts')]);
     expect(paths.themePaths).toEqual([join('/repo', 'packages', 'resources', 'themes')]);
   });

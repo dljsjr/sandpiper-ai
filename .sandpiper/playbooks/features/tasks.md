@@ -15,7 +15,7 @@ Read this before changing the task CLI, task storage, task skills, or task docs.
 - Storage behavior must support inline, separate-branch, and external-repo modes.
 - Tests must not touch real user state or production task stores.
 - Author current Trail product documentation in the standalone Trail repository. Keep `docs/features/tasks/**` focused on Sandpiper integration, not another product manual.
-- The tasks skill runs the helper at `packages/resources/skills/sandpiper/tasks/scripts/trail`.
+- The tasks skill runs the helper at `packages/resources/skills/tasks/scripts/trail`.
 - `bun run build` rebuilds `packages/trail/dist/trail` and refreshes the skill helper copy.
 - Keep the task skill's local references aligned with the bundled helper behavior.
 
@@ -26,4 +26,4 @@ Read this before changing the task CLI, task storage, task skills, or task docs.
 - Documentation ownership: `docs/features/tasks/architecture.md`
 - Board adoption: `.sandpiper/docs/specs/trail-board-adoption.md`
 - Legacy Trail CLI package: `packages/trail/README.md`
-- Skill spec: `packages/resources/skills/sandpiper/tasks/references/SPEC.md`
+- Skill spec: `packages/resources/skills/tasks/references/SPEC.md`

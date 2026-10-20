@@ -32,7 +32,7 @@ If no paths were listed, review the changes on their own merits using the code r
 5. **Quantitative analysis.** Run against the final state of the working copy:
    - Complexity: `lizard --csv` on new/changed source files
    - Lint: `bun check` (or the project's lint command)
-   - Tests: `bun test` (or the project's test command)
+   - Tests: the project's documented test command (`bun run test` in this repository)
    - Optionally: duplication (`jscpd`), structural anti-patterns (`ast-grep`)
 
 ## Output

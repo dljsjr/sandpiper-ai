@@ -6,7 +6,7 @@ Sandpiper owns its tasks skill, local legacy Trail package, helper executable co
 
 ## Local skill helper
 
-The tasks skill runs `packages/resources/skills/sandpiper/tasks/scripts/trail`. This executable is a generated local copy of `packages/trail/dist/trail`.
+The tasks skill runs `packages/resources/skills/tasks/scripts/trail`. This executable is a generated local copy of `packages/trail/dist/trail`.
 
 Run `bun run build` after Trail changes. The build compiles Trail first, then refreshes the skill helper copy. Both the package docs and skill references must describe the bundled legacy runtime.
 

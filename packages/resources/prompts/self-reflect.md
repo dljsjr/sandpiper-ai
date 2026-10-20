@@ -43,11 +43,9 @@ Common under-trigger patterns to check explicitly:
 - API/library/framework/CLI/config-format uncertainty → look up the relevant documentation rather than guessing
 - version control operations, commits, bookmarks, rebases, abandon/drop, operation-log recovery → **jj**
 - tasks, backlog, status, tickets, follow-up work → **tasks**
-- self-reflection involving skills → **skill-review** and possibly **skill-creator**
 - code review or judging code quality → **code-review**
 - cleanup, simplification, restructuring → **refactoring**
 - tests-first work or bug reproduction → **test-driven-development**
-- PDF handling → **pdf**
 - GitHub/GitLab URLs or CLI work → use the relevant forge CLI when available
 
 For project-local skills: fix issues directly. For package-provided skills: note the finding and suggest it to the user instead of editing installed package files.
@@ -62,7 +60,7 @@ Think about the work done this session. Were there any:
 - Decision-making heuristics that would help in future sessions?
 - Multi-step processes that a future session would need to rediscover?
 
-If any of these apply, create a new skill in `.sandpiper/skills/` (project-local) or `~/.sandpiper/agent/skills/` (user-global) using the **skill-creator** skill for guidance. If none apply, explicitly state: "No new skills identified this session" with a brief explanation.
+If any of these apply, create a new skill in `.sandpiper/skills/` (project-local) or `~/.sandpiper/agent/skills/` (user-global). Follow the current skill format and local guidance. If none apply, explicitly state: "No new skills identified this session" with a brief explanation.
 
 ## Phase 2: Documentation and Guidance Layers
 

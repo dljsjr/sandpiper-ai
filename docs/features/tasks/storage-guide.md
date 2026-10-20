@@ -51,7 +51,7 @@ Disabled configuration retains the effective legacy values but skips Trail-manag
 
 Standalone Trail uses `initialize` instead of `storage init`. Its configuration also requires `version` and `tasks_dir`. These standalone changes are not a Sandpiper consumer cutover.
 
-For the current bundled operator procedures, use the [skill-local storage reference](../../../packages/resources/skills/sandpiper/tasks/references/storage.md).
+For the current bundled operator procedures, use the [skill-local storage reference](../../../packages/resources/skills/tasks/references/storage.md).
 
 ## Adoption boundary
 

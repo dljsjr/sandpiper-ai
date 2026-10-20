@@ -50,8 +50,8 @@ bun run build:standalone
 ```sh
 ./node_modules/.bin/sandpiper --help
 ./node_modules/.bin/sandpiper-system-prompt --help
-packages/resources/skills/sandpiper/tasks/scripts/trail --help
-packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup --help
+packages/resources/skills/tasks/scripts/trail --help
+packages/resources/skills/standup/scripts/sandpiper-standup --help
 ```
 
 These commands exercise the same workspace paths used for local development.

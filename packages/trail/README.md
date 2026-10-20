@@ -19,4 +19,4 @@ bun run build
 bun run test
 ```
 
-The root build copies the result to `packages/resources/skills/sandpiper/tasks/scripts/trail` for local skill use.
+The root build copies the result to `packages/resources/skills/tasks/scripts/trail` for local skill use.

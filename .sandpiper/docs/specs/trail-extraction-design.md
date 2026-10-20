@@ -39,7 +39,7 @@ The migration tool must be available before or with consumer cutover. Updating t
 
 ## Local skill helper
 
-Sandpiper retains the legacy Trail package for its workspace runtime. `bun run build` builds `packages/trail/dist/trail`, then copies it to `packages/resources/skills/sandpiper/tasks/scripts/trail`.
+Sandpiper retains the legacy Trail package for its workspace runtime. `bun run build` builds `packages/trail/dist/trail`, then copies it to `packages/resources/skills/tasks/scripts/trail`.
 
 The skill's local references describe that legacy executable. They are not the source for new standalone Trail behavior.
 

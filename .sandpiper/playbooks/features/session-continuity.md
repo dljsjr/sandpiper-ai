@@ -20,5 +20,5 @@ Read this before changing standup behavior, concurrent-session handling, or sess
 
 - Public feature overview: `docs/features/standup.md`
 - Concurrent sessions design: `.sandpiper/docs/specs/concurrent-sessions.md`
-- Standup skill: `packages/resources/skills/sandpiper/standup/SKILL.md`
+- Standup skill: `packages/resources/skills/standup/SKILL.md`
 - Standup CLI package: `packages/sandpiper-standup-cli/`

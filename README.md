@@ -17,7 +17,7 @@ On top of pi's core functionality, Sandpiper provides:
 ### Enhanced Capabilities
 
 - **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion for 30–60% token savings on tabular data. Works transparently in the background.
-- **Skill Library** — Curated guidance documents for jj version control, ast-grep structural analysis, Dash documentation lookup, and more. Skills teach the agent domain-specific knowledge without bloating the system prompt.
+- **Skill Library** — First-party guidance for jj, code review, refactoring, mutation testing, task management, and session continuity. Skills add domain knowledge without putting their full contents in the system prompt.
 
 ## Quick Start
 
@@ -61,7 +61,7 @@ sandpiper-ai/
 │   └── shell-relay/     # Shared terminal via Zellij
 ├── packages/            # Workspace packages and package-owned output
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
-│   ├── resources/       # Shared skills, prompts, and themes
+│   ├── resources/       # First-party skills, prompts, and themes
 │   ├── trail/           # Trail task management CLI
 │   ├── sandpiper-standup-cli/ # Standup/session-continuity CLI
 │   └── core/            # Shared utilities

@@ -6,7 +6,7 @@ Do a thorough refactoring pass on ${1:-the current codebase}. Take your time and
 Your mantra is "simplify, deduplicate, hygienic, maintainable":
 
 - Start by using the root `AGENTS.md` routing table (if present) to identify relevant focused docs and local `README.md` / `AGENTS.md` files for the area you're refactoring.
-- Use the **ast-grep** skill to explore code structure before refactoring — find duplicated patterns, map call sites, and verify changes haven't missed usages. Use ast-grep's rewrite capabilities for mechanical transformations across many files.
+- Use ast-grep to explore code structure when syntax-aware search adds value. Find repeated patterns, map call sites, and make sure that changes cover all usages.
 - Emphasize DRY — extract shared patterns, constants, and utilities into dedicated modules
 - Emphasize YAGNI — remove unused code, unnecessary abstractions, and speculative generality
 - Prefer argument passing over global state

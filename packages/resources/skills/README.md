@@ -1,65 +1,47 @@
 # Skills
 
-Agent skills — structured guidance documents with optional companion scripts that teach the agent how to perform specific tasks.
+This directory contains the first-party skills that Sandpiper discovers at runtime.
 
 ## Layout
 
+Each skill is a direct child of this directory:
+
 ```text
-resources/
-├── skills/              # Hot skills included in runtime catalog
-│   ├── sandpiper/       # First-party hot skills
-│   └── third-party/     # Vendored hot skills
-└── skills-on-demand/    # Shipped skills that are not auto-discovered
-    ├── sandpiper/       # First-party on-demand skills
-    └── third-party/     # Vendored on-demand skills
+skills/
+├── code-review/
+├── jj/
+├── mutation-testing/
+├── projects/
+├── refactoring/
+├── standup/
+├── tasks/
+└── test-driven-development/
 ```
 
-Hot skills appear in Sandpiper's runtime skill catalogue. On-demand skills remain in the workspace but are intentionally omitted from `resources_discover` skill paths.
+Sandpiper does not include third-party or on-demand skills in this package.
 
-## Hot First-Party Skills
+## Catalogue
 
-| Skill                        | Description                                                      |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `code-review`                | Review diffs, PRs, code quality, and code health                 |
-| `jj`                         | Jujutsu version control — commands, workflows, change management |
-| `mutation-testing`           | Mutation testing setup, interpretation, and quality gates        |
-| `projects`                   | Manage the cross-project directory                               |
-| `refactoring`                | Metrics-guided code cleanup and complexity reduction             |
-| `standup`                    | Write/read session stand-up notes for cross-session continuity   |
-| `tasks`                      | Markdown-based task management with YAML frontmatter             |
-| `test-driven-development`    | TDD/BDD workflow guidance and testing discipline                 |
+| Skill | Description |
+| --- | --- |
+| `code-review` | Review diffs, pull requests, and code health |
+| `jj` | Use Jujutsu version control |
+| `mutation-testing` | Set up and interpret mutation testing |
+| `projects` | Manage the cross-project directory |
+| `refactoring` | Improve code structure with measured changes |
+| `standup` | Maintain continuity across sessions |
+| `tasks` | Manage project work through Trail |
+| `test-driven-development` | Apply test-driven and behavior-driven development |
 
-## On-Demand Skills
+The runtime adds this directory through `resources_discover`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
 
-These skills are useful but too niche or too expensive to keep in the hot catalogue by default.
+## Skill contents
 
-| Skill           | Location                           | Description                                                                  |
-| --------------- | ---------------------------------- | ---------------------------------------------------------------------------- |
-| `age`           | `../skills-on-demand/sandpiper/`   | Encrypt/decrypt files with the age CLI                                       |
-| `ast-grep`      | `../skills-on-demand/sandpiper/`   | Structural code search and codemods when AST-aware setup earns its keep      |
-| `skill-review`  | `../skills-on-demand/sandpiper/`   | Audit skills for quality, triggering accuracy, and best practices            |
-| `toon`          | `../skills-on-demand/sandpiper/`   | Convert structured data between JSON and TOON                                |
-| `pdf`           | `../skills-on-demand/third-party/` | PDF reading, extraction, manipulation, form filling, and OCR workflows        |
-| `skill-creator` | `../skills-on-demand/third-party/` | Skill authoring, evals, benchmarking, and empirical description optimization |
+A skill directory can contain:
 
-## Using Skills
+- `SKILL.md`, which defines the skill and its trigger description.
+- `references/`, which contains supporting reference material.
+- `scripts/`, which contains helper commands.
+- `evals/`, which contains skill evaluation data.
 
-At runtime, hot skills are listed in the agent's available-skills catalogue. The catalogue is routing metadata, not the full instructions.
-
-When a hot skill matches the user's request, acquired context, or the action the agent is about to take, the agent should load the skill before continuing. In Sandpiper, use the `skill` tool with the exact catalogue name. In a harness without a skill-loading tool, read the matching `SKILL.md` from the catalogue location instead.
-
-On-demand skills are not advertised in the runtime catalogue. They remain filesystem-loadable from the workspace for explicit, intentional use.
-
-## Convention
-
-Each skill is a directory containing:
-
-- `SKILL.md` — the skill definition (name, description, guidance)
-- `scripts/` — optional companion scripts (CLIs, helpers)
-- `references/` — optional reference docs (specs, cheat sheets)
-
-The Sandpiper runtime exposes hot skills through explicit resource discovery. On-demand skills are omitted from that discovery path.
-
-## Third-party snapshots
-
-Third-party skills are checked-in snapshots. Keep their source attribution and license files with the snapshot. There is no automatic updater.
+`bun run build` refreshes the ignored Trail and standup executables in their skill directories. Edit the package sources instead of those generated files.

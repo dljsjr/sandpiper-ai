@@ -29,7 +29,7 @@ export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperRe
   const resourcesRoot = join(resourceRoot, 'packages', 'resources');
 
   return {
-    skillPaths: [join(resourcesRoot, 'skills', 'sandpiper'), join(resourcesRoot, 'skills', 'third-party')],
+    skillPaths: [join(resourcesRoot, 'skills')],
     promptPaths: [join(resourcesRoot, 'prompts')],
     themePaths: [join(resourcesRoot, 'themes')],
   };

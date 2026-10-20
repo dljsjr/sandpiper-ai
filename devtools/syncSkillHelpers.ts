@@ -10,7 +10,7 @@ interface HelperCopy {
 }
 
 export async function syncSkillHelpers(repoRoot: string): Promise<void> {
-  const resourceRoot = join(repoRoot, 'packages', 'resources', 'skills', 'sandpiper');
+  const resourceRoot = join(repoRoot, 'packages', 'resources', 'skills');
   const helpers: readonly HelperCopy[] = [
     {
       source: join(repoRoot, 'packages', 'trail', 'dist', 'trail'),

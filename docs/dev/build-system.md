@@ -39,8 +39,8 @@ The root `build:packages` script uses Turborepo to build these packages:
 
 The helper sync copies:
 
-- `packages/trail/dist/trail` to `packages/resources/skills/sandpiper/tasks/scripts/trail`
-- `packages/sandpiper-standup-cli/dist/sandpiper-standup` to `packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup`
+- `packages/trail/dist/trail` to `packages/resources/skills/tasks/scripts/trail`
+- `packages/sandpiper-standup-cli/dist/sandpiper-standup` to `packages/resources/skills/standup/scripts/sandpiper-standup`
 
 Both copies are marked executable.
 
@@ -87,8 +87,8 @@ When command output changes, build first and smoke-test the workspace bins:
 bun run build
 ./node_modules/.bin/sandpiper --help
 ./node_modules/.bin/sandpiper-system-prompt --help
-packages/resources/skills/sandpiper/tasks/scripts/trail --help
-packages/resources/skills/sandpiper/standup/scripts/sandpiper-standup --help
+packages/resources/skills/tasks/scripts/trail --help
+packages/resources/skills/standup/scripts/sandpiper-standup --help
 ```
 
 ## Related docs
