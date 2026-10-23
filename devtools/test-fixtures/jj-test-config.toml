@@ -1,0 +1,4 @@
+# Subprocess tests must not inherit the developer's jj identity or aliases.
+[user]
+name = "Sandpiper Test"
+email = "sandpiper-test@example.invalid"

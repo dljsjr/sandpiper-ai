@@ -16,10 +16,9 @@ every spawn:
   `PI_CODING_AGENT_DIR`. This is the actual fix for the incident described below — see the
   design doc for why only one of these two names being set is a real, previously-hit failure
   mode, not theoretical.
-- `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` neutralized and `JJ_CONFIG` pointed at Trail's test
-  fixture, matching `packages/trail/vitest.setup.ts`'s own isolation (re-derived here rather than
-  inherited, because nested `vitest.config.ts` settings don't apply when tests run through the
-  root `bun run test:vitest` sweep).
+- `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` neutralized and `JJ_CONFIG` pointed at
+  `devtools/test-fixtures/jj-test-config.toml`. Each spawn sets these paths directly so the
+  isolation also holds when a caller runs outside the root Vitest command.
 - `--offline` passed unconditionally, so isolated runs don't make incidental startup network
   calls (verified: a pinned-but-unused provider was triggering repeated model-catalog fetches
   at startup independent of whether a turn was ever attempted; `--offline` suppresses that).

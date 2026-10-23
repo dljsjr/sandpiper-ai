@@ -147,34 +147,6 @@ Rejection text:
 Blocked by Sandpiper tool policy: load the `jj` skill before running `jj` commands, then retry.
 ```
 
-#### `inline_task_store_requires_tasks_skill`
-
-Reject direct access to inline Trail task files under `.sandpiper/tasks/**` unless `tasks` skill is loaded.
-
-Initial structured tool surfaces:
-
-- `read` file/path argument
-- `write` file/path argument
-- `edit` file/path argument
-
-Phase 0 must verify the exact active argument names before implementation hard-codes detector fields.
-
-Initial bash inspection surface:
-
-- simple `cat`, `ls`, `rg`, `grep`, or `sed` commands with a literal `.sandpiper/tasks/**` target
-
-The bash detector must refuse ambiguous shell. Nested interpreters, variables, command substitution, aliases, functions, and scripts are out of MVP.
-
-Task path detection must normalize relative and absolute inline paths. A relative `.sandpiper/tasks/...` target and an absolute `/path/to/project/.sandpiper/tasks/...` target should resolve to the same inline-storage match when the project root is known from the path.
-
-This rule is an inline-storage detector, not the full Trail storage model. Trail supports separate branch/worktree and external repo storage modes. Future resolver-backed detection must ask Trail/storage configuration which paths are task storage for the target project.
-
-Rejection text:
-
-```text
-Blocked by Sandpiper tool policy: load the `tasks` skill before accessing Trail task files directly. Use the Trail CLI for normal task work.
-```
-
 ## Tool Call Handler
 
 MVP handler shape:
@@ -240,8 +212,8 @@ Policies must not assume the agent process CWD is the target project. Persistent
 MVP implications:
 
 - `jj_requires_jj_skill` does not need project resolution to enforce skill loading: direct `jj` means `jj` skill is required.
-- `inline_task_store_requires_tasks_skill` only covers normalized inline `.sandpiper/tasks/**` paths and high-confidence simple bash inspection of those paths.
-- Future repo-aware `git` and full Trail storage policies need a target-context resolver keyed from the operation's path or command cwd.
+- Future repo-aware `git` policies need a target-context resolver keyed from the operation's path or command cwd.
+- Task-tracker policies are outside this draft until an external provider contract exists.
 
 Ambiguous context must degrade to observe/allow, never reject.
 
@@ -253,13 +225,9 @@ Minimum tests:
 2. Loading `jj` skill marks registry state.
 3. `bash` command `jj status` after loading `jj` skill allows.
 4. Non-`jj` bash command allows.
-5. `read` path `.sandpiper/tasks/AGENT/AGENT-35.md` before loading `tasks` skill rejects.
-6. `bash` command `cat .sandpiper/tasks/index.toon` before loading `tasks` skill rejects.
-7. Loading `tasks` skill marks registry state.
-8. Same `read` path and `cat` command after loading `tasks` skill allow.
-9. `shell_relay` command is not rejected by MVP policies.
-10. User `!jj status` is not rejected by agent tool policy.
-11. `/skill:jj` expansion does not satisfy loaded-skill policy state unless explicitly implemented.
+5. `shell_relay` command is not rejected by MVP policies.
+6. User `!jj status` is not rejected by agent tool policy.
+7. `/skill:jj` expansion does not satisfy loaded-skill policy state unless explicitly implemented.
 
 ## Open Questions
 

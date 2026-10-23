@@ -164,9 +164,9 @@ Potential solution space:
 
 ### Local agent config/task state should be excluded or suppressed
 
-Watching `.sandpiper` produced noisy Trail task/index/history events. Navigator
-should likely exclude project-local agent config/task storage by default, or at
-least suppress known Trail-generated churn.
+Watching `.sandpiper` produced noisy task/index/history events. Navigator
+should exclude project-local agent configuration and task storage by default, or
+suppress known task-tracker churn.
 
 Candidate excludes:
 

@@ -100,19 +100,17 @@ describe('packed Sandpiper CLI', () => {
         'projects',
         'refactoring',
         'standup',
-        'tasks',
         'test-driven-development',
       ]);
       expect(rendered.prompt).toContain(
-        join(installed, 'dist', 'standalone', 'resources', 'skills', 'tasks', 'SKILL.md'),
+        join(installed, 'dist', 'standalone', 'resources', 'skills', 'code-review', 'SKILL.md'),
       );
       expect(rendered.prompt).toContain('<tools>\n- read:');
       expect(rendered.prompt).not.toContain(repoRoot);
-      for (const helper of [
-        'tasks/scripts/trail',
-        'tasks/scripts/sandpiper-tasks',
-        'standup/scripts/sandpiper-standup',
-      ]) {
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'tasks'))).toBe(false);
+      expect(existsSync(join(installed, 'docs', 'features', 'tasks'))).toBe(false);
+      expect(existsSync(join(installed, 'docs', 'features', 'tasks.md'))).toBe(false);
+      for (const helper of ['standup/scripts/sandpiper-standup']) {
         const output = execFileSync(
           process.execPath,
           [join(installed, 'dist', 'standalone', 'resources', 'skills', helper), '--help'],

@@ -12,7 +12,6 @@
     ".": {
       "entry": [
         "package.json!",
-        "devtools/adoptTrailBoard.ts!",
         "devtools/syncSkillHelpers.ts!",
         "extensions/system.ts!"
       ],
@@ -22,7 +21,7 @@
         "extensions/tattler/**/*.ts!"
       ],
       // Root dependencies link these package-owned bin shims into node_modules/.bin.
-      "ignoreDependencies": ["@sandpiper-ai/trail", "sandpiper-ai-cli", "sandpiper-standup-cli"]
+      "ignoreDependencies": ["sandpiper-ai-cli", "sandpiper-standup-cli"]
     },
 
     "packages/cli": {
@@ -33,11 +32,6 @@
         "sandpiper_system_prompt.ts!"
       ],
       "project": ["*.ts!", "bin/*!"]
-    },
-
-    "packages/trail": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts!"]
     },
 
     "packages/sandpiper-standup-cli": {

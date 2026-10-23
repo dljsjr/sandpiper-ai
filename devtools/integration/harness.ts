@@ -22,7 +22,7 @@ export { MOCK_MODEL_ID, MOCK_PROVIDER_ID } from './mock-provider.js';
 const integrationDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = dirname(dirname(integrationDir));
 
-const TRAIL_JJ_FIXTURE = join(repoRoot, 'packages', 'trail', 'test-fixtures', 'jj-test-config.toml');
+const JJ_FIXTURE = join(repoRoot, 'devtools', 'test-fixtures', 'jj-test-config.toml');
 const MOCK_PROVIDER_PATH = join(integrationDir, 'mock-provider.ts');
 
 /** `pi`: bypasses Sandpiper's own package manifest entirely -- the true single/combinatoric
@@ -132,14 +132,10 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     SANDPIPER_CODING_AGENT_DIR: agentDir,
     PI_CODING_AGENT_DIR: agentDir,
     PI_SKIP_VERSION_CHECK: '1',
-    // VCS neutralization, matching packages/trail/vitest.setup.ts's own isolation. That
-    // setup file is NOT loaded when tests run via the root vitest sweep (nested
-    // vitest.config.ts settings don't apply from root -- see the design doc's root-config-gap
-    // finding), so this harness re-derives the same isolation explicitly rather than
-    // depending on it being inherited.
+    // Direct harness use must stay isolated even outside the root Vitest command.
     GIT_CONFIG_GLOBAL: '/dev/null',
     GIT_CONFIG_SYSTEM: '/dev/null',
-    JJ_CONFIG: TRAIL_JJ_FIXTURE,
+    JJ_CONFIG: JJ_FIXTURE,
   };
 
   if (options.settingsJson) {

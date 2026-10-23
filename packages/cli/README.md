@@ -48,7 +48,7 @@ The source entrypoints use `packages/resources/`. Built entrypoints use `dist/st
 
 `SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, points directly to a directory containing `skills/`, `prompts/`, and `themes/`. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
 
-The CLI requires Bun. Its Trail and standup helper scripts require Node. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
+The CLI requires Bun. Its standup helper requires Node. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 

@@ -22,7 +22,7 @@ For general methodology, use the `mutation-testing` skill.
 
 ```bash
 # Future target, not currently available
-cd packages/sandpiper-tasks-cli
+cd packages/core
 bun run xmutants
 ```
 

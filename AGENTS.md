@@ -4,7 +4,7 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 
 ## Start Here
 
-- Work against a task. If no relevant task exists, create one with the `tasks` skill/CLI before making changes.
+- Work against a task. Use the installed `trail` CLI for this repository's task tracking; it is not part of the Sandpiper distribution. If no relevant task exists, create one before making changes. Use `trail --help` or an available task skill for command guidance.
 - This is a jj repository. Use `jj`, not `git`, for version-control operations.
 - Before working in a subdirectory for the first time, read its `README.md` and `AGENTS.md` if they exist.
 - Read the relevant `.sandpiper/playbooks/*/index.md` before changing an area you have not already loaded this session.
@@ -20,7 +20,7 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
 - Tests must not touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config).
 - Do not create tasks for changes we believe *upstream* should make. Record the finding in the related task or doc and move on. Tasks that track an already-filed upstream PR or issue we are genuinely blocked on are fine.
-- YAAMS is adjacent tooling, not part of this monorepo yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; built-in continuity remains standup, tasks, inbox, and session logs until an integration lands.
+- YAAMS is adjacent tooling, not part of this monorepo yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; continuity for this repository remains standup, its task tracker, inbox, and session logs until an integration lands.
 
 ## Routing
 
@@ -33,7 +33,6 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 | CLI tools, Commander commands, package `bin` entries, bundled executables                              | `.sandpiper/playbooks/development/cli.md`                    |
 | Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                          | `.sandpiper/playbooks/development/pi-extensions.md`          |
 | AutoTOON, JSON→TOON conversion, token optimization                                                     | `.sandpiper/playbooks/features/autotoon.md`                  |
-| Task management, Trail/`trail`, task storage, task index                                               | `.sandpiper/playbooks/features/tasks.md`                     |
 | Shell Relay, Zellij integration, shared terminal, shell integrations                                   | `.sandpiper/playbooks/features/shell-relay.md`               |
 | Standup, session continuity, PID/liveness handling, concurrent sessions                                | `.sandpiper/playbooks/features/session-continuity.md`        |
 

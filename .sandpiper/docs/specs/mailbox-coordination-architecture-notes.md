@@ -333,7 +333,7 @@ need to answer a question that the public material cannot answer.
 - **Questions raised for Sandpiper**:
   - Do we need a formal lead concept, or should mailbox be peer-first with
     optional coordinator roles?
-  - Should task state and mailbox state be integrated with Trail rather than a
+  - Should task state and mailbox state be integrated with the project task tracker rather than a
     new team-specific task store?
 
 ### `pi-agent-teams`
@@ -441,7 +441,7 @@ need to answer a question that the public material cannot answer.
   - Health state vocabulary, especially startup-stalled detection.
 - **What to avoid / adapt**:
   - Polling by waking the model just to read inbox seems noisy and token-expensive.
-  - Separate task store under `~/.pi/tasks` would duplicate Trail in Sandpiper.
+  - Separate task store under `~/.pi/tasks` would duplicate the project task tracker.
   - Message schema is too weak for threaded coordination.
 - **Questions raised for Sandpiper**:
   - Can conversation/unread status be surfaced through tools or scoped context
@@ -511,7 +511,7 @@ need to answer a question that the public material cannot answer.
   - Should Sandpiper mailbox use JSONL plus delivery sidecar from day one?
   - Should v1 include `kind`, `priority`, `deliveryMode`, and reply fields, even
     if many are optional?
-  - Should task claims/leases be part of mailbox v1, or left to Trail/task work?
+  - Should task claims/leases be part of mailbox v1, or left to the task tracker?
 
 ## Prior Art Synthesis
 
@@ -834,9 +834,8 @@ Slack, but durable logs and broadcast are post-MVP. Direct messages are sent onl
 to online recipients. Broadcast/channel history is a follow-up slice: agents
 should eventually be able to inspect global/project channel history, but the
 first MVP should only preserve design affordances for that surface. Active
-notifications are delivery mechanisms, not storage. Trail remains the work/task
-system; conversation messages may eventually reference Trail tasks but should not
-replace them. Latency and disk usage are first-class constraints for any future
+notifications are delivery mechanisms, not storage. The project task tracker remains the work system.
+Conversation messages can reference work items but must not replace them. Latency and disk usage are first-class constraints for any future
 storage choice. Nothing in the design should prevent team-based
 organization/conventions from being layered on later.
 
@@ -1090,7 +1089,7 @@ on normal process exit and opportunistically during discovery: if discovery can
 acquire the claim's exclusive lock, it treats the claim as stale, unlinks the
 socket first, then unlinks the claim, ignoring `ENOENT` races. Durable
 global/project broadcast storage and startup channel presence are post-MVP, but
-close enough to belong in the initial Trail backlog as a separate Broadcast MVP
+close enough to belong in the initial project backlog as a separate Broadcast MVP
 work item once implementation tickets are created.
 
 ## Key Change 5 — Keep live DM payloads tiny; reserve rich records for durable logs
@@ -1382,7 +1381,7 @@ bounded notification content, or normal Pi compaction.
   be distributed for the accepted `format` identifiers?
 - For Broadcast MVP, how should durable conversation scopes be modeled beyond
   the built-in global and cwd/project broadcast channels?
-- How should conversation state interact with Trail task state once durable
+- How should conversation state interact with task-tracker state once durable
   broadcast exists?
 - For Broadcast MVP, what configuration surface should choose durable storage,
   and how should the XDG default / global / cwd-derived hierarchy be named?
@@ -1436,9 +1435,9 @@ contract.
 This is not a decision, only the current strawman to evaluate after the
 validation spike proves the interaction is valuable.
 
-- Product/package name: Tattler, Trail project key `TAT` when implementation
+- Product/package name: Tattler, project key `TAT` when implementation
   tasks are created.
-- Package shape mirrors Trail: standalone packages with a thin Pi/Sandpiper
+- Package shape: standalone packages with a thin Pi/Sandpiper
   binding layer.
 - Package split:
   - `@sandpiper-ai/tattler-core`: runtime roots, UUID/session binding interface,
@@ -1508,7 +1507,7 @@ validation spike proves the interaction is valuable.
 
 ## Candidate Broadcast MVP Slice
 
-This should become its own Trail backlog item when implementation tickets are
+This should become its own project backlog item when implementation tickets are
 created; no task has been created yet.
 
 - Durable storage resolves from user configuration or XDG default.
@@ -1541,7 +1540,7 @@ created; no task has been created yet.
 | 2026-05-14 | Make the MVP peer-first, not team-first.                                    | Brokerless peer conversations avoid requiring a leader/coordinator/team object, while still allowing teams to emerge later as naming, membership, channel, or workflow conventions.                                                                                                                                                    | Ensure v1 schema does not bake in a mandatory team/leader hierarchy.                                                                                                                                            |
 | 2026-05-14 | Use `triggerTurn` for online direct delivery, and later broadcast delivery. | Online headless agents cannot respond to inbound messages without starting a turn; forcing callers to emulate request/response with tool calls and polling is the wrong abstraction. Same-host UDS/SHM nudges are reliable enough for v1, and Pi's own queue handles injected messages. Broadcast should use the same primitive later. | Add `triggerTurn` support to the helper; define online routeability and author self-suppression. Defer broadcast, append-before-nudge ordering, wake policy, acks, coalescing, and budgets until measured need. |
 | 2026-05-14 | Scope first MVP to ephemeral online DMs only.                               | Because DMs are only valid between online agents, they do not need durability in v1. Durable private conversations can later be modeled as ordinary channels/conversations with two participants, not as a special DM subsystem.                                                                                                       | Keep first MVP tools/storage focused on live DM IPC.                                                                                                                                                            |
-| 2026-05-14 | Name the product Tattler and split core/protocol packages.                  | A tattler is a sandpiper relative known for being loud/chatty, matching the agent-messaging product shape. Tattler should be a standalone package family like Trail with a thin Pi binding layer: core owns same-host identity/IPC and protocols layer on top.                                                                         | Use Trail project key `TAT`; create `@sandpiper-ai/tattler-core`, `@sandpiper-ai/tattler-agent-message`, and product/metapackage `@sandpiper-ai/tattler` when implementation tasks are created.                 |
+| 2026-05-14 | Name the product Tattler and split core/protocol packages.                  | A tattler is a sandpiper relative known for being loud/chatty, matching the agent-messaging product shape. Tattler should be a standalone package family with a thin Pi binding layer: core owns same-host identity/IPC and protocols layer on top.                                                                         | Use project key `TAT`; create `@sandpiper-ai/tattler-core`, `@sandpiper-ai/tattler-agent-message`, and product/metapackage `@sandpiper-ai/tattler` when implementation tasks are created.                 |
 | 2026-05-14 | Use UUID-keyed runtime claims and global agent directory for identity.      | Every agent needs stable attribution before durable logs exist, but throwaway guests should not pollute the directory. UUID-keyed claims avoid handle/path cache invalidation; global handles remain renameable aliases stored in SQLite.                                                                                              | Persist `agentId` in session state via Pi `appendEntry`; implement runtime roots, claim `flock`, scan-plus-handshake discovery, and `$XDG_STATE_HOME/sandpiper/agents.sqlite3`.                                 |
 | 2026-05-14 | Build a smaller validation spike before the full Tattler MVP.               | The layered MVP design addresses real footguns, but the fastest path to value is a `control.ts`-style v0 spike that proves live agent-to-agent messaging and compact notification injection in real sessions.                                                                                                                          | When creating implementation tickets, start with a disposable/upgradeable Tattler v0 spike before agent directory, stable UUID identity, claim locks, handshakes, ack/error correlation, or schemas.            |
-| 2026-05-14 | Treat Broadcast MVP as a near-term post-MVP backlog item.                   | Global broadcast supports cross-project/floating agents; cwd broadcast keeps project coordination local. It is important enough to create Trail backlog work when implementation tickets are created, but it should not be part of the first ephemeral messaging MVP.                                                                  | When creating implementation tickets, add a Broadcast MVP task covering global/cwd durable logs, startup presence, and broadcast tools.                                                                         |
+| 2026-05-14 | Treat Broadcast MVP as a near-term post-MVP backlog item.                   | Global broadcast supports cross-project/floating agents; cwd broadcast keeps project coordination local. It is important enough to create project backlog work when implementation tickets are created, but it should not be part of the first ephemeral messaging MVP.                                                                  | When creating implementation tickets, add a Broadcast MVP task covering global/cwd durable logs, startup presence, and broadcast tools.                                                                         |

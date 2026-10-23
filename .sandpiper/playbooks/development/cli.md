@@ -1,6 +1,6 @@
 ---
 name: CLI Development
-read_when: building CLI tools, Commander commands, package bin entries, sandpiper CLI, Trail CLI, sandpiper-tasks compatibility, sandpiper-standup, bundled executables, command-line tools
+read_when: building CLI tools, Commander commands, package bin entries, sandpiper CLI, sandpiper-standup, bundled executables, command-line tools
 ---
 
 # CLI Development
@@ -18,10 +18,9 @@ Read this before changing command-line tools or package `bin` metadata.
 ## Current CLI Packages
 
 - `packages/cli/` — `sandpiper` runtime wrapper and system prompt diagnostic
-- `packages/trail/` — Trail task management CLI
 - `packages/sandpiper-standup-cli/` — standup/session-continuity CLI
 
 ## References
 
 - Public CLI guide: `docs/dev/cli-development.md`
-- Package docs: `packages/cli/README.md`, `packages/trail/README.md`, `packages/sandpiper-standup-cli/package.json`
+- Package docs: `packages/cli/README.md`, `packages/sandpiper-standup-cli/package.json`

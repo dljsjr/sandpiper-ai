@@ -27,7 +27,7 @@ Read this before you change build scripts, package metadata, or generated output
 | Sandpiper CLI, helper prerequisites, and staged resources | `bun run build:standalone` |
 | Build and pack the portable CLI without publishing | `bun run pack:cli` |
 | Package build graph only | `bun run build:packages` |
-| Refresh Trail and standup skill helpers after package builds | `bun run sync:skill-helpers` |
+| Refresh the standup skill helper after its package build | `bun run sync:skill-helpers` |
 | Remove dependencies, output, and caches | `bun run clean` |
 
 ## Source paths
@@ -35,7 +35,7 @@ Read this before you change build scripts, package metadata, or generated output
 - `package.json` defines the root build and test commands.
 - `turbo.json` defines the package build graph and cache inputs.
 - `packages/cli/package.json` builds the workspace runtime and system prompt diagnostic.
-- `devtools/syncSkillHelpers.ts` copies Trail and standup executables from package output into the local skills.
+- `devtools/syncSkillHelpers.ts` copies the standup executable from package output into its local skill.
 - `devtools/stageCliResources.ts` stages resources and public documentation in the CLI package.
 - `devtools/packCli.ts` packs the CLI and its patched runtime dependencies through a temporary package directory.
 - `packages/*/package.json` defines package-owned output.
@@ -54,6 +54,5 @@ Run the built workspace commands directly when their behavior changed:
 ```sh
 ./node_modules/.bin/sandpiper --help
 ./node_modules/.bin/sandpiper-system-prompt --help
-packages/resources/skills/tasks/scripts/trail --help
 packages/resources/skills/standup/scripts/sandpiper-standup --help
 ```

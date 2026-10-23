@@ -4,7 +4,7 @@ Guidelines for building command-line tools in the Sandpiper repository.
 
 ## Overview
 
-This document describes architectural patterns and best practices for building CLI tools with Commander.js. These guidelines apply to all CLI packages in the repository, including `packages/cli/` and the Trail CLI in `packages/trail/`.
+This document describes architectural patterns and best practices for building CLI tools with Commander.js. These guidelines apply to all CLI packages in the repository, including `packages/cli/` and `packages/sandpiper-standup-cli/`.
 
 ## Core Principle: Separation of Concerns
 
@@ -129,15 +129,15 @@ import { execSync } from "node:child_process";
 
 describe("CLI", () => {
   it("parses arguments correctly", () => {
-    const output = execSync("trail task create --help", {
+    const output = execSync("bun packages/cli/bin/sandpiper-system-prompt --help", {
       encoding: "utf8",
     });
-    expect(output).toContain("Create a new task");
+    expect(output).toContain("Usage:");
   });
 
   it("handles invalid arguments", () => {
     expect(() => {
-      execSync("trail task create --invalid-flag", {
+      execSync("bun packages/cli/bin/sandpiper-system-prompt unexpected-prompt", {
         encoding: "utf8",
       });
     }).toThrow();
@@ -219,8 +219,7 @@ Bun is the preferred runtime for CLI development:
 | `packages/cli/sandpiper_system_prompt.ts`                   | Model-free system prompt diagnostic      |
 | `packages/cli/system_prompt_diagnostic.ts`                  | Diagnostic SDK orchestration             |
 | `packages/cli/package.json`                                 | Package metadata with bin configuration  |
-| `packages/trail/src/commands/project-cmd.ts`  | Commander command wiring                |
-| `packages/trail/src/core/project-metadata.ts` | Core implementation logic               |
+| `packages/sandpiper-standup-cli/src/index.ts` | Commander command wiring                |
 
 ## Related Documentation
 

@@ -36,7 +36,6 @@ Project-local data lives in `<project>/.sandpiper/`.
 | Path                    | Purpose                                                                                                          |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | `.sandpiper/standup.md` | Session handoff note for continuity across agent sessions                                                        |
-| `.sandpiper/tasks/`     | Project task tracker data                                                                                        |
 | `.sandpiper/playbooks/` | Project-specific operational guidance for agents                                                                 |
 | `.sandpiper/docs/`      | Active internal docs that follow Diátaxis, such as in-flight specs, PRDs, design notes, and implementation plans |
 | `.sandpiper/archive/`   | Historical or superseded project docs                                                                            |

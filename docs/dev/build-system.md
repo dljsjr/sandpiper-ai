@@ -6,7 +6,7 @@ Use this page to understand the build structure. For commands, see [How to build
 
 ## Pipeline
 
-`bun run build` runs the package graph through Turborepo. The CLI build waits for Trail and standup, then stages their executables, built-in resources, and documentation. `bun install` only installs dependencies and applies the local Pi patch. It does not build Sandpiper.
+`bun run build` runs the package graph through Turborepo. The CLI build waits for standup, then stages its executable, built-in resources, and documentation. `bun install` only installs dependencies and applies the local Pi patch. It does not build Sandpiper.
 
 ## Package output
 
@@ -14,7 +14,6 @@ Use this page to understand the build structure. For commands, see [How to build
 | --- | --- |
 | `packages/cli/` | Runtime entrypoints, shared chunks, and `resources/` under `dist/standalone/`. Public documentation under ignored `docs/`. Packed tarballs under `dist/`. |
 | `packages/core/` | TypeScript declarations under `dist/` |
-| `packages/trail/` | Bundled Trail executable at `dist/trail` |
 | `packages/sandpiper-standup-cli/` | Bundled standup executable at `dist/sandpiper-standup` |
 
 The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti.
@@ -27,17 +26,11 @@ The root `build:packages` script uses Turborepo to build these packages:
 
 - `sandpiper-ai-core`
 - `sandpiper-standup-cli`
-- `@sandpiper-ai/trail`
 - `sandpiper-ai-cli`
 
 `turbo.json` defines dependency order and caches package-local output. CLI cache inputs include resources, public documentation, extension source, and staging scripts. Its outputs include `dist/**` and generated `docs/**`.
 
-The helper sync copies:
-
-- `packages/trail/dist/trail` to `packages/resources/skills/tasks/scripts/trail`
-- `packages/sandpiper-standup-cli/dist/sandpiper-standup` to `packages/resources/skills/standup/scripts/sandpiper-standup`
-
-Both copies are marked executable. The root build repeats the helper sync after Turbo to restore ignored source copies even on cache hits.
+The helper sync copies `packages/sandpiper-standup-cli/dist/sandpiper-standup` to `packages/resources/skills/standup/scripts/sandpiper-standup` and marks it executable. The root build repeats the sync after Turbo to restore the ignored source copy even on cache hits.
 
 ## Dependency resolution
 
@@ -95,7 +88,6 @@ When command output changes, build first and smoke-test the workspace bins:
 bun run build
 ./node_modules/.bin/sandpiper --help
 ./node_modules/.bin/sandpiper-system-prompt --help
-packages/resources/skills/tasks/scripts/trail --help
 packages/resources/skills/standup/scripts/sandpiper-standup --help
 ```
 

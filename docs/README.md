@@ -1,6 +1,6 @@
 # Sandpiper Documentation
 
-Sandpiper is a local coding-agent workspace built on Pi. It adds tools for shared terminals, task tracking, session continuity, skills, prompt templates, and themes.
+Sandpiper is a local coding-agent workspace built on Pi. It adds tools for shared terminals, session continuity, skills, prompt templates, and themes.
 
 ## Start here
 
@@ -12,7 +12,6 @@ Sandpiper is a local coding-agent workspace built on Pi. It adds tools for share
 
 - [AutoTOON](features/autotoon.md) - automatic JSON-to-TOON conversion for token efficiency.
 - [Shell Relay](features/shell-relay.md) - shared terminal sessions through Zellij.
-- [Task Management](features/tasks/README.md) - project task tracking with `trail`.
 - [Session Standup](features/standup.md) - handoff notes for continuity across sessions.
 
 ## Development
@@ -23,12 +22,6 @@ Sandpiper is a local coding-agent workspace built on Pi. It adds tools for share
 - [Environment variables](dev/env-vars.md) - `SANDPIPER_*` / `PI_*` mirroring and config lookup.
 - [Pi extension development](dev/pi-extension-development.md) - how Sandpiper uses Pi extension surfaces and where to check Pi API docs.
 - [Cross-extension prompt contributions](dev/prompt-contributions.md) - lifecycle-based coordination for extensions contributing system prompt content.
-
-## Task system
-
-- [Task overview](features/tasks/README.md)
-- [Bundled task storage reference](features/tasks/storage-guide.md)
-- [Task documentation ownership](features/tasks/architecture.md)
 
 ## Package and extension entrypoints
 

@@ -27,7 +27,7 @@ If no paths were listed, review the changes on their own merits using the code r
 
 3. **Accumulate, don't report per-commit.** Review each change individually but do NOT present per-commit feedback. Collapse findings into a review of the final state — if an early commit introduced an issue that a later commit fixed, don't report it.
 
-4. **Ticket alignment.** For each commit description that references a task key (e.g., `TCL-93`, `SHR-42`), read the referenced ticket using the **tasks** skill CLI (`task show <key>`). Verify that the code changes satisfy the ticket's title, description, and acceptance criteria. Flag gaps.
+4. **Ticket alignment.** For each commit description that references a task key (e.g., `TOOLS-34`, `SHR-42`), read the referenced ticket through the project's task tracker. Verify that the code changes satisfy the ticket's title, description, and acceptance criteria. Flag gaps.
 
 5. **Quantitative analysis.** Run against the final state of the working copy:
    - Complexity: `lizard --csv` on new/changed source files

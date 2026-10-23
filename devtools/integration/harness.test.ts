@@ -39,12 +39,12 @@ describe('prepareIsolatedSpawn', () => {
     }
   });
 
-  it('neutralizes VCS config and points JJ_CONFIG at the Trail fixture', () => {
+  it('neutralizes VCS config and points JJ_CONFIG at the shared test fixture', () => {
     const spawn = prepareIsolatedSpawn({ entry: 'pi' });
     try {
       expect(spawn.env.GIT_CONFIG_GLOBAL).toBe('/dev/null');
       expect(spawn.env.GIT_CONFIG_SYSTEM).toBe('/dev/null');
-      expect(spawn.env.JJ_CONFIG).toContain('packages/trail/test-fixtures/jj-test-config.toml');
+      expect(spawn.env.JJ_CONFIG).toContain('devtools/test-fixtures/jj-test-config.toml');
       expect(existsSync(spawn.env.JJ_CONFIG as string)).toBe(true);
     } finally {
       spawn.cleanup();

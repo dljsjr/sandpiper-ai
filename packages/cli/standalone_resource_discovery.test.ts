@@ -59,7 +59,6 @@ describe('standalone Sandpiper resource discovery', () => {
           'projects',
           'refactoring',
           'standup',
-          'tasks',
           'test-driven-development',
         ]);
         expect(promptNames).toContain('new-feature');

@@ -9,10 +9,7 @@ Work in this order:
    - what was accomplished recently
    - what is in progress
    - what the next session should do
-2. Use the **tasks** skill CLI to review live work:
-   - `trail task list -s IN_PROGRESS`
-   - `trail task list -s NEEDS_REVIEW`
-   - `trail task list -s NOT_STARTED --priority HIGH`
+2. If the repository uses a task tracker, review work in progress, work awaiting review, and high-priority backlog items through that tracker.
 3. Check whether the working copy is dirty using the repo's version control tool (e.g., `jj status`, `git status`), and summarize any meaningful changed files
 4. Use the root `AGENTS.md` routing table to identify the focused docs and local `README.md` / `AGENTS.md` files relevant to the user's current request
 5. Report back with:

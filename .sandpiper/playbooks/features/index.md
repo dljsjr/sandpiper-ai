@@ -3,6 +3,5 @@
 | Working on...                                                                     | Read                    |
 | --------------------------------------------------------------------------------- | ----------------------- |
 | AutoTOON, JSON→TOON conversion, token optimization, Claude plugin AutoTOON hooks  | `autotoon.md`           |
-| Task management, `trail`, task storage modes, task index, task skills   | `tasks.md`              |
 | Shell Relay, Zellij integration, shared terminal, shell integrations, relay tools | `shell-relay.md`        |
 | Standup, session continuity, concurrent sessions, PID/liveness behavior           | `session-continuity.md` |

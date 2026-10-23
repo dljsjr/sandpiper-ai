@@ -103,7 +103,8 @@ describe('system prompt diagnostic', () => {
       expect(output).toContain('<birdup>diagnostic append</birdup>');
       expect(output).toContain('<tools>\n- read:');
       expect(output).toContain('<available_skills>');
-      expect(output).toContain('name="tasks"');
+      expect(output).toContain('name="code-review"');
+      expect(output).not.toContain('<skill name="tasks"');
       expect(existsSync(credentialProbe)).toBe(false);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });

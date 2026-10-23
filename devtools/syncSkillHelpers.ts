@@ -13,13 +13,6 @@ export async function syncSkillHelpers(repoRoot: string): Promise<void> {
   const resourceRoot = join(repoRoot, 'packages', 'resources', 'skills');
   const helpers: readonly HelperCopy[] = [
     {
-      source: join(repoRoot, 'packages', 'trail', 'dist', 'trail'),
-      destinations: [
-        join(resourceRoot, 'tasks', 'scripts', 'trail'),
-        join(resourceRoot, 'tasks', 'scripts', 'sandpiper-tasks'),
-      ],
-    },
-    {
       source: join(repoRoot, 'packages', 'sandpiper-standup-cli', 'dist', 'sandpiper-standup'),
       destinations: [join(resourceRoot, 'standup', 'scripts', 'sandpiper-standup')],
     },

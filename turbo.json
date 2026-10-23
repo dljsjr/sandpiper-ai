@@ -22,11 +22,7 @@
   ],
   "tasks": {
     "sandpiper-ai-cli#build": {
-      "dependsOn": [
-        "^build",
-        "@sandpiper-ai/trail#build",
-        "sandpiper-standup-cli#build"
-      ],
+      "dependsOn": ["^build", "sandpiper-standup-cli#build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "!**/*.test.ts",

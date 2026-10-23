@@ -72,6 +72,7 @@ describe('standalone Sandpiper CLI smoke', () => {
     const cliPackage = readPackageJson(join(repoRoot, 'packages', 'cli', 'package.json'));
 
     expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe('workspace:*');
+    expect(rootPackage.dependencies).not.toHaveProperty('@sandpiper-ai/trail');
     expect(cliPackage.bin?.sandpiper).toBe('./bin/sandpiper');
     expect(cliPackage.bin?.['sandpiper-system-prompt']).toBe('./bin/sandpiper-system-prompt');
     expect(cliPackage.bin).not.toHaveProperty('sandpiper-standalone');

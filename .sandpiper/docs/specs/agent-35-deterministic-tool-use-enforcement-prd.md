@@ -15,7 +15,6 @@ Agents sometimes perform skill-shaped work without loading the skill that define
 Observed failures:
 
 - Running `jj` directly before loading the `jj` skill
-- Inspecting Trail task storage directly instead of loading the `tasks` skill and using `trail`
 - Editing agent-facing playbooks before loading the relevant librarian guidance
 
 The last example is deliberately not part of this MVP. Catalog skill loading is observable when it goes through the Sandpiper `skill` tool. Arbitrary playbook or role reading is not observable in the same way and belongs with Waymark/RG-style routing, not AGENT-35.
@@ -47,18 +46,14 @@ The MVP covers private agent tool calls that flow through Pi `tool_call`:
 | Operation                                                                                                                                          | Required skill | Detection                            | MVP action                 |
 | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ------------------------------------ | -------------------------- |
 | Standard `bash` command is a high-confidence direct `jj` invocation                                                                                | `jj`           | Conservative command-string detector | Reject if skill not loaded |
-| Direct access to inline Trail task files under `.sandpiper/tasks/**` via `read`, `edit`, or `write`                                                | `tasks`        | Structured tool path detector        | Reject if skill not loaded |
-| High-confidence simple `bash` inspection of inline Trail task files (`cat`, `ls`, `rg`, `grep`, `sed` with a literal `.sandpiper/tasks/**` target) | `tasks`        | Conservative command-string detector | Reject if skill not loaded |
 
-The task-store rules are explicitly inline-storage detectors for MVP. Trail supports storage modes where task files may live outside the obvious inline path. Resolver-backed task-store detection is required before claiming complete coverage.
+Task-tracker policies are outside this draft until an external provider contract exists.
 
 ## Success Criteria
 
 - Running a high-confidence direct `jj` command through the standard `bash` tool before loading the `jj` skill is blocked with actionable remediation.
 - Loading the `jj` skill through the `skill` tool updates live session policy state.
 - Retrying the same `jj` command after loading the `jj` skill is allowed.
-- Reading, editing, or high-confidence shell inspection of `.sandpiper/tasks/**` before loading the `tasks` skill is blocked.
-- Loading the `tasks` skill updates live session policy state.
 - Normal tool calls outside the MVP policies are unaffected.
 - `shell_relay` is unaffected by MVP enforcement.
 - User `!` / `!!` shell commands are unaffected; they use Pi's separate `user_bash` event, not agent `tool_call`.
@@ -79,7 +74,6 @@ The agent should not receive a lecture. The recovery loop is the product: load t
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | False positives make the system intolerable        | Only high-confidence detectors may reject. Ambiguous operations observe or pass.                                                   |
 | Persistent-agent process CWD is not a project CWD  | MVP `jj` skill gating does not require repo resolution. Future repo-aware policies must resolve target context from the operation. |
-| Trail task storage can move                        | MVP labels `.sandpiper/tasks/**` as inline-storage coverage only; resolver-backed detection is future work.                        |
 | Skill discovery is confused with skill loading     | Use live state recorded from successful `skill` tool execution; do not use `available_skills` catalogue metadata.                  |
 | `/skill:name` expansion is confused with tool load | MVP only treats successful Sandpiper `skill` tool calls as loaded state unless slash-skill expansion is explicitly wired later.    |
 | Scope creeps into RG or Waymark                    | Keep AGENT-35 limited to observable catalog skill preconditions.                                                                   |
@@ -88,7 +82,6 @@ The agent should not receive a lecture. The recovery loop is the product: load t
 
 - PATH shim / wrapper layer for subprocess-mediated command invocations such as `python -c 'subprocess.run(["jj"])'`
 - `shell_relay` adapter after Shell Relay lifecycle/ownership is redesigned
-- Resolver-backed Trail task-store detection across storage modes
 - Repo-aware `git` policy that checks whether a target directory is a jj repo
 - `/skill:name` slash-command activation tracking, if Sandpiper decides it should satisfy tool-policy preconditions
 - Waymark-backed playbook/role-read preconditions

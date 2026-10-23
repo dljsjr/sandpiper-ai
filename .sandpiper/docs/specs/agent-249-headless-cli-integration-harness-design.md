@@ -242,29 +242,11 @@ against a test fixture tool, including a deterministic error when a script runs 
 
 ## 4. Harness placement + wiring
 
-**Confirmed empirically** (not just per AGENT-249's claim): root `bun run test:vitest` (no
-config file at repo root) discovers test files repo-wide via vitest's default
-`**/*.test.ts` include glob — verified `packages/trail/**/*.test.ts` and
-`extensions/web-search/**/*.test.ts` both ran under a bare root sweep. But nested
-`vitest.config.ts` files (`packages/core`, `packages/trail`, `extensions/{shell-relay,web-fetch,
-web-search}`, `packages/sandpiper-standup-cli`) are **never loaded** from root — their
-`environment`/`testTimeout`/`setupFiles` settings don't apply. Root discovers the *files*, not
-the *configs*.
+The original root sweep discovered test files without loading nested package configurations. AGENT-258 later added explicit Vitest projects for core, standup, Shell Relay, web fetch, and web search. The `legacy-root` project covers the remaining tests, including this harness.
 
-**Proof this already bit the repo once**: `packages/trail/vitest.setup.ts` sets
-`GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM`/`JJ_CONFIG` for Trail's git/jj-spawning integration
-tests — but that setup file is inert from root. The root `test:vitest` script's env prefix
-(`env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
-JJ_CONFIG="$PWD/packages/trail/test-fixtures/jj-test-config.toml" vitest run`) hardcodes exactly
-those same values at the *shell* level to compensate. That's the "proven pattern" AGENT-249
-points at, and it's a workaround forced by the gap, not a design to imitate wholesale (it doesn't
-scale — every nested suite hoisting its env needs into one shared root script string is not
-sustainable, and it's already fragile: it's Trail-specific knowledge baked into a task run by
-every package).
+The root `test:vitest` command neutralizes Git configuration and points `JJ_CONFIG` at `devtools/test-fixtures/jj-test-config.toml`. The harness sets those values again for each subprocess. This keeps direct harness use isolated even when a caller does not use the root test command.
 
-**Design for this harness**: don't repeat the hoist-to-root-script pattern *or* add a root
-`vitest.config.ts` (a wider-blast-radius change than this task needs, given the whole existing
-suite currently depends on zero-config root behavior working as-is). Instead:
+**Design for this harness**:
 
 - New directory: `devtools/integration/` (sibling to `devtools/`'s existing
   process smoke-test precedent — both are "drive the real thing end-to-end" test classes,
@@ -275,7 +257,7 @@ suite currently depends on zero-config root behavior working as-is). Instead:
   `SANDPIPER_CODING_AGENT_DIR` and `PI_CODING_AGENT_DIR` to a fresh `mkdtempSync` directory (per
   §1's raw-vs-wrapper env-var divergence -- this is the actual fix for the incident described in
   §3, not a guard around it), always neutralizes `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM`/points
-  `JJ_CONFIG` at Trail's existing fixture where the extension under test might spawn VCS, always
+  `JJ_CONFIG` at the shared fixture where the extension under test might spawn VCS, always
   passes `--offline` (§3, hermeticity not safety), and always requires an explicit
   `--provider`/`--model` pin to the mock by default (overridable for the config-isolation
   canary, which deliberately omits it). No test file constructs its own `spawn()` call.

@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -14,32 +14,20 @@ function makeTempRoot(): string {
 }
 
 afterEach(() => {
-  for (const root of tempRoots.splice(0)) {
-    rmSync(root, { recursive: true, force: true });
-  }
+  for (const root of tempRoots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
 describe('syncSkillHelpers', () => {
-  it('copies package-owned CLI outputs into the source skill directories', async () => {
+  it('copies the standup helper without requiring or creating a task CLI', async () => {
     const repoRoot = makeTempRoot();
-    const trailOutput = join(repoRoot, 'packages', 'trail', 'dist', 'trail');
     const standupOutput = join(repoRoot, 'packages', 'sandpiper-standup-cli', 'dist', 'sandpiper-standup');
-
-    await mkdir(join(trailOutput, '..'), { recursive: true });
     await mkdir(join(standupOutput, '..'), { recursive: true });
-    writeFileSync(trailOutput, '#!/usr/bin/env node\ntrail\n');
     writeFileSync(standupOutput, '#!/usr/bin/env node\nstandup\n');
-
     await syncSkillHelpers(repoRoot);
-
-    const taskScripts = join(repoRoot, 'packages', 'resources', 'skills', 'tasks', 'scripts');
-    const standupScript = join(repoRoot, 'packages', 'resources', 'skills', 'standup', 'scripts', 'sandpiper-standup');
-
-    expect(readFileSync(join(taskScripts, 'trail'), 'utf-8')).toContain('trail');
-    expect(readFileSync(join(taskScripts, 'sandpiper-tasks'), 'utf-8')).toContain('trail');
+    const skills = join(repoRoot, 'packages', 'resources', 'skills');
+    const standupScript = join(skills, 'standup', 'scripts', 'sandpiper-standup');
     expect(readFileSync(standupScript, 'utf-8')).toContain('standup');
-    expect(statSync(join(taskScripts, 'trail')).mode & 0o111).not.toBe(0);
-    expect(statSync(join(taskScripts, 'sandpiper-tasks')).mode & 0o111).not.toBe(0);
     expect(statSync(standupScript).mode & 0o111).not.toBe(0);
+    expect(existsSync(join(skills, 'tasks'))).toBe(false);
   });
 });

@@ -13,9 +13,9 @@ Build the smallest useful deterministic enforcement slice:
 
 - Track catalog skills loaded through the `skill` tool.
 - Use Pi `tool_call` to reject high-confidence operations when the required skill is missing.
-- Enforce two MVP policies:
-  - direct `jj` command through standard `bash` requires `jj` skill
-  - inline `.sandpiper/tasks/**` direct access requires `tasks` skill, including structured file tools and high-confidence simple bash inspection (`cat`, `ls`, `rg`, `grep`, `sed`)
+- Enforce one MVP policy: a direct `jj` command through standard `bash` requires the `jj` skill.
+
+Task-tracker policies are outside this draft until an external provider contract exists.
 
 Do not implement guidance injection, playbook-read tracking, `/skill:name` activation tracking, `shell_relay` enforcement, PATH shims, or a policy DSL in the MVP.
 
@@ -35,7 +35,6 @@ Exit criteria:
 
 - A direct `bash` command can be blocked before execution.
 - A direct `read`/`edit`/`write` path can be blocked before execution.
-- A simple `bash` command that inspects `.sandpiper/tasks/**` can be blocked before execution.
 - No implementation work begins if this spike fails.
 
 ## Phase 1 — Loaded Skill Registry
@@ -53,7 +52,7 @@ Goal: make loaded catalog skill state available to policy evaluation.
 Verification:
 
 - Loading `jj` through the `skill` tool marks `jj` loaded.
-- Loading `tasks` through the `skill` tool marks `tasks` loaded.
+- Loading `code-review` through the `skill` tool marks `code-review` loaded.
 - Failed skill loads do not mark skills loaded.
 - Reload/resume preserves loaded-skill records within the session.
 - `available_skills` catalogue metadata alone does not mark any skill loaded.
@@ -98,24 +97,6 @@ Verification:
 - `bash: echo jj status` allows.
 - Ambiguous commands observe or allow; they never reject.
 
-### Policy 2: `inline_task_store_requires_tasks_skill`
-
-1. Add structured path detector for `read`, `write`, and `edit` paths under inline `.sandpiper/tasks/**` storage.
-2. Add conservative bash detector for simple `cat`, `ls`, `rg`, `grep`, or `sed` commands with a literal `.sandpiper/tasks/**` target.
-3. Normalize relative and absolute inline task-store paths before matching.
-4. Reject when either detector matches and `tasks` skill is not loaded.
-5. Allow when `tasks` skill is loaded.
-6. Document this as inline-storage coverage only.
-
-Verification:
-
-- `read .sandpiper/tasks/...` rejects before `tasks` skill load.
-- `bash: cat .sandpiper/tasks/index.toon` rejects before `tasks` skill load.
-- Same read and bash inspection allow after `tasks` skill load.
-- Non-task paths allow.
-- Ambiguous shell commands observe or allow; they never reject.
-- The rule does not claim coverage for external Trail storage modes.
-
 ## Phase 4 — Tests
 
 Add focused tests before broad integration.
@@ -129,18 +110,13 @@ Suggested test layers:
 2. Command detector unit tests
    - direct `jj`
    - whitespace
-   - simple task-store inspection commands
    - non-matches
    - ambiguous commands
-3. Path detector unit tests
-   - inline `.sandpiper/tasks/**`
-   - non-task paths
-   - relative and absolute inline paths where supported
-4. Policy evaluator unit tests
+3. Policy evaluator unit tests
    - missing skill rejects
    - loaded skill allows
    - observe never blocks
-5. Extension integration test
+4. Extension integration test
    - `tool_call` handler returns block for a synthetic bash event
    - structured path event blocks correctly
 
@@ -158,7 +134,6 @@ Run the focused test command from `.sandpiper/playbooks/development/typescript-a
 AGENT-35 MVP is done when:
 
 - `jj` direct command enforcement works through standard `bash`.
-- inline Trail task-file direct access enforcement works for structured file tools and high-confidence simple bash inspection.
 - loaded-skill state is live, session-persistent, and not confused with catalogue discovery.
 - `shell_relay` is explicitly out of MVP and unaffected.
 - Tests cover registry, detector, evaluator, and hook integration.
@@ -173,9 +148,8 @@ Do these only after MVP proves the core behavior:
 | PATH shim / wrapper for `jj`                    | Catches subprocess-by-name but needs passthrough fidelity and state transport   |
 | `/skill:name` activation tracking               | Needs input-pipeline integration if slash skill expansion should satisfy policy |
 | `shell_relay` adapter                           | Shared user pane requires separate lifecycle and ownership design               |
-| Resolver-backed Trail storage detection         | Needs Trail storage config integration                                          |
 | Repo-aware `git` policy                         | Needs target-project and jj/git repo resolution                                 |
-| `gh`, `glab`, `bun`, `uv` precondition policies | Same shape, but wait until two-rule MVP proves useful                           |
+| `gh`, `glab`, `bun`, `uv` precondition policies | Same shape, but wait until the initial MVP proves useful                           |
 | Waymark-backed playbook/role preconditions      | Different substrate; not catalog skill state                                    |
 
 ## Handoff Notes
@@ -186,5 +160,4 @@ Design pressure to preserve:
 - Reject only high-confidence matches.
 - False positives are worse than false negatives.
 - Persistent agents do not have project CWDs; future context-sensitive policies must resolve target context from the operation.
-- Trail storage is configurable; `.sandpiper/tasks/**` is an MVP inline detector, not the complete model.
 - Shell Relay is intentionally out of MVP.
