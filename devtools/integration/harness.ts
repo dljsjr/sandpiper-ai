@@ -66,7 +66,7 @@ export interface IsolatedSpawnOptions {
    * touch this repo's own tree as a cwd side effect. */
   readonly cwd?: string;
   /** Extra env vars layered on top of the isolation defaults. Isolation vars (agent-dir
-   * names, GIT_CONFIG_*, JJ_CONFIG) always win over this -- pass agent-dir-relative state
+   * names, HOME, GIT_CONFIG_*, JJ_CONFIG) always win over this -- pass agent-dir-relative state
    * through `agentDir` instead of trying to override them. */
   readonly env?: Readonly<NodeJS.ProcessEnv>;
   /** Written as `<agentDir>/settings.json` before the spawn is returned (so it exists on disk
@@ -129,6 +129,8 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     // is the actual fix for the incident this harness exists to contain -- see the design
     // doc's "Incident log" section: hand-run debug commands that set only one of these two
     // names silently inherited the *real* agent dir under the other name.
+    // External user skills must also resolve inside this spawn's sandbox.
+    HOME: agentDir,
     SANDPIPER_CODING_AGENT_DIR: agentDir,
     PI_CODING_AGENT_DIR: agentDir,
     PI_SKIP_VERSION_CHECK: '1',

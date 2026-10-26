@@ -19,6 +19,7 @@ describe('prepareIsolatedSpawn', () => {
         expect(spawn.env.SANDPIPER_SESSION_ID).toBeUndefined();
         expect(spawn.env.PI_EXAMPLE).toBe('kept');
         expect(spawn.env.PI_CODING_AGENT_DIR).toBe(spawn.agentDir);
+        expect(spawn.env.HOME).toBe(spawn.agentDir);
         expect(spawn.env.PATH).toBe(process.env.PATH);
       } finally {
         spawn.cleanup();

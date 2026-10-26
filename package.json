@@ -27,7 +27,7 @@
     "check": "bun run check:deps && bun run check:tsc && bun run check:biome-check",
     "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/devtools/test-fixtures/jj-test-config.toml\" vitest run",
-    "test:standalone": "bun run build:standalone && bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/pi_asset_paths.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts devtools/stageCliResources.test.ts devtools/packedCli.test.ts",
+    "test:standalone": "bun run build:standalone && bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/pi_asset_paths.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/temporary_trail_skill.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts devtools/stageCliResources.test.ts devtools/packedCli.test.ts",
     "build:packages": "turbo run build --filter=sandpiper-ai-core --filter=sandpiper-standup-cli --filter=sandpiper-ai-cli",
     "sync:skill-helpers": "bun --bun devtools/syncSkillHelpers.ts",
     "build": "rm -rf dist && bun run build:packages && bun run sync:skill-helpers",

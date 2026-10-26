@@ -35,6 +35,7 @@ Read this before you change build scripts, package metadata, or generated output
 - `package.json` defines the root build and test commands.
 - `turbo.json` defines the package build graph and cache inputs.
 - `packages/cli/package.json` builds the workspace runtime and system prompt diagnostic.
+- `packages/cli/temporary_trail_skill.ts` temporarily loads `~/git/skills-incubator/skills/trail` when `trail` is executable on PATH. TOOLS-43 tracks replacing this local bridge. There are no Trail flags, downloads, or discovery commands yet.
 - `devtools/syncSkillHelpers.ts` copies the standup executable from package output into its local skill.
 - `devtools/stageCliResources.ts` stages resources and public documentation in the CLI package.
 - `devtools/packCli.ts` packs the CLI and its patched runtime dependencies through a temporary package directory.

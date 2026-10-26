@@ -16,6 +16,7 @@ every spawn:
   `PI_CODING_AGENT_DIR`. This is the actual fix for the incident described below — see the
   design doc for why only one of these two names being set is a real, previously-hit failure
   mode, not theoretical.
+- `HOME` points at the temporary agent directory, so external user skills cannot load from the real home directory.
 - `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` neutralized and `JJ_CONFIG` pointed at
   `devtools/test-fixtures/jj-test-config.toml`. Each spawn sets these paths directly so the
   isolation also holds when a caller runs outside the root Vitest command.

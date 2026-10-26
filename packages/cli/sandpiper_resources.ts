@@ -14,6 +14,7 @@ import {
 import tattlerExtension from '../../extensions/tattler/index.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
 import webSearchExtension from '../../extensions/web-search/src/index.js';
+import { temporaryTrailSkillPaths } from './temporary_trail_skill.js';
 
 export interface SandpiperResourcePaths {
   readonly skillPaths: readonly string[];
@@ -36,7 +37,7 @@ export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperRe
 function createSandpiperResourceExtension(resourcePaths: SandpiperResourcePaths): ExtensionFactory {
   return (pi: ExtensionAPI) => {
     pi.on('resources_discover', () => ({
-      skillPaths: [...resourcePaths.skillPaths],
+      skillPaths: [...resourcePaths.skillPaths, ...temporaryTrailSkillPaths()],
       promptPaths: [...resourcePaths.promptPaths],
       themePaths: [...resourcePaths.themePaths],
     }));
