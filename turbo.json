@@ -22,15 +22,14 @@
   ],
   "tasks": {
     "sandpiper-ai-cli#build": {
-      "dependsOn": ["^build", "sandpiper-standup-cli#build"],
+      "dependsOn": ["^build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "!**/*.test.ts",
         "$TURBO_ROOT$/extensions/**/*.ts",
         "$TURBO_ROOT$/packages/resources/**",
         "$TURBO_ROOT$/docs/**",
-        "$TURBO_ROOT$/devtools/stageCliResources.ts",
-        "$TURBO_ROOT$/devtools/syncSkillHelpers.ts"
+        "$TURBO_ROOT$/devtools/stageCliResources.ts"
       ],
       "outputs": ["dist/**", "docs/**"]
     },

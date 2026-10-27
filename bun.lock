@@ -8,7 +8,6 @@
         "better-sqlite3": "13.0.3",
         "sandpiper-ai-cli": "workspace:*",
         "sandpiper-ai-core": "workspace:*",
-        "sandpiper-standup-cli": "workspace:*",
         "sanitize-filename": "1.6.4",
         "tmp": "0.2.7",
         "uuid": "14.0.2",
@@ -127,18 +126,6 @@
       "name": "sandpiper-resources",
       "version": "0.0.1",
     },
-    "packages/sandpiper-standup-cli": {
-      "name": "sandpiper-standup-cli",
-      "version": "0.0.1",
-      "bin": {
-        "sandpiper-standup": "./dist/sandpiper-standup",
-      },
-      "dependencies": {
-        "@commander-js/extra-typings": "15.0.0",
-        "commander": "15.0.0",
-        "sandpiper-ai-core": "0.0.1",
-      },
-    },
   },
   "patchedDependencies": {
     "@earendil-works/pi-coding-agent@1.3.0": "patches/@earendil-works%2Fpi-coding-agent@1.3.0.patch",
@@ -209,8 +196,6 @@
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@2.5.13", "", { "os": "win32", "cpu": "x64" }, "sha512-VOofU/nW761XWzUeUNE8zzYNyPrxuMuNFMizL0qz7J75yeV8N7WFheUlk1/K6dOkaFpH9wJ+lDKlwjAbw0346w=="],
 
     "@bramus/specificity": ["@bramus/specificity@2.4.2", "", { "dependencies": { "css-tree": "^3.0.0" }, "bin": { "specificity": "bin/cli.js" } }, "sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw=="],
-
-    "@commander-js/extra-typings": ["@commander-js/extra-typings@15.0.0", "", { "peerDependencies": { "commander": "~15.0.0" } }, "sha512-yeJlba62xqmkgELUsn7356MEnzLLu/fw2x4lofFqGnXh6YysRdEs2BaLeLtg1+KU0AXvMeqQvTTp+3hBEBK+EA=="],
 
     "@csstools/color-helpers": ["@csstools/color-helpers@6.1.1", "", {}, "sha512-gLNsunvwf3mCi5u5o46/Z/JcJMnhbHSaZ69rkgPzNM3J4s8hWwpPUQB6/tt0EDFyCiWzxANlx+2LJwpYj4zS1w=="],
 
@@ -751,8 +736,6 @@
     "sandpiper-capability-autotoon": ["sandpiper-capability-autotoon@workspace:packages/capability-autotoon"],
 
     "sandpiper-resources": ["sandpiper-resources@workspace:packages/resources"],
-
-    "sandpiper-standup-cli": ["sandpiper-standup-cli@workspace:packages/sandpiper-standup-cli"],
 
     "sandpiper-system": ["sandpiper-system@workspace:extensions/system"],
 

@@ -99,7 +99,6 @@ describe('packed Sandpiper CLI', () => {
         'mutation-testing',
         'projects',
         'refactoring',
-        'standup',
         'test-driven-development',
       ]);
       expect(rendered.prompt).toContain(
@@ -110,19 +109,7 @@ describe('packed Sandpiper CLI', () => {
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks.md'))).toBe(false);
-      for (const helper of ['standup/scripts/sandpiper-standup']) {
-        const output = execFileSync(
-          process.execPath,
-          [join(installed, 'dist', 'standalone', 'resources', 'skills', helper), '--help'],
-          {
-            cwd: project,
-            env,
-            encoding: 'utf8',
-            timeout: 15_000,
-          },
-        );
-        expect(output).toContain('Usage:');
-      }
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'standup'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone-package'))).toBe(false);
       expect(existsSync(join(project, 'dist'))).toBe(false);
     } finally {

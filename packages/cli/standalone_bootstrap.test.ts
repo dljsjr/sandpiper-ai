@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -110,6 +111,30 @@ describe('standalone bootstrap', () => {
     expect(env.PI_CODING_AGENT_VERSION).toBe('1.3.0');
     expect(env.SANDPIPER_CODING_AGENT_PACKAGE).toBe('/bundle');
     expect(env.PI_TELEMETRY).toBe('0');
+  });
+
+  it('keeps the default Journal directory anchored to launch cwd in child processes', () => {
+    const root = mkdtempSync(join(tmpdir(), 'sandpiper-journal-env-'));
+    try {
+      const env: NodeJS.ProcessEnv = {};
+      configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '1.3.0' }, env);
+      const journalDir = join(process.cwd(), '.sandpiper');
+      expect(env.AGENT_JOURNAL_DIR).toBe(journalDir);
+      const childValue = execFileSync(process.execPath, ['-e', 'console.log(process.env.AGENT_JOURNAL_DIR)'], {
+        cwd: root,
+        env,
+        encoding: 'utf8',
+      });
+      expect(childValue.trim()).toBe(journalDir);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it.each(['/custom/notes', '../relative-notes', ''])('preserves the supplied Journal directory %j', (value) => {
+    const env: NodeJS.ProcessEnv = { AGENT_JOURNAL_DIR: value };
+    configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '1.3.0' }, env);
+    expect(env.AGENT_JOURNAL_DIR).toBe(value);
   });
 
   it.each([

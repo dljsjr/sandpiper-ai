@@ -1,20 +1,22 @@
 #!/usr/bin/env bun
 
+import { existsSync } from 'node:fs';
 import { cp, rm } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { syncSkillHelpers } from './syncSkillHelpers.js';
 
 export async function stageCliResources(repoRoot: string): Promise<void> {
-  await syncSkillHelpers(repoRoot);
   const packageDir = join(repoRoot, 'packages', 'cli');
   const resourceRoot = join(packageDir, 'dist', 'standalone', 'resources');
   await rm(resourceRoot, { recursive: true, force: true });
   for (const directory of ['skills', 'prompts', 'themes']) {
-    await cp(join(repoRoot, 'packages', 'resources', directory), join(resourceRoot, directory), {
+    const source = join(repoRoot, 'packages', 'resources', directory);
+    await cp(source, join(resourceRoot, directory), {
       recursive: true,
       dereference: true,
-      filter: (path) => !basename(path).startsWith('.'),
+      filter: (path) =>
+        !basename(path).startsWith('.') &&
+        (directory !== 'skills' || dirname(path) !== source || existsSync(join(path, 'SKILL.md'))),
     });
   }
   const docs = join(packageDir, 'docs');

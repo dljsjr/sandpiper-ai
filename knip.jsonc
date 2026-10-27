@@ -12,7 +12,6 @@
     ".": {
       "entry": [
         "package.json!",
-        "devtools/syncSkillHelpers.ts!",
         "extensions/system.ts!"
       ],
       "project": [
@@ -21,7 +20,7 @@
         "extensions/tattler/**/*.ts!"
       ],
       // Root dependencies link these package-owned bin shims into node_modules/.bin.
-      "ignoreDependencies": ["sandpiper-ai-cli", "sandpiper-standup-cli"]
+      "ignoreDependencies": ["sandpiper-ai-cli"]
     },
 
     "packages/cli": {
@@ -32,11 +31,6 @@
         "sandpiper_system_prompt.ts!"
       ],
       "project": ["*.ts!", "bin/*!"]
-    },
-
-    "packages/sandpiper-standup-cli": {
-      "entry": ["src/index.ts!"],
-      "project": ["src/**/*.ts!"]
     }
   }
 }

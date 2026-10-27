@@ -65,6 +65,7 @@ export function configurePiEnvironment(options: PiEnvironmentOptions, env: NodeJ
   env.PI_PACKAGE_DIR = options.packageDir;
   env.PI_SKIP_VERSION_CHECK = '1';
   env.PI_TELEMETRY ??= '0';
+  env.AGENT_JOURNAL_DIR ??= resolve(process.cwd(), '.sandpiper');
   env.SANDPIPER_CODING_AGENT_PACKAGE = options.packageDir;
 }
 
