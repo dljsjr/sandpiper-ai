@@ -11,7 +11,7 @@ Read this before you change build scripts, package metadata, or generated output
 
 - Edit source, not generated files under `dist/` or package `dist/` directories.
 - `bun install` installs dependencies only. It must not build Sandpiper.
-- Run `bun run build` to build package-owned outputs, stage built-in resources and public docs in the CLI package.
+- Run `bun run build` to build package-owned outputs and stage built-in resources and public docs in the CLI package.
 - Use `bun run pack:cli` for an npm-compatible tarball. Do not pack the workspace subpackage directly: pack tools omit its hoisted dependencies.
 - Keep output beside the package that owns it.
 - The CLI bundles built-in extensions. Pi loads additional user/project extensions from source TypeScript. Do not add a separate extension build step.
