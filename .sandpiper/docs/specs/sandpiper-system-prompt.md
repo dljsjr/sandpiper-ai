@@ -54,7 +54,7 @@ The `<skills>` section treats `<available_skills>` as routing metadata. When the
 - user profile content from `USER.md` in the agent directory resolved by Pi's `getAgentDir()`, when present
 - session-start VCS detection (`jj`, `git`, `hg`, `svn`, `fossil`, `perforce`, or `none`)
 
-The older one-shot startup context fields (`projectTriggers`, `activeTaskContext`, `workingCopyContext`, `coldStartGuidance`, and `standupContent`) remain in the structured options for now but are not rendered into the system prompt. Moving volatile task, Journal, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
+Volatile one-shot startup context is not rendered into the system prompt. Moving volatile task, Journal, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
 
 ## Custom prompts
 

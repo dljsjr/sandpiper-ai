@@ -309,12 +309,12 @@ Initial hardcoded host-path/env references found before introducing the seam:
 
 | Area | Current references | Classification for AGENT-86 |
 | --- | --- | --- |
-| Standup CLI (`packages/sandpiper-standup-cli`) | `./.sandpiper/standup.md`, `SANDPIPER_SESSION_ID`, `SANDPIPER_SESSION_FILE` | First vertical-slice consumer; should receive explicit project paths and session identity. |
+| Standup CLI (`packages/sandpiper-standup-cli`) | `./.sandpiper/standup.md`, `SANDPIPER_SESSION_ID`, `SANDPIPER_SESSION_FILE` | Historical first vertical-slice consumer, since removed by TOOLS-51. |
 | Task CLI (`packages/sandpiper-tasks-cli`) | `./.sandpiper/tasks`, `.sandpiper-tasks.json`, `./.sandpiper/settings.json` | Candidate for later consumer; avoid a task-storage redesign in AGENT-86. |
-| Shell integration install/preflight | `~/.sandpiper/shell-integrations`, `PI_PACKAGE_DIR` | Small second consumer if the standup slice stays contained. |
+| Shell integration install/preflight | `~/.sandpiper/shell-integrations`, `PI_PACKAGE_DIR` | Second consumer of the historical host-context seam. |
 | Shell relay runtime | `SANDPIPER_SESSION_ID`, `SHELL_RELAY_SESSION`, XDG/tmp FIFO paths | Host-adapter/capability boundary candidate; leave deeper runtime split for later capability package work. |
 | Sandpiper identity/adapters (`packages/cli`, `extensions/system`, migration helpers) | Sandpiper/Pi env mirroring, migration paths, system prompt text, package sidecar config | Allowed to remain host-specific. |
-| Startup context (`packages/core/src/startup-context.ts`) | `.sandpiper/tasks` project metadata discovery | Sandpiper identity/support behavior; revisit after task/standup seams exist. |
+| Startup context (`packages/core/src/startup-context.ts`) | `.sandpiper/tasks` project metadata discovery | Sandpiper identity/support behavior; revisit after explicit task seams exist. |
 
 AGENT-86 introduced a typed seam in `packages/core/src/host-context.ts` and proved it through two consumers:
 
@@ -362,8 +362,8 @@ Neutral:
 | --- | --- | --- | --- |
 | Background process tools | `extensions/system/background-process-tools.ts` | Neutral capability exposed through a Pi adapter | Move behind a neutral capability extension factory that can load without Sandpiper identity. |
 | Background process completion context and shutdown cleanup | `extensions/system/startup-hooks.ts` | Neutral capability support for background process tools | Keep with the neutral background process capability extension. |
-| Sandpiper prompt replacement, startup task/project/standup context, cold-start guidance, system prompt dump flag | `extensions/system/startup-hooks.ts` | Sandpiper identity/startup behavior | Move behind a Sandpiper identity extension factory. |
-| Session continuity PID files and `SANDPIPER_SESSION_*` env export | `extensions/system/startup-hooks.ts` | Sandpiper session adapter behavior today; candidate for later host-neutral standup package work | Keep with the Sandpiper identity extension for AGENT-87 so neutral mode does not write Sandpiper env vars or PID files in vanilla Pi. |
+| Sandpiper prompt replacement, startup task/project context, cold-start guidance, system prompt dump flag | `extensions/system/startup-hooks.ts` | Sandpiper identity/startup behavior | Move behind a Sandpiper identity extension factory. |
+| Session continuity PID files and `SANDPIPER_SESSION_*` env export | `extensions/system/startup-hooks.ts` | Sandpiper session adapter behavior, independent of optional Journal | Keep with the Sandpiper identity extension for AGENT-87 so neutral mode does not write Sandpiper env vars or PID files in vanilla Pi. |
 | Migration and shell-integration flags/command | `extensions/system/migration-controls.ts` | Sandpiper identity/migration behavior | Keep with the Sandpiper identity extension. |
 | Diagnostics banner, unmigrated Pi config warning, Sandpiper update banner | `extensions/system/diagnostics-hooks.ts` | Sandpiper identity/support behavior | Keep with the Sandpiper identity extension. |
 | `extensions/shell-relay`, `extensions/web-fetch`, `extensions/autotoon` | Separate extension entrypoints | Neutral capability candidates, though shell-relay still has Sandpiper-specific install/preflight wording | Continue to expose them as neutral-capability extension factories; deeper host-neutral package extraction is AGENT-88+. |
@@ -404,7 +404,7 @@ rg -n "SANDPIPER_SESSION_ID|SANDPIPER_SESSION_FILE" packages/sandpiper-standup-c
 Expected invariant-search results:
 
 - The neutral `plugins/pi/extensions/capabilities.ts` entrypoint and `packages/cli/sandpiper_resources.ts` factory grouping contain no migration flag strings, no `before_agent_start` prompt hook wiring, and no direct Sandpiper prompt builder imports.
-- `write-cmd.ts` contains zero direct `SANDPIPER_SESSION_*` string references; those names live in the standup command helper identity constants until a later host-neutral standup package split.
+- `write-cmd.ts` contains zero direct `SANDPIPER_SESSION_*` string references; at that checkpoint, those names lived in the helper identity constants. The helper was later removed by TOOLS-51.
 
 ### Phase 4 — Move source under packages
 
@@ -729,9 +729,9 @@ Completion signal:
 
 #### AGENT-158 startup prompt boundary slice
 
-AGENT-158 moves startup prompt context assembly and standup reading out of the Pi extension implementation.
+AGENT-158 moved startup prompt context assembly out of the Pi extension implementation at that historical checkpoint. The old continuity-helper integration described below is retired, not current implementation guidance.
 
-Implementation target:
+Historical implementation target:
 
 - `packages/core/src/startup-prompt.ts` owns startup prompt context collection, one-shot startup/cold-start state consumption, standup CLI/file fallback reading, and delegation to `buildSandpiperSystemPrompt`.
 - `extensions/system/startup-hooks.ts` remains the Pi adapter: it reads `before_agent_start` context and returns the host-specific system prompt replacement.
@@ -1006,7 +1006,7 @@ The invariant is not "zero matches everywhere" because Sandpiper identity packag
 1. **Project config directory API:** Pi exports `getAgentDir()`, but project-local config dir resolution may not be exposed at the right abstraction level. Verify before designing around it.
 2. **Bun compile asset model:** Initial AGENT-85 answer: target an app bundle with sidecar `package.json`, assets, and resources first. A true single-file binary remains a later optimization.
 3. **Claude adapter shape:** Root `.claude-plugin` is required. Still verify whether Claude plugin metadata can union shared resource paths directly or whether unavoidable Claude-specific resource duplication is required.
-4. **Existing data migration:** Existing users have `.sandpiper/tasks`, `.sandpiper/standup.md`, and `~/.sandpiper`. Decide when neutral tools should use host config paths versus preserving Sandpiper-branded storage for product compatibility.
+4. **Existing data preservation:** Preserve saved historical project notes unchanged. The Journal cutover does not authorize migration or deletion.
 5. **CLI naming:** Confirm whether `sandpiper-tasks` remains the CLI name in neutral Pi/Claude distributions or whether aliases are needed.
 6. **Package granularity:** Use `packages/resources/` for shared resources; confirm additional package names only when boundaries are proven.
 

@@ -181,7 +181,7 @@ Build all required workspace output:
 bun run build
 ```
 
-This command runs the Turbo-backed package build graph. The CLI build refreshes helper executables and stages resources and documentation. Use `bun run build:standalone` for the CLI and its helper prerequisites. Use `bun run pack:cli` to create an installable tarball without publishing it.
+This command runs the Turbo-backed package build graph. The CLI build stages resources and documentation. Use `bun run build:standalone` for the CLI and its package prerequisites. Use `bun run pack:cli` to create an installable tarball without publishing it.
 
 ## Tools and Conventions
 

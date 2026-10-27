@@ -70,7 +70,7 @@ The patch is tied to an exact Pi version. Redo it after each Pi upgrade:
 
 ## CLI tarball
 
-`bun run pack:cli` builds the CLI and writes its tarball under `packages/cli/dist/`. The installed package includes skills, prompts, themes, public docs, and runtime dependencies. It requires Bun and Node, but no source checkout or installation scripts.
+`bun run pack:cli` builds the CLI and writes its tarball under `packages/cli/dist/`. The installed package includes skills, prompts, themes, public docs, and runtime dependencies. It requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
 
 `devtools/packCli.ts` copies publishable files into a temporary directory and links the workspace dependency root there. `bun pm pack` then includes the dependencies named in `bundledDependencies`. This temporary link compensates for pack tools that omit hoisted dependencies when run directly in a workspace package. The wrapper removes the temporary directory after packing.
 
