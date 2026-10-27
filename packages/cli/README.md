@@ -18,8 +18,8 @@ Set `SANDPIPER_PRINT_PI_VERSION=1` to write the active Pi version to stderr befo
 ## Build
 
 ```bash
-bun run build             # Build all required workspace output and skill helpers
-bun run build:standalone  # Build the CLI, helper prerequisites, and staged resources
+bun run build             # Build all required workspace output
+bun run build:standalone  # Build the CLI, package prerequisites, and staged resources
 bun run pack:cli          # Build and create an npm-compatible tarball
 ```
 
@@ -48,7 +48,7 @@ The source entrypoints use `packages/resources/`. Built entrypoints use `dist/st
 
 `SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, points directly to a directory containing `skills/`, `prompts/`, and `themes/`. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
 
-The CLI requires Bun. Its standup helper requires Node. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
+The CLI requires Bun. Journal is an optional standalone package, not a bundled helper. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 

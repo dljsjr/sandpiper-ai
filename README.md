@@ -2,7 +2,7 @@
 
 A powerful pair programming coding agent built on [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Sandpiper wraps pi with opinionated extensions, skills, and customizations that create a deeply integrated development companion — one that can see your terminal, manage your tasks, and maintain context across sessions.
 
-The repository builds the `sandpiper` runtime, its system-prompt diagnostic, and the helper executable used by the standup skill. The CLI also runs from a packed npm installation without a source checkout.
+The repository builds the `sandpiper` runtime and its system-prompt diagnostic. The CLI also runs from a packed npm installation without a source checkout.
 
 ## What Sandpiper Adds
 
@@ -11,7 +11,7 @@ On top of pi's core functionality, Sandpiper provides:
 ### Core Features
 
 - **[Shell Relay](docs/features/shell-relay.md)** — A shared terminal session via Zellij where both you and the agent can see and interact with the same shell. The agent inherits your session state: auth tokens, shell functions, activated environments, everything. No more copying commands to your terminal — the agent runs them in yours.
-- **[Session Continuity](docs/features/standup.md)** — Stand-up notes at the start of each session orient the agent on what was done last time, what's blocked, and what's next. A project directory tracks active projects across repositories.
+- **[Session Continuity](docs/features/journal.md)** — The optional standalone Journal skill records short developments and continuation context. A project directory tracks active projects across repositories.
 
 ### Enhanced Capabilities
 
@@ -39,7 +39,7 @@ bun sandpiper        # Launch Sandpiper in interactive mode
 - **[Documentation Home](docs/README.md)** — Start here for feature and development docs
 - **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion
 - **[Shell Relay](docs/features/shell-relay.md)** — Shared terminal sessions
-- **[Session Standup](docs/features/standup.md)** — Cross-session continuity
+- **[Journal](docs/features/journal.md)** — Cross-session continuity
 
 ### For Contributors
 
@@ -60,7 +60,6 @@ sandpiper-ai/
 ├── packages/            # Workspace packages and package-owned output
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
 │   ├── resources/       # First-party skills, prompts, and themes
-│   ├── sandpiper-standup-cli/ # Standup/session-continuity CLI
 │   └── core/            # Shared utilities
 ├── ast-grep/            # Structural code analysis rules
 └── devtools/            # Build and project utilities
@@ -102,7 +101,7 @@ Key files:
 - `~/.sandpiper/agent/settings.json` — global settings, installed packages
 - `~/.sandpiper/agent/AGENTS.md` — global agent guidelines
 - `.sandpiper/settings.json` — project settings
-- `.sandpiper/standup.md` — session stand-up note
+- `.sandpiper/journal.md` — continuation entries when Journal is installed
 
 ## Environment Variables
 

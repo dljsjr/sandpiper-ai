@@ -21,6 +21,12 @@ This means:
 
 Before mirroring, the runtime sets `PI_TELEMETRY=0` when it is unset, which turns off Pi's install telemetry and provider attribution headers. Set `SANDPIPER_TELEMETRY=1` or `PI_TELEMETRY=1` to opt back in. While either variable is set, Pi ignores the `enableInstallTelemetry` setting.
 
+## Journal directory
+
+Before loading Pi, providers, extensions, or tool children, both Sandpiper entrypoints default `AGENT_JOURNAL_DIR` to the absolute launch directory's `.sandpiper`. Any supplied value, including an empty or relative value, is preserved exactly. This variable has no `PI_*` or `SANDPIPER_*` alias.
+
+The default stays anchored when a child changes cwd. For intentional work in another project, select its directory with Journal's explicit `--dir`. The standalone Journal fallback remains `.agent-journal` under invocation cwd. See [Journal](../features/journal.md).
+
 ## Reading Environment Variables
 
 ### Use `resolveEnvVar()` for Mirrored Variables

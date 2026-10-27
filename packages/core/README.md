@@ -14,7 +14,7 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | `paths.ts` | `displayPath()` — replace homedir prefix with `~` for user-facing output |
 | `session-continuity.ts` | Sandpiper session startup state, env vars, and PID file lifecycle operations |
 | `startup-context.ts` | Collect compact startup prompt context (projects, active tasks, working-copy summary) |
-| `startup-prompt.ts` | Assemble Sandpiper startup prompt context and standup content for the Pi adapter |
+| `startup-prompt.ts` | Assemble Sandpiper startup prompt context for the Pi adapter |
 | `system-diagnostics.ts` | Package-owned diagnostics startup planning and update-check gating |
 | `system-startup.ts` | Build host-neutral Sandpiper startup prompt sections and cold-start heuristics |
 | `update-check.ts` | Check for pi update availability and install command suggestions |

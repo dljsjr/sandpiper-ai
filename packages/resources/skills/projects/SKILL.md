@@ -80,23 +80,21 @@ cat ~/.sandpiper/agent/projects.toon
 
 ## Session Start Workflow
 
-At the start of a session, after reading the current project's stand-up:
-
-Resolve `../standup/scripts/sandpiper-standup` against this skill directory before running it.
+At the start of a session, after current-project orientation:
 
 1. Read `~/.sandpiper/agent/projects.toon`
 2. Check if the current working directory is in the registry — if not, offer to add it
-3. For each **active** project, optionally run `../standup/scripts/sandpiper-standup read -d <project-path>` for cross-project context
+3. For a related active project, use Journal when installed. Load that skill, resolve its absolute `scripts/journal` path, and read with an explicit absolute `--dir <project-path>/.sandpiper`. Do not assume inherited `AGENT_JOURNAL_DIR` changes with cwd.
 4. Mention any relevant cross-project information (e.g., "the other project has a blocker that might affect this one")
 
-Don't read every project's stand-up every time — that would be noisy. Only scan other projects when:
+Do not read every project's journal every time — that would be noisy. Only scan other projects when:
 - The user asks about them
 - The current project references another (via task dependencies, shared code, etc.)
 - The session is starting fresh and orientation is needed
 
 ## Relationship to Other Artifacts
 
-- **Stand-ups** are per-project session notes. The project directory connects them.
+- **Journal entries**, when the optional Journal skill is installed, carry short continuation context. The project directory connects projects without requiring a journaling tool.
 - **Tasks** are per-project work items. The directory enables cross-project task queries.
 - **AGENTS.md** is per-project guidelines. The directory maps which projects exist.
 - **PKM** (future) will be global knowledge. The directory is the project-level equivalent.

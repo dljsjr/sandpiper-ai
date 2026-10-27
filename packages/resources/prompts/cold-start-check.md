@@ -5,7 +5,7 @@ Treat this as a cold-start continuity check for the current repository.
 
 Work in this order:
 
-1. Use the **standup** skill's CLI read workflow (from project root) and summarize:
+1. If Journal is installed, load its skill and read through its resolved absolute script. Use an explicit absolute `--dir <project>/.sandpiper` for work outside the launch project. Summarize:
    - what was accomplished recently
    - what is in progress
    - what the next session should do

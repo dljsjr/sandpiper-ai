@@ -23,4 +23,4 @@ The shell integration scripts are safe to source unconditionally. Outside a rela
 ## Related docs
 
 - [Shell Relay extension README](../../extensions/shell-relay/README.md)
-- [Session continuity](standup.md)
+- [Session continuity](journal.md)

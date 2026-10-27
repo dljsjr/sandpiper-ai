@@ -10,7 +10,6 @@ Use this guide to select the build and verification commands for a change. For t
 | Skills, prompts, themes, or other files under `packages/resources/` | `bun run build:standalone` to refresh the built runtime |
 | `packages/core/` | `bun --filter sandpiper-ai-core build` |
 | `packages/cli/` | `bun run build:standalone` |
-| `packages/sandpiper-standup-cli/` | `bun run build` so the standup skill receives the new executable |
 | Root build scripts, package metadata, or several packages | `bun run build` |
 
 ## Run tests while developing
@@ -36,7 +35,7 @@ Do not use bare `bun test` as the repository gate. It invokes Bun's test runner 
 bun run build
 ```
 
-This command builds core declarations, the Sandpiper runtime, and the standup helper. The CLI build copies the helpers into source skills, then stages resources and documentation in the CLI package.
+This command builds core declarations and the Sandpiper runtime. The CLI build stages resources and documentation in the CLI package.
 
 Use this narrower command when only the Sandpiper runtime changed:
 
@@ -68,14 +67,13 @@ Make sure that the package works outside the checkout:
 bun run test:vitest -- devtools/packedCli.test.ts
 ```
 
-This test installs offline with an empty npm cache and disabled scripts. It runs both commands and the helper scripts from a read-only installation.
+This test installs offline with an empty npm cache and disabled scripts. It runs both commands from a read-only installation.
 
 ## Smoke-test built commands
 
 ```sh
 ./node_modules/.bin/sandpiper --help
 ./node_modules/.bin/sandpiper-system-prompt --help
-packages/resources/skills/standup/scripts/sandpiper-standup --help
 ```
 
 These commands exercise the same workspace paths used for local development.
@@ -92,15 +90,9 @@ bun run build
 
 The package bin shims require `packages/cli/dist/standalone/` output.
 
-### A helper skill uses old behavior
+### Built-in resources use old behavior
 
-Rebuild the workspace:
-
-```sh
-bun run build
-```
-
-This rebuilds standup before it copies the executable into its skill directory.
+Run `bun run build:standalone` to refresh staged skills, prompts, themes, and documentation. Standalone packages such as Journal are installed and updated separately.
 
 ### A dependency cannot be resolved
 

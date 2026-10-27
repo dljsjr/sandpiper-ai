@@ -25,7 +25,7 @@ Put stable information here, such as:
 - coding, review, or workflow preferences that apply across repositories
 - personal context that helps agents collaborate with you effectively
 
-Do not use `USER.md` for project-specific rules; put those in the project's `AGENTS.md` or `.sandpiper/playbooks/`. Do not use it for temporary session handoff; use standup notes for that.
+Do not use `USER.md` for project-specific rules; put those in the project's `AGENTS.md` or `.sandpiper/playbooks/`. Do not use it for temporary session handoff; use Journal when installed.
 
 By default the file lives at `~/.sandpiper/agent/USER.md`. If you configure a custom Sandpiper agent directory, place `USER.md` in that directory instead.
 
@@ -35,7 +35,7 @@ Project-local data lives in `<project>/.sandpiper/`.
 
 | Path                    | Purpose                                                                                                          |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `.sandpiper/standup.md` | Session handoff note for continuity across agent sessions                                                        |
+| `.sandpiper/journal.md` | Short continuation entries managed by the optional standalone Journal skill                                    |
 | `.sandpiper/playbooks/` | Project-specific operational guidance for agents                                                                 |
 | `.sandpiper/docs/`      | Active internal docs that follow Diátaxis, such as in-flight specs, PRDs, design notes, and implementation plans |
 | `.sandpiper/archive/`   | Historical or superseded project docs                                                                            |

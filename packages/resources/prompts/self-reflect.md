@@ -76,9 +76,9 @@ Review work done this session for anything not yet captured:
 - **Incomplete work**: anything started but not finished — ensure it's tracked with accurate status in the task system
 - **Bugs discovered**: any bugs found during implementation that weren't filed — create BUG tickets
 
-## Phase 4: Standup
+## Phase 4: Journal
 
-If a session standup hasn't been written yet, write one now per the **standup** skill's CLI workflow. If one was already written earlier in the session, update it to reflect any changes from this self-reflection pass.
+If Journal is installed, load its skill and publish one short entry for any decision, discovery, blocker, or next action that changed during this pass. Run the resolved absolute script, not an assumed PATH binary. For another project, use an explicit absolute `--dir <project>/.sandpiper`. Reference detailed evidence rather than writing a session report. If Journal is unavailable, keep continuation context in existing project records.
 
 ---
 

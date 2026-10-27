@@ -13,7 +13,6 @@ skills/
 ├── mutation-testing/
 ├── projects/
 ├── refactoring/
-├── standup/
 └── test-driven-development/
 ```
 
@@ -28,7 +27,6 @@ Sandpiper does not include third-party or on-demand skills in this package.
 | `mutation-testing` | Set up and interpret mutation testing |
 | `projects` | Manage the cross-project directory |
 | `refactoring` | Improve code structure with measured changes |
-| `standup` | Maintain continuity across sessions |
 | `test-driven-development` | Apply test-driven and behavior-driven development |
 
 The source runtime adds this directory through `resources_discover`. The built runtime uses its copy under `packages/cli/dist/standalone/resources/skills/`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
@@ -44,4 +42,4 @@ A skill directory can contain:
 - `scripts/`, which contains helper commands.
 - `evals/`, which contains skill evaluation data.
 
-`bun run build` refreshes the ignored standup executable in its skill directory. Edit the package source instead of that generated file.
+Journal is a separate optional Pi package. Install it separately to expose its skill. Sandpiper does not bundle its CLI or skill.

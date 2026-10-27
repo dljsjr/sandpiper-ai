@@ -4,7 +4,7 @@ Guidelines for building command-line tools in the Sandpiper repository.
 
 ## Overview
 
-This document describes architectural patterns and best practices for building CLI tools with Commander.js. These guidelines apply to all CLI packages in the repository, including `packages/cli/` and `packages/sandpiper-standup-cli/`.
+This document describes architectural patterns and best practices for building CLI tools with Commander.js. These guidelines apply to all CLI packages in the repository, including `packages/cli/`.
 
 ## Core Principle: Separation of Concerns
 
@@ -219,7 +219,6 @@ Bun is the preferred runtime for CLI development:
 | `packages/cli/sandpiper_system_prompt.ts`                   | Model-free system prompt diagnostic      |
 | `packages/cli/system_prompt_diagnostic.ts`                  | Diagnostic SDK orchestration             |
 | `packages/cli/package.json`                                 | Package metadata with bin configuration  |
-| `packages/sandpiper-standup-cli/src/index.ts` | Commander command wiring                |
 
 ## Related Documentation
 
