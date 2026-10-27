@@ -68,8 +68,8 @@ Make guidance easier to follow in cold-start sessions by tightening the role of 
 | Root `AGENTS.md` | Global hot memory | Non-negotiable repo invariants, short workflow rules, routing table, brief enforcement summary | Deep domain detail, long explanations, repeated local architecture |
 | `.sandpiper/docs/*.md` | Topic-specific leaf docs | Compact high-signal rules, pitfalls, canonical example paths, longer reference below | Repeating global invariants or module-local ownership info |
 | Subdirectory `AGENTS.md` / `README.md` | Local architecture and module conventions | Current source-of-truth docs, architecture notes, local testing/building guidance | Repo-wide rules already covered by root `AGENTS.md` |
-| Tasks / standup | Work continuity | Decision history, next steps, blockers, work-specific context | Standing architectural guidance |
-| Skills | Cross-project procedural expertise | How to use task system, jj, standup process, etc. | Repo-specific architecture detail |
+| Tasks / optional Journal | Work continuity | Decision references, next steps, blockers, work-specific context | Standing architectural guidance |
+| Skills | Cross-project procedural expertise | How to use the task system, jj, and optional Journal | Repo-specific architecture detail |
 
 ### Root `AGENTS.md` Revision Goal
 

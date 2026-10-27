@@ -140,8 +140,6 @@ Names are provisional; refine during implementation.
 | `packages/adapter-claude-code` | Claude Code hooks and stdio MCP adapters over selected capability packages. |
 | `packages/tasks-core` | Task data model, storage, parsing, and operations. |
 | `packages/tasks-cli` | `sandpiper-tasks` binary/CLI wrapper around task core. |
-| `packages/standup-core` | Standup/session-continuity data model and file operations. |
-| `packages/standup-cli` | `sandpiper-standup` binary/CLI wrapper around standup core. |
 | `packages/resources` | Shared skills, prompt templates, themes, companion scripts/CLI materialization, and resource metadata; maps to Pi resources and Claude plugin resources where schemas are compatible. |
 | `packages/distribution-manifest` | Shared manifest describing resources and entrypoints used by distribution assemblers. |
 | `packages/dist-sandpiper-cli` | Standalone Sandpiper app/binary assembler. |
@@ -199,7 +197,7 @@ Expected characteristics:
 - Pi packages imported by extensions should be peer dependencies with `"*"` ranges, matching Pi package guidance.
 - Ships enhanced functionality: skills, prompt templates, themes, and neutral extensions/tools.
 - Does **not** set Sandpiper identity, Sandpiper system prompt, or Sandpiper config directory.
-- May still ship CLIs named `sandpiper-tasks` and `sandpiper-standup` if those are product/tool names rather than host identity.
+- Standalone tools such as Journal stay independently installed, not bundled into neutral distributions.
 - Uses Pi's config/path APIs (`getAgentDir()`, session/runtime context, resource loader paths) rather than hardcoded Sandpiper paths.
 
 ### Claude Code Plugin
@@ -353,7 +351,7 @@ Neutral:
 
 - background process tools
 - generic diagnostics/preflight where host-neutral
-- standup/session-continuity hooks after path abstraction
+- generic session lifecycle hooks after path abstraction
 - resource/capability guidance that does not imply Sandpiper identity
 
 #### AGENT-87 inventory
@@ -618,7 +616,7 @@ Artifact shape:
 - `dist/claude-plugin/commands/`
   - copies compatible Sandpiper prompt templates as Claude command files
 - `dist/claude-plugin/bin/`
-  - includes neutral helper CLIs such as `sandpiper-tasks`, `sandpiper-standup`, and `dash` for skills that invoke bundled scripts
+  - includes only helpers owned by that distribution. Optional standalone tools such as Journal remain separately installed.
 
 Initial Claude adapter scope:
 
