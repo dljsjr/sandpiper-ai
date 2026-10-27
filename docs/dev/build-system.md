@@ -26,7 +26,7 @@ The root `build:packages` script uses Turborepo to build these packages:
 - `sandpiper-ai-core`
 - `sandpiper-ai-cli`
 
-`turbo.json` defines dependency order and caches package-local output. CLI cache inputs include resources, public documentation, extension source, and staging scripts. Its outputs include `dist/**` and generated `docs/**`.
+`turbo.json` defines dependency order and caches package-local output. CLI cache inputs include resources, public documentation, extension source, and staging scripts. Its outputs include `dist/**` and generated `docs/**`. Root build commands remove the CLI's owned `dist/` and `docs/` directories before Turbo runs. Cache restoration cannot leave files removed from newer builds.
 
 Resource staging copies only skill directories that contain `SKILL.md`. Orphaned helper directories from earlier installations do not ship.
 

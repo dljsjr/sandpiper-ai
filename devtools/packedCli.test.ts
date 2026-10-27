@@ -109,6 +109,7 @@ describe('packed Sandpiper CLI', () => {
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks.md'))).toBe(false);
+      expect(existsSync(join(installed, 'docs', 'features', 'standup.md'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'standup'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone-package'))).toBe(false);
       expect(existsSync(join(project, 'dist'))).toBe(false);
