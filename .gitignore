@@ -54,6 +54,7 @@ pi-session*.html
 
 .sandpiper/tasks/
 .sandpiper/jj-workspaces/
+.sandpiper/.journal.lock
 
 # Claude Code local state
 .claude/
