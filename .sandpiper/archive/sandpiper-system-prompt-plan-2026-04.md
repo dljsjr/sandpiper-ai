@@ -32,7 +32,7 @@ We need to:
 3. Add Sandpiper docs with same granularity as Pi's
 4. Handle **dynamic tools** (extensions can register tools at runtime)
 5. Reuse PI's work loading AGENTS.md files and skills
-6. Add our dynamic sections (standup, tasks, working copy, cold-start)
+6. Add our dynamic sections (tasks, working copy, cold-start)
 
 ---
 
@@ -68,7 +68,7 @@ From `docs/extensions.md`:
    - **KEEP** PI's guidelines section (already matches available tools!)
    - **KEEP** PI's skills section (already appended by PI)
    - **KEEP** PI's date/CWD (already appended by PI)
-   - **ADD** our dynamic sections (standup, tasks, working copy, cold-start, projects)
+   - **ADD** our dynamic sections (tasks, working copy, cold-start, projects)
 
 ### Why This Approach?
 
@@ -186,7 +186,6 @@ pi.on('before_agent_start', async (event, ctx) => {
 
   // 4. Add our dynamic sections
   const dynamicSections = [
-    formatStandupContext(...),
     formatActiveTaskContext(...),
     formatWorkingCopySummary(...),
     formatProjectTriggers(...),

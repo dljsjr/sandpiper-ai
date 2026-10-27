@@ -112,7 +112,6 @@ Since we passed `--system-prompt`, `this.systemPromptSource` is set, and PI uses
 ### Step 4: We Still Need before_agent_start for Dynamic Content
 
 Our SYSTEM.md only contains the **static base**. We still need the extension to add:
-- Standup context (cold-start only)
 - Active task context
 - Working copy summary
 - Cold-start guidance
@@ -129,7 +128,6 @@ pi.on('before_agent_start', async (event, ctx) => {
   
   // We just add our dynamic sections:
   const dynamicSections = [
-    formatStandupContext(...),
     formatActiveTaskContext(...),
     formatWorkingCopySummary(...),
     formatColdStartGuidance(),

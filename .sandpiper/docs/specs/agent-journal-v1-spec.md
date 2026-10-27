@@ -1,6 +1,6 @@
 # Agent Journal v1 specification
 
-Status: agreed design, not implemented. Task: TOOLS-50. Background: [standup safety review](standup-review-2026-10-26.md).
+Status: approved design, standalone implementation complete. Sandpiper cutover: TOOLS-51. Design checkpoint: TOOLS-50. Background: [standup safety review](standup-review-2026-10-26.md).
 
 This document records the decisions from the journal design discussion. The standalone `agent-journal` repository now carries the implementation reference in `docs/spec.md` and the session handoff in `HANDOFF.md`. This copy preserves the agreed design and Sandpiper integration boundary.
 
@@ -201,10 +201,8 @@ The skill teaches the CLI workflow and does not ask agents to construct metadata
 
 ## Legacy boundary and current state
 
-Leave the existing `.sandpiper/standup.md` unchanged. No migration or deletion of its contents is authorized by this design.
+Preserve saved historical notes unchanged. No migration or deletion of their contents is authorized.
 
-The user created the standalone repository as a colocated jj/Git repository. It contains the user-provided `mise.toml` and the design/handoff documents. No journal CLI, skill implementation, or Sandpiper environment integration exists yet. Sandpiper tasks TOOLS-47 and TOOLS-50 track the review and design checkpoint.
+The standalone repository contains the executable, skill, tests, and usage documentation. Its `docs/spec.md` is the implementation reference. TOOLS-47 and TOOLS-50 preserve the earlier review and design decisions.
 
-Removal of the old bundled CLI/skill, changes to its documentation and build wiring, and the exact transition sequence still need implementation scope. Do not infer authorization to delete them from approval of individual journal design choices.
-
-No further product decisions were identified as blocking v1. The remaining mechanical details include the exact Markdown metadata layout, empty/missing-file output, author matching details, and runtime installation layout. Prefer simple defaults rather than expanding the feature set. Further product decisions require user input only when they present a meaningful tradeoff.
+The user authorized TOOLS-51 to remove the bundled legacy CLI and skill, replace operational guidance, install Journal globally, and implement the narrow host environment default. Sandpiper sets `AGENT_JOURNAL_DIR` before Pi imports and children. It does not bundle Journal or change its standalone fallback.

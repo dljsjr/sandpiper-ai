@@ -718,7 +718,7 @@ relationships, and user-visible coordination history.
 - Existing persistent extension state can be recorded with Pi custom entries, but
   coordination state likely needs cross-session and possibly cross-process
   access, which points to explicit storage rather than session-only entries.
-- Current task and standup systems are examples of local, durable coordination
+- Current task and Journal systems are examples of local, durable coordination
   state outside transient model context.
 
 ### Benefits if accepted
@@ -1250,7 +1250,7 @@ other agents just to ask what they are doing.
   `pid`, endpoint routeability, and protocol support.
 - The global agent directory can materialize registered handles without
   duplicating handle data into runtime claims.
-- Startup/task/standup context may be useful to a human, but it is not reliable
+- Startup/task/Journal context may be useful to a human, but it is not reliable
   enough to present as current online status without explicit updates.
 
 ### Benefits if accepted

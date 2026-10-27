@@ -54,7 +54,7 @@ The `<skills>` section treats `<available_skills>` as routing metadata. When the
 - user profile content from `USER.md` in the agent directory resolved by Pi's `getAgentDir()`, when present
 - session-start VCS detection (`jj`, `git`, `hg`, `svn`, `fossil`, `perforce`, or `none`)
 
-The older one-shot startup context fields (`projectTriggers`, `activeTaskContext`, `workingCopyContext`, `coldStartGuidance`, and `standupContent`) remain in the structured options for now but are not rendered into the system prompt. Moving volatile task, standup, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
+The older one-shot startup context fields (`projectTriggers`, `activeTaskContext`, `workingCopyContext`, `coldStartGuidance`, and `standupContent`) remain in the structured options for now but are not rendered into the system prompt. Moving volatile task, Journal, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
 
 ## Custom prompts
 
@@ -70,4 +70,4 @@ If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports 
 - Keep prompt construction in `sandpiper-ai-core`; extension code should stay glue-only.
 - Preserve Pi-provided context-file and skill metadata instead of re-discovering it in the extension. Tool text is Pi's `tools` and `rules` sections; Sandpiper's prompt renders none.
 - Do not parse Pi's rendered prompt string. Older notes that proposed parsing and replacing sections are archived.
-- Keep volatile task, standup, and working-copy state out of the system prompt unless a separate design explicitly accounts for provider cache behavior.
+- Keep volatile task, Journal, and working-copy state out of the system prompt unless a separate design explicitly accounts for provider cache behavior.

@@ -243,10 +243,9 @@ export function registerStartupPromptHooks(pi: ExtensionAPI, ...) {
     // For V1, let's just not include skills and see if that breaks anything
     // Or: extract via regex from event.systemPrompt
     
-    // 4. Add our dynamic sections (standup, tasks, working copy, cold-start)
+    // 4. Add our dynamic sections (tasks, working copy, cold-start)
     const dynamicSections = [
       contextSection,
-      formatStandupContext(...),
       formatActiveTaskContext(...),
       formatWorkingCopySummary(...),
       formatColdStartGuidance(),

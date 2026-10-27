@@ -59,7 +59,7 @@ The **Capability Guidance Registry** is a Sandpiper-specific pattern for cross-c
 | Type | When to Use | Example |
 |------|-------------|---------|
 | **Static** | Byte-identical across turns, participates in prefix caching | TOON format description, tool usage guidelines |
-| **Dynamic** | Varies per turn based on context | Active task context, standup content, working copy state |
+| **Dynamic** | Varies per turn based on context | Active task context, working copy state |
 
 ### Registration Pattern
 
@@ -178,7 +178,6 @@ For optimal prefix caching, assemble the prompt in **stability-descending order*
 [staticCapabilityGuidance]       ← Registered static guidance (cacheable)
 ── cache boundary ──
 [projectTriggers]                ← Dynamic project routing
-[standupContent]                 ← Session standup (changes per session)
 [activeTaskContext]              ← Active tasks (changes per turn)
 [workingCopyContext]             ← Dirty files (changes per turn)
 [coldStartGuidance]              ← Cold-start only (most volatile)
@@ -186,7 +185,7 @@ For optimal prefix caching, assemble the prompt in **stability-descending order*
 
 ### Related Patterns
 
-- **Concurrent Sessions**: Similar cooperative registration pattern for standup PID files
+- **Concurrent Sessions**: Runtime PID-file lifecycle is separate from continuation notes
 - **AutoTOON**: Primary user of static guidance registry
 - **Task Context Injection**: Uses dynamic guidance registry
 
@@ -255,7 +254,6 @@ export function buildSandpiperPrompt(piPrompt: string, options: BuildOptions): s
   
   // Append Sandpiper dynamic sections
   const dynamicSections = [
-    buildStandupSection(options.standupContent),
     buildTaskSection(options.activeTasks),
     buildWorkingCopySection(options.dirtyFiles),
     buildColdStartSection(options.isColdStart)
@@ -399,7 +397,7 @@ pi.on('before_agent_start', async (_event, ctx) => {
 
 ${activeTasks}
 
-Reference task keys (e.g., TCL-123) in commits and standup notes.`;
+Reference task keys (e.g., TCL-123) in commits and continuation records.`;
   
   return {
     systemPrompt: event.systemPrompt + '\n\n' + taskContext
@@ -441,87 +439,13 @@ The tasks CLI supports multiple storage modes:
 
 ---
 
-## Standup & Session Continuity
+## Session Continuity
 
-### Overview
+The bundled continuity helper and its prompt-injection example are retired. Use the optional standalone Journal skill for short continuation entries. Resolve its executable from the installed skill, not PATH. Keep volatile entries out of the system prompt.
 
-Sandpiper uses a **standup file** (`.sandpiper/standup.md`) to bridge context across sequential agent sessions. The standup CLI manages concurrent session access via PID-based liveness detection.
+Sandpiper supplies an absolute launch-project `.sandpiper` directory through `AGENT_JOURNAL_DIR` only when absent. For intentional cross-project work, select an explicit absolute `--dir`. Generic session PID files remain runtime infrastructure, not Journal retention metadata.
 
-### Architecture
-
-```
-┌─────────────────────┐       ┌──────────────────────────┐
-│ Extension           │       │ sandpiper-standup CLI    │
-│                     │       │                          │
-│ session_start:      │       │ read:                    │
-│   create PID file   │──────▶│   - clean dead sections  │
-│                     │       │   - output active/       │
-│ session_shutdown:   │       │     inactive sections    │
-│   remove PID file   │       │                          │
-│                     │       │ write:                   │
-│                     │       │   - clean dead sections  │
-│                     │       │   - write own section    │
-└─────────────────────┘       └──────────────────────────┘
-```
-
-### PID File Convention
-
-```
-$XDG_STATE_HOME/sandpiper/sessions/<uuid>.pid
-```
-
-Contents (three lines):
-```
-12345
-2026-04-05T10:00:00.000Z
-/Users/doug/git/my-project
-```
-
-### Liveness Detection
-
-```typescript
-function isProcessAlive(pid: number): boolean {
-  try {
-    process.kill(pid, 0);  // Signal 0 = check existence
-    return true;
-  } catch (error) {
-    if (error.code === 'ESRCH') {
-      return false;  // No such process
-    }
-    if (error.code === 'EPERM') {
-      return true;  // Process exists, no permission to signal
-    }
-    throw error;
-  }
-}
-```
-
-### Standup Injection
-
-```typescript
-import { execFileSync } from 'child_process';
-
-pi.on('before_agent_start', async (_event, ctx) => {
-  const standupContent = execFileSync('sandpiper-standup', ['read', '-d', ctx.cwd], {
-    encoding: 'utf8'
-  });
-  
-  const standupContext = `## Previous Session Context
-
-${standupContent}
-
-Use this to orient on what was done, what's planned next, and any important context.`;
-  
-  return {
-    systemPrompt: event.systemPrompt + '\n\n' + standupContext
-  };
-});
-```
-
-### Related Docs
-
-- `.sandpiper/docs/concurrent-sessions.md` - Full design
-- `packages/resources/skills/sandpiper/standup/SKILL.md` - Standup skill
+See `docs/features/journal.md` and `.sandpiper/docs/specs/concurrent-sessions.md` in the project root for the current contract.
 
 ---
 
@@ -635,7 +559,7 @@ Sandpiper extends Pi with several key architectural patterns:
 2. **System Prompt Assembly** - Parse/replace/reassemble PI's prompt
 3. **Shell Relay** - Shared terminal via Zellij + FIFOs
 4. **Task Management** - CLI + storage modes + context injection
-5. **Standup Continuity** - PID-based concurrent session handoff
+5. **Journal Continuity** - Optional standalone continuation entries
 6. **Env Var Mirroring** - SANDPIPER_* / PI_* dual namespace
 7. **Source-Loaded Extensions** - Jiti loading, no build step
 

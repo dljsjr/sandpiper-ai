@@ -26,7 +26,7 @@ Sandpiper requires [Bun](https://bun.sh). Clone and set up the workspace:
 git clone https://github.com/dljsjr/sandpiper-ai.git
 cd sandpiper-ai
 bun install          # Install dependencies only
-bun run build        # Build the runtime and local helpers
+bun run build        # Build the runtime and resources
 bun sandpiper        # Launch Sandpiper in interactive mode
 ```
 
@@ -67,16 +67,16 @@ sandpiper-ai/
 
 ## Building
 
-`bun install` installs dependencies only. `bun run build` builds the workspace runtime and helper executables:
+`bun install` installs dependencies only. `bun run build` builds the workspace runtime and stages resources:
 
 ```bash
 bun run build             # Build all required workspace output
-bun run build:standalone  # Build the CLI and its helper prerequisites
+bun run build:standalone  # Build the CLI and its package prerequisites
 bun run build:packages    # Build package-owned output through Turbo
 bun run pack:cli          # Create an npm-compatible CLI tarball
 ```
 
-See [Pack the CLI](docs/dev/build-workflows.md#pack-the-cli) for tarball installation and verification. The installed CLI requires Bun. Its helper scripts require Node.
+See [Pack the CLI](docs/dev/build-workflows.md#pack-the-cli) for tarball installation and verification. The installed CLI requires Bun. Optional standalone Journal requires Node 24 or later.
 
 ## Development
 

@@ -477,7 +477,7 @@ if (protectedPaths.some(p => path.includes(p))) {
 #### [PI-DEV-SANDPIPER-PATTERNS.md](./PI-DEV-SANDPIPER-PATTERNS.md)
 **When to read**:
 - You're working in the Sandpiper distribution (not vanilla Pi)
-- You need to integrate with Sandpiper-specific systems (tasks, standup, shell relay)
+- You need to integrate with Sandpiper-specific systems (tasks, Journal, shell relay)
 - You want to use the capability guidance registry for prompt injection
 - You're building extensions that need task context or session continuity
 - You need to understand Sandpiper's system prompt assembly approach
@@ -487,7 +487,7 @@ if (protectedPaths.some(p => path.includes(p))) {
 - System prompt assembly (parse/replace/reassemble pattern)
 - Shell relay integration (Zellij, FIFO management)
 - Task management integration (CLI, storage modes, context injection)
-- Standup & session continuity (PID-based liveness detection)
+- Session lifecycle and optional Journal continuation notes
 - Environment variable mirroring (SANDPIPER_* / PI_* namespaces)
 - Build & extension loading (source-loaded extensions, postinstall)
 - Sandpiper-specific testing constraints

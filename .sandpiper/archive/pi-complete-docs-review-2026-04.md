@@ -492,7 +492,7 @@ They **append** to PI's assembled prompt, they don't replace it.
    - **Replace** identity/docs sections (fix paths, add Sandpiper docs)
    - **Keep** tools/guidelines sections (already dynamic and correct!)
    - **Keep** context files/skills/date/CWD (already appended by PI)
-   - **Add** our dynamic sections (standup, tasks, working copy, etc.)
+   - **Add** our dynamic sections (tasks, working copy, etc.)
 
 **Why this wins**:
 - ✅ Handles dynamic tools (uses PI's dynamically-built section)
