@@ -36,7 +36,11 @@ describe('cached CLI builds', () => {
         );
         put(root, '.gitignore', 'dist\ndocs\n.turbo\ncache\nhome\n');
         put(root, 'bun.lock', readFileSync(join(repoRoot, 'bun.lock'), 'utf8'));
-        put(root, 'turbo.json', JSON.stringify({ tasks: { build: { outputs: ['dist/**', 'docs/**'] } } }));
+        put(
+          root,
+          'turbo.json',
+          JSON.stringify({ remoteCache: { enabled: false }, tasks: { build: { outputs: ['dist/**', 'docs/**'] } } }),
+        );
         for (const [directory, name] of [
           ['core', 'sandpiper-ai-core'],
           ['cli', 'sandpiper-ai-cli'],
