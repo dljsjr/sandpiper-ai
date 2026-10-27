@@ -2,7 +2,7 @@
 
 Status: agreed design, not implemented. Task: TOOLS-50. Background: [standup safety review](standup-review-2026-10-26.md).
 
-This document records the decisions from the journal design discussion. It is a reference for implementation, not permission to start implementation or remove legacy components.
+This document records the decisions from the journal design discussion. The standalone `agent-journal` repository now carries the implementation reference in `docs/spec.md` and the session handoff in `HANDOFF.md`. This copy preserves the agreed design and Sandpiper integration boundary.
 
 ## Purpose and scope
 
@@ -20,7 +20,7 @@ The implementation uses Node-compatible TypeScript. Bun is preferred for develop
 
 The distribution goal is a source script under the skill's `scripts/` directory, without a build step. Commander and Chrono are ordinary JavaScript dependencies. No native npm addon, handwritten FFI binding, or database is selected.
 
-A `.ts` script ran successfully under Node 24.22.1 during feasibility tests. The minimum Node version and final dependency-installation layout are not selected yet. Do not assume that publishing to npm, adding a release pipeline, or supporting every installation layout is part of the MVP.
+Node 24+ is the approved baseline. The user created the standalone repository with `mise.toml` selecting `node = "lts"`, currently Node 24.22.1. A source `.ts` script ran successfully under that Node version during feasibility tests. The final dependency-installation layout is not selected yet. Do not assume that publishing to npm, adding a release pipeline, or supporting every installation layout is part of the MVP.
 
 ## Journal location
 
@@ -203,8 +203,8 @@ The skill teaches the CLI workflow and does not ask agents to construct metadata
 
 Leave the existing `.sandpiper/standup.md` unchanged. No migration or deletion of its contents is authorized by this design.
 
-No journal implementation, standalone repository scaffolding, or Sandpiper environment integration exists yet. The only source-tree work from this discussion is the standup review, this specification, and their index entries. Task records track the review and design checkpoint.
+The user created the standalone repository as a colocated jj/Git repository. It contains the user-provided `mise.toml` and the design/handoff documents. No journal CLI, skill implementation, or Sandpiper environment integration exists yet. Sandpiper tasks TOOLS-47 and TOOLS-50 track the review and design checkpoint.
 
 Removal of the old bundled CLI/skill, changes to its documentation and build wiring, and the exact transition sequence still need implementation scope. Do not infer authorization to delete them from approval of individual journal design choices.
 
-The remaining mechanical details include the exact Markdown metadata layout, empty/missing-file output, author matching details, and runtime installation layout. Prefer simple defaults rather than expanding the feature set. Further product decisions require user input only when they present a meaningful tradeoff.
+No further product decisions were identified as blocking v1. The remaining mechanical details include the exact Markdown metadata layout, empty/missing-file output, author matching details, and runtime installation layout. Prefer simple defaults rather than expanding the feature set. Further product decisions require user input only when they present a meaningful tradeoff.
