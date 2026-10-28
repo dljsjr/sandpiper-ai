@@ -4,16 +4,16 @@ Sandpiper stores global state under `~/.sandpiper` and project-local state under
 
 ## Global `~/.sandpiper`
 
-| Path                               | Purpose                                                                      |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| `~/.sandpiper/agent/`              | Global agent configuration, guidance, skills, sessions, and project registry |
-| `~/.sandpiper/agent/AGENTS.md`     | Global agent instructions loaded at startup                                  |
-| `~/.sandpiper/agent/USER.md`       | User profile and working preferences                                         |
-| `~/.sandpiper/agent/inbox/`        | Cross-project handoff notes for agents                                       |
-| `~/.sandpiper/agent/projects.toon` | Registry of projects touched by Sandpiper                                    |
-| `~/.sandpiper/agent/sessions/`     | JSONL session logs                                                           |
-| `~/.sandpiper/shell-integrations/` | Shell integration scripts used by Shell Relay                                |
-| `~/.sandpiper/pi-acp/`             | ACP adapter state                                                            |
+| Path                               | Purpose                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------- |
+| `~/.sandpiper/agent/`              | Global agent configuration, guidance, skills, sessions, and project index |
+| `~/.sandpiper/agent/AGENTS.md`     | Global agent instructions loaded at startup                               |
+| `~/.sandpiper/agent/USER.md`       | User profile and working preferences                                      |
+| `~/.sandpiper/agent/inbox/`        | Cross-project handoff notes for agents                                    |
+| `~/.sandpiper/agent/projects.md`   | Optional user-maintained Markdown routing table for projects              |
+| `~/.sandpiper/agent/sessions/`     | JSONL session logs                                                        |
+| `~/.sandpiper/shell-integrations/` | Shell integration scripts used by Shell Relay                             |
+| `~/.sandpiper/pi-acp/`             | ACP adapter state                                                         |
 
 ### User profile (`USER.md`)
 
@@ -35,7 +35,7 @@ Project-local data lives in `<project>/.sandpiper/`.
 
 | Path                    | Purpose                                                                                                          |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `.sandpiper/journal.md` | Short continuation entries managed by the optional standalone Journal skill                                    |
+| `.sandpiper/journal.md` | Short continuation entries managed by the optional standalone Journal skill                                      |
 | `.sandpiper/playbooks/` | Project-specific operational guidance for agents                                                                 |
 | `.sandpiper/docs/`      | Active internal docs that follow Diátaxis, such as in-flight specs, PRDs, design notes, and implementation plans |
 | `.sandpiper/archive/`   | Historical or superseded project docs                                                                            |

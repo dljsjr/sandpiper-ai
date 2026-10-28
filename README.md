@@ -11,7 +11,7 @@ On top of pi's core functionality, Sandpiper provides:
 ### Core Features
 
 - **[Shell Relay](docs/features/shell-relay.md)** — A shared terminal session via Zellij where both you and the agent can see and interact with the same shell. The agent inherits your session state: auth tokens, shell functions, activated environments, everything. No more copying commands to your terminal — the agent runs them in yours.
-- **[Session Continuity](docs/features/journal.md)** — The optional standalone Journal skill records short developments and continuation context. A project directory tracks active projects across repositories.
+- **[Session Continuity](docs/features/journal.md)** — The optional standalone Journal skill records short developments and continuation context.
 
 ### Enhanced Capabilities
 
@@ -123,13 +123,13 @@ PI_OFFLINE=0 SANDPIPER_OFFLINE=1 sandpiper
 
 A small number of package/runtime variables are set automatically by sandpiper and are not normal mirrored user configuration:
 
-| Variable                            | Purpose                                             |
-| ----------------------------------- | --------------------------------------------------- |
-| `SANDPIPER_CODING_AGENT_PACKAGE`    | Path to the Sandpiper package root, including shipped public docs |
-| `PI_CODING_AGENT_PACKAGE`           | Path to Pi code, themes, UI assets, and export templates |
-| `PI_CODING_AGENT_VERSION`           | Version of the underlying pi-coding-agent           |
-| `PI_PACKAGE_DIR`                    | Real CLI package root for product metadata and documentation |
-| `PI_SKIP_VERSION_CHECK`             | Suppresses pi's built-in update check               |
+| Variable                         | Purpose                                                           |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `SANDPIPER_CODING_AGENT_PACKAGE` | Path to the Sandpiper package root, including shipped public docs |
+| `PI_CODING_AGENT_PACKAGE`        | Path to Pi code, themes, UI assets, and export templates          |
+| `PI_CODING_AGENT_VERSION`        | Version of the underlying pi-coding-agent                         |
+| `PI_PACKAGE_DIR`                 | Real CLI package root for product metadata and documentation      |
+| `PI_SKIP_VERSION_CHECK`          | Suppresses pi's built-in update check                             |
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` intentionally point to different package roots.
 

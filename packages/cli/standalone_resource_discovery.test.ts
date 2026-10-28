@@ -73,7 +73,6 @@ describe('standalone Sandpiper resource discovery', () => {
             'code-review',
             'jj',
             'mutation-testing',
-            'projects',
             'refactoring',
             'test-driven-development',
             ...(withTrail ? ['trail'] : []),

@@ -97,7 +97,6 @@ describe('packed Sandpiper CLI', () => {
         'code-review',
         'jj',
         'mutation-testing',
-        'projects',
         'refactoring',
         'test-driven-development',
       ]);
@@ -106,6 +105,7 @@ describe('packed Sandpiper CLI', () => {
       );
       expect(rendered.prompt).toContain('<tools>\n- read:');
       expect(rendered.prompt).not.toContain(repoRoot);
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'projects'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks.md'))).toBe(false);

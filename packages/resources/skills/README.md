@@ -11,7 +11,6 @@ skills/
 ├── code-review/
 ├── jj/
 ├── mutation-testing/
-├── projects/
 ├── refactoring/
 └── test-driven-development/
 ```
@@ -20,13 +19,12 @@ Sandpiper does not include third-party or on-demand skills in this package.
 
 ## Catalogue
 
-| Skill | Description |
-| --- | --- |
-| `code-review` | Review diffs, pull requests, and code health |
-| `jj` | Use Jujutsu version control |
-| `mutation-testing` | Set up and interpret mutation testing |
-| `projects` | Manage the cross-project directory |
-| `refactoring` | Improve code structure with measured changes |
+| Skill                     | Description                                       |
+| ------------------------- | ------------------------------------------------- |
+| `code-review`             | Review diffs, pull requests, and code health      |
+| `jj`                      | Use Jujutsu version control                       |
+| `mutation-testing`        | Set up and interpret mutation testing             |
+| `refactoring`             | Improve code structure with measured changes      |
 | `test-driven-development` | Apply test-driven and behavior-driven development |
 
 The source runtime adds this directory through `resources_discover`. The built runtime uses its copy under `packages/cli/dist/standalone/resources/skills/`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
