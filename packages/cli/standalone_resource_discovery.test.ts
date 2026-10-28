@@ -70,7 +70,6 @@ describe('standalone Sandpiper resource discovery', () => {
           const promptNames = resourceLoader.getPrompts().prompts.map((prompt) => prompt.name);
 
           expect(skillNames.sort()).toEqual([
-            'code-review',
             'jj',
             'mutation-testing',
             'refactoring',

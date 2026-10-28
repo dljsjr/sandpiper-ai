@@ -1,6 +1,7 @@
 ---
 description: Persist learnings from the current session into skills, docs, guidelines, and prompt templates
 ---
+
 Do a structured self-reflection pass to persist anything learned during this session. Work through each phase in order — do not skip phases, and explicitly note "Nothing to do" for a phase if it genuinely doesn't apply.
 
 Treat the project's guidance surface broadly: `AGENTS.md`, focused docs in `.sandpiper/docs/`, local READMEs, and project-local skills can all need updates when conventions or context changed.
@@ -43,7 +44,7 @@ Common under-trigger patterns to check explicitly:
 - API/library/framework/CLI/config-format uncertainty → look up the relevant documentation rather than guessing
 - version control operations, commits, bookmarks, rebases, abandon/drop, operation-log recovery → **jj**
 - tasks, backlog, status, tickets, follow-up work → **tasks**
-- code review or judging code quality → **code-review**
+- code review or judging code quality → an applicable review skill, if available
 - cleanup, simplification, restructuring → **refactoring**
 - tests-first work or bug reproduction → **test-driven-development**
 - GitHub/GitLab URLs or CLI work → use the relevant forge CLI when available
@@ -55,6 +56,7 @@ List every skill you reviewed and what you found. For each skill, include a trig
 ### Consider whether new project-local skills should be authored
 
 Think about the work done this session. Were there any:
+
 - Repeated workflows or patterns that you had to figure out from scratch?
 - External tools or APIs where you had to look up usage that could be codified?
 - Decision-making heuristics that would help in future sessions?
@@ -72,6 +74,7 @@ If any of these apply, create a new skill in `.sandpiper/skills/` (project-local
 ## Phase 3: Loose Ends
 
 Review work done this session for anything not yet captured:
+
 - **Unfiled tasks**: edge cases noticed, TODO comments left in code, design questions deferred, follow-up work identified — file tickets for these
 - **Incomplete work**: anything started but not finished — ensure it's tracked with accurate status in the task system
 - **Bugs discovered**: any bugs found during implementation that weren't filed — create BUG tickets

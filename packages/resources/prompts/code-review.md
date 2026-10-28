@@ -1,13 +1,14 @@
 ---
 description: Structured code review of a revision range with optional reference docs
 ---
+
 Perform a structured code review of the changes in revision range `$1`.
 
 ## Setup
 
 Before reviewing any code:
 
-1. Load the **code-review** skill and the appropriate language-specific reference for the files being reviewed.
+1. If an applicable review skill is available, load it and its relevant references.
 2. Use the root `AGENTS.md` routing table to identify and read the focused docs and local `README.md` / `AGENTS.md` files relevant to the changed files.
 3. Read the local `README.md` / `AGENTS.md` for any package or module being touched for the first time this session.
 
@@ -17,7 +18,7 @@ Additional context paths: ${@:2}
 
 If paths were listed above, read each document before starting the review. These may be work plans, PRDs, design docs, or any other context that informs the intent behind the changes. Cross-reference the implementation against them: verify alignment with the stated design, check that acceptance criteria are met, and flag divergence.
 
-If no paths were listed, review the changes on their own merits using the code review skill's standard workflow.
+If no paths were listed, review the changes on their own merits using the process below.
 
 ## Review process
 

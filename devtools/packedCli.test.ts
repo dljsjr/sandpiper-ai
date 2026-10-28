@@ -94,17 +94,17 @@ describe('packed Sandpiper CLI', () => {
       const rendered = JSON.parse(run('sandpiper-system-prompt', ['--json', '--approve'])) as { prompt: string };
       const catalogue = rendered.prompt.match(/<available_skills>[\s\S]*?<\/available_skills>/)?.[0] ?? '';
       expect([...catalogue.matchAll(/<skill name="([^"]+)"/g)].map((match) => match[1]).sort()).toEqual([
-        'code-review',
         'jj',
         'mutation-testing',
         'refactoring',
         'test-driven-development',
       ]);
       expect(rendered.prompt).toContain(
-        join(installed, 'dist', 'standalone', 'resources', 'skills', 'code-review', 'SKILL.md'),
+        join(installed, 'dist', 'standalone', 'resources', 'skills', 'refactoring', 'SKILL.md'),
       );
       expect(rendered.prompt).toContain('<tools>\n- read:');
       expect(rendered.prompt).not.toContain(repoRoot);
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'code-review'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'projects'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'tasks'))).toBe(false);
       expect(existsSync(join(installed, 'docs', 'features', 'tasks'))).toBe(false);

@@ -8,7 +8,6 @@ Each skill is a direct child of this directory:
 
 ```text
 skills/
-├── code-review/
 ├── jj/
 ├── mutation-testing/
 ├── refactoring/
@@ -21,7 +20,6 @@ Sandpiper does not include third-party or on-demand skills in this package.
 
 | Skill                     | Description                                       |
 | ------------------------- | ------------------------------------------------- |
-| `code-review`             | Review diffs, pull requests, and code health      |
 | `jj`                      | Use Jujutsu version control                       |
 | `mutation-testing`        | Set up and interpret mutation testing             |
 | `refactoring`             | Improve code structure with measured changes      |
