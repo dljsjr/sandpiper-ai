@@ -99,6 +99,15 @@ function applyFactories(factories: readonly InlineExtension[]): ReturnType<typeo
 }
 
 describe('Sandpiper resource adapter', () => {
+  it('omits an absent built-in prompt directory from discovery', () => {
+    const root = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-free-resources-'));
+    try {
+      expect(resolveSandpiperResourcePaths(root).promptPaths).toEqual([]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it('omits an absent built-in skills directory from discovery', () => {
     const root = mkdtempSync(join(tmpdir(), 'sandpiper-skill-free-resources-'));
     try {
@@ -111,7 +120,7 @@ describe('Sandpiper resource adapter', () => {
   it('maps a resource directory without assuming a checkout layout', () => {
     const root = mkdtempSync(join(tmpdir(), 'sandpiper-installed-resources-'));
     try {
-      mkdirSync(join(root, 'skills'));
+      for (const directory of ['skills', 'prompts', 'themes']) mkdirSync(join(root, directory));
       const paths = resolveSandpiperResourcePaths(root);
       expect(paths.skillPaths).toEqual([join(root, 'skills')]);
       expect(paths.promptPaths).toEqual([join(root, 'prompts')]);

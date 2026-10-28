@@ -9,7 +9,7 @@ const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandp
 
 describe('standalone Sandpiper resource discovery', () => {
   it.each([false, true])(
-    'loads built-ins and PATH-gated Trail (%s)',
+    'loads custom prompts and PATH-gated Trail without bundled templates (%s)',
     async (withTrail) => {
       const agentDir = await mkdtemp(join(tmpdir(), 'sandpiper-standalone-resources-'));
       const home = join(agentDir, 'home');
@@ -17,6 +17,12 @@ describe('standalone Sandpiper resource discovery', () => {
       const trailSkill = join(home, 'git', 'skills-incubator', 'skills', 'trail');
       await mkdir(home, { recursive: true });
       await mkdir(bin);
+      const customPrompts = join(agentDir, 'custom-prompts');
+      await mkdir(customPrompts);
+      await writeFile(
+        join(customPrompts, 'fixture-prompt.md'),
+        '---\ndescription: Custom prompt fixture.\n---\nFixture prompt.\n',
+      );
       if (withTrail) {
         await mkdir(trailSkill, { recursive: true });
         await writeFile(
@@ -45,12 +51,13 @@ describe('standalone Sandpiper resource discovery', () => {
         );
 
         const resourceLoader = new DefaultResourceLoader({
-          cwd: repoRoot,
+          cwd: agentDir,
           agentDir,
+          additionalPromptTemplatePaths: [customPrompts],
           extensionFactories: [...createNeutralCapabilityExtensionFactories(join(repoRoot, 'packages', 'resources'))],
           noExtensions: true,
           noSkills: true,
-          noPromptTemplates: true,
+          noPromptTemplates: false,
           noThemes: true,
           noContextFiles: true,
         });
@@ -73,8 +80,7 @@ describe('standalone Sandpiper resource discovery', () => {
           if (withTrail) {
             expect(resourceLoader.getSkills().skills.find((skill) => skill.name === 'trail')?.baseDir).toBe(trailSkill);
           }
-          expect(promptNames).toContain('new-feature');
-          expect(promptNames).toContain('code-review');
+          expect(promptNames).toEqual(['fixture-prompt']);
         } finally {
           session.dispose();
         }

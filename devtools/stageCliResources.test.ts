@@ -11,6 +11,22 @@ async function put(root: string, path: string, contents: string): Promise<void> 
 }
 
 describe('CLI resource staging', () => {
+  it('stages resources without bundled prompt templates', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'sandpiper-stage-no-prompts-'));
+    try {
+      await mkdir(join(root, 'packages/resources/skills'), { recursive: true });
+      await put(root, 'packages/resources/themes/example.json', '{"name":"example"}');
+      await put(root, 'docs/README.md', 'Documentation');
+      await put(root, 'packages/cli/dist/standalone/resources/prompts/obsolete.md', 'stale prompt');
+      await stageCliResources(root);
+      const staged = join(root, 'packages/cli/dist/standalone/resources');
+      expect(await readFile(join(staged, 'themes/example.json'), 'utf8')).toBe('{"name":"example"}');
+      await expect(access(join(staged, 'prompts'))).rejects.toThrow();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('copies skills, prompts, themes, and docs without retired or orphaned helpers', async () => {
     const root = await mkdtemp(join(tmpdir(), 'sandpiper-stage-resources-'));
     try {

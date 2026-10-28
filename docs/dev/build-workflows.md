@@ -4,13 +4,13 @@ Use this guide to select the build and verification commands for a change. For t
 
 ## Choose the command
 
-| You changed | Build command |
-| --- | --- |
-| Built-in extension source under `extensions/` | `bun run build:standalone` |
+| You changed                                                         | Build command                                           |
+| ------------------------------------------------------------------- | ------------------------------------------------------- |
+| Built-in extension source under `extensions/`                       | `bun run build:standalone`                              |
 | Skills, prompts, themes, or other files under `packages/resources/` | `bun run build:standalone` to refresh the built runtime |
-| `packages/core/` | `bun --filter sandpiper-ai-core build` |
-| `packages/cli/` | `bun run build:standalone` |
-| Root build scripts, package metadata, or several packages | `bun run build` |
+| `packages/core/`                                                    | `bun --filter sandpiper-ai-core build`                  |
+| `packages/cli/`                                                     | `bun run build:standalone`                              |
+| Root build scripts, package metadata, or several packages           | `bun run build`                                         |
 
 ## Run tests while developing
 
@@ -92,7 +92,7 @@ The package bin shims require `packages/cli/dist/standalone/` output.
 
 ### Built-in resources use old behavior
 
-Run `bun run build:standalone` to refresh staged skills, prompts, themes, and documentation. Standalone packages such as Journal are installed and updated separately.
+Run `bun run build:standalone` to refresh any present resource files and public documentation. Standalone packages such as Journal are installed and updated separately.
 
 ### A dependency cannot be resolved
 

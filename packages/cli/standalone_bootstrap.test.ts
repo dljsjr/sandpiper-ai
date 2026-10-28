@@ -45,6 +45,22 @@ describe('standalone bootstrap', () => {
     }
   });
 
+  it('accepts packed resources without bundled prompts or skills', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-free-bootstrap-'));
+    try {
+      const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
+      const startDir = join(packageDir, 'dist', 'standalone');
+      const resourceRoot = join(startDir, 'resources');
+      createResources(resourceRoot);
+      rmSync(join(resourceRoot, 'skills'), { recursive: true });
+      rmSync(join(resourceRoot, 'prompts'), { recursive: true });
+      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
+      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it('accepts packed resources without a bundled skills directory', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-skill-free-bootstrap-'));
     try {

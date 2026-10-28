@@ -10,10 +10,10 @@ Use this page to understand the build structure. For commands, see [How to build
 
 ## Package output
 
-| Package | Build output |
-| --- | --- |
-| `packages/cli/` | Runtime entrypoints, shared chunks, and `resources/` under `dist/standalone/`. Public documentation under ignored `docs/`. Packed tarballs under `dist/`. |
-| `packages/core/` | TypeScript declarations under `dist/` |
+| Package          | Build output                                                                                                                                              |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/cli/`  | Runtime entrypoints, shared chunks, and `resources/` under `dist/standalone/`. Public documentation under ignored `docs/`. Packed tarballs under `dist/`. |
+| `packages/core/` | TypeScript declarations under `dist/`                                                                                                                     |
 
 The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti.
 
@@ -70,7 +70,7 @@ The patch is tied to an exact Pi version. Redo it after each Pi upgrade:
 
 ## CLI tarball
 
-`bun run pack:cli` builds the CLI and writes its tarball under `packages/cli/dist/`. The installed package includes skills, prompts, themes, public docs, and runtime dependencies. It requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
+`bun run pack:cli` builds the CLI and writes its tarball under `packages/cli/dist/`. The installed package includes the resource scaffold, public docs, and runtime dependencies. It does not bundle skills or prompt templates. It requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
 
 `devtools/packCli.ts` copies publishable files into a temporary directory and links the workspace dependency root there. `bun pm pack` then includes the dependencies named in `bundledDependencies`. This temporary link compensates for pack tools that omit hoisted dependencies when run directly in a workspace package. The wrapper removes the temporary directory after packing.
 

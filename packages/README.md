@@ -4,12 +4,12 @@ Workspace packages used by the local Sandpiper runtime.
 
 ## Contents
 
-| Package | Description |
-|---------|-------------|
-| [`cli/`](cli/) | Sandpiper CLI wrapper around pi-coding-agent |
+| Package                                        | Description                                         |
+| ---------------------------------------------- | --------------------------------------------------- |
+| [`cli/`](cli/)                                 | Sandpiper CLI wrapper around pi-coding-agent        |
 | [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON neutral transform and Pi adapter |
-| [`resources/`](resources/) | First-party skills, prompts, and themes |
-| [`core/`](core/) | Shared core utilities |
+| [`resources/`](resources/)                     | Resource staging and metadata                       |
+| [`core/`](core/)                               | Shared core utilities                               |
 
 ## Build
 

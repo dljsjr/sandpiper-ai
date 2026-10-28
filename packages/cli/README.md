@@ -46,7 +46,7 @@ bun run test:standalone
 
 The source entrypoints use `packages/resources/`. Built entrypoints use `dist/standalone/resources/` inside the CLI package. Built-in extensions and resources load through explicit extension factories and `resources_discover`. The built runtime requires no source checkout and creates no metadata sidecar.
 
-`SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, points directly to a directory containing `skills/`, `prompts/`, and `themes/`. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
+`SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, points directly to a resource directory containing `themes/`. The `skills/` and `prompts/` subdirectories are optional; Sandpiper currently bundles neither skills nor prompt templates. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
 
 The CLI requires Bun. Journal is an optional standalone package, not a bundled helper. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 
@@ -80,14 +80,14 @@ birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `sandpiper_standalone.ts` | Normal runtime entrypoint that selects installed package metadata before loading Pi and registers built-in extensions and resources |
-| `sandpiper_system_prompt.ts` | Diagnostic entrypoint that configures the Sandpiper runtime and renders the prompt without a model request |
-| `system_prompt_diagnostic.ts` | SDK-based diagnostic session orchestration |
-| `bin/sandpiper` | Stable workspace bin shim for the normal runtime |
-| `bin/sandpiper-system-prompt` | Stable workspace bin shim for the system prompt diagnostic |
-| `deferred_pi_import.ts` | Load-order shim so Sandpiper imports Pi only after package metadata env vars are set |
+| File                          | Purpose                                                                                                                             |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `sandpiper_standalone.ts`     | Normal runtime entrypoint that selects installed package metadata before loading Pi and registers built-in extensions and resources |
+| `sandpiper_system_prompt.ts`  | Diagnostic entrypoint that configures the Sandpiper runtime and renders the prompt without a model request                          |
+| `system_prompt_diagnostic.ts` | SDK-based diagnostic session orchestration                                                                                          |
+| `bin/sandpiper`               | Stable workspace bin shim for the normal runtime                                                                                    |
+| `bin/sandpiper-system-prompt` | Stable workspace bin shim for the system prompt diagnostic                                                                          |
+| `deferred_pi_import.ts`       | Load-order shim so Sandpiper imports Pi only after package metadata env vars are set                                                |
 
 ## Pi asset resolution
 

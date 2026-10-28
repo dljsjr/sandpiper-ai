@@ -99,6 +99,7 @@ describe('packed Sandpiper CLI', () => {
       );
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'mutation-testing'))).toBe(false);
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'jj'))).toBe(false);
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'prompts'))).toBe(false);
       expect([...catalogue.matchAll(/<skill name="([^"]+)"/g)].map((match) => match[1]).sort()).toEqual([]);
       expect(rendered.prompt).toContain('<tools>\n- read:');
       expect(rendered.prompt).not.toContain(repoRoot);

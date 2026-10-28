@@ -59,7 +59,7 @@ sandpiper-ai/
 │   └── shell-relay/     # Shared terminal via Zellij
 ├── packages/            # Workspace packages and package-owned output
 │   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
-│   ├── resources/       # First-party skills, prompts, and themes
+│   ├── resources/       # Resource staging and metadata
 │   └── core/            # Shared utilities
 ├── ast-grep/            # Structural code analysis rules
 └── devtools/            # Build and project utilities

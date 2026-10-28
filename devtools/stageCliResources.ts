@@ -11,6 +11,7 @@ export async function stageCliResources(repoRoot: string): Promise<void> {
   await rm(resourceRoot, { recursive: true, force: true });
   for (const directory of ['skills', 'prompts', 'themes']) {
     const source = join(repoRoot, 'packages', 'resources', directory);
+    if ((directory === 'skills' || directory === 'prompts') && !existsSync(source)) continue;
     await cp(source, join(resourceRoot, directory), {
       recursive: true,
       dereference: true,
