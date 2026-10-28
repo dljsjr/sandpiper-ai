@@ -69,7 +69,7 @@ describe('standalone Sandpiper resource discovery', () => {
           const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
           const promptNames = resourceLoader.getPrompts().prompts.map((prompt) => prompt.name);
 
-          expect(skillNames.sort()).toEqual(['jj', 'mutation-testing', ...(withTrail ? ['trail'] : [])]);
+          expect(skillNames.sort()).toEqual(['jj', ...(withTrail ? ['trail'] : [])]);
           if (withTrail) {
             expect(resourceLoader.getSkills().skills.find((skill) => skill.name === 'trail')?.baseDir).toBe(trailSkill);
           }

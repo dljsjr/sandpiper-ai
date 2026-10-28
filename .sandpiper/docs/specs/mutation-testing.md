@@ -10,7 +10,7 @@
 
 This document records the planned mutation-testing workflow for Sandpiper. The commands below are design targets, not current repo commands: StrykerJS is not installed, and no `stryker.config.json` files exist yet.
 
-For general methodology, use the `mutation-testing` skill.
+For general methodology, use project testing guidance and the selected tool's documentation.
 
 ## Proposed Tooling
 
