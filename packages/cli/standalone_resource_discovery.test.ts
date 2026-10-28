@@ -39,7 +39,7 @@ describe('standalone Sandpiper resource discovery', () => {
         // Doug's real settings (e.g. an `!op read ...` braveApiKey) into the test.
         process.env.SANDPIPER_CODING_AGENT_DIR = agentDir;
 
-        const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
+        const { createNeutralCapabilityExtensionFactories } = await import('./sandpiper_resources.js');
         const { DefaultResourceLoader, SessionManager, createAgentSession } = await import(
           '@earendil-works/pi-coding-agent'
         );
@@ -47,7 +47,7 @@ describe('standalone Sandpiper resource discovery', () => {
         const resourceLoader = new DefaultResourceLoader({
           cwd: repoRoot,
           agentDir,
-          extensionFactories: createSandpiperExtensionFactories(join(repoRoot, 'packages', 'resources')),
+          extensionFactories: [...createNeutralCapabilityExtensionFactories(join(repoRoot, 'packages', 'resources'))],
           noExtensions: true,
           noSkills: true,
           noPromptTemplates: true,
@@ -69,7 +69,7 @@ describe('standalone Sandpiper resource discovery', () => {
           const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
           const promptNames = resourceLoader.getPrompts().prompts.map((prompt) => prompt.name);
 
-          expect(skillNames.sort()).toEqual(['jj', ...(withTrail ? ['trail'] : [])]);
+          expect(skillNames.sort()).toEqual(withTrail ? ['trail'] : []);
           if (withTrail) {
             expect(resourceLoader.getSkills().skills.find((skill) => skill.name === 'trail')?.baseDir).toBe(trailSkill);
           }

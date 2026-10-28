@@ -1,6 +1,6 @@
 // AGENT-253 wave-1 coverage: the workspace runtime's `skill` tool.
-// Real observable behavior asserted (not just exit code): the actual SKILL.md content for a
-// real skill in this repo's catalogue, delivered through a real RPC tool_execution_end event
+// Real observable behavior asserted (not just exit code): the actual SKILL.md content for an
+// isolated fixture, delivered through a real RPC tool_execution_end event
 // for a real filesystem read pi's tool machinery performed.
 //
 // source:'filesystem' rather than source:'catalog': isolated spawns pass --no-skills (part of
@@ -16,7 +16,7 @@ import { startRpcSession } from './rpc-driver.js';
 
 const SMOKE_TIMEOUT_MS = 60_000;
 const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const JJ_SKILL_DIR = join(repoRoot, 'packages', 'resources', 'skills', 'jj');
+const SKILL_FIXTURE_DIR = join(repoRoot, 'devtools', 'integration', 'fixtures', 'rpc-skill-fixture');
 
 describe('wave 1: workspace skill tool (AGENT-253)', () => {
   it(
@@ -26,9 +26,9 @@ describe('wave 1: workspace skill tool (AGENT-253)', () => {
         {
           type: 'toolCall',
           toolName: 'skill',
-          arguments: { source: 'filesystem', path: JJ_SKILL_DIR },
+          arguments: { source: 'filesystem', path: SKILL_FIXTURE_DIR },
         },
-        { type: 'text', text: 'loaded the jj skill' },
+        { type: 'text', text: 'loaded the fixture skill' },
       ]);
 
       const session = startRpcSession({
@@ -38,7 +38,10 @@ describe('wave 1: workspace skill tool (AGENT-253)', () => {
       });
 
       try {
-        const response = await session.sendCommand({ type: 'prompt', message: 'load the jj skill' });
+        const response = await session.sendCommand({
+          type: 'prompt',
+          message: `load the skill fixture from ${SKILL_FIXTURE_DIR}`,
+        });
         expect(response.success).toBe(true);
 
         const toolExecutionEnd = await session.waitForEvent(
@@ -49,11 +52,8 @@ describe('wave 1: workspace skill tool (AGENT-253)', () => {
 
         const result = toolExecutionEnd.result as { content: Array<{ type: string; text?: string }> };
         const textBlock = result.content.find((block) => block.type === 'text');
-        // Real skill content, not a stub: the jj skill's own name attribute and a phrase from
-        // its actual description, proving the tool read the real SKILL.md rather than
-        // returning something synthetic.
-        expect(textBlock?.text).toContain('name="jj"');
-        expect(textBlock?.text).toContain('Jujutsu');
+        expect(textBlock?.text).toContain('name="rpc-skill-fixture"');
+        expect(textBlock?.text).toContain('Filesystem fixture marker: wave1-skill');
 
         await session.waitForEvent((event) => event.type === 'agent_settled', SMOKE_TIMEOUT_MS);
       } finally {

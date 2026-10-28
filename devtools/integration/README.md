@@ -61,7 +61,7 @@ later by Doug against the pair's own earlier framing. The real cause: the ad hoc
 that produced the incident (predating this harness) set only `PI_CODING_AGENT_DIR`, never
 `SANDPIPER_CODING_AGENT_DIR`, and never overrode `PI_PACKAGE_DIR` — which inherited the invoking
 session's own Sandpiper-branded value, making `SANDPIPER_CODING_AGENT_DIR` (never touched) the
-name pi actually honored, which in turn inherited the *real* agent dir. Real `settings.json`
+name pi actually honored, which in turn inherited the _real_ agent dir. Real `settings.json`
 loaded; real configured providers ran. **This harness's own `prepareIsolatedSpawn()` was never
 affected** — it has set both agent-dir names unconditionally since it was written.
 
@@ -72,7 +72,7 @@ implementation bugs along the way (documented in the design doc's git/task histo
 curious) — both real, both moot for the reason below.
 
 **The guard was torn down entirely, not reframed, once the actual question got asked: what
-situation causes a pinned `--provider` invocation to *not* use the mock?** Answer: none exists.
+situation causes a pinned `--provider` invocation to _not_ use the mock?** Answer: none exists.
 An unknown provider is a hard error; an unresolvable model is a hard error; pi 0.84.0 makes
 resolution ambiguity an explicit error, not a silent fallback. The guard was scar tissue for a
 threat model that doesn't describe how pi actually behaves. What replaced it:
@@ -94,7 +94,7 @@ threat that isn't real.
 ## Wave 1 coverage (AGENT-253)
 
 - [`wave1-skill.integration.test.ts`](./wave1-skill.integration.test.ts) — the `skill` tool,
-  isolated. Real filesystem skill load (the jj skill's actual SKILL.md content) and a real
+  isolated. Real filesystem skill load from a self-contained fixture and a real
   not-found error case, both through a real spawned RPC session.
 - [`wave1-autotoon.integration.test.ts`](./wave1-autotoon.integration.test.ts) — autotoon,
   isolated (a padded bash-tool JSON result) and combinatoric (autotoon transforming
@@ -126,7 +126,7 @@ threat that isn't real.
 - **`entry: 'sandpiper'` runs from source** (`packages/cli/sandpiper_standalone.ts` directly via
   `bun`, no build step). Chosen for dev-loop speed, but this is a real, named tradeoff, not a
   hypothetical one: AGENT-243 (this same session) found a bug that only manifested in the
-  *compiled* standalone binary, invisible from source. Evaluated for AGENT-253 (per the
+  _compiled_ standalone binary, invisible from source. Evaluated for AGENT-253 (per the
   coordinator's ruling, include a compiled-binary smoke only if genuinely cheap): the compiled
   binary isn't currently built in this environment, and building it is a real `bun compile`
   step, not something a skip-if-not-built test can make cheap on its own — deferred as named

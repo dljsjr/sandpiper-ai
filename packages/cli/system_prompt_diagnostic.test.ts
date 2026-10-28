@@ -103,7 +103,7 @@ describe('system prompt diagnostic', () => {
       expect(output).toContain('<birdup>diagnostic append</birdup>');
       expect(output).toContain('<tools>\n- read:');
       expect(output).toContain('<available_skills>');
-      expect(output).toContain('name="jj"');
+      expect(output).not.toContain('<skill name="jj"');
       expect(output).not.toContain('<skill name="mutation-testing"');
       expect(output).not.toContain('<skill name="test-driven-development"');
       expect(output).not.toContain('<skill name="refactoring"');

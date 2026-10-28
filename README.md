@@ -16,7 +16,7 @@ On top of pi's core functionality, Sandpiper provides:
 ### Enhanced Capabilities
 
 - **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion for 30–60% token savings on tabular data. Works transparently in the background.
-- **Skill Library** — First-party guidance for Jujutsu (jj). Skills add domain knowledge without putting their full contents in the system prompt.
+- **Skill Support** — Load project-local or separately installed skills. Skills add domain knowledge without putting their full contents in the system prompt.
 
 ## Quick Start
 

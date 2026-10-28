@@ -1,3 +1,5 @@
+import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { ExtensionAPI, InlineExtension } from '@earendil-works/pi-coding-agent';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -97,12 +99,26 @@ function applyFactories(factories: readonly InlineExtension[]): ReturnType<typeo
 }
 
 describe('Sandpiper resource adapter', () => {
-  it('maps a resource directory without assuming a checkout layout', () => {
-    const paths = resolveSandpiperResourcePaths('/installed/resources');
+  it('omits an absent built-in skills directory from discovery', () => {
+    const root = mkdtempSync(join(tmpdir(), 'sandpiper-skill-free-resources-'));
+    try {
+      expect(resolveSandpiperResourcePaths(root).skillPaths).toEqual([]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 
-    expect(paths.skillPaths).toEqual([join('/installed/resources', 'skills')]);
-    expect(paths.promptPaths).toEqual([join('/installed/resources', 'prompts')]);
-    expect(paths.themePaths).toEqual([join('/installed/resources', 'themes')]);
+  it('maps a resource directory without assuming a checkout layout', () => {
+    const root = mkdtempSync(join(tmpdir(), 'sandpiper-installed-resources-'));
+    try {
+      mkdirSync(join(root, 'skills'));
+      const paths = resolveSandpiperResourcePaths(root);
+      expect(paths.skillPaths).toEqual([join(root, 'skills')]);
+      expect(paths.promptPaths).toEqual([join(root, 'prompts')]);
+      expect(paths.themePaths).toEqual([join(root, 'themes')]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {

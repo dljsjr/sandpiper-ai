@@ -1,31 +1,16 @@
 # Skills
 
-This directory contains the first-party skills that Sandpiper discovers at runtime.
+Sandpiper currently bundles no skills. The runtime can load project-local skills and skills from separately installed packages.
 
-## Layout
+## Resource location
 
-Each skill is a direct child of this directory:
+The source runtime uses this directory through `resources_discover`. Built-in skill resources, when present, are staged under `packages/cli/dist/standalone/resources/skills/`. A child directory with a `SKILL.md` file appears in the available-skills catalogue.
 
-```text
-skills/
-└── jj/
-```
-
-Sandpiper does not include third-party or on-demand skills in this package.
-
-## Catalogue
-
-| Skill | Description                 |
-| ----- | --------------------------- |
-| `jj`  | Use Jujutsu version control |
-
-The source runtime adds this directory through `resources_discover`. The built runtime uses its copy under `packages/cli/dist/standalone/resources/skills/`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
-
-Run `bun run build:standalone` after changing these files to refresh the built runtime.
+Run `bun run build:standalone` after changing resource files to refresh the built runtime.
 
 ## Skill contents
 
-A skill directory can contain:
+A separately managed skill directory can contain:
 
 - `SKILL.md`, which defines the skill and its trigger description.
 - `references/`, which contains supporting reference material.

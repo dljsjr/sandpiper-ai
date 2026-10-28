@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
@@ -27,8 +28,9 @@ function inlineExtension(name: string, factory: ExtensionFactory): InlineExtensi
 }
 
 export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperResourcePaths {
+  const skillDir = join(resourceRoot, 'skills');
   return {
-    skillPaths: [join(resourceRoot, 'skills')],
+    skillPaths: existsSync(skillDir) ? [skillDir] : [],
     promptPaths: [join(resourceRoot, 'prompts')],
     themePaths: [join(resourceRoot, 'themes')],
   };

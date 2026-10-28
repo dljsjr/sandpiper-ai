@@ -49,7 +49,7 @@ export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): 
       ? resolve(packageDir, '..', 'resources')
       : join(packageDir, 'dist', 'standalone', 'resources');
 
-  if (!['skills', 'prompts', 'themes'].every((directory) => existsSync(join(resourceRoot, directory)))) {
+  if (!['prompts', 'themes'].every((directory) => existsSync(join(resourceRoot, directory)))) {
     throw new Error(`Sandpiper resources are missing at ${resourceRoot}. Rebuild or reinstall Sandpiper.`);
   }
   return { resourceRoot, packageDir };
