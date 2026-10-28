@@ -45,7 +45,7 @@ Common under-trigger patterns to check explicitly:
 - version control operations, commits, bookmarks, rebases, abandon/drop, operation-log recovery → **jj**
 - tasks, backlog, status, tickets, follow-up work → **tasks**
 - code review or judging code quality → an applicable review skill, if available
-- cleanup, simplification, restructuring → **refactoring**
+- cleanup, simplification, restructuring → an applicable refactoring skill, if available
 - tests-first work or bug reproduction → **test-driven-development**
 - GitHub/GitLab URLs or CLI work → use the relevant forge CLI when available
 

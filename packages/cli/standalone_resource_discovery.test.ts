@@ -72,7 +72,6 @@ describe('standalone Sandpiper resource discovery', () => {
           expect(skillNames.sort()).toEqual([
             'jj',
             'mutation-testing',
-            'refactoring',
             'test-driven-development',
             ...(withTrail ? ['trail'] : []),
           ]);

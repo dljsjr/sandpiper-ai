@@ -103,7 +103,8 @@ describe('system prompt diagnostic', () => {
       expect(output).toContain('<birdup>diagnostic append</birdup>');
       expect(output).toContain('<tools>\n- read:');
       expect(output).toContain('<available_skills>');
-      expect(output).toContain('name="refactoring"');
+      expect(output).toContain('name="test-driven-development"');
+      expect(output).not.toContain('<skill name="refactoring"');
       expect(output).not.toContain('<skill name="code-review"');
       expect(output).not.toContain('<skill name="tasks"');
       expect(existsSync(credentialProbe)).toBe(false);
