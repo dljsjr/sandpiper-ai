@@ -94,13 +94,15 @@ describe('packed Sandpiper CLI', () => {
       const rendered = JSON.parse(run('sandpiper-system-prompt', ['--json', '--approve'])) as { prompt: string };
       const catalogue = rendered.prompt.match(/<available_skills>[\s\S]*?<\/available_skills>/)?.[0] ?? '';
       expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'refactoring'))).toBe(false);
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources', 'skills', 'test-driven-development'))).toBe(
+        false,
+      );
       expect([...catalogue.matchAll(/<skill name="([^"]+)"/g)].map((match) => match[1]).sort()).toEqual([
         'jj',
         'mutation-testing',
-        'test-driven-development',
       ]);
       expect(rendered.prompt).toContain(
-        join(installed, 'dist', 'standalone', 'resources', 'skills', 'test-driven-development', 'SKILL.md'),
+        join(installed, 'dist', 'standalone', 'resources', 'skills', 'mutation-testing', 'SKILL.md'),
       );
       expect(rendered.prompt).toContain('<tools>\n- read:');
       expect(rendered.prompt).not.toContain(repoRoot);

@@ -46,7 +46,7 @@ Common under-trigger patterns to check explicitly:
 - tasks, backlog, status, tickets, follow-up work → **tasks**
 - code review or judging code quality → an applicable review skill, if available
 - cleanup, simplification, restructuring → an applicable refactoring skill, if available
-- tests-first work or bug reproduction → **test-driven-development**
+- tests-first work or bug reproduction → the project's testing guidance and any applicable installed testing skill
 - GitHub/GitLab URLs or CLI work → use the relevant forge CLI when available
 
 For project-local skills: fix issues directly. For package-provided skills: note the finding and suggest it to the user instead of editing installed package files.

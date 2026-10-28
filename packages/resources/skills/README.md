@@ -9,19 +9,17 @@ Each skill is a direct child of this directory:
 ```text
 skills/
 ├── jj/
-├── mutation-testing/
-└── test-driven-development/
+└── mutation-testing/
 ```
 
 Sandpiper does not include third-party or on-demand skills in this package.
 
 ## Catalogue
 
-| Skill                     | Description                                       |
-| ------------------------- | ------------------------------------------------- |
-| `jj`                      | Use Jujutsu version control                       |
-| `mutation-testing`        | Set up and interpret mutation testing             |
-| `test-driven-development` | Apply test-driven and behavior-driven development |
+| Skill              | Description                           |
+| ------------------ | ------------------------------------- |
+| `jj`               | Use Jujutsu version control           |
+| `mutation-testing` | Set up and interpret mutation testing |
 
 The source runtime adds this directory through `resources_discover`. The built runtime uses its copy under `packages/cli/dist/standalone/resources/skills/`. Each child that contains a `SKILL.md` file appears in the available-skills catalogue.
 
