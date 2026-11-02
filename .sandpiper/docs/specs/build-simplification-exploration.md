@@ -101,13 +101,17 @@ The repository also installs mcporter, jscpd, hike, and lizard through mise. No 
 
 Shell Relay is disabled in the builtin factory list but remains in the workspace. Its source, migration flags, documentation, and assets need an explicit capability decision. Package simplification does not authorize silently deleting them.
 
-## Asset gap found during exploration
+## Dormant Shell Relay installer
+
+Doug clarified that Shell Relay is intentionally disabled because it does not work well. Deprecation is under consideration, not approved.
+
+TOOLS-93 records the deferred capability decision. It is not a packaging repair or a blocker for the proposed build. Do not add shell assets or restore the installer as part of build simplification.
 
 The current CLI advertises `--install-shell-integrations`. The default installer expects scripts under the product package's `extensions/shell-relay/shell-integration` directory.
 
 The current tarball contains none of those scripts. The real installer returned `Shell integration source not found` against an extracted current tarball. The probe used an explicit temporary target and did not touch installed shell integrations.
 
-The proposed bundled-root prototype does not yet include these assets either. If the flag remains, its scripts need an explicit package file-list entry and an isolated installed behavior test. Retiring the flag is a separate user decision. This gap does not require preserving the current staging helper.
+The proposed bundled-root prototype also omits these assets. If Doug retains Shell Relay, its installer and assets need evaluation with that capability. If Doug retires Shell Relay, its exposed installer belongs in the retirement scope. Neither change is approved by this exploration. The current observation does not justify preserving the staging helper.
 
 ## Evidence and limits
 
