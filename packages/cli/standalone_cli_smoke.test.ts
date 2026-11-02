@@ -1,35 +1,37 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
-const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai');
+const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai-cli');
 const bunExecutable = process.env.BUN_EXECUTABLE ?? 'bun';
 
-interface PackageMetadata {
-  readonly version?: string;
-  readonly bin?: Record<string, string>;
-  readonly dependencies?: Record<string, string>;
-  readonly scripts?: Record<string, string>;
-  readonly bundledDependencies?: readonly string[];
-  readonly piConfig?: { readonly name: string; readonly configDir: string; readonly bin: string };
-  readonly files?: readonly string[];
-}
-
-function readPackageJson(path: string): PackageMetadata {
-  return JSON.parse(readFileSync(path, 'utf-8')) as PackageMetadata;
-}
-
-function standaloneEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
-  const env = { ...process.env, ...overrides };
-  delete env.PI_PACKAGE_DIR;
-  delete env.PI_CODING_AGENT_PACKAGE;
-  delete env.PI_CODING_AGENT_VERSION;
-  delete env.SANDPIPER_CODING_AGENT_PACKAGE;
-  return env;
+function standaloneEnv(overrides: NodeJS.ProcessEnv & { SANDPIPER_CODING_AGENT_DIR: string }): NodeJS.ProcessEnv {
+  const root = dirname(overrides.SANDPIPER_CODING_AGENT_DIR);
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(PI|SANDPIPER)_/.test(key)));
+  return {
+    ...env,
+    HOME: join(root, 'home'),
+    XDG_CONFIG_HOME: join(root, 'config'),
+    XDG_STATE_HOME: join(root, 'state'),
+    XDG_CACHE_HOME: join(root, 'cache'),
+    XDG_RUNTIME_DIR: join(root, 'runtime'),
+    BUN_INSTALL: join(root, 'bun'),
+    BUN_INSTALL_CACHE_DIR: join(root, 'bun-cache'),
+    JITI_FS_CACHE: 'false',
+    PI_OFFLINE: '1',
+    PI_CODING_AGENT_DIR: overrides.SANDPIPER_CODING_AGENT_DIR,
+    PI_CODING_AGENT_SESSION_DIR: join(root, 'sessions'),
+    SANDPIPER_CODING_AGENT_SESSION_DIR: join(root, 'sessions'),
+    AGENT_JOURNAL_DIR: join(root, 'journal'),
+    GIT_CONFIG_GLOBAL: '/dev/null',
+    GIT_CONFIG_SYSTEM: '/dev/null',
+    JJ_CONFIG: join(repoRoot, 'devtools', 'test-fixtures', 'jj-test-config.toml'),
+    ...overrides,
+  };
 }
 
 function runStandalone(args: readonly string[], env: NodeJS.ProcessEnv): string {
@@ -67,40 +69,6 @@ function countFlagLines(output: string, flag: string): number {
 }
 
 describe('standalone Sandpiper CLI smoke', () => {
-  it('declares stable workspace bins for the Sandpiper runtime', () => {
-    const rootPackage = readPackageJson(join(repoRoot, 'package.json'));
-    const cliPackage = readPackageJson(join(repoRoot, 'packages', 'cli', 'package.json'));
-
-    expect(rootPackage.dependencies?.['sandpiper-ai-cli']).toBe('workspace:*');
-    expect(rootPackage.dependencies).not.toHaveProperty('@sandpiper-ai/trail');
-    expect(cliPackage.bin?.sandpiper).toBe('./bin/sandpiper');
-    expect(cliPackage.bin?.['sandpiper-system-prompt']).toBe('./bin/sandpiper-system-prompt');
-    expect(cliPackage.bin).not.toHaveProperty('sandpiper-standalone');
-    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper'))).toBe(true);
-    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-system-prompt'))).toBe(true);
-    expect(existsSync(join(repoRoot, 'packages', 'cli', 'bin', 'sandpiper-standalone'))).toBe(false);
-    expect(cliPackage.scripts).not.toHaveProperty('preinstall');
-    expect(cliPackage.scripts?.build).toContain('build:standalone');
-    expect(cliPackage.scripts).not.toHaveProperty('build:sandpiper');
-    expect(cliPackage.scripts).not.toHaveProperty('build:system-prompt');
-    expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@earendil-works/*'");
-    expect(cliPackage.scripts?.['build:standalone']).toContain("--external '@mariozechner/*'");
-    expect(cliPackage.scripts?.['build:standalone']).toContain('--splitting');
-    expect(cliPackage.piConfig).toEqual({ name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' });
-    expect(cliPackage.files).toEqual(expect.arrayContaining(['bin/', 'dist/standalone/', 'docs/']));
-    expect(cliPackage.bundledDependencies).toEqual(
-      expect.arrayContaining([
-        '@earendil-works/pi-coding-agent',
-        '@earendil-works/pi-ai',
-        '@earendil-works/pi-tui',
-        'better-sqlite3',
-        'jsdom',
-      ]),
-    );
-    expect(cliPackage.dependencies?.['better-sqlite3']).toBe('13.0.3');
-    expect(cliPackage.dependencies?.jsdom).toBe('30.0.1');
-  });
-
   it('runs the normal sandpiper bin through the standalone runtime', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-bin-smoke-'));
 

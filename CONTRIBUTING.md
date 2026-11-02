@@ -11,7 +11,7 @@ bun install
 bun run build
 ```
 
-Sandpiper uses Bun for package management and scripts. Run workspace installs from the repository root. Installation does not build generated output.
+Sandpiper pins Bun 1.4.4 for package management and scripts. Run workspace installs from the repository root. Installation only installs dependencies. `bun run build` writes both commands and shared chunks under root `dist/`.
 
 ## Development checks
 
@@ -22,7 +22,6 @@ bun check                         # Type-check + lint
 bun run test:vitest -- <testpath> # Focused Vitest run
 bun run test                      # Full Vitest gate
 ```
-
 
 Do not use bare `bun test` as the repository health gate; it invokes Bun's test runner, not the Vitest suite configured for this repo.
 
@@ -35,10 +34,10 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 | Path                  | Purpose                                                                        |
 | --------------------- | ------------------------------------------------------------------------------ |
 | `docs/`               | Public Sandpiper documentation                                                 |
-| `packages/`           | Workspace packages and package-owned build output                              |
+| `packages/`           | CLI source modules and internal workspace packages                             |
 | `extensions/`         | Sandpiper Pi extensions and compatibility entrypoints                          |
-| `packages/resources/` | First-party skills, prompts, and themes                                             |
-| `devtools/`           | Development-only build and project tooling                                     |
+| `packages/resources/` | Optional resource location, not included in the product                        |
+| `devtools/`           | Build regressions and isolated CLI/RPC integration tests                       |
 | `.sandpiper/`         | Project-local agent state, tasks, playbooks, active specs, notes, and archives |
 
 ## Useful docs

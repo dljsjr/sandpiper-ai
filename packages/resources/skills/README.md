@@ -4,9 +4,9 @@ Sandpiper currently bundles no skills. The runtime can load project-local skills
 
 ## Resource location
 
-The source runtime uses this directory through `resources_discover`. Built-in skill resources, when present, are staged under `packages/cli/dist/standalone/resources/skills/`. A child directory with a `SKILL.md` file appears in the available-skills catalogue.
+Both source and built runtimes use the optional `<productRoot>/packages/resources/` directory through `resources_discover`. No resource staging step runs, and the packed product omits this tree. A child directory under `skills/` with a `SKILL.md` file appears in the available-skills catalogue.
 
-Run `bun run build:standalone` after changing resource files to refresh the built runtime.
+Use configured project, user, or package skills for separately managed resources.
 
 ## Skill contents
 

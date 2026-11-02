@@ -45,9 +45,7 @@ export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): 
     : findPackageRoot(options.startDir, 'sandpiper-ai-cli');
   const resourceRoot = options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT
     ? resolve(options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT)
-    : resolve(options.startDir) === packageDir
-      ? resolve(packageDir, '..', 'resources')
-      : join(packageDir, 'dist', 'standalone', 'resources');
+    : join(packageDir, 'packages', 'resources');
 
   if (
     options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT &&

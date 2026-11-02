@@ -20,17 +20,15 @@ On top of pi's core functionality, Sandpiper provides:
 
 ## Quick Start
 
-Sandpiper requires [Bun](https://bun.sh). Clone and set up the workspace:
+Sandpiper requires [Bun](https://bun.sh) 1.4.4 or later. The repository pins Bun 1.4.4. Clone and set up the workspace:
 
 ```bash
 git clone https://github.com/dljsjr/sandpiper-ai.git
 cd sandpiper-ai
-bun install          # Install dependencies only
-bun run build        # Build the runtime and resources
-bun sandpiper        # Launch Sandpiper in interactive mode
+bun install                # Install dependencies only
+bun run build              # Build both commands under root dist/
+packages/cli/bin/sandpiper  # Launch Sandpiper in interactive mode
 ```
-
-> **Note:** `bun install` may need to run twice on a clean checkout due to a [known issue with workspace bin linking](https://github.com/oven-sh/bun/issues/19782). This is a bun behavior, not a sandpiper bug.
 
 ## Documentation
 
@@ -57,24 +55,25 @@ sandpiper-ai/
 ├── extensions/          # Pi extension packages and compatibility entrypoints
 │   ├── system/          # Sandpiper identity + system capabilities
 │   └── shell-relay/     # Shared terminal via Zellij
-├── packages/            # Workspace packages and package-owned output
-│   ├── cli/             # Sandpiper CLI wrapper around pi-coding-agent
-│   ├── resources/       # Resource staging and metadata
+├── dist/                # Built entrypoints and shared chunks
+├── packages/            # Source modules and internal workspace packages
+│   ├── cli/             # Sandpiper entrypoints and stable bin launchers
+│   ├── resources/       # Optional resource location, not shipped
 │   └── core/            # Shared utilities
 ├── ast-grep/            # Structural code analysis rules
-└── devtools/            # Build and project utilities
+└── devtools/            # Build regressions and isolated integration tests
 ```
 
 ## Building
 
-`bun install` installs dependencies only. `bun run build` builds the workspace runtime and stages resources:
+The root package is the `sandpiper-ai-cli` product. `bun install` installs dependencies only. Build and pack it explicitly:
 
 ```bash
-bun run build             # Build all required workspace output
-bun run build:standalone  # Build the CLI and its package prerequisites
-bun run build:packages    # Build package-owned output through Turbo
-bun run pack:cli          # Create an npm-compatible CLI tarball
+bun run build     # Build both commands and shared chunks under root dist/
+bun run pack:cli  # Build, then pack the root product under dist/
 ```
+
+`pack:cli` uses ordinary `bun pm pack --ignore-scripts --destination ./dist`, not a pack wrapper. The package includes root documentation, the license, and patched runtime dependencies directly. It ships no built-in skills, prompt templates, or custom themes.
 
 See [Pack the CLI](docs/dev/build-workflows.md#pack-the-cli) for tarball installation and verification. The installed CLI requires Bun. Optional standalone Journal requires Node 24 or later.
 
@@ -83,11 +82,10 @@ See [Pack the CLI](docs/dev/build-workflows.md#pack-the-cli) for tarball install
 ```bash
 bun check                         # Dependency policy + type-check + lint
 bun run check:deps                # Syncpack dependency version policy
-bun run test                      # Full Vitest gate; unsets PI_PACKAGE_DIR
+bun run test                      # Build and run the full Vitest gate
 bun run test:vitest -- <testpath> # Focused Vitest run
 bun check --write                 # Auto-fix formatting
 bun check:ast-grep                # Structural code analysis
-bun run clean                     # Remove node_modules, dist, caches
 
 # Do not use bare `bun test` as the repo health gate; it invokes Bun's runner, not Vitest.
 ```
@@ -128,7 +126,7 @@ A small number of package/runtime variables are set automatically by sandpiper a
 | `SANDPIPER_CODING_AGENT_PACKAGE` | Path to the Sandpiper package root, including shipped public docs |
 | `PI_CODING_AGENT_PACKAGE`        | Path to Pi code, themes, UI assets, and export templates          |
 | `PI_CODING_AGENT_VERSION`        | Version of the underlying pi-coding-agent                         |
-| `PI_PACKAGE_DIR`                 | Real CLI package root for product metadata and documentation      |
+| `PI_PACKAGE_DIR`                 | Root product package for metadata and documentation               |
 | `PI_SKIP_VERSION_CHECK`          | Suppresses pi's built-in update check                             |
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` intentionally point to different package roots.

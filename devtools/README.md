@@ -1,34 +1,17 @@
 # Devtools
 
-Development scripts and build utilities for this workspace.
+Build regressions and isolated runtime tests for this workspace.
 
-## Scripts
+## Build and package tests
 
-| Script | Purpose |
-| --- | --- |
-| `stageCliResources.ts` | Stages resources and public docs in the CLI package |
-| `packCli.ts` | Packs the CLI with patched dependencies through a temporary package directory |
-| `clean.ts` | Removes dependencies, generated output, and caches |
+The root product builds both entrypoints into root `dist/` with `bun run build`. Run `bun run pack:cli` from the repository root to build and pack. It uses ordinary `bun pm pack --ignore-scripts --destination ./dist`. The package includes root documentation, the license, and patched runtime dependencies directly.
 
-## Build flow
+The former production helpers `clean.ts`, `packCli.ts`, and `stageCliResources.ts` are retired. There is no recursive dependency cleaner, temporary pack directory, or resource staging step. Their removal does not remove the runtime test infrastructure.
 
-`bun install` installs dependencies only. `bun run build` performs the explicit workspace build:
-
-```text
-bun run build
-  → Turbo builds core and the CLI
-  → CLI build bundles built-in extensions
-  → stageCliResources.ts stages resources and docs
-```
-
-Package output stays under the package that owns it. Startup reads the real CLI package metadata and does not create a package sidecar.
-
-Use `bun run build:standalone` for the CLI and its package prerequisites.
-
-Use `bun run pack:cli` to write an npm-compatible tarball under `packages/cli/dist/`. The pack wrapper exposes hoisted workspace dependencies in a temporary directory so `bun pm pack` includes the patched runtime. It does not publish to a registry.
+`packedCli.test.ts` covers offline installation with scripts disabled and both commands in a read-only installation outside the checkout. Build regressions cover replacement of stale output.
 
 ## Integration tests
 
-[`integration/`](./integration/) contains the headless CLI and remote procedure call (RPC) integration tests. They start real `pi` or `sandpiper` processes with mock providers and isolated configuration directories.
+[`integration/`](./integration/) contains the headless CLI and remote procedure call (RPC) integration tests. They start real `pi` or `sandpiper` processes with mock providers and isolated configuration directories. The jj isolation fixture remains under `test-fixtures/`.
 
 See [`integration/README.md`](./integration/README.md) and the [AGENT-249 harness design](../.sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md).

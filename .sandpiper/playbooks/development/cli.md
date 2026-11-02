@@ -11,13 +11,14 @@ Read this before changing command-line tools or package `bin` metadata.
 
 - Use Commander for CLI entrypoints and subcommands.
 - Keep CLI wiring thin; move core behavior into framework-independent modules.
-- Keep checked-in `bin/` shims stable; Bun workspace bin links resolve before lifecycle scripts produce fresh `dist/` outputs.
-- Build package-owned binaries before claiming CLI behavior works from generated artifacts.
+- Keep the checked-in `packages/cli/bin/` shims stable. The root product owns both bin entries.
+- Build root `dist/` before claiming CLI behavior works from generated artifacts.
 - Use `bun` as the runtime for Sandpiper-owned tooling unless the package explicitly targets Node.
 
-## Current CLI Packages
+## Current product
 
-- `packages/cli/` — `sandpiper` runtime wrapper and system prompt diagnostic
+- Root `package.json` owns `sandpiper-ai-cli` and both command names.
+- `packages/cli/` holds the `sandpiper` runtime wrapper, system prompt diagnostic, and stable launchers.
 
 ## References
 

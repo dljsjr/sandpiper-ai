@@ -1,6 +1,6 @@
 ---
 name: Build System
-read_when: modifying build scripts, package.json, bunfig.toml, turbo.json, package dist output, workspace bins, resource staging, deciding whether a change needs a build step
+read_when: modifying build scripts, root product package.json, bunfig.toml, root dist output, bin launchers, bun pm pack, deciding whether a change needs a build step
 ---
 
 # Build System
@@ -9,35 +9,37 @@ Read this before you change build scripts, package metadata, or generated output
 
 ## Key rules
 
-- Edit source, not generated files under `dist/` or package `dist/` directories.
+- Edit source, not generated files under root `dist/`.
+- Use the pinned Bun 1.4.4 toolchain. The product requires Bun 1.4.4 or later.
 - `bun install` installs dependencies only. It must not build Sandpiper.
-- Run `bun run build` to build package-owned outputs and stage built-in resources and public docs in the CLI package.
-- Use `bun run pack:cli` for an npm-compatible tarball. Do not pack the workspace subpackage directly: pack tools omit its hoisted dependencies.
-- Keep output beside the package that owns it.
+- Run `bun run build` for both JavaScript entrypoints and shared chunks under root `dist/`.
+- Run `bun run pack:cli` from the root to build and pack. It uses ordinary `bun pm pack --ignore-scripts --destination ./dist`, not a pack wrapper.
+- Keep the product identity `sandpiper-ai-cli` and existing `packages/cli/bin/` launcher paths.
+- Pack root documentation and the license directly. Do not add staging, temporary package directories, or metadata sidecars.
+- Both runtime modes use optional `<productRoot>/packages/resources`. The packed product omits it. Preserve configured custom resources and explicit override validation.
 - The CLI bundles built-in extensions. Pi loads additional user/project extensions from source TypeScript. Do not add a separate extension build step.
+- Core and capability packages expose source TypeScript. Do not restore separate JavaScript or declaration emission.
 - Keep root local dependencies on `workspace:*`. Keep package-level internal and registry dependencies on exact versions.
 - Run `bun run check:deps` after package metadata changes.
 - Sandpiper patches `@earendil-works/pi-coding-agent` locally through `patches/` and `patchedDependencies`. Redo the patch after each Pi version change. Follow "Local Pi patch" in `docs/dev/build-system.md`.
 
 ## Build commands
 
-| Need | Command |
-| --- | --- |
-| All workspace outputs | `bun run build` |
-| Sandpiper CLI, package prerequisites, and staged resources | `bun run build:standalone` |
-| Build and pack the portable CLI without publishing | `bun run pack:cli` |
-| Package build graph only | `bun run build:packages` |
-| Remove dependencies, output, and caches | `bun run clean` |
+| Need                                               | Command                                             |
+| -------------------------------------------------- | --------------------------------------------------- |
+| Both commands and shared chunks                    | `bun run build`                                     |
+| Build and pack the root product without publishing | `bun run pack:cli`                                  |
+| Pack existing output without rebuilding            | `bun pm pack --ignore-scripts --destination ./dist` |
+
+The build replaces only root `dist/`. Packing writes `dist/sandpiper-ai-cli-0.0.1.tgz`, with the filename set by the product version. There is no Turbo cache, recursive dependency cleaner, resource staging helper, or custom pack wrapper.
 
 ## Source paths
 
-- `package.json` defines the root build and test commands.
-- `turbo.json` defines the package build graph and cache inputs.
-- `packages/cli/package.json` builds the workspace runtime and system prompt diagnostic.
+- Root `package.json` owns product metadata, bins, file selection, dependencies, and build/test commands.
+- `packages/cli/` contains both source entrypoints and the stable `bin/` launchers.
 - `packages/cli/temporary_trail_skill.ts` temporarily loads `~/git/skills-incubator/skills/trail` when `trail` is executable on PATH. TOOLS-43 tracks replacing this local bridge. There are no Trail flags, downloads, or discovery commands yet.
-- `devtools/stageCliResources.ts` stages resources and public documentation in the CLI package.
-- `devtools/packCli.ts` packs the CLI and its patched runtime dependencies through a temporary package directory.
-- `packages/*/package.json` defines package-owned output.
+- `packages/*/package.json` defines internal source packages, not separate product outputs.
+- `devtools/` retains build/pack regressions, isolated RPC and print-mode drivers, mock providers, and the jj test fixture.
 
 ## Verification
 
@@ -48,9 +50,9 @@ bun check
 bun run test
 ```
 
-Run the built workspace commands directly when their behavior changed:
+Run the built commands directly when their behavior changed:
 
 ```sh
-./node_modules/.bin/sandpiper --help
-./node_modules/.bin/sandpiper-system-prompt --help
+packages/cli/bin/sandpiper --help
+packages/cli/bin/sandpiper-system-prompt --help
 ```

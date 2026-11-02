@@ -1,34 +1,36 @@
 # Build system reference
 
-Sandpiper builds in this Bun workspace and runs from either the checkout or a packed CLI installation. Build output stays beside the package that owns it.
+The root `package.json` owns the `sandpiper-ai-cli` product. Sandpiper runs from either the checkout or a packed installation. Both layouts use root `dist/`.
 
 Use this page to understand the build structure. For commands, see [How to build and verify Sandpiper changes](build-workflows.md).
 
 ## Pipeline
 
-`bun run build` runs the package graph through Turborepo. The CLI build stages its built-in resources and documentation. `bun install` only installs dependencies and applies the local Pi patch. It does not build Sandpiper.
+`bun install` only installs dependencies and applies the local Pi patch. It does not build Sandpiper.
 
-## Package output
+`bun run build` removes root `dist/`, then runs one Bun build for both entrypoints. It produces JavaScript bundles and shared chunks. It does not produce a compiled executable.
 
-| Package          | Build output                                                                                                                                              |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/cli/`  | Runtime entrypoints, shared chunks, and `resources/` under `dist/standalone/`. Public documentation under ignored `docs/`. Packed tarballs under `dist/`. |
-| `packages/core/` | TypeScript declarations under `dist/`                                                                                                                     |
+## Product layout
 
-The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti.
+| Path                                               | Purpose                                                                          |
+| -------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `package.json`                                     | Product identity, version, runtime dependencies, file list, and both bin entries |
+| `dist/`                                            | Built runtime, system prompt diagnostic, and shared chunks                       |
+| `packages/cli/bin/`                                | Stable launchers that load root output                                           |
+| `docs/`, `README.md`, `CONTRIBUTING.md`, `LICENSE` | Root-owned documentation and license, packed directly                            |
+| `packages/resources/`                              | Optional resource location, absent from the packed product                       |
 
-The runtime reads metadata from the real CLI `package.json`. A local Pi patch resolves Pi-owned assets from the coding-agent dependency instead. Startup creates no package sidecar and does not write into the installation.
+The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti. Core and capability packages expose source TypeScript. They need no separate JavaScript or declaration build.
 
-## Task orchestration
+Both source and built entrypoints read metadata from the root product package. A local Pi patch resolves Pi-owned assets from the coding-agent dependency instead. Startup creates no package sidecar and does not write into the installation.
 
-The root `build:packages` script uses Turborepo to build these packages:
+The build has no Turbo graph, cache restoration, resource staging, or documentation copying. Output cleanup affects root `dist/`, not dependency directories.
 
-- `sandpiper-ai-core`
-- `sandpiper-ai-cli`
+## Build tools and developer tools
 
-`turbo.json` defines dependency order and caches package-local output. CLI cache inputs include resources, public documentation, extension source, and staging scripts. Its outputs include `dist/**` and generated `docs/**`. Root build commands remove the CLI's owned `dist/` and `docs/` directories before Turbo runs. Cache restoration cannot leave files removed from newer builds.
+The repository pins Bun 1.4.4 and declares Bun 1.4.4 or later for the product. Earlier packing behavior is not supported. Bun and the declared workspace dependencies build the product. TypeScript, Vitest, Biome, and Syncpack support development checks.
 
-Resource staging copies only skill directories that contain `SKILL.md`. Orphaned helper directories from earlier installations do not ship.
+The mise tools mcporter, jscpd, hike, and lizard are developer conveniences, not build steps. The mcporter application dependency remains in use by web search.
 
 ## Dependency resolution
 
@@ -70,22 +72,28 @@ The patch is tied to an exact Pi version. Redo it after each Pi upgrade:
 
 ## CLI tarball
 
-`bun run pack:cli` builds the CLI and writes its tarball under `packages/cli/dist/`. The installed package includes any present resource files, public docs, and runtime dependencies. No built-in resource directory is required. It does not bundle skills, prompt templates, or custom themes; stock themes come from the Pi dependency. It requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
+Run `bun run pack:cli` from the repository root. It builds, then runs ordinary `bun pm pack --ignore-scripts --destination ./dist`. The tarball is `dist/sandpiper-ai-cli-0.0.1.tgz`, with its filename set by the product version.
 
-`devtools/packCli.ts` copies publishable files into a temporary directory and links the workspace dependency root there. `bun pm pack` then includes the dependencies named in `bundledDependencies`. This temporary link compensates for pack tools that omit hoisted dependencies when run directly in a workspace package. The wrapper removes the temporary directory after packing.
+Direct packing uses the root file list and includes the dependencies named in `bundledDependencies`. The file list selects `dist/**/*.js` and `dist/**/*.js.map`, not arbitrary output or previous tarballs. Packing does not build the application. There is no temporary package directory or pack wrapper.
+
+The installed package includes both launchers, root output, public docs, the license, and patched runtime dependencies. It ships no built-in skills, prompt templates, or custom themes. Stock themes come from Pi. Configured custom resources remain supported through the SDK.
+
+Both source and built modes default to optional `<productRoot>/packages/resources`. A missing default tree is valid. An explicit `SANDPIPER_STANDALONE_RESOURCE_ROOT` must name an existing directory.
+
+The installed CLI requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
 
 `devtools/packedCli.test.ts` installs the tarball offline with an empty npm cache and disabled scripts. It runs both CLI commands from a read-only installation outside the checkout.
 
 ## Verification
 
-Use `bun check` for dependency policy, type checks, structural rules, and lint. Use `bun run test` for the full Vitest suite.
+Use `bun check` for dependency policy, type checks, formatting, and lint. Use `bun run test` for the full Vitest suite.
 
 When command output changes, build first and smoke-test the workspace bins:
 
 ```sh
 bun run build
-./node_modules/.bin/sandpiper --help
-./node_modules/.bin/sandpiper-system-prompt --help
+packages/cli/bin/sandpiper --help
+packages/cli/bin/sandpiper-system-prompt --help
 ```
 
 ## Related docs

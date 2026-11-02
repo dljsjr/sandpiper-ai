@@ -1,9 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "../..",
-    "outDir": "dist"
-  },
   "include": [
     "./sandpiper_standalone.ts",
     "./sandpiper_system_prompt.ts",

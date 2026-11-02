@@ -24,10 +24,8 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
 
-    // Type definitions and emit
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    // Typecheck source; Bun owns application output
+    "noEmit": true,
     "types": ["node"],
 
     // Resolve Pi framework imports for single-file extensions that run

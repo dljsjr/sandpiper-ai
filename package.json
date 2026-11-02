@@ -1,7 +1,10 @@
 {
-  "name": "sandpiper-ai",
+  "name": "sandpiper-ai-cli",
   "version": "0.0.1",
-  "packageManager": "bun@1.3.13",
+  "packageManager": "bun@1.4.4",
+  "engines": {
+    "bun": ">=1.4.4"
+  },
   "author": "Doug Stephen <dljs.jr@dougstephenjr.com>",
   "homepage": "https://github.com/dljsjr/sandpiper-ai#readme",
   "repository": {
@@ -9,6 +12,15 @@
     "url": "https://github.com/dljsjr/sandpiper-ai.git"
   },
   "private": true,
+  "files": [
+    "packages/cli/bin/",
+    "dist/**/*.js",
+    "dist/**/*.js.map",
+    "docs/",
+    "LICENSE",
+    "README.md",
+    "CONTRIBUTING.md"
+  ],
   "bin": {
     "sandpiper": "./packages/cli/bin/sandpiper",
     "sandpiper-system-prompt": "./packages/cli/bin/sandpiper-system-prompt"
@@ -27,12 +39,9 @@
     "check": "bun run check:deps && bun run check:tsc && bun run check:biome-check",
     "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/devtools/test-fixtures/jj-test-config.toml\" vitest run",
-    "test:standalone": "bun run build:standalone && bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/pi_asset_paths.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/temporary_trail_skill.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts devtools/stageCliResources.test.ts devtools/packedCli.test.ts",
-    "build:packages": "rm -rf packages/cli/dist packages/cli/docs && turbo run build --filter=sandpiper-ai-core --filter=sandpiper-ai-cli",
-    "build": "rm -rf dist && bun run build:packages",
-    "build:standalone": "rm -rf packages/cli/dist packages/cli/docs && turbo run build --filter=sandpiper-ai-cli",
-    "pack:cli": "bun run build:standalone && bun devtools/packCli.ts",
-    "clean": "bun devtools/clean.ts",
+    "test:standalone": "bun run build && bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/pi_asset_paths.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/temporary_trail_skill.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts devtools/rootProductMetadata.test.ts devtools/packedCli.test.ts",
+    "build": "rm -rf dist && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external canvas --external css-tree --external jsdom --external better-sqlite3 --external '@earendil-works/*' --external '@mariozechner/*' ./packages/cli/sandpiper_standalone.ts ./packages/cli/sandpiper_system_prompt.ts --outdir ./dist",
+    "pack:cli": "bun run build && bun pm pack --ignore-scripts --destination ./dist",
     "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
     "sandpiper-built": "bun ./packages/cli/bin/sandpiper",
     "system-prompt-dev": "bun run --bun ./packages/cli/sandpiper_system_prompt.ts",
@@ -46,26 +55,30 @@
     "extensions/*"
   ],
   "dependencies": {
-    "better-sqlite3": "13.0.3",
-    "sandpiper-ai-cli": "workspace:*",
-    "sandpiper-ai-core": "workspace:*",
-    "sanitize-filename": "1.6.4",
-    "tmp": "0.2.7",
-    "uuid": "14.0.2"
-  },
-  "peerDependencies": {
     "@earendil-works/pi-ai": "1.3.0",
     "@earendil-works/pi-coding-agent": "1.3.0",
-    "@earendil-works/pi-tui": "1.3.0"
+    "@earendil-works/pi-tui": "1.3.0",
+    "better-sqlite3": "13.0.3",
+    "jsdom": "30.0.1"
   },
+  "bundledDependencies": [
+    "@earendil-works/pi-ai",
+    "@earendil-works/pi-coding-agent",
+    "@earendil-works/pi-tui",
+    "better-sqlite3",
+    "jsdom"
+  ],
   "devDependencies": {
     "@biomejs/biome": "2.5.13",
     "@types/better-sqlite3": "9.6.0",
     "@types/node": "26.5.0",
     "knip": "6.35.1",
+    "sandpiper-ai-core": "workspace:*",
+    "sanitize-filename": "1.6.4",
     "syncpack": "15.3.3",
-    "turbo": "2.10.12",
+    "tmp": "0.2.7",
     "typescript": "7.0.2",
+    "uuid": "14.0.2",
     "vitest": "5.0.0"
   },
   "license": "MIT",

@@ -28,12 +28,13 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('uses the installed CLI package and staged resources without a repository root', () => {
+  it('uses the installed product root and its resources without a repository root', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-installed-bootstrap-'));
     try {
       const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
-      const startDir = join(packageDir, 'dist', 'standalone');
-      const resourceRoot = join(startDir, 'resources');
+      const startDir = join(packageDir, 'dist');
+      mkdirSync(startDir, { recursive: true });
+      const resourceRoot = join(packageDir, 'packages', 'resources');
       createResources(resourceRoot);
       const manifest = JSON.stringify({ name: 'sandpiper-ai-cli', version: '1.2.3' });
       writeFileSync(join(packageDir, 'package.json'), manifest);
@@ -45,12 +46,12 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('accepts packed resources without bundled prompts or skills', () => {
+  it('accepts product resources without bundled prompts or skills', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-free-bootstrap-'));
     try {
       const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
-      const startDir = join(packageDir, 'dist', 'standalone');
-      const resourceRoot = join(startDir, 'resources');
+      const startDir = join(packageDir, 'dist');
+      const resourceRoot = join(packageDir, 'packages', 'resources');
       createResources(resourceRoot);
       rmSync(join(resourceRoot, 'skills'), { recursive: true });
       rmSync(join(resourceRoot, 'prompts'), { recursive: true });
@@ -61,12 +62,12 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('accepts packed resources without a bundled skills directory', () => {
+  it('accepts product resources without a bundled skills directory', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-skill-free-bootstrap-'));
     try {
       const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
-      const startDir = join(packageDir, 'dist', 'standalone');
-      const resourceRoot = join(startDir, 'resources');
+      const startDir = join(packageDir, 'dist');
+      const resourceRoot = join(packageDir, 'packages', 'resources');
       createResources(resourceRoot);
       rmSync(join(resourceRoot, 'skills'), { recursive: true });
       writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
@@ -76,31 +77,40 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('loads checkout resources when running the source entrypoint', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-source-bootstrap-'));
+  it('resolves source and built modules to the same real product metadata and resources', () => {
+    const packageDir = mkdtempSync(join(tmpdir(), 'sandpiper-source-bootstrap-'));
     try {
-      const packageDir = join(dir, 'packages', 'cli');
-      mkdirSync(packageDir, { recursive: true });
-      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
-      const resourceRoot = join(dir, 'packages', 'resources');
+      const manifest = JSON.stringify({
+        name: 'sandpiper-ai-cli',
+        version: '1.2.3',
+        piConfig: { name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' },
+      });
+      writeFileSync(join(packageDir, 'package.json'), manifest);
+      const resourceRoot = join(packageDir, 'packages', 'resources');
       createResources(resourceRoot);
-      expect(resolveStandalonePaths({ startDir: packageDir, env: {} })).toEqual({ packageDir, resourceRoot });
+      for (const startDir of [join(packageDir, 'packages', 'cli'), join(packageDir, 'dist')]) {
+        mkdirSync(startDir, { recursive: true });
+        expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
+        expect(readFileSync(join(packageDir, 'package.json'), 'utf8')).toBe(manifest);
+      }
+      expect(existsSync(join(packageDir, 'packages', 'cli', 'package.json'))).toBe(false);
     } finally {
-      rmSync(dir, { recursive: true, force: true });
+      rmSync(packageDir, { recursive: true, force: true });
     }
   });
 
-  it('does not silently fall back to checkout resources when built resources are missing', () => {
+  it('accepts absent product resources without falling back to an ancestor checkout', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-missing-resources-'));
     try {
-      const packageDir = join(dir, 'packages', 'cli');
-      mkdirSync(join(packageDir, 'dist', 'standalone'), { recursive: true });
-      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
+      writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
       createResources(join(dir, 'packages', 'resources'));
-      expect(resolveStandalonePaths({ startDir: join(packageDir, 'dist', 'standalone'), env: {} })).toEqual({
-        packageDir,
-        resourceRoot: join(packageDir, 'dist', 'standalone', 'resources'),
-      });
+      const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
+      const startDir = join(packageDir, 'dist');
+      mkdirSync(startDir, { recursive: true });
+      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
+      const resourceRoot = join(packageDir, 'packages', 'resources');
+      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
+      expect(existsSync(resourceRoot)).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -149,6 +159,23 @@ describe('standalone bootstrap', () => {
       });
       expect(paths).toEqual({ packageDir, resourceRoot });
       expect(existsSync(join(packageDir, 'package.json'))).toBe(false);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('anchors default resources to an explicit metadata package instead of the module location', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-package-override-'));
+    try {
+      const packageDir = join(dir, 'metadata');
+      mkdirSync(packageDir);
+      const paths = resolveStandalonePaths({
+        startDir: join(dir, 'unrelated', 'dist'),
+        env: { SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir },
+      });
+      expect(paths).toEqual({ packageDir, resourceRoot: join(packageDir, 'packages', 'resources') });
+      expect(existsSync(join(packageDir, 'package.json'))).toBe(false);
+      expect(existsSync(paths.resourceRoot)).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

@@ -19,22 +19,22 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 - Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
 - Tests must not touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config).
-- Do not create tasks for changes we believe *upstream* should make. Record the finding in the related task or doc and move on. Tasks that track an already-filed upstream PR or issue we are genuinely blocked on are fine.
+- Do not create tasks for changes we believe _upstream_ should make. Record the finding in the related task or doc and move on. Tasks that track an already-filed upstream PR or issue we are genuinely blocked on are fine.
 - YAAMS is adjacent tooling, not part of this monorepo yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; continuity uses Journal when installed, the task tracker, inbox, and session logs.
 
 ## Routing
 
-| Working on...                                                                                          | Read first                                                   |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
-| Documentation, `README.md`, `AGENTS.md`, `.sandpiper/docs`, `.sandpiper/playbooks`, docs cleanup       | `.sandpiper/playbooks/documentation/index.md`                |
-| Build system, package metadata, package `dist/` output, local helper assembly                       | `.sandpiper/playbooks/development/build.md`                  |
-| TypeScript, tests, linting, verification, code-health rules                                            | `.sandpiper/playbooks/development/typescript-and-tests.md`   |
-| Environment variables, config paths, `PI_*`, `SANDPIPER_*`                                             | `.sandpiper/playbooks/development/env-vars.md`               |
-| CLI tools, Commander commands, package `bin` entries, bundled executables                              | `.sandpiper/playbooks/development/cli.md`                    |
-| Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                          | `.sandpiper/playbooks/development/pi-extensions.md`          |
-| AutoTOON, JSON→TOON conversion, token optimization                                                     | `.sandpiper/playbooks/features/autotoon.md`                  |
-| Shell Relay, Zellij integration, shared terminal, shell integrations                                   | `.sandpiper/playbooks/features/shell-relay.md`               |
-| Journal, session continuity, PID/liveness handling, concurrent sessions                                | `.sandpiper/playbooks/features/session-continuity.md`        |
+| Working on...                                                                                    | Read first                                                 |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Documentation, `README.md`, `AGENTS.md`, `.sandpiper/docs`, `.sandpiper/playbooks`, docs cleanup | `.sandpiper/playbooks/documentation/index.md`              |
+| Build system, root product metadata, root `dist/` output, packing                                | `.sandpiper/playbooks/development/build.md`                |
+| TypeScript, tests, linting, verification, code-health rules                                      | `.sandpiper/playbooks/development/typescript-and-tests.md` |
+| Environment variables, config paths, `PI_*`, `SANDPIPER_*`                                       | `.sandpiper/playbooks/development/env-vars.md`             |
+| CLI tools, Commander commands, package `bin` entries, bundled executables                        | `.sandpiper/playbooks/development/cli.md`                  |
+| Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                    | `.sandpiper/playbooks/development/pi-extensions.md`        |
+| AutoTOON, JSON→TOON conversion, token optimization                                               | `.sandpiper/playbooks/features/autotoon.md`                |
+| Shell Relay, Zellij integration, shared terminal, shell integrations                             | `.sandpiper/playbooks/features/shell-relay.md`             |
+| Journal, session continuity, PID/liveness handling, concurrent sessions                          | `.sandpiper/playbooks/features/session-continuity.md`      |
 
 ## Verification
 
@@ -54,9 +54,9 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 | `.sandpiper/docs/`      | Active internal specs, PRDs, design notes, and implementation plans                             |
 | `.sandpiper/archive/`   | Historical, completed, superseded, or stale docs                                                |
 | `extensions/`           | Sandpiper Pi extension source and compatibility bridges                                         |
-| `packages/`             | Workspace packages and package-owned build output                                                |
-| `packages/resources/`   | First-party skills, prompts, and themes                                                              |
-| `devtools/`             | Development-only build and project utilities                                                     |
+| `packages/`             | CLI source modules and internal workspace packages                                              |
+| `packages/resources/`   | Optional resource location, not shipped in the product                                          |
+| `devtools/`             | Build regressions and isolated CLI/RPC integration tests                                        |
 
 ## Public Documentation
 

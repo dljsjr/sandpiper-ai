@@ -6,7 +6,7 @@
   "description": "Host-neutral AutoTOON JSON to TOON conversion",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "default": "./src/index.ts"
     }
   },
@@ -14,7 +14,6 @@
     "@toon-format/toon": "4.1.1"
   },
   "scripts": {
-    "build": "tsc --build",
     "test": "vitest run",
     "test:watch": "vitest"
   }

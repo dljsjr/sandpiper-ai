@@ -3,7 +3,7 @@
 - Mode: How-to plan
 - Parent: TOOLS-30
 - Exploration: TOOLS-92
-- Status: Authorized for implementation. Initial parallel lanes: TOOLS-94, TOOLS-95, and TOOLS-97.
+- Status: TOOLS-94–98 are ready for user review. Integrated verification and independent read-only review are complete. User acceptance remains separate.
 - Agent execution: Doug lifted the fling hold and authorized inherited-model workers.
 
 ## Target and boundaries
@@ -34,6 +34,8 @@ Custom resource support, ordinary settings, package-management behavior, and Jou
 Shell Relay remains disabled. TOOLS-93 is a deferred capability decision, not a packaging repair. Do not add its assets, revive its installer, or remove the capability in this work.
 
 Do not redesign web search, replace mcporter, remove developer tools, change external repositories or user configuration, install archived skills, or modify the WIP jj replacement.
+
+Doug approved one narrow external exception after the new build and stable-bin checks passed: change the old `node_modules/.bin/sandpiper` target to `packages/cli/bin/sandpiper` in both the deployed launcher and its canonical dotfiles source. Preserve every other byte, argument-handling difference, and file mode. Leave unrelated dotfiles changes untouched.
 
 ## Work items
 
@@ -124,3 +126,11 @@ Shared-checkout workers must respect the file ownership table. Do not run concur
 Use jj, not git. Every snapshotting jj command needs the command-local `--config fsmonitor.backend=none` workaround. Do not change persistent configuration.
 
 Doug fixed fling and lifted the execution hold. The lead starts the initial workers before authorizing edits. No worker can commit, mutate shared dependency installation, or run integration builds without a lead-coordinated handoff.
+
+## Verification status
+
+- All implementation workers and the independent reviewer have handed off and closed. TOOLS-94–98 are NEEDS REVIEW. The independent read-only review found no outstanding actionable findings or blockers; it made no edits or test runs.
+- The integrated checkout passes `bun check`, all 85 Vitest files and 653 tests, and `bun run pack:cli`, with unchanged test timeouts and no lint warnings. An SDK-anchored regression proved the Jiti cache-fixture correction RED then GREEN; the four touched fixtures now disable filesystem caching.
+- A fresh source copy passes frozen offline dependency installation with scripts disabled, the same checks and full test suite, and packing. Its lockfile stays unchanged; no legacy CLI, core, or capability output is present or emitted. Existing ignored output is left alone in the live checkout.
+- Actual packing excludes a previous root tarball on repack and produces the identical payload. Empty-cache offline npm installation, read-only CLI/SDK/theme checks, and native SQLite and DOM probes pass without installed sidecars. This does not certify empty-cache Bun consumer installation.
+- All nine protected roots match their baselines. Both launcher copies retain only the approved target change, and the three unrelated dotfiles retain their original bytes and modes. TOOLS-30 remains open; passing verification is not user acceptance.

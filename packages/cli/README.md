@@ -1,12 +1,12 @@
 # Sandpiper CLI
 
-Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent).
+Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). This directory holds source and stable launchers. The root `package.json` owns the `sandpiper-ai-cli` product.
 
 ## How It Works
 
 `sandpiper_standalone.ts` is the normal `sandpiper` runtime. It:
 
-1. Resolves the CLI package and its resource directory without writing to the installation.
+1. Resolves the root product package and its optional resource directory without writing to the installation.
 2. Configures `PI_PACKAGE_DIR`, `PI_CODING_AGENT_PACKAGE`, `PI_CODING_AGENT_VERSION`, `SANDPIPER_CODING_AGENT_PACKAGE`, and mirrored user-facing `SANDPIPER_*` env vars before importing Pi.
 3. Imports Pi through `deferred_pi_import.ts`.
 4. Calls `main(args, { extensionFactories })` with Sandpiper identity/capability factories and explicit resource discovery.
@@ -18,12 +18,11 @@ Set `SANDPIPER_PRINT_PI_VERSION=1` to write the active Pi version to stderr befo
 ## Build
 
 ```bash
-bun run build             # Build all required workspace output
-bun run build:standalone  # Build the CLI, package prerequisites, and staged resources
-bun run pack:cli          # Build and create an npm-compatible tarball
+bun run build     # Build both commands and shared chunks under root dist/
+bun run pack:cli  # Build, then pack the root product under dist/
 ```
 
-Builds are explicit; dependency installation does not build runtime bundles.
+Run these commands from the repository root with Bun 1.4.4 or later. `pack:cli` uses ordinary `bun pm pack`, not a pack wrapper. Dependency installation does not build runtime bundles.
 
 ## Runtime Targets
 
@@ -34,21 +33,21 @@ Use explicit package scripts or paths when testing. The user's `$PATH` may conta
 bun run sandpiper-dev -- --help
 
 # Build and run the normal runtime bundle
-bun run build:standalone
+bun run build
 bun run sandpiper-built -- --help
 
-# Workspace-linked bin after bun install
-./node_modules/.bin/sandpiper --help
+# Stable bin after building
+packages/cli/bin/sandpiper --help
 
 # Smoke tests
 bun run test:standalone
 ```
 
-The source entrypoints use `packages/resources/`. Built entrypoints use `dist/standalone/resources/` inside the CLI package. Built-in extensions and resources load through explicit extension factories and `resources_discover`. The built runtime requires no source checkout and creates no metadata sidecar.
+Both source and built entrypoints use optional `<productRoot>/packages/resources/`. Built-in extensions load through explicit factories. Resource discovery uses `resources_discover` without a staging step. The built runtime requires no source checkout and creates no metadata sidecar.
 
-The built-in resource tree may be absent. `SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, must point to an existing directory; its `skills/`, `prompts/`, and `themes/` subdirectories are optional. Sandpiper currently bundles no skills, prompt templates, or custom themes. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
+The default resource tree can be absent, and the packed product omits it. If set, `SANDPIPER_STANDALONE_RESOURCE_ROOT` must point to an existing directory. Its `skills/`, `prompts/`, and `themes/` subdirectories are optional. Sandpiper currently bundles no skills, prompt templates, or custom themes. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
 
-The CLI requires Bun. Journal is an optional standalone package, not a bundled helper. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
+The CLI requires Bun. Journal is an optional standalone package, not a bundled helper. See the [build workflow](../../docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 
 Package-management commands such as `install`, `list`, `remove`, and `update` operate on the normal Sandpiper global/project settings files.
 
@@ -62,7 +61,7 @@ Run it from source:
 bun run system-prompt-dev -- --approve > /tmp/system-prompt.txt
 ```
 
-After building the CLI package, use the stable workspace bin:
+After building the root product, use the stable bin:
 
 ```bash
 packages/cli/bin/sandpiper-system-prompt --approve > /tmp/system-prompt.txt
@@ -91,6 +90,6 @@ birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux
 
 ## Pi asset resolution
 
-Sandpiper sets two separate package paths before importing Pi. `PI_PACKAGE_DIR` points to the real CLI package for branding, version, documentation, and `.sandpiper` configuration. `PI_CODING_AGENT_PACKAGE` points to the installed Pi dependency for themes, UI assets, and HTML export templates. A local Bun patch separates these paths.
+Sandpiper sets two separate package paths before importing Pi. `PI_PACKAGE_DIR` points to the root product package for branding, version, documentation, and `.sandpiper` configuration. `PI_CODING_AGENT_PACKAGE` points to the installed Pi dependency for themes, UI assets, and HTML export templates. A local Bun patch separates these paths.
 
 The published tarball includes the patched Pi dependency through `bundledDependencies`. Consumers do not need to apply patches or run installation scripts.

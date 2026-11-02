@@ -8,15 +8,15 @@
   ],
   "versionGroups": [
     {
-      "label": "Root router uses workspace protocol for local packages",
-      "packages": ["sandpiper-ai"],
+      "label": "Root product uses workspace protocol for local packages",
+      "packages": ["sandpiper-ai-cli"],
       "dependencies": ["$LOCAL"],
       "dependencyTypes": ["dev", "prod"],
       "pinVersion": "workspace:*"
     },
     {
       "label": "Workspace package local dependency specs stay exact",
-      "packages": ["!sandpiper-ai"],
+      "packages": ["!sandpiper-ai-cli"],
       "dependencies": ["$LOCAL"],
       "dependencyTypes": ["dev", "prod"]
     }
@@ -24,7 +24,7 @@
   "semverGroups": [
     {
       "label": "Ignore root local workspace protocols",
-      "packages": ["sandpiper-ai"],
+      "packages": ["sandpiper-ai-cli"],
       "dependencies": ["$LOCAL"],
       "isIgnored": true
     },

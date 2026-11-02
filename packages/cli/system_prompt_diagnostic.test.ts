@@ -6,26 +6,32 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
-const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai');
+const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai-cli');
 const bunExecutable = process.env.BUN_EXECUTABLE ?? 'bun';
 
 function diagnosticEnv(agentDir: string): NodeJS.ProcessEnv {
   const testRoot = dirname(agentDir);
-  const env: NodeJS.ProcessEnv = {
-    ...process.env,
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(PI|SANDPIPER)_/.test(key)));
+  return {
+    ...env,
     HOME: join(testRoot, 'home'),
     XDG_CONFIG_HOME: join(testRoot, 'config'),
     XDG_STATE_HOME: join(testRoot, 'state'),
+    XDG_CACHE_HOME: join(testRoot, 'cache'),
+    XDG_RUNTIME_DIR: join(testRoot, 'runtime'),
+    BUN_INSTALL: join(testRoot, 'bun'),
+    BUN_INSTALL_CACHE_DIR: join(testRoot, 'bun-cache'),
+    JITI_FS_CACHE: 'false',
     PI_OFFLINE: '1',
+    PI_CODING_AGENT_DIR: agentDir,
     SANDPIPER_CODING_AGENT_DIR: agentDir,
-    SANDPIPER_SESSION_DIR: join(agentDir, 'sessions'),
-    SANDPIPER_STANDALONE_RESOURCE_ROOT: join(repoRoot, 'packages', 'resources'),
+    PI_CODING_AGENT_SESSION_DIR: join(agentDir, 'sessions'),
+    SANDPIPER_CODING_AGENT_SESSION_DIR: join(agentDir, 'sessions'),
+    AGENT_JOURNAL_DIR: join(testRoot, 'journal'),
+    GIT_CONFIG_GLOBAL: '/dev/null',
+    GIT_CONFIG_SYSTEM: '/dev/null',
+    JJ_CONFIG: join(repoRoot, 'devtools', 'test-fixtures', 'jj-test-config.toml'),
   };
-  delete env.PI_PACKAGE_DIR;
-  delete env.PI_CODING_AGENT_PACKAGE;
-  delete env.PI_CODING_AGENT_VERSION;
-  delete env.SANDPIPER_CODING_AGENT_PACKAGE;
-  return env;
 }
 
 describe('system prompt diagnostic', () => {

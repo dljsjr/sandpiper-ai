@@ -124,13 +124,12 @@ threat that isn't real.
   `SANDPIPER_INTEGRATION_MOCK_REPLY`'s single canned reply when no script is set. Does not
   reliably index compaction-summarization calls the same way (see the design doc).
 - **`entry: 'sandpiper'` runs from source** (`packages/cli/sandpiper_standalone.ts` directly via
-  `bun`, no build step). Chosen for dev-loop speed, but this is a real, named tradeoff, not a
-  hypothetical one: AGENT-243 (this same session) found a bug that only manifested in the
-  _compiled_ standalone binary, invisible from source. Evaluated for AGENT-253 (per the
-  coordinator's ruling, include a compiled-binary smoke only if genuinely cheap): the compiled
-  binary isn't currently built in this environment, and building it is a real `bun compile`
-  step, not something a skip-if-not-built test can make cheap on its own — deferred as named
-  wave-2 scope, not added.
+  `bun`, no build step). This keeps the development loop fast but does not test built output.
+  Historically, AGENT-243 found a bug that appeared only in the compiled standalone binary,
+  not in source execution. AGENT-253 deferred a compiled-binary smoke test at that time.
+  Compiled executable delivery is now retired. Test the current JavaScript bundles and packed
+  installation through the [build workflows](../../docs/dev/build-workflows.md) and
+  [`packedCli.test.ts`](../packedCli.test.ts), rather than adding a compiled-binary lane.
 
 ## Placement note
 

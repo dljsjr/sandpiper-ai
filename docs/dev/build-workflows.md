@@ -1,16 +1,15 @@
 # How to build and verify Sandpiper changes
 
-Use this guide to select the build and verification commands for a change. For the pipeline and output layout, see [Build system reference](build-system.md).
+Use this guide to select the build and verification commands for a change. Use Bun 1.4.4, the pinned toolchain version. For the pipeline and output layout, see [Build system reference](build-system.md).
 
 ## Choose the command
 
-| You changed                                                         | Build command                                           |
-| ------------------------------------------------------------------- | ------------------------------------------------------- |
-| Built-in extension source under `extensions/`                       | `bun run build:standalone`                              |
-| Skills, prompts, themes, or other files under `packages/resources/` | `bun run build:standalone` to refresh the built runtime |
-| `packages/core/`                                                    | `bun --filter sandpiper-ai-core build`                  |
-| `packages/cli/`                                                     | `bun run build:standalone`                              |
-| Root build scripts, package metadata, or several packages           | `bun run build`                                         |
+| You changed                                         | Build command                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------- |
+| CLI, built-in extension, core, or capability source | `bun run build`                                               |
+| Root build scripts or product metadata              | `bun run build`                                               |
+| Public documentation or license                     | No build required. Pack again to refresh the tarball.         |
+| Configured custom skills, prompts, or themes        | No application build. Update the separately managed resource. |
 
 ## Run tests while developing
 
@@ -35,13 +34,7 @@ Do not use bare `bun test` as the repository gate. It invokes Bun's test runner 
 bun run build
 ```
 
-This command builds core declarations and the Sandpiper runtime. The CLI build stages resources and documentation in the CLI package.
-
-Use this narrower command when only the Sandpiper runtime changed:
-
-```sh
-bun run build:standalone
-```
+The command replaces root `dist/` with both JavaScript entrypoints and their shared chunks. It uses one Bun build. No core emission or resource staging step runs.
 
 ## Pack the CLI
 
@@ -51,14 +44,22 @@ Run from the repository root:
 bun run pack:cli
 ```
 
-The command builds the runtime and creates `packages/cli/dist/sandpiper-ai-cli-0.0.1.tgz`. The filename follows the CLI package version.
+The command builds, then packs the root product into `dist/sandpiper-ai-cli-0.0.1.tgz`. The filename follows the root product version.
 
-The tarball includes built-in resources and patched runtime dependencies. The pack wrapper uses a temporary directory to expose hoisted workspace dependencies to `bun pm pack`. It removes that directory after packing. Do not pack `packages/cli` directly, because pack tools omit its hoisted dependencies.
+To pack existing output without rebuilding, run the underlying Bun command from the root:
+
+```sh
+bun pm pack --ignore-scripts --destination ./dist
+```
+
+This direct packing command does not build the runtime.
+
+The tarball includes root output, stable launchers, public documentation, the license, and patched runtime dependencies. It omits built-in skills, prompt templates, and custom themes. No staging directory or pack wrapper is needed.
 
 With Bun and Node installed, install the tarball without installation scripts:
 
 ```sh
-npm install --global --ignore-scripts ./packages/cli/dist/sandpiper-ai-cli-0.0.1.tgz
+npm install --global --ignore-scripts ./dist/sandpiper-ai-cli-0.0.1.tgz
 ```
 
 Make sure that the package works outside the checkout:
@@ -72,11 +73,11 @@ This test installs offline with an empty npm cache and disabled scripts. It runs
 ## Smoke-test built commands
 
 ```sh
-./node_modules/.bin/sandpiper --help
-./node_modules/.bin/sandpiper-system-prompt --help
+packages/cli/bin/sandpiper --help
+packages/cli/bin/sandpiper-system-prompt --help
 ```
 
-These commands exercise the same workspace paths used for local development.
+These stable launchers load the same root output paths in the checkout and installed product.
 
 ## Repair common problems
 
@@ -88,11 +89,11 @@ Run:
 bun run build
 ```
 
-The package bin shims require `packages/cli/dist/standalone/` output.
+The bin shims require root `dist/` output. Dependency installation does not create it.
 
-### Built-in resources use old behavior
+### Custom resources use old behavior
 
-Run `bun run build:standalone` to refresh any present resource files and public documentation. Standalone packages such as Journal are installed and updated separately.
+Update the configured resource files or their separately installed package. Both runtime modes use optional `<productRoot>/packages/resources` without copying it into `dist/`. The packed product omits that tree. Standalone packages such as Journal are installed and updated separately.
 
 ### A dependency cannot be resolved
 

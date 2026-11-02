@@ -53,15 +53,17 @@ if (process.env.PI_OFFLINE === "1") {
 
 The package/version variables below are set by the Sandpiper runtime and are not normal mirrored user configuration:
 
-| Variable | Purpose | Read with |
-| -------- | ------- | --------- |
+| Variable                         | Purpose                                                           | Read with                                    |
+| -------------------------------- | ----------------------------------------------------------------- | -------------------------------------------- |
 | `SANDPIPER_CODING_AGENT_PACKAGE` | Path to the Sandpiper package root, including shipped public docs | `process.env.SANDPIPER_CODING_AGENT_PACKAGE` |
-| `PI_CODING_AGENT_PACKAGE` | Path to the wrapped pi-coding-agent package root | `process.env.PI_CODING_AGENT_PACKAGE` |
-| `PI_CODING_AGENT_VERSION` | Pi version string | `process.env.PI_CODING_AGENT_VERSION` |
-| `PI_PACKAGE_DIR` | Pi package directory override | `process.env.PI_PACKAGE_DIR` |
-| `PI_SKIP_VERSION_CHECK` | Suppress Pi update check | `process.env.PI_SKIP_VERSION_CHECK` |
+| `PI_CODING_AGENT_PACKAGE`        | Path to the wrapped pi-coding-agent package root                  | `process.env.PI_CODING_AGENT_PACKAGE`        |
+| `PI_CODING_AGENT_VERSION`        | Pi version string                                                 | `process.env.PI_CODING_AGENT_VERSION`        |
+| `PI_PACKAGE_DIR`                 | Root Sandpiper product package for metadata and documentation     | `process.env.PI_PACKAGE_DIR`                 |
+| `PI_SKIP_VERSION_CHECK`          | Suppress Pi update check                                          | `process.env.PI_SKIP_VERSION_CHECK`          |
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` deliberately have different meanings. Do not mirror one into the other. Use `resolveEnvVar()` for user-facing configuration such as `OFFLINE`, not for runtime-owned package roots.
+
+Both source and built entrypoints resolve the root Sandpiper product before importing Pi. `SANDPIPER_STANDALONE_PACKAGE_DIR` overrides the metadata package. The optional default resource location is `<productRoot>/packages/resources`. `SANDPIPER_STANDALONE_RESOURCE_ROOT`, when set, must name an existing directory. Its `skills/`, `prompts/`, and `themes/` subdirectories are optional. The packed product omits the default resource tree. Configured custom resources remain supported.
 
 ```typescript
 // ✅ Correct for runtime-owned package roots

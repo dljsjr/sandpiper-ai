@@ -83,7 +83,7 @@ const createCommand = new Command("create")
 // core/create.ts
 export async function createProject(
   name: string,
-  type: ProjectType,
+  type: ProjectType
 ): Promise<void> {
   // Implementation logic here
   // No Commander imports, no process.argv, no CLI-specific types
@@ -129,17 +129,23 @@ import { execSync } from "node:child_process";
 
 describe("CLI", () => {
   it("parses arguments correctly", () => {
-    const output = execSync("bun packages/cli/bin/sandpiper-system-prompt --help", {
-      encoding: "utf8",
-    });
+    const output = execSync(
+      "bun packages/cli/bin/sandpiper-system-prompt --help",
+      {
+        encoding: "utf8",
+      }
+    );
     expect(output).toContain("Usage:");
   });
 
   it("handles invalid arguments", () => {
     expect(() => {
-      execSync("bun packages/cli/bin/sandpiper-system-prompt unexpected-prompt", {
-        encoding: "utf8",
-      });
+      execSync(
+        "bun packages/cli/bin/sandpiper-system-prompt unexpected-prompt",
+        {
+          encoding: "utf8",
+        }
+      );
     }).toThrow();
   });
 });
@@ -163,25 +169,19 @@ Unit tests alone miss argument parsing bugs. E2E tests alone are slower and hard
 
 ## Build and local use
 
-CLI packages that emit bundled executables or type declarations must be built before local use. Dependency installation does not build Sandpiper output.
-
-### When to Build
-
-Build a CLI package when:
-
-- It emits a bundled runtime (for example, `packages/cli/dist/standalone/sandpiper_standalone.js`)
-- It emits TypeScript declarations (`.d.ts` files)
-- It uses a bundler (Bun build, esbuild, Rollup, etc.)
+Build Sandpiper before using its bin launchers. Dependency installation does not build application output.
 
 ### Build Process
 
-Build all required workspace output:
+From the repository root:
 
 ```bash
 bun run build
 ```
 
-This command runs the Turbo-backed package build graph. The CLI build stages resources and documentation. Use `bun run build:standalone` for the CLI and its package prerequisites. Use `bun run pack:cli` to create an installable tarball without publishing it.
+One Bun invocation writes both JavaScript entrypoints and shared chunks under root `dist/`. The stable launchers stay under `packages/cli/bin/`. The root product owns documentation and the license directly.
+
+After building, run `bun pm pack --ignore-scripts --destination ./dist` from the root to create a tarball without publishing it. The `bun run pack:cli` alias builds before running this command.
 
 ## Tools and Conventions
 
@@ -209,16 +209,16 @@ Bun is the preferred runtime for CLI development:
 - Use `strict: true` in `tsconfig.json`
 - No `any` types
 - Use `interface` for object shapes
-- Emit declarations (`.d.ts`) for packages that are imported
+- Internal packages expose source TypeScript for runtime imports and type checking
 
 ## Examples in This Repository
 
-| File                                                        | Purpose                                 |
-| ----------------------------------------------------------- | --------------------------------------- |
-| `packages/cli/sandpiper_standalone.ts`                      | Main Sandpiper CLI entry point           |
-| `packages/cli/sandpiper_system_prompt.ts`                   | Model-free system prompt diagnostic      |
-| `packages/cli/system_prompt_diagnostic.ts`                  | Diagnostic SDK orchestration             |
-| `packages/cli/package.json`                                 | Package metadata with bin configuration  |
+| File                                       | Purpose                                    |
+| ------------------------------------------ | ------------------------------------------ |
+| `packages/cli/sandpiper_standalone.ts`     | Main Sandpiper CLI entry point             |
+| `packages/cli/sandpiper_system_prompt.ts`  | Model-free system prompt diagnostic        |
+| `packages/cli/system_prompt_diagnostic.ts` | Diagnostic SDK orchestration               |
+| `package.json`                             | Root product metadata and both bin entries |
 
 ## Related Documentation
 

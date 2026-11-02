@@ -5,19 +5,25 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it, vi } from 'vitest';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
-const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai');
+const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai-cli');
 const piPackageDir = dirname(dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent'))));
 
 describe('standalone Sandpiper resource discovery', () => {
   it.each([false, true])(
-    'loads custom prompts, themes and PATH-gated Trail without bundled templates (%s)',
+    'loads custom skills, prompts, themes and PATH-gated Trail without bundled resources (%s)',
     async (withTrail) => {
-      const agentDir = await mkdtemp(join(tmpdir(), 'sandpiper-standalone-resources-'));
+      const agentDir = await mkdtemp(join(tmpdir(), 'sp-res-'));
       const home = join(agentDir, 'home');
       const bin = join(agentDir, 'bin');
       const trailSkill = join(home, 'git', 'skills-incubator', 'skills', 'trail');
       await mkdir(home, { recursive: true });
       await mkdir(bin);
+      const customSkills = join(agentDir, 'custom-skills');
+      await mkdir(join(customSkills, 'fixture-skill'), { recursive: true });
+      await writeFile(
+        join(customSkills, 'fixture-skill', 'SKILL.md'),
+        '---\nname: fixture-skill\ndescription: Custom skill fixture.\n---\n# Fixture\n',
+      );
       const customPrompts = join(agentDir, 'custom-prompts');
       await mkdir(customPrompts);
       await writeFile(
@@ -41,20 +47,34 @@ describe('standalone Sandpiper resource discovery', () => {
         );
         await writeFile(join(bin, 'trail'), '#!/bin/sh\nexit 99\n', { mode: 0o755 });
       }
-      vi.stubEnv('HOME', home);
-      vi.stubEnv('PATH', bin);
-      const previousPackageDir = process.env.PI_PACKAGE_DIR;
-      const previousSkipVersionCheck = process.env.PI_SKIP_VERSION_CHECK;
-      const previousAgentDir = process.env.SANDPIPER_CODING_AGENT_DIR;
+      for (const key of Object.keys(process.env)) {
+        if (/^(PI|SANDPIPER)_/.test(key)) vi.stubEnv(key, undefined);
+      }
+      for (const [key, value] of Object.entries({
+        HOME: home,
+        PATH: bin,
+        XDG_CONFIG_HOME: join(agentDir, 'config'),
+        XDG_STATE_HOME: join(agentDir, 'state'),
+        XDG_CACHE_HOME: join(agentDir, 'cache'),
+        XDG_RUNTIME_DIR: agentDir,
+        JITI_FS_CACHE: 'false',
+        PI_PACKAGE_DIR: repoRoot,
+        PI_CODING_AGENT_PACKAGE: piPackageDir,
+        PI_SKIP_VERSION_CHECK: '1',
+        PI_OFFLINE: '1',
+        PI_CODING_AGENT_DIR: agentDir,
+        SANDPIPER_CODING_AGENT_DIR: agentDir,
+        PI_CODING_AGENT_SESSION_DIR: join(agentDir, 'sessions'),
+        SANDPIPER_CODING_AGENT_SESSION_DIR: join(agentDir, 'sessions'),
+        AGENT_JOURNAL_DIR: join(agentDir, 'journal'),
+        GIT_CONFIG_GLOBAL: '/dev/null',
+        GIT_CONFIG_SYSTEM: '/dev/null',
+        JJ_CONFIG: join(repoRoot, 'devtools', 'test-fixtures', 'jj-test-config.toml'),
+      })) {
+        vi.stubEnv(key, value);
+      }
 
       try {
-        process.env.PI_PACKAGE_DIR = repoRoot;
-        process.env.PI_SKIP_VERSION_CHECK = '1';
-        // bindExtensions() boots the web-search extension in-process, which reads the
-        // real global agent-dir settings.json unless this is set — must not leak
-        // Doug's real settings (e.g. an `!op read ...` braveApiKey) into the test.
-        process.env.SANDPIPER_CODING_AGENT_DIR = agentDir;
-
         const { createNeutralCapabilityExtensionFactories } = await import('./sandpiper_resources.js');
         const { DefaultResourceLoader, SessionManager, createAgentSession } = await import(
           '@earendil-works/pi-coding-agent'
@@ -63,6 +83,7 @@ describe('standalone Sandpiper resource discovery', () => {
         const resourceLoader = new DefaultResourceLoader({
           cwd: agentDir,
           agentDir,
+          additionalSkillPaths: [customSkills],
           additionalPromptTemplatePaths: [customPrompts],
           additionalThemePaths: [customThemes],
           extensionFactories: [...createNeutralCapabilityExtensionFactories(join(repoRoot, 'packages', 'resources'))],
@@ -76,6 +97,7 @@ describe('standalone Sandpiper resource discovery', () => {
         await resourceLoader.reload();
 
         const { session } = await createAgentSession({
+          cwd: agentDir,
           agentDir,
           resourceLoader,
           sessionManager: SessionManager.inMemory(),
@@ -87,7 +109,10 @@ describe('standalone Sandpiper resource discovery', () => {
           const skillNames = resourceLoader.getSkills().skills.map((skill) => skill.name);
           const promptNames = resourceLoader.getPrompts().prompts.map((prompt) => prompt.name);
 
-          expect(skillNames.sort()).toEqual(withTrail ? ['trail'] : []);
+          expect(skillNames.sort()).toEqual(withTrail ? ['fixture-skill', 'trail'] : ['fixture-skill']);
+          expect(resourceLoader.getSkills().skills.find((skill) => skill.name === 'fixture-skill')?.baseDir).toBe(
+            join(customSkills, 'fixture-skill'),
+          );
           if (withTrail) {
             expect(resourceLoader.getSkills().skills.find((skill) => skill.name === 'trail')?.baseDir).toBe(trailSkill);
           }
@@ -98,24 +123,6 @@ describe('standalone Sandpiper resource discovery', () => {
           session.dispose();
         }
       } finally {
-        if (previousPackageDir === undefined) {
-          delete process.env.PI_PACKAGE_DIR;
-        } else {
-          process.env.PI_PACKAGE_DIR = previousPackageDir;
-        }
-
-        if (previousSkipVersionCheck === undefined) {
-          delete process.env.PI_SKIP_VERSION_CHECK;
-        } else {
-          process.env.PI_SKIP_VERSION_CHECK = previousSkipVersionCheck;
-        }
-
-        if (previousAgentDir === undefined) {
-          delete process.env.SANDPIPER_CODING_AGENT_DIR;
-        } else {
-          process.env.SANDPIPER_CODING_AGENT_DIR = previousAgentDir;
-        }
-
         vi.unstubAllEnvs();
         await rm(agentDir, { recursive: true, force: true });
       }
