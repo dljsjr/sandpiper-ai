@@ -3,8 +3,8 @@
 - Mode: How-to plan
 - Parent: TOOLS-30
 - Exploration: TOOLS-92
-- Status: Work breakdown complete. Implementation has not started.
-- Agent execution: On hold at Doug's request while he fixes fling
+- Status: Authorized for implementation. Initial parallel lanes: TOOLS-94, TOOLS-95, and TOOLS-97.
+- Agent execution: Doug lifted the fling hold and authorized inherited-model workers.
 
 ## Target and boundaries
 
@@ -45,11 +45,11 @@ Do not redesign web search, replace mcporter, remove developer tools, change ext
 | TOOLS-97 | Active documentation and obsolete build-only cleanup       | Active docs, READMEs, project build playbooks, two unreferenced devtools AST-grep files                                                      | Lead receives documentation aligned with implemented commands                             |
 | TOOLS-98 | Integration, independent review, and preservation evidence | Lead owns integration. Reviewer remains read-only                                                                                            | User receives implementation and review results separately from final acceptance          |
 
-Do not edit another owner's files without a lead-coordinated handoff. The lead owns this plan, tracker coordination, Journal, commits, and integration builds.
+Do not edit another owner's files without a lead-coordinated handoff. TOOLS-94 also owns the new `devtools/rootProductMetadata.test.ts` for its manifest and bin contracts. The lead owns this plan, tracker coordination, Journal, commits, and integration builds.
 
 ## Execution order
 
-1. Start TOOLS-94, TOOLS-95, and the documentation draft in TOOLS-97 after Doug releases the fling hold. Use model and thinking inheritance.
+1. Start TOOLS-94, TOOLS-95, and the documentation draft in TOOLS-97. Use model and thinking inheritance. Start with read-only preparation until the lead sends GO.
 2. Hand off the package and runtime contracts to TOOLS-96. Finalize documentation against the implemented result.
 3. Integrate all four work items under TOOLS-98. Run the complete checks and independent review before presenting acceptance results.
 
@@ -115,7 +115,7 @@ Review the full diff for added indirection, accidental feature removal, dependen
 
 Leave completed implementation tasks ready for user review. Do not automatically close TOOLS-30 or infer final acceptance from passing tests.
 
-## Working rules and current hold
+## Working rules and launch coordination
 
 Complete one behavior's RED, GREEN, and refactoring assessment before starting the next test. Agents perform these cycles autonomously. No human approval is required for each cycle.
 
@@ -123,4 +123,4 @@ Shared-checkout workers must respect the file ownership table. Do not run concur
 
 Use jj, not git. Every snapshotting jj command needs the command-local `--config fsmonitor.backend=none` workaround. Do not change persistent configuration.
 
-Sub-agent execution is on hold because Doug identified a fling bug that he is fixing. Do not retry spawning, diagnose that bug, or substitute solo implementation during this planning step.
+Doug fixed fling and lifted the execution hold. The lead starts the initial workers before authorizing edits. No worker can commit, mutate shared dependency installation, or run integration builds without a lead-coordinated handoff.
