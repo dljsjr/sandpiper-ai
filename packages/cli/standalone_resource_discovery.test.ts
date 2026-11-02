@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,10 +6,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
 const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai');
+const piPackageDir = dirname(dirname(fileURLToPath(import.meta.resolve('@earendil-works/pi-coding-agent'))));
 
 describe('standalone Sandpiper resource discovery', () => {
   it.each([false, true])(
-    'loads custom prompts and PATH-gated Trail without bundled templates (%s)',
+    'loads custom prompts, themes and PATH-gated Trail without bundled templates (%s)',
     async (withTrail) => {
       const agentDir = await mkdtemp(join(tmpdir(), 'sandpiper-standalone-resources-'));
       const home = join(agentDir, 'home');
@@ -22,6 +23,15 @@ describe('standalone Sandpiper resource discovery', () => {
       await writeFile(
         join(customPrompts, 'fixture-prompt.md'),
         '---\ndescription: Custom prompt fixture.\n---\nFixture prompt.\n',
+      );
+      const customThemes = join(agentDir, 'custom-themes');
+      await mkdir(customThemes);
+      const stockTheme = JSON.parse(
+        await readFile(join(piPackageDir, 'dist', 'modes', 'interactive', 'theme', 'dark.json'), 'utf8'),
+      ) as Record<string, unknown>;
+      await writeFile(
+        join(customThemes, 'fixture-theme.json'),
+        JSON.stringify({ ...stockTheme, name: 'fixture-theme' }),
       );
       if (withTrail) {
         await mkdir(trailSkill, { recursive: true });
@@ -54,11 +64,12 @@ describe('standalone Sandpiper resource discovery', () => {
           cwd: agentDir,
           agentDir,
           additionalPromptTemplatePaths: [customPrompts],
+          additionalThemePaths: [customThemes],
           extensionFactories: [...createNeutralCapabilityExtensionFactories(join(repoRoot, 'packages', 'resources'))],
           noExtensions: true,
           noSkills: true,
           noPromptTemplates: false,
-          noThemes: true,
+          noThemes: false,
           noContextFiles: true,
         });
 
@@ -81,6 +92,8 @@ describe('standalone Sandpiper resource discovery', () => {
             expect(resourceLoader.getSkills().skills.find((skill) => skill.name === 'trail')?.baseDir).toBe(trailSkill);
           }
           expect(promptNames).toEqual(['fixture-prompt']);
+          expect(resourceLoader.getThemes().themes.map((theme) => theme.name)).toEqual(['fixture-theme']);
+          expect(resourceLoader.getThemes().diagnostics).toEqual([]);
         } finally {
           session.dispose();
         }

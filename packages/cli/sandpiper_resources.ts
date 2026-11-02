@@ -30,10 +30,11 @@ function inlineExtension(name: string, factory: ExtensionFactory): InlineExtensi
 export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperResourcePaths {
   const skillDir = join(resourceRoot, 'skills');
   const promptDir = join(resourceRoot, 'prompts');
+  const themeDir = join(resourceRoot, 'themes');
   return {
     skillPaths: existsSync(skillDir) ? [skillDir] : [],
     promptPaths: existsSync(promptDir) ? [promptDir] : [],
-    themePaths: [join(resourceRoot, 'themes')],
+    themePaths: existsSync(themeDir) ? [themeDir] : [],
   };
 }
 

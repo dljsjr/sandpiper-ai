@@ -97,9 +97,40 @@ describe('standalone bootstrap', () => {
       mkdirSync(join(packageDir, 'dist', 'standalone'), { recursive: true });
       writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
       createResources(join(dir, 'packages', 'resources'));
-      expect(() => resolveStandalonePaths({ startDir: join(packageDir, 'dist', 'standalone'), env: {} })).toThrow(
-        'Sandpiper resources are missing',
-      );
+      expect(resolveStandalonePaths({ startDir: join(packageDir, 'dist', 'standalone'), env: {} })).toEqual({
+        packageDir,
+        resourceRoot: join(packageDir, 'dist', 'standalone', 'resources'),
+      });
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects an explicit resource root that does not exist', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-missing-resource-override-'));
+    try {
+      expect(() =>
+        resolveStandalonePaths({
+          startDir: dir,
+          env: { SANDPIPER_STANDALONE_PACKAGE_DIR: dir, SANDPIPER_STANDALONE_RESOURCE_ROOT: join(dir, 'missing') },
+        }),
+      ).toThrow('resource override must be an existing directory');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects an explicit resource root that is a file', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-file-resource-override-'));
+    try {
+      const resourceRoot = join(dir, 'not-a-directory');
+      writeFileSync(resourceRoot, 'fixture');
+      expect(() =>
+        resolveStandalonePaths({
+          startDir: dir,
+          env: { SANDPIPER_STANDALONE_PACKAGE_DIR: dir, SANDPIPER_STANDALONE_RESOURCE_ROOT: resourceRoot },
+        }),
+      ).toThrow('resource override must be an existing directory');
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
@@ -111,7 +142,7 @@ describe('standalone bootstrap', () => {
       const packageDir = join(dir, 'metadata');
       const resourceRoot = join(dir, 'resources');
       mkdirSync(packageDir);
-      createResources(resourceRoot);
+      mkdirSync(resourceRoot);
       const paths = resolveStandalonePaths({
         startDir: join(dir, 'ignored'),
         env: { SANDPIPER_STANDALONE_RESOURCE_ROOT: resourceRoot, SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir },

@@ -99,6 +99,15 @@ function applyFactories(factories: readonly InlineExtension[]): ReturnType<typeo
 }
 
 describe('Sandpiper resource adapter', () => {
+  it('omits an absent built-in theme directory from discovery', () => {
+    const root = mkdtempSync(join(tmpdir(), 'sandpiper-theme-free-resources-'));
+    try {
+      expect(resolveSandpiperResourcePaths(root).themePaths).toEqual([]);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it('omits an absent built-in prompt directory from discovery', () => {
     const root = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-free-resources-'));
     try {

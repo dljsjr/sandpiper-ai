@@ -11,6 +11,19 @@ async function put(root: string, path: string, contents: string): Promise<void> 
 }
 
 describe('CLI resource staging', () => {
+  it('stages docs without any built-in resource directories', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'sandpiper-stage-no-resources-'));
+    try {
+      await put(root, 'docs/README.md', 'Documentation');
+      await put(root, 'packages/cli/dist/standalone/resources/themes/obsolete.json', '{}');
+      await stageCliResources(root);
+      expect(await readFile(join(root, 'packages/cli/docs/README.md'), 'utf8')).toBe('Documentation');
+      await expect(access(join(root, 'packages/cli/dist/standalone/resources'))).rejects.toThrow();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it('stages resources without bundled prompt templates', async () => {
     const root = await mkdtemp(join(tmpdir(), 'sandpiper-stage-no-prompts-'));
     try {

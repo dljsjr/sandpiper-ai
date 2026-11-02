@@ -12,7 +12,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { packCli } from './packCli.js';
 
@@ -56,7 +56,7 @@ function makeReadOnly(path: string, modes: Map<string, number>): void {
 }
 
 describe('packed Sandpiper CLI', () => {
-  it('installs offline and runs with built-in skills and patched Pi from a read-only package outside the checkout', async () => {
+  it('runs without bundled resources and loads stock Pi themes from a read-only offline installation', async () => {
     const root = realpathSync(mkdtempSync(join(tmpdir(), 'sandpiper-packed-cli-')));
     const env = isolatedEnv(root);
     const consumer = join(root, 'consumer');
@@ -80,7 +80,28 @@ describe('packed Sandpiper CLI', () => {
       expect(existsSync(join(pi, 'dist', 'modes', 'interactive', 'theme', 'dark.json'))).toBe(true);
       expect(existsSync(join(pi, 'dist', 'core', 'export-html', 'template.html'))).toBe(true);
       expect(existsSync(join(installed, 'docs', 'README.md'))).toBe(true);
+      rmSync(join(installed, 'dist', 'standalone', 'resources'), { recursive: true, force: true });
       makeReadOnly(consumer, modes);
+      const themeModule = pathToFileURL(join(pi, 'dist', 'modes', 'interactive', 'theme', 'theme.js')).href;
+      const stockThemes = execFileSync(
+        bun,
+        [
+          '--eval',
+          `const { getThemeByName } = await import(${JSON.stringify(themeModule)});
+const dark = getThemeByName('dark');
+const light = getThemeByName('light');
+if (!dark || !light) throw new Error('Stock themes failed to load without bundled resources');
+console.log([dark.name, light.name].join(','));`,
+        ],
+        {
+          cwd: project,
+          env: { ...env, PI_PACKAGE_DIR: installed, PI_CODING_AGENT_PACKAGE: pi },
+          encoding: 'utf8',
+          timeout: 30_000,
+        },
+      );
+      expect(stockThemes.trim()).toBe('dark,light');
+      expect(existsSync(join(installed, 'dist', 'standalone', 'resources'))).toBe(false);
       const run = (bin: string, args: readonly string[]): string =>
         execFileSync(bun, [join(installed, 'bin', bin), ...args], {
           cwd: project,

@@ -46,7 +46,7 @@ bun run test:standalone
 
 The source entrypoints use `packages/resources/`. Built entrypoints use `dist/standalone/resources/` inside the CLI package. Built-in extensions and resources load through explicit extension factories and `resources_discover`. The built runtime requires no source checkout and creates no metadata sidecar.
 
-`SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, points directly to a resource directory containing `themes/`. The `skills/` and `prompts/` subdirectories are optional; Sandpiper currently bundles neither skills nor prompt templates. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
+The built-in resource tree may be absent. `SANDPIPER_STANDALONE_RESOURCE_ROOT`, if set, must point to an existing directory; its `skills/`, `prompts/`, and `themes/` subdirectories are optional. Sandpiper currently bundles no skills, prompt templates, or custom themes. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
 
 The CLI requires Bun. Journal is an optional standalone package, not a bundled helper. See the [build workflow](docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 

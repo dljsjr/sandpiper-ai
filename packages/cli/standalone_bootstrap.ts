@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
 export interface StandalonePaths {
@@ -49,8 +49,11 @@ export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): 
       ? resolve(packageDir, '..', 'resources')
       : join(packageDir, 'dist', 'standalone', 'resources');
 
-  if (!existsSync(join(resourceRoot, 'themes'))) {
-    throw new Error(`Sandpiper resources are missing at ${resourceRoot}. Rebuild or reinstall Sandpiper.`);
+  if (
+    options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT &&
+    (!existsSync(resourceRoot) || !statSync(resourceRoot).isDirectory())
+  ) {
+    throw new Error(`Sandpiper resource override must be an existing directory: ${resourceRoot}`);
   }
   return { resourceRoot, packageDir };
 }
