@@ -30,7 +30,7 @@ The build has no Turbo graph, cache restoration, resource staging, or documentat
 
 The repository pins Bun 1.4.4 and declares Bun 1.4.4 or later for the product. Earlier packing behavior is not supported. Bun and the declared workspace dependencies build the product. TypeScript, Vitest, Biome, and Syncpack support development checks.
 
-The mise tools mcporter, jscpd, hike, and lizard are developer conveniences, not build steps. The mcporter application dependency remains in use by web search.
+The mise tools mcporter, jscpd, hike, and lizard are developer conveniences, not build steps. Web search uses Pi's standalone MCP client instead of the mcporter application library. This does not remove the separate developer CLI.
 
 ## Dependency resolution
 

@@ -1,7 +1,7 @@
 /**
  * Tests for the Parallel MCP adapter's result parsing.
  * parseParallelResult is the bug-prone mapping layer (MCP content -> SearchResultItem[]);
- * the live mcporter/network call is covered by an e2e probe, not here.
+ * Transport behavior is covered by parallel-adapter.transport.test.ts.
  */
 
 import { describe, expect, it } from 'vitest';

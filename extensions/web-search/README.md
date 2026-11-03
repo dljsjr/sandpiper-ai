@@ -18,11 +18,11 @@ Agent: "What's the latest version of React?"
 Mirrors `web-fetch`'s adapter pattern:
 
 - **`SearchAdapter`** interface — one implementation per search provider
-- **`DdgSearchAdapter`** — DuckDuckGo HTML scraping (fallback, may hit CAPTCHAs)
-- **`BraveSearchAdapter`** — Brave Search API (primary, requires API key)
-- **`SearXNGSearchAdapter`** — future, self-hosted
+- `BraveSearchAdapter` uses the Brave Search API as the primary provider when its key resolves.
+- `ParallelMcpSearchAdapter` uses Pi's standalone MCP client for the anonymous Parallel fallback.
+- `DdgSearchAdapter` remains available for explicit use. It is not the automatic fallback.
 
-Swapping providers is a one-line change in `index.ts` — same interface, different backend.
+Provider selection lives in `src/adapter-selection.ts`. Parallel runs behind our existing `web_search` tool. It does not register upstream tools or require a separate MCP server configuration.
 
 ## Configuration
 
@@ -39,11 +39,18 @@ Set `BRAVE_API_KEY` as an environment variable, or store it in `~/.sandpiper/set
 ```
 
 The config resolver supports:
+
 - **Literal strings**: `"sk-abc123"`
 - **Env var references**: `"$BRAVE_API_KEY"` or `"BRAVE_API_KEY"` (all-uppercase)
 - **Shell commands**: `"!op read op://vault/brave-api-key/password"` (prefix with `!`)
 
-### DuckDuckGo (fallback)
+### Parallel (anonymous fallback)
+
+No API key or separate MCP server configuration is needed. Our `web_search` tool calls Parallel through Pi's standalone MCP client. Upstream tools do not enter the model's tool catalogue.
+
+Connection setup has a 60-second limit. The tool-call limit defaults to 15 seconds, followed by best-effort session cleanup.
+
+### DuckDuckGo (explicit adapter)
 
 No configuration needed. Works without an API key but may hit CAPTCHAs on repeated queries. Best for occasional use or when no API key is available.
 
@@ -61,10 +68,10 @@ No configuration needed. Works without an API key but may hit CAPTCHAs on repeat
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `query` | string | yes | — | The search query |
-| `count` | integer | no | 5 | Max results (1–20) |
+| Parameter | Type    | Required | Default | Description        |
+| --------- | ------- | -------- | ------- | ------------------ |
+| `query`   | string  | yes      | —       | The search query   |
+| `count`   | integer | no       | 5       | Max results (1–20) |
 
 ## Composing with web_fetch
 
@@ -81,8 +88,8 @@ Don't use `web_search` when the user already gives you a URL — go straight to 
 # Install dependencies
 bun install
 
-# Run tests
-bun test
+# Run tests from the repository root
+bun run test:vitest -- extensions/web-search
 
 # Type check
 bunx tsc --noEmit

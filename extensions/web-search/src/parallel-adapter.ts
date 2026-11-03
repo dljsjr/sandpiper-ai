@@ -2,8 +2,8 @@
  * Parallel Search MCP adapter — the no-key fallback provider.
  *
  * Hits Parallel's free, anonymous Search MCP server (https://search.parallel.ai/mcp)
- * over Streamable HTTP via the mcporter runtime library (programmatic server def — no
- * config.json, no CLI subprocess). The MCP `web_search` tool returns LLM-optimized
+ * over Streamable HTTP via Pi's standalone MCP client (no host configuration or
+ * upstream tool registration). The MCP `web_search` tool returns LLM-optimized
  * excerpts; we map them to SearchResultItem[]. Free tier needs no API key.
  *
  * Parallel's web_search input (from the live tool schema): objective + search_queries[]
@@ -11,7 +11,7 @@
  * a JSON string of { results: [{ url, title, excerpts: string[] }] }.
  */
 
-import { createRuntime, type Runtime, type ServerDefinition } from 'mcporter';
+import { McpClient, StreamableHttpTransport } from '@earendil-works/pi-mcp';
 import {
   DEFAULT_RESULT_COUNT,
   MAX_RESULT_COUNT,
@@ -21,8 +21,9 @@ import {
 } from './types.js';
 
 const PARALLEL_MCP_URL = 'https://search.parallel.ai/mcp';
-const SERVER_NAME = 'parallel-search';
 const DEFAULT_TIMEOUT_MS = 15_000;
+const DEFAULT_MCP_REQUEST_TIMEOUT_MS = 60_000;
+const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
 /** Minimal shapes for what we read out of the MCP tool result. */
 interface McpTextContent {
@@ -81,31 +82,40 @@ export class ParallelMcpSearchAdapter implements SearchAdapter {
       return [];
     }
     const count = Math.min(options?.count ?? DEFAULT_RESULT_COUNT, MAX_RESULT_COUNT);
+    const requestedTimeoutMs = Math.trunc(options?.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+    const timeoutMs =
+      Number.isFinite(requestedTimeoutMs) && requestedTimeoutMs > 0
+        ? Math.min(requestedTimeoutMs, MAX_TIMER_DELAY_MS)
+        : DEFAULT_MCP_REQUEST_TIMEOUT_MS;
 
-    const serverDef: ServerDefinition = {
-      name: SERVER_NAME,
-      command: { kind: 'http', url: new URL(PARALLEL_MCP_URL) },
-    };
-
-    const runtime: Runtime = await createRuntime({
-      servers: [serverDef],
-      clientInfo: { name: 'sandpiper-web-search', version: '0.0.1' },
+    const client = new McpClient({
+      name: 'sandpiper-web-search',
+      version: '0.0.1',
+      requestTimeoutMs: DEFAULT_MCP_REQUEST_TIMEOUT_MS,
     });
+    let closePromise: Promise<void> | undefined;
+    const closeClient = () => (closePromise ??= client.close().catch(() => {}));
+    let connectionTimeoutError: Error | undefined;
+    // The client's request timer does not cover the initialized-notification POST.
+    const connectionTimer = setTimeout(() => {
+      connectionTimeoutError = new Error(`Parallel MCP connection timed out after ${DEFAULT_MCP_REQUEST_TIMEOUT_MS}ms`);
+      void closeClient();
+    }, DEFAULT_MCP_REQUEST_TIMEOUT_MS);
 
     try {
-      const raw = await runtime.callTool(SERVER_NAME, 'web_search', {
-        args: {
-          objective: trimmed,
-          search_queries: [trimmed],
-          session_id: this.sessionId,
-        },
-        timeoutMs: options?.timeoutMs ?? DEFAULT_TIMEOUT_MS,
-      });
+      await client.connect(new StreamableHttpTransport({ url: PARALLEL_MCP_URL }));
+      clearTimeout(connectionTimer);
+      const raw = await client.callTool(
+        'web_search',
+        { objective: trimmed, search_queries: [trimmed], session_id: this.sessionId },
+        { timeoutMs },
+      );
       return parseParallelResult(raw, count);
+    } catch (error) {
+      throw connectionTimeoutError ?? error;
     } finally {
-      await runtime.close().catch(() => {
-        // best-effort cleanup; a failed close shouldn't mask a successful search
-      });
+      clearTimeout(connectionTimer);
+      await closeClient();
     }
   }
 }

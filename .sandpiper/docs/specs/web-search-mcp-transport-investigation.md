@@ -2,15 +2,15 @@
 
 Mode: Explanation
 Task: TOOLS-99, related to TOOLS-92 and TOOLS-30
-Status: Investigation complete. Replacement implementation is not approved.
+Status: Research accepted. Native adoption under TOOLS-100–102 is implemented, verified, and independently reviewed. Final implementation acceptance remains separate. Evidence distinguishes the research baseline from integrated verification.
 
-Pi's standalone MCP client can call the upstream service behind our existing `web_search` tool. The upstream service does not need a REST endpoint. This investigation changes no application code or dependencies.
+Pi's standalone MCP client can call the upstream service behind our existing `web_search` tool. The upstream service does not need a REST endpoint. The investigation changed no application code or dependencies. Implementation follows the accepted research.
 
 ## Keep the existing tool boundary
 
-The current mcporter call belongs to `web_search`, not `web_fetch`. `web_fetch` uses ordinary HTTP through `SimpleFetchAdapter`. The original WEB-11 decision records these sibling tools and their separate roles.
+At the research baseline, mcporter backed `web_search`, not `web_fetch`. `web_fetch` uses ordinary HTTP through `SimpleFetchAdapter`. The original WEB-11 decision records these sibling tools and their separate roles.
 
-The current request path is:
+The request path before adoption was:
 
 ```text
 web_search
@@ -91,15 +91,27 @@ A direct application import still needs an explicit dependency. Adoption require
 
 The application can then remove its mcporter library dependency. That change does not remove the independently installed mcporter developer CLI from `mise.toml`. No dependency declarations, lockfile entries, or developer tools changed during this investigation.
 
-## Recommendation and remaining evidence
+## Approved implementation
 
-Use the standalone Pi client as the preferred replacement candidate for the adapter's internal MCP transport. Keep our existing tool and parser instead of registering upstream tools. This reuses a client that the product already ships.
+Doug accepted the research and required this replacement in the current simplification work. TOOLS-100–102 cover the adapter, direct dependencies, and integrated verification. The implementation uses the standalone client, not the host-managed MCP route.
 
-Adoption still needs evidence from the actual Parallel service and explicit timeout and cleanup behavior. It also needs regression coverage for the adapter and the normal build, packed installation, and runtime gates. Those are replacement requirements, not completed implementation claims.
+The adapter preserves the previous 60-second initialization budget. A separate setup guard also covers the initialized-notification POST. A shared close promise joins cleanup that the guard starts.
+
+Tool calls retain the 15-second default and existing override normalization. Positive values are truncated and capped at the runtime timer limit. Invalid or nonpositive values retain the previous 60-second fallback instead of disabling the deadline.
+
+The permanent transport tests use the real SDK with fake HTTP responses. The packed regression runs our actual installed `web_search` through a scripted mock model. It checks request and result mapping, unchanged schema, session termination, and absence of upstream tool registration.
+
+Both the normal checkout and a fresh source copy pass the full 86-file, 671-test suite, zero-warning checks, and packing. The fresh copy uses frozen offline installation with scripts disabled and keeps its lockfile unchanged. The packed tool runs from read-only product files after an offline npm installation with an empty cache.
+
+The build now bundles 184 modules instead of 453. The lockfile removes 29 obsolete records without changing retained versions or integrity values. Application bundles contain no mcporter or `@modelcontextprotocol/client` modules. Both producer layouts produce identical application payload bytes.
+
+Independent read-only review reports no outstanding actionable findings. The reviewer also ran focused tests and a concurrency and streamed-response probe. Passing verification and review do not close TOOLS-30 or imply user acceptance.
+
+The research recommended live-service evidence. Implementation verification uses isolated protocol fixtures and does not certify live Parallel availability. It covers the selected anonymous Streamable HTTP contract, not every legacy transport, authentication, or recording feature in mcporter.
 
 ## Source references
 
-The findings use the current source and installed pinned package:
+The findings use source and installed packages at research revision `cc55849f`:
 
 - `extensions/web-search/src/parallel-adapter.ts:14–112`, `adapter-selection.ts:42–60`, and `tool-operation.ts:52–71` define the existing request and output path.
 - `node_modules/mcporter/dist/runtime.js:17–24,168–200` and `runtime/http-transport.js:115–125,198–241` show configuration loading, call limits, and legacy transport fallback.

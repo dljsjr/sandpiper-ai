@@ -46,11 +46,20 @@ describe('root Sandpiper product', () => {
     expect(product.dependencies).toEqual({
       '@earendil-works/pi-ai': '1.3.0',
       '@earendil-works/pi-coding-agent': '1.3.0',
+      '@earendil-works/pi-mcp': '1.3.0',
       '@earendil-works/pi-tui': '1.3.0',
       'better-sqlite3': '13.0.3',
       jsdom: '30.0.1',
     });
     expect([...product.bundledDependencies].sort()).toEqual(Object.keys(product.dependencies).sort());
+    const webSearch = JSON.parse(readFileSync(join(repoRoot, 'extensions/web-search/package.json'), 'utf8')) as {
+      readonly dependencies: Readonly<Record<string, string>>;
+    };
+    expect(webSearch.dependencies).toEqual({
+      '@earendil-works/pi-mcp': '1.3.0',
+      jsdom: '30.0.1',
+    });
+    expect(product.devDependencies).not.toHaveProperty('mcporter');
     expect(product.devDependencies).toMatchObject({
       'sandpiper-ai-core': 'workspace:*',
       'sanitize-filename': '1.6.4',

@@ -31,6 +31,7 @@ function isolatedEnv(root: string): NodeJS.ProcessEnv {
     BUN_INSTALL: join(root, 'bun'),
     BUN_INSTALL_CACHE_DIR: join(root, 'bun-cache'),
     JITI_FS_CACHE: 'false',
+    BRAVE_API_KEY: '',
     npm_config_cache: join(root, 'npm-cache'),
     npm_config_userconfig: join(root, 'npmrc'),
     npm_config_globalconfig: join(root, 'global-npmrc'),
@@ -120,6 +121,7 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
           'package/packages/cli/bin/sandpiper-system-prompt',
           'package/dist/sandpiper_standalone.js',
           'package/dist/sandpiper_system_prompt.js',
+          'package/node_modules/@earendil-works/pi-mcp/package.json',
           'package/docs/README.md',
           'package/LICENSE',
           'package/README.md',
@@ -148,7 +150,22 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
         ).toEqual([]);
       }
       expect(entries.filter((entry) => /^package\/packages\/cli\/.*\.ts$/.test(entry))).toEqual([]);
+      const legacyApplicationPayload = entries
+        .filter((entry) => /^package\/dist\/.*\.(js|map)$/.test(entry))
+        .filter((entry) =>
+          /mcporter|@modelcontextprotocol\/(?:client|sdk)/i.test(
+            execFileSync('tar', ['-xOzf', tarball, entry], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }),
+          ),
+        );
+      expect(legacyApplicationPayload).toEqual([]);
+      const packagedManifest = JSON.parse(
+        execFileSync('tar', ['-xOzf', tarball, 'package/package.json'], { encoding: 'utf8' }),
+      ) as { dependencies: Record<string, string>; bundledDependencies: string[] };
+      expect(packagedManifest.dependencies['@earendil-works/pi-mcp']).toBe('1.3.0');
+      expect(packagedManifest.bundledDependencies).toContain('@earendil-works/pi-mcp');
+      expect(packagedManifest.dependencies).not.toHaveProperty('mcporter');
 
+      expect(existsSync(join(root, 'npm-cache'))).toBe(false);
       execFileSync('npm', ['install', tarball, '--offline', '--ignore-scripts', '--no-audit', '--no-fund'], {
         cwd: consumer,
         env,
@@ -166,6 +183,25 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       makeReadOnly(consumer, modes);
       const installedPaths = readdirSync(consumer, { recursive: true }).sort();
       const themeModule = pathToFileURL(join(pi, 'dist', 'modes', 'interactive', 'theme', 'theme.js')).href;
+      const nativeRuntime = execFileSync(
+        bun,
+        [
+          '--eval',
+          `const resolved = ${JSON.stringify(pathToFileURL(join(installed, 'node_modules', '@earendil-works', 'pi-mcp', 'dist', 'index.js')).href)};
+const { McpClient, StreamableHttpTransport } = await import(resolved);
+console.log(JSON.stringify({ resolved, client: typeof McpClient, transport: typeof StreamableHttpTransport }));`,
+        ],
+        { cwd: project, env, encoding: 'utf8', timeout: 10_000 },
+      );
+      expect(JSON.parse(nativeRuntime)).toEqual({
+        resolved: pathToFileURL(join(installed, 'node_modules', '@earendil-works', 'pi-mcp', 'dist', 'index.js')).href,
+        client: 'function',
+        transport: 'function',
+      });
+      expect(
+        JSON.parse(readFileSync(join(installed, 'node_modules', '@earendil-works', 'pi-mcp', 'package.json'), 'utf8'))
+          .version,
+      ).toBe('1.3.0');
       const stockThemes = execFileSync(
         bun,
         [
@@ -184,10 +220,10 @@ console.log([dark.name, light.name].join(','));`,
         },
       );
       expect(stockThemes.trim()).toBe('dark,light');
-      const run = (bin: string, args: readonly string[]): string =>
+      const run = (bin: string, args: readonly string[], extraEnv: NodeJS.ProcessEnv = {}): string =>
         execFileSync(bun, [join(installed, 'packages', 'cli', 'bin', bin), ...args], {
           cwd: project,
-          env,
+          env: { ...env, ...extraEnv },
           encoding: 'utf8',
           timeout: 30_000,
           maxBuffer: 2 * 1024 * 1024,
@@ -209,6 +245,103 @@ export default function runtimeImportProbe(pi) {
 `,
       );
       expect(run('sandpiper', ['--help', '-e', extensionPath])).toContain('--packed-runtime-import-probe');
+      const transportProbe = join(project, 'transport-probe.ts');
+      const mockProvider = join(project, 'mock-provider.ts');
+      const proofPath = join(root, 'native-mcp-proof.json');
+      writeFileSync(
+        transportProbe,
+        readFileSync(join(repoRoot, 'devtools/integration/fixtures/native-mcp/transport-probe.ts')),
+      );
+      writeFileSync(mockProvider, readFileSync(join(repoRoot, 'devtools/integration/mock-provider.ts')));
+      mkdirSync(join(root, 'agent'), { recursive: true });
+      writeFileSync(join(root, 'agent', 'settings.json'), JSON.stringify({ 'web-search': {} }));
+      writeFileSync(join(root, 'agent', 'auth.json'), '{}');
+      const searchEvents = run(
+        'sandpiper',
+        [
+          '--offline',
+          '--no-session',
+          '--mode',
+          'json',
+          '--tools',
+          'web_search',
+          '--provider',
+          'sandpiper-integration-mock',
+          '--model',
+          'mock-1',
+          '-e',
+          transportProbe,
+          '-e',
+          mockProvider,
+          'Run the packed web search probe.',
+        ],
+        {
+          SANDPIPER_PACKED_MCP_PROOF: proofPath,
+          SANDPIPER_INTEGRATION_MOCK_SCRIPT: JSON.stringify([
+            { type: 'toolCall', toolName: 'web_search', arguments: { query: '  packed query  ', count: 1 } },
+            { type: 'text', text: 'packed search complete' },
+          ]),
+        },
+      )
+        .trim()
+        .split('\n')
+        .map((line) => JSON.parse(line) as { type: string; toolName?: string; isError?: boolean; result?: unknown });
+      expect(searchEvents.filter((event) => event.type === 'tool_execution_end')).toEqual([
+        expect.objectContaining({
+          toolName: 'web_search',
+          isError: false,
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: 'Search results for "  packed query  " (via parallel):\n\n1. Packed title\n   https://example.invalid/packed\n   Packed snippet',
+              },
+            ],
+            details: { query: '  packed query  ', provider: 'parallel', resultCount: 1 },
+          },
+        }),
+      ]);
+      const proof = JSON.parse(readFileSync(proofPath, 'utf8')) as {
+        requests: { method: string; rpc?: { method: string; params?: unknown }; session: string | null }[];
+        blocked: string[];
+        tools: {
+          name: string;
+          parameters: { required: string[]; properties: Record<string, unknown> };
+          namespace?: { name: string };
+          sourceInfo: { path: string };
+        }[];
+        activeTools: string[];
+      };
+      expect(proof.blocked).toEqual([]);
+      expect(
+        proof.requests.filter((request) => request.method === 'POST').map((request) => request.rpc?.method),
+      ).toEqual(['initialize', 'notifications/initialized', 'tools/call']);
+      expect(proof.requests.find((request) => request.rpc?.method === 'initialize')?.rpc?.params).toEqual(
+        expect.objectContaining({ clientInfo: { name: 'sandpiper-web-search', version: '0.0.1' } }),
+      );
+      expect(proof.requests.find((request) => request.rpc?.method === 'tools/call')?.rpc?.params).toEqual({
+        name: 'web_search',
+        arguments: {
+          objective: 'packed query',
+          search_queries: ['packed query'],
+          session_id: expect.stringMatching(/^sp-/),
+        },
+      });
+      expect(proof.requests.filter((request) => request.method === 'DELETE')).toEqual([
+        { method: 'DELETE', session: 'packed-native-session' },
+      ]);
+      expect(proof.activeTools).toEqual(['web_search']);
+      expect(
+        proof.tools.filter((tool) => tool.namespace?.name.startsWith('mcp') || tool.sourceInfo.path === 'builtin:mcp'),
+      ).toEqual([]);
+      const searchTools = proof.tools.filter((tool) => tool.name === 'web_search');
+      expect(searchTools).toHaveLength(1);
+      expect(searchTools[0]?.parameters.required).toEqual(['query']);
+      expect(Object.keys(searchTools[0]?.parameters.properties ?? {}).sort()).toEqual(['count', 'query']);
+      expect(searchTools[0]?.parameters.properties).toEqual({
+        query: expect.objectContaining({ type: 'string' }),
+        count: expect.objectContaining({ type: 'integer', minimum: 1, maximum: 20 }),
+      });
       expect(run('sandpiper-system-prompt', ['--help'])).toContain('render the effective Sandpiper system prompt');
       const rendered = JSON.parse(run('sandpiper-system-prompt', ['--json', '--approve'])) as { prompt: string };
       const catalogue = rendered.prompt.match(/<available_skills>[\s\S]*?<\/available_skills>/)?.[0] ?? '';

@@ -3,7 +3,7 @@
 - Mode: How-to plan
 - Parent: TOOLS-30
 - Exploration: TOOLS-92
-- Status: TOOLS-94–98 are ready for user review. Integrated verification and independent read-only review are complete. User acceptance remains separate.
+- Status: TOOLS-94–98 and the approved native MCP client replacement under TOOLS-100–102 are ready for user review. Verification and independent review are complete. User acceptance remains separate.
 - Agent execution: Doug lifted the fling hold and authorized inherited-model workers.
 
 ## Target and boundaries
@@ -33,7 +33,7 @@ Custom resource support, ordinary settings, package-management behavior, and Jou
 
 Shell Relay remains disabled. TOOLS-93 is a deferred capability decision, not a packaging repair. Do not add its assets, revive its installer, or remove the capability in this work.
 
-Do not redesign web search, replace mcporter, remove developer tools, change external repositories or user configuration, install archived skills, or modify the WIP jj replacement.
+Do not redesign web search, remove developer tools, change external repositories or user configuration, install archived skills, or modify the WIP jj replacement. The later approved internal MCP client replacement below is part of TOOLS-30.
 
 Doug approved one narrow external exception after the new build and stable-bin checks passed: change the old `node_modules/.bin/sandpiper` target to `packages/cli/bin/sandpiper` in both the deployed launcher and its canonical dotfiles source. Preserve every other byte, argument-handling difference, and file mode. Leave unrelated dotfiles changes untouched.
 
@@ -117,6 +117,20 @@ Review the full diff for added indirection, accidental feature removal, dependen
 
 Leave completed implementation tasks ready for user review. Do not automatically close TOOLS-30 or infer final acceptance from passing tests.
 
+## Approved native MCP client replacement
+
+Doug approved the [standalone-client investigation](web-search-mcp-transport-investigation.md) and required adoption in this simplification work. This is no longer an unapproved or deferred candidate. The existing `web_search` tool remains the interface to Parallel.
+
+1. TOOLS-100 replaces the internal mcporter library with `@earendil-works/pi-mcp@1.3.0`. Preserve queries, local result limits, provider selection, stable application session IDs, and the existing parser. Keep upstream tools unregistered.
+2. TOOLS-101 declares the exact native package directly in web-search and the root runtime/bundled dependencies. Remove the application mcporter dependency without unrelated version changes. Keep the separate mise developer CLI.
+3. TOOLS-102 runs the full gates, isolated protocol and packed-tool tests, dependency/payload inspection, and independent read-only review. Installation remains offline with scripts disabled and runtime checks use read-only product files.
+
+Keep the 15-second tool-call default and the preceding 60-second initialization budget. Bound a stalled initialized-notification POST and join best-effort cleanup. Do not add public configuration, host MCP server registration, or new user-cancellation behavior.
+
+Tests use fake or localhost MCP servers, not real providers, credentials, or user configuration. The existing Shell Relay, Trail, SOP, archive, and WIP-skill boundaries remain unchanged. Final implementation acceptance remains separate from passing tests or review.
+
+Native client verification passes in both the normal checkout and a fresh offline producer: 86 files, 671 tests, zero warnings, and packing. The read-only installed product runs its own `web_search` with fake MCP responses and no upstream tool registration. Independent review reports no outstanding actionable findings. Detailed evidence is in the [client investigation and adoption record](web-search-mcp-transport-investigation.md#approved-implementation).
+
 ## Working rules and launch coordination
 
 Complete one behavior's RED, GREEN, and refactoring assessment before starting the next test. Agents perform these cycles autonomously. No human approval is required for each cycle.
@@ -127,7 +141,7 @@ Use jj, not git. Every snapshotting jj command needs the command-local `--config
 
 Doug fixed fling and lifted the execution hold. The lead starts the initial workers before authorizing edits. No worker can commit, mutate shared dependency installation, or run integration builds without a lead-coordinated handoff.
 
-## Verification status
+## Initial build-slice verification
 
 - All implementation workers and the independent reviewer have handed off and closed. TOOLS-94–98 are NEEDS REVIEW. The independent read-only review found no outstanding actionable findings or blockers; it made no edits or test runs.
 - The integrated checkout passes `bun check`, all 85 Vitest files and 653 tests, and `bun run pack:cli`, with unchanged test timeouts and no lint warnings. An SDK-anchored regression proved the Jiti cache-fixture correction RED then GREEN; the four touched fixtures now disable filesystem caching.
