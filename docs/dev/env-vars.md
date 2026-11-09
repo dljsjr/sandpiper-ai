@@ -17,7 +17,7 @@ This means:
 
 - Users can set either `SANDPIPER_OFFLINE=1` or `PI_OFFLINE=1` — both work
 - If both are set, `SANDPIPER_*` wins
-- Internal code always reads through Sandpiper-first lookup
+- After startup, both names hold the same value, so internal code reads `process.env` directly
 
 Before mirroring, the runtime sets `PI_TELEMETRY=0` when it is unset, which turns off Pi's install telemetry and provider attribution headers. Set `SANDPIPER_TELEMETRY=1` or `PI_TELEMETRY=1` to opt back in. While either variable is set, Pi ignores the `enableInstallTelemetry` setting.
 
@@ -29,25 +29,19 @@ The default stays anchored when a child changes cwd. For intentional work in ano
 
 ## Reading Environment Variables
 
-### Use `resolveEnvVar()` for Mirrored Variables
+### Read `process.env` Directly
 
-Always use `resolveEnvVar(name)` from `sandpiper-ai-core` to read env vars that exist in both namespaces:
+Mirroring finishes before any extension loads. After that, `SANDPIPER_X` and `PI_X` hold the same value for every mirrored variable, so read whichever name fits the code:
 
 ```typescript
-import { resolveEnvVar } from "sandpiper-ai-core";
-
-// ✅ Correct — checks SANDPIPER_OFFLINE, then PI_OFFLINE
-if (resolveEnvVar("OFFLINE") === "1") {
-  // Handle offline mode
-}
-
-// ❌ Wrong — misses the SANDPIPER_* override
-if (process.env.PI_OFFLINE === "1") {
-  // This won't work if user set SANDPIPER_OFFLINE instead
-}
+const debug = process.env.SANDPIPER_DEBUG === "1";
 ```
 
-**Why this matters**: If you read `process.env.PI_OFFLINE` directly, you'll miss cases where the user set `SANDPIPER_OFFLINE=1`.
+Pi can rewrite a `PI_*` variable that it owns during its own startup. For example, `--offline` and `PI_OFFLINE=true` both make Pi set `PI_OFFLINE=1`, while `SANDPIPER_OFFLINE` keeps the original text or stays unset. Code that asks what Pi is doing reads the name Pi itself reads:
+
+```typescript
+const offline = process.env.PI_OFFLINE === "1";
+```
 
 ### Runtime-owned Variables
 
@@ -61,7 +55,7 @@ The package/version variables below are set by the Sandpiper runtime and are not
 | `PI_PACKAGE_DIR`                 | Root Sandpiper product package for metadata and documentation     | `process.env.PI_PACKAGE_DIR`                 |
 | `PI_SKIP_VERSION_CHECK`          | Suppress Pi update check                                          | `process.env.PI_SKIP_VERSION_CHECK`          |
 
-`SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` deliberately have different meanings. Do not mirror one into the other. Use `resolveEnvVar()` for user-facing configuration such as `OFFLINE`, not for runtime-owned package roots.
+`SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` deliberately have different meanings. Do not mirror one into the other.
 
 Both source and built entrypoints resolve the root Sandpiper product before importing Pi. `SANDPIPER_STANDALONE_PACKAGE_DIR` overrides the metadata package. The optional default resource location is `<productRoot>/packages/resources`. `SANDPIPER_STANDALONE_RESOURCE_ROOT`, when set, must name an existing directory. Its `skills/`, `prompts/`, and `themes/` subdirectories are optional. The packed product omits the default resource tree. Configured custom resources remain supported.
 
@@ -71,7 +65,7 @@ const sandpiperPackagePath = process.env.SANDPIPER_CODING_AGENT_PACKAGE;
 const piPackagePath = process.env.PI_CODING_AGENT_PACKAGE;
 
 // ✅ Correct for mirrored user configuration
-const offline = resolveEnvVar("OFFLINE") === "1";
+const debug = process.env.SANDPIPER_DEBUG === "1";
 ```
 
 ## Writing Environment Variables
@@ -103,24 +97,22 @@ Set both `SANDPIPER_*` and `PI_*` when:
 
 ## Configuration Path Resolution
 
-Sandpiper uses `resolveEnvVar()` for config path overrides:
+Config path overrides read the Sandpiper name. Mirroring makes `PI_CODING_AGENT_DIR` work too:
 
 ```typescript
 const agentDir =
-  resolveEnvVar("AGENT_DIR") ?? join(homedir(), ".sandpiper", "agent");
+  process.env.SANDPIPER_CODING_AGENT_DIR ??
+  join(homedir(), ".sandpiper", "agent");
 ```
 
-This allows users to override with either `SANDPIPER_AGENT_DIR` or `PI_AGENT_DIR`.
-
-**Best practice**: Prefer existing env/config resolution paths before adding new path knobs. Don't invent ad hoc overrides when `resolveEnvVar()` or existing config plumbing already covers the case.
+**Best practice**: Prefer existing env/config resolution paths before adding new path knobs. Don't invent ad hoc overrides when existing config plumbing already covers the case.
 
 ## Common Patterns
 
 ### Feature Flags
 
 ```typescript
-// Check for feature flag (user can set either namespace)
-if (resolveEnvVar("EXPERIMENTAL_FEATURE") === "1") {
+if (process.env.SANDPIPER_EXPERIMENTAL_FEATURE === "1") {
   // Enable experimental feature
 }
 ```
@@ -128,7 +120,7 @@ if (resolveEnvVar("EXPERIMENTAL_FEATURE") === "1") {
 ### Debug Mode
 
 ```typescript
-const debug = resolveEnvVar("DEBUG") === "1";
+const debug = process.env.SANDPIPER_DEBUG === "1";
 if (debug) {
   console.log("Debug mode enabled");
 }
@@ -137,9 +129,9 @@ if (debug) {
 ### Offline Mode
 
 ```typescript
-if (resolveEnvVar("OFFLINE") === "1") {
+if (process.env.PI_OFFLINE === "1") {
   // Disable network requests
-  // Works with either SANDPIPER_OFFLINE=1 or PI_OFFLINE=1
+  // Pi sets PI_OFFLINE=1 for --offline and for PI_OFFLINE=true
 }
 ```
 
@@ -178,4 +170,3 @@ describe("offline mode", () => {
 ## Related Documentation
 
 - [Pi extension development](./pi-extension-development.md) — Where Pi runtime behavior fits into Sandpiper
-- [Env Vars Implementation](../../packages/core/src/env.ts) — `resolveEnvVar()` source code

@@ -1,6 +1,6 @@
 ---
 name: Environment Variables
-read_when: reading env vars, writing env vars, adding config paths, PI_ variables, SANDPIPER_ variables, resolveEnvVar, config directory, host context, path resolution
+read_when: reading env vars, writing env vars, adding config paths, PI_ variables, SANDPIPER_ variables, config directory, host context, path resolution
 ---
 
 # Environment Variables
@@ -9,7 +9,8 @@ Read this before adding or changing environment-variable behavior.
 
 ## Key Rules
 
-- Use `resolveEnvVar()` from `sandpiper-ai-core` for mirrored Sandpiper/Pi variables.
+- Read `process.env` directly. Startup mirroring makes `SANDPIPER_X` and `PI_X` equal, so either name works for user configuration.
+- Pi can rewrite a `PI_*` variable it owns during its own startup (`--offline` sets `PI_OFFLINE=1`). Code that asks what Pi is doing reads the name Pi reads.
 - Prefer `SANDPIPER_*` as the user-facing namespace for Sandpiper behavior.
 - Keep Pi runtime-control variables in the `PI_*` namespace when they specifically control wrapped Pi behavior.
 - Keep `SANDPIPER_CODING_AGENT_PACKAGE` distinct from `PI_CODING_AGENT_PACKAGE`; they point to different package roots and are not mirrored aliases.
@@ -18,10 +19,10 @@ Read this before adding or changing environment-variable behavior.
 
 ## Mirroring Model
 
-Sandpiper supports both `SANDPIPER_*` and `PI_*` user configuration. When both are set, `SANDPIPER_*` wins. Internal code should avoid direct `process.env.PI_*` reads except for exempt Pi runtime variables.
+Sandpiper supports both `SANDPIPER_*` and `PI_*` user configuration. When both are set, `SANDPIPER_*` wins. Mirroring runs in both entrypoints before any extension loads, so internal code reads `process.env` directly. Exempt Pi runtime variables are not mirrored.
 
 ## References
 
 - Public guide: `docs/dev/env-vars.md`
-- Core implementation: `packages/core/src/env.ts`
+- Mirroring implementation: `packages/cli/standalone_bootstrap.ts`
 - Host/config path utilities: `packages/core/src/host-context.ts` and nearby modules

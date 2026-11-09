@@ -8,7 +8,6 @@
 import { existsSync, mkdirSync, renameSync, symlinkSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { resolveEnvVar } from './env.js';
 
 export type MigrationMode = 'move' | 'symlink';
 export type MigrationScope = 'both' | 'global' | 'local';
@@ -52,11 +51,10 @@ export function getOldPiAgentDir(): string {
 
 /**
  * Get the current sandpiper agent directory.
- * Uses the same SANDPIPER_* / PI_* mirrored override lookup route as the rest
- * of sandpiper via resolveEnvVar('CODING_AGENT_DIR').
+ * Honors the SANDPIPER_CODING_AGENT_DIR override, then PI_CODING_AGENT_DIR.
  */
 export function getNewSandpiperAgentDir(): string {
-  const configuredDir = resolveEnvVar('CODING_AGENT_DIR');
+  const configuredDir = process.env.SANDPIPER_CODING_AGENT_DIR ?? process.env.PI_CODING_AGENT_DIR;
   if (configuredDir) {
     return resolveConfiguredPath(configuredDir);
   }

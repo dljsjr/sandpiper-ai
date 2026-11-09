@@ -1,4 +1,3 @@
-import { resolveEnvVar as defaultResolveEnvVar } from './env.js';
 import { detectUnmigratedConfigs as defaultDetectUnmigratedConfigs } from './migrate-pi-configs.js';
 import {
   collectPreflightDiagnostics as defaultCollectPreflightDiagnostics,
@@ -28,7 +27,7 @@ export interface SystemDiagnosticsStartupPlan {
 export interface SystemDiagnosticsDependencies {
   readonly collectPreflightDiagnostics?: (source: PreflightSourceLike) => readonly PreflightDiagnostic[];
   readonly detectUnmigratedConfigs?: (cwd: string) => readonly string[];
-  readonly resolveEnvVar?: (name: string) => string | undefined;
+  readonly env?: NodeJS.ProcessEnv;
 }
 
 function dependenciesWithDefaults(
@@ -37,7 +36,7 @@ function dependenciesWithDefaults(
   return {
     collectPreflightDiagnostics: dependencies.collectPreflightDiagnostics ?? defaultCollectPreflightDiagnostics,
     detectUnmigratedConfigs: dependencies.detectUnmigratedConfigs ?? defaultDetectUnmigratedConfigs,
-    resolveEnvVar: dependencies.resolveEnvVar ?? defaultResolveEnvVar,
+    env: dependencies.env ?? process.env,
   };
 }
 
@@ -67,6 +66,6 @@ export function buildSystemDiagnosticsStartupPlan(
 
   return {
     unhealthyDiagnostics: diagnostics.filter((diagnostic) => !diagnostic.healthy),
-    shouldCheckForUpdates: dependencies.resolveEnvVar('OFFLINE') !== '1',
+    shouldCheckForUpdates: dependencies.env.PI_OFFLINE !== '1',
   };
 }
