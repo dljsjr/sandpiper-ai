@@ -10,18 +10,12 @@ import {
   type SessionEntry,
 } from '@earendil-works/pi-coding-agent';
 import { createTwoFilesPatch } from 'diff';
-import {
-  buildSandpiperStartupPrompt,
-  formatLocalDate,
-  handleSandpiperSessionShutdown,
-  handleSandpiperSessionStart,
-} from 'sandpiper-ai-core';
+import { buildSandpiperStartupPrompt, formatLocalDate, setSandpiperSessionEnv } from 'sandpiper-ai-core';
 import {
   applyPromptContributions,
   SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL,
   SandpiperPromptContributionCollector,
 } from './prompt-contributions.js';
-import type { SystemRuntimeState } from './runtime.js';
 
 const SESSION_START_DATE_ENTRY_TYPE = 'sandpiper:session-start-date';
 
@@ -209,16 +203,11 @@ export function registerStartupPromptHooks(
   });
 }
 
-export function registerSessionContinuityHooks(pi: ExtensionAPI, state: SystemRuntimeState): void {
+export function registerSessionContinuityHooks(pi: ExtensionAPI): void {
   pi.on('session_start', async (_event, ctx) => {
-    handleSandpiperSessionStart(state, {
-      cwd: ctx.cwd,
+    setSandpiperSessionEnv(process.env, {
       sessionId: ctx.sessionManager.getSessionId(),
       sessionFile: ctx.sessionManager.getSessionFile(),
     });
-  });
-
-  pi.on('session_shutdown', async () => {
-    handleSandpiperSessionShutdown(state);
   });
 }

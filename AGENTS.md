@@ -34,7 +34,7 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 | Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                    | `.sandpiper/playbooks/development/pi-extensions.md`        |
 | AutoTOON, JSON→TOON conversion, token optimization                                               | `.sandpiper/playbooks/features/autotoon.md`                |
 | Shell Relay, Zellij integration, shared terminal, shell integrations                             | `.sandpiper/playbooks/features/shell-relay.md`             |
-| Journal, session continuity, PID/liveness handling, concurrent sessions                          | `.sandpiper/playbooks/features/session-continuity.md`      |
+| Journal, session continuity, session environment variables, concurrent sessions                  | `.sandpiper/playbooks/features/session-continuity.md`      |
 
 ## Verification
 

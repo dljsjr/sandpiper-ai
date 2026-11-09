@@ -1,14 +1,17 @@
 # Concurrent sessions
 
-Sandpiper records session lifecycle state independently of project continuation notes. Journal is a standalone optional package. Its writers coordinate through kernel locks, not session liveness.
+Sandpiper exposes the active session to child processes and skills independently of project continuation notes. Journal is a standalone optional package. Its writers coordinate through kernel locks, not session liveness.
 
-## Runtime lifecycle
+## Session environment variables
 
-`packages/core/src/session-continuity.ts` owns the runtime state and PID-file lifecycle. The system extension calls it on session start and shutdown.
+`packages/core/src/session-continuity.ts` exports `setSandpiperSessionEnv`. The system extension calls it on every `session_start` with the active session's ID and session file, and passes `process.env`.
 
-On session start, it exports `SANDPIPER_SESSION_ID` and, when present, `SANDPIPER_SESSION_FILE`. It writes the process ID, creation timestamp, and cwd as three lines in the session PID file. When the session changes, it removes the previous session's PID file. On shutdown, it removes the current PID file and clears runtime state.
+- `SANDPIPER_SESSION_ID` is set to the session ID.
+- `SANDPIPER_SESSION_FILE` is set to the session file path. When the session has no file, the variable is removed so it never points at a previous session's file.
 
-These values support runtime session identification and other features. They do not determine which Journal entries survive. Do not remove generic lifecycle infrastructure merely because the retired continuity helper used it.
+The values stay set for the whole process, so every child process and every tool inherits them. Pi's own `PI_SESSION_ID` and `PI_SESSION_FILE` reach only commands that Pi's bash tool runs. They never enter `process.env`, so the extension assigns the `SANDPIPER_` names itself. Shell Relay derives its session name from `SANDPIPER_SESSION_ID`, and skills read `SANDPIPER_SESSION_FILE` to find the session transcript.
+
+Sandpiper writes no per-session state files. It keeps no registry of running sessions and does not track session liveness. These values do not determine which Journal entries survive.
 
 ## Project continuation context
 

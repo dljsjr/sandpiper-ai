@@ -9,7 +9,6 @@ import {
   createSkillLoadingExtension,
   createTurnControlExtension,
 } from './neutral-capability-extension.js';
-import { createSystemRuntimeState, type SystemRuntimeState } from './runtime.js';
 import { registerStartupHeader } from './startup-header.js';
 import {
   registerSessionContinuityHooks,
@@ -28,7 +27,6 @@ export {
 export interface SandpiperIdentityExtensionOptions {
   readonly checkForUpdates?: () => Promise<readonly UpdateInfo[]>;
   readonly dumpSystemPrompt?: boolean;
-  readonly runtimeState?: SystemRuntimeState;
   readonly systemPromptDiagnostic?: StartupPromptDiagnosticCommand;
 }
 
@@ -40,14 +38,13 @@ function defaultCheckForUpdates(): Promise<readonly UpdateInfo[]> {
 }
 
 export function createSandpiperIdentityExtension(options: SandpiperIdentityExtensionOptions = {}): ExtensionFactory {
-  const runtimeState = options.runtimeState ?? createSystemRuntimeState();
   const dumpSystemPrompt = options.dumpSystemPrompt ?? process.env.SANDPIPER_DUMP_SYSTEM_PROMPT === '1';
   const updateCheck = options.checkForUpdates ?? defaultCheckForUpdates;
 
   return (pi: ExtensionAPI) => {
     registerMigrationControls(pi);
     registerStartupPromptHooks(pi, dumpSystemPrompt, options.systemPromptDiagnostic);
-    registerSessionContinuityHooks(pi, runtimeState);
+    registerSessionContinuityHooks(pi);
     registerDiagnosticsHooks(pi, updateCheck);
     registerStartupHeader(pi);
   };

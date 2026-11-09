@@ -55,8 +55,9 @@ PRD is explicitly rejected as an architecture input for this work.
   - Web Fetch already uses `sendSystemNotification`, proving the lightweight
     notification path is active code rather than only a design sketch.
 - `.sandpiper/docs/specs/concurrent-sessions.md`
-  - Current session liveness state uses flat PID files at
-    `$XDG_STATE_HOME/sandpiper/sessions/<sessionId>.pid`.
+  - At the time of this review, session liveness state used flat PID files at
+    `$XDG_STATE_HOME/sandpiper/sessions/<sessionId>.pid`. Sandpiper no longer
+    writes them.
   - This differs from the older mailbox PRD's implied per-session state layout.
 
 ## Review Plan
@@ -999,13 +1000,14 @@ socket handshake, not by the socket basename.
 
 ### Why this came up
 
-The older docs imply a session-state layout that does not match current
-Sandpiper. Current concurrent-session design uses flat PID files under
-`$XDG_STATE_HOME/sandpiper/sessions/`. The immediate MVP only needs
-liveness-scoped UDS endpoints and routeability records used to nudge online
-agents. Pi session storage demonstrates the cwd-derived hierarchy convention for
-future directory-scoped state, but conversation storage also needs a global scope
-for floating agents that move across projects when broadcast is added.
+The older docs imply a session-state layout that does not match Sandpiper as of
+this review. The concurrent-session design then used flat PID files under
+`$XDG_STATE_HOME/sandpiper/sessions/`, which Sandpiper no longer writes. The
+immediate MVP only needs liveness-scoped UDS endpoints and routeability records
+used to nudge online agents. Pi session storage demonstrates the cwd-derived
+hierarchy convention for future directory-scoped state, but conversation storage
+also needs a global scope for floating agents that move across projects when
+broadcast is added.
 
 The identity discussion also changed the layout. Every live agent gets a UUIDv4
 `agentId`, including guest agents. Guest agents persist that UUID in the Pi
@@ -1016,12 +1018,13 @@ are never used as claim or socket path keys.
 
 ### Current codebase evidence
 
-- `packages/core/src/paths.ts` resolves XDG state home and session PID paths.
-- `.sandpiper/docs/specs/concurrent-sessions.md` documents PID files at
-  `$XDG_STATE_HOME/sandpiper/sessions/<uuid>.pid`.
-- Session start/shutdown hooks in `extensions/system/startup-hooks.ts` pass
-  session id, session file, cwd, and session entries into Sandpiper continuity
-  handling.
+- At the time of this review, `packages/core/src/paths.ts` resolved XDG state
+  home and session PID paths. Those functions are removed.
+- At the time of this review, `.sandpiper/docs/specs/concurrent-sessions.md`
+  documented PID files at `$XDG_STATE_HOME/sandpiper/sessions/<uuid>.pid`. It
+  now describes the session environment variables only.
+- The `session_start` hook in `extensions/system/startup-hooks.ts` passes the
+  session id and session file into `setSandpiperSessionEnv`.
 
 ### Benefits if accepted
 

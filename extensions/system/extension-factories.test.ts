@@ -122,7 +122,6 @@ describe('system extension factory split', () => {
       'session_shutdown', // registerStartupPromptHooks
       'before_agent_start', // registerStartupPromptHooks
       'session_start', // registerSessionContinuityHooks
-      'session_shutdown', // registerSessionContinuityHooks
       'session_start', // registerDiagnosticsHooks
       'session_start', // registerStartupHeader
     ]);

@@ -1,6 +1,6 @@
 ---
 name: Session Continuity and Journal
-read_when: journal, session continuity, concurrent sessions, PID files, liveness, AGENT_JOURNAL_DIR, startup context, active session, handoff
+read_when: journal, session continuity, concurrent sessions, SANDPIPER_SESSION_ID, SANDPIPER_SESSION_FILE, AGENT_JOURNAL_DIR, startup context, active session, handoff
 ---
 
 # Session Continuity and Journal
@@ -13,7 +13,7 @@ If Journal is installed, load its skill before reading or publishing short conti
 - For intentional cross-project work, use an explicit absolute `--dir <project>/.sandpiper`. Inherited environment values do not follow cwd changes.
 - Journal owns its implementation and skill outside this repository. Do not bundle a copy or change its standalone `.agent-journal` fallback.
 - Preserve saved historical notes. Do not migrate or delete their contents.
-- Keep generic session PID files and liveness infrastructure separate from Journal. Other runtime features still use them.
+- Keep `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` set for the whole process at every `session_start`. Sandpiper writes no session PID files and tracks no session liveness. Journal does not depend on either.
 
 Read on resume. Publish one development as it occurs, with references for detail. Journal does not require a tracker or identity. If unavailable, use existing project records. YAAMS remains optional external memory.
 
@@ -23,4 +23,4 @@ Tests must use temporary notes and configuration directories, never real user no
 
 - Public usage and host directory contract: `docs/features/journal.md`
 - Environment setup: `packages/cli/standalone_bootstrap.ts`
-- Generic session lifecycle: `packages/core/src/session-continuity.ts`
+- Session environment variables: `packages/core/src/session-continuity.ts`
