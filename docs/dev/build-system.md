@@ -18,7 +18,6 @@ Use this page to understand the build structure. For commands, see [How to build
 | `dist/`                                            | Built runtime, system prompt diagnostic, and shared chunks                       |
 | `packages/cli/bin/`                                | Stable launchers that load root output                                           |
 | `docs/`, `README.md`, `CONTRIBUTING.md`, `LICENSE` | Root-owned documentation and license, packed directly                            |
-| `packages/resources/`                              | Optional resource location, absent from the packed product                       |
 
 The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti. Core and capability packages expose source TypeScript. They need no separate JavaScript or declaration build.
 
@@ -77,8 +76,6 @@ Run `bun run pack:cli` from the repository root. It builds, then runs ordinary `
 Direct packing uses the root file list and includes the dependencies named in `bundledDependencies`. The file list selects `dist/**/*.js` and `dist/**/*.js.map`, not arbitrary output or previous tarballs. Packing does not build the application. There is no temporary package directory or pack wrapper.
 
 The installed package includes both launchers, root output, public docs, the license, and patched runtime dependencies. It ships no built-in skills, prompt templates, or custom themes. Stock themes come from Pi. Configured custom resources remain supported through the SDK.
-
-Both source and built modes default to optional `<productRoot>/packages/resources`. A missing default tree is valid. An explicit `SANDPIPER_STANDALONE_RESOURCE_ROOT` must name an existing directory.
 
 The installed CLI requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
 

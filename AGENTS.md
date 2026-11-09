@@ -55,7 +55,6 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 | `.sandpiper/archive/`   | Historical, completed, superseded, or stale docs                                                |
 | `extensions/`           | Sandpiper Pi extension source and compatibility bridges                                         |
 | `packages/`             | CLI source modules and internal workspace packages                                              |
-| `packages/resources/`   | Optional resource location, not shipped in the product                                          |
 | `devtools/`             | Build regressions and isolated CLI/RPC integration tests                                        |
 
 ## Public Documentation

@@ -83,7 +83,7 @@ describe('wave 1: workspace skill tool (AGENT-253)', () => {
           toolName: 'skill',
           arguments: {
             source: 'filesystem',
-            path: join(repoRoot, 'packages', 'resources', 'skills', 'does-not-exist'),
+            path: join(SKILL_FIXTURE_DIR, 'does-not-exist'),
           },
         },
         { type: 'text', text: 'handled the error' },

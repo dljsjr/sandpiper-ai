@@ -57,7 +57,7 @@ The package/version variables below are set by the Sandpiper runtime and are not
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` deliberately have different meanings. Do not mirror one into the other.
 
-Both source and built entrypoints resolve the root Sandpiper product before importing Pi. `SANDPIPER_STANDALONE_PACKAGE_DIR` overrides the metadata package. The optional default resource location is `<productRoot>/packages/resources`. `SANDPIPER_STANDALONE_RESOURCE_ROOT`, when set, must name an existing directory. Its `skills/`, `prompts/`, and `themes/` subdirectories are optional. The packed product omits the default resource tree. Configured custom resources remain supported.
+Both source and built entrypoints resolve the root Sandpiper product before importing Pi. `SANDPIPER_STANDALONE_PACKAGE_DIR` overrides the metadata package. The product ships no built-in skills, prompt templates, or custom themes. User, project, settings-configured, and package resources still load through Pi.
 
 ```typescript
 // ✅ Correct for runtime-owned package roots

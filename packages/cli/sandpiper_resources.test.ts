@@ -1,6 +1,3 @@
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import type { ExtensionAPI, InlineExtension } from '@earendil-works/pi-coding-agent';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -13,11 +10,9 @@ vi.mock('../../extensions/web-search/src/config-resolver.js', async (importOrigi
   return { ...actual, readSettingsKey: vi.fn(() => undefined) };
 });
 
-import {
-  createNeutralCapabilityExtensionFactories,
-  createSandpiperExtensionFactories,
-  resolveSandpiperResourcePaths,
-} from './sandpiper_resources.js';
+vi.mock('./temporary_trail_skill.js', () => ({ temporaryTrailSkillPaths: () => ['/trail/skill'] }));
+
+import { createNeutralCapabilityExtensionFactories, createSandpiperExtensionFactories } from './sandpiper_resources.js';
 
 const savedBraveApiKey = process.env.BRAVE_API_KEY;
 
@@ -99,48 +94,28 @@ function applyFactories(factories: readonly InlineExtension[]): ReturnType<typeo
 }
 
 describe('Sandpiper resource adapter', () => {
-  it('omits an absent built-in theme directory from discovery', () => {
-    const root = mkdtempSync(join(tmpdir(), 'sandpiper-theme-free-resources-'));
-    try {
-      expect(resolveSandpiperResourcePaths(root).themePaths).toEqual([]);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
+  it('offers only the temporary Trail skill path for resource discovery', async () => {
+    const handlers = new Map<string, () => unknown>();
+    const capture = createExtensionCapture();
+    const pi = {
+      ...capture.pi,
+      on: ((event: string, handler: () => unknown) => {
+        handlers.set(event, handler);
+        return () => {};
+      }) as ExtensionAPI['on'],
+    };
+    const resources = createNeutralCapabilityExtensionFactories().find(
+      (extension) => typeof extension !== 'function' && extension.name === 'sandpiper-resources',
+    );
+    if (!resources || typeof resources === 'function') throw new Error('sandpiper-resources extension is missing');
 
-  it('omits an absent built-in prompt directory from discovery', () => {
-    const root = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-free-resources-'));
-    try {
-      expect(resolveSandpiperResourcePaths(root).promptPaths).toEqual([]);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
+    await resources.factory(pi as ExtensionAPI);
 
-  it('omits an absent built-in skills directory from discovery', () => {
-    const root = mkdtempSync(join(tmpdir(), 'sandpiper-skill-free-resources-'));
-    try {
-      expect(resolveSandpiperResourcePaths(root).skillPaths).toEqual([]);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
-  });
-
-  it('maps a resource directory without assuming a checkout layout', () => {
-    const root = mkdtempSync(join(tmpdir(), 'sandpiper-installed-resources-'));
-    try {
-      for (const directory of ['skills', 'prompts', 'themes']) mkdirSync(join(root, directory));
-      const paths = resolveSandpiperResourcePaths(root);
-      expect(paths.skillPaths).toEqual([join(root, 'skills')]);
-      expect(paths.promptPaths).toEqual([join(root, 'prompts')]);
-      expect(paths.themePaths).toEqual([join(root, 'themes')]);
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+    expect(handlers.get('resources_discover')?.()).toEqual({ skillPaths: ['/trail/skill'] });
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {
-    const { commands, flags, renderers, tools } = applyFactories(createNeutralCapabilityExtensionFactories('/repo'));
+    const { commands, flags, renderers, tools } = applyFactories(createNeutralCapabilityExtensionFactories());
 
     expect(tools).toEqual(expect.arrayContaining(['skill', 'start_background_process', 'check_background_process']));
     expect(tools).toEqual(expect.arrayContaining(['web_fetch']));
@@ -156,7 +131,7 @@ describe('Sandpiper resource adapter', () => {
 
   it('adds the opt-in system prompt diagnostic command to the identity extension', () => {
     const { commands } = applyFactories(
-      createSandpiperExtensionFactories('/repo', {
+      createSandpiperExtensionFactories({
         systemPromptDiagnostic: {
           commandName: '__sandpiper-system-prompt',
           onPrompt: vi.fn(),
@@ -168,7 +143,7 @@ describe('Sandpiper resource adapter', () => {
   });
 
   it('adds Sandpiper identity behavior exactly once for the Sandpiper distribution', () => {
-    const { flags } = applyFactories(createSandpiperExtensionFactories('/repo'));
+    const { flags } = applyFactories(createSandpiperExtensionFactories());
 
     expect(flags.filter((flag) => flag === 'migrate-pi-configs')).toHaveLength(1);
     expect(flags.filter((flag) => flag === 'install-shell-integrations')).toHaveLength(1);

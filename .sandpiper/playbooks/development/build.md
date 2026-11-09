@@ -16,7 +16,7 @@ Read this before you change build scripts, package metadata, or generated output
 - Run `bun run pack:cli` from the root to build and pack. It uses ordinary `bun pm pack --ignore-scripts --destination ./dist`, not a pack wrapper.
 - Keep the product identity `sandpiper-ai-cli` and existing `packages/cli/bin/` launcher paths.
 - Pack root documentation and the license directly. Do not add staging, temporary package directories, or metadata sidecars.
-- Both runtime modes use optional `<productRoot>/packages/resources`. The packed product omits it. Preserve configured custom resources and explicit override validation.
+- The product ships no built-in skills, prompt templates, or custom themes. Pi loads user, project, settings-configured, and package resources. Do not add a product-owned resource location.
 - The CLI bundles built-in extensions. Pi loads additional user/project extensions from source TypeScript. Do not add a separate extension build step.
 - Core and capability packages expose source TypeScript. Do not restore separate JavaScript or declaration emission.
 - Keep root local dependencies on `workspace:*`. Keep package-level internal and registry dependencies on exact versions.

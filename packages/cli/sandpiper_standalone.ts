@@ -60,5 +60,5 @@ const { createSandpiperExtensionFactories } = await import('./sandpiper_resource
 const main = await loadPiMain();
 
 await main(defaultStandaloneMainArgs(process.argv.slice(2), process.env), {
-  extensionFactories: createSandpiperExtensionFactories(standalonePaths.resourceRoot),
+  extensionFactories: createSandpiperExtensionFactories(),
 });

@@ -11,10 +11,6 @@ import {
   resolveStandalonePaths,
 } from './standalone_bootstrap.js';
 
-function createResources(root: string): void {
-  for (const directory of ['skills', 'prompts', 'themes']) mkdirSync(join(root, directory), { recursive: true });
-}
-
 describe('standalone bootstrap', () => {
   it('finds the nearest package root by package name', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-standalone-bootstrap-'));
@@ -28,17 +24,15 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('uses the installed product root and its resources without a repository root', () => {
+  it('uses the installed product root without a repository root', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-installed-bootstrap-'));
     try {
       const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
       const startDir = join(packageDir, 'dist');
       mkdirSync(startDir, { recursive: true });
-      const resourceRoot = join(packageDir, 'packages', 'resources');
-      createResources(resourceRoot);
       const manifest = JSON.stringify({ name: 'sandpiper-ai-cli', version: '1.2.3' });
       writeFileSync(join(packageDir, 'package.json'), manifest);
-      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
+      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir });
       expect(readFileSync(join(packageDir, 'package.json'), 'utf8')).toBe(manifest);
       expect(existsSync(join(dir, 'dist', 'standalone-package'))).toBe(false);
     } finally {
@@ -46,38 +40,7 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('accepts product resources without bundled prompts or skills', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-prompt-free-bootstrap-'));
-    try {
-      const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
-      const startDir = join(packageDir, 'dist');
-      const resourceRoot = join(packageDir, 'packages', 'resources');
-      createResources(resourceRoot);
-      rmSync(join(resourceRoot, 'skills'), { recursive: true });
-      rmSync(join(resourceRoot, 'prompts'), { recursive: true });
-      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
-      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('accepts product resources without a bundled skills directory', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-skill-free-bootstrap-'));
-    try {
-      const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
-      const startDir = join(packageDir, 'dist');
-      const resourceRoot = join(packageDir, 'packages', 'resources');
-      createResources(resourceRoot);
-      rmSync(join(resourceRoot, 'skills'), { recursive: true });
-      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
-      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('resolves source and built modules to the same real product metadata and resources', () => {
+  it('resolves source and built modules to the same real product metadata', () => {
     const packageDir = mkdtempSync(join(tmpdir(), 'sandpiper-source-bootstrap-'));
     try {
       const manifest = JSON.stringify({
@@ -86,11 +49,9 @@ describe('standalone bootstrap', () => {
         piConfig: { name: 'sandpiper', configDir: '.sandpiper', bin: 'sandpiper' },
       });
       writeFileSync(join(packageDir, 'package.json'), manifest);
-      const resourceRoot = join(packageDir, 'packages', 'resources');
-      createResources(resourceRoot);
       for (const startDir of [join(packageDir, 'packages', 'cli'), join(packageDir, 'dist')]) {
         mkdirSync(startDir, { recursive: true });
-        expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
+        expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir });
         expect(readFileSync(join(packageDir, 'package.json'), 'utf8')).toBe(manifest);
       }
       expect(existsSync(join(packageDir, 'packages', 'cli', 'package.json'))).toBe(false);
@@ -99,72 +60,37 @@ describe('standalone bootstrap', () => {
     }
   });
 
-  it('accepts absent product resources without falling back to an ancestor checkout', () => {
+  it('does not fall back to an ancestor checkout', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-missing-resources-'));
     try {
       writeFileSync(join(dir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
-      createResources(join(dir, 'packages', 'resources'));
       const packageDir = join(dir, 'node_modules', 'sandpiper-ai-cli');
       const startDir = join(packageDir, 'dist');
       mkdirSync(startDir, { recursive: true });
       writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli' }));
-      const resourceRoot = join(packageDir, 'packages', 'resources');
-      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir, resourceRoot });
-      expect(existsSync(resourceRoot)).toBe(false);
+      expect(resolveStandalonePaths({ startDir, env: {} })).toEqual({ packageDir });
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it('rejects an explicit resource root that does not exist', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-missing-resource-override-'));
-    try {
-      expect(() =>
-        resolveStandalonePaths({
-          startDir: dir,
-          env: { SANDPIPER_STANDALONE_PACKAGE_DIR: dir, SANDPIPER_STANDALONE_RESOURCE_ROOT: join(dir, 'missing') },
-        }),
-      ).toThrow('resource override must be an existing directory');
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('rejects an explicit resource root that is a file', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'sandpiper-file-resource-override-'));
-    try {
-      const resourceRoot = join(dir, 'not-a-directory');
-      writeFileSync(resourceRoot, 'fixture');
-      expect(() =>
-        resolveStandalonePaths({
-          startDir: dir,
-          env: { SANDPIPER_STANDALONE_PACKAGE_DIR: dir, SANDPIPER_STANDALONE_RESOURCE_ROOT: resourceRoot },
-        }),
-      ).toThrow('resource override must be an existing directory');
-    } finally {
-      rmSync(dir, { recursive: true, force: true });
-    }
-  });
-
-  it('accepts existing package and resource directory overrides without generating files', () => {
+  it('accepts an existing package directory override without generating files', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-bootstrap-overrides-'));
     try {
       const packageDir = join(dir, 'metadata');
-      const resourceRoot = join(dir, 'resources');
       mkdirSync(packageDir);
-      mkdirSync(resourceRoot);
       const paths = resolveStandalonePaths({
         startDir: join(dir, 'ignored'),
-        env: { SANDPIPER_STANDALONE_RESOURCE_ROOT: resourceRoot, SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir },
+        env: { SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir },
       });
-      expect(paths).toEqual({ packageDir, resourceRoot });
+      expect(paths).toEqual({ packageDir });
       expect(existsSync(join(packageDir, 'package.json'))).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
-  it('anchors default resources to an explicit metadata package instead of the module location', () => {
+  it('anchors the product root to an explicit metadata package instead of the module location', () => {
     const dir = mkdtempSync(join(tmpdir(), 'sandpiper-package-override-'));
     try {
       const packageDir = join(dir, 'metadata');
@@ -173,9 +99,8 @@ describe('standalone bootstrap', () => {
         startDir: join(dir, 'unrelated', 'dist'),
         env: { SANDPIPER_STANDALONE_PACKAGE_DIR: packageDir },
       });
-      expect(paths).toEqual({ packageDir, resourceRoot: join(packageDir, 'packages', 'resources') });
+      expect(paths).toEqual({ packageDir });
       expect(existsSync(join(packageDir, 'package.json'))).toBe(false);
-      expect(existsSync(paths.resourceRoot)).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

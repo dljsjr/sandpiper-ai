@@ -31,7 +31,6 @@ const CAPTURE_MODEL = 'capture';
 export interface SystemPromptDiagnosticOptions {
   readonly args: readonly string[];
   readonly cwd: string;
-  readonly resourceRoot: string;
 }
 
 export interface SystemPromptDiagnosticSources {
@@ -141,7 +140,7 @@ export async function renderSystemPrompt(
   let renderedPrompt: string | undefined;
   let identitySource: string | undefined;
   const extensionFactories = [
-    ...createSandpiperExtensionFactories(options.resourceRoot, {
+    ...createSandpiperExtensionFactories({
       checkForUpdates: async () => [],
       systemPromptDiagnostic: {
         commandName: DIAGNOSTIC_COMMAND,

@@ -1,8 +1,7 @@
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
 export interface StandalonePaths {
-  readonly resourceRoot: string;
   readonly packageDir: string;
 }
 
@@ -43,17 +42,7 @@ export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): 
   const packageDir = options.env.SANDPIPER_STANDALONE_PACKAGE_DIR
     ? resolve(options.env.SANDPIPER_STANDALONE_PACKAGE_DIR)
     : findPackageRoot(options.startDir, 'sandpiper-ai-cli');
-  const resourceRoot = options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT
-    ? resolve(options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT)
-    : join(packageDir, 'packages', 'resources');
-
-  if (
-    options.env.SANDPIPER_STANDALONE_RESOURCE_ROOT &&
-    (!existsSync(resourceRoot) || !statSync(resourceRoot).isDirectory())
-  ) {
-    throw new Error(`Sandpiper resource override must be an existing directory: ${resourceRoot}`);
-  }
-  return { resourceRoot, packageDir };
+  return { packageDir };
 }
 
 export function defaultStandaloneMainArgs(args: readonly string[], _env: NodeJS.ProcessEnv): string[] {

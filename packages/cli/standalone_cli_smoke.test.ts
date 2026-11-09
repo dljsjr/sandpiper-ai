@@ -194,7 +194,6 @@ export default function runtimeImportProbe(pi) {
       const output = runStandalone(
         ['--version'],
         standaloneEnv({
-          SANDPIPER_STANDALONE_RESOURCE_ROOT: join(repoRoot, 'packages', 'resources'),
           SANDPIPER_STANDALONE_PACKAGE_DIR: metadataPackageDir,
           SANDPIPER_CODING_AGENT_DIR: join(tempDir, 'agent'),
         }),

@@ -86,7 +86,7 @@ describe('standalone Sandpiper resource discovery', () => {
           additionalSkillPaths: [customSkills],
           additionalPromptTemplatePaths: [customPrompts],
           additionalThemePaths: [customThemes],
-          extensionFactories: [...createNeutralCapabilityExtensionFactories(join(repoRoot, 'packages', 'resources'))],
+          extensionFactories: [...createNeutralCapabilityExtensionFactories()],
           noExtensions: true,
           noSkills: true,
           noPromptTemplates: false,

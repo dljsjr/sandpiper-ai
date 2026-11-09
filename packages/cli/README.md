@@ -6,7 +6,7 @@ Sandpiper-branded CLI runtime around [pi-coding-agent](https://github.com/badlog
 
 `sandpiper_standalone.ts` is the normal `sandpiper` runtime. It:
 
-1. Resolves the root product package and its optional resource directory without writing to the installation.
+1. Resolves the root product package without writing to the installation.
 2. Configures `PI_PACKAGE_DIR`, `PI_CODING_AGENT_PACKAGE`, `PI_CODING_AGENT_VERSION`, `SANDPIPER_CODING_AGENT_PACKAGE`, and mirrored user-facing `SANDPIPER_*` env vars before importing Pi.
 3. Imports Pi through `deferred_pi_import.ts`.
 4. Calls `main(args, { extensionFactories })` with Sandpiper identity/capability factories and explicit resource discovery.
@@ -43,9 +43,9 @@ packages/cli/bin/sandpiper --help
 bun run test:standalone
 ```
 
-Both source and built entrypoints use optional `<productRoot>/packages/resources/`. Built-in extensions load through explicit factories. Resource discovery uses `resources_discover` without a staging step. The built runtime requires no source checkout and creates no metadata sidecar.
+Built-in extensions load through explicit factories in both source and built entrypoints. Resource discovery uses `resources_discover` without a staging step. The built runtime requires no source checkout and creates no metadata sidecar.
 
-The default resource tree can be absent, and the packed product omits it. If set, `SANDPIPER_STANDALONE_RESOURCE_ROOT` must point to an existing directory. Its `skills/`, `prompts/`, and `themes/` subdirectories are optional. Sandpiper currently bundles no skills, prompt templates, or custom themes. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
+Sandpiper bundles no skills, prompt templates, or custom themes. Stock themes come from Pi, and user, project, settings-configured, and package resources still load through Pi. `SANDPIPER_STANDALONE_PACKAGE_DIR` selects an existing metadata package and does not generate files.
 
 The CLI requires Bun. Journal is an optional standalone package, not a bundled helper. See the [build workflow](../../docs/dev/build-workflows.md#pack-the-cli) for tarball commands.
 

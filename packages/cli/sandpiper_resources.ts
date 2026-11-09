@@ -1,5 +1,3 @@
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
 import type { ExtensionAPI, ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import chorusExtension from '../../extensions/chorus.js';
@@ -17,38 +15,17 @@ import webFetchExtension from '../../extensions/web-fetch/src/index.js';
 import webSearchExtension from '../../extensions/web-search/src/index.js';
 import { temporaryTrailSkillPaths } from './temporary_trail_skill.js';
 
-export interface SandpiperResourcePaths {
-  readonly skillPaths: readonly string[];
-  readonly promptPaths: readonly string[];
-  readonly themePaths: readonly string[];
-}
-
 function inlineExtension(name: string, factory: ExtensionFactory): InlineExtension {
   return { name, factory };
 }
 
-export function resolveSandpiperResourcePaths(resourceRoot: string): SandpiperResourcePaths {
-  const skillDir = join(resourceRoot, 'skills');
-  const promptDir = join(resourceRoot, 'prompts');
-  const themeDir = join(resourceRoot, 'themes');
-  return {
-    skillPaths: existsSync(skillDir) ? [skillDir] : [],
-    promptPaths: existsSync(promptDir) ? [promptDir] : [],
-    themePaths: existsSync(themeDir) ? [themeDir] : [],
-  };
-}
-
-function createSandpiperResourceExtension(resourcePaths: SandpiperResourcePaths): ExtensionFactory {
+function createSandpiperResourceExtension(): ExtensionFactory {
   return (pi: ExtensionAPI) => {
-    pi.on('resources_discover', () => ({
-      skillPaths: [...resourcePaths.skillPaths, ...temporaryTrailSkillPaths()],
-      promptPaths: [...resourcePaths.promptPaths],
-      themePaths: [...resourcePaths.themePaths],
-    }));
+    pi.on('resources_discover', () => ({ skillPaths: temporaryTrailSkillPaths() }));
   };
 }
 
-export function createNeutralCapabilityExtensionFactories(resourceRoot: string): readonly InlineExtension[] {
+export function createNeutralCapabilityExtensionFactories(): readonly InlineExtension[] {
   return [
     inlineExtension('skill-loading', createSkillLoadingExtension()),
     inlineExtension('turn-control', createTurnControlExtension()),
@@ -60,10 +37,7 @@ export function createNeutralCapabilityExtensionFactories(resourceRoot: string):
     inlineExtension('autotoon', autotoonExtension),
     inlineExtension('tattler', tattlerExtension),
     inlineExtension('chorus', chorusExtension),
-    inlineExtension(
-      'sandpiper-resources',
-      createSandpiperResourceExtension(resolveSandpiperResourcePaths(resourceRoot)),
-    ),
+    inlineExtension('sandpiper-resources', createSandpiperResourceExtension()),
   ];
 }
 
@@ -74,11 +48,10 @@ function createSandpiperIdentityExtensionFactories(
 }
 
 export function createSandpiperExtensionFactories(
-  resourceRoot: string,
   identityOptions: SandpiperIdentityExtensionOptions = {},
 ): InlineExtension[] {
   return [
     ...createSandpiperIdentityExtensionFactories(identityOptions),
-    ...createNeutralCapabilityExtensionFactories(resourceRoot),
+    ...createNeutralCapabilityExtensionFactories(),
   ];
 }

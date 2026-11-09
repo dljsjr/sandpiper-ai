@@ -101,7 +101,6 @@ if (args.includes('--help') || args.includes('-h')) {
       renderSystemPrompt({
         args,
         cwd: process.cwd(),
-        resourceRoot: standalonePaths.resourceRoot,
       }),
     );
     for (const warning of result.warnings) {

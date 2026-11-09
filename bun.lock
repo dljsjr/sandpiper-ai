@@ -100,10 +100,6 @@
       "name": "sandpiper-ai-core",
       "version": "0.0.1",
     },
-    "packages/resources": {
-      "name": "sandpiper-resources",
-      "version": "0.0.1",
-    },
   },
   "patchedDependencies": {
     "@earendil-works/pi-coding-agent@1.3.0": "patches/@earendil-works%2Fpi-coding-agent@1.3.0.patch",
@@ -634,8 +630,6 @@
     "sandpiper-ai-core": ["sandpiper-ai-core@workspace:packages/core"],
 
     "sandpiper-capability-autotoon": ["sandpiper-capability-autotoon@workspace:packages/capability-autotoon"],
-
-    "sandpiper-resources": ["sandpiper-resources@workspace:packages/resources"],
 
     "sandpiper-system": ["sandpiper-system@workspace:extensions/system"],
 

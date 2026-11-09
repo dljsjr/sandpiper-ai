@@ -93,7 +93,7 @@ The bin shims require root `dist/` output. Dependency installation does not crea
 
 ### Custom resources use old behavior
 
-Update the configured resource files or their separately installed package. Both runtime modes use optional `<productRoot>/packages/resources` without copying it into `dist/`. The packed product omits that tree. Standalone packages such as Journal are installed and updated separately.
+Update the configured resource files or their separately installed package. The product ships no resources of its own. Pi loads user, project, settings-configured, and package resources at runtime. Standalone packages such as Journal are installed and updated separately.
 
 ### A dependency cannot be resolved
 

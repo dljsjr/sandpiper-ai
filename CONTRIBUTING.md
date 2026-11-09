@@ -31,14 +31,13 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 
 ## Repository map
 
-| Path                  | Purpose                                                                        |
-| --------------------- | ------------------------------------------------------------------------------ |
-| `docs/`               | Public Sandpiper documentation                                                 |
-| `packages/`           | CLI source modules and internal workspace packages                             |
-| `extensions/`         | Sandpiper Pi extensions and compatibility entrypoints                          |
-| `packages/resources/` | Optional resource location, not included in the product                        |
-| `devtools/`           | Build regressions and isolated CLI/RPC integration tests                       |
-| `.sandpiper/`         | Project-local agent state, tasks, playbooks, active specs, notes, and archives |
+| Path          | Purpose                                                                        |
+| ------------- | ------------------------------------------------------------------------------ |
+| `docs/`       | Public Sandpiper documentation                                                 |
+| `packages/`   | CLI source modules and internal workspace packages                             |
+| `extensions/` | Sandpiper Pi extensions and compatibility entrypoints                          |
+| `devtools/`   | Build regressions and isolated CLI/RPC integration tests                       |
+| `.sandpiper/` | Project-local agent state, tasks, playbooks, active specs, notes, and archives |
 
 ## Useful docs
 

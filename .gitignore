@@ -60,8 +60,5 @@ pi-session*.html
 .claude/
 .sandpiper/claude-code/
 
-# skill-creator ephemeral eval workspaces (generated next to each skill)
-packages/resources/skills/*/*-workspace/
-
 # dora code context index
 .dora/

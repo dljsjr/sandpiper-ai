@@ -8,7 +8,6 @@ Source modules and internal workspace packages used by the Sandpiper runtime. Th
 | ---------------------------------------------- | --------------------------------------------------- |
 | [`cli/`](cli/)                                 | CLI entrypoints and stable bin launchers            |
 | [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON neutral transform and Pi adapter |
-| [`resources/`](resources/)                     | Optional resource location, not shipped             |
 | [`core/`](core/)                               | Shared core utilities                               |
 
 ## Build

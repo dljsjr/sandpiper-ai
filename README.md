@@ -58,7 +58,6 @@ sandpiper-ai/
 ├── dist/                # Built entrypoints and shared chunks
 ├── packages/            # Source modules and internal workspace packages
 │   ├── cli/             # Sandpiper entrypoints and stable bin launchers
-│   ├── resources/       # Optional resource location, not shipped
 │   └── core/            # Shared utilities
 ├── ast-grep/            # Structural code analysis rules
 └── devtools/            # Build regressions and isolated integration tests
