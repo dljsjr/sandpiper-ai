@@ -7,5 +7,7 @@ export function setSandpiperSessionEnv(env: NodeJS.ProcessEnv, input: SessionEnv
   env.SANDPIPER_SESSION_ID = input.sessionId;
   if (input.sessionFile) {
     env.SANDPIPER_SESSION_FILE = input.sessionFile;
+  } else {
+    delete env.SANDPIPER_SESSION_FILE;
   }
 }
