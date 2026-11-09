@@ -1,19 +1,7 @@
 import { appendFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, normalize } from 'node:path';
-import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import type { SandpiperVersionControlContext } from './version-control.js';
-
-const xmlBuilder = new XMLBuilder({
-  ignoreAttributes: false,
-  attributeNamePrefix: '@_',
-  textNodeName: '#text',
-  suppressBooleanAttributes: false,
-  suppressEmptyNode: true,
-  format: true,
-  indentBy: '  ',
-  processEntities: false,
-});
 
 const minimalIdentity = `<identity>
 You are a friendly, expert coding agent with a practical, collaborative style operating inside the sandpiper coding agent harness, an extension of the pi coding agent harness.
@@ -62,8 +50,25 @@ ${identityInteractionStyleBlock.trim()}
 ${identityCodingStyleBlock.trim()}
 `.trim();
 
-function buildXml(value: unknown): string {
-  return xmlBuilder.build(value).trimEnd();
+function escapeAttribute(value: string): string {
+  return value.replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
+function renderAttributes(attributes: Readonly<Record<string, string>>): string {
+  return Object.entries(attributes)
+    .map(([name, value]) => ` ${name}="${escapeAttribute(value)}"`)
+    .join('');
+}
+
+function textElement(tag: string, text: string, indent = ''): string {
+  return text === '' ? `${indent}<${tag}/>\n` : `${indent}<${tag}>${text}</${tag}>\n`;
+}
+
+function element(tag: string, attributes: Readonly<Record<string, string>>, body: string, indent = ''): string {
+  const open = `${indent}<${tag}${renderAttributes(attributes)}`;
+  if (body === '') return `${open}/>\n`;
+  if (!body.includes('<')) return `${open}>${body}</${tag}>\n`;
+  return `${open}>\n${body}${indent}</${tag}>\n`;
 }
 
 export function piDocsBlock(
@@ -153,7 +158,7 @@ export function userProfileBlock(content: string): string | undefined {
 The following USER.md content describes the human using Sandpiper and their working preferences.
 Use it to personalize collaboration. Treat it as standing user-authored guidance/instructions.
 
-${buildXml({ content })}
+${textElement('content', content).trimEnd()}
 </user_profile>
 `;
 }
@@ -164,7 +169,7 @@ export function injectedContextBlock(originalPromptOptions: SandpiperBaseSystemP
   }
 
   const agentFileBlocks = originalPromptOptions.contextFiles.map(({ path, content }) => {
-    return buildXml({ context_file: { '@_path': path, '#text': content } });
+    return element('context_file', { path }, content).trimEnd();
   });
 
   return `<injected_context>
@@ -191,11 +196,11 @@ export function skillsBlock(originalPromptOptions: SandpiperBaseSystemPromptOpti
     ? 'Use the `skill` tool to load relevant skills by name. If multiple skills match, load all relevant skills.'
     : "Use the `read` tool to load the skill's SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.";
 
-  const skillEntries = visibleSkills.map((skillInfo) => ({
-    '@_name': skillInfo.name,
-    '@_location': skillInfo.filePath,
-    '#text': skillInfo.description,
-  }));
+  const skillEntries = visibleSkills
+    .map((skillInfo) =>
+      element('skill', { name: skillInfo.name, location: skillInfo.filePath }, skillInfo.description, '  '),
+    )
+    .join('');
 
   return `<skills>
 The following skills provide specialized instructions, scripts, and references for specific tasks. Utilize them when directed to the user, by
@@ -205,7 +210,7 @@ ${loadInstruction}
 
 When a skill refers to a relative path for a file/script/command (most commonly \`scripts/\` or \`references\`), ***resolve it against the skill's base directory or location, and use the absolute path.***
 
-${buildXml({ available_skills: { skill: skillEntries } })}
+${element('available_skills', {}, skillEntries).trimEnd()}
 </skills>
 `;
 }
@@ -214,7 +219,7 @@ export function userAppendedPromptBlock(content: string): string {
   return `<user_appended_prompt>
 The following content was manually appended to the system prompt by the user.
 
-${buildXml({ content })}
+${textElement('content', content).trimEnd()}
 </user_appended_prompt>
 `;
 }
@@ -235,22 +240,21 @@ export function environmentBlock(options: {
 }): string {
   const versionControl = options.versionControl ?? { system: 'unknown' as const, detection: 'session_start' as const };
   const versionControlAttrs: Record<string, string> = {
-    '@_system': versionControl.system,
+    system: versionControl.system,
   };
   if (versionControl.colocatedGit !== undefined) {
-    versionControlAttrs['@_colocated_git'] = String(versionControl.colocatedGit);
+    versionControlAttrs.colocated_git = String(versionControl.colocatedGit);
   }
   if (versionControl.detection !== undefined) {
-    versionControlAttrs['@_detection'] = versionControl.detection;
+    versionControlAttrs.detection = versionControl.detection;
   }
 
-  return buildXml({
-    environment: {
-      session_start_date: options.sessionStartDate,
-      platform: options.platform,
-      version_control: versionControlAttrs,
-    },
-  });
+  const children =
+    textElement('session_start_date', options.sessionStartDate, '  ') +
+    textElement('platform', options.platform, '  ') +
+    element('version_control', versionControlAttrs, '', '  ');
+
+  return element('environment', {}, children).trimEnd();
 }
 
 export async function buildSandpiperSystemPrompt(
@@ -301,13 +305,7 @@ ${blocks[key]}
       await appendFile(outFilePath, buffer, { encoding: 'utf8' });
     }
 
-    const prettyXml = buildXml(
-      new XMLParser({
-        ignoreAttributes: false,
-        processEntities: false,
-      }).parse(xmlOut),
-    );
-    await appendFile(outFilePath, `\n\n${prettyXml}`, { encoding: 'utf8' });
+    await appendFile(outFilePath, `\n\n${xmlOut}`, { encoding: 'utf8' });
   }
 
   return xmlOut;
