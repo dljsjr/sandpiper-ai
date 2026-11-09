@@ -52,7 +52,7 @@ The `<skills>` section treats `<available_skills>` as routing metadata. When the
 - Pi package path and version from `PI_CODING_AGENT_PACKAGE` / `PI_CODING_AGENT_VERSION`
 - Sandpiper package path from `SANDPIPER_CODING_AGENT_PACKAGE`
 - user profile content from `USER.md` in the agent directory resolved by Pi's `getAgentDir()`, when present
-- session-start VCS detection (`jj`, `git`, `hg`, `svn`, `fossil`, `perforce`, or `none`)
+- session-start VCS detection (`jj`, `git`, or `none`)
 
 Volatile one-shot startup context is not rendered into the system prompt. Moving volatile task, Journal, and working-copy state out of the system prompt preserves provider cache stability and keeps system guidance from changing mid-session.
 

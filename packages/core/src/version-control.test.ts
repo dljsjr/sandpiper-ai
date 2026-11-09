@@ -34,42 +34,24 @@ describe('detectVersionControl', () => {
     });
   });
 
-  it.each([
-    ['.hg', 'hg'],
-    ['.svn', 'svn'],
-    ['.fslckout', 'fossil'],
-    ['_FOSSIL_', 'fossil'],
-  ] as const)('detects %s workspaces', (marker, system) => {
-    const fileExists = vi.fn((path: string) => path === `/repo/${marker}`);
-
-    expect(detectVersionControl('/repo/subdir', { fileExists })).toEqual({
-      system,
-      detection: 'session_start',
-    });
-  });
-
-  it('detects perforce workspaces with p4 info', () => {
-    const fileExists = vi.fn(() => false);
-    const runCommand = vi.fn(() => 'Client root: /repo');
-
-    expect(detectVersionControl('/repo/subdir', { fileExists, runCommand })).toEqual({
-      system: 'perforce',
-      detection: 'session_start',
-    });
-    expect(runCommand).toHaveBeenCalledWith('p4', ['info'], '/repo/subdir');
-  });
-
   it('reports none when no VCS marker exists', () => {
-    expect(
-      detectVersionControl('/repo', {
-        fileExists: vi.fn(() => false),
-        runCommand: vi.fn(() => {
-          throw new Error('no perforce workspace');
-        }),
-      }),
-    ).toEqual({
+    const runCommand = vi.fn(() => '');
+
+    expect(detectVersionControl('/repo', { fileExists: vi.fn(() => false), runCommand })).toEqual({
       system: 'none',
       detection: 'session_start',
     });
+    expect(runCommand).not.toHaveBeenCalled();
+  });
+
+  it.each(['.hg', '.svn', '.fslckout', '_FOSSIL_'])('does not detect %s workspaces', (marker) => {
+    const fileExists = vi.fn((path: string) => path === `/repo/${marker}`);
+    const runCommand = vi.fn(() => '');
+
+    expect(detectVersionControl('/repo/subdir', { fileExists, runCommand })).toEqual({
+      system: 'none',
+      detection: 'session_start',
+    });
+    expect(runCommand).not.toHaveBeenCalled();
   });
 });

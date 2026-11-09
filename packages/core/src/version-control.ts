@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
-export type VersionControlSystem = 'jj' | 'git' | 'hg' | 'svn' | 'fossil' | 'perforce' | 'none' | 'unknown';
+export type VersionControlSystem = 'jj' | 'git' | 'none' | 'unknown';
 
 export interface SandpiperVersionControlContext {
   readonly system: VersionControlSystem;
@@ -48,18 +48,6 @@ function detectJjColocation(
   return undefined;
 }
 
-function isPerforceWorkspace(
-  cwd: string,
-  runCommand: (command: string, args: readonly string[], cwd: string) => string,
-) {
-  try {
-    runCommand('p4', ['info'], cwd);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export function detectVersionControl(
   cwd: string,
   dependencies: VersionControlDetectionDependencies = {},
@@ -78,25 +66,6 @@ export function detectVersionControl(
 
   if (findAncestorContaining(cwd, '.git', syncFileExists)) {
     return { system: 'git', detection: 'session_start' };
-  }
-
-  if (findAncestorContaining(cwd, '.hg', syncFileExists)) {
-    return { system: 'hg', detection: 'session_start' };
-  }
-
-  if (findAncestorContaining(cwd, '.svn', syncFileExists)) {
-    return { system: 'svn', detection: 'session_start' };
-  }
-
-  if (
-    findAncestorContaining(cwd, '.fslckout', syncFileExists) ||
-    findAncestorContaining(cwd, '_FOSSIL_', syncFileExists)
-  ) {
-    return { system: 'fossil', detection: 'session_start' };
-  }
-
-  if (isPerforceWorkspace(cwd, runCommand)) {
-    return { system: 'perforce', detection: 'session_start' };
   }
 
   return { system: 'none', detection: 'session_start' };
