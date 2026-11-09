@@ -9,6 +9,7 @@
 // documented fallback path for "a non-catalogued skill from a filesystem path."
 
 import { dirname, join } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { encodeMockScript, MOCK_SCRIPT_ENV_VAR } from './mock-provider.js';
@@ -54,6 +55,16 @@ describe('wave 1: workspace skill tool (AGENT-253)', () => {
         const textBlock = result.content.find((block) => block.type === 'text');
         expect(textBlock?.text).toContain('name="rpc-skill-fixture"');
         expect(textBlock?.text).toContain('Filesystem fixture marker: wave1-skill');
+
+        // The process runs under Bun, so this proves the activation counter writes through node:sqlite there.
+        const metrics = new DatabaseSync(join(session.agentDir, 'skill_metrics.sqlite3'), { readOnly: true });
+        try {
+          expect(metrics.prepare('SELECT skill_name, source, count FROM skill_activation_counts').all()).toEqual([
+            { skill_name: 'rpc-skill-fixture', source: 'filesystem', count: 1 },
+          ]);
+        } finally {
+          metrics.close();
+        }
 
         await session.waitForEvent((event) => event.type === 'agent_settled', SMOKE_TIMEOUT_MS);
       } finally {

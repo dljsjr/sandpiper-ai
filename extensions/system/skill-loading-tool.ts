@@ -2,6 +2,7 @@ import type { Dirent } from 'node:fs';
 import { mkdirSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { Type } from '@earendil-works/pi-ai';
 import type {
   AgentToolResult,
@@ -12,7 +13,6 @@ import type {
 } from '@earendil-works/pi-coding-agent';
 import { getAgentDir, keyHint, parseFrontmatter } from '@earendil-works/pi-coding-agent';
 import { Text } from '@earendil-works/pi-tui';
-import Database from 'better-sqlite3';
 
 const SKILL_COMMAND_PREFIX = 'skill:';
 const SKILL_FILE_NAME = 'SKILL.md';
@@ -116,7 +116,7 @@ export function recordSkillActivationCount(
 ): void {
   mkdirSync(dirname(dbPath), { recursive: true });
 
-  const database = new Database(dbPath);
+  const database = new DatabaseSync(dbPath);
   try {
     database.exec(`
       CREATE TABLE IF NOT EXISTS skill_activation_counts (

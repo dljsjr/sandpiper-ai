@@ -43,6 +43,8 @@ export interface StartRpcSessionOptions extends Omit<IsolatedSpawnOptions, 'args
 }
 
 export interface RpcSession {
+  /** The isolated agent directory this session runs with. Removed by `close`. */
+  readonly agentDir: string;
   /** Send a command and resolve with its correlated response. Auto-assigns an `id` if the
    * command doesn't supply one. */
   readonly sendCommand: (command: RpcCommand) => Promise<RpcResponse>;
@@ -285,6 +287,7 @@ export function startRpcSession(options: StartRpcSessionOptions): RpcSession {
   };
 
   return {
+    agentDir: spawnPlan.agentDir,
     sendCommand,
     events,
     waitForEvent,

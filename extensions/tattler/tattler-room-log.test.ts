@@ -1,6 +1,7 @@
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import {
   advanceCursor,
@@ -26,7 +27,9 @@ describe('tattler room log', () => {
 
   test('opens database and runs migrations', () => {
     const db = openRoomLog(dataDir);
-    const tables = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").pluck().all() as string[];
+    const tables = (db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as { name: string }[]).map(
+      (row) => row.name,
+    );
 
     expect(tables).toContain('messages');
     expect(tables).toContain('cursors');
@@ -146,5 +149,75 @@ describe('tattler room log', () => {
 
     expect(snapshotRoomMessages(db, 'room-a')).toHaveLength(1);
     expect(snapshotRoomMessages(db, 'room-b')).toHaveLength(1);
+  });
+
+  describe('migration atomicity', () => {
+    function withDatabase<T>(use: (database: DatabaseSync) => T): T {
+      const database = new DatabaseSync(join(dataDir, 'tattler-rooms.db'));
+      try {
+        return use(database);
+      } finally {
+        database.close();
+      }
+    }
+
+    function seedMigrationsTable(extraSql: string): void {
+      withDatabase((database) => {
+        database.exec(`
+          CREATE TABLE _migrations (
+            version INTEGER PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL,
+            applied_at INTEGER NOT NULL
+          );
+          ${extraSql}
+        `);
+      });
+    }
+
+    function listNames(type: 'table' | 'index'): string[] {
+      return withDatabase((database) =>
+        (
+          database.prepare('SELECT name FROM sqlite_master WHERE type = ? ORDER BY name').all(type) as {
+            name: string;
+          }[]
+        )
+          .map((row) => row.name)
+          .filter((name) => !name.startsWith('sqlite_')),
+      );
+    }
+
+    function appliedVersions(): number[] {
+      return withDatabase((database) =>
+        (database.prepare('SELECT version FROM _migrations ORDER BY version').all() as { version: number }[]).map(
+          (row) => row.version,
+        ),
+      );
+    }
+
+    test('leaves nothing from a migration whose version record cannot be written', () => {
+      seedMigrationsTable(`
+        CREATE TRIGGER reject_version_two BEFORE INSERT ON _migrations WHEN NEW.version = 2
+        BEGIN SELECT RAISE(ABORT, 'version two rejected'); END;
+      `);
+
+      expect(() => openRoomLog(dataDir)).toThrow('version two rejected');
+      closeRoomLog();
+
+      expect(appliedVersions()).toEqual([1]);
+      expect(listNames('table')).toContain('messages');
+      expect(listNames('table')).not.toContain('cursors');
+      expect(listNames('index')).not.toContain('idx_cursors_room');
+    });
+
+    test('leaves nothing from a migration whose SQL fails after earlier statements ran', () => {
+      seedMigrationsTable('CREATE TABLE idx_messages_room_id (blocker INTEGER);');
+
+      expect(() => openRoomLog(dataDir)).toThrow('idx_messages_room_id');
+      closeRoomLog();
+
+      expect(appliedVersions()).toEqual([]);
+      expect(listNames('table')).not.toContain('messages');
+      expect(listNames('index')).not.toContain('idx_messages_room_seq');
+    });
   });
 });

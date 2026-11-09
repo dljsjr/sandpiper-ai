@@ -1,10 +1,10 @@
 import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 import type { AgentToolResult, ExtensionAPI, SlashCommandInfo, ToolDefinition } from '@earendil-works/pi-coding-agent';
 import { initTheme } from '@earendil-works/pi-coding-agent';
 import { KeybindingsManager, setKeybindings } from '@earendil-works/pi-tui';
-import Database from 'better-sqlite3';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   executeSkillTool,
@@ -389,7 +389,7 @@ describe('registerSkillLoadingTool', () => {
       recordSkillActivationCount({ name: 'jj', source: 'catalog' }, dbPath);
       recordSkillActivationCount({ name: 'tui', source: 'filesystem' }, dbPath);
 
-      const database = new Database(dbPath, { readonly: true });
+      const database = new DatabaseSync(dbPath, { readOnly: true });
       try {
         expect(
           database

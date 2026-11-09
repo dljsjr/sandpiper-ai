@@ -48,7 +48,6 @@ describe('root Sandpiper product', () => {
       '@earendil-works/pi-coding-agent': '1.3.0',
       '@earendil-works/pi-mcp': '1.3.0',
       '@earendil-works/pi-tui': '1.3.0',
-      'better-sqlite3': '13.0.3',
       jsdom: '30.0.1',
     });
     expect([...product.bundledDependencies].sort()).toEqual(Object.keys(product.dependencies).sort());
