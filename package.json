@@ -31,8 +31,6 @@
     "bin": "sandpiper"
   },
   "scripts": {
-    "check:biome-fmt": "biome format",
-    "check:biome-lint": "biome lint",
     "check:biome-check": "biome check",
     "check:tsc": "tsc --noEmit",
     "check:ast-grep": "ast-grep scan",
@@ -45,7 +43,6 @@
     "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",
     "sandpiper-built": "bun ./packages/cli/bin/sandpiper",
     "system-prompt-dev": "bun run --bun ./packages/cli/sandpiper_system_prompt.ts",
-    "system-prompt-built": "bun ./packages/cli/bin/sandpiper-system-prompt",
     "check:knip": "knip",
     "check:knip:production": "knip --production",
     "check:deps": "syncpack lint"
