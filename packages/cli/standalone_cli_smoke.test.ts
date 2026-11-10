@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { findPackageRoot } from './standalone_bootstrap.js';
@@ -160,12 +160,6 @@ export default function runtimeImportProbe(pi) {
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
-  });
-
-  it('uses the workspace entrypoint instead of a sandpiper executable from PATH', () => {
-    const entrypointPath = resolve(repoRoot, 'packages', 'cli', 'sandpiper_standalone.ts');
-
-    expect(entrypointPath).toContain('/packages/cli/sandpiper_standalone.ts');
   });
 
   it('configures Pi package metadata before importing Pi', () => {

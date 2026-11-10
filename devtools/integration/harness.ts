@@ -36,10 +36,6 @@ export interface IsolatedSpawnOptions {
    * mock-provider extension (always loaded, regardless of entry mode or provider/model
    * pinning). */
   readonly extraExtensions?: readonly string[];
-  /** For entry:'pi', disable discovery of everything except explicit `-e` paths (true
-   * per-extension isolation). Defaults to true for entry:'pi'; has no effect for
-   * entry:'sandpiper' (Sandpiper's own manifest always loads there by design). */
-  readonly isolateExtensions?: boolean;
   /** Provider/model to pin via `--provider`/`--model`. Defaults to the harness's mock
    * provider -- isolation-by-construction means every spawn is pinned to *something*
    * explicit by default, never left to resolve on its own. */
@@ -144,7 +140,6 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     writeFileSync(join(agentDir, 'settings.json'), JSON.stringify(options.settingsJson));
   }
 
-  const isolateExtensions = options.isolateExtensions ?? options.entry === 'pi';
   const flags: string[] = [
     // Suppresses startup network operations (model-catalog refresh and similar) so isolated
     // runs don't make incidental network calls -- verified empirically: without this flag, a
@@ -156,7 +151,7 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     // reaching a real network endpoint just to start up.
     '--offline',
   ];
-  if (options.entry === 'pi' && isolateExtensions) {
+  if (options.entry === 'pi') {
     flags.push('--no-extensions', '--no-skills', '--no-prompt-templates', '--no-themes', '--no-context-files');
   }
   const harnessExtensions = options.skipMockProvider ? [] : [MOCK_PROVIDER_PATH];
