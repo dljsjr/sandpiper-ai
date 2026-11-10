@@ -1,14 +1,13 @@
+import { isRecord } from './utils.js';
+
 export enum SystemNotificationSourceType {
   Tool = 'tool',
-  Extension = 'extension',
   Harness = 'harness',
-  Adapter = 'adapter',
   PeerMessage = 'peer',
 }
 
 export enum SystemNotificationDelivery {
   Steer = 'steer',
-  FollowUp = 'followUp',
   NextTurn = 'nextTurn',
 }
 
@@ -19,14 +18,17 @@ export interface SystemNotificationAttributes {
   readonly triggerTurn?: boolean;
 }
 
+type NotificationPrimitive = string | number | boolean | null | undefined;
+type NotificationDataValue = NotificationPrimitive | Record<string, NotificationPrimitive>;
+
 export interface SystemNotificationInstructions {
   readonly instructions: string;
-  readonly data?: Record<string, unknown>;
+  readonly data?: Record<string, NotificationDataValue>;
 }
 
 export interface SystemNotificationData {
   readonly instructions?: string;
-  readonly data: Record<string, unknown>;
+  readonly data: Record<string, NotificationDataValue>;
 }
 
 export type SystemNotificationWithInstructions = SystemNotificationAttributes & SystemNotificationInstructions;
@@ -50,7 +52,7 @@ export interface SystemNotificationMessage {
   readonly details: SystemNotificationDetails;
 }
 
-type SystemNotificationDeliveryWireValue = 'steer' | 'followUp' | 'nextTurn';
+type SystemNotificationDeliveryWireValue = 'steer' | 'nextTurn';
 
 export interface SystemNotificationSender {
   sendMessage(
@@ -63,8 +65,6 @@ function deliveryWireValue(delivery: SystemNotificationDelivery): SystemNotifica
   switch (delivery) {
     case SystemNotificationDelivery.Steer:
       return 'steer';
-    case SystemNotificationDelivery.FollowUp:
-      return 'followUp';
     case SystemNotificationDelivery.NextTurn:
       return 'nextTurn';
   }
@@ -81,10 +81,6 @@ function escapeXml(value: string): string {
 
 function isPrimitive(value: unknown): value is string | number | boolean | null {
   return value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function primitiveToString(value: string | number | boolean | null): string {
@@ -117,37 +113,29 @@ function isPrimitiveAttributeRecord(
   return Object.entries(value).every(([key, entry]) => isXmlName(key) && isPrimitive(entry));
 }
 
-function formatDataEntry(key: string, value: unknown, level: number): string {
+function formatPrimitiveDataEntry(key: string, value: NotificationPrimitive, level: number): string {
+  const { tagName, nameAttribute } = formatTagName(key);
+  const attributeValue = value === undefined ? 'undefined' : value;
+  return `${indent(level)}<${tagName}${nameAttribute}${formatPrimitiveAttribute('value', attributeValue)}/>`;
+}
+
+function formatDataEntry(key: string, value: NotificationDataValue, level: number): string {
+  if (!isRecord(value)) return formatPrimitiveDataEntry(key, value, level);
+
   const { tagName, nameAttribute } = formatTagName(key);
   const prefix = indent(level);
+  const entries = Object.entries(value);
+  if (entries.length === 0) return `${prefix}<${tagName}${nameAttribute}/>`;
 
-  if (isPrimitive(value)) {
-    return `${prefix}<${tagName}${nameAttribute}${formatPrimitiveAttribute('value', value)}/>`;
+  if (isPrimitiveAttributeRecord(value)) {
+    const attributes = entries
+      .map(([name, entry]) => formatPrimitiveAttribute(name, entry as string | number | boolean | null))
+      .join('');
+    return `${prefix}<${tagName}${nameAttribute}${attributes}/>`;
   }
 
-  if (Array.isArray(value)) {
-    if (value.length === 0) return `${prefix}<${tagName}${nameAttribute}/>`;
-
-    const items = value.map((item) => formatDataEntry('item', item, level + 1));
-    return [`${prefix}<${tagName}${nameAttribute}>`, ...items, `${prefix}</${tagName}>`].join('\n');
-  }
-
-  if (isRecord(value)) {
-    const entries = Object.entries(value);
-    if (entries.length === 0) return `${prefix}<${tagName}${nameAttribute}/>`;
-
-    if (isPrimitiveAttributeRecord(value)) {
-      const attributes = entries
-        .map(([name, entry]) => formatPrimitiveAttribute(name, entry as string | number | boolean | null))
-        .join('');
-      return `${prefix}<${tagName}${nameAttribute}${attributes}/>`;
-    }
-
-    const children = entries.map(([childKey, childValue]) => formatDataEntry(childKey, childValue, level + 1));
-    return [`${prefix}<${tagName}${nameAttribute}>`, ...children, `${prefix}</${tagName}>`].join('\n');
-  }
-
-  return `${prefix}<${tagName}${nameAttribute}${formatPrimitiveAttribute('value', String(value))}/>`;
+  const children = entries.map(([childKey, childValue]) => formatPrimitiveDataEntry(childKey, childValue, level + 1));
+  return [`${prefix}<${tagName}${nameAttribute}>`, ...children, `${prefix}</${tagName}>`].join('\n');
 }
 
 function notificationInstructions(notification: SandpiperSystemNotification): string | undefined {
@@ -156,7 +144,9 @@ function notificationInstructions(notification: SandpiperSystemNotification): st
   return instructions.length > 0 ? instructions : undefined;
 }
 
-function notificationData(notification: SandpiperSystemNotification): Record<string, unknown> | undefined {
+function notificationData(
+  notification: SandpiperSystemNotification,
+): Record<string, NotificationDataValue> | undefined {
   if (notification.data === undefined) return;
   return Object.keys(notification.data).length > 0 ? notification.data : undefined;
 }

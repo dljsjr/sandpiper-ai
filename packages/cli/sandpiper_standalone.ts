@@ -5,7 +5,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   configurePiEnvironment,
-  defaultStandaloneMainArgs,
   mirrorPiSandpiperEnvironment,
   resolveStandalonePaths,
 } from './standalone_bootstrap.js';
@@ -59,6 +58,6 @@ const { loadPiMain } = await import('./deferred_pi_import.js');
 const { createSandpiperExtensionFactories } = await import('./sandpiper_resources.js');
 const main = await loadPiMain();
 
-await main(defaultStandaloneMainArgs(process.argv.slice(2), process.env), {
+await main(process.argv.slice(2), {
   extensionFactories: createSandpiperExtensionFactories(),
 });

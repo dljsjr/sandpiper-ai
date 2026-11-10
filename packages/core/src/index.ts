@@ -7,7 +7,6 @@ export * from './startup-prompt.js';
 export * from './system-diagnostics.js';
 export * from './system-notification.js';
 export * from './system-prompt.js';
-export * from './system-startup.js';
 export * from './user-profile.js';
 export * from './utils.js';
 export * from './version-control.js';

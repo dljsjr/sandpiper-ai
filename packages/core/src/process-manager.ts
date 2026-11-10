@@ -4,7 +4,7 @@
  * Manages long-lived child processes with lifecycle control, output buffering,
  * and exit tracking. Framework-independent — no pi/sandpiper imports.
  *
- * Consumers register callbacks for stdout/stderr/exit events and can read
+ * Consumers register callbacks for exit events and can read
  * buffered output on demand.
  */
 
@@ -21,8 +21,6 @@ export interface SpawnOptions {
   readonly args?: readonly string[];
   /** Working directory. */
   readonly cwd?: string;
-  /** Additional environment variables (merged with process.env). */
-  readonly env?: Readonly<Record<string, string>>;
 }
 
 export interface ReadOutputOptions {
@@ -42,7 +40,6 @@ export interface ProcessInfo {
 
 // ─── ManagedProcess ─────────────────────────────────────────────
 
-type DataHandler = (data: Buffer) => void;
 type ExitHandler = (code: number | null, signal: string | null) => void;
 
 export class ManagedProcess {
@@ -55,8 +52,6 @@ export class ManagedProcess {
   private stdoutBuffer: string[] = [];
   private stderrBuffer: string[] = [];
 
-  private stdoutHandlers: DataHandler[] = [];
-  private stderrHandlers: DataHandler[] = [];
   private exitHandlers: ExitHandler[] = [];
 
   constructor(id: string) {
@@ -87,16 +82,6 @@ export class ManagedProcess {
       exitCode: this._exitCode,
       exitSignal: this._exitSignal,
     };
-  }
-
-  /** Register a stdout data handler. */
-  onStdout(handler: DataHandler): void {
-    this.stdoutHandlers.push(handler);
-  }
-
-  /** Register a stderr data handler. */
-  onStderr(handler: DataHandler): void {
-    this.stderrHandlers.push(handler);
   }
 
   /** Register an exit handler. */
@@ -131,13 +116,6 @@ export class ManagedProcess {
     }
   }
 
-  /** Write to the process's stdin. */
-  write(data: string): void {
-    if (this.process?.stdin && this._running) {
-      this.process.stdin.write(data);
-    }
-  }
-
   /**
    * Start the process. Called by ProcessManager — not intended for direct use.
    * @internal
@@ -148,7 +126,7 @@ export class ManagedProcess {
     const args = [...(options.args ?? [])];
     const spawnOpts: SpawnOptionsWithoutStdio = {
       cwd: options.cwd,
-      env: options.env ? { ...process.env, ...options.env } : process.env,
+      env: process.env,
       stdio: ['pipe', 'pipe', 'pipe'],
     };
     const proc = nodeSpawn(options.command, args, spawnOpts);
@@ -158,12 +136,10 @@ export class ManagedProcess {
 
     proc.stdout?.on('data', (data: Buffer) => {
       this.appendToBuffer(this.stdoutBuffer, data);
-      for (const handler of this.stdoutHandlers) handler(data);
     });
 
     proc.stderr?.on('data', (data: Buffer) => {
       this.appendToBuffer(this.stderrBuffer, data);
-      for (const handler of this.stderrHandlers) handler(data);
     });
 
     proc.on('close', (code, signal) => {
@@ -213,7 +189,7 @@ export class ProcessManager {
    * Spawn a new managed process. Throws if a process with this ID is still running.
    * If a prior process with this ID has already exited, its entry is replaced —
    * exit (however it happened, including an external kill) always frees the ID
-   * for reuse without requiring an explicit `remove()` call.
+   * for reuse.
    */
   spawn(options: SpawnOptions): ManagedProcess {
     if (this.processes.get(options.id)?.running) {
@@ -231,25 +207,10 @@ export class ProcessManager {
     return this.processes.get(id);
   }
 
-  /** Kill a process by ID. */
-  kill(id: string, signal?: NodeJS.Signals): void {
-    this.processes.get(id)?.kill(signal);
-  }
-
   /** Kill all managed processes. */
   killAll(signal?: NodeJS.Signals): void {
     for (const proc of this.processes.values()) {
       proc.kill(signal);
     }
-  }
-
-  /** Remove a process from tracking (after it has exited). */
-  remove(id: string): void {
-    this.processes.delete(id);
-  }
-
-  /** List all managed processes. */
-  list(): readonly ProcessInfo[] {
-    return [...this.processes.values()].map((p) => p.info);
   }
 }

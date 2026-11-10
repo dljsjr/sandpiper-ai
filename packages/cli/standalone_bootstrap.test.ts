@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   configurePiEnvironment,
-  defaultStandaloneMainArgs,
   findPackageRoot,
   mirrorPiSandpiperEnvironment,
   resolveStandalonePaths,
@@ -104,16 +103,6 @@ describe('standalone bootstrap', () => {
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }
-  });
-
-  it('preserves Pi CLI arguments', () => {
-    expect(defaultStandaloneMainArgs(['--help'], {})).toEqual(['--help']);
-    expect(defaultStandaloneMainArgs(['--help', '--skill', '/tmp/skill'], {})).toEqual([
-      '--help',
-      '--skill',
-      '/tmp/skill',
-    ]);
-    expect(defaultStandaloneMainArgs(['install', 'npm:@example/pkg'], {})).toEqual(['install', 'npm:@example/pkg']);
   });
 
   it('sets Pi environment before importing Pi', () => {

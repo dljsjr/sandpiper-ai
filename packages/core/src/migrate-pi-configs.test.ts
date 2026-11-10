@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { getNewSandpiperAgentDir, getOldPiAgentDir } from './migrate-pi-configs.js';
+import { getNewSandpiperAgentDir } from './migrate-pi-configs.js';
 
 describe('migrate-pi-configs path resolution', () => {
   const savedEnv: Record<string, string | undefined> = {};
-  const envKeys = ['SANDPIPER_CODING_AGENT_DIR', 'PI_CODING_AGENT_DIR', '__PI_CODING_AGENT_DIR_ORIGINAL'] as const;
+  const envKeys = ['SANDPIPER_CODING_AGENT_DIR', 'PI_CODING_AGENT_DIR'] as const;
 
   beforeEach(() => {
     for (const key of envKeys) {
@@ -41,12 +41,5 @@ describe('migrate-pi-configs path resolution', () => {
 
     expect(getNewSandpiperAgentDir()).toMatch(/\/custom-agent$/);
     expect(getNewSandpiperAgentDir()).not.toContain('~');
-  });
-
-  it('expands tilde in the original pi agent dir override', () => {
-    process.env.__PI_CODING_AGENT_DIR_ORIGINAL = '~/legacy-pi-agent';
-
-    expect(getOldPiAgentDir()).toMatch(/\/legacy-pi-agent$/);
-    expect(getOldPiAgentDir()).not.toContain('~');
   });
 });

@@ -38,14 +38,8 @@ function resolveConfiguredPath(path: string): string {
 
 /**
  * Get the old pi agent directory (before sandpiper override).
- * Respects user's PI_CODING_AGENT_DIR if they set it (captured as __PI_CODING_AGENT_DIR_ORIGINAL
- * by the Sandpiper runtime before remapping SANDPIPER_* → PI_*).
  */
 export function getOldPiAgentDir(): string {
-  const original = process.env.__PI_CODING_AGENT_DIR_ORIGINAL;
-  if (original) {
-    return resolveConfiguredPath(original);
-  }
   return join(homedir(), '.pi', 'agent');
 }
 

@@ -31,9 +31,8 @@ PRD is explicitly rejected as an architecture input for this work.
   - Sandpiper currently has a lightweight system notification helper built on Pi
     custom messages.
   - Notification content is wrapped in `<sandpiper_system_notification ...>`.
-  - Source types are currently `tool`, `extension`, `harness`, and `adapter`.
-  - Delivery modes map to Pi message delivery: `steer`, `followUp`, and
-    `nextTurn`.
+  - Source types are currently `tool`, `harness`, and `peer`.
+  - Delivery modes map to Pi message delivery: `steer` and `nextTurn`.
 - `packages/core/src/system-prompt.ts`
   - The Sandpiper system prompt explicitly describes the system notification
     XML envelope and tells the model to treat notification instructions as
@@ -866,9 +865,8 @@ The same mechanism will apply to broadcast delivery once Broadcast MVP exists.
 
 - Pi `sendMessage()` supports `triggerTurn: true`, so recipient wake-up is
   technically possible and does not require a custom notification dispatcher.
-- Existing Sandpiper system notification delivery modes include steering and
-  follow-up behavior; for v1 coordination, default to `steer` and
-  `triggerTurn: true` because steering and turn triggering are orthogonal in Pi.
+- Sandpiper system notifications support steering. For v1 coordination, use
+  `steer` and `triggerTurn: true` because steering and turn triggering are orthogonal in Pi.
   `triggerTurn` only matters when the recipient is idle and is ignored while the
   agent is already busy.
 - Current Shell Relay and background-process designs show a preference for

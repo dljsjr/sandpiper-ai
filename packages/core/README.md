@@ -13,7 +13,6 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | `startup-context.ts`               | Collect compact startup prompt context (projects, active tasks, working-copy summary)   |
 | `startup-prompt.ts`                | Assemble Sandpiper startup prompt context for the Pi adapter                            |
 | `system-diagnostics.ts`            | Package-owned diagnostics startup planning                                              |
-| `system-startup.ts`                | Build host-neutral Sandpiper startup prompt sections and cold-start heuristics          |
 
 ## Build
 

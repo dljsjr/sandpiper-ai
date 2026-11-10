@@ -9,6 +9,50 @@ import {
 } from './system-notification.js';
 
 describe('system notifications', () => {
+  it('preserves the background process, peer inbox, and context data shapes', () => {
+    expect(
+      formatSystemNotification({
+        sourceType: SystemNotificationSourceType.Tool,
+        sourceId: 'background_process',
+        instructions: 'Process completed.',
+        data: { process: { id: 'build', exitCode: 0, exitSignal: null } },
+      }),
+    ).toBe(
+      '<sandpiper_system_notification source_type="tool" source_id="background_process">\n' +
+        '  <instructions>Process completed.</instructions>\n' +
+        '  <process id="build" exitCode="0" exitSignal="null"/>\n' +
+        '</sandpiper_system_notification>',
+    );
+    expect(
+      formatSystemNotification({
+        sourceType: SystemNotificationSourceType.PeerMessage,
+        sourceId: 'tattler-pending-inbox',
+        instructions: 'Pending messages arrived.',
+        data: { pendingMessageCount: 2 },
+      }),
+    ).toBe(
+      '<sandpiper_system_notification source_type="peer" source_id="tattler-pending-inbox">\n' +
+        '  <instructions>Pending messages arrived.</instructions>\n' +
+        '  <pendingMessageCount value="2"/>\n' +
+        '</sandpiper_system_notification>',
+    );
+    expect(
+      formatSystemNotification({
+        sourceType: SystemNotificationSourceType.Harness,
+        sourceId: 'system',
+        data: { contextUsage: { contextWindow: 1000, percentUsed: 50, tokensUsed: undefined } },
+      }),
+    ).toBe(
+      '<sandpiper_system_notification source_type="harness" source_id="system">\n' +
+        '  <contextUsage>\n' +
+        '    <contextWindow value="1000"/>\n' +
+        '    <percentUsed value="50"/>\n' +
+        '    <tokensUsed value="undefined"/>\n' +
+        '  </contextUsage>\n' +
+        '</sandpiper_system_notification>',
+    );
+  });
+
   it('formats instructions and compact object data as XML', () => {
     const xml = formatSystemNotification({
       sourceType: SystemNotificationSourceType.Tool,
@@ -55,7 +99,7 @@ describe('system notifications', () => {
   it('escapes XML in attributes and instruction text', () => {
     expect(
       formatSystemNotification({
-        sourceType: SystemNotificationSourceType.Extension,
+        sourceType: SystemNotificationSourceType.Tool,
         sourceId: 'demo',
         instructions: 'Use <this> & "that".',
         data: {
@@ -68,19 +112,26 @@ describe('system notifications', () => {
   it('falls back to field tags for non-XML data keys', () => {
     expect(
       formatSystemNotification({
-        sourceType: SystemNotificationSourceType.Extension,
+        sourceType: SystemNotificationSourceType.Tool,
         sourceId: 'demo',
         data: {
           'not xml': 'value',
         },
       }),
     ).toContain('<field name="not xml" value="value"/>');
+    expect(
+      formatSystemNotification({
+        sourceType: SystemNotificationSourceType.Tool,
+        sourceId: 'demo',
+        data: { parent: { 'not xml': 'value' } },
+      }),
+    ).toContain('  <parent>\n    <field name="not xml" value="value"/>\n  </parent>');
   });
 
   it('rejects empty notifications', () => {
     expect(() =>
       formatSystemNotification({
-        sourceType: SystemNotificationSourceType.Extension,
+        sourceType: SystemNotificationSourceType.Tool,
         sourceId: 'demo',
         data: {},
       }),
@@ -127,10 +178,10 @@ describe('system notifications', () => {
       sourceType: SystemNotificationSourceType.Harness,
       sourceId: 'background_process',
       instructions: 'Process completed.',
-      deliverAs: SystemNotificationDelivery.FollowUp,
+      deliverAs: SystemNotificationDelivery.NextTurn,
     });
 
-    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'followUp' });
+    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'nextTurn' });
   });
 
   it('sends message without triggerTurn by default', () => {
@@ -140,11 +191,11 @@ describe('system notifications', () => {
       sourceType: SystemNotificationSourceType.Harness,
       sourceId: 'background_process',
       instructions: 'Process completed.',
-      deliverAs: SystemNotificationDelivery.FollowUp,
+      deliverAs: SystemNotificationDelivery.NextTurn,
     });
 
     expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), {
-      deliverAs: 'followUp',
+      deliverAs: 'nextTurn',
     });
   });
 
@@ -155,11 +206,11 @@ describe('system notifications', () => {
       sourceType: SystemNotificationSourceType.Harness,
       sourceId: 'background_process',
       instructions: 'Process completed.',
-      deliverAs: SystemNotificationDelivery.FollowUp,
+      deliverAs: SystemNotificationDelivery.NextTurn,
       triggerTurn: true,
     });
 
-    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'followUp', triggerTurn: true });
+    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'nextTurn', triggerTurn: true });
   });
 
   it('supports explicit requests to suppress waking the agent with triggerTurn', () => {
@@ -169,10 +220,10 @@ describe('system notifications', () => {
       sourceType: SystemNotificationSourceType.Harness,
       sourceId: 'background_process',
       instructions: 'Process completed.',
-      deliverAs: SystemNotificationDelivery.FollowUp,
+      deliverAs: SystemNotificationDelivery.NextTurn,
       triggerTurn: false,
     });
 
-    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'followUp', triggerTurn: false });
+    expect(sender.sendMessage).toHaveBeenCalledWith(expect.anything(), { deliverAs: 'nextTurn', triggerTurn: false });
   });
 });

@@ -54,13 +54,6 @@ describe('ProcessManager', () => {
       expect(() => pm.spawn({ id: 'test', command: 'echo' })).toThrow('is already running');
     });
 
-    it('should allow reuse of ID after process is removed', () => {
-      pm.spawn({ id: 'test', command: 'echo', args: ['hello'] });
-      pm.remove('test');
-      const reused = pm.spawn({ id: 'test', command: 'echo', args: ['world'] });
-      expect(reused.id).toBe('test');
-    });
-
     it('should allow reuse of ID after the previous process exited, without an explicit remove', async () => {
       const first = pm.spawn({ id: 'test', command: 'true' });
       await waitFor(() => expect(first.running).toBe(false), { timeout: 2000 });
@@ -82,7 +75,7 @@ describe('ProcessManager', () => {
     });
   });
 
-  // ─── get / list / kill ──────────────────────────────────────────
+  // ─── get ──────────────────────────────────────────────────────
 
   describe('get', () => {
     it('should return the process by ID', () => {
@@ -93,34 +86,6 @@ describe('ProcessManager', () => {
 
     it('should return undefined for unknown ID', () => {
       expect(pm.get('nonexistent')).toBeUndefined();
-    });
-  });
-
-  describe('list', () => {
-    it('should return all process infos', () => {
-      pm.spawn({ id: 'a', command: 'sleep', args: ['10'] });
-      pm.spawn({ id: 'b', command: 'sleep', args: ['10'] });
-      const infos = pm.list();
-      expect(infos).toHaveLength(2);
-      expect(infos.map((i) => i.id).sort()).toEqual(['a', 'b']);
-    });
-
-    it('should return empty array when no processes', () => {
-      expect(pm.list()).toHaveLength(0);
-    });
-  });
-
-  describe('kill', () => {
-    it('should kill a running process', async () => {
-      const proc = pm.spawn({ id: 'test', command: 'sleep', args: ['60'] });
-      expect(proc.running).toBe(true);
-      pm.kill('test');
-      // Wait for exit
-      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-    });
-
-    it('should be safe to kill an unknown ID', () => {
-      expect(() => pm.kill('nonexistent')).not.toThrow();
     });
   });
 
@@ -203,14 +168,6 @@ describe('ProcessManager', () => {
   // ─── callbacks ─────────────────────────────────────────────────
 
   describe('callbacks', () => {
-    it('should call onStdout handler', async () => {
-      const proc = pm.spawn({ id: 'test', command: 'echo', args: ['callback-test'] });
-      const chunks: string[] = [];
-      proc.onStdout((data) => chunks.push(data.toString()));
-      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      expect(chunks.join('')).toContain('callback-test');
-    });
-
     it('should call onExit handler', async () => {
       const proc = pm.spawn({ id: 'test', command: 'true' });
       const exits: Array<{ code: number | null; signal: string | null }> = [];

@@ -40,10 +40,6 @@ export function resolveStandalonePaths(options: ResolveStandalonePathsOptions): 
   return { packageDir };
 }
 
-export function defaultStandaloneMainArgs(args: readonly string[], _env: NodeJS.ProcessEnv): string[] {
-  return [...args];
-}
-
 export function configurePiEnvironment(options: PiEnvironmentOptions, env: NodeJS.ProcessEnv): void {
   env.PI_CODING_AGENT_PACKAGE = options.piPackageDir;
   env.PI_CODING_AGENT_VERSION = options.piVersion;

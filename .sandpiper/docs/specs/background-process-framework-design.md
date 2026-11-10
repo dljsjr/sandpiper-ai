@@ -13,33 +13,31 @@
 
 - `ProcessManager` class in `sandpiper-ai-core` (framework-independent)
 - `ManagedProcess` with lifecycle control, output buffering, event callbacks
-- `spawn()`, `get()`, `kill()`, `killAll()`, `list()` methods
-- `onStdout()`, `onStderr()`, `onExit()` callbacks for stream consumers
+- `spawn()`, `get()`, `killAll()` methods
+- `onExit()` callbacks
 - `readStdout()`, `readStderr()` with `tail` and `clear` options
 - `getCompletedUnacknowledged()` and `acknowledge()` for notification deduplication
 - `start_background_process` tool (agent-facing)
 - `check_background_process` tool with `include_stdout`, `include_stderr`, `tail_lines`, `clear_buffer` parameters
-- `write()` method for stdin input (implemented but not exposed via tool)
 
 ### ⚠️ Partial / Not Implemented
 
-| Feature                                              | Status             | Notes                                                                                        |
-| ---------------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------- |
-| Passive completion notifications via `context` event | ❌ Not implemented | Design specifies automatic injection when process exits. Not wired up.                       |
-| Buffer size limits                                   | ❌ Not implemented | Buffers are unbounded. No ring buffer or max size.                                           |
-| Process restart                                      | ❌ Not implemented | No auto-restart logic. Consumer responsibility.                                              |
-| Multiple consumers / broadcast                       | ⚠️ Partial         | Multiple handlers supported via `onStdout()`, but no broadcast mechanism for tool consumers. |
-| PTY support                                          | ❌ Not implemented | Uses standard `child_process.spawn()` with pipes. PTY discussed but punted.                  |
+| Feature                                              | Status             | Notes                                                                       |
+| ---------------------------------------------------- | ------------------ | --------------------------------------------------------------------------- |
+| Passive completion notifications via `context` event | ❌ Not implemented | Design specifies automatic injection when process exits. Not wired up.      |
+| Buffer size limits                                   | ❌ Not implemented | Buffers are unbounded. No ring buffer or max size.                          |
+| Process restart                                      | ❌ Not implemented | No auto-restart logic. Consumer responsibility.                             |
+| PTY support                                          | ❌ Not implemented | Uses standard `child_process.spawn()` with pipes. PTY discussed but punted. |
 
 ### 🔍 Needs Verification
 
-- Session teardown (`killAll()` on `session_shutdown`) — verify registration in `system.ts`
+- Session teardown (`killAll()` on `session_shutdown`) — verify registration in `background-process-tools.ts`
 - `context` event handler for completion notifications — may be implemented but not found in initial review
 
 ---
 
 AGENT-15. Framework-independent process manager in `sandpiper-ai-core`,
-exposed to the agent via tool calls registered in `system.ts`.
+exposed to the agent via tool calls registered in `background-process-tools.ts`.
 
 ## Problem
 
@@ -63,9 +61,6 @@ interface ManagedProcess {
   readonly exitCode: number | null;
   readonly exitSignal: string | null;
 
-  // Stream callbacks — consumers handle parsing
-  onStdout(handler: (data: Buffer) => void): void;
-  onStderr(handler: (data: Buffer) => void): void;
   onExit(handler: (code: number | null, signal: string | null) => void): void;
 
   // Buffered output (accumulated since last read)
@@ -74,7 +69,6 @@ interface ManagedProcess {
 
   // Lifecycle
   kill(signal?: string): void;
-  write(data: string): void;
 }
 
 interface SpawnOptions {
@@ -82,15 +76,12 @@ interface SpawnOptions {
   readonly command: string;
   readonly args?: readonly string[];
   readonly cwd?: string;
-  readonly env?: Record<string, string>;
 }
 
 interface ProcessManager {
   spawn(options: SpawnOptions): ManagedProcess;
   get(id: string): ManagedProcess | undefined;
-  kill(id: string): void;
   killAll(): void;
-  list(): readonly ManagedProcess[];
 
   // Completed processes that haven't been acknowledged
   getCompletedUnacknowledged(): readonly ManagedProcess[];
@@ -98,7 +89,7 @@ interface ProcessManager {
 }
 ```
 
-### Extension Glue: Tool Registration (system.ts)
+### Extension Glue: Tool Registration (background-process-tools.ts)
 
 Two tools registered for agent interaction:
 
@@ -250,5 +241,4 @@ and persist data. Assessed for relevance to the background process framework.
 1. **Buffer size limits** — stdout can accumulate fast. Ring buffer? Max size with oldest-dropped?
 2. **Process restart** — should the framework support auto-restart on exit? Or is that the consumer's job?
 3. **Multiple consumers** — if both an extension and a tool call want the same process's output, how do we handle that? Broadcast vs. single reader?
-4. **Stdin** — the `write` method on ManagedProcess allows writing to stdin. Is this needed for any current use case, or can we defer it?
-5. **`context` injection format** — should the notification be a user message, a system message, or something else? User message would trigger a response; system message would be informational.
+4. **`context` injection format** — should the notification be a user message, a system message, or something else? User message would trigger a response; system message would be informational.
