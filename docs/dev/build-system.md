@@ -65,9 +65,12 @@ The patch applies during workspace installation. The packed CLI includes the pat
 
 The patch is tied to an exact Pi version. Redo it after each Pi upgrade:
 
-1. Update the version pins. Run `bun patch @earendil-works/pi-coding-agent` and reapply the changes marked `Sandpiper local patch` in the old patch file.
-2. Run `bun patch --commit 'node_modules/@earendil-works/pi-coding-agent'`. Delete `.bun-tag-*` entries from the new patch file. Remove the old version's patch file if Bun leaves it under `patches/`.
-3. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts packages/cli/pi_asset_paths.test.ts`, then run the full checks.
+1. Update the version pins. Run `bun patch @earendil-works/pi-coding-agent`. Bun warns that the old patch no longer applies. That is expected.
+2. Reapply the changes marked `Sandpiper local patch` in `node_modules/@earendil-works/pi-coding-agent`. Edit the files, or run `patch -p1 --no-backup-if-mismatch` in that directory with the old patch file as input. Without that option, `patch` leaves a `.orig` backup beside each file whose hunks moved, and Bun records the backups in the new patch.
+3. Compare each reapplied block with the Pi code around it. A block that copies Pi's text does not follow a change in Pi.
+4. Run `find node_modules/@earendil-works/pi-coding-agent -name '*.orig' -o -name '*.rej'`. It must print nothing.
+5. Run `bun patch --commit 'node_modules/@earendil-works/pi-coding-agent'`. Run `grep '^diff' patches/*.patch`. It must list only the modules named above. Delete `.bun-tag-*` entries from the new patch file. Remove the old version's patch file and its `patchedDependencies` entry in the root `package.json` if Bun leaves them.
+6. Run `bun run test:vitest -- extensions/system/prompt-ownership.test.ts packages/cli/pi_asset_paths.test.ts`, then run the full checks.
 
 ## CLI tarball
 

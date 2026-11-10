@@ -44,10 +44,10 @@ describe('root Sandpiper product', () => {
   it('ships all pinned external runtime dependencies and keeps bundled source dependencies build-only', () => {
     const product = manifest();
     expect(product.dependencies).toEqual({
-      '@earendil-works/pi-ai': '1.3.0',
-      '@earendil-works/pi-coding-agent': '1.3.0',
-      '@earendil-works/pi-mcp': '1.3.0',
-      '@earendil-works/pi-tui': '1.3.0',
+      '@earendil-works/pi-ai': '1.5.2',
+      '@earendil-works/pi-coding-agent': '1.5.2',
+      '@earendil-works/pi-mcp': '1.5.2',
+      '@earendil-works/pi-tui': '1.5.2',
       jsdom: '30.0.1',
     });
     expect([...product.bundledDependencies].sort()).toEqual(Object.keys(product.dependencies).sort());
@@ -55,7 +55,7 @@ describe('root Sandpiper product', () => {
       readonly dependencies: Readonly<Record<string, string>>;
     };
     expect(webSearch.dependencies).toEqual({
-      '@earendil-works/pi-mcp': '1.3.0',
+      '@earendil-works/pi-mcp': '1.5.2',
       jsdom: '30.0.1',
     });
     expect(product.devDependencies).not.toHaveProperty('mcporter');

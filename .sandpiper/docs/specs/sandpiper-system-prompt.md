@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/skill-loading-tool.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.3.0.patch`
+- **Implementation**: `packages/core/src/system-prompt.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/skill-loading-tool.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
 - **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (decisions and invariants), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md)
 - **Supersedes**: archived April 2026 parsing-plan notes
 

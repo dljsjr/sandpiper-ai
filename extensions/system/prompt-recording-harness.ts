@@ -10,7 +10,6 @@ import {
   type Message,
   type Model,
   type TranscriptContext,
-  Type,
 } from '@earendil-works/pi-ai';
 import {
   type AgentSession,
@@ -21,6 +20,7 @@ import {
   SessionManager,
   SettingsManager,
 } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
 
 export const RECORDING_PROVIDER = 'prompt-recorder';
 export const RECORDING_MODEL = 'recorder-1';

@@ -55,10 +55,10 @@
     "extensions/*"
   ],
   "dependencies": {
-    "@earendil-works/pi-ai": "1.3.0",
-    "@earendil-works/pi-coding-agent": "1.3.0",
-    "@earendil-works/pi-mcp": "1.3.0",
-    "@earendil-works/pi-tui": "1.3.0",
+    "@earendil-works/pi-ai": "1.5.2",
+    "@earendil-works/pi-coding-agent": "1.5.2",
+    "@earendil-works/pi-mcp": "1.5.2",
+    "@earendil-works/pi-tui": "1.5.2",
     "jsdom": "30.0.1"
   },
   "bundledDependencies": [
@@ -76,6 +76,7 @@
     "sanitize-filename": "1.6.4",
     "syncpack": "15.3.3",
     "tmp": "0.2.7",
+    "typebox": "1.3.27",
     "typescript": "7.0.2",
     "uuid": "14.0.2",
     "vitest": "5.0.0"
@@ -83,6 +84,6 @@
   "license": "MIT",
   "type": "module",
   "patchedDependencies": {
-    "@earendil-works/pi-coding-agent@1.3.0": "patches/@earendil-works%2Fpi-coding-agent@1.3.0.patch"
+    "@earendil-works/pi-coding-agent@1.5.2": "patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch"
   }
 }

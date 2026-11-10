@@ -37,7 +37,7 @@ The existing contract includes:
 
 ## Use the standalone client, not host-managed tools
 
-The installed `@earendil-works/pi-mcp` version is 1.3.0. Its public API exports `McpClient` and `StreamableHttpTransport`. This standalone package does not depend on Pi's agent host or the official MCP SDK.
+The installed `@earendil-works/pi-mcp` version is 1.5.2. Its public API exports `McpClient` and `StreamableHttpTransport`. This standalone package does not depend on Pi's agent host or the official MCP SDK.
 
 The client can connect and call the known upstream `web_search` tool directly. It does not require `tools/list` or agent-tool registration. Our existing parser can consume the raw MCP result.
 
@@ -85,7 +85,7 @@ The native client without an authentication provider reports a 401 error without
 
 ## Dependency and ownership implications
 
-Pi's coding-agent package already depends on `@earendil-works/pi-mcp@1.3.0`. The current product already ships it through its bundled dependency closure. The root build also externalizes `@earendil-works/*`.
+Pi's coding-agent package already depends on `@earendil-works/pi-mcp@1.5.2`. The current product already ships it through its bundled dependency closure. The root build also externalizes `@earendil-works/*`.
 
 A direct application import still needs an explicit dependency. Adoption requires exact declarations in the web-search package and the root product's runtime and bundled dependency lists. It cannot rely on an incidental transitive dependency location.
 

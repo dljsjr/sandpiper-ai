@@ -5,8 +5,8 @@
 // delivery) without coupling that proof to any production extension's own tool logic -- that
 // coverage is AGENT-253's job, against real extensions.
 
-import { Type } from '@earendil-works/pi-ai';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
 
 export const PROBE_TOOL_NAME = 'sandpiper_integration_probe';
 

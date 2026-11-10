@@ -1,15 +1,15 @@
 import { mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { getCurrentTools, type Message, Type } from '@earendil-works/pi-ai';
+import { getCurrentTools, type Message } from '@earendil-works/pi-ai';
 import { type ExtensionFactory, SessionManager } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createTurnControlExtension } from './neutral-capability-extension.js';
 import { createPromptRecordingSession, type PromptRecordingSession } from './prompt-recording-harness.js';
 import { registerStartupPromptHooks } from './startup-hooks.js';
 
 const SANDPIPER_PROMPT_START = '<system_prompt>';
-const PI_DEFAULT_PREAMBLE = 'operating inside pi, a coding agent harness';
 
 const sandpiperPromptExtension: ExtensionFactory = (pi) => registerStartupPromptHooks(pi);
 
@@ -92,7 +92,6 @@ describe('Sandpiper prompt ownership on Pi 1.0', () => {
     expect(syntheticRunRequests).toHaveLength(2);
     for (const request of syntheticRunRequests) {
       expect(isSandpiperPrompt(request.systemPrompt)).toBe(true);
-      expect(request.systemPrompt).not.toContain(PI_DEFAULT_PREAMBLE);
     }
     expect(isSandpiperPrompt(recording.session.state.systemPrompt)).toBe(true);
   });

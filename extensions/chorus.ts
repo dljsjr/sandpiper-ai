@@ -2,10 +2,10 @@ import { randomUUID } from 'node:crypto';
 import { stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { dirname, join, normalize } from 'node:path';
-import { Type } from '@earendil-works/pi-ai';
 import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
 import type { Component } from '@earendil-works/pi-tui';
 import sanitize from 'sanitize-filename';
+import { Type } from 'typebox';
 import {
   type ChorusIncomingMessageDetails,
   type ChorusReplyResult,

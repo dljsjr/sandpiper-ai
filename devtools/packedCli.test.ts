@@ -161,7 +161,7 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       const packagedManifest = JSON.parse(
         execFileSync('tar', ['-xOzf', tarball, 'package/package.json'], { encoding: 'utf8' }),
       ) as { dependencies: Record<string, string>; bundledDependencies: string[] };
-      expect(packagedManifest.dependencies['@earendil-works/pi-mcp']).toBe('1.3.0');
+      expect(packagedManifest.dependencies['@earendil-works/pi-mcp']).toBe('1.5.2');
       expect(packagedManifest.bundledDependencies).toContain('@earendil-works/pi-mcp');
       expect(packagedManifest.dependencies).not.toHaveProperty('mcporter');
 
@@ -201,7 +201,7 @@ console.log(JSON.stringify({ resolved, client: typeof McpClient, transport: type
       expect(
         JSON.parse(readFileSync(join(installed, 'node_modules', '@earendil-works', 'pi-mcp', 'package.json'), 'utf8'))
           .version,
-      ).toBe('1.3.0');
+      ).toBe('1.5.2');
       const stockThemes = execFileSync(
         bun,
         [

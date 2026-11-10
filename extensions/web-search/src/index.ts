@@ -4,8 +4,8 @@
  * Mirrors the web-fetch extension's structure and adapter-injection pattern.
  */
 
-import { Type } from '@earendil-works/pi-ai';
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
 import { selectSearchAdapter } from './adapter-selection.js';
 import {
   PARAM_COUNT_DESC,

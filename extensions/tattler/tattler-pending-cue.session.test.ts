@@ -7,7 +7,6 @@ import {
   type Context,
   createAssistantMessageEventStream,
   type Model,
-  Type,
 } from '@earendil-works/pi-ai';
 import {
   createAgentSession,
@@ -16,6 +15,7 @@ import {
   SessionManager,
   SettingsManager,
 } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
 import { afterEach, describe, expect, it } from 'vitest';
 import tattlerExtension from './index';
 import { sendAgentMessage } from './tattler-ipc';

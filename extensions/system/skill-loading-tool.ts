@@ -3,7 +3,6 @@ import { mkdirSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { Type } from '@earendil-works/pi-ai';
 import type {
   AgentToolResult,
   ExtensionAPI,
@@ -13,6 +12,7 @@ import type {
 } from '@earendil-works/pi-coding-agent';
 import { getAgentDir, keyHint, parseFrontmatter } from '@earendil-works/pi-coding-agent';
 import { Text } from '@earendil-works/pi-tui';
+import { Type } from 'typebox';
 
 const SKILL_COMMAND_PREFIX = 'skill:';
 const SKILL_FILE_NAME = 'SKILL.md';

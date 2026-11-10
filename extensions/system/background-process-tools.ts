@@ -1,4 +1,3 @@
-import { Type } from '@earendil-works/pi-ai';
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import {
   checkBackgroundProcess,
@@ -8,6 +7,7 @@ import {
   sendSystemNotification,
   startBackgroundProcess,
 } from 'sandpiper-ai-core';
+import { Type } from 'typebox';
 
 const BACKGROUND_PROCESS_COMPLETION_INSTRUCTIONS =
   'A background process started with start_background_process completed. Use check_background_process if you need its final output before continuing.';
