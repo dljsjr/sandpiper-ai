@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "include": [
-    "./sandpiper_standalone.ts",
-    "./sandpiper_system_prompt.ts",
-    "./bin/sandpiper",
-    "./bin/sandpiper-system-prompt"
-  ]
-}

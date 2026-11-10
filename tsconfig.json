@@ -5,8 +5,6 @@
     "target": "ESNext",
     "module": "Preserve",
     "moduleDetection": "force",
-    "jsx": "react-jsx",
-    "allowJs": true,
 
     // Bundler mode
     "moduleResolution": "bundler",
@@ -19,25 +17,9 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
-    // Some stricter flags (disabled by default)
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noPropertyAccessFromIndexSignature": false,
-
     // Typecheck source; Bun owns application output
     "noEmit": true,
-    "types": ["node"],
-
-    // Resolve Pi framework imports for single-file extensions that run
-    // in pi's jiti environment (no package.json of their own)
-    "paths": {
-      "@earendil-works/pi-coding-agent": [
-        "./node_modules/@earendil-works/pi-coding-agent"
-      ],
-      "@earendil-works/pi-tui": ["./node_modules/@earendil-works/pi-tui"],
-      "@sinclair/typebox": ["./node_modules/@sinclair/typebox"],
-      "sandpiper-ai-core": ["./packages/core/src/index.ts"]
-    }
+    "types": ["node"]
   },
   "exclude": [
     "node_modules",
@@ -46,9 +28,6 @@
     "**/dist",
     // Config files
     "vitest.config.ts",
-    "**/vitest.config.ts",
-    // JS output files
-    "./*.js",
-    "**/*.cjs"
+    "**/vitest.config.ts"
   ]
 }

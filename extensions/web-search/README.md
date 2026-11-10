@@ -108,6 +108,5 @@ extensions/web-search/
 │   ├── config-resolver.ts    # !cmd / $VAR / literal config value resolver
 │   └── __fixtures__/         # Test fixtures (DDG SERP HTML)
 ├── package.json
-├── tsconfig.json
 └── vitest.config.ts
 ```
