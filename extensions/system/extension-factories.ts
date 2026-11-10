@@ -1,13 +1,6 @@
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { registerDiagnosticsHooks } from './diagnostics-hooks.js';
 import { registerMigrationControls } from './migration-controls.js';
-import {
-  type BackgroundProcessExtensionOptions,
-  createBackgroundProcessExtension,
-  createContextManagementExtension,
-  createSkillLoadingExtension,
-  createTurnControlExtension,
-} from './neutral-capability-extension.js';
 import { registerStartupHeader } from './startup-header.js';
 import {
   registerSessionContinuityHooks,
@@ -37,24 +30,5 @@ export function createSandpiperIdentityExtension(options: SandpiperIdentityExten
     registerSessionContinuityHooks(pi);
     registerDiagnosticsHooks(pi);
     registerStartupHeader(pi);
-  };
-}
-
-export function createSandpiperSystemExtension(
-  identityOptions: SandpiperIdentityExtensionOptions = {},
-  capabilityOptions: BackgroundProcessExtensionOptions = {},
-): ExtensionFactory {
-  const identityExtension = createSandpiperIdentityExtension(identityOptions);
-  const skillLoadingExtension = createSkillLoadingExtension();
-  const turnControlExtension = createTurnControlExtension();
-  const contextManagementExtension = createContextManagementExtension();
-  const backgroundProcessExtension = createBackgroundProcessExtension(capabilityOptions);
-
-  return (pi: ExtensionAPI) => {
-    identityExtension(pi);
-    skillLoadingExtension(pi);
-    turnControlExtension(pi);
-    contextManagementExtension(pi);
-    backgroundProcessExtension(pi);
   };
 }

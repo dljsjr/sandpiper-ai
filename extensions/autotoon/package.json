@@ -6,10 +6,5 @@
   "description": "AutoTOON Pi extension — JSON to TOON conversion on tool results",
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "1.5.2"
-  },
-  "pi": {
-    "extensions": [
-      "./autotoon.ts"
-    ]
   }
 }

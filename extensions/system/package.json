@@ -3,11 +3,6 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "pi": {
-    "extensions": [
-      "./index.ts"
-    ]
-  },
   "dependencies": {
     "diff": "9.0.0",
     "sandpiper-ai-core": "0.0.1"

@@ -11,8 +11,7 @@
   "workspaces": {
     ".": {
       "entry": [
-        "package.json!",
-        "extensions/system.ts!"
+        "package.json!"
       ],
       "project": [
         "extensions/*.ts!",

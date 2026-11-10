@@ -25,6 +25,6 @@ As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic i
 
 Extensions are TypeScript modules that export a default function receiving the `ExtensionAPI`. They can register tools, subscribe to events, add commands, and interact with users.
 
-Sandpiper registers its built-in extensions explicitly in `packages/cli/sandpiper_resources.ts`. Directory extensions can also declare an entrypoint in `package.json` under `pi.extensions` for direct local Pi experiments.
+Sandpiper registers its built-in extensions explicitly in `packages/cli/sandpiper_resources.ts`.
 
 For the full extension API, see the [pi extensions documentation](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/extensions.md).
