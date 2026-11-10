@@ -8,10 +8,6 @@
       "default": "./src/index.ts"
     }
   },
-  "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
   "author": {
     "name": "Doug Stephen",
     "email": "dljs.jr@dougstephenjr.com"

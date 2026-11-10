@@ -114,11 +114,11 @@ describe('root Sandpiper product', () => {
     const packageRoot = join(repoRoot, 'packages', name);
     const metadata = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8')) as {
       exports: { '.': { types: string; default: string } };
-      scripts: Record<string, string>;
+      scripts?: Record<string, string>;
     };
     expect(metadata.exports['.'].types).toBe(metadata.exports['.'].default);
     expect(existsSync(join(packageRoot, metadata.exports['.'].types))).toBe(true);
-    expect(metadata.scripts.build).toBeUndefined();
+    expect(metadata.scripts?.build).toBeUndefined();
   });
 
   it.each([

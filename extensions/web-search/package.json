@@ -3,10 +3,6 @@
   "version": "0.0.1",
   "type": "module",
   "description": "Pi extension: search the web and return top results (title, URL, snippet)",
-  "scripts": {
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
   "dependencies": {
     "@earendil-works/pi-mcp": "1.5.2",
     "jsdom": "30.0.1"

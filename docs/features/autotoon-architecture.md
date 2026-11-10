@@ -47,7 +47,7 @@ Error results are left unchanged.
 ## Testing
 
 ```bash
-bun --filter sandpiper-capability-autotoon test
+bun run test:vitest -- packages/capability-autotoon
 bun run test:vitest -- extensions/autotoon/autotoon.test.ts
 ```
 
