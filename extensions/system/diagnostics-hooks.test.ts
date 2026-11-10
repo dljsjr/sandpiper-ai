@@ -13,10 +13,10 @@ describe('registerDiagnosticsHooks', () => {
     vi.spyOn(core, 'buildSystemDiagnosticsStartupPlan').mockReturnValue({
       unhealthyDiagnostics: [
         {
-          key: 'shell-relay:integration',
+          key: 'example:check',
           healthy: false,
-          message: 'Shell relay integration not sourced',
-          instructions: ['source ~/.sandpiper/shell-integrations/relay.fish'],
+          message: 'Example check failed',
+          instructions: ['run the example fix'],
         },
       ],
       shouldCheckForUpdates: false,
@@ -50,17 +50,17 @@ describe('registerDiagnosticsHooks', () => {
 
     await handler({}, { cwd: '/repo' });
 
-    expect(core.buildSystemDiagnosticsStartupPlan).toHaveBeenCalledWith({ cwd: '/repo', preflightSource: pi });
+    expect(core.buildSystemDiagnosticsStartupPlan).toHaveBeenCalledWith({ cwd: '/repo' });
     expect(appendedEntries).toEqual([
       {
         customType: 'sandpiper:diagnostics-banner',
         data: {
           diagnostics: [
             {
-              key: 'shell-relay:integration',
+              key: 'example:check',
               healthy: false,
-              message: 'Shell relay integration not sourced',
-              instructions: ['source ~/.sandpiper/shell-integrations/relay.fish'],
+              message: 'Example check failed',
+              instructions: ['run the example fix'],
             },
           ],
         },
@@ -126,10 +126,10 @@ describe('registerDiagnosticsHooks', () => {
           data: {
             diagnostics: [
               {
-                key: 'shell-relay:integration',
+                key: 'example:check',
                 healthy: false,
-                message: 'Shell relay integration not sourced',
-                instructions: ['source ~/.sandpiper/shell-integrations/relay.fish'],
+                message: 'Example check failed',
+                instructions: ['run the example fix'],
               },
             ],
           },
@@ -140,8 +140,8 @@ describe('registerDiagnosticsHooks', () => {
 
       const lines = (component as { render: (width: number) => string[] } | undefined)?.render(80);
       expect(lines?.join('\n')).toContain('Sandpiper Diagnostics');
-      expect(lines?.join('\n')).toContain('Shell relay integration not sourced');
-      expect(lines?.join('\n')).toContain('source ~/.sandpiper/shell-integrations/relay.fish');
+      expect(lines?.join('\n')).toContain('Example check failed');
+      expect(lines?.join('\n')).toContain('run the example fix');
     });
 
     it('renders nothing when data is missing or empty', () => {

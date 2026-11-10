@@ -119,14 +119,12 @@ describe('Sandpiper resource adapter', () => {
 
     expect(tools).toEqual(expect.arrayContaining(['skill', 'start_background_process', 'check_background_process']));
     expect(tools).toEqual(expect.arrayContaining(['web_fetch']));
-    expect(tools).not.toEqual(expect.arrayContaining(['shell_relay', 'shell_relay_inspect']));
     expect(tools).toContain('send_chorus_reply');
     expect(commands).toContain('chorus');
     expect(renderers).toContain('chorus-room-message');
     expect(commands).not.toContain('migrate-pi');
     expect(flags).not.toContain('identity');
     expect(flags).not.toContain('migrate-pi-configs');
-    expect(flags).not.toContain('install-shell-integrations');
   });
 
   it('adds the opt-in system prompt diagnostic command to the identity extension', () => {
@@ -146,6 +144,5 @@ describe('Sandpiper resource adapter', () => {
     const { flags } = applyFactories(createSandpiperExtensionFactories());
 
     expect(flags.filter((flag) => flag === 'migrate-pi-configs')).toHaveLength(1);
-    expect(flags.filter((flag) => flag === 'install-shell-integrations')).toHaveLength(1);
   });
 });

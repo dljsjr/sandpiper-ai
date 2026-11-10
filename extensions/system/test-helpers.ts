@@ -65,7 +65,7 @@ export function createEventStub(flags: Record<string, boolean | string | undefin
   };
 }
 
-// ─── Diagnostics hooks stub (on + events + entries) ──────────────
+// ─── Diagnostics hooks stub (on + entries) ───────────────────────
 
 type AnyEntryRenderer = (
   entry: { readonly data?: unknown },
@@ -74,7 +74,7 @@ type AnyEntryRenderer = (
 ) => unknown;
 
 export function createDiagnosticsStub(): {
-  pi: Pick<ExtensionAPI, 'on' | 'events' | 'appendEntry' | 'registerEntryRenderer'>;
+  pi: Pick<ExtensionAPI, 'on' | 'appendEntry' | 'registerEntryRenderer'>;
   handlers: Map<string, AnyHandler>;
   entryRenderers: Map<string, AnyEntryRenderer>;
   appendedEntries: Array<{ readonly customType: string; readonly data: unknown }>;
@@ -87,10 +87,6 @@ export function createDiagnosticsStub(): {
       on: ((event: string, handler: AnyHandler) => {
         handlers.set(event, handler);
       }) as ExtensionAPI['on'],
-      events: {
-        on: vi.fn(),
-        emit: vi.fn(),
-      } as unknown as ExtensionAPI['events'],
       appendEntry: ((customType: string, data?: unknown) => {
         appendedEntries.push({ customType, data });
       }) as ExtensionAPI['appendEntry'],

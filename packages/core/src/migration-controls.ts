@@ -1,9 +1,4 @@
 import {
-  formatInstallInstructions,
-  type InstallResult,
-  installShellIntegrations,
-} from './install-shell-integrations.js';
-import {
   performMigration as defaultPerformMigration,
   type MigrationMode,
   type MigrationResult,
@@ -15,7 +10,6 @@ import {
 } from './migrate-pi-configs.js';
 
 export interface MigrationControlFlags {
-  readonly installShellIntegrations?: boolean;
   readonly migratePiConfigs?: boolean;
   readonly symlinkConfig?: boolean;
   readonly piConfigsGlobal?: boolean;
@@ -51,8 +45,6 @@ export interface MigrationCommandInput {
 }
 
 export interface MigrationControlDependencies {
-  readonly formatInstallInstructions?: typeof formatInstallInstructions;
-  readonly installShellIntegrations?: () => InstallResult;
   readonly parseMigrationCommandArgs?: (args: string) => ParsedMigrationArgs | ParsedMigrationArgsError;
   readonly parseMigrationScope?: typeof parseMigrationScope;
   readonly performMigration?: typeof performMigration;
@@ -62,8 +54,6 @@ function dependenciesWithDefaults(
   dependencies: MigrationControlDependencies = {},
 ): Required<MigrationControlDependencies> {
   return {
-    formatInstallInstructions: dependencies.formatInstallInstructions ?? formatInstallInstructions,
-    installShellIntegrations: dependencies.installShellIntegrations ?? installShellIntegrations,
     parseMigrationCommandArgs: dependencies.parseMigrationCommandArgs ?? parseMigrationCommandArgs,
     parseMigrationScope: dependencies.parseMigrationScope ?? parseMigrationScope,
     performMigration: dependencies.performMigration ?? defaultPerformMigration,
@@ -99,19 +89,6 @@ export async function executeMigrationStartupControls(
   controlDependencies: MigrationControlDependencies = {},
 ): Promise<MigrationStartupControlResult> {
   const dependencies = dependenciesWithDefaults(controlDependencies);
-
-  if (input.flags.installShellIntegrations === true) {
-    const result = dependencies.installShellIntegrations();
-    if (result.success) {
-      return {
-        kind: 'exit',
-        exitCode: 0,
-        stdout: [dependencies.formatInstallInstructions(result.installedTo)],
-        stderr: [],
-      };
-    }
-    return { kind: 'exit', exitCode: 1, stdout: [], stderr: [`✗ Install failed: ${result.error}`] };
-  }
 
   const migrate = input.flags.migratePiConfigs === true;
   const symlink = input.flags.symlinkConfig === true;

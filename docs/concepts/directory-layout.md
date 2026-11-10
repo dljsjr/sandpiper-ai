@@ -4,16 +4,15 @@ Sandpiper stores global state under `~/.sandpiper` and project-local state under
 
 ## Global `~/.sandpiper`
 
-| Path                               | Purpose                                                                   |
-| ---------------------------------- | ------------------------------------------------------------------------- |
-| `~/.sandpiper/agent/`              | Global agent configuration, guidance, skills, sessions, and project index |
-| `~/.sandpiper/agent/AGENTS.md`     | Global agent instructions loaded at startup                               |
-| `~/.sandpiper/agent/USER.md`       | User profile and working preferences                                      |
-| `~/.sandpiper/agent/inbox/`        | Cross-project handoff notes for agents                                    |
-| `~/.sandpiper/agent/projects.md`   | Optional user-maintained Markdown routing table for projects              |
-| `~/.sandpiper/agent/sessions/`     | JSONL session logs                                                        |
-| `~/.sandpiper/shell-integrations/` | Shell integration scripts used by Shell Relay                             |
-| `~/.sandpiper/pi-acp/`             | ACP adapter state                                                         |
+| Path                             | Purpose                                                                   |
+| -------------------------------- | ------------------------------------------------------------------------- |
+| `~/.sandpiper/agent/`            | Global agent configuration, guidance, skills, sessions, and project index |
+| `~/.sandpiper/agent/AGENTS.md`   | Global agent instructions loaded at startup                               |
+| `~/.sandpiper/agent/USER.md`     | User profile and working preferences                                      |
+| `~/.sandpiper/agent/inbox/`      | Cross-project handoff notes for agents                                    |
+| `~/.sandpiper/agent/projects.md` | Optional user-maintained Markdown routing table for projects              |
+| `~/.sandpiper/agent/sessions/`   | JSONL session logs                                                        |
+| `~/.sandpiper/pi-acp/`           | ACP adapter state                                                         |
 
 ### User profile (`USER.md`)
 

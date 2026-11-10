@@ -9,9 +9,6 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | `background-process-capability.ts` | Host-neutral background process start/check/completion operations over `ProcessManager` |
 | `migrate-pi-configs.ts`            | Move/symlink pi config directories to sandpiper equivalents                             |
 | `migration-controls.ts`            | Package-owned migration flag and `/migrate-pi` command operations                       |
-| `preflight.ts`                     | Preflight check registration system (via `pi.events` bus)                               |
-| `install-shell-integrations.ts`    | Copy shell integration scripts to `~/.sandpiper/shell-integrations/`                    |
-| `paths.ts`                         | `displayPath()` — replace homedir prefix with `~` for user-facing output                |
 | `session-continuity.ts`            | Set `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` for a session                   |
 | `startup-context.ts`               | Collect compact startup prompt context (projects, active tasks, working-copy summary)   |
 | `startup-prompt.ts`                | Assemble Sandpiper startup prompt context for the Pi adapter                            |
@@ -33,11 +30,7 @@ bun run test:vitest -- packages/core
 Extensions import from `sandpiper-ai-core`:
 
 ```typescript
-import {
-  registerPreflightCheck,
-  performMigration,
-  displayPath,
-} from "sandpiper-ai-core";
+import { performMigration } from "sandpiper-ai-core";
 ```
 
 The package exports its source for both runtime imports and type checking. Extensions do not need a generated core `dist/` directory.

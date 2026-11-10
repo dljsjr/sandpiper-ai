@@ -1,15 +1,18 @@
 # Shell Relay Historical Archive
 
-This directory contains superseded shell-relay design and review artifacts that are kept for lineage, archaeology, and task-reference purposes.
+Shell Relay was a Zellij-based shared-terminal extension. It was removed from Sandpiper. This directory keeps its design, review, and documentation artifacts for lineage, archaeology, and task-reference purposes.
 
-These files are **not** the current source of truth for shell-relay behavior.
+These files describe code that no longer exists in the repository. Paths and links inside them are left as they were written.
 
-Current references:
-- `extensions/shell-relay/README.md` — current setup, usage, and architecture overview
-- `extensions/shell-relay/AGENTS.md` — implementation-oriented development guidance
-- `.sandpiper/docs/zellij-044-relay-design.md` — current Zellij-based design notes
+Documentation at the time of removal:
 
-Archived here:
+- `feature-overview.md` — public feature overview, formerly `docs/features/shell-relay.md`
+- `extension-readme.md` — setup, usage, and architecture overview, formerly `extensions/shell-relay/README.md`
+- `playbook.md` — agent development guidance, formerly `.sandpiper/playbooks/features/shell-relay.md`
+- `zellij-044-relay-design.md` — Zellij 0.44 design notes, formerly `.sandpiper/docs/specs/zellij-044-relay-design.md`
+
+Older artifacts, superseded before the removal:
+
 - `shell-relay-prd.md` — older product/design requirements document
 - `shell-relay-workplan.md` — older implementation plan
 - `shell-relay-session-context.jsonl` — preserved design-session context artifact

@@ -183,33 +183,6 @@ pi.on("session_shutdown", async () => {
 
 ## What This Enables
 
-### Shell Relay (SHR-79)
-
-The relay would use `ProcessManager` directly (not via tool calls) for its own
-infrastructure:
-
-```typescript
-// Start subscribe stream
-const sub = processManager.spawn({
-  id: "zellij-subscribe",
-  command: "zellij",
-  args: [
-    "--session",
-    session,
-    "subscribe",
-    "--pane-id",
-    paneId,
-    "--format",
-    "json",
-  ],
-});
-
-// Extension-level consumer parses NDJSON
-sub.onStdout((data) => {
-  // Parse viewport updates, detect prompt_ready patterns, etc.
-});
-```
-
 ### Agent-Initiated Background Work
 
 The agent could start builds, tests, or other long-running tasks:
@@ -250,7 +223,7 @@ and persist data. Assessed for relevance to the background process framework.
 ### Mechanisms chosen for the framework
 
 - **`pi.events`** — internal extension-to-extension signaling. "Process X finished,
-  relay should react." Synchronous, in-memory, no persistence overhead.
+  another extension should react." Synchronous, in-memory, no persistence overhead.
 
 - **`context` event** — passive LLM notifications. Inject "background process X
   exited with code 0" into the next LLM call without triggering a new turn.
@@ -276,6 +249,6 @@ and persist data. Assessed for relevance to the background process framework.
 
 1. **Buffer size limits** — stdout can accumulate fast. Ring buffer? Max size with oldest-dropped?
 2. **Process restart** — should the framework support auto-restart on exit? Or is that the consumer's job?
-3. **Multiple consumers** — if both the relay extension and a tool call want the same process's output, how do we handle that? Broadcast vs. single reader?
+3. **Multiple consumers** — if both an extension and a tool call want the same process's output, how do we handle that? Broadcast vs. single reader?
 4. **Stdin** — the `write` method on ManagedProcess allows writing to stdin. Is this needed for any current use case, or can we defer it?
 5. **`context` injection format** — should the notification be a user message, a system message, or something else? User message would trigger a response; system message would be informational.

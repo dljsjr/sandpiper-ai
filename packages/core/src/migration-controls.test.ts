@@ -8,8 +8,6 @@ import {
 
 function createDependencies(overrides: Partial<MigrationControlDependencies> = {}): MigrationControlDependencies {
   return {
-    formatInstallInstructions: vi.fn(() => 'source ~/.sandpiper/shell-integrations/relay.fish'),
-    installShellIntegrations: vi.fn(() => ({ success: true, installedTo: '/tmp/install' })),
     parseMigrationCommandArgs: vi.fn((_args: string) => ({ mode: 'move' as const, scope: 'both' as const })),
     parseMigrationScope: vi.fn((_global: boolean, _local: boolean) => 'both' as const),
     performMigration: vi.fn(
@@ -31,25 +29,7 @@ describe('executeMigrationStartupControls', () => {
     const result = await executeMigrationStartupControls({ cwd: '/repo', flags: {} }, dependencies);
 
     expect(result).toEqual({ kind: 'none' });
-    expect(dependencies.installShellIntegrations).not.toHaveBeenCalled();
     expect(dependencies.performMigration).not.toHaveBeenCalled();
-  });
-
-  it('returns install instructions and exit code when shell integration installation succeeds', async () => {
-    const dependencies = createDependencies();
-
-    const result = await executeMigrationStartupControls(
-      { cwd: '/repo', flags: { installShellIntegrations: true } },
-      dependencies,
-    );
-
-    expect(dependencies.installShellIntegrations).toHaveBeenCalled();
-    expect(result).toEqual({
-      kind: 'exit',
-      exitCode: 0,
-      stdout: ['source ~/.sandpiper/shell-integrations/relay.fish'],
-      stderr: [],
-    });
   });
 
   it('rejects scope flags without migrate or symlink', async () => {

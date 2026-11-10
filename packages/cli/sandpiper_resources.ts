@@ -1,7 +1,6 @@
 import type { ExtensionAPI, ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import chorusExtension from '../../extensions/chorus.js';
-// import shellRelayExtension from '../../extensions/shell-relay/src/index.js';
 import {
   createBackgroundProcessExtension,
   createContextManagementExtension,
@@ -31,7 +30,6 @@ export function createNeutralCapabilityExtensionFactories(): readonly InlineExte
     inlineExtension('turn-control', createTurnControlExtension()),
     inlineExtension('context-management', createContextManagementExtension()),
     inlineExtension('background-process', createBackgroundProcessExtension()),
-    // shellRelayExtension,
     inlineExtension('web-fetch', webFetchExtension),
     inlineExtension('web-search', webSearchExtension),
     inlineExtension('autotoon', autotoonExtension),

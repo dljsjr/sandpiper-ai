@@ -2,13 +2,6 @@ import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import * as core from 'sandpiper-ai-core';
 
 export function registerMigrationControls(pi: ExtensionAPI): void {
-  pi.registerFlag('install-shell-integrations', {
-    description:
-      'Install shell integration scripts to ~/.sandpiper/shell-integrations/, print sourcing instructions, then exit',
-    type: 'boolean',
-    default: false,
-  });
-
   pi.registerFlag('migrate-pi-configs', {
     description: 'Migrate ~/.pi and ./.pi to ~/.sandpiper and ./.sandpiper, then exit',
     type: 'boolean',
@@ -39,7 +32,6 @@ export function registerMigrationControls(pi: ExtensionAPI): void {
     const result = await core.executeMigrationStartupControls({
       cwd: ctx.cwd,
       flags: {
-        installShellIntegrations: pi.getFlag('install-shell-integrations') === true,
         migratePiConfigs: pi.getFlag('migrate-pi-configs') === true,
         symlinkConfig: pi.getFlag('symlink-config') === true,
         piConfigsGlobal: pi.getFlag('pi-configs-global') === true,

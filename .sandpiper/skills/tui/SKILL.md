@@ -127,19 +127,6 @@ theme.fg('dim', text)       // dimmer — timestamps, metadata
 theme.bold(text)            // bold — combine: theme.bold(theme.fg('warning', text))
 ```
 
-## Preflight Check Duplication on /reload
-
-`pi.events.on()` listeners accumulate across `/reload` cycles (the event bus persists,
-but extension factories re-register). Deduplicate by key when collecting:
-
-```typescript
-export function collectPreflightDiagnostics(pi: HasEvents): PreflightDiagnostic[] {
-  const seen = new Map<string, PreflightDiagnostic>();
-  pi.events.emit(PREFLIGHT_EVENT, (d: PreflightDiagnostic) => seen.set(d.key, d));
-  return [...seen.values()];
-}
-```
-
 ## Adding new core package exports
 
 Adding a new module to `sandpiper-ai-core` requires a **full agent restart** after building —

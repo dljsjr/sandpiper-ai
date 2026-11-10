@@ -13,8 +13,8 @@ import { configDefaults, defineConfig } from 'vitest/config';
  * two different configs — legacy-root's `exclude` starts from vitest's
  * own `configDefaults.exclude` rather than a hand-copied literal, so
  * migrating a package can't accidentally drop node_modules/.git from the
- * catch-all's exclusions). Migrated so far: extensions/shell-relay,
- * extensions/web-fetch, extensions/web-search, packages/core.
+ * catch-all's exclusions). Migrated so far: extensions/web-fetch,
+ * extensions/web-search, packages/core.
  */
 export default defineConfig({
   test: {
@@ -27,14 +27,12 @@ export default defineConfig({
           include: ['**/*.test.ts'],
           exclude: [
             ...configDefaults.exclude,
-            'extensions/shell-relay/**',
             'extensions/web-fetch/**',
             'extensions/web-search/**',
             'packages/core/**',
           ],
         },
       },
-      'extensions/shell-relay/vitest.config.ts',
       'extensions/web-fetch/vitest.config.ts',
       'extensions/web-search/vitest.config.ts',
       'packages/core/vitest.config.ts',

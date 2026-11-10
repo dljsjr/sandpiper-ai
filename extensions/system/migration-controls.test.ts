@@ -21,7 +21,7 @@ describe('registerMigrationControls', () => {
     const { pi, commands } = createMigrationControlsStub();
     registerMigrationControls(pi as Parameters<typeof registerMigrationControls>[0]);
 
-    expect(pi.registerFlag).toHaveBeenCalledTimes(5);
+    expect(pi.registerFlag).toHaveBeenCalledTimes(4);
 
     const command = commands.find((item) => item.name === 'migrate-pi');
     if (!command) {
@@ -77,7 +77,6 @@ describe('registerMigrationControls', () => {
 
   it('rejects conflicting migrate/symlink flags during session_start handling', async () => {
     const { pi, events } = createMigrationControlsStub({
-      'install-shell-integrations': false,
       'migrate-pi-configs': true,
       'symlink-config': true,
       'pi-configs-global': false,
@@ -104,7 +103,6 @@ describe('registerMigrationControls', () => {
     expect(core.executeMigrationStartupControls).toHaveBeenCalledWith({
       cwd: '/repo',
       flags: {
-        installShellIntegrations: false,
         migratePiConfigs: true,
         symlinkConfig: true,
         piConfigsGlobal: false,

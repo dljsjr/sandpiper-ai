@@ -7,8 +7,7 @@ Sandpiper builds on Pi's extension system. When you change extension behavior in
 | Surface                         | Use for                                                                                                                                                    |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `extensions/system/`            | Sandpiper identity, startup behavior, system prompt assembly, diagnostics, migration controls, session continuity, and Sandpiper-owned system capabilities |
-| `extensions/shell-relay/`       | Shell Relay's Zellij-backed shared terminal tools, commands, runtime, and shell integrations                                                               |
-| `extensions/autotoon/`          | Pi entrypoint for AutoTOON                                                                                                                                |
+| `extensions/autotoon/`          | Pi entrypoint for AutoTOON                                                                                                                                 |
 | `packages/capability-autotoon/` | Host-neutral AutoTOON transform and Pi adapter source of truth                                                                                             |
 
 Keep entrypoints thin. Put reusable logic in package-owned modules or extension-local framework-independent modules, then wire that logic to Pi APIs at the edge.

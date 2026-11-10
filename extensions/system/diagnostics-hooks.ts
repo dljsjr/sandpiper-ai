@@ -1,14 +1,14 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { DynamicBorder } from '@earendil-works/pi-coding-agent';
 import { Container, Spacer, Text } from '@earendil-works/pi-tui';
-import type { PreflightDiagnostic, UpdateInfo } from 'sandpiper-ai-core';
+import type { SystemDiagnostic, UpdateInfo } from 'sandpiper-ai-core';
 import * as core from 'sandpiper-ai-core';
 
 const DIAGNOSTICS_BANNER_ENTRY_TYPE = 'sandpiper:diagnostics-banner';
 const UPDATE_BANNER_ENTRY_TYPE = 'sandpiper:update-banner';
 
 interface DiagnosticsBannerData {
-  readonly diagnostics: readonly PreflightDiagnostic[];
+  readonly diagnostics: readonly SystemDiagnostic[];
 }
 
 export function registerDiagnosticsHooks(
@@ -58,7 +58,7 @@ export function registerDiagnosticsHooks(
   });
 
   pi.on('session_start', async (_event, ctx) => {
-    const plan = core.buildSystemDiagnosticsStartupPlan({ cwd: ctx.cwd, preflightSource: pi });
+    const plan = core.buildSystemDiagnosticsStartupPlan({ cwd: ctx.cwd });
 
     if (plan.unhealthyDiagnostics.length > 0) {
       pi.appendEntry<DiagnosticsBannerData>(DIAGNOSTICS_BANNER_ENTRY_TYPE, { diagnostics: plan.unhealthyDiagnostics });

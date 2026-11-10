@@ -25,4 +25,3 @@ Sandpiper supports both `SANDPIPER_*` and `PI_*` user configuration. When both a
 
 - Public guide: `docs/dev/env-vars.md`
 - Mirroring implementation: `packages/cli/standalone_bootstrap.ts`
-- Host/config path utilities: `packages/core/src/host-context.ts` and nearby modules

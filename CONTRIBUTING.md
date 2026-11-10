@@ -47,7 +47,6 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 - [CLI development](docs/dev/cli-development.md)
 - [Environment variables](docs/dev/env-vars.md)
 - [Pi extension development](docs/dev/pi-extension-development.md)
-- [Shell Relay](docs/features/shell-relay.md)
 - [Directory layout](docs/concepts/directory-layout.md)
 
 ## Documentation changes

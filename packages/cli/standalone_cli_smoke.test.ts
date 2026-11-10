@@ -81,7 +81,6 @@ describe('standalone Sandpiper CLI smoke', () => {
       );
 
       expect(output).toContain('--migrate-pi-configs');
-      expect(output).toContain('--install-shell-integrations');
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
@@ -130,14 +129,12 @@ export default function runtimeImportProbe(pi) {
     ]);
 
     expect(output).toContain('--migrate-pi-configs');
-    expect(output).toContain('--install-shell-integrations');
   }, 15_000);
 
   it('loads Sandpiper extension flags exactly once by default', () => {
     const output = runStandaloneHelp();
 
     expect(countFlagLines(output, '--migrate-pi-configs')).toBe(1);
-    expect(countFlagLines(output, '--install-shell-integrations')).toBe(1);
   });
 
   it('allows package-management commands to use persisted settings', () => {

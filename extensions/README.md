@@ -4,11 +4,10 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ## Contents
 
-| Extension | Description |
-| --- | --- |
-| [`system/`](system/) | Sandpiper identity, lifecycle behavior, and core tools |
+| Extension                | Description                                                                  |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| [`system/`](system/)     | Sandpiper identity, lifecycle behavior, and core tools                       |
 | [`autotoon/`](autotoon/) | Pi entrypoint for the AutoTOON capability in `packages/capability-autotoon/` |
-| [`shell-relay/`](shell-relay/) | Shared terminal session between user and agent through Zellij |
 
 ### system/
 
@@ -21,10 +20,6 @@ As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic i
 ### autotoon
 
 `autotoon/` is the Pi entrypoint. The source of truth lives in `packages/capability-autotoon/`: `src/core.ts` contains the host-neutral JSON→TOON transform, while `src/pi-extension.ts` contains the Pi `tool_result` adapter.
-
-### shell-relay
-
-A multi-module extension providing a shared terminal session. See its own [README](shell-relay/README.md) for full documentation.
 
 ## How Extensions Work
 

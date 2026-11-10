@@ -1,6 +1,6 @@
 # Sandpiper Documentation
 
-Sandpiper is a local coding-agent workspace built on Pi. It adds tools for shared terminals, session continuity, skills, prompt templates, and themes.
+Sandpiper is a local coding-agent workspace built on Pi. It adds tools for session continuity, skills, prompt templates, and themes.
 
 ## Start here
 
@@ -11,7 +11,6 @@ Sandpiper is a local coding-agent workspace built on Pi. It adds tools for share
 ## Features
 
 - [AutoTOON](features/autotoon.md) - automatic JSON-to-TOON conversion for token efficiency.
-- [Shell Relay](features/shell-relay.md) - shared terminal sessions through Zellij.
 - [Journal](features/journal.md) - optional standalone continuation notes.
 
 ## Development

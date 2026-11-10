@@ -109,7 +109,6 @@ describe('system extension factory split', () => {
     expect(tools).toEqual([]);
     expect(commands).toEqual(['migrate-pi']);
     expect(flags).toEqual([
-      'install-shell-integrations',
       'migrate-pi-configs',
       'symlink-config',
       'pi-configs-global',

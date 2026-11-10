@@ -42,16 +42,19 @@ Install the relay shell integration files using your host distribution's shell-i
 Then source the appropriate file from your shell config. The examples below use `<config-dir>` for your host config directory, such as `~/.sandpiper` for Sandpiper or `~/.pi` for vanilla Pi:
 
 **Fish** (`~/.config/fish/config.fish`)
+
 ```fish
 source <config-dir>/shell-integrations/relay.fish
 ```
 
 **Bash** (`~/.bashrc`)
+
 ```bash
 source <config-dir>/shell-integrations/relay.bash
 ```
 
 **Zsh** (`~/.zshrc`)
+
 ```zsh
 source <config-dir>/shell-integrations/relay.zsh
 ```
@@ -159,10 +162,10 @@ Implementation notes:
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
+| Command          | Description                                               |
+| ---------------- | --------------------------------------------------------- |
 | `/relay-connect` | Connect to an existing Zellij session or create a new one |
-| `/relay-status` | Show current relay session, shell, pane, and signal FIFO |
+| `/relay-status`  | Show current relay session, shell, pane, and signal FIFO  |
 
 ### Tool parameters
 
@@ -178,8 +181,8 @@ Implementation notes:
 
 ### Environment variables
 
-| Variable | Description |
-|----------|-------------|
+| Variable              | Description                               |
+| --------------------- | ----------------------------------------- |
 | `SHELL_RELAY_SESSION` | Default Zellij session name to connect to |
 
 ## When to use it

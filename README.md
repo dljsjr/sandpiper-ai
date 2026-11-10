@@ -1,6 +1,6 @@
 # Sandpiper
 
-A powerful pair programming coding agent built on [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Sandpiper wraps pi with opinionated extensions, skills, and customizations that create a deeply integrated development companion — one that can see your terminal, manage your tasks, and maintain context across sessions.
+A powerful pair programming coding agent built on [pi-coding-agent](https://github.com/badlogic/pi-mono/tree/main/packages/coding-agent). Sandpiper wraps pi with opinionated extensions, skills, and customizations that create a deeply integrated development companion — one that can manage your tasks and maintain context across sessions.
 
 The repository builds the `sandpiper` runtime and its system-prompt diagnostic. The CLI also runs from a packed npm installation without a source checkout.
 
@@ -10,7 +10,6 @@ On top of pi's core functionality, Sandpiper provides:
 
 ### Core Features
 
-- **[Shell Relay](docs/features/shell-relay.md)** — A shared terminal session via Zellij where both you and the agent can see and interact with the same shell. The agent inherits your session state: auth tokens, shell functions, activated environments, everything. No more copying commands to your terminal — the agent runs them in yours.
 - **[Session Continuity](docs/features/journal.md)** — The optional standalone Journal skill records short developments and continuation context.
 
 ### Enhanced Capabilities
@@ -36,7 +35,6 @@ packages/cli/bin/sandpiper  # Launch Sandpiper in interactive mode
 
 - **[Documentation Home](docs/README.md)** — Start here for feature and development docs
 - **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion
-- **[Shell Relay](docs/features/shell-relay.md)** — Shared terminal sessions
 - **[Journal](docs/features/journal.md)** — Cross-session continuity
 
 ### For Contributors
@@ -53,8 +51,7 @@ sandpiper-ai/
 │   ├── dev/             # Developer documentation
 │   └── concepts/        # Conceptual/reference documentation
 ├── extensions/          # Pi extension packages and compatibility entrypoints
-│   ├── system/          # Sandpiper identity + system capabilities
-│   └── shell-relay/     # Shared terminal via Zellij
+│   └── system/          # Sandpiper identity + system capabilities
 ├── dist/                # Built entrypoints and shared chunks
 ├── packages/            # Source modules and internal workspace packages
 │   ├── cli/             # Sandpiper entrypoints and stable bin launchers
