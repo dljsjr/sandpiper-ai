@@ -174,6 +174,9 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       const manifest = JSON.parse(readFileSync(join(installed, 'package.json'), 'utf8')) as { version: string };
       const pi = join(installed, 'node_modules', '@earendil-works', 'pi-coding-agent');
       expect(readFileSync(join(pi, 'dist', 'config.js'), 'utf8')).toContain('process.env.PI_CODING_AGENT_PACKAGE');
+      expect(readFileSync(join(pi, 'dist', 'modes', 'interactive', 'interactive-mode.js'), 'utf8')).toContain(
+        'checkForNewPiVersion(process.env.PI_CODING_AGENT_VERSION || this.version)',
+      );
       expect(existsSync(join(pi, 'dist', 'modes', 'interactive', 'theme', 'dark.json'))).toBe(true);
       expect(existsSync(join(pi, 'dist', 'core', 'export-html', 'template.html'))).toBe(true);
       expect(existsSync(join(installed, 'packages', 'resources'))).toBe(false);

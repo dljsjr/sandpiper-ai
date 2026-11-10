@@ -120,11 +120,24 @@ describe('standalone bootstrap', () => {
     const env: Record<string, string | undefined> = {};
     configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '1.3.0' }, env);
     expect(env.PI_PACKAGE_DIR).toBe('/bundle');
-    expect(env.PI_SKIP_VERSION_CHECK).toBe('1');
     expect(env.PI_CODING_AGENT_PACKAGE).toBe('/pi-package');
     expect(env.PI_CODING_AGENT_VERSION).toBe('1.3.0');
     expect(env.SANDPIPER_CODING_AGENT_PACKAGE).toBe('/bundle');
     expect(env.PI_TELEMETRY).toBe('0');
+  });
+
+  it.each([
+    ['PI_SKIP_VERSION_CHECK', '1'],
+    ['SANDPIPER_SKIP_VERSION_CHECK', '1'],
+  ])("leaves Pi's version check on unless %s turns it off", (key, value) => {
+    const env: Record<string, string | undefined> = {};
+    configurePiEnvironment({ packageDir: '/bundle', piPackageDir: '/pi-package', piVersion: '1.3.0' }, env);
+    mirrorPiSandpiperEnvironment(env);
+    expect(env.PI_SKIP_VERSION_CHECK).toBeUndefined();
+
+    env[key] = value;
+    mirrorPiSandpiperEnvironment(env);
+    expect(env.PI_SKIP_VERSION_CHECK).toBe('1');
   });
 
   it('keeps the default Journal directory anchored to launch cwd in child processes', () => {

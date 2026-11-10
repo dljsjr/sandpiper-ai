@@ -53,7 +53,6 @@ The package/version variables below are set by the Sandpiper runtime and are not
 | `PI_CODING_AGENT_PACKAGE`        | Path to the wrapped pi-coding-agent package root                  | `process.env.PI_CODING_AGENT_PACKAGE`        |
 | `PI_CODING_AGENT_VERSION`        | Pi version string                                                 | `process.env.PI_CODING_AGENT_VERSION`        |
 | `PI_PACKAGE_DIR`                 | Root Sandpiper product package for metadata and documentation     | `process.env.PI_PACKAGE_DIR`                 |
-| `PI_SKIP_VERSION_CHECK`          | Suppress Pi update check                                          | `process.env.PI_SKIP_VERSION_CHECK`          |
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` deliberately have different meanings. Do not mirror one into the other.
 

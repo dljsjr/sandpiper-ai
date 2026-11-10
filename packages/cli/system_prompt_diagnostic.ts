@@ -141,7 +141,6 @@ export async function renderSystemPrompt(
   let identitySource: string | undefined;
   const extensionFactories = [
     ...createSandpiperExtensionFactories({
-      checkForUpdates: async () => [],
       systemPromptDiagnostic: {
         commandName: DIAGNOSTIC_COMMAND,
         onPrompt: (_prompt, sources) => {

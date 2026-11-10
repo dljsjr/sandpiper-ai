@@ -1,5 +1,4 @@
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
-import { checkForUpdates as checkForSandpiperUpdates, type UpdateInfo } from 'sandpiper-ai-core';
 import { registerDiagnosticsHooks } from './diagnostics-hooks.js';
 import { registerMigrationControls } from './migration-controls.js';
 import {
@@ -25,27 +24,18 @@ export {
 } from './neutral-capability-extension.js';
 
 export interface SandpiperIdentityExtensionOptions {
-  readonly checkForUpdates?: () => Promise<readonly UpdateInfo[]>;
   readonly dumpSystemPrompt?: boolean;
   readonly systemPromptDiagnostic?: StartupPromptDiagnosticCommand;
 }
 
-function defaultCheckForUpdates(): Promise<readonly UpdateInfo[]> {
-  return checkForSandpiperUpdates({
-    piCodingAgentVersion: process.env.PI_CODING_AGENT_VERSION,
-    bunVersion: process.versions.bun,
-  });
-}
-
 export function createSandpiperIdentityExtension(options: SandpiperIdentityExtensionOptions = {}): ExtensionFactory {
   const dumpSystemPrompt = options.dumpSystemPrompt ?? process.env.SANDPIPER_DUMP_SYSTEM_PROMPT === '1';
-  const updateCheck = options.checkForUpdates ?? defaultCheckForUpdates;
 
   return (pi: ExtensionAPI) => {
     registerMigrationControls(pi);
     registerStartupPromptHooks(pi, dumpSystemPrompt, options.systemPromptDiagnostic);
     registerSessionContinuityHooks(pi);
-    registerDiagnosticsHooks(pi, updateCheck);
+    registerDiagnosticsHooks(pi);
     registerStartupHeader(pi);
   };
 }

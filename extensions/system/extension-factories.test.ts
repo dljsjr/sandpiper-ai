@@ -91,7 +91,6 @@ describe('system extension factory split', () => {
     const { pi, commands } = createExtensionCapture();
 
     createSandpiperIdentityExtension({
-      checkForUpdates: async () => [],
       systemPromptDiagnostic: {
         commandName: '__sandpiper-system-prompt',
         onPrompt: vi.fn(),
@@ -104,7 +103,7 @@ describe('system extension factory split', () => {
   it('registers Sandpiper identity behavior separately from neutral tools', () => {
     const { pi, commands, events, flags, tools } = createExtensionCapture();
 
-    createSandpiperIdentityExtension({ dumpSystemPrompt: false, checkForUpdates: async () => [] })(pi as ExtensionAPI);
+    createSandpiperIdentityExtension({ dumpSystemPrompt: false })(pi as ExtensionAPI);
 
     expect(tools).toEqual([]);
     expect(commands).toEqual(['migrate-pi']);

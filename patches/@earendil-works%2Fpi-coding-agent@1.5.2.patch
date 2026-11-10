@@ -63,3 +63,17 @@ index 94c320ec7175265d067891d044d5b37407bdbbb4..aab994c6d907bb80200d8e70c137916f
      }
      else {
          promptSections.preamble =
+diff --git a/dist/modes/interactive/interactive-mode.js b/dist/modes/interactive/interactive-mode.js
+index d4e4b09197dec6ab4e2a3d5dab6f9cb8620e7644..a0a4f08015cc3001aa82273b3a4fd64828252a42 100644
+--- a/dist/modes/interactive/interactive-mode.js
++++ b/dist/modes/interactive/interactive-mode.js
+@@ -869,7 +869,8 @@ export class InteractiveMode {
+                 .finally(() => clearTimeout(timeout));
+         }
+         // Start version check asynchronously
+-        checkForNewPiVersion(this.version).then((newRelease) => {
++        // Sandpiper local patch: compare the Pi version; this.version is the product package version.
++        checkForNewPiVersion(process.env.PI_CODING_AGENT_VERSION || this.version).then((newRelease) => {
+             if (newRelease) {
+                 this.showNewVersionNotification(newRelease);
+             }

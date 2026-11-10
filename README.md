@@ -123,7 +123,6 @@ A small number of package/runtime variables are set automatically by sandpiper a
 | `PI_CODING_AGENT_PACKAGE`        | Path to Pi code, themes, UI assets, and export templates          |
 | `PI_CODING_AGENT_VERSION`        | Version of the underlying pi-coding-agent                         |
 | `PI_PACKAGE_DIR`                 | Root product package for metadata and documentation               |
-| `PI_SKIP_VERSION_CHECK`          | Suppresses pi's built-in update check                             |
 
 `SANDPIPER_CODING_AGENT_PACKAGE` and `PI_CODING_AGENT_PACKAGE` intentionally point to different package roots.
 

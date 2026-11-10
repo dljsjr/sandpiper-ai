@@ -56,10 +56,11 @@ The source manifest policy is:
 
 Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`. The patch is stored under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`.
 
-The patch changes two Pi modules:
+The patch changes three Pi modules:
 
 - `dist/core/system-prompt.js` preserves the tools and rules sections when Sandpiper supplies a custom prompt.
 - `dist/config.js` resolves themes, UI assets, and HTML export templates from `PI_CODING_AGENT_PACKAGE`. Product metadata still comes from `PI_PACKAGE_DIR`.
+- `dist/modes/interactive/interactive-mode.js` gives Pi's update check the Pi version from `PI_CODING_AGENT_VERSION`. Unpatched, the check compares the product version from `PI_PACKAGE_DIR`.
 
 The patch applies during workspace installation. The packed CLI includes the patched dependency through `bundledDependencies`. Consumer installations do not inherit root patch declarations.
 

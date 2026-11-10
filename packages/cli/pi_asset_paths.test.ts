@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -73,5 +73,14 @@ describe('local Pi asset-root patch', () => {
     expect(paths.themes).toBe(join(piPackageDir, 'dist', 'modes', 'interactive', 'theme'));
     expect(paths.assets).toBe(join(piPackageDir, 'dist', 'modes', 'interactive', 'assets'));
     expect(paths.exports).toBe(join(piPackageDir, 'dist', 'core', 'export-html'));
+  });
+});
+
+describe('local Pi version-check patch', () => {
+  it('gives the native update check the Pi version, not the product version', () => {
+    const interactiveMode = join(piPackageDir, 'dist', 'modes', 'interactive', 'interactive-mode.js');
+    expect(readFileSync(interactiveMode, 'utf8')).toContain(
+      'checkForNewPiVersion(process.env.PI_CODING_AGENT_VERSION || this.version)',
+    );
   });
 });

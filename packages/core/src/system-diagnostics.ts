@@ -17,12 +17,10 @@ export interface SystemDiagnosticsStartupInput {
 
 export interface SystemDiagnosticsStartupPlan {
   readonly unhealthyDiagnostics: readonly SystemDiagnostic[];
-  readonly shouldCheckForUpdates: boolean;
 }
 
 export interface SystemDiagnosticsDependencies {
   readonly detectUnmigratedConfigs?: (cwd: string) => readonly string[];
-  readonly env?: NodeJS.ProcessEnv;
 }
 
 function dependenciesWithDefaults(
@@ -30,7 +28,6 @@ function dependenciesWithDefaults(
 ): Required<SystemDiagnosticsDependencies> {
   return {
     detectUnmigratedConfigs: dependencies.detectUnmigratedConfigs ?? defaultDetectUnmigratedConfigs,
-    env: dependencies.env ?? process.env,
   };
 }
 
@@ -58,6 +55,5 @@ export function buildSystemDiagnosticsStartupPlan(
 
   return {
     unhealthyDiagnostics: unmigratedDiagnostic ? [unmigratedDiagnostic] : [],
-    shouldCheckForUpdates: dependencies.env.PI_OFFLINE !== '1',
   };
 }
