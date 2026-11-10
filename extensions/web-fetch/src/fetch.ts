@@ -3,7 +3,7 @@
  * Framework-independent — no pi imports.
  */
 
-import type { FetchAdapter, FetchOptions, FetchResult } from './types.js';
+import type { FetchAdapter, FetchResult } from './types.js';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
@@ -13,16 +13,13 @@ const DEFAULT_HEADERS: Record<string, string> = {
 };
 
 export class SimpleFetchAdapter implements FetchAdapter {
-  async fetch(url: string, options?: FetchOptions): Promise<FetchResult> {
-    const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-    const headers = { ...DEFAULT_HEADERS, ...options?.headers };
-
+  async fetch(url: string): Promise<FetchResult> {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const timer = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
     try {
       const response = await globalThis.fetch(url, {
-        headers,
+        headers: DEFAULT_HEADERS,
         signal: controller.signal,
         redirect: 'follow',
       });
@@ -33,7 +30,6 @@ export class SimpleFetchAdapter implements FetchAdapter {
         url: response.url,
         statusCode: response.status,
         html,
-        contentType: response.headers.get('content-type') ?? '',
       };
     } finally {
       clearTimeout(timer);

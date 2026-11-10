@@ -1,6 +1,7 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
-import autotoon, { MIN_JSON_BYTES } from './autotoon.js';
+import { MIN_JSON_BYTES } from '../../packages/capability-autotoon/src/core.js';
+import autotoon from './autotoon.js';
 
 describe('autotoon Pi extension', () => {
   it('does not modify error results', async () => {

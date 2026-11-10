@@ -13,8 +13,6 @@ import {
   type TattlerSendableFrame,
 } from '../tattler/tattler-protocol';
 
-export const CHORUS_MESSAGE_CUSTOM_TYPE = 'chorus-room-message';
-
 export interface ChorusRoomPostResult {
   readonly postId: TattlerMessageId;
 }

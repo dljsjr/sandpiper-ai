@@ -44,8 +44,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebSearchExte
       count: Type.Optional(Type.Integer({ description: PARAM_COUNT_DESC, minimum: 1, maximum: MAX_RESULT_COUNT })),
     }),
     async execute(_toolCallId, params): Promise<AgentToolResult<WebSearchToolDetails>> {
-      const count = params.count === undefined ? undefined : Math.min(params.count, MAX_RESULT_COUNT);
-      return executeWebSearchTool(getAdapter(), { query: params.query, count });
+      return executeWebSearchTool(getAdapter(), { query: params.query, count: params.count });
     },
   });
 }

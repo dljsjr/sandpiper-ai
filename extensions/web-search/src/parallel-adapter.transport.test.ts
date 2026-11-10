@@ -113,16 +113,8 @@ describe('Parallel native MCP transport', () => {
     }
   });
 
-  it.each([
-    [undefined, 15_000],
-    [250, 250],
-    [0, 60_000],
-    [-1, 60_000],
-    [0.5, 60_000],
-    [Number.NaN, 60_000],
-    [Number.POSITIVE_INFINITY, 60_000],
-    [2_147_483_648, 2_147_483_647],
-  ] as const)('enforces the tool-call deadline (%s) and aborts transport I/O on close', async (timeoutMs, deadline) => {
+  it('enforces the default tool-call deadline and aborts transport I/O on close', async () => {
+    const deadline = 15_000;
     vi.useFakeTimers();
     let requestSignal: AbortSignal | null | undefined;
     let release: (() => void) | undefined;
@@ -140,7 +132,7 @@ describe('Parallel native MCP transport', () => {
       });
     });
     let error: unknown;
-    const search = new ParallelMcpSearchAdapter().search('fixture query', { timeoutMs }).catch((caught: unknown) => {
+    const search = new ParallelMcpSearchAdapter().search('fixture query').catch((caught: unknown) => {
       error = caught;
     });
     try {

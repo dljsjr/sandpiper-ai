@@ -26,11 +26,6 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
-  if (url === '/slow') {
-    // Don't respond — let the timeout trigger
-    return;
-  }
-
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.end('default');
 }
@@ -59,7 +54,6 @@ describe('SimpleFetchAdapter', () => {
     const result = await adapter.fetch(`${baseUrl}/hello`);
     expect(result.statusCode).toBe(200);
     expect(result.html).toContain('<h1>Hello</h1>');
-    expect(result.contentType).toContain('text/html');
   });
 
   it('should follow redirects and return the final URL', async () => {
@@ -72,16 +66,5 @@ describe('SimpleFetchAdapter', () => {
   it('should return 404 status for not-found pages', async () => {
     const result = await adapter.fetch(`${baseUrl}/not-found`);
     expect(result.statusCode).toBe(404);
-  });
-
-  it('should respect custom headers', async () => {
-    const result = await adapter.fetch(`${baseUrl}/hello`, {
-      headers: { 'X-Custom': 'test' },
-    });
-    expect(result.statusCode).toBe(200);
-  });
-
-  it('should timeout on slow responses', async () => {
-    await expect(adapter.fetch(`${baseUrl}/slow`, { timeoutMs: 100 })).rejects.toThrow();
   });
 });

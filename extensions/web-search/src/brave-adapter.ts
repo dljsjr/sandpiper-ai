@@ -57,11 +57,8 @@ export class BraveSearchAdapter implements SearchAdapter {
     url.searchParams.set('q', trimmed);
     url.searchParams.set('count', String(count));
 
-    const timeoutMs = options?.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
-    // Honor a caller-provided signal in addition to our timeout.
-    options?.signal?.addEventListener('abort', () => controller.abort(), { once: true });
+    const timer = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
     try {
       const response = await fetch(url, {

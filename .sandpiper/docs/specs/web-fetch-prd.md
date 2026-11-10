@@ -89,7 +89,7 @@ The fetch layer should use an adapter interface so JS-rendering backends (lightp
 
 ```typescript
 interface FetchAdapter {
-  fetch(url: string, options?: FetchOptions): Promise<FetchResult>;
+  fetch(url: string): Promise<FetchResult>;
 }
 
 // MVP: SimpleFetchAdapter (uses global fetch())

@@ -1,13 +1,6 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { tryConvertJsonToToon } from '../../packages/capability-autotoon/src/core.js';
 
-export {
-  MAX_JSON_BYTES,
-  MIN_JSON_BYTES,
-  TOON_HEADER,
-  tryConvertJsonToToon,
-} from '../../packages/capability-autotoon/src/core.js';
-
 export default function autotoon(pi: ExtensionAPI): void {
   pi.on('tool_result', async (event) => {
     // Nested calls come from another tool, such as a codemode script, which expects the tool's

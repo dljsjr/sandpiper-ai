@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import type { Component } from '@earendil-works/pi-tui';
 import { Type } from 'typebox';
 import { drainPendingInboxToBatch, type TattlerPendingInbox } from './tattler-inbox';
@@ -80,5 +80,3 @@ export function registerTattlerReceiveTool(
     }
   });
 }
-
-export type TattlerReceiveContext = Pick<ExtensionContext, 'isIdle'>;

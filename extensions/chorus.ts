@@ -19,7 +19,6 @@ import {
   clearChorusRoomUi,
   createChorusMessageComponent,
   DEFAULT_OUTPUT_PAD,
-  registerChorusMessageRenderer,
   sendChorusMessageToChat,
   setChorusRoomUi,
 } from './chorus/chorus-ui';
@@ -417,7 +416,6 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
 export default function (pi: ExtensionAPI) {
   void stopActiveRoom();
   clearEventListeners();
-  registerChorusMessageRenderer(pi);
   registerChorusAgentCommand(pi);
   registerChorusReplyTool(pi);
 

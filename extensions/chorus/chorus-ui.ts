@@ -22,13 +22,8 @@ import {
   type TattlerPendingChorusMessage,
 } from '../tattler/tattler-inbox';
 import { requestChorusRoomPost } from '../tattler/tattler-pi-events';
-import { type ChorusRoomId, roomId, type TattlerIdentityV0, type TattlerMessageId } from '../tattler/tattler-protocol';
-import {
-  CHORUS_MESSAGE_CUSTOM_TYPE,
-  type ChorusIncomingMessageDetails,
-  type ChorusRoomBroker,
-  type ChorusTranscriptEntry,
-} from './chorus-runtime';
+import type { ChorusRoomId, TattlerIdentityV0 } from '../tattler/tattler-protocol';
+import type { ChorusIncomingMessageDetails, ChorusRoomBroker, ChorusTranscriptEntry } from './chorus-runtime';
 
 // Data retention bound: how many recent entries the transcript keeps as render candidates.
 // The actual on-screen height is a SEPARATE, smaller bound -- see CHORUS_ROOM_LINE_BUDGET_CAP
@@ -323,27 +318,6 @@ export function createChorusMessageComponent(
   const box = new Box(outputPad, 1, (text) => theme.bg(backgroundColor, text));
   box.addChild(new Text(`${badge}\n${details.message}`, 0, 0));
   return box;
-}
-
-export function registerChorusMessageRenderer(pi: ExtensionAPI): void {
-  pi.registerMessageRenderer<ChorusIncomingMessageDetails>(CHORUS_MESSAGE_CUSTOM_TYPE, (message, options, theme) => {
-    const details = message.details;
-    if (details) {
-      return createChorusMessageComponent(details, theme as ThemeLike, options.outputPad);
-    }
-
-    return createChorusMessageComponent(
-      {
-        roomId: roomId('unknown'),
-        from: 'unknown',
-        message: typeof message.content === 'string' ? message.content : '',
-        postId: 'unknown' as TattlerMessageId,
-        broker: { name: 'unknown', shortId: 'unknown', socketPath: '' },
-      },
-      theme as ThemeLike,
-      options.outputPad,
-    );
-  });
 }
 
 export function sendChorusMessageToChat(

@@ -3,14 +3,6 @@
  * Framework-independent — no pi imports.
  */
 
-/** Options passed to the fetch adapter. */
-export interface FetchOptions {
-  /** Custom HTTP headers. */
-  readonly headers?: Record<string, string>;
-  /** Request timeout in milliseconds. */
-  readonly timeoutMs?: number;
-}
-
 /** Raw result from the fetch adapter (before content extraction). */
 export interface FetchResult {
   /** Final URL after redirects. */
@@ -19,8 +11,6 @@ export interface FetchResult {
   readonly statusCode: number;
   /** Raw HTML body. */
   readonly html: string;
-  /** Content-Type header value. */
-  readonly contentType: string;
 }
 
 /** A link extracted from page content. */
@@ -105,5 +95,5 @@ export interface WebFetchResult {
 
 /** Adapter interface for fetching HTML. Extensible for future backends. */
 export interface FetchAdapter {
-  fetch(url: string, options?: FetchOptions): Promise<FetchResult>;
+  fetch(url: string): Promise<FetchResult>;
 }

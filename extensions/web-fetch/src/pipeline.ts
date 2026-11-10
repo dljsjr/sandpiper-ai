@@ -7,9 +7,15 @@ import { htmlToMarkdown } from './convert.js';
 import { extractContent, extractDocumentMetadata, extractLinksFromHtml, extractLinksFromMarkdown } from './extract.js';
 import { createWebFetchFilter, type HtmlFilterObject, type MarkdownFilterObject } from './filters.js';
 import { probeLlmsTxt } from './llms-txt.js';
-import type { FetchAdapter, FetchOptions, LlmsTxtProbeResult, WebFetchFilterSpec, WebFetchResult } from './types.js';
+import {
+  type FetchAdapter,
+  type LlmsTxtProbeResult,
+  type WebFetchFilterSpec,
+  WebFetchFilterType,
+  type WebFetchResult,
+} from './types.js';
 
-export interface PipelineOptions extends FetchOptions {
+export interface PipelineOptions {
   /** Targeted extraction filter. */
   readonly filter?: WebFetchFilterSpec;
   /** Whether to extract and return page links. */
@@ -20,23 +26,19 @@ export interface PipelineOptions extends FetchOptions {
 
 function noMatchMessage(filter: WebFetchFilterSpec): string {
   switch (filter.type) {
-    case 'css_selector':
+    case WebFetchFilterType.CssSelector:
       return `No content matched CSS selector: ${filter.selector}`;
-    case 'markdown_section':
+    case WebFetchFilterType.MarkdownSection:
       return `No content matched Markdown section: ${filter.heading}`;
-    default:
-      return 'No content matched filter';
   }
 }
 
 function filterErrorMessage(filter: WebFetchFilterSpec, error: string): string {
   switch (filter.type) {
-    case 'css_selector':
+    case WebFetchFilterType.CssSelector:
       return `CSS selector filter failed: ${error}`;
-    case 'markdown_section':
+    case WebFetchFilterType.MarkdownSection:
       return `Markdown section filter failed: ${error}`;
-    default:
-      return `Filter failed: ${error}`;
   }
 }
 
@@ -109,7 +111,7 @@ export async function fetchAndExtract(
   url: string,
   options?: PipelineOptions,
 ): Promise<WebFetchResult> {
-  const fetchResult = await adapter.fetch(url, options);
+  const fetchResult = await adapter.fetch(url);
   const llmsTxt = await (options?.probeLlmsTxt ?? probeLlmsTxt)(fetchResult.url);
   const filter = createWebFetchFilter(options?.filter);
 

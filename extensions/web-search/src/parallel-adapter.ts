@@ -23,7 +23,6 @@ import {
 const PARALLEL_MCP_URL = 'https://search.parallel.ai/mcp';
 const DEFAULT_TIMEOUT_MS = 15_000;
 const DEFAULT_MCP_REQUEST_TIMEOUT_MS = 60_000;
-const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
 /** Minimal shapes for what we read out of the MCP tool result. */
 interface McpTextContent {
@@ -82,11 +81,6 @@ export class ParallelMcpSearchAdapter implements SearchAdapter {
       return [];
     }
     const count = Math.min(options?.count ?? DEFAULT_RESULT_COUNT, MAX_RESULT_COUNT);
-    const requestedTimeoutMs = Math.trunc(options?.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-    const timeoutMs =
-      Number.isFinite(requestedTimeoutMs) && requestedTimeoutMs > 0
-        ? Math.min(requestedTimeoutMs, MAX_TIMER_DELAY_MS)
-        : DEFAULT_MCP_REQUEST_TIMEOUT_MS;
 
     const client = new McpClient({
       name: 'sandpiper-web-search',
@@ -108,7 +102,7 @@ export class ParallelMcpSearchAdapter implements SearchAdapter {
       const raw = await client.callTool(
         'web_search',
         { objective: trimmed, search_queries: [trimmed], session_id: this.sessionId },
-        { timeoutMs },
+        { timeoutMs: DEFAULT_TIMEOUT_MS },
       );
       return parseParallelResult(raw, count);
     } catch (error) {

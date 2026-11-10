@@ -73,7 +73,7 @@ describe('web-fetch extension', () => {
     },
   );
 
-  it('returns the tool result directly without sending a system notification when llms.txt exists', async () => {
+  it('returns the tool result directly when llms.txt exists', async () => {
     const toolResult: WebFetchToolResult = {
       content: [
         {
@@ -95,23 +95,20 @@ describe('web-fetch extension', () => {
       },
     };
     const executeWebFetchTool = vi.fn(async () => toolResult);
-    const sendMessage = vi.fn();
     let registeredTool: RegisteredWebFetchTool | undefined;
     const pi = {
       registerTool: vi.fn((tool: RegisteredWebFetchTool) => {
         registeredTool = tool;
       }),
-      sendMessage,
     } as unknown as ExtensionAPI;
 
     await init(pi, { adapter: createAdapter(), executeWebFetchTool });
     const output = await registeredTool?.execute('call-1', { url: 'https://example.com/page' });
 
     expect(output).toBe(toolResult);
-    expect(sendMessage).not.toHaveBeenCalled();
   });
 
-  it('does not send a system notification when probe metadata is absent', async () => {
+  it('returns the tool result when probe metadata is absent', async () => {
     const toolResult: WebFetchToolResult = {
       content: [{ type: 'text', text: 'URL: https://example.com/page\n\nExample body' }],
       details: {
@@ -119,18 +116,16 @@ describe('web-fetch extension', () => {
         title: 'Example title',
       },
     };
-    const sendMessage = vi.fn();
     let registeredTool: RegisteredWebFetchTool | undefined;
     const pi = {
       registerTool: vi.fn((tool: RegisteredWebFetchTool) => {
         registeredTool = tool;
       }),
-      sendMessage,
     } as unknown as ExtensionAPI;
 
     await init(pi, { adapter: createAdapter(), executeWebFetchTool: vi.fn(async () => toolResult) });
-    await registeredTool?.execute('call-1', { url: 'https://example.com/page' });
+    const output = await registeredTool?.execute('call-1', { url: 'https://example.com/page' });
 
-    expect(sendMessage).not.toHaveBeenCalled();
+    expect(output).toBe(toolResult);
   });
 });
