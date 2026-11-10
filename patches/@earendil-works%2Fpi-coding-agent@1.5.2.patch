@@ -46,6 +46,20 @@ index 8566260a142337b80861d41a70ca27425a066a36..df35089421821a6ee6cc368fa7641650
      const srcOrDist = existsSync(join(packageDir, "src")) ? "src" : "dist";
      return join(packageDir, srcOrDist, "modes", "interactive", "assets");
  }
+diff --git a/dist/core/client-identity.js b/dist/core/client-identity.js
+index bb263af7e5acf406be56edbdd1aafb32828af835..ed5e6ed3e8ab9fcfc0fff64ee73cdab393238eac 100644
+--- a/dist/core/client-identity.js
++++ b/dist/core/client-identity.js
+@@ -8,7 +8,8 @@ import { isInstallTelemetryEnabled } from "./telemetry.js";
+ export function getClientIdentity(settingsManager) {
+     return {
+         userAgent: "detailed",
+-        version: VERSION,
++        // Sandpiper local patch: identify as the Pi version; VERSION is the product package version.
++        version: process.env.PI_CODING_AGENT_VERSION || VERSION,
+         attribution: isInstallTelemetryEnabled(settingsManager) ? PI_ATTRIBUTION : null,
+     };
+ }
 diff --git a/dist/core/system-prompt.js b/dist/core/system-prompt.js
 index 94c320ec7175265d067891d044d5b37407bdbbb4..aab994c6d907bb80200d8e70c137916f6859ab1d 100644
 --- a/dist/core/system-prompt.js
@@ -63,6 +77,20 @@ index 94c320ec7175265d067891d044d5b37407bdbbb4..aab994c6d907bb80200d8e70c137916f
      }
      else {
          promptSections.preamble =
+diff --git a/dist/extensions/mcp/runtime.js b/dist/extensions/mcp/runtime.js
+index bad9188620334cb89268bff888f8117d075d1660..813fb7529df28cd43719ffa003d7c01a9b7063e6 100644
+--- a/dist/extensions/mcp/runtime.js
++++ b/dist/extensions/mcp/runtime.js
+@@ -280,7 +280,8 @@ export class McpServerConnection {
+     async connectOnce() {
+         const client = new McpClient({
+             name: "pi",
+-            version: VERSION,
++            // Sandpiper local patch: identify as the Pi version; VERSION is the product package version.
++            version: process.env.PI_CODING_AGENT_VERSION || VERSION,
+             requestTimeoutMs: this.timeoutMs,
+             roots: [{ uri: pathToFileURL(this.cwd).href, name: basename(this.cwd) }],
+         });
 diff --git a/dist/modes/interactive/interactive-mode.js b/dist/modes/interactive/interactive-mode.js
 index d4e4b09197dec6ab4e2a3d5dab6f9cb8620e7644..a0a4f08015cc3001aa82273b3a4fd64828252a42 100644
 --- a/dist/modes/interactive/interactive-mode.js
@@ -77,3 +105,17 @@ index d4e4b09197dec6ab4e2a3d5dab6f9cb8620e7644..a0a4f08015cc3001aa82273b3a4fd648
              if (newRelease) {
                  this.showNewVersionNotification(newRelease);
              }
+diff --git a/dist/utils/pi-user-agent.js b/dist/utils/pi-user-agent.js
+index 6ad454f69b411ae0c50a6f9d54938de0941f0ba2..61fe8953ede02a23ae43b67a1f307fbd5289abd3 100644
+--- a/dist/utils/pi-user-agent.js
++++ b/dist/utils/pi-user-agent.js
+@@ -1,6 +1,7 @@
+ import { formatUserAgent } from "@earendil-works/pi-ai";
+ /** pi's `User-Agent` for its own network requests; the same detailed form pi-ai sends to providers. */
+ export function getPiUserAgent(version) {
+-    return formatUserAgent({ userAgent: "detailed", version });
++    // Sandpiper local patch: identify as the Pi version; callers pass the product package version.
++    return formatUserAgent({ userAgent: "detailed", version: process.env.PI_CODING_AGENT_VERSION || version });
+ }
+ //# sourceMappingURL=pi-user-agent.js.map
+\ No newline at end of file

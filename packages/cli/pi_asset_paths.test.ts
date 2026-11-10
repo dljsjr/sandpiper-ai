@@ -84,3 +84,53 @@ describe('local Pi version-check patch', () => {
     );
   });
 });
+
+describe('local Pi User-Agent patch', () => {
+  interface PiUserAgents {
+    readonly ownRequests: string;
+    readonly providerRequests: string;
+  }
+
+  function readPiUserAgents(packageDir: string, piVersion?: string): PiUserAgents {
+    const env: NodeJS.ProcessEnv = { ...process.env, PI_PACKAGE_DIR: packageDir };
+    delete env.PI_CODING_AGENT_VERSION;
+    if (piVersion !== undefined) env.PI_CODING_AGENT_VERSION = piVersion;
+    const moduleUrl = (...path: readonly string[]) => JSON.stringify(pathToFileURL(join(piPackageDir, ...path)).href);
+    return JSON.parse(
+      execFileSync(
+        process.execPath,
+        [
+          '--input-type=module',
+          '-e',
+          `import { formatUserAgent } from ${JSON.stringify(import.meta.resolve('@earendil-works/pi-ai'))};
+import { VERSION } from ${JSON.stringify(configUrl)};
+import { getClientIdentity } from ${moduleUrl('dist', 'core', 'client-identity.js')};
+import { getPiUserAgent } from ${moduleUrl('dist', 'utils', 'pi-user-agent.js')};
+console.log(JSON.stringify({ ownRequests: getPiUserAgent(VERSION),
+providerRequests: formatUserAgent(getClientIdentity({ getEnableInstallTelemetry: () => false })) }));`,
+        ],
+        { encoding: 'utf8', env },
+      ),
+    ) as PiUserAgents;
+  }
+
+  it.each([
+    ['the Pi version', '1.2.3', /^pi\/1\.2\.3 /],
+    ['the product version when no Pi version is set', undefined, /^pi\/9\.8\.7 /],
+  ])('identifies as %s in its own and provider requests', (_label, piVersion, expected) => {
+    const packageDir = mkdtempSync(join(tmpdir(), 'sandpiper-pi-user-agent-'));
+    try {
+      writeFileSync(join(packageDir, 'package.json'), JSON.stringify({ name: 'sandpiper-ai-cli', version: '9.8.7' }));
+      const userAgents = readPiUserAgents(packageDir, piVersion);
+      expect(userAgents.ownRequests).toMatch(expected);
+      expect(userAgents.providerRequests).toMatch(expected);
+    } finally {
+      rmSync(packageDir, { recursive: true, force: true });
+    }
+  });
+
+  it('identifies as the Pi version to MCP servers', () => {
+    const mcpRuntime = join(piPackageDir, 'dist', 'extensions', 'mcp', 'runtime.js');
+    expect(readFileSync(mcpRuntime, 'utf8')).toContain('version: process.env.PI_CODING_AGENT_VERSION || VERSION,');
+  });
+});
