@@ -14,7 +14,7 @@ description: >-
 # Pi TUI Extension Patterns
 
 Reference for building TUI components in sandpiper extensions. **Read
-`.sandpiper/docs/tui-extension-patterns.md` for the full reference** — this skill
+`.sandpiper/archive/tui-extension-patterns-2026-03.md` for the full reference** — this skill
 provides orientation and the key decision guide.
 
 ## Three Ways to Show Content
@@ -63,7 +63,7 @@ ctx.ui.setWidget('my-banner', undefined); // clear the no-op widget
 - Fire-and-forget async work inside the factory for post-startup placement
 - Components are transient — not persisted to JSONL, no duplication on `--resume`
 
-See `.sandpiper/docs/tui-extension-patterns.md` for full details and layout map.
+See `.sandpiper/archive/tui-extension-patterns-2026-03.md` for full details and layout map.
 
 ## Custom Message Renderer Pattern (Caution: Persistent)
 
@@ -129,13 +129,13 @@ theme.bold(text)            // bold — combine: theme.bold(theme.fg('warning', 
 
 ## Adding new core package exports
 
-Adding a new module to `sandpiper-ai-core` requires a **full agent restart** after building —
+Adding a new module to `sandpiper-ai-core` requires a **full agent restart** —
 `/reload` does not re-resolve the dependency tree. jiti caches the module graph in memory
 for the lifetime of the session.
 
 ## Full Reference
 
-`.sandpiper/docs/tui-extension-patterns.md` — complete patterns, Pi internals analysis,
+`.sandpiper/archive/tui-extension-patterns-2026-03.md` — complete patterns, Pi internals analysis,
 component API details, and decision guide.
 
 Pi framework references (relative to `$PI_CODING_AGENT_PACKAGE`):

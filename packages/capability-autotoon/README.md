@@ -4,12 +4,11 @@ Shared AutoTOON implementation for the Sandpiper runtime.
 
 ## Modules
 
-| Module                | Description                                                                                     |
-| --------------------- | ----------------------------------------------------------------------------------------------- |
-| `src/core.ts`         | Host-neutral JSON→TOON transform constants and `tryConvertJsonToToon(...)`. No Pi imports.      |
-| `src/pi-extension.ts` | Pi adapter that registers the `tool_result` hook and applies the core transform to text blocks. |
+| Module        | Description                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| `src/core.ts` | Host-neutral JSON→TOON transform constants and `tryConvertJsonToToon(...)`. No Pi imports. |
 
-`extensions/autotoon/autotoon.ts` is the Pi extension entrypoint.
+`extensions/autotoon/autotoon.ts` is the Pi adapter. It registers the `tool_result` hook and applies the core transform to text blocks.
 
 ## Commands
 

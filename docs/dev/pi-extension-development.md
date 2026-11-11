@@ -7,8 +7,8 @@ Sandpiper builds on Pi's extension system. When you change extension behavior in
 | Surface                         | Use for                                                                                                                                                    |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `extensions/system/`            | Sandpiper identity, startup behavior, system prompt assembly, diagnostics, migration controls, session continuity, and Sandpiper-owned system capabilities |
-| `extensions/autotoon/`          | Pi entrypoint for AutoTOON                                                                                                                                 |
-| `packages/capability-autotoon/` | Host-neutral AutoTOON transform and Pi adapter source of truth                                                                                             |
+| `extensions/autotoon/`          | Pi adapter for AutoTOON                                                                                                                                    |
+| `packages/capability-autotoon/` | Host-neutral AutoTOON transform that the AutoTOON entrypoint calls                                                                                         |
 
 Keep entrypoints thin. Put reusable logic in package-owned modules or extension-local framework-independent modules, then wire that logic to Pi APIs at the edge.
 
@@ -53,9 +53,9 @@ For upstream source browsing, see the [Pi coding-agent package](https://github.c
 
 ## Work from source
 
-Extension sources live in `extensions/` and package-owned source directories. Pi loads their TypeScript source through jiti, so extension changes do not need a build step.
+Extension sources live in `extensions/` and package-owned source directories. The CLI bundles its built-in extensions, so run `bun run build` after you change one. Pi loads user and project extensions from TypeScript through jiti, without a build step.
 
-If you changed a package that emits output, run its package build or `bun run build`. See [Build system](build-system.md) for the workspace build flow.
+Core and capability packages expose source TypeScript and have no build of their own; the root build bundles them. See [Build system](build-system.md) for the build flow.
 
 ## Verify behavior
 

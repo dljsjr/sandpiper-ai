@@ -56,11 +56,10 @@ function componentForBatchDetails(
   return new TattlerPendingBatchComponent(details, theme, outputPad);
 }
 
-// Registers renderers for BOTH the legacy message-based batch (TATTLER_PENDING_BATCH_CUSTOM_TYPE,
-// still emitted for every model-visible batch) and the display-only entry-based batch
+// Registers renderers for BOTH the message-based batch (TATTLER_PENDING_BATCH_CUSTOM_TYPE,
+// emitted for every model-visible batch) and the display-only entry-based batch
 // (TATTLER_PENDING_BATCH_ENTRY_TYPE, used for model-invisible batches like chorus self-echoes).
-// Keep both registered permanently, not just during a migration window -- old session files
-// with legacy custom_message-shaped batches are a persistent population, not a transient one.
+// Keep both registered: both are emitted today, and session files hold both kinds of batch.
 export function registerTattlerPendingBatchRenderer(
   pi: Pick<ExtensionAPI, 'registerEntryRenderer' | 'registerMessageRenderer'>,
 ): void {

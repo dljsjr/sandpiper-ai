@@ -83,7 +83,7 @@ export interface SandpiperPromptContribution {
 ### Example: contributing extension
 
 ```typescript
-import { SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL } from 'sandpiper-ai-core';
+const SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL = 'sandpiper:prompt-contribution';
 
 pi.on("resources_discover", async (_event, _ctx) => {
   pi.events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {

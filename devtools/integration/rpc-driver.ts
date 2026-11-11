@@ -7,7 +7,7 @@
 // U+2028/U+2029, which are valid inside JSON strings) -- this driver splits stdout on '\n'
 // itself rather than reaching for `readline`.
 //
-// message_update is delta-only as of 0.84.0 (no cumulative `message`, no
+// message_update is delta-only (no cumulative `message`, no
 // `assistantMessageEvent.partial`): this driver buffers text deltas by `contentIndex` for
 // callers that want to observe streaming, but `message_end.message` is what
 // `waitForAssistantText`/tool-result helpers treat as ground truth -- never the buffered

@@ -173,9 +173,9 @@ These were discussed but are not authorized. Each needs Doug's go-ahead before i
 - Register rarely used Sandpiper tools with `exposure: "deferred"` and enable `tool_search`, so their snippets and guidelines leave the `tools` and `rules` sections until the model loads them. `pi-claude-code-cli-provider` delivers mid-run tool additions through `tools/list_changed` since PCCP-304, so a loaded tool is callable in the same run.
 - Register turn-control tools (`done`, `tattler_receive`) with `exposure: "model-only"` if codemode scripts calling them becomes a measured problem: calls from scripts ignore `terminate`.
 
-### Approved MCP client adoption
+### MCP client adoption
 
-Doug approved replacing the internal mcporter library in the current simplification work. TOOLS-100–102 track the adapter, dependencies, and verification. The approved design uses the standalone `@earendil-works/pi-mcp` client behind our existing `web_search` tool. It does not use `pi.registerMcpServer()` or expose additional server tools.
+Doug approved replacing the internal mcporter library in the simplification work. TOOLS-100–102 delivered the adapter, dependencies, and verification. Sandpiper uses the standalone `@earendil-works/pi-mcp` client behind our existing `web_search` tool. It does not use `pi.registerMcpServer()` or expose additional server tools.
 
 ## Provider-facing request shape
 

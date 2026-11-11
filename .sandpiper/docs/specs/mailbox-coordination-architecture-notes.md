@@ -1,7 +1,7 @@
 # Agent Conversation Coordination Architecture Review Notes
 
 - **Diátaxis mode**: Explanation / working design notes
-- **Status**: Draft, active discussion
+- **Status**: Complete. The AGENT-201 review is finished.
 - **Task**: AGENT-201
 - **Last updated**: 2026-05-14
 

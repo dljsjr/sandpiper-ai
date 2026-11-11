@@ -9,7 +9,7 @@ A Pi extension that adds a `web_search` tool — search the web and return struc
 ```
 Agent: "What's the latest version of React?"
   → web_search("React latest version")
-  → Returns: [{title, url, snippet}, ...]
+  → Returns: numbered results, each with title, URL, snippet
   → Agent picks a URL → web_fetch(url)
 ```
 
@@ -28,12 +28,12 @@ Provider selection lives in `src/adapter-selection.ts`. Parallel runs behind our
 
 ### Brave Search API (recommended)
 
-Set `BRAVE_API_KEY` as an environment variable, or store it in `~/.sandpiper/settings.json` under the `web-search` namespace:
+Set `BRAVE_API_KEY` as an environment variable, or store it as `braveApiKey` under the `web-search` namespace in `settings.json`. The extension reads `.sandpiper/settings.json` in the working directory first, then `settings.json` in the agent directory (`~/.sandpiper/agent/` by default):
 
 ```json
 {
   "web-search": {
-    "apiKey": "$BRAVE_API_KEY"
+    "braveApiKey": "$BRAVE_API_KEY"
   }
 }
 ```
@@ -41,7 +41,7 @@ Set `BRAVE_API_KEY` as an environment variable, or store it in `~/.sandpiper/set
 The config resolver supports:
 
 - **Literal strings**: `"sk-abc123"`
-- **Env var references**: `"$BRAVE_API_KEY"` or `"BRAVE_API_KEY"` (all-uppercase)
+- **Env var references**: `"$BRAVE_API_KEY"` or `"${BRAVE_API_KEY}"`. A bare `"BRAVE_API_KEY"` is a literal string.
 - **Shell commands**: `"!op read op://vault/brave-api-key/password"` (prefix with `!`)
 
 ### Parallel (anonymous fallback)
@@ -56,15 +56,17 @@ No configuration needed. Works without an API key but may hit CAPTCHAs on repeat
 
 ## Result format
 
-```json
-[
-  {
-    "title": "Getting Started with Example",
-    "url": "https://example.com/docs",
-    "snippet": "A comprehensive guide to..."
-  }
-]
+The tool returns numbered text, with the provider name in the header line:
+
 ```
+Search results for "example docs" (via brave):
+
+1. Getting Started with Example
+   https://example.com/docs
+   A comprehensive guide to...
+```
+
+When nothing matches, it returns `No results for "example docs" (via brave).`
 
 ## Parameters
 
@@ -104,6 +106,9 @@ extensions/web-search/
 │   ├── types.ts              # SearchAdapter interface + result types
 │   ├── tool-metadata.ts      # LLM-facing description, promptSnippet, param docs
 │   ├── tool-operation.ts     # Framework-independent execution logic
+│   ├── adapter-selection.ts  # Picks the adapter: Brave when a key resolves, otherwise Parallel
+│   ├── brave-adapter.ts      # Brave Search API adapter
+│   ├── parallel-adapter.ts   # Parallel MCP search adapter (anonymous fallback)
 │   ├── ddg-adapter.ts        # DuckDuckGo HTML scraping adapter
 │   ├── config-resolver.ts    # !cmd / $VAR / literal config value resolver
 │   └── __fixtures__/         # Test fixtures (DDG SERP HTML)

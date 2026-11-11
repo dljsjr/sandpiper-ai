@@ -9,8 +9,7 @@ AutoTOON currently does conversion only. It does not inject model guidance about
 | Path                                                         | Purpose                                          |
 | ------------------------------------------------------------ | ------------------------------------------------ |
 | `packages/capability-autotoon/src/core.ts`                   | Host-neutral JSON→TOON transform source of truth |
-| `packages/capability-autotoon/src/pi-extension.ts`           | Pi `tool_result` adapter                         |
-| `extensions/autotoon/autotoon.ts`                            | Pi extension entrypoint                          |
+| `extensions/autotoon/autotoon.ts`                            | Pi `tool_result` adapter                         |
 
 ## Conversion pipeline
 
@@ -19,7 +18,7 @@ When a tool result is available:
 1. The Pi adapter receives the `tool_result` event.
 2. AutoTOON inspects each text content block.
 3. Fast-reject skips text that does not start with `{` or `[`.
-4. Size gates skip payloads smaller than 256 bytes or larger than 100,000 bytes.
+4. Size gates skip payloads shorter than 256 characters or longer than 100,000 characters.
 5. The payload is parsed as JSON.
 6. The JSON is encoded as TOON.
 7. The conversion is kept only if TOON is shorter than the original JSON.
@@ -54,6 +53,6 @@ bun run test:vitest -- extensions/autotoon/autotoon.test.ts
 ## Future work
 
 - Reintroduce capability guidance if dynamic system-prompt sections return.
-- Use token-aware savings instead of byte length.
+- Use token-aware savings instead of character length.
 - Add per-tool opt-out configuration.
 - Track conversion metrics.

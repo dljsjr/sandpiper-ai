@@ -14,7 +14,7 @@ On top of pi's core functionality, Sandpiper provides:
 
 ### Enhanced Capabilities
 
-- **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion for 30–60% token savings on tabular data. Works transparently in the background.
+- **[AutoTOON](docs/features/autotoon.md)** — Automatic JSON→TOON conversion to cut token use on tabular data. Works transparently in the background.
 - **Skill Support** — Load project-local or separately installed skills. Skills add domain knowledge without putting their full contents in the system prompt.
 
 ## Quick Start
@@ -50,8 +50,13 @@ sandpiper-ai/
 │   ├── features/        # Feature documentation
 │   ├── dev/             # Developer documentation
 │   └── concepts/        # Conceptual/reference documentation
-├── extensions/          # Pi extension packages and compatibility entrypoints
-│   └── system/          # Sandpiper identity + system capabilities
+├── extensions/          # Pi extensions
+│   ├── system/          # Sandpiper identity + system capabilities
+│   ├── autotoon/        # AutoTOON adapter
+│   ├── tattler/         # Peer messaging
+│   ├── chorus.ts        # Chorus rooms
+│   ├── web-fetch/       # web_fetch tool
+│   └── web-search/      # web_search tool
 ├── dist/                # Built entrypoints and shared chunks
 ├── packages/            # Source modules and internal workspace packages
 │   ├── cli/             # Sandpiper entrypoints and stable bin launchers

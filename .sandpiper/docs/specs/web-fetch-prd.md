@@ -59,10 +59,10 @@ Implemented as a Pi extension (`extensions/web-fetch/`) with a `web_fetch` tool.
 
 ### Framework-Independent Core
 
-Same pattern as shell-relay: all logic in pure TypeScript modules, only `index.ts` imports Pi framework APIs.
+All logic lives in pure TypeScript modules; only `index.ts` imports Pi framework APIs.
 
 ```
-extensions/web-fetch/
+extensions/web-fetch/src/
 ├── index.ts          # Pi glue: tool registration (thin)
 ├── fetch.ts          # HTTP fetching (fetch API wrapper)
 ├── extract.ts        # Content extraction (readability + jsdom)

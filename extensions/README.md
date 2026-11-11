@@ -4,10 +4,14 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ## Contents
 
-| Extension                | Description                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| [`system/`](system/)     | Sandpiper identity, lifecycle behavior, and core tools                       |
-| [`autotoon/`](autotoon/) | Pi entrypoint for the AutoTOON capability in `packages/capability-autotoon/` |
+| Extension                    | Description                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| [`system/`](system/)         | Sandpiper identity, lifecycle behavior, and core tools                          |
+| [`autotoon/`](autotoon/)     | Pi adapter for AutoTOON; calls the transform in `packages/capability-autotoon/` |
+| [`tattler/`](tattler/)       | Tattler peer messaging: `list_peers`, `send_peer_message`, and the inbox        |
+| [`chorus.ts`](chorus.ts)     | Chorus rooms: the `/chorus` and `/agent` commands and `send_chorus_reply`       |
+| [`web-fetch/`](web-fetch/)   | The `web_fetch` tool                                                            |
+| [`web-search/`](web-search/) | The `web_search` tool                                                           |
 
 ### system/
 
@@ -19,7 +23,7 @@ As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic i
 
 ### autotoon
 
-`autotoon/` is the Pi entrypoint. The source of truth lives in `packages/capability-autotoon/`: `src/core.ts` contains the host-neutral JSON→TOON transform, while `src/pi-extension.ts` contains the Pi `tool_result` adapter.
+`autotoon/autotoon.ts` is the Pi `tool_result` adapter. It calls the host-neutral JSON→TOON transform in `packages/capability-autotoon/src/core.ts`.
 
 ## How Extensions Work
 

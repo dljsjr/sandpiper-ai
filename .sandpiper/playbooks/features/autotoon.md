@@ -10,8 +10,7 @@ Read this before changing JSON→TOON conversion or AutoTOON adapters.
 ## Key Rules
 
 - The host-neutral transform source of truth is `packages/capability-autotoon/src/core.ts`.
-- Pi adapter behavior lives in `packages/capability-autotoon/src/pi-extension.ts`.
-- The Pi entrypoint lives in `extensions/autotoon/autotoon.ts`. The package owns the implementation.
+- The Pi adapter lives in `extensions/autotoon/autotoon.ts`. It calls the transform from `packages/capability-autotoon/src/core.ts`.
 - Keep prompt/capability guidance separate from conversion unless the task explicitly reintroduces guidance injection.
 - Preserve size gates and length-guard behavior unless tests are updated to cover the change.
 

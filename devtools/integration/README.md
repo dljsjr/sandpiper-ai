@@ -73,7 +73,7 @@ curious) — both real, both moot for the reason below.
 
 **The guard was torn down entirely, not reframed, once the actual question got asked: what
 situation causes a pinned `--provider` invocation to _not_ use the mock?** Answer: none exists.
-An unknown provider is a hard error; an unresolvable model is a hard error; pi 0.84.0 makes
+An unknown provider is a hard error; an unresolvable model is a hard error; pi makes
 resolution ambiguity an explicit error, not a silent fallback. The guard was scar tissue for a
 threat model that doesn't describe how pi actually behaves. What replaced it:
 

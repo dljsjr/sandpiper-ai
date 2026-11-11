@@ -4,15 +4,20 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 
 ## Modules
 
-| Module                             | Description                                                                             |
-| ---------------------------------- | --------------------------------------------------------------------------------------- |
-| `background-process-capability.ts` | Host-neutral background process start/check/completion operations over `ProcessManager` |
-| `migrate-pi-configs.ts`            | Move/symlink pi config directories to sandpiper equivalents                             |
-| `migration-controls.ts`            | Package-owned migration flag and `/migrate-pi` command operations                       |
-| `session-continuity.ts`            | Set `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` for a session                   |
-| `startup-context.ts`               | Collect compact startup prompt context (projects, active tasks, working-copy summary)   |
-| `startup-prompt.ts`                | Assemble Sandpiper startup prompt context for the Pi adapter                            |
-| `system-diagnostics.ts`            | Package-owned diagnostics startup planning                                              |
+| Module                             | Description                                                                               |
+| ---------------------------------- | ----------------------------------------------------------------------------------------- |
+| `background-process-capability.ts` | Host-neutral background process start/check/completion operations over `ProcessManager`   |
+| `migrate-pi-configs.ts`            | Move/symlink pi config directories to sandpiper equivalents                               |
+| `migration-controls.ts`            | Package-owned migration flag and `/migrate-pi` command operations                         |
+| `session-continuity.ts`            | Set `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` for a session                     |
+| `process-manager.ts`               | `ProcessManager` and `ManagedProcess`: spawn, track, and buffer output of child processes |
+| `startup-prompt.ts`                | Assemble Sandpiper startup prompt context for the Pi adapter                              |
+| `system-diagnostics.ts`            | Package-owned diagnostics startup planning                                                |
+| `system-notification.ts`           | Format and send `<sandpiper_system_notification>` messages                                |
+| `system-prompt.ts`                 | Build the Sandpiper system prompt blocks                                                  |
+| `user-profile.ts`                  | Read `USER.md` from the agent directory                                                   |
+| `utils.ts`                         | Small shared helpers (`withTimeout`, `errorMessage`, `isRecord`, session short IDs)       |
+| `version-control.ts`               | Detect whether the working directory uses jj, git, or neither                             |
 
 ## Build
 

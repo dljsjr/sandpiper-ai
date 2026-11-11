@@ -44,10 +44,11 @@ stretching v0 guidance:
 Treat v0 as a same-host, live-session validation slice:
 
 - Keep `extensions/tattler/index.ts` as the Pi entrypoint unless
-  the user explicitly asks to start the v1 extraction.
+  the user explicitly asks to start the v1 extraction. The inbox, IPC,
+  protocol, identity, room log, and receive logic live in the `tattler-*.ts`
+  modules beside it.
 - Prefer small behavior slices over package architecture, durable logs,
   broadcast, stable identity, or handshake work.
-- Keep TAT-5 dogfood open while the user is actively validating multi-agent use.
 - Treat short IDs and `.id` identity files as local session locators, not stable
   agent identity. Stable agent identity/directory belongs to TAT-7/v1.
 
@@ -95,9 +96,14 @@ Useful cases to re-test after changes:
 
 ## Verification
 
-Run focused checks first, then the repo gate when the slice is ready. Until
-`TAT-12` adds Tattler-specific tests, the available focused checks depend on the
-area touched:
+Run focused checks first, then the repo gate when the slice is ready. The
+Tattler tests live beside the modules in `extensions/tattler/*.test.ts`:
+
+```sh
+bun run test:vitest -- extensions/tattler
+```
+
+Other focused checks depend on the area touched:
 
 - If touching system notification behavior, run:
 
