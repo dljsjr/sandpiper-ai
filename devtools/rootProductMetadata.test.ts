@@ -56,7 +56,6 @@ describe('root Sandpiper product', () => {
     };
     expect(webSearch.dependencies).toEqual({
       '@earendil-works/pi-mcp': '1.5.2',
-      jsdom: '30.0.1',
     });
     expect(product.devDependencies).not.toHaveProperty('mcporter');
     expect(product.devDependencies).toMatchObject({

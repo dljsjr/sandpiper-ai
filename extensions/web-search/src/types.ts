@@ -3,8 +3,7 @@
  * Framework-independent — no pi imports.
  *
  * This is the load-bearing seam: every search provider implements `SearchAdapter`,
- * mirroring web-fetch's `FetchAdapter`. Swapping DuckDuckGo for Brave or SearXNG later
- * is a new adapter behind this interface, not a rewrite.
+ * mirroring web-fetch's `FetchAdapter`.
  */
 
 /** A single search-result row. Deliberately minimal — title, url, snippet. */
@@ -21,18 +20,14 @@ export interface SearchResultItem {
 export interface SearchAdapterOptions {
   /** Max number of results to return. Adapters should treat this as an upper bound. */
   readonly count?: number;
-  /** Request timeout in milliseconds. */
-  readonly timeoutMs?: number;
-  /** Optional cancellation signal (wired through to the underlying HTTP call). */
-  readonly signal?: AbortSignal;
 }
 
 /**
- * A search provider. One implementation per backend (DuckDuckGo, Brave, SearXNG, ...).
+ * A search provider. One implementation per backend (Brave, Parallel).
  * The default count when unspecified is provider-defined but should be small (≈5).
  */
 export interface SearchAdapter {
-  /** Stable provider identifier, e.g. "duckduckgo", "brave". Surfaced in tool result details. */
+  /** Stable provider identifier, e.g. "brave", "parallel". Surfaced in tool result details. */
   readonly name: string;
   /** Run a single query and return ranked results (best-first), capped by `options.count`. */
   search(query: string, options?: SearchAdapterOptions): Promise<SearchResultItem[]>;

@@ -20,7 +20,6 @@ Mirrors `web-fetch`'s adapter pattern:
 - **`SearchAdapter`** interface — one implementation per search provider
 - `BraveSearchAdapter` uses the Brave Search API as the primary provider when its key resolves.
 - `ParallelMcpSearchAdapter` uses Pi's standalone MCP client for the anonymous Parallel fallback.
-- `DdgSearchAdapter` remains available for explicit use. It is not the automatic fallback.
 
 Provider selection lives in `src/adapter-selection.ts`. Parallel runs behind our existing `web_search` tool. It does not register upstream tools or require a separate MCP server configuration.
 
@@ -51,10 +50,6 @@ The config resolver supports:
 No API key or separate MCP server configuration is needed. Our `web_search` tool calls Parallel through Pi's standalone MCP client. Upstream tools do not enter the model's tool catalogue.
 
 Connection setup has a 60-second limit. The tool-call limit defaults to 15 seconds, followed by best-effort session cleanup.
-
-### DuckDuckGo (explicit adapter)
-
-No configuration needed. Works without an API key but may hit CAPTCHAs on repeated queries. Best for occasional use or when no API key is available.
 
 ## Result format
 
@@ -111,9 +106,7 @@ extensions/web-search/
 │   ├── adapter-selection.ts  # Picks the adapter: Brave when a key resolves, otherwise Parallel
 │   ├── brave-adapter.ts      # Brave Search API adapter
 │   ├── parallel-adapter.ts   # Parallel MCP search adapter (anonymous fallback)
-│   ├── ddg-adapter.ts        # DuckDuckGo HTML scraping adapter
-│   ├── config-resolver.ts    # !cmd / $VAR / literal config value resolver
-│   └── __fixtures__/         # Test fixtures (DDG SERP HTML)
+│   └── config-resolver.ts    # !cmd / $VAR / literal config value resolver
 ├── package.json
 └── vitest.config.ts
 ```

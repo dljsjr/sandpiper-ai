@@ -6,9 +6,6 @@
  *   2. Brave, if a Brave API key resolves (keyed, primary).
  *   3. Parallel's free MCP search (no-key fallback) when no key is configured.
  *
- * DuckDuckGo remains implemented but is no longer the auto-fallback (it CAPTCHA-walls
- * server-side); Parallel's free anonymous MCP is the reliable no-key path.
- *
  * The Brave key is read from `BRAVE_API_KEY` (env) or `braveApiKey` (settings.json) and
  * resolved through the config-resolver, so it supports literals, `$VAR`, and `!cmd`
  * (e.g. `!op read 'op://Personal/.../credential'`) — the secret never lands in a file.
