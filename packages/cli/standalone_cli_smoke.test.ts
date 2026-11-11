@@ -43,7 +43,7 @@ function runStandalone(args: readonly string[], env: NodeJS.ProcessEnv): string 
 }
 
 function runSandpiperBin(args: readonly string[], env: NodeJS.ProcessEnv): string {
-  return execFileSync(bunExecutable, ['./packages/cli/bin/sandpiper', ...args], {
+  return execFileSync(bunExecutable, ['--no-install', './packages/cli/bin/sandpiper', ...args], {
     cwd: repoRoot,
     encoding: 'utf-8',
     env,
