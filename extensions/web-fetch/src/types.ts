@@ -9,8 +9,10 @@ export interface FetchResult {
   readonly url: string;
   /** HTTP status code. */
   readonly statusCode: number;
-  /** Raw HTML body. */
-  readonly html: string;
+  /** Raw response body: HTML, or text when `contentType` says so. */
+  readonly body: string;
+  /** Lowercase media type from the Content-Type header, without parameters. Absent when the server sent none. */
+  readonly contentType?: string;
 }
 
 /** A link extracted from page content. */
@@ -93,7 +95,7 @@ export interface WebFetchResult {
   readonly links?: readonly ExtractedLink[];
 }
 
-/** Adapter interface for fetching HTML. Extensible for future backends. */
+/** Adapter interface for fetching a page. Extensible for future backends. */
 export interface FetchAdapter {
   fetch(url: string): Promise<FetchResult>;
 }

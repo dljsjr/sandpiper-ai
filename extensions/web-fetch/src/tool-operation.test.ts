@@ -25,7 +25,7 @@ function createAdapter(): FetchAdapter {
     fetch: vi.fn(async () => ({
       url: 'https://example.com/final',
       statusCode: 200,
-      html: '<h1>Example</h1>',
+      body: '<h1>Example</h1>',
     })),
   };
 }

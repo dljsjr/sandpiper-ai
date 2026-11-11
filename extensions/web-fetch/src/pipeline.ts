@@ -24,6 +24,9 @@ export interface PipelineOptions {
   readonly probeLlmsTxt?: (url: string) => Promise<LlmsTxtProbeResult>;
 }
 
+// Bodies that are already text. Parsing them as HTML would collapse their line structure.
+const TEXT_MEDIA_TYPES = new Set(['text/markdown', 'text/x-markdown', 'text/plain']);
+
 function noMatchMessage(filter: WebFetchFilterSpec): string {
   switch (filter.type) {
     case WebFetchFilterType.CssSelector:
@@ -127,15 +130,40 @@ export async function fetchAndExtract(
     };
   }
 
-  if (filter?.stage === 'html' && options?.filter) {
-    return applyHtmlFilter(fetchResult.html, fetchResult.url, filter, options.filter, llmsTxt, options);
+  if (fetchResult.contentType !== undefined && TEXT_MEDIA_TYPES.has(fetchResult.contentType)) {
+    const result = {
+      url: fetchResult.url,
+      title: '',
+      excerpt: '',
+      byline: '',
+      siteName: '',
+      content: fetchResult.body,
+      llmsTxt,
+    };
+    if (filter?.stage === 'markdown' && options?.filter) {
+      return applyMarkdownFilter(fetchResult.body, result, filter, options.filter, options);
+    }
+    if (filter?.stage === 'html' && options?.filter) {
+      const error = `the response is ${fetchResult.contentType}, not HTML`;
+      return {
+        ...result,
+        content: filterErrorMessage(options.filter, error),
+        filter: { type: filter.type, matched: false, matchCount: 0, error },
+      };
+    }
+
+    return options?.followLinks ? { ...result, links: extractLinksFromMarkdown(fetchResult.body) } : result;
   }
 
-  const extracted = extractContent(fetchResult.html, fetchResult.url);
+  if (filter?.stage === 'html' && options?.filter) {
+    return applyHtmlFilter(fetchResult.body, fetchResult.url, filter, options.filter, llmsTxt, options);
+  }
+
+  const extracted = extractContent(fetchResult.body, fetchResult.url);
 
   if (!extracted) {
     // Readability couldn't parse — fall back to raw HTML conversion
-    const markdown = htmlToMarkdown(fetchResult.html);
+    const markdown = htmlToMarkdown(fetchResult.body);
     const result = {
       url: fetchResult.url,
       title: '',

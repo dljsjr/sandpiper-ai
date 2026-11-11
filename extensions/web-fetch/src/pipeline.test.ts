@@ -72,6 +72,35 @@ const ARTICLE_PAGE = `
 </html>
 `;
 
+const RAW_CHANGELOG = [
+  '# Changelog',
+  '',
+  'All notable changes are listed here.',
+  '',
+  '## [0.80.10] - 2026-07-01',
+  '',
+  '- Later release.',
+  '',
+  '## [0.80.1] - 2026-06-23',
+  '',
+  '- Fixed the   spacing bug.',
+  '- See the [migration guide](https://example.com/migrate).',
+  '',
+  '```sh',
+  '# not a heading',
+  'bun   install',
+  '```',
+  '',
+  '## [0.80.0] - 2026-06-01',
+  '',
+  '- First release.',
+  '',
+  '[0.80.10]: https://example.com/v0.80.10',
+  '[0.80.1]: https://example.com/v0.80.1',
+  '[0.80.0]: https://example.com/v0.80.0',
+  '',
+].join('\n');
+
 let server: Server;
 let baseUrl: string;
 
@@ -99,6 +128,12 @@ function handler(req: IncomingMessage, res: ServerResponse) {
   if (url === '/sections') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(SECTION_PAGE);
+    return;
+  }
+
+  if (url === '/CHANGELOG.md') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end(RAW_CHANGELOG);
     return;
   }
 
@@ -259,6 +294,52 @@ describe('fetchAndExtract (end-to-end)', () => {
 
     expect(result.content).toBe('No content matched Markdown section: Missing Section');
     expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: false, matchCount: 0 });
+  });
+
+  it('should return a plain-text Markdown document unchanged', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/CHANGELOG.md`);
+
+    expect(result.content).toBe(RAW_CHANGELOG);
+    expect(result.title).toBe('');
+  });
+
+  it('should apply a Markdown section filter to a plain-text Markdown document', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/CHANGELOG.md`, {
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: '[0.80.0] - 2026-06-01' },
+    });
+
+    expect(result.content).toBe(
+      [
+        '## [0.80.0] - 2026-06-01',
+        '',
+        '- First release.',
+        '',
+        '[0.80.10]: https://example.com/v0.80.10',
+        '[0.80.1]: https://example.com/v0.80.1',
+        '[0.80.0]: https://example.com/v0.80.0',
+      ].join('\n'),
+    );
+    expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: true, matchCount: 1 });
+  });
+
+  it('should extract links from a plain-text Markdown document when followLinks is true', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/CHANGELOG.md`, { followLinks: true });
+
+    expect(result.links).toEqual([{ text: 'migration guide', href: 'https://example.com/migrate' }]);
+  });
+
+  it('should explain that a CSS selector cannot apply to a plain-text document', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/CHANGELOG.md`, {
+      filter: { type: WebFetchFilterType.CssSelector, selector: 'h2' },
+    });
+
+    expect(result.content).toBe('CSS selector filter failed: the response is text/plain, not HTML');
+    expect(result.filter).toEqual({
+      type: WebFetchFilterType.CssSelector,
+      matched: false,
+      matchCount: 0,
+      error: 'the response is text/plain, not HTML',
+    });
   });
 
   it('should not include links when followLinks is false/undefined', async () => {

@@ -24,12 +24,14 @@ export class SimpleFetchAdapter implements FetchAdapter {
         redirect: 'follow',
       });
 
-      const html = await response.text();
+      const body = await response.text();
+      const contentType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase();
 
       return {
         url: response.url,
         statusCode: response.status,
-        html,
+        body,
+        ...(contentType ? { contentType } : {}),
       };
     } finally {
       clearTimeout(timer);

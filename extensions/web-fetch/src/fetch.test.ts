@@ -26,7 +26,7 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.writeHead(200, { 'Content-Type': 'Text/Plain; charset=utf-8' });
   res.end('default');
 }
 
@@ -53,14 +53,23 @@ describe('SimpleFetchAdapter', () => {
   it('should fetch a simple HTML page', async () => {
     const result = await adapter.fetch(`${baseUrl}/hello`);
     expect(result.statusCode).toBe(200);
-    expect(result.html).toContain('<h1>Hello</h1>');
+    expect(result.body).toContain('<h1>Hello</h1>');
   });
 
   it('should follow redirects and return the final URL', async () => {
     const result = await adapter.fetch(`${baseUrl}/redirect`);
     expect(result.statusCode).toBe(200);
     expect(result.url).toContain('/hello');
-    expect(result.html).toContain('<h1>Hello</h1>');
+    expect(result.body).toContain('<h1>Hello</h1>');
+  });
+
+  it('should report the media type without its parameters', async () => {
+    const html = await adapter.fetch(`${baseUrl}/hello`);
+    const text = await adapter.fetch(`${baseUrl}/charset`);
+
+    expect(html.contentType).toBe('text/html');
+    expect(text.contentType).toBe('text/plain');
+    expect(text.body).toBe('default');
   });
 
   it('should return 404 status for not-found pages', async () => {
