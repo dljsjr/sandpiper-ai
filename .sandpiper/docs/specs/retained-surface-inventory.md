@@ -10,9 +10,9 @@ This inventory records the audited revision after the root-product build and nat
 
 ## Implementation checkpoint
 
-Doug authorized all ten approved tasks on 2026-11-11 and chose GPT-6.1 Sol for the subagents. Nine are implemented: AGENT-321 to AGENT-323, WEB-22, and TOOLS-109 to TOOLS-113. Parent and independent reviews found no outstanding actionable findings. TOOLS-114 starts last, after content changes.
+Doug authorized all ten approved tasks on 2026-11-11 and chose GPT-6.1 Sol for the subagents. All are implemented: AGENT-321 to AGENT-323, WEB-22, and TOOLS-109 to TOOLS-114. Parent and independent reviews found no outstanding actionable findings. Markdown formatting and its gate landed last, in separate commits.
 
-Full and per-commit test gates remain pending because of machine load. Implemented tasks remain IN PROGRESS, not accepted or complete. Trail holds per-task evidence. The continuation entrypoint is [the simplification handoff](../../notes/simplification-handoff.md).
+Independent frozen installs and clean checks passed for all 11 implementation units. Six tasks passed their full gates and are NEEDS REVIEW. Four remain IN PROGRESS after a low-load CLI smoke-test timeout stopped the gate queue. The same timeout reproduced on the already-gated predecessor, so it is not specific to the removal commit. TOOLS-116 records the separate blocker. Authorized investigation found unintended Bun auto-install before host aliases. A test-only `--no-install` correction awaits approval; no runtime policy change is authorized. No task is user-accepted or complete. Trail holds per-task evidence. The continuation entrypoint is [the simplification handoff](../../notes/simplification-handoff.md).
 
 ## How to read the tables
 
