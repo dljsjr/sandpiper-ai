@@ -7,12 +7,9 @@ Shared core utilities used across sandpiper packages and extensions. Framework-i
 | Module                             | Description                                                                               |
 | ---------------------------------- | ----------------------------------------------------------------------------------------- |
 | `background-process-capability.ts` | Host-neutral background process start/check/completion operations over `ProcessManager`   |
-| `migrate-pi-configs.ts`            | Move/symlink pi config directories to sandpiper equivalents                               |
-| `migration-controls.ts`            | Package-owned migration flag and `/migrate-pi` command operations                         |
 | `session-continuity.ts`            | Set `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` for a session                     |
 | `process-manager.ts`               | `ProcessManager` and `ManagedProcess`: spawn, track, and buffer output of child processes |
 | `startup-prompt.ts`                | Assemble Sandpiper startup prompt context for the Pi adapter                              |
-| `system-diagnostics.ts`            | Package-owned diagnostics startup planning                                                |
 | `system-notification.ts`           | Format and send `<sandpiper_system_notification>` messages                                |
 | `system-prompt.ts`                 | Build the Sandpiper system prompt blocks                                                  |
 | `user-profile.ts`                  | Read `USER.md` from the agent directory                                                   |
@@ -33,7 +30,7 @@ bun run test:vitest -- packages/core
 Extensions import from `sandpiper-ai-core`:
 
 ```typescript
-import { performMigration } from "sandpiper-ai-core";
+import { errorMessage } from "sandpiper-ai-core";
 ```
 
 The package exports its source for both runtime imports and type checking. Extensions do not need a generated core `dist/` directory.

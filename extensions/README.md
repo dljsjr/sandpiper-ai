@@ -15,7 +15,7 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ### system/
 
-`system/` owns Sandpiper identity and startup behavior, prompt assembly, session continuity, diagnostics, the model-callable `skill` tool, background process tools, and completion hooks.
+`system/` owns Sandpiper identity and startup behavior, prompt assembly, session continuity, the model-callable `skill` tool, background process tools, and completion hooks.
 
 The entrypoints are intentionally thin glue layers. Framework-independent logic belongs in `packages/core/` or focused extension-local modules. Pi-specific system wiring lives under `extensions/system/`.
 

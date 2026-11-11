@@ -6,7 +6,7 @@ Sandpiper builds on Pi's extension system. When you change extension behavior in
 
 | Surface                         | Use for                                                                                                                                                    |
 | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extensions/system/`            | Sandpiper identity, startup behavior, system prompt assembly, diagnostics, migration controls, session continuity, and Sandpiper-owned system capabilities |
+| `extensions/system/`            | Sandpiper identity, startup behavior, system prompt assembly, session continuity, and Sandpiper-owned system capabilities |
 | `extensions/autotoon/`          | Pi adapter for AutoTOON                                                                                                                                    |
 | `packages/capability-autotoon/` | Host-neutral AutoTOON transform that the AutoTOON entrypoint calls                                                                                         |
 

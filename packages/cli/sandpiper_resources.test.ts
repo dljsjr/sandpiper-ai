@@ -121,9 +121,7 @@ describe('Sandpiper resource adapter', () => {
     expect(tools).toEqual(expect.arrayContaining(['web_fetch']));
     expect(tools).toContain('send_chorus_reply');
     expect(commands).toContain('chorus');
-    expect(commands).not.toContain('migrate-pi');
     expect(flags).not.toContain('identity');
-    expect(flags).not.toContain('migrate-pi-configs');
   });
 
   it('adds the opt-in system prompt diagnostic command to the identity extension', () => {
@@ -142,6 +140,6 @@ describe('Sandpiper resource adapter', () => {
   it('adds Sandpiper identity behavior exactly once for the Sandpiper distribution', () => {
     const { flags } = applyFactories(createSandpiperExtensionFactories());
 
-    expect(flags.filter((flag) => flag === 'migrate-pi-configs')).toHaveLength(1);
+    expect(flags.filter((flag) => flag === 'identity')).toHaveLength(1);
   });
 });

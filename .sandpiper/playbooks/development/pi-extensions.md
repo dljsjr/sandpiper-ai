@@ -18,7 +18,7 @@ Read this before changing Pi extensions, custom tools, TUI behavior, provider ad
 
 ## Current Extension Surfaces
 
-- `extensions/system/` — Sandpiper identity, system prompt, migration controls, diagnostics, session continuity, system capabilities
+- `extensions/system/` — Sandpiper identity, system prompt, session continuity, system capabilities
 - `extensions/autotoon/` — Pi adapter for AutoTOON; calls the transform in `packages/capability-autotoon/`
 - `extensions/tattler/` — Tattler peer messaging: `list_peers`, `send_peer_message`, and the inbox
 - `extensions/chorus.ts` — Chorus rooms: the `/chorus` and `/agent` commands and `send_chorus_reply`

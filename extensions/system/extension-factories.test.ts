@@ -11,14 +11,7 @@ import {
 function createExtensionCapture(): {
   readonly pi: Pick<
     ExtensionAPI,
-    | 'appendEntry'
-    | 'events'
-    | 'getFlag'
-    | 'on'
-    | 'registerCommand'
-    | 'registerEntryRenderer'
-    | 'registerFlag'
-    | 'registerTool'
+    'appendEntry' | 'events' | 'getFlag' | 'on' | 'registerCommand' | 'registerFlag' | 'registerTool'
   >;
   readonly commands: string[];
   readonly events: string[];
@@ -50,7 +43,6 @@ function createExtensionCapture(): {
       registerTool: ((tool: { readonly name: string }) => {
         tools.push(tool.name);
       }) as ExtensionAPI['registerTool'],
-      registerEntryRenderer: vi.fn() as ExtensionAPI['registerEntryRenderer'],
       appendEntry: vi.fn() as ExtensionAPI['appendEntry'],
     },
     commands,
@@ -106,21 +98,13 @@ describe('system extension factory split', () => {
     createSandpiperIdentityExtension({ dumpSystemPrompt: false })(pi as ExtensionAPI);
 
     expect(tools).toEqual([]);
-    expect(commands).toEqual(['migrate-pi']);
-    expect(flags).toEqual([
-      'migrate-pi-configs',
-      'symlink-config',
-      'pi-configs-global',
-      'pi-configs-local',
-      'identity',
-    ]);
+    expect(commands).toEqual([]);
+    expect(flags).toEqual(['identity']);
     expect(events).toEqual([
-      'session_start', // registerMigrationControls
       'session_start', // registerStartupPromptHooks
       'session_shutdown', // registerStartupPromptHooks
       'before_agent_start', // registerStartupPromptHooks
       'session_start', // registerSessionContinuityHooks
-      'session_start', // registerDiagnosticsHooks
       'session_start', // registerStartupHeader
     ]);
   });

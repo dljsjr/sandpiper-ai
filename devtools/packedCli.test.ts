@@ -235,7 +235,7 @@ console.log([dark.name, light.name].join(','));`,
       expect(
         run('sandpiper', ['--help'])
           .split('\n')
-          .filter((line) => line.trimStart().startsWith('--migrate-pi-configs')),
+          .filter((line) => line.trimStart().startsWith('--identity')),
       ).toHaveLength(1);
       const extensionPath = join(project, 'runtime-import-extension.ts');
       writeFileSync(
