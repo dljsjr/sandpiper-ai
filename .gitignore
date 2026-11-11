@@ -9,7 +9,6 @@ references/*
 # output
 out
 dist
-/packages/cli/docs/
 *.tgz
 
 # code coverage
@@ -32,9 +31,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 # caches
 .eslintcache
 .cache
-.turbo/
-**/.turbo/
-*.tsbuildinfo
 __pycache__/
 *.py[cod]
 
