@@ -133,6 +133,8 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       expect(entries.filter((entry) => /\/(\.sandpiper|\.pi|\.git|\.jj|\.turbo)(\/|$)/.test(entry))).toEqual([]);
       for (const retired of [
         'packages/resources',
+        'packages/core',
+        'packages/capability-autotoon',
         'packages/cli/package.json',
         'packages/cli/dist',
         'packages/cli/docs',
@@ -160,9 +162,17 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       const packagedManifest = JSON.parse(
         execFileSync('tar', ['-xOzf', tarball, 'package/package.json'], { encoding: 'utf8' }),
       ) as { dependencies: Record<string, string>; bundledDependencies: string[] };
-      expect(packagedManifest.dependencies['@earendil-works/pi-mcp']).toBe('1.5.2');
-      expect(packagedManifest.bundledDependencies).toContain('@earendil-works/pi-mcp');
-      expect(packagedManifest.dependencies).not.toHaveProperty('mcporter');
+      expect(packagedManifest).not.toHaveProperty('workspaces');
+      expect(packagedManifest.dependencies).toEqual({
+        '@earendil-works/pi-ai': '1.5.2',
+        '@earendil-works/pi-coding-agent': '1.5.2',
+        '@earendil-works/pi-mcp': '1.5.2',
+        '@earendil-works/pi-tui': '1.5.2',
+        jsdom: '30.0.1',
+      });
+      expect([...packagedManifest.bundledDependencies].sort()).toEqual(
+        Object.keys(packagedManifest.dependencies).sort(),
+      );
 
       expect(existsSync(join(root, 'npm-cache'))).toBe(false);
       execFileSync('npm', ['install', tarball, '--offline', '--ignore-scripts', '--no-audit', '--no-fund'], {

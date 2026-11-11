@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
-import { MIN_JSON_BYTES } from '../../packages/capability-autotoon/src/core.js';
 import autotoon from './autotoon.js';
+import { MIN_JSON_BYTES } from './core.js';
 
 describe('autotoon Pi extension', () => {
   it('preserves read JSON content and metadata without returning a patch', async () => {

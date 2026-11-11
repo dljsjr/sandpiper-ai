@@ -1,6 +1,6 @@
 # Sandpiper Development Guidelines
 
-This repository is the Sandpiper source tree: a Bun/Node monorepo for the local Sandpiper runtime, extensions, skills, prompts, themes, docs, and developer tooling.
+This repository is the Sandpiper source tree: a Bun/Node repository for the local Sandpiper runtime, extensions, skills, prompts, themes, docs, and developer tooling.
 
 ## Start Here
 
@@ -13,14 +13,14 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 
 - Edit source, not generated artifacts. Do not hand-edit `dist/` or package `dist/` output.
 - Use Bun as the preferred runtime, package manager, and script runner.
-- Run workspace installs from the repo root.
-- Keep workspace dependency specifications consistent: no `catalog:` specs; root local dependencies use `workspace:*`; package-level internal and registry dependencies use exact versions; verify with `bun run check:deps`.
+- Keep one root `package.json` and `bun.lock`; run installs from the repo root.
+- Pin registry dependencies to exact versions. Import internal source modules by relative path, not workspace names or aliases.
 - Keep application code runtime-agnostic between Node and Bun unless the code is explicitly dev tooling.
 - Keep extension entrypoints thin; put reusable logic in package-owned or extension-local framework-independent modules.
 - Use `strict: true`; no `any`; no `@ts-ignore` / `@ts-expect-error` without explicit justification.
 - Tests must not touch real user or installed production state (`~/.sandpiper`, `~/.pi`, installed shell integrations, real agent config).
 - Do not create tasks for changes we believe _upstream_ should make. Record the finding in the related task or doc and move on. Tasks that track an already-filed upstream PR or issue we are genuinely blocked on are fine.
-- YAAMS is adjacent tooling, not part of this monorepo yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; continuity uses Journal when installed, the task tracker, inbox, and session logs.
+- YAAMS is adjacent tooling, not part of this repository yet. Keep repo guidance valid without YAAMS, identity-local memory databases, or persistent identity CWDs; continuity uses Journal when installed, the task tracker, inbox, and session logs.
 
 ## Routing
 
@@ -36,7 +36,7 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 
 ## Verification
 
-- `bun check` is the lint/typecheck gate and must be clean: zero errors, zero warnings. Biome only
+- `bun check` runs TypeScript, Biome, and Knip and must be clean: zero errors, zero warnings. Biome only
   hard-fails on errors, so zero-warnings is discipline rather than enforcement. That is deliberate
   — do not change the gate to fail on warnings.
 - Use `bun run test:vitest -- <testpath>` for focused Vitest runs.
@@ -52,7 +52,7 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 | `.sandpiper/docs/`      | Active internal specs, PRDs, design notes, and implementation plans                             |
 | `.sandpiper/archive/`   | Historical, completed, superseded, or stale docs                                                |
 | `extensions/`           | Sandpiper Pi extension source                                                                   |
-| `packages/`             | CLI source modules and internal workspace packages                                              |
+| `packages/`             | CLI and shared core source modules                                              |
 | `devtools/`             | Build regressions and isolated CLI/RPC integration tests                                        |
 
 ## Public Documentation

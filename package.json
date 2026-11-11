@@ -33,7 +33,7 @@
   "scripts": {
     "check:biome-check": "biome check",
     "check:tsc": "tsc --noEmit",
-    "check": "bun run check:deps && bun run check:tsc && bun run check:biome-check",
+    "check": "bun run check:tsc && bun run check:biome-check && bun run check:knip",
     "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/devtools/test-fixtures/jj-test-config.toml\" vitest run",
     "build": "rm -rf dist && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external jsdom --external '@earendil-works/*' ./packages/cli/sandpiper_standalone.ts ./packages/cli/sandpiper_system_prompt.ts --outdir ./dist",
@@ -42,13 +42,8 @@
     "sandpiper-built": "bun ./packages/cli/bin/sandpiper",
     "system-prompt-dev": "bun run --bun ./packages/cli/sandpiper_system_prompt.ts",
     "check:knip": "knip",
-    "check:knip:production": "knip --production",
-    "check:deps": "syncpack lint"
+    "check:knip:production": "knip --production"
   },
-  "workspaces": [
-    "packages/*",
-    "extensions/*"
-  ],
   "dependencies": {
     "@earendil-works/pi-ai": "1.5.2",
     "@earendil-works/pi-coding-agent": "1.5.2",
@@ -65,12 +60,16 @@
   ],
   "devDependencies": {
     "@biomejs/biome": "2.5.13",
+    "@mozilla/readability": "0.6.0",
+    "@toon-format/toon": "4.1.1",
+    "@types/jsdom": "30.0.0",
     "@types/node": "26.5.0",
+    "@types/turndown": "5.0.6",
+    "diff": "9.0.0",
     "knip": "6.35.1",
-    "sandpiper-ai-core": "workspace:*",
     "sanitize-filename": "1.6.4",
-    "syncpack": "15.3.3",
     "tmp": "0.2.7",
+    "turndown": "7.2.4",
     "typebox": "1.3.27",
     "typescript": "7.0.2",
     "uuid": "14.0.2",

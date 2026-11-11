@@ -8,7 +8,7 @@ AutoTOON currently does conversion only. It does not inject model guidance about
 
 | Path                                                         | Purpose                                          |
 | ------------------------------------------------------------ | ------------------------------------------------ |
-| `packages/capability-autotoon/src/core.ts`                   | Host-neutral JSON→TOON transform source of truth |
+| `extensions/autotoon/core.ts`                   | Host-neutral JSON→TOON transform source of truth |
 | `extensions/autotoon/autotoon.ts`                            | Pi `tool_result` adapter                         |
 
 ## Conversion pipeline
@@ -46,8 +46,7 @@ The `read` exemption preserves exact file text for edits. The adapter returns no
 ## Testing
 
 ```bash
-bun run test:vitest -- packages/capability-autotoon
-bun run test:vitest -- extensions/autotoon/autotoon.test.ts
+bun run test:vitest -- extensions/autotoon
 ```
 
 ## Future work

@@ -1,35 +1,29 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
 
-  // Several modules export small helpers for same-file reuse. Report helpers only when
-  // they are no longer used anywhere, not merely because they are exported from the file.
+  // Report helpers only when unused everywhere, not merely exported from their own file.
   "ignoreExportsUsedInFile": true,
 
-  // Provided by the host system or developer environment, not by the npm dependency graph.
-  "ignoreBinaries": ["jj", "rg"],
+  // Production scans omit the build script that references these external runtime packages.
+  "ignoreDependencies": [
+    "@earendil-works/pi-ai!",
+    "@earendil-works/pi-coding-agent!",
+    "@earendil-works/pi-mcp!",
+    "@earendil-works/pi-tui!",
+    "jsdom!"
+  ],
 
   "workspaces": {
     ".": {
       "entry": [
-        "package.json!"
+        "packages/cli/sandpiper_standalone.ts!",
+        "packages/cli/sandpiper_system_prompt.ts!",
+        // Test extensions are loaded by path in subprocesses rather than imported.
+        "devtools/integration/mock-provider.ts",
+        "devtools/integration/probe-tool.ts",
+        "devtools/integration/fixtures/native-mcp/transport-probe.ts"
       ],
-      "project": [
-        "extensions/*.ts!",
-        "extensions/chorus/**/*.ts!",
-        "extensions/tattler/**/*.ts!"
-      ],
-      // Root dependencies link these package-owned bin shims into node_modules/.bin.
-      "ignoreDependencies": ["sandpiper-ai-cli"]
-    },
-
-    "packages/cli": {
-      "entry": [
-        "bin/sandpiper!",
-        "bin/sandpiper-system-prompt!",
-        "sandpiper_standalone.ts!",
-        "sandpiper_system_prompt.ts!"
-      ],
-      "project": ["*.ts!", "bin/*!"]
+      "project": ["packages/**/*.ts!", "extensions/**/*.ts!", "devtools/**/*.ts"]
     }
   }
 }

@@ -1,8 +1,8 @@
 import { mkdir, readFile, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, join } from 'node:path';
-import { isRecord } from 'sandpiper-ai-core';
 import sanitize from 'sanitize-filename';
+import { isRecord } from '../../packages/core/src/utils.js';
 
 // runtime directory constants
 const TATTLER_RUNTIME_NAMESPACE_ENV_KEY = 'TATTLER_RUNTIME_NAMESPACE';

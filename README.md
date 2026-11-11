@@ -19,7 +19,7 @@ On top of pi's core functionality, Sandpiper provides:
 
 ## Quick Start
 
-Sandpiper requires [Bun](https://bun.sh) 1.4.4 or later. The repository pins Bun 1.4.4. Clone and set up the workspace:
+Sandpiper requires [Bun](https://bun.sh) 1.4.4 or later. The repository pins Bun 1.4.4. Clone and set up the repository:
 
 ```bash
 git clone https://github.com/dljsjr/sandpiper-ai.git
@@ -58,7 +58,7 @@ sandpiper-ai/
 │   ├── web-fetch/       # web_fetch tool
 │   └── web-search/      # web_search tool
 ├── dist/                # Built entrypoints and shared chunks
-├── packages/            # Source modules and internal workspace packages
+├── packages/            # CLI and shared core source modules
 │   ├── cli/             # Sandpiper entrypoints and stable bin launchers
 │   └── core/            # Shared utilities
 └── devtools/            # Build regressions and isolated integration tests
@@ -80,11 +80,10 @@ See [Pack the CLI](docs/dev/build-workflows.md#pack-the-cli) for tarball install
 ## Development
 
 ```bash
-bun check                         # Dependency policy + type-check + lint
-bun run check:deps                # Syncpack dependency version policy
+bun check                         # Type-check + lint + unused code/dependency checks
 bun run test                      # Build and run the full Vitest gate
 bun run test:vitest -- <testpath> # Focused Vitest run
-bun check --write                 # Auto-fix formatting
+bun run check:biome-check --write # Apply safe Biome fixes
 
 # Do not use bare `bun test` as the repo health gate; it invokes Bun's runner, not Vitest.
 ```

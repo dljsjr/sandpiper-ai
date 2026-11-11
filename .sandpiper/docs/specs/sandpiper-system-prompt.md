@@ -10,7 +10,7 @@
 
 Sandpiper owns Pi's base prompt through Pi's custom base prompt. In the system extension's `before_agent_start` hook, it:
 
-1. renders the Sandpiper prompt from Pi's `event.systemPromptOptions` with `buildSandpiperStartupPrompt()` in `sandpiper-ai-core`
+1. renders the Sandpiper prompt from Pi's `event.systemPromptOptions` with `buildSandpiperStartupPrompt()` in `packages/core/src/startup-prompt.ts`
 2. sets `systemPromptOptions.customPrompt` to the rendered prompt, so Pi records it in the transcript as the `preamble` section
 3. clears `appendSystemPrompt`, `contextFiles`, and `skills`, which Sandpiper renders itself
 4. returns no `systemPrompt`: Pi applies a returned prompt to one run only and does not record it
@@ -67,7 +67,7 @@ If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports 
 
 ## Invariants
 
-- Keep prompt construction in `sandpiper-ai-core`; extension code should stay glue-only.
+- Keep prompt construction in `packages/core/src/`; extension code should stay glue-only.
 - Preserve Pi-provided context-file and skill metadata instead of re-discovering it in the extension. Tool text is Pi's `tools` and `rules` sections; Sandpiper's prompt renders none.
 - Do not parse Pi's rendered prompt string. Older notes that proposed parsing and replacing sections are archived.
 - Keep volatile task, Journal, and working-copy state out of the system prompt unless a separate design explicitly accounts for provider cache behavior.

@@ -52,7 +52,7 @@ When you see `[TOON]` at the start of tool output, you're looking at converted d
 
 AutoTOON intercepts the `tool_result` event and converts JSON to TOON when beneficial (256–100,000 characters, and only when the result is shorter). It leaves `read` results unchanged so that the model can copy exact file text for edits. Error results and nested tool calls also remain unchanged.
 
-**Implementation**: `packages/capability-autotoon/src/core.ts`  
+**Implementation**: `extensions/autotoon/core.ts`  
 **Pi adapter**: `extensions/autotoon/autotoon.ts`  
 **Guidance injection**: Deferred. AutoTOON currently performs conversion only.
 

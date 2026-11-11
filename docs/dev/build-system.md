@@ -19,7 +19,7 @@ Use this page to understand the build structure. For commands, see [How to build
 | `packages/cli/bin/`                                | Stable launchers that load root output                                           |
 | `docs/`, `README.md`, `CONTRIBUTING.md`, `LICENSE` | Root-owned documentation and license, packed directly                            |
 
-The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti. Core and capability packages expose source TypeScript. They need no separate JavaScript or declaration build.
+The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti. Core and extension-local modules use source TypeScript. They need no separate JavaScript or declaration build.
 
 Both source and built entrypoints read metadata from the root product package. A local Pi patch resolves Pi-owned assets from the coding-agent dependency instead. Startup creates no package sidecar and does not write into the installation.
 
@@ -27,13 +27,13 @@ The build has no Turbo graph, cache restoration, resource staging, or documentat
 
 ## Build tools and developer tools
 
-The repository pins Bun 1.4.4 and declares Bun 1.4.4 or later for the product. Earlier packing behavior is not supported. Bun and the declared workspace dependencies build the product. TypeScript, Vitest, Biome, and Syncpack support development checks.
+The repository pins Bun 1.4.4 and declares Bun 1.4.4 or later for the product. Earlier packing behavior is not supported. Bun and the root dependencies build the product. TypeScript, Vitest, Biome, and Knip support development checks.
 
 The mise tools mcporter, jscpd, hike, and lizard are developer conveniences, not build steps. Web search uses Pi's standalone MCP client instead of the mcporter application library. This does not remove the separate developer CLI.
 
 ## Dependency resolution
 
-The workspace uses Bun's hoisted linker:
+The repository uses Bun's hoisted linker:
 
 ```toml
 # bunfig.toml
@@ -43,14 +43,13 @@ linker = "hoisted"
 
 Extension dependencies resolve from the root `node_modules/` directory.
 
-The source manifest policy is:
+One root `package.json` and `bun.lock` own all dependencies. Registry dependencies use exact versions. Internal source imports use relative paths to the owning module, without workspace packages or aliases.
 
-- Do not use `catalog:` dependency specifications.
-- Use `workspace:*` for local dependencies in the root package.
-- Use exact versions for package-level internal and registry dependencies.
-- Do not use wildcards, tags, caret ranges, or tilde ranges.
+The four Pi packages and jsdom remain runtime dependencies. The package includes them through `bundledDependencies`. Libraries compiled into the application, such as TOON encoding and web conversion, are build-only `devDependencies`.
 
-`bun run check:deps` enforces this policy with Syncpack.
+`bun check` runs TypeScript, Biome, and Knip. Knip analyzes both CLI entrypoints in one root workspace. Its production-only dependency ignores cover the external runtime packages. Test extensions loaded by file path are explicit non-production entrypoints.
+
+One root `vitest.config.ts` defines the catch-all project and the core, web-fetch, and web-search projects. Core tests keep a 10-second default timeout. The two web areas keep 15 seconds. Other tests keep Vitest's 5-second default, except where a test declares its own timeout.
 
 ## Local Pi patch
 
@@ -63,7 +62,7 @@ The patch changes six Pi modules:
 - `dist/modes/interactive/interactive-mode.js` gives Pi's update check the Pi version from `PI_CODING_AGENT_VERSION`. Unpatched, the check compares the product version from `PI_PACKAGE_DIR`.
 - `dist/utils/pi-user-agent.js`, `dist/core/client-identity.js`, and `dist/extensions/mcp/runtime.js` identify Pi by the Pi version from `PI_CODING_AGENT_VERSION`. This covers the `User-Agent` of requests to pi.dev, GitHub, and model providers, and the client information sent to MCP servers. Unpatched, they send the product version.
 
-The patch applies during workspace installation. The packed CLI includes the patched dependency through `bundledDependencies`. Consumer installations do not inherit root patch declarations.
+The patch applies during dependency installation. The packed CLI includes the patched dependency through `bundledDependencies`. Consumer installations do not inherit root patch declarations.
 
 The patch is tied to an exact Pi version. Redo it after each Pi upgrade:
 
@@ -88,7 +87,7 @@ The installed CLI requires Bun, but no source checkout or installation scripts. 
 
 ## Verification
 
-Use `bun check` for dependency policy, type checks, formatting, and lint. Use `bun run test` for the full Vitest suite.
+Use `bun check` for type checks, formatting, lint, and unused code/dependency checks. Use `bun run test` for the full Vitest suite.
 
 When command output changes, build first and smoke-test the workspace bins:
 

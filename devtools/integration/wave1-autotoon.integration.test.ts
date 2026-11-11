@@ -3,7 +3,7 @@
 // autotoon's pi.on('tool_result', ...) hook produces, delivered through a real RPC
 // tool_execution_end event for a real tool_result pi's own hook pipeline transformed.
 //
-// MIN_JSON_BYTES (packages/capability-autotoon/src/core.ts) is 256 -- conversion only
+// MIN_JSON_BYTES (extensions/autotoon/core.ts) is 256 -- conversion only
 // triggers above that threshold, so every JSON payload here is deliberately padded past it;
 // a smaller payload would silently skip conversion and prove nothing.
 

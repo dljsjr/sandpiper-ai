@@ -4,7 +4,7 @@ import {
   type SystemNotificationSender,
   SystemNotificationSourceType,
   sendSystemNotification,
-} from 'sandpiper-ai-core';
+} from '../../packages/core/src/system-notification.js';
 
 export interface TattlerPendingInboxNotifier {
   notify(): void;

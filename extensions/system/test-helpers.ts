@@ -9,8 +9,8 @@
  * event handlers, etc.) for assertion purposes.
  */
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import type { ProcessInfo, ProcessManager } from 'sandpiper-ai-core';
 import { vi } from 'vitest';
+import type { ProcessInfo, ProcessManager } from '../../packages/core/src/process-manager.js';
 
 // ─── Common handler types ────────────────────────────────────────
 

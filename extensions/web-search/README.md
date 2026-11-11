@@ -98,15 +98,13 @@ bunx tsc --noEmit
 
 ```
 extensions/web-search/
-├── src/
-│   ├── index.ts              # Pi extension entry point
-│   ├── types.ts              # SearchAdapter interface + result types
-│   ├── tool-metadata.ts      # LLM-facing description, promptSnippet, param docs
-│   ├── tool-operation.ts     # Framework-independent execution logic
-│   ├── adapter-selection.ts  # Picks the adapter: Brave when a key resolves, otherwise Parallel
-│   ├── brave-adapter.ts      # Brave Search API adapter
-│   ├── parallel-adapter.ts   # Parallel MCP search adapter (anonymous fallback)
-│   └── config-resolver.ts    # !cmd / $VAR / literal config value resolver
-├── package.json
-└── vitest.config.ts
+└── src/
+    ├── index.ts              # Pi extension entry point
+    ├── types.ts              # SearchAdapter interface + result types
+    ├── tool-metadata.ts      # LLM-facing description, promptSnippet, param docs
+    ├── tool-operation.ts     # Framework-independent execution logic
+    ├── adapter-selection.ts  # Picks the adapter: Brave when a key resolves, otherwise Parallel
+    ├── brave-adapter.ts      # Brave Search API adapter
+    ├── parallel-adapter.ts   # Parallel MCP search adapter (anonymous fallback)
+    └── config-resolver.ts    # !cmd / $VAR / literal config value resolver
 ```

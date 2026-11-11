@@ -1,5 +1,5 @@
-import { SANDPIPER_SYSTEM_NOTIFICATION_CUSTOM_TYPE } from 'sandpiper-ai-core';
 import { describe, expect, it, vi } from 'vitest';
+import { SANDPIPER_SYSTEM_NOTIFICATION_CUSTOM_TYPE } from '../../packages/core/src/system-notification.js';
 import { registerBackgroundProcessTools } from './background-process-tools.js';
 import { createProcessManagerStub, createToolRegistrationStub } from './test-helpers.js';
 

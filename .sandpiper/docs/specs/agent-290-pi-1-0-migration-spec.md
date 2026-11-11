@@ -20,7 +20,7 @@ Out of scope:
 | Item                                                 | Requirement                                                                                                                  |
 | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, and `extensions/*`). Published to npm 2026-10-05. |
-| Version policy                                       | Exact versions, as enforced by `bun run check:deps`.                                                                         |
+| Version policy                                       | Exact versions. Current dependency ownership is in the [build system reference](../../../docs/dev/build-system.md#dependency-resolution).                                                                         |
 
 ## System prompt
 

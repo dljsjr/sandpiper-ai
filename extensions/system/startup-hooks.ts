@@ -10,14 +10,11 @@ import {
   type SessionEntry,
 } from '@earendil-works/pi-coding-agent';
 import { createTwoFilesPatch } from 'diff';
-import {
-  buildSandpiperStartupPrompt,
-  detectVersionControl,
-  formatLocalDate,
-  readSandpiperUserProfile,
-  type SandpiperVersionControlContext,
-  setSandpiperSessionEnv,
-} from 'sandpiper-ai-core';
+import { setSandpiperSessionEnv } from '../../packages/core/src/session-continuity.js';
+import { buildSandpiperStartupPrompt } from '../../packages/core/src/startup-prompt.js';
+import { formatLocalDate } from '../../packages/core/src/system-prompt.js';
+import { readSandpiperUserProfile } from '../../packages/core/src/user-profile.js';
+import { detectVersionControl, type SandpiperVersionControlContext } from '../../packages/core/src/version-control.js';
 import {
   applyPromptContributions,
   SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL,

@@ -1,5 +1,5 @@
-import { errorMessage, isRecord } from 'sandpiper-ai-core';
 import { v7 as uuidv7 } from 'uuid';
+import { errorMessage, isRecord } from '../../packages/core/src/utils.js';
 
 // socket/wire protocol constants
 export const TATTLER_ID_ENTRY_KEY = 'tattler-id';

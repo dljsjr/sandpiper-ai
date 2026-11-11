@@ -38,7 +38,19 @@ describe('root Sandpiper product', () => {
         'sandpiper-system-prompt': './packages/cli/bin/sandpiper-system-prompt',
       },
     });
-    expect(existsSync(join(repoRoot, 'packages/cli/package.json'))).toBe(false);
+    expect(manifest()).not.toHaveProperty('workspaces');
+    for (const directory of [
+      'packages/cli',
+      'packages/core',
+      'packages/capability-autotoon',
+      'extensions/autotoon',
+      'extensions/system',
+      'extensions/web-fetch',
+      'extensions/web-search',
+    ]) {
+      expect(existsSync(join(repoRoot, directory, 'package.json'))).toBe(false);
+    }
+    expect(existsSync(join(repoRoot, 'packages/capability-autotoon'))).toBe(false);
   });
 
   it('ships all pinned external runtime dependencies and keeps bundled source dependencies build-only', () => {
@@ -51,19 +63,22 @@ describe('root Sandpiper product', () => {
       jsdom: '30.0.1',
     });
     expect([...product.bundledDependencies].sort()).toEqual(Object.keys(product.dependencies).sort());
-    const webSearch = JSON.parse(readFileSync(join(repoRoot, 'extensions/web-search/package.json'), 'utf8')) as {
-      readonly dependencies: Readonly<Record<string, string>>;
-    };
-    expect(webSearch.dependencies).toEqual({
-      '@earendil-works/pi-mcp': '1.5.2',
-    });
-    expect(product.devDependencies).not.toHaveProperty('mcporter');
+    for (const retired of ['mcporter', 'sandpiper-ai-core', 'syncpack']) {
+      expect(product.devDependencies).not.toHaveProperty(retired);
+    }
     expect(product.devDependencies).toMatchObject({
-      'sandpiper-ai-core': 'workspace:*',
+      '@mozilla/readability': '0.6.0',
+      '@toon-format/toon': '4.1.1',
+      '@types/jsdom': '30.0.0',
+      '@types/turndown': '5.0.6',
+      diff: '9.0.0',
       'sanitize-filename': '1.6.4',
       tmp: '0.2.7',
+      turndown: '7.2.4',
       uuid: '14.0.2',
     });
+    expect(product.scripts).not.toHaveProperty('check:deps');
+    expect(product.scripts.check).toBe('bun run check:tsc && bun run check:biome-check && bun run check:knip');
   });
 
   it('builds both commands into a clean root dist without a workspace build graph', () => {
@@ -109,15 +124,13 @@ describe('root Sandpiper product', () => {
     }
   });
 
-  it.each(['core', 'capability-autotoon'])('%s exposes source types without an emitted package build', (name) => {
-    const packageRoot = join(repoRoot, 'packages', name);
-    const metadata = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf8')) as {
-      exports: { '.': { types: string; default: string } };
-      scripts?: Record<string, string>;
-    };
-    expect(metadata.exports['.'].types).toBe(metadata.exports['.'].default);
-    expect(existsSync(join(packageRoot, metadata.exports['.'].types))).toBe(true);
-    expect(metadata.scripts?.build).toBeUndefined();
+  it.each([
+    ['packages/core', 'src/utils.ts'],
+    ['extensions/autotoon', 'core.ts'],
+  ])('%s keeps source modules without a package barrel or emitted build', (directory, source) => {
+    expect(existsSync(join(repoRoot, directory, source))).toBe(true);
+    expect(existsSync(join(repoRoot, directory, 'src/index.ts'))).toBe(false);
+    expect(existsSync(join(repoRoot, directory, 'dist'))).toBe(false);
   });
 
   it.each([

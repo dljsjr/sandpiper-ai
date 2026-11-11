@@ -127,11 +127,10 @@ theme.fg('dim', text)       // dimmer — timestamps, metadata
 theme.bold(text)            // bold — combine: theme.bold(theme.fg('warning', text))
 ```
 
-## Adding new core package exports
+## Changing core modules
 
-Adding a new module to `sandpiper-ai-core` requires a **full agent restart** —
-`/reload` does not re-resolve the dependency tree. jiti caches the module graph in memory
-for the lifetime of the session.
+Built-in extensions import core source modules directly. After changing bundled core code,
+rebuild Sandpiper and restart the agent. `/reload` does not replace the built-in bundle.
 
 ## Full Reference
 

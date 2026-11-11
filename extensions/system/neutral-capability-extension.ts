@@ -1,5 +1,5 @@
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
-import { ProcessManager } from 'sandpiper-ai-core';
+import { ProcessManager } from '../../packages/core/src/process-manager.js';
 import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
 import { registerBackgroundProcessTools } from './background-process-tools.js';
 import { registerContextManagementHooks } from './context-management.js';

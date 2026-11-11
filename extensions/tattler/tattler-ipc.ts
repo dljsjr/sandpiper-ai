@@ -1,6 +1,6 @@
 import { once } from 'node:events';
 import * as net from 'node:net';
-import { errorMessage, withTimeout } from 'sandpiper-ai-core';
+import { errorMessage, withTimeout } from '../../packages/core/src/utils.js';
 import {
   createTattlerPendingAgentMessage,
   createTattlerPendingBatchMessageFromMessages,

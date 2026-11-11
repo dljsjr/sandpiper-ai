@@ -7,7 +7,7 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 | Extension                    | Description                                                                     |
 | ---------------------------- | ------------------------------------------------------------------------------- |
 | [`system/`](system/)         | Sandpiper identity, lifecycle behavior, and core tools                          |
-| [`autotoon/`](autotoon/)     | Pi adapter for AutoTOON; calls the transform in `packages/capability-autotoon/` |
+| [`autotoon/`](autotoon/)     | AutoTOON Pi adapter and framework-independent JSON→TOON transform |
 | [`tattler/`](tattler/)       | Tattler peer messaging: `list_peers`, `send_peer_message`, and the inbox        |
 | [`chorus.ts`](chorus.ts)     | Chorus rooms: the `/chorus` and `/agent` commands and `send_chorus_reply`       |
 | [`web-fetch/`](web-fetch/)   | The `web_fetch` tool                                                            |
@@ -23,7 +23,7 @@ As sandpiper grows, prefer keeping entrypoints thin and pushing reusable logic i
 
 ### autotoon
 
-`autotoon/autotoon.ts` is the Pi `tool_result` adapter. It calls the host-neutral JSON→TOON transform in `packages/capability-autotoon/src/core.ts`.
+`autotoon/autotoon.ts` is the Pi `tool_result` adapter. It calls the host-neutral JSON→TOON transform in `extensions/autotoon/core.ts`.
 
 ## How Extensions Work
 

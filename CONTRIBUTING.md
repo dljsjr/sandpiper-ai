@@ -11,14 +11,14 @@ bun install
 bun run build
 ```
 
-Sandpiper pins Bun 1.4.4 for package management and scripts. Run workspace installs from the repository root. Installation only installs dependencies. `bun run build` writes both commands and shared chunks under root `dist/`.
+Sandpiper pins Bun 1.4.4 for package management and scripts. Run installs from the repository root. One root manifest and lockfile own all dependencies. Installation only installs dependencies. `bun run build` writes both commands and shared chunks under root `dist/`.
 
 ## Development checks
 
 Use these commands while developing:
 
 ```bash
-bun check                         # Type-check + lint
+bun check                         # Type-check + lint + unused code/dependency checks
 bun run test:vitest -- <testpath> # Focused Vitest run
 bun run test                      # Full Vitest gate
 ```
@@ -34,7 +34,7 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 | Path          | Purpose                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
 | `docs/`       | Public Sandpiper documentation                                                 |
-| `packages/`   | CLI source modules and internal workspace packages                             |
+| `packages/`   | CLI and shared core source modules                             |
 | `extensions/` | Sandpiper Pi extensions and compatibility entrypoints                          |
 | `devtools/`   | Build regressions and isolated CLI/RPC integration tests                       |
 | `.sandpiper/` | Project-local agent state, tasks, playbooks, active specs, notes, and archives |
@@ -66,7 +66,7 @@ Keep public docs direct and natural. Agent-operational guidance belongs in `.san
 Use safe auto-fixes when appropriate:
 
 ```bash
-bun check --write
+bun run check:biome-check --write
 ```
 
 ## Pull requests

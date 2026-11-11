@@ -1,5 +1,5 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
-import { tryConvertJsonToToon } from '../../packages/capability-autotoon/src/core.js';
+import { tryConvertJsonToToon } from './core.js';
 
 export default function autotoon(pi: ExtensionAPI): void {
   pi.on('tool_result', async (event) => {

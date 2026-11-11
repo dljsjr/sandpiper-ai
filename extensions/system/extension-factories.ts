@@ -7,7 +7,6 @@ import {
 } from './startup-hooks.js';
 
 export {
-  type BackgroundProcessExtensionOptions,
   createBackgroundProcessExtension,
   createContextManagementExtension,
   createSkillLoadingExtension,

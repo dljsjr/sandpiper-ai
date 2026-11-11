@@ -18,9 +18,9 @@ Read this before you change build scripts, package metadata, or generated output
 - Pack root documentation and the license directly. Do not add staging, temporary package directories, or metadata sidecars.
 - The product ships no built-in skills, prompt templates, or custom themes. Pi loads user, project, settings-configured, and package resources. Do not add a product-owned resource location.
 - The CLI bundles built-in extensions. Pi loads additional user/project extensions from source TypeScript. Do not add a separate extension build step.
-- Core and capability packages expose source TypeScript. Do not restore separate JavaScript or declaration emission.
-- Keep root local dependencies on `workspace:*`. Keep package-level internal and registry dependencies on exact versions.
-- Run `bun run check:deps` after package metadata changes.
+- Core and extension-local modules use source TypeScript. Do not restore separate JavaScript or declaration emission.
+- Keep one root manifest and lockfile. Pin registry dependencies to exact versions; use relative imports for internal source modules.
+- Run `bun check` after package metadata changes, including Knip's unused dependency check.
 - Sandpiper patches `@earendil-works/pi-coding-agent` locally through `patches/` and `patchedDependencies`. Redo the patch after each Pi version change. Follow "Local Pi patch" in `docs/dev/build-system.md`.
 
 ## Build commands
@@ -38,7 +38,8 @@ The build replaces only root `dist/`. Packing writes `dist/sandpiper-ai-cli-0.0.
 - Root `package.json` owns product metadata, bins, file selection, dependencies, and build/test commands.
 - `packages/cli/` contains both source entrypoints and the stable `bin/` launchers.
 - `packages/cli/temporary_trail_skill.ts` temporarily loads `~/git/skills-incubator/skills/trail` when `trail` is executable on PATH. TOOLS-43 tracks replacing this local bridge. There are no Trail flags, downloads, or discovery commands yet.
-- `packages/*/package.json` defines internal source packages, not separate product outputs.
+- `packages/core/src/` contains shared modules imported directly by relative path. It has no separate package manifest.
+- `extensions/autotoon/core.ts` owns the framework-independent JSON→TOON transform.
 - `devtools/` retains build/pack regressions, isolated RPC and print-mode drivers, mock providers, and the jj test fixture.
 
 ## Verification

@@ -11,7 +11,7 @@
 
 ### ✅ Implemented
 
-- `ProcessManager` class in `sandpiper-ai-core` (framework-independent)
+- `ProcessManager` class in `packages/core/src/process-manager.ts` (framework-independent)
 - `ManagedProcess` with lifecycle control, output buffering, event callbacks
 - `spawn()`, `get()`, `killAll()` methods
 - `onExit()` callbacks
@@ -36,7 +36,7 @@
 
 ---
 
-AGENT-15. Framework-independent process manager in `sandpiper-ai-core`,
+AGENT-15. Framework-independent process manager in `packages/core/src/process-manager.ts`,
 exposed to the agent via tool calls registered in `background-process-tools.ts`.
 
 ## Problem
@@ -48,7 +48,7 @@ next message. We need a way to start processes that outlive the tool call.
 
 ## Architecture
 
-### Core: `ProcessManager` (sandpiper-ai-core)
+### Core: `ProcessManager` (`packages/core/src/process-manager.ts`)
 
 Framework-independent. No pi/sandpiper imports. Manages spawned child processes
 with lifecycle control, output buffering, and event callbacks.

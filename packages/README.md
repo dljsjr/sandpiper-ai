@@ -1,18 +1,17 @@
 # Packages
 
-Source modules and internal workspace packages used by the Sandpiper runtime. The root `package.json` owns the `sandpiper-ai-cli` product.
+CLI and shared core source modules used by the Sandpiper runtime. The root `package.json` owns the `sandpiper-ai-cli` product.
 
 ## Contents
 
 | Package                                        | Description                               |
 | ---------------------------------------------- | ----------------------------------------- |
 | [`cli/`](cli/)                                 | CLI entrypoints and stable bin launchers  |
-| [`capability-autotoon/`](capability-autotoon/) | AutoTOON JSON→TOON host-neutral transform |
 | [`core/`](core/)                               | Shared core utilities                     |
 
 ## Build
 
-Run `bun run build` from the repository root. One Bun invocation bundles both CLI entrypoints and their shared chunks under root `dist/`. Core and capability packages expose source TypeScript without separate JavaScript or declaration output. `bun install` installs dependencies only.
+Run `bun run build` from the repository root. One Bun invocation bundles both CLI entrypoints and their shared chunks under root `dist/`. Core modules use source TypeScript without separate JavaScript or declaration output. AutoTOON's transform lives beside its adapter in `extensions/autotoon/`. `bun install` installs dependencies only.
 
 ## Output
 

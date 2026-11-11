@@ -4,7 +4,7 @@ import {
   type SandpiperSystemNotification,
   SystemNotificationSourceType,
   sendSystemNotification,
-} from 'sandpiper-ai-core';
+} from '../../packages/core/src/system-notification.js';
 
 const CONTEXT_USAGE_WARNING_THRESHOLD = 50;
 const CONTEXT_USAGE_ALERT_THRESHOLD = 80;

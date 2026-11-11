@@ -1,13 +1,15 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
 import {
   checkBackgroundProcess,
-  type ProcessManager,
+  startBackgroundProcess,
+} from '../../packages/core/src/background-process-capability.js';
+import type { ProcessManager } from '../../packages/core/src/process-manager.js';
+import {
   SystemNotificationDelivery,
   SystemNotificationSourceType,
   sendSystemNotification,
-  startBackgroundProcess,
-} from 'sandpiper-ai-core';
-import { Type } from 'typebox';
+} from '../../packages/core/src/system-notification.js';
 
 const BACKGROUND_PROCESS_COMPLETION_INSTRUCTIONS =
   'A background process started with start_background_process completed. Use check_background_process if you need its final output before continuing.';

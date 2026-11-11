@@ -1,6 +1,6 @@
 # Sandpiper Core
 
-Shared core utilities used across sandpiper packages and extensions. Framework-independent — no pi imports.
+Shared core utilities used across Sandpiper CLI modules and extensions. Framework-independent — no pi imports.
 
 ## Modules
 
@@ -27,10 +27,10 @@ bun run test:vitest -- packages/core
 
 ## Usage
 
-Extensions import from `sandpiper-ai-core`:
+Extensions import the owning source module by relative path:
 
 ```typescript
-import { errorMessage } from "sandpiper-ai-core";
+import { errorMessage } from '../../packages/core/src/utils.js';
 ```
 
-The package exports its source for both runtime imports and type checking. Extensions do not need a generated core `dist/` directory.
+Core has no package manifest or barrel. Runtime imports and type checking use the same source modules. Extensions do not need a generated core `dist/` directory.

@@ -242,7 +242,7 @@ against a test fixture tool, including a deterministic error when a script runs 
 
 ## 4. Harness placement + wiring
 
-The original root sweep discovered test files without loading nested package configurations. AGENT-258 later added explicit Vitest projects for core, standup, Shell Relay, web fetch, and web search. The `legacy-root` project covers the remaining tests, including this harness.
+The original root sweep discovered test files without loading nested package configurations. AGENT-258 later added explicit Vitest projects for core, standup, Shell Relay, web fetch, and web search. TOOLS-111 consolidates the remaining core, web-fetch, web-search, and `legacy-root` projects in the root `vitest.config.ts`. The `legacy-root` project covers the remaining tests, including this harness.
 
 The root `test:vitest` command neutralizes Git configuration and points `JJ_CONFIG` at `devtools/test-fixtures/jj-test-config.toml`. The harness sets those values again for each subprocess. This keeps direct harness use isolated even when a caller does not use the root test command.
 

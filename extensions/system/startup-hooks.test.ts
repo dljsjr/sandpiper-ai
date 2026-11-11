@@ -85,8 +85,8 @@ vi.mock('@earendil-works/pi-coding-agent', async (importOriginal) => {
   };
 });
 
-vi.mock('sandpiper-ai-core', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('sandpiper-ai-core')>();
+vi.mock('../../packages/core/src/startup-prompt.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../packages/core/src/startup-prompt.js')>();
   return {
     ...actual,
     buildSandpiperStartupPrompt: (...args: unknown[]) => mockBuildSandpiperStartupPrompt(...args),

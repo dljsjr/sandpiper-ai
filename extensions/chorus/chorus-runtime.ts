@@ -1,4 +1,4 @@
-import { errorMessage } from 'sandpiper-ai-core';
+import { errorMessage } from '../../packages/core/src/utils.js';
 import {
   buildMessage,
   type ChorusReplyRouteV0,
