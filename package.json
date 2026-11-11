@@ -37,7 +37,6 @@
     "check": "bun run check:deps && bun run check:tsc && bun run check:biome-check",
     "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/devtools/test-fixtures/jj-test-config.toml\" vitest run",
-    "test:standalone": "bun run build && bun run test:vitest -- packages/cli/standalone_bootstrap.test.ts packages/cli/pi_asset_paths.test.ts packages/cli/sandpiper_resources.test.ts packages/cli/temporary_trail_skill.test.ts packages/cli/standalone_cli_smoke.test.ts packages/cli/standalone_resource_discovery.test.ts packages/cli/system_prompt_diagnostic.test.ts devtools/rootProductMetadata.test.ts devtools/packedCli.test.ts",
     "build": "rm -rf dist && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external jsdom --external '@earendil-works/*' ./packages/cli/sandpiper_standalone.ts ./packages/cli/sandpiper_system_prompt.ts --outdir ./dist",
     "pack:cli": "bun run build && bun pm pack --ignore-scripts --destination ./dist",
     "sandpiper-dev": "bun run --bun ./packages/cli/sandpiper_standalone.ts",

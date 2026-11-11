@@ -17,7 +17,6 @@ Sandpiper is a local coding-agent workspace built on Pi. It adds AutoTOON conver
 
 - [Build workflows](dev/build-workflows.md) - choose the right build or verification command after a change.
 - [Build system reference](dev/build-system.md) - the root product, runtime dependencies, and generated output.
-- [CLI development](dev/cli-development.md) - Commander patterns and bundled CLI packages.
 - [Environment variables](dev/env-vars.md) - `SANDPIPER_*` / `PI_*` mirroring and config lookup.
 - [Pi extension development](dev/pi-extension-development.md) - how Sandpiper uses Pi extension surfaces and where to check Pi API docs.
 - [Cross-extension prompt contributions](dev/prompt-contributions.md) - lifecycle-based coordination for extensions contributing system prompt content.

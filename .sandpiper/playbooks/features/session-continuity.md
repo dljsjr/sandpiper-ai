@@ -12,7 +12,6 @@ If Journal is installed, load its skill before reading or publishing short conti
 - Sandpiper defaults `AGENT_JOURNAL_DIR` to the absolute launch cwd's `.sandpiper` before Pi imports and child processes. Preserve every supplied value, including empty and relative values.
 - For intentional cross-project work, use an explicit absolute `--dir <project>/.sandpiper`. Inherited environment values do not follow cwd changes.
 - Journal owns its implementation and skill outside this repository. Do not bundle a copy or change its standalone `.agent-journal` fallback.
-- Preserve saved historical notes. Do not migrate or delete their contents.
 - Keep `SANDPIPER_SESSION_ID` and `SANDPIPER_SESSION_FILE` set for the whole process at every `session_start`. Sandpiper writes no session PID files and tracks no session liveness. Journal does not depend on either.
 
 Read on resume. Publish one development as it occurs, with references for detail. Journal does not require a tracker or identity. If unavailable, use existing project records. YAAMS remains optional external memory.

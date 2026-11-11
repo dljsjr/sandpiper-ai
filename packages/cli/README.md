@@ -38,9 +38,6 @@ bun run sandpiper-built -- --help
 
 # Stable bin after building
 packages/cli/bin/sandpiper --help
-
-# Smoke tests
-bun run test:standalone
 ```
 
 Built-in extensions load through explicit factories in both source and built entrypoints. Resource discovery uses `resources_discover` without a staging step. The built runtime requires no source checkout and creates no metadata sidecar.

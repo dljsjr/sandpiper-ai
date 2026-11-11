@@ -30,7 +30,6 @@ This repository is the Sandpiper source tree: a Bun/Node monorepo for the local 
 | Build system, root product metadata, root `dist/` output, packing                                | `.sandpiper/playbooks/development/build.md`                |
 | TypeScript, tests, linting, verification, code-health rules                                      | `.sandpiper/playbooks/development/typescript-and-tests.md` |
 | Environment variables, config paths, `PI_*`, `SANDPIPER_*`                                       | `.sandpiper/playbooks/development/env-vars.md`             |
-| CLI tools, Commander commands, package `bin` entries, bundled executables                        | `.sandpiper/playbooks/development/cli.md`                  |
 | Pi extensions, lifecycle hooks, custom tools, TUI, providers, SDK integration                    | `.sandpiper/playbooks/development/pi-extensions.md`        |
 | AutoTOON, JSON→TOON conversion, token optimization                                               | `.sandpiper/playbooks/features/autotoon.md`                |
 | Journal, session continuity, session environment variables, concurrent sessions                  | `.sandpiper/playbooks/features/session-continuity.md`      |

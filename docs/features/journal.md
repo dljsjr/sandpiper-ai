@@ -31,7 +31,7 @@ Changing cwd does not retarget the default. For intentional work in another proj
 <absolute-journal-skill-directory>/scripts/journal --dir /absolute/other-project/.sandpiper read
 ```
 
-Outside Sandpiper, select the directory through `--dir` or `AGENT_JOURNAL_DIR`. Without either, standalone Journal uses `.agent-journal` under invocation cwd. Do not edit `journal.md` directly. Preserve saved historical notes without migration or deletion.
+Outside Sandpiper, select the directory through `--dir` or `AGENT_JOURNAL_DIR`. Without either, standalone Journal uses `.agent-journal` under invocation cwd. Do not edit `journal.md` directly.
 
 If Journal is unavailable, use existing project docs, tasks, or other continuation records.
 
