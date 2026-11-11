@@ -6,9 +6,11 @@
 import { htmlToMarkdown } from './convert.js';
 import { extractContent, extractDocumentMetadata, extractLinksFromHtml, extractLinksFromMarkdown } from './extract.js';
 import { createWebFetchFilter, type HtmlFilterObject, type MarkdownFilterObject } from './filters.js';
-import { probeLlmsTxt } from './llms-txt.js';
+import { findLlmsTxtLink, type LinkRelation, parseHtmlLinks, parseLinkHeader } from './link-relations.js';
+import { declaredLlmsTxt, discoverLlmsTxt } from './llms-txt.js';
 import {
   type FetchAdapter,
+  type FetchResult,
   type LlmsTxtProbeResult,
   type WebFetchFilterSpec,
   WebFetchFilterType,
@@ -20,7 +22,7 @@ export interface PipelineOptions {
   readonly filter?: WebFetchFilterSpec;
   /** Whether to extract and return page links. */
   readonly followLinks?: boolean;
-  /** Override llms.txt probing for tests or specialized callers. */
+  /** Override llms.txt discovery for tests or specialized callers. */
   readonly probeLlmsTxt?: (url: string) => Promise<LlmsTxtProbeResult>;
 }
 
@@ -106,6 +108,15 @@ async function applyHtmlFilter(
   };
 }
 
+function declaredRelations(fetchResult: FetchResult, isText: boolean): readonly LinkRelation[] {
+  if (fetchResult.statusCode >= 400) return [];
+
+  return [
+    ...parseLinkHeader(fetchResult.linkHeader, fetchResult.url),
+    ...(isText ? [] : parseHtmlLinks(fetchResult.body, fetchResult.url)),
+  ];
+}
+
 /**
  * Fetch a URL and return structured content with a markdown body.
  */
@@ -114,8 +125,17 @@ export async function fetchAndExtract(
   url: string,
   options?: PipelineOptions,
 ): Promise<WebFetchResult> {
+  const discover = options?.probeLlmsTxt ?? discoverLlmsTxt;
+  // Start discovery with the page request, so the page rarely waits for it.
+  const earlyDiscovery = discover(url);
   const fetchResult = await adapter.fetch(url);
-  const llmsTxt = await (options?.probeLlmsTxt ?? probeLlmsTxt)(fetchResult.url);
+  const isText = fetchResult.contentType !== undefined && TEXT_MEDIA_TYPES.has(fetchResult.contentType);
+  const relations = declaredRelations(fetchResult, isText);
+  const declared = findLlmsTxtLink(relations);
+  const llmsTxt =
+    declared !== undefined
+      ? declaredLlmsTxt(declared)
+      : await (fetchResult.url === url ? earlyDiscovery : discover(fetchResult.url));
   const filter = createWebFetchFilter(options?.filter);
 
   if (fetchResult.statusCode >= 400) {
@@ -130,7 +150,7 @@ export async function fetchAndExtract(
     };
   }
 
-  if (fetchResult.contentType !== undefined && TEXT_MEDIA_TYPES.has(fetchResult.contentType)) {
+  if (isText) {
     const result = {
       url: fetchResult.url,
       title: '',

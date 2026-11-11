@@ -13,6 +13,8 @@ export interface FetchResult {
   readonly body: string;
   /** Lowercase media type from the Content-Type header, without parameters. Absent when the server sent none. */
   readonly contentType?: string;
+  /** Raw Link header value. Absent when the server sent none. */
+  readonly linkHeader?: string;
 }
 
 /** A link extracted from page content. */

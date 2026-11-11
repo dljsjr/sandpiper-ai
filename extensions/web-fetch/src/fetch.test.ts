@@ -14,6 +14,12 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
+  if (url === '/linked') {
+    res.writeHead(200, { 'Content-Type': 'text/html', Link: '</docs/llms.txt>; rel="describedby"' });
+    res.end('<html><body><h1>Linked</h1></body></html>');
+    return;
+  }
+
   if (url === '/redirect') {
     res.writeHead(302, { Location: '/hello' });
     res.end();
@@ -70,6 +76,14 @@ describe('SimpleFetchAdapter', () => {
     expect(html.contentType).toBe('text/html');
     expect(text.contentType).toBe('text/plain');
     expect(text.body).toBe('default');
+  });
+
+  it('should report the Link header when the server sends one', async () => {
+    const linked = await adapter.fetch(`${baseUrl}/linked`);
+    const plain = await adapter.fetch(`${baseUrl}/hello`);
+
+    expect(linked.linkHeader).toBe('</docs/llms.txt>; rel="describedby"');
+    expect(plain.linkHeader).toBeUndefined();
   });
 
   it('should return 404 status for not-found pages', async () => {

@@ -1,37 +1,39 @@
 /**
- * Passive llms.txt existence probing.
+ * llms.txt discovery: find the index for language models that covers a page.
  * Framework-independent — no pi imports.
  */
 
 import type { LlmsTxtProbeResult } from './types.js';
 
 const DEFAULT_PROBE_TIMEOUT_MS = 3_000;
-const probeCache = new Map<string, LlmsTxtProbeResult>();
+// An llms.txt covers the pages under its directory, so it sits near the top of a tree.
+const MAX_CANDIDATES = 4;
+// One answer per location for the life of the process, failures included: sites that
+// resist automated requests are not asked again.
+const probeCache = new Map<string, Promise<LlmsTxtProbeResult>>();
 
 export interface LlmsTxtProbeOptions {
   readonly timeoutMs?: number;
   readonly now?: () => Date;
 }
 
-interface ProbeTarget {
-  readonly cacheKey: string;
-  readonly url: string;
-}
-
 function checkedAt(options: LlmsTxtProbeOptions): string {
   return (options.now?.() ?? new Date()).toISOString();
 }
 
-function probeTarget(pageUrl: string): ProbeTarget {
-  const parsed = new URL(pageUrl);
+/**
+ * The llms.txt location of each directory above the page, most specific first.
+ * A deep page keeps the root and the directories nearest to it.
+ */
+export function llmsTxtCandidates(pageUrl: string): readonly string[] {
+  const page = new URL(pageUrl);
+  const segments = page.pathname.split('/').slice(1, -1);
+  const directories = ['/', ...segments.map((_, index) => `/${segments.slice(0, index + 1).join('/')}/`)];
 
-  // URL.origin includes scheme, host, and port. Keeping the scheme in the key
-  // follows HTTP cache/origin semantics rather than guessing that http and https
-  // have equivalent root metadata.
-  return {
-    cacheKey: parsed.origin,
-    url: new URL('/llms.txt', parsed.origin).toString(),
-  };
+  return directories
+    .slice(0, MAX_CANDIDATES)
+    .reverse()
+    .map((directory) => new URL(`${directory}llms.txt`, page.origin).toString());
 }
 
 function unknownResult(url: string, reason: string, options: LlmsTxtProbeOptions): LlmsTxtProbeResult {
@@ -45,13 +47,13 @@ function unknownResult(url: string, reason: string, options: LlmsTxtProbeOptions
   };
 }
 
-function resultFromResponse(response: Response, target: ProbeTarget, options: LlmsTxtProbeOptions): LlmsTxtProbeResult {
+function resultFromResponse(response: Response, url: string, options: LlmsTxtProbeOptions): LlmsTxtProbeResult {
   if (response.status >= 200 && response.status < 300) {
     return {
       checked: true,
       exists: true,
       status: 'found',
-      url: target.url,
+      url,
       checkedAt: checkedAt(options),
       statusCode: response.status,
     };
@@ -62,7 +64,7 @@ function resultFromResponse(response: Response, target: ProbeTarget, options: Ll
       checked: true,
       exists: false,
       status: 'missing',
-      url: target.url,
+      url,
       checkedAt: checkedAt(options),
       statusCode: response.status,
     };
@@ -74,7 +76,7 @@ function resultFromResponse(response: Response, target: ProbeTarget, options: Ll
       checked: true,
       exists: null,
       status: 'unknown',
-      url: target.url,
+      url,
       checkedAt: checkedAt(options),
       statusCode: response.status,
       reason: 'head-not-allowed',
@@ -86,7 +88,7 @@ function resultFromResponse(response: Response, target: ProbeTarget, options: Ll
     checked: true,
     exists: null,
     status: 'unknown',
-    url: target.url,
+    url,
     checkedAt: checkedAt(options),
     statusCode: response.status,
     reason: 'unexpected-status',
@@ -101,34 +103,50 @@ export function clearLlmsTxtProbeCache(): void {
   probeCache.clear();
 }
 
-export async function probeLlmsTxt(pageUrl: string, options: LlmsTxtProbeOptions = {}): Promise<LlmsTxtProbeResult> {
-  let target: ProbeTarget;
-  try {
-    target = probeTarget(pageUrl);
-  } catch (error) {
-    return unknownResult(pageUrl, `invalid-url: ${errorReason(error)}`, options);
-  }
-
-  const cached = probeCache.get(target.cacheKey);
-  if (cached !== undefined) return cached;
-
+async function probe(url: string, options: LlmsTxtProbeOptions): Promise<LlmsTxtProbeResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS);
 
   try {
-    const response = await globalThis.fetch(target.url, {
-      method: 'HEAD',
-      redirect: 'follow',
-      signal: controller.signal,
-    });
-    const result = resultFromResponse(response, target, options);
-    probeCache.set(target.cacheKey, result);
-    return result;
+    const response = await globalThis.fetch(url, { method: 'HEAD', redirect: 'follow', signal: controller.signal });
+    return resultFromResponse(response, url, options);
   } catch (error) {
-    const result = unknownResult(target.url, errorReason(error), options);
-    probeCache.set(target.cacheKey, result);
-    return result;
+    return unknownResult(url, errorReason(error), options);
   } finally {
     clearTimeout(timer);
   }
+}
+
+function cachedProbe(url: string, options: LlmsTxtProbeOptions): Promise<LlmsTxtProbeResult> {
+  const cached = probeCache.get(url);
+  if (cached !== undefined) return cached;
+
+  const pending = probe(url, options);
+  probeCache.set(url, pending);
+  return pending;
+}
+
+/** A file the page itself named as its llms.txt. Taken as found without a request. */
+export function declaredLlmsTxt(url: string, options: LlmsTxtProbeOptions = {}): LlmsTxtProbeResult {
+  return { checked: false, exists: true, status: 'found', url, checkedAt: checkedAt(options) };
+}
+
+/**
+ * Probe every candidate location at once and return the most specific file found.
+ * When none is found, the result describes the site root.
+ */
+export async function discoverLlmsTxt(pageUrl: string, options: LlmsTxtProbeOptions = {}): Promise<LlmsTxtProbeResult> {
+  let candidates: readonly string[];
+  try {
+    candidates = llmsTxtCandidates(pageUrl);
+  } catch (error) {
+    return unknownResult(pageUrl, `invalid-url: ${errorReason(error)}`, options);
+  }
+
+  const results = await Promise.all(candidates.map((candidate) => cachedProbe(candidate, options)));
+  return (
+    results.find((result) => result.exists === true) ??
+    results.at(-1) ??
+    unknownResult(pageUrl, 'no-candidates', options)
+  );
 }

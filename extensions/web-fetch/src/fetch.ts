@@ -26,12 +26,14 @@ export class SimpleFetchAdapter implements FetchAdapter {
 
       const body = await response.text();
       const contentType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase();
+      const linkHeader = response.headers.get('link');
 
       return {
         url: response.url,
         statusCode: response.status,
         body,
         ...(contentType ? { contentType } : {}),
+        ...(linkHeader ? { linkHeader } : {}),
       };
     } finally {
       clearTimeout(timer);

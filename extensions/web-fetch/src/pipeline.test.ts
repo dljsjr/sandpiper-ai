@@ -1,9 +1,9 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SimpleFetchAdapter } from './fetch.js';
 import { clearLlmsTxtProbeCache } from './llms-txt.js';
 import { fetchAndExtract } from './pipeline.js';
-import { WebFetchFilterType } from './types.js';
+import { type FetchAdapter, type LlmsTxtProbeResult, WebFetchFilterType } from './types.js';
 
 const TARGETED_PAGE = `
 <html>
@@ -101,6 +101,10 @@ const RAW_CHANGELOG = [
   '',
 ].join('\n');
 
+function missingLlmsTxt(url: string): LlmsTxtProbeResult {
+  return { checked: true, exists: false, status: 'missing', url, checkedAt: '2026-11-11T00:00:00.000Z' };
+}
+
 let server: Server;
 let baseUrl: string;
 
@@ -134,6 +138,18 @@ function handler(req: IncomingMessage, res: ServerResponse) {
   if (url === '/CHANGELOG.md') {
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end(RAW_CHANGELOG);
+    return;
+  }
+
+  if (url === '/declared-header') {
+    res.writeHead(200, { 'Content-Type': 'text/html', Link: '</docs/llms.txt>; rel="describedby"' });
+    res.end(ARTICLE_PAGE);
+    return;
+  }
+
+  if (url === '/declared-link') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(ARTICLE_PAGE.replace('<head>', '<head><link rel="describedby" href="/guide/llms.txt">'));
     return;
   }
 
@@ -204,6 +220,62 @@ describe('fetchAndExtract (end-to-end)', () => {
       statusCode: 204,
       url: `${baseUrl}/llms.txt`,
     });
+  });
+
+  it.each([
+    ['Link header', '/declared-header', '/docs/llms.txt'],
+    ['link element', '/declared-link', '/guide/llms.txt'],
+  ])('should take the llms.txt a page declares in a %s as found', async (_name, path, declared) => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}${path}`);
+
+    expect(result.llmsTxt).toMatchObject({
+      checked: false,
+      exists: true,
+      status: 'found',
+      url: `${baseUrl}${declared}`,
+    });
+  });
+
+  it('should start llms.txt discovery before the page fetch completes', async () => {
+    let discoveryStarted: () => void = () => {};
+    const started = new Promise<void>((resolve) => {
+      discoveryStarted = resolve;
+    });
+    const waitingAdapter: FetchAdapter = {
+      fetch: async (url) => {
+        await started;
+        return { url, statusCode: 200, body: ARTICLE_PAGE, contentType: 'text/html' };
+      },
+    };
+    const probeLlmsTxt = vi.fn(async (url: string) => {
+      discoveryStarted();
+      return missingLlmsTxt(url);
+    });
+
+    const result = await fetchAndExtract(waitingAdapter, 'https://example.com/docs/page', { probeLlmsTxt });
+
+    expect(result.title).toBe('Pipeline Test');
+    expect(probeLlmsTxt).toHaveBeenCalledTimes(1);
+  });
+
+  it('should discover llms.txt again from the final URL after a redirect', async () => {
+    const redirectingAdapter: FetchAdapter = {
+      fetch: async () => ({
+        url: 'https://new.example/docs/page',
+        statusCode: 200,
+        body: ARTICLE_PAGE,
+        contentType: 'text/html',
+      }),
+    };
+    const probeLlmsTxt = vi.fn(async (url: string) => missingLlmsTxt(url));
+
+    const result = await fetchAndExtract(redirectingAdapter, 'https://old.example/page', { probeLlmsTxt });
+
+    expect(probeLlmsTxt.mock.calls.map(([url]) => url)).toEqual([
+      'https://old.example/page',
+      'https://new.example/docs/page',
+    ]);
+    expect(result.llmsTxt?.url).toBe('https://new.example/docs/page');
   });
 
   it('should extract links when followLinks is true', async () => {
