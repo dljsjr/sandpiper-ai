@@ -89,6 +89,8 @@ export interface WebFetchResult {
   readonly siteName: string;
   /** Markdown body content. */
   readonly content: string;
+  /** URL of the site's own Markdown version of the page, when the content came from it. */
+  readonly markdownSource?: string;
   /** Supplemental llms.txt existence probe metadata. */
   readonly llmsTxt?: LlmsTxtProbeResult;
   /** Targeted extraction filter metadata, when a filter was applied. */
@@ -97,7 +99,12 @@ export interface WebFetchResult {
   readonly links?: readonly ExtractedLink[];
 }
 
+export interface FetchOptions {
+  /** Ask for HTML only. By default the adapter asks for a Markdown version first. */
+  readonly htmlOnly?: boolean;
+}
+
 /** Adapter interface for fetching a page. Extensible for future backends. */
 export interface FetchAdapter {
-  fetch(url: string): Promise<FetchResult>;
+  fetch(url: string, options?: FetchOptions): Promise<FetchResult>;
 }

@@ -66,7 +66,8 @@ export function formatWebFetchResult(result: WebFetchResult): string {
     .join('\n\n');
 
   const body = header ? `${header}\n\n---\n\n${result.content}` : result.content;
-  let output = `URL: ${result.url}\n\n${body}`;
+  const source = result.markdownSource ? `\nMarkdown source: ${result.markdownSource}` : '';
+  let output = `URL: ${result.url}${source}\n\n${body}`;
 
   if (result.links && result.links.length > 0) {
     const linkList = result.links.map((link) => `- [${link.text}](${link.href})`).join('\n');

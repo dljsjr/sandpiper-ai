@@ -43,6 +43,22 @@ describe('formatWebFetchResult', () => {
     );
   });
 
+  it("names the site's Markdown version when the content came from it", () => {
+    const output = formatWebFetchResult(
+      createResult({
+        title: '',
+        excerpt: '',
+        byline: '',
+        siteName: '',
+        markdownSource: 'https://example.com/final.md',
+      }),
+    );
+
+    expect(output).toBe(
+      'URL: https://example.com/final\nMarkdown source: https://example.com/final.md\n\nExample body',
+    );
+  });
+
   it('renders discovered links when present', () => {
     const output = formatWebFetchResult(createResult({ links: [{ text: 'Docs', href: 'https://example.com/docs' }] }));
 

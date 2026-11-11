@@ -26,7 +26,8 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
       'Fetch a web page and return its content as clean markdown. ' +
       'Use this to read documentation, READMEs, API references, blog posts, ' +
       'package details, or any web page the user points you to. ' +
-      'Markdown and plain-text responses are returned unchanged. ' +
+      "Markdown and plain-text responses are returned unchanged, and a site's own Markdown version of a page " +
+      'is used when it offers one. ' +
       'Optionally target part of a page with a filter. ' +
       'Returns structured metadata (title, excerpt, byline) plus the page ' +
       'content converted to token-efficient markdown.',

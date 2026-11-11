@@ -17,6 +17,11 @@
 | Passive `llms.txt` existence probing         | ✅ Complete    | WEB-14 |
 | CSS selector targeting                       | ✅ Complete    | WEB-15 |
 | Markdown section targeting                   | ✅ Complete    | WEB-16 |
+| Markdown and plain-text responses unchanged  | ✅ Complete    | WEB-18 |
+| Section matching by parsed heading text      | ✅ Complete    | WEB-19 |
+| Site's own Markdown version of a page        | ✅ Complete    | WEB-26 |
+| `llms.txt` discovery by link and by path     | ✅ Complete    | WEB-25 |
+| `llms.txt` instructions for the model        | ✅ Complete    | WEB-24 |
 | JS rendering adapter (lightpanda/Playwright) | ❌ Not started | WEB-10 |
 | Single-query web search                      | ❌ Not started | WEB-11 |
 | Site crawling with robots.txt                | ❌ Not started | WEB-12 |
@@ -86,13 +91,33 @@ Both paths meet at Markdown text. A response served as `text/markdown`, `text/x-
 5. **`turndown`** — convert cleaned HTML to markdown. Preserves headings, code blocks, lists, tables, links. Far more token-efficient than raw HTML.
 6. **Return** — TOON-encoded object with metadata + markdown body.
 
+### The site's own Markdown version
+
+A page a site wrote in Markdown is better than our conversion of its HTML. The pipeline gets it in two ways:
+
+1. **Ask.** The request puts `text/markdown` first in its `Accept` header. A server that honors it answers with Markdown, which takes the text path.
+2. **Follow.** When the answer is HTML and the page advertises `rel="alternate" type="text/markdown"`, in the `Link` header or a `<link>` element, the pipeline fetches that URL and returns its content. The title and description still come from the HTML page, and the result names the Markdown URL.
+
+An advertised version is followed only on the page's own origin, and only when it answers with a text media type. Otherwise the HTML page is converted as usual. The pipeline does not guess `.md` URLs. A CSS selector filter needs a DOM, so those calls ask for HTML and ignore the Markdown version.
+
+### `llms.txt` discovery
+
+An `llms.txt` file is a site's index of its pages for language models ([llmstxt.org](https://llmstxt.org/)). A file covers the pages under its directory, and the most specific file wins.
+
+1. **Declared.** A page can name its file with `rel="describedby"`, in the `Link` header or a `<link>` element. A target whose path ends in `/llms.txt` is taken as found without a request.
+2. **Probed.** Otherwise the pipeline sends a `HEAD` request to the `llms.txt` location of each directory above the page, all at once, and uses the most specific 2xx answer. A deep page probes the root and the three directories nearest to it.
+
+Discovery starts together with the page request, and the result waits for it, so output does not depend on timing. Each location is asked once per process. A failure or timeout is kept as the answer: some sites resist automated requests, and a missed file costs little. The file's content is not read.
+
+When a file is found, the tool result ends with an `<additional_content>` block that holds an `<instructions>` element and the file's URL. The instructions tell the model what the index is and how to read one part of it. The block is left out when the fetched page is the file itself.
+
 ### Adapter Interface
 
 The fetch layer should use an adapter interface so JS-rendering backends (lightpanda, Playwright) can slot in later without changing the tool's public API:
 
 ```typescript
 interface FetchAdapter {
-  fetch(url: string): Promise<FetchResult>;
+  fetch(url: string, options?: { htmlOnly?: boolean }): Promise<FetchResult>;
 }
 
 // MVP: SimpleFetchAdapter (uses global fetch())
@@ -117,6 +142,7 @@ interface FetchAdapter {
   byline: string;         // Author (if detected)
   siteName: string;       // Site name (if detected)
   content: string;        // Markdown body
+  markdownSource?: string; // URL of the site's own Markdown version, when the content came from it
   filter?: {              // Targeted extraction metadata (when filter is provided)
     type: 'css_selector' | 'markdown_section';
     matched: boolean;
@@ -124,7 +150,7 @@ interface FetchAdapter {
     error?: string;
   };
   links?: Array<{ text: string; href: string }>;  // Extracted links (when followLinks=true)
-  llmsTxt?: {                   // Passive /llms.txt existence probe metadata
+  llmsTxt?: {                   // llms.txt discovery result (declared by the page, or probed)
     checked: boolean;
     exists: boolean | null;     // null means unknown/indeterminate
     status: 'found' | 'missing' | 'unknown';

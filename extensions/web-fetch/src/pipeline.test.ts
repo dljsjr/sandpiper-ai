@@ -101,6 +101,18 @@ const RAW_CHANGELOG = [
   '',
 ].join('\n');
 
+const ALTERNATE_MARKDOWN = [
+  '# Target Guide',
+  '',
+  'Intro   text.',
+  '',
+  '## API',
+  '',
+  'The site wrote this Markdown.',
+  '',
+].join('\n');
+let alternateRequests = 0;
+
 function missingLlmsTxt(url: string): LlmsTxtProbeResult {
   return { checked: true, exists: false, status: 'missing', url, checkedAt: '2026-11-11T00:00:00.000Z' };
 }
@@ -153,6 +165,41 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
+  if (url === '/negotiated') {
+    const wantsMarkdown = (req.headers.accept ?? '').trimStart().startsWith('text/markdown');
+    res.writeHead(200, { 'Content-Type': wantsMarkdown ? 'text/markdown' : 'text/html' });
+    res.end(wantsMarkdown ? '# Negotiated\n\nMarkdown from the server.' : TARGETED_PAGE);
+    return;
+  }
+
+  if (url === '/alt/page.md') {
+    alternateRequests += 1;
+    res.writeHead(200, { 'Content-Type': 'text/markdown; charset=utf-8' });
+    res.end(ALTERNATE_MARKDOWN);
+    return;
+  }
+
+  if (url === '/advertised-link' || url === '/advertised-header' || url === '/advertised-broken') {
+    const target = url === '/advertised-broken' ? '/alt/missing.md' : '/alt/page.md';
+    const viaHeader = url === '/advertised-header';
+    res.writeHead(200, {
+      'Content-Type': 'text/html',
+      ...(viaHeader ? { Link: `<${target}>; rel="alternate"; type="text/markdown"` } : {}),
+    });
+    res.end(
+      viaHeader
+        ? TARGETED_PAGE
+        : TARGETED_PAGE.replace('<head>', `<head><link rel="alternate" type="text/markdown" href="${target}">`),
+    );
+    return;
+  }
+
+  if (url === '/alt/missing.md') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end('<html><body>Soft not-found page</body></html>');
+    return;
+  }
+
   if (url === '/error') {
     res.writeHead(500, { 'Content-Type': 'text/html' });
     res.end('<html><body>Internal Server Error</body></html>');
@@ -188,6 +235,7 @@ afterAll(async () => {
 
 beforeEach(() => {
   clearLlmsTxtProbeCache();
+  alternateRequests = 0;
 });
 
 describe('fetchAndExtract (end-to-end)', () => {
@@ -276,6 +324,60 @@ describe('fetchAndExtract (end-to-end)', () => {
       'https://new.example/docs/page',
     ]);
     expect(result.llmsTxt?.url).toBe('https://new.example/docs/page');
+  });
+
+  it('should return the Markdown a server sends when asked for it', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/negotiated`);
+
+    expect(result.content).toBe('# Negotiated\n\nMarkdown from the server.');
+  });
+
+  it('should ask for HTML when a CSS selector filter needs it', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/negotiated`, {
+      filter: { type: WebFetchFilterType.CssSelector, selector: '#api' },
+    });
+
+    expect(result.content).toContain('Only API content should be returned.');
+    expect(result.filter).toMatchObject({ matched: true, matchCount: 1 });
+  });
+
+  it.each([
+    ['link element', '/advertised-link'],
+    ['Link header', '/advertised-header'],
+  ])('should return the Markdown version a page advertises in a %s', async (_name, path) => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}${path}`);
+
+    expect(result.content).toBe(ALTERNATE_MARKDOWN);
+    expect(result.url).toBe(`${baseUrl}${path}`);
+    expect(result.title).toBe('Target Test');
+    expect(result.excerpt).toBe('Targeted extraction fixture');
+    expect(result.markdownSource).toBe(`${baseUrl}/alt/page.md`);
+  });
+
+  it('should apply a Markdown section filter to the advertised Markdown version', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/advertised-link`, {
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: 'API' },
+    });
+
+    expect(result.content).toBe('## API\n\nThe site wrote this Markdown.');
+    expect(result.markdownSource).toBe(`${baseUrl}/alt/page.md`);
+  });
+
+  it('should convert the HTML page when the advertised Markdown version is not Markdown', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/advertised-broken`);
+
+    expect(result.content).toContain('Only API content should be returned.');
+    expect(result.content).not.toContain('Soft not-found page');
+    expect(result.markdownSource).toBeUndefined();
+  });
+
+  it('should not fetch the advertised Markdown version for a CSS selector filter', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/advertised-link`, {
+      filter: { type: WebFetchFilterType.CssSelector, selector: '#api' },
+    });
+
+    expect(result.content).toContain('Only API content should be returned.');
+    expect(alternateRequests).toBe(0);
   });
 
   it('should extract links when followLinks is true', async () => {

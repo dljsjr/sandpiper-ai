@@ -20,6 +20,13 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
+  if (url === '/negotiate') {
+    const wantsMarkdown = (req.headers.accept ?? '').trimStart().startsWith('text/markdown');
+    res.writeHead(200, { 'Content-Type': wantsMarkdown ? 'text/markdown' : 'text/html' });
+    res.end(wantsMarkdown ? '# Negotiated' : '<html><body><h1>Negotiated</h1></body></html>');
+    return;
+  }
+
   if (url === '/redirect') {
     res.writeHead(302, { Location: '/hello' });
     res.end();
@@ -84,6 +91,14 @@ describe('SimpleFetchAdapter', () => {
 
     expect(linked.linkHeader).toBe('</docs/llms.txt>; rel="describedby"');
     expect(plain.linkHeader).toBeUndefined();
+  });
+
+  it('should ask for Markdown first, and for HTML only when told to', async () => {
+    const preferred = await adapter.fetch(`${baseUrl}/negotiate`);
+    const html = await adapter.fetch(`${baseUrl}/negotiate`, { htmlOnly: true });
+
+    expect(preferred).toMatchObject({ contentType: 'text/markdown', body: '# Negotiated' });
+    expect(html.contentType).toBe('text/html');
   });
 
   it('should return 404 status for not-found pages', async () => {
