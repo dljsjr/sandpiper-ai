@@ -1,4 +1,6 @@
 import { JSDOM } from 'jsdom';
+import { fromMarkdown } from 'mdast-util-from-markdown';
+import { toString as nodeText } from 'mdast-util-to-string';
 import type { WebFetchFilterDetails, WebFetchFilterSpec, WebFetchFilterType } from './types.js';
 
 export type HtmlDocument = string;
@@ -40,54 +42,42 @@ function stripMarkdownLinks(text: string): string {
 function normalizeHeadingText(text: string): string {
   return stripMarkdownLinks(text)
     .replace(/`([^`]*)`/g, '$1')
-    .replace(/[\\*_~]/g, '')
+    .replace(/[\\*_~[\]]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
     .toLocaleLowerCase();
 }
 
-function parseMarkdownHeading(line: string): { readonly level: number; readonly text: string } | undefined {
-  const match = /^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$/.exec(line);
-  if (!match) return undefined;
+const WORD_CHARACTER = /[\p{L}\p{N}]/u;
 
-  const marker = match[1];
-  const text = match[2];
-  if (!marker || !text) return undefined;
+/** True when `phrase` occurs in `text` without a letter or digit directly before or after it. */
+function containsPhrase(text: string, phrase: string): boolean {
+  if (phrase === '') return false;
 
-  return { level: marker.length, text: text.trim() };
+  for (let at = text.indexOf(phrase); at !== -1; at = text.indexOf(phrase, at + 1)) {
+    const before = text[at - 1];
+    const after = text[at + phrase.length];
+    const bounded = (character: string | undefined) => character === undefined || !WORD_CHARACTER.test(character);
+    if (bounded(before) && bounded(after)) return true;
+  }
+
+  return false;
 }
 
-function collectMarkdownHeadings(markdown: MarkdownDocument): readonly {
-  readonly lineIndex: number;
-  readonly level: number;
+interface MarkdownHeading {
+  readonly depth: number;
   readonly text: string;
-}[] {
-  const lines = markdown.split(/\r?\n/);
-  const headings: { lineIndex: number; level: number; text: string }[] = [];
-  let fence: { marker: '`' | '~'; length: number } | undefined;
+  /** Offset of the heading's first character in the source text. */
+  readonly start: number;
+}
 
-  lines.forEach((line, lineIndex) => {
-    const fenceMatch = /^\s*(`{3,}|~{3,})/.exec(line);
-    if (fenceMatch) {
-      const fenceMarker = fenceMatch[1];
-      if (!fenceMarker) return;
-      const marker = fenceMarker[0] as '`' | '~';
-      const length = fenceMarker.length;
-      if (!fence) {
-        fence = { marker, length };
-      } else if (marker === fence.marker && length >= fence.length) {
-        fence = undefined;
-      }
-      return;
-    }
-
-    if (fence) return;
-
-    const heading = parseMarkdownHeading(line);
-    if (heading) headings.push({ lineIndex, ...heading });
+/** Headings at the top level of the document, in source order. */
+function collectMarkdownHeadings(markdown: MarkdownDocument): readonly MarkdownHeading[] {
+  return fromMarkdown(markdown).children.flatMap((node) => {
+    const start = node.position?.start.offset;
+    if (node.type !== 'heading' || start === undefined) return [];
+    return [{ depth: node.depth, text: nodeText(node), start }];
   });
-
-  return headings;
 }
 
 class CssSelectorFilter implements HtmlFilterObject {
@@ -147,17 +137,18 @@ class MarkdownSectionFilter implements MarkdownFilterObject {
   }
 
   filterMarkdown(markdown: MarkdownDocument): WebFetchFilterResult<MarkdownDocument> {
-    const lines = markdown.split(/\r?\n/);
     const headings = collectMarkdownHeadings(markdown);
     const target = normalizeHeadingText(this.heading);
-    const sections: string[] = [];
+    const candidates = headings
+      .map((heading, index) => ({ ...heading, index, text: normalizeHeadingText(heading.text) }))
+      .filter((heading) => this.level === undefined || heading.depth === this.level);
+    const exact = candidates.filter((heading) => heading.text === target);
+    const matches = exact.length > 0 ? exact : candidates.filter((heading) => containsPhrase(heading.text, target));
 
-    headings.forEach((heading, index) => {
-      if (this.level !== undefined && heading.level !== this.level) return;
-      if (normalizeHeadingText(heading.text) !== target) return;
-
-      const nextBoundary = headings.slice(index + 1).find((candidate) => candidate.level <= heading.level)?.lineIndex;
-      sections.push(lines.slice(heading.lineIndex, nextBoundary).join('\n').trim());
+    // Slice the source instead of serializing the tree, so each section keeps the author's formatting.
+    const sections = matches.map((heading) => {
+      const end = headings.slice(heading.index + 1).find((candidate) => candidate.depth <= heading.depth)?.start;
+      return markdown.slice(heading.start, end).trim();
     });
 
     return {

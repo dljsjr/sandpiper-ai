@@ -73,12 +73,15 @@ extensions/web-fetch/src/
 ### Pipeline
 
 ```
-fetch(url) → raw HTML → optional filter → jsdom/readability extract → turndown convert → TOON envelope
+HTML:  fetch(url) → raw HTML → optional CSS filter → jsdom/readability extract → turndown convert ─┐
+Text:  fetch(url) → Markdown or plain text ────────────────────────────────────────────────────────┴→ Markdown text → optional section filter → TOON envelope
 ```
+
+Both paths meet at Markdown text. A response served as `text/markdown`, `text/x-markdown` or `text/plain` takes the text path and is returned unchanged. Every other response takes the HTML path.
 
 1. **`fetch(url)`** — standard Fetch API. Custom headers supported. Follows redirects.
 2. **`jsdom`** — parse HTML into a DOM. **No JS execution, no remote resource fetching** (security: we're a parser, not a browser).
-3. **Filter (optional)** — apply targeted extraction filters before or after conversion. CSS selector filters operate on parsed HTML before readability. Markdown section filters operate on heading ranges after Turndown conversion.
+3. **Filter (optional)** — apply targeted extraction filters before or after conversion. CSS selector filters operate on parsed HTML before readability. Markdown section filters operate on the Markdown text of either path. The filter parses the text with `mdast-util-from-markdown`, finds the top-level headings, and slices the section out of the source text by offset, so the section keeps its original formatting. A heading matches when its plain text equals the requested text. When no heading matches exactly, headings that contain the requested text as a whole phrase match instead: `0.80.1` finds `## [0.80.1] - 2026-06-23` but not `## [0.80.10]`. Comparison ignores case, repeated whitespace and Markdown markup. A CSS selector filter on a text response returns an explanatory error.
 4. **`@mozilla/readability`** — extract article content when no pre-readability filter is active. Returns structured object with title, excerpt, byline, siteName, and cleaned HTML body.
 5. **`turndown`** — convert cleaned HTML to markdown. Preserves headings, code blocks, lists, tables, links. Far more token-efficient than raw HTML.
 6. **Return** — TOON-encoded object with metadata + markdown body.
@@ -168,11 +171,13 @@ Security and correctness. We're parsing HTML structure, not running a web applic
 
 ## Dependencies
 
-| Package                | Purpose            | Justification                                                                 |
-| ---------------------- | ------------------ | ----------------------------------------------------------------------------- |
-| `@mozilla/readability` | Content extraction | Firefox Reader View algorithm — no reasonable way to replicate in a few lines |
-| `jsdom`                | HTML → DOM parsing | Required by readability; standard DOM implementation for Node.js              |
-| `turndown`             | HTML → markdown    | Handles all HTML element types, edge cases, and nesting correctly             |
+| Package                    | Purpose                | Justification                                                                 |
+| -------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `@mozilla/readability`     | Content extraction     | Firefox Reader View algorithm — no reasonable way to replicate in a few lines |
+| `jsdom`                    | HTML → DOM parsing     | Required by readability; standard DOM implementation for Node.js              |
+| `turndown`                 | HTML → markdown        | Handles all HTML element types, edge cases, and nesting correctly             |
+| `mdast-util-from-markdown` | Markdown → syntax tree | The parser behind `remark`; gives each heading its source offsets             |
+| `mdast-util-to-string`     | Heading plain text     | Resolves links, emphasis and code spans to the text a reader sees             |
 
 All are pure JS, no native addons. Bundled at build time into the extension.
 

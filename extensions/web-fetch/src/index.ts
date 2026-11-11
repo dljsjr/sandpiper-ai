@@ -46,7 +46,11 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
           }),
           Type.Object({
             type: Type.Literal(WebFetchFilterType.MarkdownSection),
-            heading: Type.String({ description: 'Markdown heading text for the section to extract' }),
+            heading: Type.String({
+              description:
+                'Heading text of the section to extract, without Markdown markup. An exact match wins; ' +
+                'otherwise headings that contain the text as a whole phrase match',
+            }),
             level: Type.Optional(
               Type.Integer({
                 description: 'Optional heading level (1-6) to disambiguate repeated headings',

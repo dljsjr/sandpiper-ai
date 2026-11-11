@@ -322,6 +322,27 @@ describe('fetchAndExtract (end-to-end)', () => {
     expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: true, matchCount: 1 });
   });
 
+  it('should find a changelog release by its version in a plain-text Markdown document', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/CHANGELOG.md`, {
+      filter: { type: WebFetchFilterType.MarkdownSection, heading: '0.80.1' },
+    });
+
+    expect(result.content).toBe(
+      [
+        '## [0.80.1] - 2026-06-23',
+        '',
+        '- Fixed the   spacing bug.',
+        '- See the [migration guide](https://example.com/migrate).',
+        '',
+        '```sh',
+        '# not a heading',
+        'bun   install',
+        '```',
+      ].join('\n'),
+    );
+    expect(result.filter).toEqual({ type: WebFetchFilterType.MarkdownSection, matched: true, matchCount: 1 });
+  });
+
   it('should extract links from a plain-text Markdown document when followLinks is true', async () => {
     const result = await fetchAndExtract(adapter, `${baseUrl}/CHANGELOG.md`, { followLinks: true });
 
