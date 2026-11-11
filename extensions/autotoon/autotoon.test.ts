@@ -4,6 +4,37 @@ import { MIN_JSON_BYTES } from '../../packages/capability-autotoon/src/core.js';
 import autotoon from './autotoon.js';
 
 describe('autotoon Pi extension', () => {
+  it('preserves read JSON content and metadata without returning a patch', async () => {
+    const json = `${JSON.stringify(Array(50).fill({ id: 1, name: 'café', value: 42 }), null, 2).replaceAll('\n', '\r\n')}\r\n`;
+    const event = {
+      toolName: 'read',
+      toolCallId: 'tc-read',
+      input: { path: 'fixture.json' },
+      content: [
+        { type: 'text', text: json },
+        { type: 'image', data: 'base64data', mimeType: 'image/png' },
+      ],
+      details: { truncation: { truncated: false } },
+      structuredContent: { source: 'fixture.json' },
+      usage: { input: 1, output: 2 },
+      isError: false,
+    };
+    const original = structuredClone(event);
+    let handlerResult: unknown = null;
+
+    const mockPi = {
+      on: vi.fn((_event: string, handler: (result: unknown) => void) => {
+        handlerResult = handler(event);
+      }),
+    } as unknown as ExtensionAPI;
+
+    autotoon(mockPi);
+
+    expect(await handlerResult).toBeUndefined();
+    expect(event).toEqual(original);
+    expect(Buffer.from(event.content[0]!.text!)).toEqual(Buffer.from(json));
+  });
+
   it('does not modify error results', async () => {
     let handlerCalled = false;
     let handlerResult: unknown = null;

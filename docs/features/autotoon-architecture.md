@@ -15,7 +15,7 @@ AutoTOON currently does conversion only. It does not inject model guidance about
 
 When a tool result is available:
 
-1. The Pi adapter receives the `tool_result` event.
+1. The Pi adapter receives the `tool_result` event and skips `read` results, error results, and nested tool calls.
 2. AutoTOON inspects each text content block.
 3. Fast-reject skips text that does not start with `{` or `[`.
 4. Size gates skip payloads shorter than 256 characters or longer than 100,000 characters.
@@ -24,7 +24,7 @@ When a tool result is available:
 7. The conversion is kept only if TOON is shorter than the original JSON.
 8. Converted output is prefixed with `[TOON]\n`.
 
-Error results are left unchanged.
+The `read` exemption preserves exact file text for edits. The adapter returns no patch, so Pi keeps all content blocks and result metadata unchanged.
 
 ## Size thresholds
 

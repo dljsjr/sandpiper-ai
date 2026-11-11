@@ -3,9 +3,9 @@ import { tryConvertJsonToToon } from '../../packages/capability-autotoon/src/cor
 
 export default function autotoon(pi: ExtensionAPI): void {
   pi.on('tool_result', async (event) => {
-    // Nested calls come from another tool, such as a codemode script, which expects the tool's
-    // own output; only the result the model reads gets converted.
-    if (event.isError || event.parentToolCallId !== undefined) {
+    // Read results must keep exact file text for edits. Nested calls come from another tool,
+    // such as a codemode script, which expects the tool's own output.
+    if (event.toolName === 'read' || event.isError || event.parentToolCallId !== undefined) {
       return;
     }
 

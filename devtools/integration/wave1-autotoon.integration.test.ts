@@ -7,6 +7,8 @@
 // triggers above that threshold, so every JSON payload here is deliberately padded past it;
 // a smaller payload would silently skip conversion and prove nothing.
 
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { JsonObject } from '@earendil-works/pi-ai';
@@ -31,6 +33,56 @@ function largeJsonArguments(): JsonObject {
 }
 
 describe('wave 1: autotoon, isolated (AGENT-253)', () => {
+  it(
+    'preserves real read JSON file text and structured content (AGENT-323)',
+    async () => {
+      const json = `${JSON.stringify(
+        Array.from({ length: 20 }, (_, id) => ({ id, name: 'café', value: 42 })),
+        null,
+        2,
+      )}\n`;
+      expect(json.length).toBeGreaterThan(256);
+
+      const fixtureDir = await mkdtemp(join(tmpdir(), 'autotoon-read-'));
+      const fixturePath = join(fixtureDir, 'fixture.json');
+      const session = startRpcSession({
+        entry: 'pi',
+        extraExtensions: [AUTOTOON_PATH],
+        commandTimeoutMs: SMOKE_TIMEOUT_MS,
+        env: {
+          [MOCK_SCRIPT_ENV_VAR]: encodeMockScript([
+            { type: 'toolCall', toolName: 'read', arguments: { path: fixturePath } },
+            { type: 'text', text: 'read the fixture' },
+          ]),
+        },
+      });
+
+      try {
+        await writeFile(fixturePath, json);
+        await session.sendCommand({ type: 'prompt', message: `read ${fixturePath}` });
+
+        const toolExecutionEnd = await session.waitForEvent(
+          (event) => event.type === 'tool_execution_end' && event.toolName === 'read',
+          SMOKE_TIMEOUT_MS,
+        );
+        expect(toolExecutionEnd.isError).toBeFalsy();
+
+        const result = toolExecutionEnd.result as {
+          content: Array<{ type: string; text?: string }>;
+          structuredContent: unknown;
+        };
+        expect(result.content).toEqual([{ type: 'text', text: json }]);
+        expect(result.structuredContent).toBe(json);
+
+        await session.waitForEvent((event) => event.type === 'agent_settled', SMOKE_TIMEOUT_MS);
+      } finally {
+        await session.close();
+        await rm(fixtureDir, { recursive: true, force: true });
+      }
+    },
+    SMOKE_TIMEOUT_MS + 5_000,
+  );
+
   it(
     'converts a large JSON bash-tool result to TOON, with only autotoon loaded (no other custom extension)',
     async () => {

@@ -2,7 +2,7 @@
 
 **Like Auto-Tune, but for tokens.** 🎤
 
-AutoTOON automatically converts verbose JSON output from tools into [TOON (Token-Oriented Object Notation)](https://toonformat.dev), reducing token usage for tabular data.
+AutoTOON automatically converts verbose JSON output from tools other than `read` into [TOON (Token-Oriented Object Notation)](https://toonformat.dev), reducing token usage for tabular data.
 
 ## What It Does
 
@@ -35,7 +35,7 @@ When you see `[TOON]` at the start of tool output, you're looking at converted d
 | `bash` running `npm ls --json`       | Dependency trees    | ✅ Yes                  |
 | `bash` running `docker inspect`      | Container metadata  | ✅ Yes                  |
 | `bash` running `kubectl get -o json` | K8s resources       | ✅ Yes                  |
-| `read` tool                          | JSON file contents  | ✅ Yes                  |
+| `read` tool                          | JSON file contents  | ❌ No (preserved as-is) |
 | `ls` / `find` / `grep`               | Plain text output   | ❌ No (not JSON)        |
 | Any tool returning < 256 chars JSON  | Small payloads      | ❌ No                   |
 | Any tool returning error             | Error messages      | ❌ No (preserved as-is) |
@@ -50,7 +50,7 @@ When you see `[TOON]` at the start of tool output, you're looking at converted d
 
 ## Technical Overview
 
-AutoTOON intercepts the `tool_result` event, converts JSON to TOON when beneficial (256–100,000 characters, and only when the result is shorter), and injects the result. It never touches error results.
+AutoTOON intercepts the `tool_result` event and converts JSON to TOON when beneficial (256–100,000 characters, and only when the result is shorter). It leaves `read` results unchanged so that the model can copy exact file text for edits. Error results and nested tool calls also remain unchanged.
 
 **Implementation**: `packages/capability-autotoon/src/core.ts`  
 **Pi adapter**: `extensions/autotoon/autotoon.ts`  
