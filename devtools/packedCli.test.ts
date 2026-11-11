@@ -232,7 +232,11 @@ console.log([dark.name, light.name].join(','));`,
           maxBuffer: 2 * 1024 * 1024,
         });
       expect(run('sandpiper', ['--version']).trim()).toBe(manifest.version);
-      expect(run('sandpiper', ['--help'])).toContain('--migrate-pi-configs');
+      expect(
+        run('sandpiper', ['--help'])
+          .split('\n')
+          .filter((line) => line.trimStart().startsWith('--migrate-pi-configs')),
+      ).toHaveLength(1);
       const extensionPath = join(project, 'runtime-import-extension.ts');
       writeFileSync(
         extensionPath,
