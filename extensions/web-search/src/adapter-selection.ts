@@ -15,12 +15,12 @@
  */
 
 import { BraveSearchAdapter } from './brave-adapter.js';
-import { readSettingsKey, resolveConfigValue } from './config-resolver.js';
+import { readSettingsKey, resolveConfigValue, type SettingsContext } from './config-resolver.js';
 import { ParallelMcpSearchAdapter } from './parallel-adapter.js';
 import type { SearchAdapter } from './types.js';
 
 /** Resolve a Brave API key from env or settings.json, supporting literal / $VAR / !cmd forms. */
-export function resolveBraveKey(): string | undefined {
+export function resolveBraveKey(context: SettingsContext): string | undefined {
   const envValue = process.env.BRAVE_API_KEY;
   if (envValue) {
     const resolved = resolveConfigValue(envValue);
@@ -33,9 +33,9 @@ export function resolveBraveKey(): string | undefined {
   const nsBraveKey = (ns: unknown): unknown =>
     ns && typeof ns === 'object' ? (ns as Record<string, unknown>).braveApiKey : undefined;
   const candidates: unknown[] = [
-    nsBraveKey(readSettingsKey('web-search')),
-    nsBraveKey(readSettingsKey('webSearch')),
-    readSettingsKey('braveApiKey'),
+    nsBraveKey(readSettingsKey('web-search', context)),
+    nsBraveKey(readSettingsKey('webSearch', context)),
+    readSettingsKey('braveApiKey', context),
   ];
   for (const candidate of candidates) {
     if (typeof candidate === 'string') {
@@ -51,10 +51,10 @@ export function resolveBraveKey(): string | undefined {
  * Pick the search adapter to use. Brave when a key is available; otherwise Parallel's
  * free MCP search (no key required, works anonymously).
  */
-export function selectSearchAdapter(explicit?: SearchAdapter): SearchAdapter {
+export function selectSearchAdapter(context: SettingsContext, explicit?: SearchAdapter): SearchAdapter {
   if (explicit) return explicit;
 
-  const braveKey = resolveBraveKey();
+  const braveKey = resolveBraveKey(context);
   if (braveKey) return new BraveSearchAdapter(braveKey);
 
   return new ParallelMcpSearchAdapter();

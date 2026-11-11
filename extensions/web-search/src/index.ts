@@ -4,7 +4,7 @@
  * Mirrors the web-fetch extension's structure and adapter-injection pattern.
  */
 
-import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import type { AgentToolResult, ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
 import { selectSearchAdapter } from './adapter-selection.js';
 import {
@@ -27,8 +27,8 @@ interface WebSearchExtensionDependencies {
 
 export default async function init(pi: ExtensionAPI, dependencies: WebSearchExtensionDependencies = {}) {
   let adapter = dependencies.adapter;
-  const getAdapter = () => {
-    adapter ??= selectSearchAdapter();
+  const getAdapter = (ctx: ExtensionContext) => {
+    adapter ??= selectSearchAdapter({ cwd: ctx.cwd, projectTrusted: ctx.isProjectTrusted() });
     return adapter;
   };
   const executeWebSearchTool = dependencies.executeWebSearchTool ?? defaultExecuteWebSearchTool;
@@ -43,8 +43,8 @@ export default async function init(pi: ExtensionAPI, dependencies: WebSearchExte
       query: Type.String({ description: PARAM_QUERY_DESC }),
       count: Type.Optional(Type.Integer({ description: PARAM_COUNT_DESC, minimum: 1, maximum: MAX_RESULT_COUNT })),
     }),
-    async execute(_toolCallId, params): Promise<AgentToolResult<WebSearchToolDetails>> {
-      return executeWebSearchTool(getAdapter(), { query: params.query, count: params.count });
+    async execute(_toolCallId, params, _signal, _onUpdate, ctx): Promise<AgentToolResult<WebSearchToolDetails>> {
+      return executeWebSearchTool(getAdapter(ctx), { query: params.query, count: params.count });
     },
   });
 }

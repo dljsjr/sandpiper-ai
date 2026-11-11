@@ -28,7 +28,9 @@ Provider selection lives in `src/adapter-selection.ts`. Parallel runs behind our
 
 ### Brave Search API (recommended)
 
-Set `BRAVE_API_KEY` as an environment variable, or store it as `braveApiKey` under the `web-search` namespace in `settings.json`. The extension reads `.sandpiper/settings.json` in the working directory first, then `settings.json` in the agent directory (`~/.sandpiper/agent/` by default):
+Set `BRAVE_API_KEY` as an environment variable, or store it as `braveApiKey` under the `web-search` namespace in `settings.json`.
+
+The extension reads `.sandpiper/settings.json` in the session's working directory only when Pi trusts that project. It then checks `settings.json` in the agent directory (`~/.sandpiper/agent/` by default). Environment values take priority, and agent settings remain available without project trust:
 
 ```json
 {

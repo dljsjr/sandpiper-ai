@@ -18,6 +18,7 @@
 
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { getAgentDir } from '@earendil-works/pi-coding-agent';
 
 // ---------------------------------------------------------------------------
@@ -91,32 +92,37 @@ export function resolveConfigValue(config: string | undefined): string | undefin
 // Settings.json helpers
 // ---------------------------------------------------------------------------
 
+export interface SettingsContext {
+  readonly cwd: string;
+  readonly projectTrusted: boolean;
+}
+
 /**
- * Settings.json locations to check, in priority order (project wins over global).
+ * Settings.json locations to check, in priority order (trusted project wins over global).
  * Global lives at the agent dir: SANDPIPER_CODING_AGENT_DIR or ~/.sandpiper/agent
  * (NOT ~/.sandpiper). Project-local is .sandpiper/settings.json relative to cwd.
  */
-function settingsPaths(): string[] {
+function settingsPaths(context: SettingsContext): string[] {
   // Project-local first (cwd), then the global agent-dir settings. Pi's getAgentDir()
   // resolves the correct dir (~/.sandpiper/agent, honoring SANDPIPER_CODING_AGENT_DIR and
   // branding) — the canonical source rather than a hand-rolled home path.
-  const paths: string[] = [`${process.cwd()}/.sandpiper/settings.json`];
+  const paths: string[] = context.projectTrusted ? [join(context.cwd, '.sandpiper', 'settings.json')] : [];
   try {
     const dir = getAgentDir();
-    if (dir) paths.push(`${dir}/settings.json`);
+    if (dir) paths.push(join(dir, 'settings.json'));
   } catch {
-    // getAgentDir unavailable (e.g. Pi config not initialized in a bare test context) — project-local only.
+    // getAgentDir unavailable (e.g. Pi config not initialized in a bare test context).
   }
   return paths;
 }
 
 /**
  * Read a key from the nearest sandpiper settings.json.
- * Checks project-local first, then the global agent-dir settings. Returns undefined
+ * Checks trusted project-local settings first, then the global agent-dir settings. Returns undefined
  * when neither exists or the key is missing.
  */
-export function readSettingsKey(key: string): unknown | undefined {
-  for (const fullPath of settingsPaths()) {
+export function readSettingsKey(key: string, context: SettingsContext): unknown | undefined {
+  for (const fullPath of settingsPaths(context)) {
     if (!existsSync(fullPath)) continue;
     try {
       const raw = readFileSync(fullPath, 'utf-8');

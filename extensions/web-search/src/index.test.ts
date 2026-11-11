@@ -1,4 +1,4 @@
-import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI, ExtensionToolContext } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
 import type { WebSearchToolInput, WebSearchToolResult } from './tool-operation.js';
 import type { SearchAdapter } from './types.js';
@@ -14,7 +14,13 @@ vi.mock('./adapter-selection.js', () => ({
 import init from './index.js';
 
 interface RegisteredWebSearchTool {
-  execute(toolCallId: string, params: WebSearchToolInput): Promise<WebSearchToolResult>;
+  execute(
+    toolCallId: string,
+    params: WebSearchToolInput,
+    signal: undefined,
+    onUpdate: undefined,
+    ctx: ExtensionToolContext,
+  ): Promise<WebSearchToolResult>;
 }
 
 describe('web-search extension', () => {
@@ -35,10 +41,12 @@ describe('web-search extension', () => {
 
     expect(mocks.selectSearchAdapter).not.toHaveBeenCalled();
 
-    await registeredTool?.execute('call-1', { query: 'first' });
-    await registeredTool?.execute('call-2', { query: 'second' });
+    const ctx = { cwd: '/project', isProjectTrusted: () => false } as ExtensionToolContext;
+    await registeredTool?.execute('call-1', { query: 'first' }, undefined, undefined, ctx);
+    await registeredTool?.execute('call-2', { query: 'second' }, undefined, undefined, ctx);
 
     expect(mocks.selectSearchAdapter).toHaveBeenCalledTimes(1);
+    expect(mocks.selectSearchAdapter).toHaveBeenCalledWith({ cwd: '/project', projectTrusted: false });
     expect(adapter.search).toHaveBeenCalledTimes(2);
   });
 });
