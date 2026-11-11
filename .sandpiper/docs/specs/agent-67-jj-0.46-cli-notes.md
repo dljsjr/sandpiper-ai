@@ -151,7 +151,7 @@ Subcommands, with aliases: `advance` (a), `create` (c), `delete` (d), `forget` (
 Config comes from config files and environment variables; see `jj help -k config`.
 
 - Scope selectors, shared by edit/list/path/set/unset: `--user`, `--repo`, `--workspace`, and `--file <PATH>` (on edit/set/unset; `[NEW 0.45]`).
-  - `--file` must point to a location jj recognizes: a user/repo/workspace file, a file in `conf.d/`, a system config, `$JJ_CONFIG`, or a `--config-file`. The global `--config-file` *loads* an extra file; `--file` *chooses which file on disk to change*. `set` and `edit` create the file and any missing parent directories.
+  - `--file` must point to a location jj recognizes: a user/repo/workspace file, a file in `conf.d/`, a system config, `$JJ_CONFIG`, or a `--config-file`. The global `--config-file` _loads_ an extra file; `--file` _chooses which file on disk to change_. `set` and `edit` create the file and any missing parent directories.
   - `--user` targets the first loaded user file without prompting, since 0.45.
 - `jj config edit <--user|--repo|--workspace|--file>` `[EDITOR]` `[INTERACTIVE]`: creates the file even if the editor writes nothing.
 - `jj config gc`: finds, and optionally deletes, repo-level config directories under `~/.config/jj/repos` whose repo no longer exists `[NEW 0.43]`.
@@ -355,7 +355,7 @@ See the git-comparison doc and the git command table.
 
 ### `jj interdiff <--from <REV>|--to <REV>> [FILESETS]...`
 
-- Compares two revisions' *patches* rather than their file contents: it rebases `--from` onto `--to`'s parents and diffs the result against `--to`. Unlike `jj diff --from A --to B`, it ignores differences between the parents.
+- Compares two revisions' _patches_ rather than their file contents: it rebases `--from` onto `--to`'s parents and diffs the result against `--to`. Unlike `jj diff --from A --to B`, it ignores differences between the parents.
 - `-f, --from` and `-t, --to` each default to `@`, and at least one is required.
 - Typical use, seeing what changed since the last push: `jj interdiff --from push-xyz@origin --to push-xyz`. For a change's whole evolution, use `jj evolog -p`.
 - Full Diff Formatting Options, including `-w`/`-b`.
@@ -405,7 +405,7 @@ See the operation-log docs.
 #### `jj op abandon <OPERATION>`
 
 - Discards op history. `..<op>` abandons that op and its ancestors and reparents its descendants onto the root op.
-- To discard *recent* ops: `jj op restore <op>`, then `jj op abandon <op>..@-`.
+- To discard _recent_ ops: `jj op restore <op>`, then `jj op abandon <op>..@-`.
 - Change predecessors that become unreachable are discarded too, and `jj util gc` removes them later. `[DESTRUCTIVE]` once garbage-collected.
 
 #### `jj op diff`
@@ -540,7 +540,7 @@ Moves revisions to new parents and keeps their diffs. A working-copy revision th
 
 ### `jj split [FILESETS]...` `[EDITOR]` and, without FILESETS, `[INTERACTIVE]`
 
-- Splits one revision into two. Without FILESETS, `-i` is the default and opens the diff editor; you edit the right side down to what the *first* commit should contain. With FILESETS, the matching files form the "selected" part and no diff editor opens.
+- Splits one revision into two. Without FILESETS, `-i` is the default and opens the diff editor; you edit the right side down to what the _first_ commit should contain. With FILESETS, the matching files form the "selected" part and no diff editor opens.
 - Layout:
   - Default: selected K' becomes the parent, remaining K" the child, and L is rebased onto K".
   - `-p, --parallel`: K' and K" become siblings, and L merges them.
@@ -548,7 +548,7 @@ Moves revisions to new parents and keeps their diffs. A working-copy revision th
   - `[AGENT]` Without `-o/-A/-B`, bookmarks move forward to the child.
 - Descriptions:
   - It asks for descriptions of both commits; since 0.46 that's a single editor session.
-  - `-m, --message <MSG>` sets the *selected* commit's description; the other keeps the original. `[VERIFY]` whether `-m` alone suppresses the editor entirely in 0.46.
+  - `-m, --message <MSG>` sets the _selected_ commit's description; the other keeps the original. `[VERIFY]` whether `-m` alone suppresses the editor entirely in 0.46.
   - `--editor`: force the editor even with `-m`.
 - `-r, --revision <REV>` (default `@`). `--tool <NAME>`. `-o, --onto` (aliases `-d`, `--destination`), `-A`, `-B` (each repeatable, making a merge).
 - An empty commit can't be split; use `jj new`.
@@ -561,7 +561,7 @@ Moves revisions to new parents and keeps their diffs. A working-copy revision th
 - An emptied source is abandoned unless `-k, --keep-emptied`. Without `-i` or paths, the source is always emptied.
 - If the abandoned source and the destination **both** have descriptions, it prompts for a combined one. `[AGENT]` Avoid the prompt with `-m <MSG>` or `-u, --use-destination-message`, which keeps the destination's description and drops the source's.
 - `--editor`. `-i, --interactive` `[INTERACTIVE]`. `--tool`.
-- EXPERIMENTAL: `-o, --onto` (aliases `-d`, `--destination`), `-A`, `-B` create a *new* commit at that location from one or more `--from` sources (default `--from @`).
+- EXPERIMENTAL: `-o, --onto` (aliases `-d`, `--destination`), `-A`, `-B` create a _new_ commit at that location from one or more `--from` sources (default `--from @`).
 
 ### `jj status [FILESETS]...` (alias `st`)
 
@@ -622,16 +622,16 @@ Moves revisions to new parents and keeps their diffs. A working-copy revision th
 
 ### Editor and interactive hazards, with non-interactive escapes
 
-| Command | Hazard | Escape |
-| --- | --- | --- |
-| `commit` | editor | `-m` (no `--stdin`) |
-| `describe` | editor | `-m`, `--stdin` |
-| `split` | diff editor (no FILESETS); description editor | give FILESETS; `-m` (`[VERIFY]` it suppresses the editor) |
-| `squash` | combined-description prompt; `-i` | `-m`, `-u`; no `-i` |
-| `converge` | prompts | `--no-interactive` |
-| `resolve` | merge tool | `--tool :ours` / `:theirs`; `--list` |
-| `absorb -i`, `commit -i`, `restore -i`, `squash -i`, `diffedit`, `arrange` | diff editor / TUI | none; avoid |
-| `file edit`, `config edit`, `sparse edit` | editor | `JJ_EDITOR` / `ui.editor` script; for config, `config set`; for sparse, `sparse set` |
+| Command                                                                    | Hazard                                        | Escape                                                                               |
+| -------------------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `commit`                                                                   | editor                                        | `-m` (no `--stdin`)                                                                  |
+| `describe`                                                                 | editor                                        | `-m`, `--stdin`                                                                      |
+| `split`                                                                    | diff editor (no FILESETS); description editor | give FILESETS; `-m` (`[VERIFY]` it suppresses the editor)                            |
+| `squash`                                                                   | combined-description prompt; `-i`             | `-m`, `-u`; no `-i`                                                                  |
+| `converge`                                                                 | prompts                                       | `--no-interactive`                                                                   |
+| `resolve`                                                                  | merge tool                                    | `--tool :ours` / `:theirs`; `--list`                                                 |
+| `absorb -i`, `commit -i`, `restore -i`, `squash -i`, `diffedit`, `arrange` | diff editor / TUI                             | none; avoid                                                                          |
+| `file edit`, `config edit`, `sparse edit`                                  | editor                                        | `JJ_EDITOR` / `ui.editor` script; for config, `config set`; for sparse, `sparse set` |
 
 ### Flag naming
 

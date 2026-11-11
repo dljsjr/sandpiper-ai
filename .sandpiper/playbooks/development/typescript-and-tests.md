@@ -25,12 +25,12 @@ read_when: writing TypeScript, changing tests, running checks, verification, lin
 
 ## Verification Commands
 
-| Need              | Command                                                          |
-| ----------------- | ---------------------------------------------------------------- |
-| Typecheck + lint + Knip | `bun check`                                                      |
-| Safe auto-fix     | `bun run check:biome-check --write`                                              |
-| Focused Vitest    | `bun run test:vitest -- <testpath>`                              |
-| Full suite        | `bun run test`                                                   |
+| Need                    | Command                             |
+| ----------------------- | ----------------------------------- |
+| Typecheck + lint + Knip | `bun check`                         |
+| Safe auto-fix           | `bun run check:biome-check --write` |
+| Focused Vitest          | `bun run test:vitest -- <testpath>` |
+| Full suite              | `bun run test`                      |
 
 One root `vitest.config.ts` owns all projects. Preserve the default test timeouts: 10 seconds for core, 15 seconds for web-fetch and web-search, and Vitest's default elsewhere.
 

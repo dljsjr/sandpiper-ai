@@ -11,7 +11,7 @@ Sandpiper's system prompt extension replaces Pi's base prompt wholesale in its `
 
 This is the bug that broke the YAAMS memory bootstrap: `pi-yaams` appended a `<memory>` block to the system prompt, then Sandpiper's startup hook rebuilt the prompt from scratch and lost the block.
 
-The root cause is compositional: the `before_agent_start` event chains system prompt mutations across handlers, but a handler that *replaces* the prompt (instead of appending to it) breaks the chain for any earlier handler.
+The root cause is compositional: the `before_agent_start` event chains system prompt mutations across handlers, but a handler that _replaces_ the prompt (instead of appending to it) breaks the chain for any earlier handler.
 
 ## Why not just fix the ordering?
 
@@ -54,11 +54,12 @@ This means:
 The canonical contract is exported by AGENT-214 in `extensions/system/prompt-contributions.ts`:
 
 ```typescript
-export const SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL = 'sandpiper:prompt-contribution';
+export const SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL =
+  "sandpiper:prompt-contribution";
 
 export interface SandpiperPromptContribution {
   readonly id: string;
-  readonly phase?: 'prepend' | 'append';
+  readonly phase?: "prepend" | "append";
   readonly acknowledge?: () => void;
   readonly getContent: () => string | Promise<string | undefined> | undefined;
 }
@@ -83,7 +84,7 @@ export interface SandpiperPromptContribution {
 ### Example: contributing extension
 
 ```typescript
-const SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL = 'sandpiper:prompt-contribution';
+const SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL = "sandpiper:prompt-contribution";
 
 pi.on("resources_discover", async (_event, _ctx) => {
   pi.events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
@@ -146,6 +147,7 @@ The `acknowledge()` callback enables harness-agnostic fallback: when the Sandpip
 If a contribution block is correctly assembled in `before_agent_start`, it is visible in the agent's context. An agent that cannot see a contribution block does not have it — do not rationalize missing blocks as self-introspection unreliability.
 
 For verification, use:
+
 - `YAAMS_BOOTSTRAP_DEBUG_FILE` — pi-yaams writes the computed block (or skip reason) to this file
 - `SANDPIPER_DUMP_SYSTEM_PROMPT` — Sandpiper dumps the final assembled prompt and exits
 - A `before_provider_request` hook that captures the actual provider payload — this is the strongest proof, since it shows the exact bytes sent to the model

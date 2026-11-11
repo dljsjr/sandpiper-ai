@@ -61,6 +61,7 @@ incident's original OS-keychain explanation was later corrected and the whole de
 was torn down, see that section).
 
 **Two distinct entry modes, per AGENT-249's own framing, confirmed as genuinely different:**
+
 1. `sandpiper` (the wrapper: `packages/cli/sandpiper_standalone.ts`) — always loads Sandpiper's
    explicit built-in extension and resource set plus whatever `-e`/`--no-extensions` add/remove
    on top. Good for "does Sandpiper's real runtime behave", not for single-extension isolation.
@@ -110,9 +111,10 @@ non-negotiable, not an optimization.**
 **Tool-call/result observability**: `tool_execution_start`/`_update`/`_end`, keyed by
 `toolCallId`, carry `toolName`, `args`, streaming `partialResult`, and the final `result`/
 `isError`. This is sufficient to assert extension tool behavior (arguments in, structured result
-+ error flag out) without needing to parse assistant-message tool-call deltas at all — prefer
-these events over `toolcall_end` for test assertions, since they carry the tool's actual return
-value, not just the call it made.
+
+- error flag out) without needing to parse assistant-message tool-call deltas at all — prefer
+  these events over `toolcall_end` for test assertions, since they carry the tool's actual return
+  value, not just the call it made.
 
 **Compaction**: `compact` command triggers a **real LLM call** to generate the summary (response
 includes `usage`/`cost` for "the LLM call or calls that generated the summary"). This means
@@ -141,11 +143,11 @@ earlier framing). It was not an OS keychain or cached-OAuth store bypassing proc
 It was a self-inflicted configuration gap in the ad hoc debug commands that produced the
 incident, run before this harness existed: those commands set only `PI_CODING_AGENT_DIR` to a
 temp directory, never `SANDPIPER_CODING_AGENT_DIR`, and never overrode `PI_PACKAGE_DIR`. Because
-`PI_PACKAGE_DIR` was left unset, it inherited the *invoking* Sandpiper session's own value —
+`PI_PACKAGE_DIR` was left unset, it inherited the _invoking_ Sandpiper session's own value —
 pointed at Sandpiper's branded package (with `piConfig`), making `APP_NAME` resolve to
 `"sandpiper"` and `ENV_AGENT_DIR` resolve to `"SANDPIPER_CODING_AGENT_DIR"` (AGENT-221's
 confirmed derivation) — the one variable name those commands never touched, which therefore
-inherited the *real* `~/.sandpiper/agent`. Real `settings.json` loaded, with Doug's real
+inherited the _real_ `~/.sandpiper/agent`. Real `settings.json` loaded, with Doug's real
 configured providers (a `claude-cli` provider that forks to the real Claude Code CLI binary,
 needing no stored credential file at all — explaining the keyless success; and a Codex-family
 provider — explaining the separate strict-schema rejection incident, consistent with, not
@@ -154,7 +156,7 @@ Verified by reconstruction and by a safe re-run: identical invocation, both agen
 to the same fresh temp dir, keyless — clean, deterministic `"No API key found for the selected
 model."` exit, zero completion, the temp agent dir left holding only fresh empty state.
 
-**This harness's own `prepareIsolatedSpawn()` was never affected.** It has set *both* agent-dir
+**This harness's own `prepareIsolatedSpawn()` was never affected.** It has set _both_ agent-dir
 env var names unconditionally since AGENT-251 — precisely the fix this correction confirms is
 sufficient. The incident was a property of hand-run debug commands that predated the harness,
 not a gap in its design.
@@ -172,10 +174,10 @@ findings, verified empirically, and both now moot for a reason that has nothing 
 either fix being wrong.
 
 **Doug's question, unanswered until he asked it directly: what situation causes a pinned
-invocation to *not* use the mock?** Answer: none. An unknown `--provider` value is a hard error.
+invocation to _not_ use the mock?** Answer: none. An unknown `--provider` value is a hard error.
 An unresolvable `--model` value is a hard error. Pi 0.84.0 makes model-resolution ambiguity an
 explicit error, not a silent substitution. There is no fall-through mechanism from an explicit
-provider pin to *anything* else — real credential, ambient OAuth, or otherwise. Every layer of
+provider pin to _anything_ else — real credential, ambient OAuth, or otherwise. Every layer of
 the guard was scar tissue from an incident whose real root cause (the branding-trap isolation
 gap above) was found only once Doug pushed past the pair's own prior framing. The guard
 machinery was built to defend against a fallback path that does not exist in pi.
@@ -195,10 +197,10 @@ onto what's actually true:
   process-level interception layer backing it up. There is no known mechanism by which that pin
   gets silently ignored.
 - **`--offline`**, passed unconditionally by `prepareIsolatedSpawn()`, is the answer to the one
-  real *hermeticity* (not safety) concern that survived the teardown: isolated test runs were
+  real _hermeticity_ (not safety) concern that survived the teardown: isolated test runs were
   making incidental network calls at startup regardless of whether a turn was ever attempted —
   observed directly while building the guard, as repeated `https://pi.dev/api/models/providers/
-  ...` catalog-refresh fetches even in a keyless, immediately-failing run. `--offline` suppresses
+...` catalog-refresh fetches even in a keyless, immediately-failing run. `--offline` suppresses
   pi's startup network operations; verified empirically (with the guard's diagnostic log, before
   it was deleted, as a one-time debugging tool) that the catalog fetches stop happening with the
   flag set. This is a determinism measure — isolated tests shouldn't depend on reaching a real
@@ -253,7 +255,7 @@ The root `test:vitest` command neutralizes Git configuration and points `JJ_CONF
   and `devtools/` is already the established home for tests that spawn real processes/binaries).
 - **Isolation-by-construction, not per-test discipline** (AGENT-249's explicit requirement): a
   single shared helper, `devtools/integration/harness.ts`'s `prepareIsolatedSpawn()`. It is the
-  *only* supported way to spawn `pi`/`sandpiper` from a test; it always sets **both**
+  _only_ supported way to spawn `pi`/`sandpiper` from a test; it always sets **both**
   `SANDPIPER_CODING_AGENT_DIR` and `PI_CODING_AGENT_DIR` to a fresh `mkdtempSync` directory (per
   §1's raw-vs-wrapper env-var divergence -- this is the actual fix for the incident described in
   §3, not a guard around it), always neutralizes `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM`/points
@@ -261,7 +263,7 @@ The root `test:vitest` command neutralizes Git configuration and points `JJ_CONF
   passes `--offline` (§3, hermeticity not safety), and always requires an explicit
   `--provider`/`--model` pin to the mock by default (overridable for the config-isolation
   canary, which deliberately omits it). No test file constructs its own `spawn()` call.
-- Because this lives under the default include glob, it *is* swept by a bare `bun run test`
+- Because this lives under the default include glob, it _is_ swept by a bare `bun run test`
   today — confirmed no existing mechanism in this repo actually excludes suites from the default
   sweep. Given wave 1 is only 2-3 extensions with a fast in-process mock (no real subprocess network
   wait, no real model latency), this is likely fine to leave in the default gate — revisit only
@@ -290,17 +292,18 @@ both directly exercised by the confirmed `tool_execution_*` RPC events:
   two extensions.
 
 **Deferred past wave 1, with reasons** (not just "not now" — each has a concrete blocker):
+
 - `background-process` — real timing/notification semantics (the whole point of testing it is
   process-completion notifications, which means real wall-clock waits or a fake-timer strategy
   neither confirmed nor designed yet); candidate for wave 2 once wave 1 proves the harness
   itself is solid.
 - `tattler` — "two-process potential" is exactly right and exactly why it's not wave 1: it needs
-  the harness to spawn and correlate *two* isolated `pi` processes with distinct identities, a
+  the harness to spawn and correlate _two_ isolated `pi` processes with distinct identities, a
   materially bigger harness capability than anything wave 1 needs. Don't let tattler coverage
   gate wave 1 landing; it's the natural wave-2 anchor once single-process RPC driving is proven.
 - `shell-relay` (needs zellij) and `web-fetch`/`web-search` live paths (network) — excluded per
   AGENT-249's own note; their mock adapters (e.g. `DdgSearchAdapter` already visible in
-  `extensions/web-search/src/ddg-adapter.test.ts`) may allow *unit*-level inclusion later but add
+  `extensions/web-search/src/ddg-adapter.test.ts`) may allow _unit_-level inclusion later but add
   nothing RPC-specific to prove in wave 1.
 
 ### The AGENT-237(e) payoff, realized
@@ -310,8 +313,8 @@ Doug's manual sweep because, at the time, "there was zero existing test coverage
 anywhere in extensions/ or packages/core/, and the risk lives entirely inside Pi's internal
 turn/compaction state machine, which only exists during a real streaming turn -- nothing to mock
 without testing the mock instead of Pi's actual behavior." That reasoning predates this harness:
-the mock provider is a real, structurally-network-incapable *provider* that pi's actual
-compaction/turn machinery treats exactly like any other provider -- only the model *content* is
+the mock provider is a real, structurally-network-incapable _provider_ that pi's actual
+compaction/turn machinery treats exactly like any other provider -- only the model _content_ is
 scripted, not pi's internal state machine.
 
 `wave1-compaction.integration.test.ts` (AGENT-253) drives real manual compaction via the RPC
@@ -361,7 +364,7 @@ under, not a claim about current state. See the Status line at the top of this d
 ## Open questions for the coordinator
 
 1. Does `devtools/integration/` match intent, or should this live under a different top-level
-   directory given it's a new *class* of test (spawns real binaries) rather than a build/dist
+   directory given it's a new _class_ of test (spawns real binaries) rather than a build/dist
    check?
 2. Is leaving wave-1 tests in the default `bun run test` sweep (no exclusion) acceptable, or
    should this design add an actual exclusion mechanism up front rather than deferring to

@@ -52,7 +52,7 @@ This repository is the Sandpiper source tree: a Bun/Node repository for the loca
 | `.sandpiper/docs/`      | Active internal specs, PRDs, design notes, and implementation plans                             |
 | `.sandpiper/archive/`   | Historical, completed, superseded, or stale docs                                                |
 | `extensions/`           | Sandpiper Pi extension source                                                                   |
-| `packages/`             | CLI and shared core source modules                                              |
+| `packages/`             | CLI and shared core source modules                                                              |
 | `devtools/`             | Build regressions and isolated CLI/RPC integration tests                                        |
 
 ## Public Documentation

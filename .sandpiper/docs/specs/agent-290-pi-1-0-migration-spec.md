@@ -17,10 +17,10 @@ Out of scope:
 
 ## Versions
 
-| Item                                                 | Requirement                                                                                                                  |
-| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, and `extensions/*`). Published to npm 2026-10-05. |
-| Version policy                                       | Exact versions. Current dependency ownership is in the [build system reference](../../../docs/dev/build-system.md#dependency-resolution).                                                                         |
+| Item                                                 | Requirement                                                                                                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, and `extensions/*`). Published to npm 2026-10-05.                                   |
+| Version policy                                       | Exact versions. Current dependency ownership is in the [build system reference](../../../docs/dev/build-system.md#dependency-resolution). |
 
 ## System prompt
 
@@ -158,8 +158,8 @@ Production extension code needs no other API changes: `tsc` against Pi 1.0.3 rep
 
 ## Follow-up
 
-| Item | Where |
-| --- | --- |
+| Item                                                      | Where    |
+| --------------------------------------------------------- | -------- |
 | Retain only the workspace runtime and local helper builds | TOOLS-30 |
 
 ### Adoption candidates

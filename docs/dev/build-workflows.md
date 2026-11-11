@@ -4,12 +4,12 @@ Use this guide to select the build and verification commands for a change. Use B
 
 ## Choose the command
 
-| You changed                                         | Build command                                                 |
-| --------------------------------------------------- | ------------------------------------------------------------- |
-| CLI, built-in extension, or core source | `bun run build`                                               |
-| Root build scripts or product metadata              | `bun run build`                                               |
-| Public documentation or license                     | No build required. Pack again to refresh the tarball.         |
-| Configured custom skills, prompts, or themes        | No application build. Update the separately managed resource. |
+| You changed                                  | Build command                                                 |
+| -------------------------------------------- | ------------------------------------------------------------- |
+| CLI, built-in extension, or core source      | `bun run build`                                               |
+| Root build scripts or product metadata       | `bun run build`                                               |
+| Public documentation or license              | No build required. Pack again to refresh the tarball.         |
+| Configured custom skills, prompts, or themes | No application build. Update the separately managed resource. |
 
 ## Run tests while developing
 

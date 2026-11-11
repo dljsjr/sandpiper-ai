@@ -19,21 +19,21 @@ provides orientation and the key decision guide.
 
 ## Three Ways to Show Content
 
-| API | Placement | Component support | Use when |
-|-----|-----------|-------------------|----------|
-| `ctx.ui.notify(msg, type)` | Chat (flows up) | None — plain text, single color | Simple one-off notifications |
-| `ctx.ui.setWidget(key, factory)` | Above/below editor (sticky) | Full — DynamicBorder, Container, etc. | Persistent status/diagnostics that should stay visible |
-| `pi.registerMessageRenderer` + `pi.sendMessage` | Chat (flows up) | Full — DynamicBorder, Container, etc. | Rich notifications — but persisted to JSONL (duplicates on resume) |
-| Direct chat container injection | Chat (flows up) | Full — DynamicBorder, Container, etc. | **Preferred** — rich, non-sticky, non-persistent. See patterns doc. |
+| API                                             | Placement                   | Component support                     | Use when                                                            |
+| ----------------------------------------------- | --------------------------- | ------------------------------------- | ------------------------------------------------------------------- |
+| `ctx.ui.notify(msg, type)`                      | Chat (flows up)             | None — plain text, single color       | Simple one-off notifications                                        |
+| `ctx.ui.setWidget(key, factory)`                | Above/below editor (sticky) | Full — DynamicBorder, Container, etc. | Persistent status/diagnostics that should stay visible              |
+| `pi.registerMessageRenderer` + `pi.sendMessage` | Chat (flows up)             | Full — DynamicBorder, Container, etc. | Rich notifications — but persisted to JSONL (duplicates on resume)  |
+| Direct chat container injection                 | Chat (flows up)             | Full — DynamicBorder, Container, etc. | **Preferred** — rich, non-sticky, non-persistent. See patterns doc. |
 
 **The key tradeoff:** `setWidget` = sticky but full components. `notify` = chat-flowing but plain text only. **Direct chat container injection** = chat-flowing AND full components AND non-persistent — the right choice for styled banners.
 
 ## notify() internals
 
 ```typescript
-ctx.ui.notify('msg', 'info')     // → showStatus()   → dim text, coalescing (replaces consecutive calls)
-ctx.ui.notify('msg', 'warning')  // → showWarning()  → yellow, prepends "Warning: "
-ctx.ui.notify('msg', 'error')    // → showError()    → red, prepends "Error: "
+ctx.ui.notify("msg", "info"); // → showStatus()   → dim text, coalescing (replaces consecutive calls)
+ctx.ui.notify("msg", "warning"); // → showWarning()  → yellow, prepends "Warning: "
+ctx.ui.notify("msg", "error"); // → showError()    → red, prepends "Error: "
 ```
 
 All three wrap the entire message in a single color — embedded ANSI styling partially works
@@ -46,17 +46,23 @@ Use a transient `setWidget` to capture the TUI reference, inject components as
 a side-effect, then immediately clear the widget:
 
 ```typescript
-ctx.ui.setWidget('my-banner', (tui, theme) => {
+ctx.ui.setWidget("my-banner", (tui, theme) => {
   const chatContainer = tui.children[1];
-  if (chatContainer && 'addChild' in chatContainer) {
+  if (chatContainer && "addChild" in chatContainer) {
     chatContainer.addChild(new Spacer(1));
-    chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
-    chatContainer.addChild(new Text(theme.bold(theme.fg('warning', 'Heading')), 1, 0));
-    chatContainer.addChild(new DynamicBorder((s: string) => theme.fg('warning', s)));
+    chatContainer.addChild(
+      new DynamicBorder((s: string) => theme.fg("warning", s)),
+    );
+    chatContainer.addChild(
+      new Text(theme.bold(theme.fg("warning", "Heading")), 1, 0),
+    );
+    chatContainer.addChild(
+      new DynamicBorder((s: string) => theme.fg("warning", s)),
+    );
   }
   return { render: () => [], invalidate: () => {} };
 });
-ctx.ui.setWidget('my-banner', undefined); // clear the no-op widget
+ctx.ui.setWidget("my-banner", undefined); // clear the no-op widget
 ```
 
 - Duck-type with `'addChild' in candidate` — don't use `instanceof` (jiti boundary issue)
@@ -73,15 +79,15 @@ for transient notifications. Use `sendMessage` only when persistence is desired
 (e.g., messages the LLM should see in resumed sessions).
 
 ```typescript
-pi.registerMessageRenderer<MyDetails>('my-type', (message, _options, theme) => {
+pi.registerMessageRenderer<MyDetails>("my-type", (message, _options, theme) => {
   const container = new Container();
   // ... build component ...
   return container;
 });
 
 pi.sendMessage({
-  customType: 'my-type',
-  content: '',
+  customType: "my-type",
+  content: "",
   display: true,
   details: myData,
 });
@@ -112,19 +118,19 @@ pi.on('session_start', async (_event, ctx) => {
 Renders `────────────────────` (repeated `─` to full terminal width). Must be a Container child — not embeddable in text strings.
 
 ```typescript
-import { DynamicBorder } from '@earendil-works/pi-coding-agent';
+import { DynamicBorder } from "@earendil-works/pi-coding-agent";
 // Always type the color param explicitly:
-new DynamicBorder((s: string) => theme.fg('warning', s));
+new DynamicBorder((s: string) => theme.fg("warning", s));
 ```
 
 ## Theme Color Roles
 
 ```typescript
-theme.fg('warning', text)   // yellow — warnings, headings
-theme.fg('accent', text)    // cyan — commands, URLs, actions
-theme.fg('muted', text)     // gray — secondary info
-theme.fg('dim', text)       // dimmer — timestamps, metadata
-theme.bold(text)            // bold — combine: theme.bold(theme.fg('warning', text))
+theme.fg("warning", text); // yellow — warnings, headings
+theme.fg("accent", text); // cyan — commands, URLs, actions
+theme.fg("muted", text); // gray — secondary info
+theme.fg("dim", text); // dimmer — timestamps, metadata
+theme.bold(text); // bold — combine: theme.bold(theme.fg('warning', text))
 ```
 
 ## Changing core modules
@@ -138,6 +144,7 @@ rebuild Sandpiper and restart the agent. `/reload` does not replace the built-in
 component API details, and decision guide.
 
 Pi framework references (relative to `$PI_CODING_AGENT_PACKAGE`):
+
 - `docs/tui.md` — component API, theming, overlays, keyboard input
 - `docs/extensions.md` — sendMessage, registerMessageRenderer, setWidget, lifecycle
 - `examples/extensions/message-renderer.ts` — canonical custom renderer example

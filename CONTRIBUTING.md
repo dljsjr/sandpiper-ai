@@ -34,7 +34,7 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 | Path          | Purpose                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
 | `docs/`       | Public Sandpiper documentation                                                 |
-| `packages/`   | CLI and shared core source modules                             |
+| `packages/`   | CLI and shared core source modules                                             |
 | `extensions/` | Sandpiper Pi extensions and compatibility entrypoints                          |
 | `devtools/`   | Build regressions and isolated CLI/RPC integration tests                       |
 | `.sandpiper/` | Project-local agent state, tasks, playbooks, active specs, notes, and archives |

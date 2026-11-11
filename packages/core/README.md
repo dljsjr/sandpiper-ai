@@ -30,7 +30,7 @@ bun run test:vitest -- packages/core
 Extensions import the owning source module by relative path:
 
 ```typescript
-import { errorMessage } from '../../packages/core/src/utils.js';
+import { errorMessage } from "../../packages/core/src/utils.js";
 ```
 
 Core has no package manifest or barrel. Runtime imports and type checking use the same source modules. Extensions do not need a generated core `dist/` directory.

@@ -4,10 +4,10 @@ CLI and shared core source modules used by the Sandpiper runtime. The root `pack
 
 ## Contents
 
-| Package                                        | Description                               |
-| ---------------------------------------------- | ----------------------------------------- |
-| [`cli/`](cli/)                                 | CLI entrypoints and stable bin launchers  |
-| [`core/`](core/)                               | Shared core utilities                     |
+| Package          | Description                              |
+| ---------------- | ---------------------------------------- |
+| [`cli/`](cli/)   | CLI entrypoints and stable bin launchers |
+| [`core/`](core/) | Shared core utilities                    |
 
 ## Build
 

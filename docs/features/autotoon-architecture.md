@@ -6,10 +6,10 @@ AutoTOON currently does conversion only. It does not inject model guidance about
 
 ## Source layout
 
-| Path                                                         | Purpose                                          |
-| ------------------------------------------------------------ | ------------------------------------------------ |
-| `extensions/autotoon/core.ts`                   | Host-neutral JSON→TOON transform source of truth |
-| `extensions/autotoon/autotoon.ts`                            | Pi `tool_result` adapter                         |
+| Path                              | Purpose                                          |
+| --------------------------------- | ------------------------------------------------ |
+| `extensions/autotoon/core.ts`     | Host-neutral JSON→TOON transform source of truth |
+| `extensions/autotoon/autotoon.ts` | Pi `tool_result` adapter                         |
 
 ## Conversion pipeline
 

@@ -4,14 +4,14 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ## Contents
 
-| Extension                    | Description                                                                     |
-| ---------------------------- | ------------------------------------------------------------------------------- |
-| [`system/`](system/)         | Sandpiper identity, lifecycle behavior, and core tools                          |
-| [`autotoon/`](autotoon/)     | AutoTOON Pi adapter and framework-independent JSON→TOON transform |
-| [`tattler/`](tattler/)       | Tattler peer messaging: `list_peers`, `send_peer_message`, and the inbox        |
-| [`chorus.ts`](chorus.ts)     | Chorus rooms: the `/chorus` and `/agent` commands and `send_chorus_reply`       |
-| [`web-fetch/`](web-fetch/)   | The `web_fetch` tool                                                            |
-| [`web-search/`](web-search/) | The `web_search` tool                                                           |
+| Extension                    | Description                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| [`system/`](system/)         | Sandpiper identity, lifecycle behavior, and core tools                    |
+| [`autotoon/`](autotoon/)     | AutoTOON Pi adapter and framework-independent JSON→TOON transform         |
+| [`tattler/`](tattler/)       | Tattler peer messaging: `list_peers`, `send_peer_message`, and the inbox  |
+| [`chorus.ts`](chorus.ts)     | Chorus rooms: the `/chorus` and `/agent` commands and `send_chorus_reply` |
+| [`web-fetch/`](web-fetch/)   | The `web_fetch` tool                                                      |
+| [`web-search/`](web-search/) | The `web_search` tool                                                     |
 
 ### system/
 

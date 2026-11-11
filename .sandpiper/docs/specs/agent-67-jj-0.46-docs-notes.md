@@ -13,8 +13,8 @@
 - Runtime needs **git ≥ 2.42.0** (Debian 11 and Ubuntu 22.04 must upgrade). Building needs Rust ≥ 1.97.1.
 - Set identity: `jj config set --user user.name "…"` and `user.email`.
 - Completions:
-  - *Standard*: `jj util completion <shell>`.
-  - *Dynamic*: `COMPLETE=<shell> jj`, which also completes bookmarks, aliases, revisions, ops and files, and respects `-R` and `--at-op`. The docs recommend it even though clap labels it unstable.
+  - _Standard_: `jj util completion <shell>`.
+  - _Dynamic_: `COMPLETE=<shell> jj`, which also completes bookmarks, aliases, revisions, ops and files, and respects `-R` and `--at-op`. The docs recommend it even though clap labels it unstable.
   - Fish ≥ 4.0.2 loads dynamic completions automatically; otherwise use `COMPLETE=fish jj | source`.
 
 ### Tutorial
@@ -44,7 +44,7 @@
 ### Working with Gerrit
 
 - Remote selection: `--remote`, otherwise `gerrit.default-remote`, otherwise a remote named `gerrit`; it fails if none of those exist. Branch selection: `--remote-branch`, otherwise `gerrit.default-remote-branch`.
-- A re-upload with the same `Change-Id` adds a patch set. Without a trailer, the Change-Id comes from the jj change ID. So when you split, keep the part that belongs to the original Gerrit change in the *first* half (the original change), and squash into the change that was uploaded before.
+- A re-upload with the same `Change-Id` adds a patch set. Without a trailer, the Change-Id comes from the jj change ID. So when you split, keep the part that belongs to the original Gerrit change in the _first_ half (the original change), and squash into the change that was uploaded before.
 - To attach a jj change to an existing Gerrit change, paste its `Change-Id` trailer into the description.
 - With `templates.commit_trailers` adding Change-Id locally, the mapping lives entirely in the trailer: never duplicate one across changes.
 - `gerrit.review-url` makes upload use the `Link: <review-url>/id/I<change-id>` trailer (Gerrit ≥ 3.3.1) instead of `Change-Id`.
@@ -63,7 +63,7 @@
   - Rewrite: `jj new feat-`, edit, `jj squash`, `jj git push --bookmark feat`. jj makes the force push itself.
   - `[AGENT]` Once `@` becomes immutable, for example because it was just pushed, jj creates a new working-copy commit on top. Run `jj new` before further edits so they don't amend the pushed commit.
 - Other people's bookmarks: clone imports only the default branch, and fetch doesn't create local bookmarks for new remote ones. Use `jj new <bm>@<remote>`, or set `remotes.<name>.auto-track-bookmarks = "*"` (this key replaced `git.auto-local-bookmark`; details under config).
-- `gh` in a *non-colocated* repo: `GIT_DIR=$(jj git root) gh …`, or set it in direnv's `.envrc`.
+- `gh` in a _non-colocated_ repo: `GIT_DIR=$(jj git root) gh …`, or set it in direnv's `.envrc`.
 - Useful revsets:
   - Unpushed local bookmarks: `bookmarks() & ~(main | remote_bookmarks())`.
   - Mine and unpushed: `mine() & bookmarks() & ~remote_bookmarks()`.
@@ -83,7 +83,7 @@
 ## FAQ
 
 - **Bookmarks don't follow `jj new` or `jj commit`.** There's no "current bookmark". Use `jj bookmark move` (or `advance`).
-- **`jj git push --all` says "Nothing changed".** It pushes *bookmarks*, not revisions. Use `-c`, or create or move a bookmark first.
+- **`jj git push --all` says "Nothing changed".** It pushes _bookmarks_, not revisions. Use `-c`, or create or move a bookmark first.
 - **A commit is missing from `jj log`.**
   - The default revset hides most remote commits. Check with `jj log -r 'all()'`.
   - An abandoned or rewritten commit is hidden; `jj log -r <commit_id>` shows it as "hidden", and `jj new <commit_id>` brings it back into view.
@@ -151,7 +151,7 @@
   - A workspace is a working copy plus a `.jj/` that links to the main repo; each can check out a different commit.
   - `workspace root --name X` prints that workspace's path. `workspace list` shows each workspace with its root.
   - `forget` leaves the directory and its files on disk; use it when the path is gone or the files should stay. (Verified: on a colocated workspace it does delete the `.git` file; see the CLI notes.)
-  - `remove` `[DESTRUCTIVE]` `[AGENT]`: snapshots tracked changes, then deletes the directory, **including ignored files** (`.env`, build output, `node_modules`). The main workspace can't be removed. Removing the *current* workspace works on Unix; on Windows run it from elsewhere with `jj -R`.
+  - `remove` `[DESTRUCTIVE]` `[AGENT]`: snapshots tracked changes, then deletes the directory, **including ignored files** (`.env`, build output, `node_modules`). The main workspace can't be removed. Removing the _current_ workspace works on Unix; on Windows run it from elsewhere with `jj -R`.
 - **Stale working copy.** Commands run in three steps: snapshot (an op), rewrite (an op), update the files.
   - If step 3 doesn't happen, the workspace is "stale"; `.jj/working_copy/` records the last op it was updated to. Fix it with `jj workspace update-stale`.
   - Causes:
@@ -165,22 +165,22 @@
 - `name@remote` is the last-seen remote position. It updates on fetch and on push of that bookmark, and you can't edit it by hand.
 - **Tracked remote bookmark:** pulling it propagates to the same-name local bookmark, creating it if needed. Fetch merges the two updates: if one side is ahead, it wins; otherwise the local bookmark becomes **conflicted**. One local bookmark can track the same name on several remotes, and the names must match. It's the counterpart of Git's upstream branch.
 - Terms:
-  - *Remote bookmark*: the ref on the remote, as last seen.
-  - *Tracked bookmark*: a remote bookmark that has been associated with the same-name local one.
-  - *Tracking bookmark*: the local side of that pair.
+  - _Remote bookmark_: the ref on the remote, as last seen.
+  - _Tracked bookmark_: a remote bookmark that has been associated with the same-name local one.
+  - _Tracking bookmark_: the local side of that pair.
 - Log decorations:
   - `main*`: the local target differs from some remote; consider pushing.
-  - `main??`: conflicted, shown on every candidate target. The name resolves to *all* candidates, so `jj new main` errors.
+  - `main??`: conflicted, shown on every candidate target. The name resolves to _all_ candidates, so `jj new main` errors.
 - Auto-tracking:
   - `jj git clone` tracks the default branch.
   - Pushing a new bookmark tracks the newly created remote one.
-  - Everything else fetched arrives untracked, unless `remotes.<name>.auto-track-bookmarks = "*"`. Then each fetch tracks *newly fetched* bookmarks (existing ones are unaffected), and new local bookmarks are tracked at creation, ready for the next push.
+  - Everything else fetched arrives untracked, unless `remotes.<name>.auto-track-bookmarks = "*"`. Then each fetch tracks _newly fetched_ bookmarks (existing ones are unaffected), and new local bookmarks are tracked at creation, ready for the next push.
 - Track by hand: `jj bookmark list --all`, `jj bookmark track <bm> --remote=<r>`, then `jj git fetch --remote <r>`, then `jj new <bm>`. `jj bookmark list -t [name]` checks whether something is tracked.
 - **Push safety checks:**
   1. The actual remote state must equal jj's record (like `--force-with-lease`). Exception: an unexpected position is accepted when a fetch wouldn't conflict, for example when it equals the local target.
   2. The local bookmark must not be conflicted. That keeps background `jj git fetch` on a timer safe, unlike some forms of `git --force-with-lease`.
   3. A bookmark that already exists on the remote must be tracked.
-  On failure: `jj git fetch --remote <r>`, resolve, push again.
+     On failure: `jj git fetch --remote <r>`, resolve, push again.
 - Resolving conflicts:
   - Local: `jj bookmark move` to the intended target, optionally merging first (`jj new main`) or rebasing one side.
   - Remote (`main@origin` conflicted after concurrent ops): `jj git fetch`, which also fixes the local bookmark.
@@ -188,7 +188,7 @@
 
 ### First-class conflicts
 
-- A conflict is stored in the commit as a *logical* representation, not as markers, and the operation creating it (rebase, merge) succeeds. Conflicted commits can be rebased, merged or backed out again without nesting markers.
+- A conflict is stored in the commit as a _logical_ representation, not as markers, and the operation creating it (rebase, merge) succeeds. Conflicted commits can be rebased, merged or backed out again without nesting markers.
 - Consequences:
   - There's no `--continue`. The single workflow is: check out the conflict, resolve it, amend.
   - Descendants rebase automatically.
@@ -223,7 +223,7 @@
 
 ### Operation log
 
-- Each op stores a *view*: where each bookmark, tag and Git ref points, the heads, and each workspace's `@`. It also records its parent op(s) and metadata (time, user, host, description).
+- Each op stores a _view_: where each bookmark, tag and Git ref points, the heads, and each workspace's `@`. It also records its parent op(s) and metadata (time, user, host, description).
 - `jj undo` goes back one step; `jj op revert` reverts an arbitrary op; `jj op restore` returns to a whole earlier state. Op revsets: `@` is the current op, plus `x-` and `x+`.
 - **Lock-free concurrency:** concurrent jj commands, even on different machines over a shared filesystem with ordered writes, never corrupt the repo. Each command loads the latest op and doesn't see concurrent writes. Divergence then shows up in later `jj st` and `jj log` output, for example a change edited in an editor while its content also changed.
 - `--at-op`: no snapshot is taken, and `@` resolves to the working-copy commit recorded in that op's view. Read-only commands (log, st, diff) are the sensible use. A mutating command there acts as if it had been started at that op, which is only useful for simulating concurrency.
@@ -249,7 +249,7 @@
 - **Rewrite:** a new commit with a new commit ID and, usually, the same change ID. Editing the working copy rewrites `@`.
 - **Root commit:** the virtual commit `00000000…` / `zzzzzzzz…`, reachable as `root()`. Git's root commits are `root()+`.
 - **Visible commits:** what `jj log -r 'all()'` shows, meaning commits reachable from an anonymous head in the view. Rewritten and abandoned commits become "hidden" but stay reachable by commit ID or change ID plus offset.
-- **Workspace:** a working copy plus the repo. Every workspace has a `.jj/`, but commits and ops live in the *initial* workspace; the others point to it. Git calls this a worktree.
+- **Workspace:** a working copy plus the repo. Every workspace has a `.jj/`, but commits and ops live in the _initial_ workspace; the others point to it. Git calls this a worktree.
 - **Working copy** is Git's working tree. It's snapshotted at the start and updated at the end of nearly every command. There's one working-copy commit per workspace, tracked in the op log.
 
 ## Guides
@@ -259,7 +259,7 @@
 - **Sources:**
   - `-r/--revision(s)`: exactly the set.
   - `-s/--source`: the set plus descendants (`-s X` ≈ `-r X::`). Commands that must touch descendants, like `jj fix -s`, accept only `-s`.
-  - `-f/--from`: the *contents* of a revision, or the bookmarks on it.
+  - `-f/--from`: the _contents_ of a revision, or the bookmarks on it.
   - `-b/--branch`: the whole branch relative to the destination.
 - **Destinations:**
   - `-o/--onto`: children of the target.
@@ -310,7 +310,7 @@
   - `jj config {edit,set,unset} --file <PATH>` targets one file. A `#:schema` line at the top enables JSON Schema validation in editors.
 - TOML notes:
   - Dotted keys and headings are equivalent: `template-aliases."format_short_id(id)" = …` and `colors."commit_id prefix".bold = true`. **Dotted keys must come before the first heading.**
-  - Strings are parsed twice, first by TOML and then by jj's languages. Prefer TOML *literal* strings (`'…'`, `'''…'''`) for templates and revsets, so TOML doesn't consume `\n`. The jj languages follow the same rule: `"` allows escapes, `'` doesn't.
+  - Strings are parsed twice, first by TOML and then by jj's languages. Prefer TOML _literal_ strings (`'…'`, `'''…'''`) for templates and revsets, so TOML doesn't consume `\n`. The jj languages follow the same rule: `"` allows escapes, `'` doesn't.
 
 ### User and UI basics
 
@@ -453,7 +453,7 @@
 - `git.colocate` (default true) applies to init and clone. `git.object-hash` is `sha1` (default) or `sha256`, chosen only at init, and the two formats don't interoperate.
 - **Default remotes:** with one remote, it's used. With several, `origin` is assumed. `git.fetch` and `git.push` accept a single name, a list, or string patterns, e.g. `"regex:'^(remote|upstream)'"` or `'["remote*", "upstream*"]'`. A list or pattern for `push` means a multi-remote push (0.46).
 - `remotes.<name>.fetch-bookmarks` / `fetch-tags` take a string pattern, e.g. `fetch-bookmarks = "~gh-pages"` and `fetch-tags = "v*"`. Only `*` globs, union, and negative intersection are supported. If unset, Git's refspecs are used.
-- **`remotes.<name>.auto-track-bookmarks`** (pattern) applies to *new* bookmarks, both fetched and created locally:
+- **`remotes.<name>.auto-track-bookmarks`** (pattern) applies to _new_ bookmarks, both fetched and created locally:
   - Use a personal prefix (`"alice/*"`) when sharing a remote.
   - For a fork, `origin` gets `"*"` and `upstream` gets `"main"`.
   - **`remotes.<name>.auto-track-created-bookmarks`** applies only to bookmarks you create with `create`/`set`; you then have to track your own bookmarks fetched from other machines by hand.
@@ -488,7 +488,7 @@
 
 - **User config, in load order:** `~/.jjconfig.toml` → `<platform>/jj/config.toml` (preferred) → `<platform>/jj/conf.d/*.toml` (lexicographic). The platform directory is `$XDG_CONFIG_HOME` or `~/.config` on Linux and macOS, `%APPDATA%` on Windows. `--user` edits the primary file, or the first in `conf.d/`.
 - **System:** `/etc/jj/config.toml` then `/etc/jj/conf.d/*.toml` (0.43). User config overrides it.
-- **`JJ_CONFIG`** replaces user *and* system config when set, *even to an empty string*. It can be a file, a directory, or a `:`-separated list. It doesn't affect repo or workspace config, and nothing can disable those.
+- **`JJ_CONFIG`** replaces user _and_ system config when set, _even to an empty string_. It can be a file, a directory, or a `:`-separated list. It doesn't affect repo or workspace config, and nothing can disable those.
   - `JJ_CONFIG= jj log` runs with no user config. `[AGENT]` Good for reproducible runs (this repo's `test:vitest` already points it at a fixture).
 - JSON schema: `#:schema https://docs.jj-vcs.dev/latest/config-schema.json` (or `jj util config-schema`).
 - **Environment overrides** beat files but lose to `--config`:
@@ -499,7 +499,7 @@
 - **Conditional config:**
   - Write `[[--scope]]` tables with `--when.*` conditions (several conditions intersect) and settings under `[--scope.<table>]`. A top-level `--when.*` applies to a whole file, which suits `conf.d/`.
   - **Conditions:**
-    - `repositories` (path prefixes; `~` expands; case-sensitive; with several workspaces, the *main* workspace's path).
+    - `repositories` (path prefixes; `~` expands; case-sensitive; with several workspaces, the _main_ workspace's path).
     - `workspaces` (path prefixes).
     - `hostnames` (exact match against `operation.hostname`).
     - `commands` (space-separated prefix match: `"file"` matches `file show`).
@@ -510,8 +510,8 @@
 
 ## Reference: fileset language
 
-- **Quoting:** paths with whitespace or metacharacters must be quoted *inside* the expression, unless the expression has no operators or function calls. So `jj diff 'Foo Bar'` works, but `'~"Foo Bar"'` and `'"Foo(1)"'` need both quote layers. Glob characters aren't metacharacters, but the shell still needs quotes: `'~glob:**/*.rs'`.
-- **A bare `"path"` parses as `prefix-glob:`**, a cwd-relative path prefix *with glob expansion*. The skill doesn't currently describe the default fileset kind; worth adding.
+- **Quoting:** paths with whitespace or metacharacters must be quoted _inside_ the expression, unless the expression has no operators or function calls. So `jj diff 'Foo Bar'` works, but `'~"Foo Bar"'` and `'"Foo(1)"'` need both quote layers. Glob characters aren't metacharacters, but the shell still needs quotes: `'~glob:**/*.rs'`.
+- **A bare `"path"` parses as `prefix-glob:`**, a cwd-relative path prefix _with glob expansion_. The skill doesn't currently describe the default fileset kind; worth adding.
 - Patterns (`cwd-` is the default anchor; `root-` anchors at the workspace root):
   - `cwd:"p"`: prefix, recursive.
   - `file:"p"` or `cwd-file:"p"`: exact file.
@@ -528,7 +528,7 @@
 - Examples:
   - `jj diff '~Cargo.lock'`.
   - `jj file list 'src ~ glob:"**/*.rs"'`.
-  - `jj split '~foo'` puts `foo` in the *second* commit. `[AGENT]` A FILESETS complement makes `split` non-interactive for a whole-file partition.
+  - `jj split '~foo'` puts `foo` in the _second_ commit. `[AGENT]` A FILESETS complement makes `split` non-interactive for a whole-file partition.
 
 ## Reference: revset language
 
@@ -538,7 +538,7 @@
 - **Hidden revisions:** searches cover visible commits only, unless a hidden commit is named explicitly (by commit ID, `name@remote`, or `at_operation()`). Then its ancestors join the search space too: they're in `all()`, `x..` and `~x`, but not in `..visible_heads()`. For example, `hidden | all()` = `hidden | ::(hidden | visible_heads())`.
 - **Symbols:**
   - `@` is this workspace's working-copy commit; **`<workspace>@`** is another workspace's; `<name>@<remote>` is a remote bookmark or tag.
-  - A full or unique-prefix commit ID. A full or unique-prefix change ID, which must refer to a *visible* commit and isn't allowed when divergent. Use `<change>/<offset>` for hidden or divergent commits.
+  - A full or unique-prefix commit ID. A full or unique-prefix change ID, which must refer to a _visible_ commit and isn't allowed when divergent. Use `<change>/<offset>` for hidden or divergent commits.
   - Quote a symbol to stop it being parsed as an operator: `jj log -r '"x-"'` means the bookmark literally named `x-`.
 - **Priority:** tag name, then bookmark name, then commit or change ID. To force one, use `commit_id(abc)`, `change_id(abc)`, `bookmarks(exact:abc)` and so on. `[AGENT]` Scripts should pass IDs through `commit_id()` / `change_id()` so a same-named bookmark or tag can't hijack them.
 
@@ -568,7 +568,7 @@
 - **Graph:**
   - `parents(x,[depth])`: `parents(x,3)` = `x---`. `children(x,[depth])`. `ancestors(x,[depth])`, `descendants(x,[depth])`.
   - `first_parent(x,[depth])` (follows only the first parent at merges) and `first_ancestors(x,[depth])`, which leave out side branches as `git log --first-parent` does.
-  - **`reachable(srcs, domain)`:** follows parent *and* child edges while staying inside `domain`. `reachable(@, mutable())` = "my current stack".
+  - **`reachable(srcs, domain)`:** follows parent _and_ child edges while staying inside `domain`. `reachable(@, mutable())` = "my current stack".
   - `connected(x)` = `x::x`.
   - `heads(x)` = `x ~ ::x-` and `roots(x)` = `x ~ x+::`. Both differ from Mercurial's definitions.
   - `visible_heads()`, `root()`, `all()`, `none()`.
@@ -612,7 +612,7 @@
 ### String patterns
 
 - **A bare string defaults to `glob:`** `[SKILL-STALE: confirmed]`. The skill's `references/revsets.md:187` says "Default is `substring` for most functions". Verified on 0.46 in a scratch repo: `description(base)` matched nothing, while `description(*base*)` and `description(substring:base)` matched "base commit". (`ui.revsets-use-glob-by-default` was removed in 0.43.) So `description(fix)` matches only a description that is exactly "fix". **Write `*fix*` or `substring:fix`.** The docs' examples use `author(*martinvonz*) & description(*reset*)`.
-- Kinds: `exact:`, `glob:` (globset syntax), `regex:` (matches *substrings*; regex crate syntax), `substring:`. Append `-i` for case-insensitive (`glob-i:"fix*jpeg*"`).
+- Kinds: `exact:`, `glob:` (globset syntax), `regex:` (matches _substrings_; regex crate syntax), `substring:`. Append `-i` for case-insensitive (`glob-i:"fix*jpeg*"`).
 - Combine with `~x`, `x & y`, `x ~ y`, `x | y`, e.g. `bookmarks(~glob:"ci/*")`.
 - **Date patterns:** `after:"…"` (inclusive) and `before:"…"` (exclusive). Accepted forms: `2024-02-01`, `2024-02-01T12:00:00(-08:00)`, `2024-02-01 12:00:00`, `2 days ago`, `5 minutes ago`, `yesterday`, `yesterday 5pm`, `yesterday 10:30`.
 
@@ -623,12 +623,12 @@
   - **`trunk()`**: the default remote's default bookmark, or `upstream`'s or `origin`'s, set per repo at init. Otherwise it tries `main`, `master` and `trunk` on `upstream` and `origin` and takes the newest, falling back to `root()`. If you override it, it must resolve to exactly one commit: `'trunk()' = 'bm@remote'`.
   - `builtin_log()` = `present(@) | ancestors(immutable_heads().., 2) | trunk()`.
   - `builtin_immutable_heads()` = `trunk() | tags() | untracked_remote_bookmarks() | untracked_remote_tags()`. Don't redefine it; redefine `immutable_heads()`.
-  - **`immutable_heads()`** is the *heads of* the immutable set, not the immutable heads.
+  - **`immutable_heads()`** is the _heads of_ the immutable set, not the immutable heads.
   - `immutable()` = `::(immutable_heads() | root())`.
   - `mutable()` = `~immutable()`.
   - **Redefining `immutable()` or `mutable()` doesn't change what is immutable; edit `immutable_heads()`.**
   - `visible()` = `::visible_heads()`.
-  - `hidden()` = `~visible()`. It's empty unless hidden commits are named, so it's *not* "every previously visible commit" (#2623).
+  - `hidden()` = `~visible()`. It's empty unless hidden commits are named, so it's _not_ "every previously visible commit" (#2623).
 - Examples:
   - `jj log -r @-` (like `git log -1 HEAD`); `-r ::@` (plain `git log`).
   - `'remote_bookmarks()..'` (unpushed); `'remote_bookmarks(remote=origin)..'`.
@@ -663,7 +663,7 @@
   - Control flow:
     - `if(cond, then, [else])`.
     - **`try(expr, fallback…)`** (0.44): the first expression that succeeds; runtime errors are suppressed, parse and type errors aren't.
-    - `coalesce(…)`: the first *non-empty* value.
+    - `coalesce(…)`: the first _non-empty_ value.
     - `concat(…)`; `join(sep, …)`; `separate(sep, …)` (only non-empty parts); `surround(prefix, suffix, content)` (only if non-empty).
   - `config(name: Stringify) -> Option<ConfigValue>`; dynamic names allowed since 0.40.
   - `git_web_url([remote="origin"])`: best-effort HTTPS URL, empty string on failure, no SSH alias resolution.
@@ -690,7 +690,7 @@
   - State: `.divergent()`, `.hidden()`, **`.change_offset() -> Option<Integer>`**, `.immutable()`, **`.contained_in(revset: StringLiteral)`**, `.conflict()`, `.empty()`, `.root()`.
   - Content:
     - `.diff([files]) -> TreeDiff`, relative to the parents.
-    - `.files([files]) -> List<TreeEntry>`: the files *present* in the commit. For *changed* files, use `.diff().files()`.
+    - `.files([files]) -> List<TreeEntry>`: the files _present_ in the commit. For _changed_ files, use `.diff().files()`.
     - `.conflicted_files()`.
 - **CommitEvolutionEntry** (Serialize): `.commit()`, `.operation()`, `.predecessors()`, `.inter_diff([files]) -> TreeDiff` (the same view as `evolog -p`).
 - **CommitId** (Serialize, Template): `.short([len])`, `.shortest([min_len])`.
@@ -728,7 +728,7 @@
 - **RefSymbol**: a String rendered as a revset symbol, quoted and escaped as needed. It doesn't convert to Bool.
 - **RegexCaptures**: `.len()` (including group 0), `.get(i) -> ByteString` (errors when out of range), `.name(n)`.
 - **RepoPath** (Serialize, Template): slash-separated and relative to the repo root. `.absolute() -> FsPath` (since 0.44 `RepoPath.absolute()` returns FsPath, not String), `.display()` (native separators, relative to cwd), `.parent() -> Option<RepoPath>`.
-- **Serialize**: field names and types are *usually* stable but not guaranteed. `[AGENT]` A script parsing `json()` output should tolerate added fields.
+- **Serialize**: field names and types are _usually_ stable but not guaranteed. `[AGENT]` A script parsing `json()` output should tolerate added fields.
 - **ShortestIdPrefix**: `.prefix()`, `.rest()`, `.upper()`, `.lower()`.
 - **Signature** (Serialize, Template): `.name()`, `.email() -> Email`, `.timestamp() -> Timestamp`.
 - **SizeHint** (Serialize): `.lower()`, `.upper() -> Option`, `.exact() -> Option`, `.zero()`.
@@ -742,7 +742,7 @@
   - `'…'` has no escapes and can't contain `'`.
 - **StringPattern**:
   - The same syntax as revset string patterns, but **the quotes are mandatory**.
-  - **In templates, a plain literal string matches as a case-sensitive *substring*** `[AGENT]`. In revsets a bare string is a *glob*, so the two languages default differently; `.match("foo")` is a substring match.
+  - **In templates, a plain literal string matches as a case-sensitive _substring_** `[AGENT]`. In revsets a bare string is a _glob_, so the two languages default differently; `.match("foo")` is a substring match.
   - Patterns can't be stored or passed as values, only written at the call site.
 - **Template**: no methods; most types convert to it.
 - **Timestamp** (Serialize, Template): `.ago()`, `.format(strftime)` (chrono syntax), `.utc()`, `.local()`, `.after(datelit)`, `.before(datelit)`, `.since(start) -> TimestampRange`.
@@ -782,47 +782,47 @@
 
 ### Git command table (from `git-command-table.yml`; only the less obvious rows)
 
-| Git | jj |
-| --- | --- |
-| `git init` | `jj git init [--no-colocate]` |
-| `git push --all` | `jj git push --all` (the yml notes it "only affects tracked branches now") |
-| `git diff HEAD` | `jj diff` |
-| `git diff R^ R` | `jj diff -r R` |
-| `git diff R` | `jj diff --from R` |
-| `git diff A...B` | `jj diff -r A..B` |
-| `git rm --cached f` | `jj file untrack f` (it must match an ignore pattern to stay untracked) |
-| `git commit -a` | `jj commit` |
-| `git log --oneline --graph` | `jj log -r ::@` |
-| `git log --all` | `jj log -r ::` (Git's `--all` also shows jj-hidden commits kept under `refs/jj/*`; use `--exclude refs/jj/* --all`) |
-| `git log --branches --not upstream/main` | `jj log` |
-| `git log -G stuff` (pickaxe) | `jj log -r 'diff_lines(regex:stuff)'` |
-| `git ls-files` | `jj file list` |
-| `git grep foo` | `jj file search --pattern=foo` or `rg --no-require-git foo` |
-| `git reset --hard` | `jj abandon` (new change) or `jj restore` (empty the current one); both can be undone |
-| `git reset --soft HEAD~` | **`jj squash --from @-`** |
-| `git restore <paths>` | `jj restore <paths>` |
-| `git commit --amend --only` | `jj describe @-` |
-| `git commit --fixup=reword:X; git rebase --autosquash X^` | `jj describe X` |
-| `git stash` | **`jj new @-`** (the old working copy stays as a sibling; get it back with `jj edit X`) |
-| `git switch -c topic main` | `jj new main` |
-| `git merge A` | `jj new @ A` |
-| `git checkout v1.0.1` | `jj new v1.0.1` |
-| `git rebase B A` | `jj rebase -b A -o B` |
-| `git rebase --onto B A^ <desc>` | `jj rebase -s A -o B` |
-| reorder A-B-C-D to A-C-B-D | `jj rebase -r C --before B` (for several, `jj arrange`) |
-| `git commit --amend -a` | `jj squash` |
-| `git commit --fixup=X; git rebase --autosquash X^` | `jj squash --into X` |
-| move part of X into Y | `jj squash -i --from X --into Y` (Git can't) |
-| `git commit -p` | `jj split` (`jj split -r R` for any revision) |
-| resolve, then `--continue` | `echo resolved > f; jj squash` |
-| `git cherry-pick S` onto D | `jj duplicate S -o D` |
-| `git rev-parse --show-toplevel` | `jj workspace root` |
-| `git branch -f n R` | `jj bookmark move n --to R` (`jj b m n -t R`; `--allow-backwards` for moves backwards or sideways) |
-| `git tag n R` | `jj tag set n -r R` |
-| `git tag --contains R` | `jj tag list -r 'R::'` |
-| `git tag --merged R` | `jj tag list -r '::R'` |
-| `git revert R` | **`jj revert -r R -B @`** |
-| `git blame f` | `jj file annotate f` |
+| Git                                                       | jj                                                                                                                  |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `git init`                                                | `jj git init [--no-colocate]`                                                                                       |
+| `git push --all`                                          | `jj git push --all` (the yml notes it "only affects tracked branches now")                                          |
+| `git diff HEAD`                                           | `jj diff`                                                                                                           |
+| `git diff R^ R`                                           | `jj diff -r R`                                                                                                      |
+| `git diff R`                                              | `jj diff --from R`                                                                                                  |
+| `git diff A...B`                                          | `jj diff -r A..B`                                                                                                   |
+| `git rm --cached f`                                       | `jj file untrack f` (it must match an ignore pattern to stay untracked)                                             |
+| `git commit -a`                                           | `jj commit`                                                                                                         |
+| `git log --oneline --graph`                               | `jj log -r ::@`                                                                                                     |
+| `git log --all`                                           | `jj log -r ::` (Git's `--all` also shows jj-hidden commits kept under `refs/jj/*`; use `--exclude refs/jj/* --all`) |
+| `git log --branches --not upstream/main`                  | `jj log`                                                                                                            |
+| `git log -G stuff` (pickaxe)                              | `jj log -r 'diff_lines(regex:stuff)'`                                                                               |
+| `git ls-files`                                            | `jj file list`                                                                                                      |
+| `git grep foo`                                            | `jj file search --pattern=foo` or `rg --no-require-git foo`                                                         |
+| `git reset --hard`                                        | `jj abandon` (new change) or `jj restore` (empty the current one); both can be undone                               |
+| `git reset --soft HEAD~`                                  | **`jj squash --from @-`**                                                                                           |
+| `git restore <paths>`                                     | `jj restore <paths>`                                                                                                |
+| `git commit --amend --only`                               | `jj describe @-`                                                                                                    |
+| `git commit --fixup=reword:X; git rebase --autosquash X^` | `jj describe X`                                                                                                     |
+| `git stash`                                               | **`jj new @-`** (the old working copy stays as a sibling; get it back with `jj edit X`)                             |
+| `git switch -c topic main`                                | `jj new main`                                                                                                       |
+| `git merge A`                                             | `jj new @ A`                                                                                                        |
+| `git checkout v1.0.1`                                     | `jj new v1.0.1`                                                                                                     |
+| `git rebase B A`                                          | `jj rebase -b A -o B`                                                                                               |
+| `git rebase --onto B A^ <desc>`                           | `jj rebase -s A -o B`                                                                                               |
+| reorder A-B-C-D to A-C-B-D                                | `jj rebase -r C --before B` (for several, `jj arrange`)                                                             |
+| `git commit --amend -a`                                   | `jj squash`                                                                                                         |
+| `git commit --fixup=X; git rebase --autosquash X^`        | `jj squash --into X`                                                                                                |
+| move part of X into Y                                     | `jj squash -i --from X --into Y` (Git can't)                                                                        |
+| `git commit -p`                                           | `jj split` (`jj split -r R` for any revision)                                                                       |
+| resolve, then `--continue`                                | `echo resolved > f; jj squash`                                                                                      |
+| `git cherry-pick S` onto D                                | `jj duplicate S -o D`                                                                                               |
+| `git rev-parse --show-toplevel`                           | `jj workspace root`                                                                                                 |
+| `git branch -f n R`                                       | `jj bookmark move n --to R` (`jj b m n -t R`; `--allow-backwards` for moves backwards or sideways)                  |
+| `git tag n R`                                             | `jj tag set n -r R`                                                                                                 |
+| `git tag --contains R`                                    | `jj tag list -r 'R::'`                                                                                              |
+| `git tag --merged R`                                      | `jj tag list -r '::R'`                                                                                              |
+| `git revert R`                                            | **`jj revert -r R -B @`**                                                                                           |
+| `git blame f`                                             | `jj file annotate f`                                                                                                |
 
 ### Git compatibility
 
@@ -838,7 +838,7 @@
   - **Submodules: no**. They're invisible but not lost.
   - Partial clones: no. Shallow clones: kind of (shallow commits get the root as parent; deepening breaks things). Git LFS: no (#80).
   - Signing: yes.
-  - **git-worktree: "No"**, per the page; `[DOCS-STALE]` 0.46's colocated workspaces *are* Git worktrees.
+  - **git-worktree: "No"**, per the page; `[DOCS-STALE]` 0.46's colocated workspaces _are_ Git worktrees.
   - Sparse: jj's own (`jj sparse`).
 - **Ways to set up a repo:**
   - `jj git init <name>` (colocated).
@@ -864,7 +864,7 @@
   3. `echo -n '../../../.git' > .jj/repo/store/git_target`.
   4. `git config --unset core.bare`.
   5. `jj new && jj undo`.
-  On Windows, use `Set-Content … -NoNewLine` instead of `echo -n`.
+     On Windows, use `Set-Content … -NoNewLine` instead of `echo -n`.
 - **Format mapping:**
   - Paths are UTF-8. jj-created commits get `refs/jj/…` refs so Git won't GC them.
   - **A conflicted commit's Git tree** holds `.jjconflict-base-*/` and `.jjconflict-side-*/` directories; the truth is in a `jj:trees` commit header. `[AGENT]` If someone `git switch`es onto one, a `jj st` snapshot "adds" those directories. Recover with `jj abandon`.
@@ -872,7 +872,7 @@
 
 ### Jujutsu for Git experts (new points only)
 
-- Index replacements: `jj split file1 file2` puts the named files in the *first* commit. `jj squash file3` moves one file into the parent.
+- Index replacements: `jj split file1 file2` puts the named files in the _first_ commit. `jj squash file3` moves one file into the parent.
 - Fixup without the autosquash dance: `jj squash --into abc file1 file2`; descendants rebase automatically.
 - The op log replaces reflog: `jj undo` repeatedly, `jj op log -p` for diffs, `--at-operation`.
 - Find an old version with `jj evolog`, then `jj restore --from <old>` to restore it fully or partially.
@@ -920,7 +920,7 @@
   - This setup is lightly tested, especially colocated. Bookmark pointers might be lost, but commits won't be.
 - **Op log mechanics:**
   - A command loads the latest op, sees a frozen view from then on, and writes its op with that start op as parent. **It can't fail to commit**, short of disk errors.
-  - The *next* command notices several op heads and **3-way-merges the views**. Conflicts are recorded in the view, for example "main moved A→B or A→C", giving `main??`. Work continues; only commands that need the conflicted ref fail, e.g. `jj new main` with "resolved to multiple revisions".
+  - The _next_ command notices several op heads and **3-way-merges the views**. Conflicts are recorded in the view, for example "main moved A→B or A→C", giving `main??`. Work continues; only commands that need the conflicted ref fail, e.g. `jj new main` with "resolved to multiple revisions".
   - `[AGENT]` So parallel agents in one repo never block each other or corrupt it. Their races appear afterwards as conflicted bookmarks or divergent changes, and the next jj command reconciles them.
 - **Storage:** ops and views are content-addressed. Each op head is an empty file named by its ID in `.jj/repo/op_heads/heads/` (the path the FAQ's watchexec example watches). Add the new head file, then remove the old one: the new file makes the op visible, and readers clean up any stale ones.
 
@@ -950,7 +950,7 @@
   - Fetching a commit whose `change-id` header matches a local one.
   - Concurrent snapshots on a distributed filesystem.
 - **Algorithm:**
-  - Build the *truncated evolution graph* back to the most recent common predecessor (the "evolution fork point").
+  - Build the _truncated evolution graph_ back to the most recent common predecessor (the "evolution fork point").
   - For author, description, parents and tree, merge fork point + Σ(successor − predecessor), counting duplicate edges once (`try_resolve_deduplicating_same_diffs`). That lets the solution pick, for example, description "v3" when both sides went v1→v2 and one then went v2→v3.
   - The description falls back to the user's **merge tool**; the author falls back to a choice prompt.
 - **Parents:**
@@ -976,7 +976,7 @@
 
 ### Tracking branches (design from the 0.8 era; shipped long ago; mostly background)
 
-- Each remote ref has a state, *new* (untracked) or *tracking*. `@git` is a pseudo-remote that mirrors the backing Git repo's `refs/heads`.
+- Each remote ref has a state, _new_ (untracked) or _tracking_. `@git` is a pseudo-remote that mirrors the backing Git repo's `refs/heads`.
 - Import merges `[local, new_remote] − [known_remote]` only for tracking refs. Export copies jj's view to Git, but **won't overwrite a Git ref changed since the last import**.
 - `jj op restore` **never rolls back `git_refs`** (the record of last-imported refs). `[AGENT]` After undoing a fetch in a colocated repo, the Git-side refs can lag until the next export.
 - A deleted bookmark can't be pushed to an untracked remote, because it's a no-op (track it first). Fetching a branch deleted remotely abandons its commits only when it was tracked.
@@ -991,7 +991,7 @@
   - Any in-repo `config.toml` is unused, apart from legacy migration (symlinked or read-only).
 - **Copy vs move:**
   - If the recorded path no longer exists, it's a move, and the path is updated.
-  - Otherwise jj writes a probe file to see whether this is the same directory reached by a link or mount. If it isn't, it's a **copy**, which gets a *new* ID and a copy of the config the next time jj runs there.
+  - Otherwise jj writes a probe file to see whether this is the same directory reached by a link or mount. If it isn't, it's a **copy**, which gets a _new_ ID and a copy of the config the next time jj runs there.
   - `[AGENT]` A `cp -r` of a repo carries the repo config forward, frozen at copy time.
 - `jj config gc` prunes entries for deleted or moved repos. It asks first, can't tell a delete from a move, and removes only the files it manages.
 - Remaining hole: a replay attack that reuses a known config ID; deliberately not handled.
@@ -1024,7 +1024,7 @@
 
 - jj **doesn't record copies**. In the Git backend, renames are detected on the fly where diffs report them, which is where `TreeDiffEntry.status()` `copied`/`renamed` come from.
 - The design proposes a per-file `copy_id` pointing into a copy-history DAG stored in trees, so that diff, merge, rebase, log and annotate can follow renames losslessly.
-  - Changes would *not* propagate across copies automatically; `jj resolve` would ask.
+  - Changes would _not_ propagate across copies automatically; `jj resolve` would ask.
   - A conflict in the copy ID would hide the file until it's resolved.
 - Its 9-step implementation plan is open-ended. The Git representation is unresolved; backfilling would be expensive (13 hours for Nixpkgs with `git --find-copies-harder`).
 - `[AGENT]` Consequences for today:

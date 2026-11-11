@@ -4,10 +4,10 @@ Sandpiper builds on Pi's extension system. When you change extension behavior in
 
 ## Choose the extension surface
 
-| Surface                         | Use for                                                                                                                                                    |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extensions/system/`            | Sandpiper identity, startup behavior, system prompt assembly, session continuity, and Sandpiper-owned system capabilities |
-| `extensions/autotoon/`          | Pi adapter and framework-independent AutoTOON transform in `core.ts`                                                                                       |
+| Surface                | Use for                                                                                                                   |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `extensions/system/`   | Sandpiper identity, startup behavior, system prompt assembly, session continuity, and Sandpiper-owned system capabilities |
+| `extensions/autotoon/` | Pi adapter and framework-independent AutoTOON transform in `core.ts`                                                      |
 
 Keep entrypoints thin. Put reusable logic in package-owned modules or extension-local framework-independent modules, then wire that logic to Pi APIs at the edge.
 
