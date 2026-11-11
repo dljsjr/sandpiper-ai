@@ -36,9 +36,10 @@ This repository is the Sandpiper source tree: a Bun/Node repository for the loca
 
 ## Verification
 
-- `bun check` runs TypeScript, Biome, and Knip and must be clean: zero errors, zero warnings. Biome only
+- `bun check` runs TypeScript, Biome, Knip, and Markdown formatting checks and must be clean: zero errors, zero warnings. Biome only
   hard-fails on errors, so zero-warnings is discipline rather than enforcement. That is deliberate
   — do not change the gate to fail on warnings.
+- Use `bun run check:markdown` to check Markdown. Format edited Markdown with `bunx prettier <path> --write`. Respect `.prettierignore`.
 - Use `bun run test:vitest -- <testpath>` for focused Vitest runs.
 - Use `bun run test` for the full Vitest gate.
 - Only use safe auto-fixes; no suppressions without asking.

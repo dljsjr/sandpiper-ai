@@ -78,7 +78,9 @@ describe('root Sandpiper product', () => {
       uuid: '14.0.2',
     });
     expect(product.scripts).not.toHaveProperty('check:deps');
-    expect(product.scripts.check).toBe('bun run check:tsc && bun run check:biome-check && bun run check:knip');
+    expect(product.scripts.check).toBe(
+      'bun run check:tsc && bun run check:biome-check && bun run check:knip && bun run check:markdown',
+    );
   });
 
   it('builds both commands into a clean root dist without a workspace build graph', () => {

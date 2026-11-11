@@ -33,7 +33,8 @@
   "scripts": {
     "check:biome-check": "biome check",
     "check:tsc": "tsc --noEmit",
-    "check": "bun run check:tsc && bun run check:biome-check && bun run check:knip",
+    "check:markdown": "prettier --check \"**/*.md\"",
+    "check": "bun run check:tsc && bun run check:biome-check && bun run check:knip && bun run check:markdown",
     "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/devtools/test-fixtures/jj-test-config.toml\" vitest run",
     "build": "rm -rf dist && bun build --sourcemap --production --minify --target=bun --splitting --chunk-naming 'chunks/[name]-[hash].[ext]' --external jsdom --external '@earendil-works/*' ./packages/cli/sandpiper_standalone.ts ./packages/cli/sandpiper_system_prompt.ts --outdir ./dist",
@@ -67,6 +68,7 @@
     "@types/turndown": "5.0.6",
     "diff": "9.0.0",
     "knip": "6.35.1",
+    "prettier": "3.10.0",
     "sanitize-filename": "1.6.4",
     "tmp": "0.2.7",
     "turndown": "7.2.4",

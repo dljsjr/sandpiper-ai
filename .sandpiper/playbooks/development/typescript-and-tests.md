@@ -25,12 +25,16 @@ read_when: writing TypeScript, changing tests, running checks, verification, lin
 
 ## Verification Commands
 
-| Need                    | Command                             |
-| ----------------------- | ----------------------------------- |
-| Typecheck + lint + Knip | `bun check`                         |
-| Safe auto-fix           | `bun run check:biome-check --write` |
-| Focused Vitest          | `bun run test:vitest -- <testpath>` |
-| Full suite              | `bun run test`                      |
+| Need                               | Command                             |
+| ---------------------------------- | ----------------------------------- |
+| Typecheck + lint + Knip + Markdown | `bun check`                         |
+| Safe auto-fix                      | `bun run check:biome-check --write` |
+| Check Markdown                     | `bun run check:markdown`            |
+| Format Markdown                    | `bunx prettier <path> --write`      |
+| Focused Vitest                     | `bun run test:vitest -- <testpath>` |
+| Full suite                         | `bun run test`                      |
+
+Prettier checks Markdown with the exclusions in `.prettierignore` and `.gitignore`. Do not format historical archives, Journal, task data, or generated output.
 
 One root `vitest.config.ts` owns all projects. Preserve the default test timeouts: 10 seconds for core, 15 seconds for web-fetch and web-search, and Vitest's default elsewhere.
 

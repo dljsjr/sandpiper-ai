@@ -18,7 +18,7 @@ Sandpiper pins Bun 1.4.4 for package management and scripts. Run installs from t
 Use these commands while developing:
 
 ```bash
-bun check                         # Type-check + lint + unused code/dependency checks
+bun check                         # Type-check + lint + unused code/dependency + Markdown checks
 bun run test:vitest -- <testpath> # Focused Vitest run
 bun run test                      # Full Vitest gate
 ```
@@ -53,6 +53,14 @@ This repository uses Jujutsu (`jj`). Use `jj` commands for local version-control
 Documentation under `docs/` follows the [Diátaxis](https://diataxis.fr/) framework. A page should have a clear job: tutorial, how-to guide, reference, or explanation. If a page starts mixing jobs, split it and link between the pieces.
 
 Keep public docs direct and natural. Agent-operational guidance belongs in `.sandpiper/playbooks/`; active internal specs and design notes belong in `.sandpiper/docs/`; completed or superseded material belongs in `.sandpiper/archive/`.
+
+`bun check` includes Prettier checks for Markdown. To format a Markdown file, run:
+
+```bash
+bunx prettier path/to/file.md --write
+```
+
+Prettier reads `.gitignore` and `.prettierignore`. It skips historical archives, Journal, tasks, and ignored output.
 
 ## Code style
 

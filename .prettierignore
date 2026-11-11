@@ -1,0 +1,7 @@
+# Historical and tool-owned Markdown
+.sandpiper/archive/
+.sandpiper/journal.md
+.sandpiper/tasks/
+
+# Generated task workspaces
+.sandpiper/jj-workspaces/
