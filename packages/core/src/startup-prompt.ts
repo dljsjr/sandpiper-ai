@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { buildSandpiperSystemPrompt } from './system-prompt.js';
 import { readSandpiperUserProfile } from './user-profile.js';
-import { detectVersionControl } from './version-control.js';
+import { detectVersionControl, type SandpiperVersionControlContext } from './version-control.js';
 
 type BuildSystemPrompt = typeof buildSandpiperSystemPrompt;
 
@@ -17,6 +17,8 @@ export interface StartupPromptDependencies {
 export interface StartupPromptInput {
   readonly agentDir?: string;
   readonly identityContent?: string;
+  readonly versionControl?: SandpiperVersionControlContext;
+  readonly userProfile?: string;
   readonly cwd: string;
   readonly systemPromptOptions: Parameters<BuildSystemPrompt>[1];
   readonly sessionStartDate?: string;
@@ -56,12 +58,15 @@ export async function buildSandpiperStartupPrompt(
       piCodingAgentPackage: resolved.env.PI_CODING_AGENT_PACKAGE,
       piCodingAgentVersion: resolved.env.PI_CODING_AGENT_VERSION,
       sandpiperCodingAgentPackage: resolved.env.SANDPIPER_CODING_AGENT_PACKAGE,
-      versionControl: resolved.detectVersionControl(input.cwd, { fileExists: resolved.fileExists }),
-      userProfile: resolved.readUserProfile({
-        agentDir: input.agentDir,
-        fileExists: resolved.fileExists,
-        readFile: resolved.readFile,
-      }),
+      versionControl:
+        input.versionControl ?? resolved.detectVersionControl(input.cwd, { fileExists: resolved.fileExists }),
+      userProfile:
+        input.userProfile ??
+        resolved.readUserProfile({
+          agentDir: input.agentDir,
+          fileExists: resolved.fileExists,
+          readFile: resolved.readFile,
+        }),
       identityOverride: input.identityContent,
       sessionStartDate: input.sessionStartDate,
       dumpSystemPrompt: input.dumpSystemPrompt,

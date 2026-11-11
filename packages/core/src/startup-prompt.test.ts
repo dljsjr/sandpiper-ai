@@ -57,6 +57,25 @@ describe('startup prompt operations', () => {
     expect(prompt).toContain('"versionControl":{"system":"jj","colocatedGit":true,"detection":"session_start"}');
   });
 
+  it('builds from supplied session inputs without detecting VCS or reading even an empty profile again', async () => {
+    const dependencies = createDependencies();
+    const prompt = await buildSandpiperStartupPrompt(
+      {
+        agentDir: '/agent',
+        cwd: '/repo',
+        systemPromptOptions: { cwd: '/repo' },
+        versionControl: { system: 'jj', detection: 'session_start' },
+        userProfile: '',
+      },
+      dependencies,
+    );
+
+    expect(dependencies.detectVersionControl).not.toHaveBeenCalled();
+    expect(dependencies.readUserProfile).not.toHaveBeenCalled();
+    expect(prompt).toContain('"versionControl":{"system":"jj","detection":"session_start"}');
+    expect(prompt).toContain('"userProfile":""');
+  });
+
   it('passes the user profile into system prompt construction', async () => {
     const dependencies = createDependencies({
       readUserProfile: vi.fn(() => '# User\nLikes plans'),

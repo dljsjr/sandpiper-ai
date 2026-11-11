@@ -10,7 +10,14 @@ import {
   type SessionEntry,
 } from '@earendil-works/pi-coding-agent';
 import { createTwoFilesPatch } from 'diff';
-import { buildSandpiperStartupPrompt, formatLocalDate, setSandpiperSessionEnv } from 'sandpiper-ai-core';
+import {
+  buildSandpiperStartupPrompt,
+  detectVersionControl,
+  formatLocalDate,
+  readSandpiperUserProfile,
+  type SandpiperVersionControlContext,
+  setSandpiperSessionEnv,
+} from 'sandpiper-ai-core';
 import {
   applyPromptContributions,
   SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL,
@@ -73,6 +80,10 @@ export function registerStartupPromptHooks(
   // memory bootstrap) inject via SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL — a public extension API.
   const promptContributions = new SandpiperPromptContributionCollector();
   let unsubscribePromptContributions: (() => void) | undefined;
+  let versionControl: SandpiperVersionControlContext | undefined;
+  let userProfile: string | undefined;
+  let identity: ReturnType<typeof readIdentity> | undefined;
+  let lastKnownSystemPrompt: string | undefined;
 
   const resetPromptContributionListener = () => {
     unsubscribePromptContributions?.();
@@ -86,6 +97,10 @@ export function registerStartupPromptHooks(
   });
 
   pi.on('session_start', () => {
+    versionControl = undefined;
+    userProfile = undefined;
+    identity = undefined;
+    lastKnownSystemPrompt = undefined;
     resetPromptContributionListener();
     unsubscribePromptContributions = pi.events.on(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, (payload) => {
       promptContributions.add(payload);
@@ -96,11 +111,7 @@ export function registerStartupPromptHooks(
     resetPromptContributionListener();
   });
 
-  const buildEffectiveSystemPrompt = async (
-    cwd: string,
-    systemPromptOptions: BuildSystemPromptOptions,
-    sessionStartDate: string,
-  ) => {
+  const readIdentity = async () => {
     const identityFlag = pi.getFlag('identity');
     let identityContent: string | undefined;
     let identitySource: string | undefined;
@@ -116,8 +127,23 @@ export function registerStartupPromptHooks(
 
       identityContent = identityContent ?? identityFlag;
     }
+    return { identityContent, identitySource };
+  };
 
+  const buildEffectiveSystemPrompt = async (
+    cwd: string,
+    systemPromptOptions: BuildSystemPromptOptions,
+    sessionStartDate: string,
+  ) => {
+    identity ??= readIdentity();
+    const { identityContent, identitySource } = await identity;
+    if (!systemPromptOptions.customPrompt) {
+      versionControl ??= detectVersionControl(cwd);
+      userProfile ??= readSandpiperUserProfile({ agentDir: getAgentDir() });
+    }
     const prompt = await buildSandpiperStartupPrompt({
+      versionControl,
+      userProfile,
       agentDir: getAgentDir(),
       cwd,
       systemPromptOptions,
@@ -170,7 +196,6 @@ export function registerStartupPromptHooks(
     });
   }
 
-  let lastKnownSystemPrompt: string | undefined;
   pi.on('before_agent_start', async (event, ctx) => {
     const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
     const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions, sessionStartDate);
