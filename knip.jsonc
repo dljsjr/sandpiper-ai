@@ -6,7 +6,7 @@
   "ignoreExportsUsedInFile": true,
 
   // Provided by the host system or developer environment, not by the npm dependency graph.
-  "ignoreBinaries": ["ast-grep", "jj", "rg"],
+  "ignoreBinaries": ["jj", "rg"],
 
   "workspaces": {
     ".": {

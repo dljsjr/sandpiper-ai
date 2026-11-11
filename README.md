@@ -61,7 +61,6 @@ sandpiper-ai/
 ├── packages/            # Source modules and internal workspace packages
 │   ├── cli/             # Sandpiper entrypoints and stable bin launchers
 │   └── core/            # Shared utilities
-├── ast-grep/            # Structural code analysis rules
 └── devtools/            # Build regressions and isolated integration tests
 ```
 
@@ -86,7 +85,6 @@ bun run check:deps                # Syncpack dependency version policy
 bun run test                      # Build and run the full Vitest gate
 bun run test:vitest -- <testpath> # Focused Vitest run
 bun check --write                 # Auto-fix formatting
-bun check:ast-grep                # Structural code analysis
 
 # Do not use bare `bun test` as the repo health gate; it invokes Bun's runner, not Vitest.
 ```

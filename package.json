@@ -33,7 +33,6 @@
   "scripts": {
     "check:biome-check": "biome check",
     "check:tsc": "tsc --noEmit",
-    "check:ast-grep": "ast-grep scan",
     "check": "bun run check:deps && bun run check:tsc && bun run check:biome-check",
     "test": "bun run build && bun run test:vitest",
     "test:vitest": "env GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null JJ_CONFIG=\"$PWD/devtools/test-fixtures/jj-test-config.toml\" vitest run",
