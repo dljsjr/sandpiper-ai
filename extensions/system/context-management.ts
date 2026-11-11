@@ -16,6 +16,10 @@ export function registerContextManagementHooks(pi: ExtensionAPI) {
   let alerted = false;
   let currentModel: Model<Api> | undefined;
 
+  pi.on('session_compact', () => {
+    nextContextMessageThreshold = CONTEXT_USAGE_NOTIFICATION_STEP_SIZE;
+  });
+
   pi.on('turn_end', async (_evt, ctx) => {
     const ctxUsage = ctx.getContextUsage();
     const model = ctx.model;
@@ -51,16 +55,13 @@ export function registerContextManagementHooks(pi: ExtensionAPI) {
     }
 
     if (!warned && ctxUsage?.percent && ctxUsage.percent >= CONTEXT_USAGE_WARNING_THRESHOLD) {
-      contextNotificationInstructions = `
-<info>Context usage is above 50%.</info>
-`.trim();
+      contextNotificationInstructions = 'Context usage is above 50%.';
       warned = true;
     }
 
     if (!alerted && ctxUsage?.percent && ctxUsage.percent >= CONTEXT_USAGE_ALERT_THRESHOLD) {
-      contextNotificationInstructions = `
-<important>Context usage is above 80%. Make sure you've persisted anything you don't want to forget before continuing your current work.</important>
-`.trim();
+      contextNotificationInstructions =
+        "Context usage is above 80%. Make sure you've persisted anything you don't want to forget before continuing your current work.";
       alerted = true;
     }
 
