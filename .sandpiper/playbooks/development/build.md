@@ -1,6 +1,6 @@
 ---
 name: Build System
-read_when: modifying build scripts, root product package.json, bunfig.toml, root dist output, bin launchers, bun pm pack, deciding whether a change needs a build step
+read_when: modifying build scripts, root product package.json, root dist output, bin launchers, bun pm pack, deciding whether a change needs a build step
 ---
 
 # Build System

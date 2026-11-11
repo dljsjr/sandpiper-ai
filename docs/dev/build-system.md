@@ -33,15 +33,7 @@ The mise tools mcporter, jscpd, hike, and lizard are developer conveniences, not
 
 ## Dependency resolution
 
-The repository uses Bun's hoisted linker:
-
-```toml
-# bunfig.toml
-[install]
-linker = "hoisted"
-```
-
-Extension dependencies resolve from the root `node_modules/` directory.
+With one root manifest and no workspaces, Bun installs every dependency into the root `node_modules/` directory. Extension dependencies resolve from there.
 
 One root `package.json` and `bun.lock` own all dependencies. Registry dependencies use exact versions. Internal source imports use relative paths to the owning module, without workspace packages or aliases.
 
