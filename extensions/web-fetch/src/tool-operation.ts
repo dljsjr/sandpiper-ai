@@ -36,9 +36,15 @@ export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
 }
 
+const LLMS_TXT_INSTRUCTIONS =
+  'This site publishes an index of its pages for language models at the llms_txt url. ' +
+  'To find another page on this site, fetch that index with web_fetch instead of guessing a URL. ' +
+  'The index is Markdown: a markdown_section filter with one of its headings returns that part alone.';
+
 function formatLlmsTxtMetadata(llmsTxt: LlmsTxtProbeResult): string {
   const lines = [
     '<additional_content>',
+    `  <instructions>${LLMS_TXT_INSTRUCTIONS}</instructions>`,
     '  <llms_txt',
     `    status="${llmsTxt.status}"`,
     `    url="${llmsTxt.url}"`,
@@ -67,7 +73,7 @@ export function formatWebFetchResult(result: WebFetchResult): string {
     output += `\n\n---\n\n## Links found on page\n\n${linkList}`;
   }
 
-  if (result.llmsTxt?.exists === true) {
+  if (result.llmsTxt?.exists === true && result.llmsTxt.url !== result.url) {
     output += `\n\n---\n\n${formatLlmsTxtMetadata(result.llmsTxt)}`;
   }
 

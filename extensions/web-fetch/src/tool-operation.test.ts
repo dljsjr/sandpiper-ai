@@ -61,10 +61,34 @@ describe('formatWebFetchResult', () => {
     };
     const output = formatWebFetchResult(createResult({ llmsTxt }));
 
-    expect(output).toContain('<additional_content>');
-    expect(output).toContain('status="found"');
-    expect(output).toContain('url="https://example.com/llms.txt"');
-    expect(output).toContain('http_status="200"');
+    expect(
+      output.endsWith(
+        [
+          '<additional_content>',
+          '  <instructions>This site publishes an index of its pages for language models at the llms_txt url. To find another page on this site, fetch that index with web_fetch instead of guessing a URL. The index is Markdown: a markdown_section filter with one of its headings returns that part alone.</instructions>',
+          '  <llms_txt',
+          '    status="found"',
+          '    url="https://example.com/llms.txt"',
+          '    http_status="200"',
+          '  />',
+          '</additional_content>',
+        ].join('\n'),
+      ),
+    ).toBe(true);
+  });
+
+  it('omits the llms.txt metadata block when the fetched page is that llms.txt file', () => {
+    const llmsTxt: LlmsTxtProbeResult = {
+      checked: true,
+      exists: true,
+      status: 'found',
+      url: 'https://example.com/llms.txt',
+      checkedAt: '2026-05-13T00:00:00.000Z',
+      statusCode: 200,
+    };
+    const output = formatWebFetchResult(createResult({ url: 'https://example.com/llms.txt', llmsTxt }));
+
+    expect(output).not.toContain('<additional_content>');
   });
 
   it('omits the llms.txt metadata block when llms.txt is missing', () => {
