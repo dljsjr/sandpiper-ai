@@ -74,13 +74,13 @@ function readTextFile(path: string): string | undefined {
 }
 
 // Pi reads an appended prompt source that names a file and keeps any other source as text, in
-// order. Pair each file's content with its path; a file Pi changed while reading (a BOM) stays text.
+// order. Pair each file's content with its path. Pi drops a leading byte order mark while reading.
 function appendSystemPromptParts(resourceLoader: ResourceLoader | undefined): SandpiperAppendSystemPromptPart[] {
   if (resourceLoader === undefined) return [];
   const paths = resourceLoader.getAppendSystemPromptSources().map(({ path }) => path);
   return resourceLoader.getAppendSystemPrompt().map((content) => {
     const path = paths[0];
-    if (path === undefined || readTextFile(path) !== content) return { content };
+    if (path === undefined || readTextFile(path)?.replace(/^\uFEFF/, '') !== content) return { content };
     paths.shift();
     return { content, path };
   });

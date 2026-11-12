@@ -351,6 +351,48 @@ describe('prompt editor page', () => {
     await browser.happyDOM.close();
   });
 
+  it('shows a short piece of a sibling file inside the card of the template around it', async () => {
+    const { browser, promptEditor } = loadPromptEditor();
+    const payload = templatePayload([
+      '<system_prompt>\n',
+      ['skills.md', '<skills>\nSkills help.\n\n'],
+      ['skill_tool.md', 'Use the `skill` tool.'],
+      ['skills.md', '\n\nThe list:\n'],
+      '<available_skills/>',
+      ['skills.md', '\n</skills>'],
+      '\n</system_prompt>',
+    ]);
+    const ids = regionIds(payload);
+
+    promptEditor.render(payload);
+
+    const groups = browser.document.querySelectorAll('.source-group');
+    expect(groups).toHaveLength(1);
+    const group = groups[0]!;
+    expect(group.querySelector('.region-name')?.textContent).toBe('skills.md');
+    expect([...group.querySelectorAll('.inline-file')].map((label) => label.textContent)).toEqual(['skill_tool.md']);
+    expect(
+      [...group.querySelectorAll('.source-region')].map((region) => region.getAttribute('data-region-id')),
+    ).toEqual(ids);
+    expect(browser.document.querySelectorAll('.region-card')).toHaveLength(1);
+    await browser.happyDOM.close();
+  });
+
+  it('keeps a long piece of a sibling file in a card of its own', async () => {
+    const { browser, promptEditor } = loadPromptEditor();
+    promptEditor.render(
+      templatePayload([
+        ['skills.md', '<skills>\nSkills help.\n'],
+        ['other.md', `${'A long sibling file. '.repeat(30)}`],
+        ['skills.md', '\nMore skills.\n</skills>'],
+      ]),
+    );
+
+    expect(browser.document.querySelectorAll('.inline-file')).toHaveLength(0);
+    expect(browser.document.querySelectorAll('.region-card')).toHaveLength(3);
+    await browser.happyDOM.close();
+  });
+
   it('stages each region of a shared card by its own id', async () => {
     const { browser, messages, promptEditor } = loadPromptEditor();
     const payload = templatePayload(harnessAndProfile);

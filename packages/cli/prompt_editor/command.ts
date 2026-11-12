@@ -27,7 +27,11 @@ export async function runPromptEditor(command: PromptEditorCommand): Promise<voi
         cwd: command.cwd,
         env: process.env,
       }),
-    catalog: { promptSources: options.promptSources, userProfile: getSandpiperUserProfilePath(getAgentDir()) },
+    catalog: {
+      promptSources: options.promptSources,
+      escapedPromptSources: options.escapedPromptSources,
+      userProfile: getSandpiperUserProfilePath(getAgentDir()),
+    },
     identity: { key: options.title.toLowerCase(), name: options.title, job: options.subtitle ?? options.title },
   });
   const window = openGlimpseWindow(glimpse, promptEditorPage(), {

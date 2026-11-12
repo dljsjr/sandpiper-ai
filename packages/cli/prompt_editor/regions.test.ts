@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DiagnosticPrompt, EditableSpan } from './diagnostic.js';
-import type { PromptProjection } from './projection.js';
+import { buildSourceChanges, type PromptProjection } from './projection.js';
 import { buildEditorProjection } from './regions.js';
 
 let root: string;
@@ -178,6 +178,45 @@ describe('matched source files', () => {
     );
 
     expect(editableText(projection)).toEqual([[source, 'xml-text', '&gt; identity &amp; voice']]);
+  });
+
+  it('maps a file the caller marks as escaped as xml-text, even when nothing in it needs escaping', () => {
+    const plain = writeSource('IDENTITY.md', '# Identity\n\nPlain words.\n');
+    const prompt = '<identity><content># Identity\n\nPlain words.</content></identity>';
+
+    const guessed = buildEditorProjection(diagnostic(prompt), { promptSources: [plain] });
+    const marked = buildEditorProjection(diagnostic(prompt), {
+      promptSources: [plain],
+      escapedPromptSources: [plain],
+    });
+
+    expect(editableText(guessed)).toEqual([[plain, 'direct', '# Identity\n\nPlain words.']]);
+    expect(editableText(marked)).toEqual([[plain, 'xml-text', '# Identity\n\nPlain words.']]);
+  });
+
+  it('does not map a file marked as escaped where its text appears unescaped', () => {
+    const source = writeSource('SELF.md', 'a < b\n');
+
+    const projection = buildEditorProjection(diagnostic('<self>a < b</self>'), {
+      promptSources: [],
+      escapedPromptSources: [source],
+    });
+
+    expect(projection.regions).toEqual([]);
+  });
+
+  it('maps a file that starts with a byte order mark, past the mark', () => {
+    const source = writeSource('USER.md', '\uFEFF# Profile\n\nPrefers fish.\n');
+
+    const projection = buildEditorProjection(diagnostic('<user_profile># Profile\n\nPrefers fish.</user_profile>'), {
+      promptSources: [source],
+    });
+
+    expect(editableText(projection)).toEqual([[source, 'direct', '# Profile\n\nPrefers fish.']]);
+    const region = projection.regions[0];
+    expect(region).toMatchObject({ sourceStart: 1 });
+    const [change] = buildSourceChanges(projection, new Map([[region?.id ?? '', '# Profile\n\nPrefers bash.']]));
+    expect(change?.updatedSource).toBe('\uFEFF# Profile\n\nPrefers bash.\n');
   });
 
   it('maps the body after frontmatter with an extended hyphen delimiter', () => {

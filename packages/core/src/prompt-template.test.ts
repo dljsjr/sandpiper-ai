@@ -94,6 +94,15 @@ describe('prompt templates', () => {
       ]);
     });
 
+    it('shifts spans past a byte order mark that Pi dropped while reading the file', () => {
+      writeFileSync(join(root, 'AGENTS.md'), '\uFEFF# Rules\n');
+      const rendered = joinRendered(['<context>', sourcedText('# Rules', join(root, 'AGENTS.md')), '</context>']);
+
+      expect(verifyEditableSpans(rendered.text, rendered.spans)).toEqual([
+        { start: 9, end: 16, path: join(root, 'AGENTS.md'), sourceStart: 1, sourceEnd: 8, codec: 'direct' },
+      ]);
+    });
+
     it('drops spans whose file changed, is missing, or is out of range', () => {
       writeFileSync(join(root, 'user.md'), 'Hello world');
       const changed = sourcedText('Hello there', join(root, 'user.md'));

@@ -5,6 +5,8 @@ export interface PromptEditorOptions {
   readonly diagnosticArgs: readonly string[];
   /** `--prompt-source` paths, resolved against the working directory. */
   readonly promptSources: readonly string[];
+  /** `--prompt-source-xml` paths: files the prompt holds XML-escaped. Resolved against the working directory. */
+  readonly escapedPromptSources: readonly string[];
   readonly title: string;
   readonly subtitle?: string;
 }
@@ -15,13 +17,14 @@ const DEFAULT_TITLE = 'Sandpiper';
 export function parsePromptEditorOptions(args: readonly string[], cwd: string): PromptEditorOptions {
   const diagnosticArgs: string[] = [];
   const promptSources: string[] = [];
+  const escapedPromptSources: string[] = [];
   let title = DEFAULT_TITLE;
   let subtitle: string | undefined;
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index] ?? '';
     if (arg === '--edit' || arg === '--json') continue;
-    if (arg !== '--prompt-source' && arg !== '--edit-title' && arg !== '--edit-subtitle') {
+    if (!['--prompt-source', '--prompt-source-xml', '--edit-title', '--edit-subtitle'].includes(arg)) {
       diagnosticArgs.push(arg);
       continue;
     }
@@ -29,9 +32,16 @@ export function parsePromptEditorOptions(args: readonly string[], cwd: string): 
     if (value === undefined) throw new Error(`${arg} requires a value`);
     index += 1;
     if (arg === '--prompt-source') promptSources.push(resolve(cwd, value));
+    else if (arg === '--prompt-source-xml') escapedPromptSources.push(resolve(cwd, value));
     else if (arg === '--edit-title') title = value;
     else subtitle = value;
   }
 
-  return { diagnosticArgs, promptSources, title, ...(subtitle === undefined ? {} : { subtitle }) };
+  return {
+    diagnosticArgs,
+    promptSources,
+    escapedPromptSources,
+    title,
+    ...(subtitle === undefined ? {} : { subtitle }),
+  };
 }

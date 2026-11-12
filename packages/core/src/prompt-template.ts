@@ -102,6 +102,8 @@ export function renderPromptTemplate(
   );
 }
 
+const BYTE_ORDER_MARK = '\uFEFF';
+
 /**
  * Keep the spans whose text in `text` matches the current contents of their source file, with
  * the path resolved to its real path. Drops spans whose file cannot be read.
@@ -120,16 +122,22 @@ export function verifyEditableSpans(text: string, spans: readonly EditableSpan[]
     return sources.get(path);
   };
 
+  const matches = (span: EditableSpan, source: { readonly text: string }) =>
+    span.start >= 0 &&
+    span.end <= text.length &&
+    span.sourceStart >= 0 &&
+    span.sourceEnd <= source.text.length &&
+    span.end - span.start === span.sourceEnd - span.sourceStart &&
+    text.slice(span.start, span.end) === source.text.slice(span.sourceStart, span.sourceEnd);
+
   return spans.flatMap((span) => {
     const source = readSource(span.path);
-    const matches =
-      source !== undefined &&
-      span.start >= 0 &&
-      span.end <= text.length &&
-      span.sourceStart >= 0 &&
-      span.sourceEnd <= source.text.length &&
-      span.end - span.start === span.sourceEnd - span.sourceStart &&
-      text.slice(span.start, span.end) === source.text.slice(span.sourceStart, span.sourceEnd);
-    return matches ? [{ ...span, path: source.path }] : [];
+    if (source === undefined) return [];
+    if (matches(span, source)) return [{ ...span, path: source.path }];
+    // Pi drops a file's leading byte order mark when it reads it, so offsets taken from the content it
+    // returned are one short of the file's.
+    if (!source.text.startsWith(BYTE_ORDER_MARK)) return [];
+    const shifted = { ...span, sourceStart: span.sourceStart + 1, sourceEnd: span.sourceEnd + 1 };
+    return matches(shifted, source) ? [{ ...shifted, path: source.path }] : [];
   });
 }

@@ -507,6 +507,16 @@
       background: var(--locked);
       color: var(--locked-ink);
     }
+    .inline-file {
+      margin-right: 4px;
+      padding: 0 5px;
+      border-radius: 4px;
+      background: var(--editable-head);
+      color: var(--editable-ink);
+      font: 600 10px/16px var(--sans);
+      user-select: none;
+      vertical-align: 1px;
+    }
     .value-chip.blank { border: 0; padding: 0; background: transparent; }
     .editable-part { border-radius: 3px; outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
     .editable-part:empty::before { content: "\200b"; }
@@ -1224,15 +1234,26 @@
         return region;
       }
 
-      // The last region of the card that starts at `start`: regions of the same file with only generated text
-      // between them, such as a template split at its placeholders, share one card.
+      const folderOf = (path) => String(path || '').slice(0, String(path || '').lastIndexOf('/'));
+      // The longest piece of a sibling file that can sit inside another file's card.
+      const INLINE_SIBLING_LIMIT = 400;
+
+      // A short region of another file in the same folder, such as a sentence one template picks from a
+      // sibling template, flows inside the card of the template around it.
+      function inlineSibling(segment, path) {
+        return segment.path !== path && folderOf(segment.path) === folderOf(path) && segment.text.length <= INLINE_SIBLING_LIMIT;
+      }
+
+      // The last region of the card that starts at `start`: regions of the same file with only generated text,
+      // or short sibling pieces, between them, such as a template split at its placeholders, share one card.
       function groupEnd(start) {
         const path = segments[start].path;
         let end = start;
         for (let index = start + 1; index < segments.length; index += 1) {
-          if (!segments[index].editable) continue;
-          if (segments[index].path !== path) break;
-          end = index;
+          const segment = segments[index];
+          if (!segment.editable) continue;
+          if (segment.path === path) end = index;
+          else if (!inlineSibling(segment, path)) break;
         }
         return end;
       }
@@ -1266,7 +1287,10 @@
         const group = h('section', { class: 'source-group region-card', id: `group-${segments[start].regionId}`, dataset: { path } });
         const body = h('div', { class: 'region-body group-body' });
         for (let index = start; index <= end; index += 1) {
-          body.append(segments[index].editable ? inlineRegion(segments[index], index) : valueChip(segments[index], index));
+          const segment = segments[index];
+          if (!segment.editable) body.append(valueChip(segment, index));
+          else if ((segment.path || segment.label) === path) body.append(inlineRegion(segment, index));
+          else body.append(h('span', { class: 'inline-file', title: segment.path, text: basename(segment.path) }), inlineRegion(segment, index));
         }
         group.append(regionHead(path), body);
         return group;
