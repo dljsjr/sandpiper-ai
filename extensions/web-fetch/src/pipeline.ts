@@ -19,6 +19,7 @@ import {
   parseLinkHeader,
 } from './link-relations.js';
 import { declaredLlmsTxt, discoverLlmsTxt } from './llms-txt.js';
+import { isMarkdownMediaType } from './media-types.js';
 import {
   type FetchAdapter,
   type FetchResult,
@@ -36,9 +37,6 @@ export interface PipelineOptions {
   /** Override llms.txt discovery for tests or specialized callers. */
   readonly probeLlmsTxt?: (url: string) => Promise<LlmsTxtProbeResult>;
 }
-
-// Bodies that are already text. Parsing them as HTML would collapse their line structure.
-const TEXT_MEDIA_TYPES = new Set(['text/markdown', 'text/x-markdown', 'text/plain']);
 
 function noMatchMessage(filter: WebFetchFilterSpec): string {
   switch (filter.type) {
@@ -128,8 +126,9 @@ function declaredRelations(fetchResult: FetchResult, isText: boolean): readonly 
   ];
 }
 
+// A body that is already text. Parsing it as HTML would collapse its line structure.
 function isTextResponse(fetchResult: FetchResult): boolean {
-  return fetchResult.contentType !== undefined && TEXT_MEDIA_TYPES.has(fetchResult.contentType);
+  return isMarkdownMediaType(fetchResult.contentType);
 }
 
 /** The Markdown version a page advertises, or nothing when it cannot be fetched as text. */

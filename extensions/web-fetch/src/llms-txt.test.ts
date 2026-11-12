@@ -2,7 +2,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { clearLlmsTxtProbeCache, declaredLlmsTxt, discoverLlmsTxt, llmsTxtCandidates } from './llms-txt.js';
 
-type Mode = 'found' | 'method-not-allowed' | 'server-error';
+type Mode = 'found' | 'found-as-markdown' | 'html-page' | 'untyped' | 'method-not-allowed' | 'server-error';
 
 let server: Server;
 let baseUrl: string;
@@ -16,6 +16,12 @@ let held: (() => void)[] = [];
 
 function respond(res: ServerResponse, mode: Mode | undefined): void {
   if (mode === 'found') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  } else if (mode === 'found-as-markdown') {
+    res.writeHead(200, { 'Content-Type': 'text/markdown' });
+  } else if (mode === 'html-page') {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  } else if (mode === 'untyped') {
     res.writeHead(204);
   } else if (mode === 'method-not-allowed') {
     res.writeHead(405, { Allow: 'GET' });
@@ -103,10 +109,44 @@ describe('discoverLlmsTxt', () => {
       checked: true,
       exists: true,
       status: 'found',
-      statusCode: 204,
+      statusCode: 200,
       url: `${baseUrl}/llms.txt`,
     });
     expect(getCount).toBe(0);
+  });
+
+  it('accepts an answer served as Markdown', async () => {
+    files = new Map([['/llms.txt', 'found-as-markdown']]);
+
+    const result = await discoverLlmsTxt(`${baseUrl}/page`);
+
+    expect(result).toMatchObject({ status: 'found', url: `${baseUrl}/llms.txt` });
+  });
+
+  it.each([
+    ['an HTML page', 'html-page'],
+    ['an answer with no media type', 'untyped'],
+  ] as const)('does not accept %s as an llms.txt file', async (_name, mode) => {
+    files.set('/docs/llms.txt', mode);
+
+    const result = await discoverLlmsTxt(`${baseUrl}/docs/page`);
+
+    expect(result).toMatchObject({ status: 'found', url: `${baseUrl}/llms.txt` });
+  });
+
+  it('reports a location that answers with something other than Markdown as missing', async () => {
+    files = new Map([['/llms.txt', 'html-page']]);
+
+    const result = await discoverLlmsTxt(`${baseUrl}/page`);
+
+    expect(result).toMatchObject({
+      checked: true,
+      exists: false,
+      status: 'missing',
+      statusCode: 200,
+      reason: 'not-markdown',
+      url: `${baseUrl}/llms.txt`,
+    });
   });
 
   it('prefers the most specific llms.txt above the page', async () => {

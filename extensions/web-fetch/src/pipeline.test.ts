@@ -124,7 +124,7 @@ function handler(req: IncomingMessage, res: ServerResponse) {
   const url = req.url ?? '/';
 
   if (url === '/llms.txt') {
-    res.writeHead(204);
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end();
     return;
   }
@@ -265,7 +265,7 @@ describe('fetchAndExtract (end-to-end)', () => {
       checked: true,
       exists: true,
       status: 'found',
-      statusCode: 204,
+      statusCode: 200,
       url: `${baseUrl}/llms.txt`,
     });
   });

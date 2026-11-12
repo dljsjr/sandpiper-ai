@@ -3,6 +3,7 @@
  * Framework-independent — no pi imports.
  */
 
+import { mediaType } from './media-types.js';
 import type { FetchAdapter, FetchOptions, FetchResult } from './types.js';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
@@ -26,7 +27,7 @@ export class SimpleFetchAdapter implements FetchAdapter {
       });
 
       const body = await response.text();
-      const contentType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase();
+      const contentType = mediaType(response.headers.get('content-type'));
       const linkHeader = response.headers.get('link');
 
       return {

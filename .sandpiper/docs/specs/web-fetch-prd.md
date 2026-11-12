@@ -105,7 +105,7 @@ An advertised version is followed only on the page's own origin, and only when i
 An `llms.txt` file is a site's index of its pages for language models ([llmstxt.org](https://llmstxt.org/)). A file covers the pages under its directory, and the most specific file wins.
 
 1. **Declared.** A page can name its file with `rel="describedby"`, in the `Link` header or a `<link>` element. A target whose path ends in `/llms.txt` is taken as found without a request.
-2. **Probed.** Otherwise the pipeline sends a `HEAD` request to the `llms.txt` location of each directory above the page, all at once, and uses the most specific 2xx answer. A deep page probes the root and the three directories nearest to it.
+2. **Probed.** Otherwise the pipeline sends a `HEAD` request to the `llms.txt` location of each directory above the page, all at once, and uses the most specific answer that is a 2xx with a Markdown media type. `text/plain` counts as Markdown, because that is how servers send these files. An HTML answer does not count: some servers answer every path with a 200 page. A deep page probes the root and the three directories nearest to it.
 
 Discovery starts together with the page request, and the result waits for it, so output does not depend on timing. Each location is asked once per process. A failure or timeout is kept as the answer: some sites resist automated requests, and a missed file costs little. The file's content is not read.
 

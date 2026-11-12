@@ -70,7 +70,7 @@ export interface LlmsTxtProbeResult {
   readonly checkedAt: string;
   /** HTTP status returned by the probe when available. */
   readonly statusCode?: number;
-  /** Non-fatal reason for unknown/indeterminate outcomes. */
+  /** Why the outcome is unknown, or missing despite a success status. */
   readonly reason?: string;
   /** Allow header for 405 Method Not Allowed responses. */
   readonly allow?: string;

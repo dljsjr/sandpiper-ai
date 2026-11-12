@@ -3,6 +3,7 @@
  * Framework-independent — no pi imports.
  */
 
+import { isMarkdownMediaType, mediaType } from './media-types.js';
 import type { LlmsTxtProbeResult } from './types.js';
 
 const DEFAULT_PROBE_TIMEOUT_MS = 3_000;
@@ -49,13 +50,16 @@ function unknownResult(url: string, reason: string, options: LlmsTxtProbeOptions
 
 function resultFromResponse(response: Response, url: string, options: LlmsTxtProbeOptions): LlmsTxtProbeResult {
   if (response.status >= 200 && response.status < 300) {
+    // An llms.txt file is Markdown. Some servers answer every path with a 200 HTML page.
+    const isMarkdown = isMarkdownMediaType(mediaType(response.headers.get('content-type')));
     return {
       checked: true,
-      exists: true,
-      status: 'found',
+      exists: isMarkdown,
+      status: isMarkdown ? 'found' : 'missing',
       url,
       checkedAt: checkedAt(options),
       statusCode: response.status,
+      ...(isMarkdown ? {} : { reason: 'not-markdown' }),
     };
   }
 
