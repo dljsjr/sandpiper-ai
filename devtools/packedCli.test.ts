@@ -121,6 +121,7 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
           'package/packages/cli/bin/sandpiper-system-prompt',
           'package/dist/sandpiper_standalone.js',
           'package/dist/sandpiper_system_prompt.js',
+          'package/packages/core/system-prompt/system_prompt.md',
           'package/node_modules/@earendil-works/pi-mcp/package.json',
           'package/docs/README.md',
           'package/LICENSE',
@@ -131,9 +132,16 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       expect(entries.filter((entry) => !entry.startsWith('package/') || entry.split('/').includes('..'))).toEqual([]);
       expect(entries.filter((entry) => /\.(tgz|tar\.gz)$/.test(entry))).toEqual([]);
       expect(entries.filter((entry) => /\/(\.sandpiper|\.pi|\.git|\.jj|\.turbo)(\/|$)/.test(entry))).toEqual([]);
+      // Core ships only the system prompt templates it reads at run time.
+      expect(
+        entries.filter(
+          (entry) =>
+            entry.startsWith('package/packages/core/') &&
+            !/^package\/packages\/core\/system-prompt\/\w+\.md$/.test(entry),
+        ),
+      ).toEqual([]);
       for (const retired of [
         'packages/resources',
-        'packages/core',
         'packages/capability-autotoon',
         'packages/cli/package.json',
         'packages/cli/dist',
@@ -359,7 +367,18 @@ export default function runtimeImportProbe(pi) {
         count: expect.objectContaining({ type: 'integer', minimum: 1, maximum: 20 }),
       });
       expect(run('sandpiper-system-prompt', ['--help'])).toContain('render the effective Sandpiper system prompt');
-      const rendered = JSON.parse(run('sandpiper-system-prompt', ['--json', '--approve'])) as { prompt: string };
+      const rendered = JSON.parse(run('sandpiper-system-prompt', ['--json', '--approve'])) as {
+        prompt: string;
+        editableSpans: { start: number; end: number; path: string; sourceStart: number; sourceEnd: number }[];
+      };
+      const installedTemplates = join(installed, 'packages', 'core', 'system-prompt');
+      expect(rendered.editableSpans.map((span) => span.path)).toContain(join(installedTemplates, 'identity.md'));
+      for (const span of rendered.editableSpans) {
+        expect(span.path.startsWith(`${installedTemplates}/`)).toBe(true);
+        expect(rendered.prompt.slice(span.start, span.end)).toBe(
+          readFileSync(span.path, 'utf8').slice(span.sourceStart, span.sourceEnd),
+        );
+      }
       const catalogue = rendered.prompt.match(/<available_skills>[\s\S]*?<\/available_skills>/)?.[0] ?? '';
       expect([...catalogue.matchAll(/<skill name="([^"]+)"/g)].map((match) => match[1]).sort()).toEqual([]);
       expect(rendered.prompt).toContain('<tools>\n- read:');

@@ -111,6 +111,7 @@ describe('root Sandpiper product', () => {
     const product = manifest();
     expect(product.files).toEqual([
       'packages/cli/bin/',
+      'packages/core/system-prompt/',
       'dist/**/*.js',
       'dist/**/*.js.map',
       'docs/',
