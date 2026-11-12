@@ -42,6 +42,12 @@ describe('web-fetch tool rendering', () => {
     );
   });
 
+  it('names the renderer in the tool call when the call names one', () => {
+    expect(formatWebFetchRenderCall({ url: 'https://example.com/app', renderer: 'obscura' }, theme)).toBe(
+      '**web_fetch** https://example.com/app (rendered with obscura)',
+    );
+  });
+
   it('collapses fetched markdown by default', () => {
     expect(
       formatWebFetchRenderResult(createResult(), { expanded: false, isPartial: false }, theme, 'Ctrl+O to expand'),

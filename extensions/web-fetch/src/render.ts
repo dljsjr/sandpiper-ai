@@ -3,7 +3,7 @@
  * Framework-independent — no pi imports.
  *
  * A renderer is code that drives one browser and returns a normalized result. Extensions
- * register renderers on WEB_FETCH_RENDERER_CHANNEL; one renderer serves a session.
+ * register renderers on WEB_FETCH_RENDERER_CHANNEL. web_fetch has none of its own.
  */
 
 import { execFile } from 'node:child_process';
@@ -14,8 +14,6 @@ import type { FetchAdapter, FetchResult } from './types.js';
 
 /** Event bus channel on which extensions register a renderer, during `resources_discover`. */
 export const WEB_FETCH_RENDERER_CHANNEL = 'sandpiper:web-fetch-renderer';
-/** Names the renderer to use, by id, when more than one is registered. */
-export const RENDERER_ENV = 'SANDPIPER_WEB_FETCH_RENDERER';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_OUTPUT_BYTES = 20 * 1024 * 1024;
@@ -118,32 +116,24 @@ function isRenderer(value: unknown): value is WebFetchRenderer {
   );
 }
 
-/** Collects renderer registrations and picks the one a session uses. */
+/** Collects renderer registrations from the event bus. */
 export class RendererCollector {
   readonly #registered = new Map<string, WebFetchRenderer>();
 
-  constructor(private readonly builtIn: WebFetchRenderer | undefined) {}
-
-  /** Accept a registration from the event bus. The first renderer registered under an id keeps it. */
+  /** Accept a registration. The first renderer registered under an id keeps it. */
   add(value: unknown): void {
     if (!isRenderer(value)) return;
 
     const id = value.id.trim();
     if (this.#registered.has(id)) return;
 
-    this.#registered.set(id, value);
+    this.#registered.set(id, { ...value, id });
     value.acknowledge?.();
   }
 
-  /**
-   * The renderer the environment names. With no name: the first registered renderer, and the
-   * built-in one when none is registered. A name that matches nothing selects nothing.
-   */
-  select(env: NodeJS.ProcessEnv): WebFetchRenderer | undefined {
-    const named = env[RENDERER_ENV]?.trim();
-    if (named) return this.#registered.get(named) ?? (this.builtIn?.id === named ? this.builtIn : undefined);
-
-    return this.#registered.values().next().value ?? this.builtIn;
+  /** The registered renderers in id order, so the result does not depend on extension load order. */
+  renderers(): readonly WebFetchRenderer[] {
+    return [...this.#registered.values()].sort((a, b) => a.id.localeCompare(b.id));
   }
 }
 

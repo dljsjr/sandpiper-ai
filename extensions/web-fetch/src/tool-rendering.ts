@@ -43,7 +43,8 @@ function colorMultiline(theme: WebFetchRenderTheme, color: WebFetchRenderColor, 
 export function formatWebFetchRenderCall(args: WebFetchToolInput, theme: WebFetchRenderTheme): string {
   const url = args.url ? theme.fg('accent', args.url) : theme.fg('toolOutput', '...');
   const followLinks = args.followLinks ? theme.fg('muted', ' (follow links)') : '';
-  const rendered = args.render ? theme.fg('muted', ' (rendered)') : '';
+  const renderedLabel = args.renderer ? ` (rendered with ${args.renderer})` : args.render ? ' (rendered)' : '';
+  const rendered = renderedLabel ? theme.fg('muted', renderedLabel) : '';
   return `${theme.fg('toolTitle', theme.bold('web_fetch'))} ${url}${followLinks}${rendered}`;
 }
 

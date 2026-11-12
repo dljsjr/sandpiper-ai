@@ -235,18 +235,46 @@ describe('executeWebFetchTool', () => {
     });
   });
 
-  it('uses the rendering adapter when rendering is requested', async () => {
-    const adapter = createAdapter();
-    const renderAdapter = createAdapter();
+  it('uses the first renderer when rendering is requested without naming one', async () => {
+    const lightpanda = createAdapter();
     const fetchAndExtract = vi.fn(async () => createResult());
 
     await executeWebFetchTool(
-      adapter,
+      createAdapter(),
       { url: 'https://example.com/app', render: true },
-      { fetchAndExtract, renderAdapter },
+      {
+        fetchAndExtract,
+        renderAdapters: new Map([
+          ['lightpanda', lightpanda],
+          ['obscura', createAdapter()],
+        ]),
+      },
     );
 
-    expect(fetchAndExtract).toHaveBeenCalledWith(renderAdapter, 'https://example.com/app', {
+    expect(fetchAndExtract).toHaveBeenCalledWith(lightpanda, 'https://example.com/app', {
+      filter: undefined,
+      followLinks: undefined,
+      render: true,
+    });
+  });
+
+  it('uses the renderer the call names, and treats naming one as a request to render', async () => {
+    const obscura = createAdapter();
+    const fetchAndExtract = vi.fn(async () => createResult());
+
+    await executeWebFetchTool(
+      createAdapter(),
+      { url: 'https://example.com/app', renderer: 'obscura' },
+      {
+        fetchAndExtract,
+        renderAdapters: new Map([
+          ['lightpanda', createAdapter()],
+          ['obscura', obscura],
+        ]),
+      },
+    );
+
+    expect(fetchAndExtract).toHaveBeenCalledWith(obscura, 'https://example.com/app', {
       filter: undefined,
       followLinks: undefined,
       render: true,
@@ -259,8 +287,8 @@ describe('executeWebFetchTool', () => {
 
     await executeWebFetchTool(
       adapter,
-      { url: 'https://example.com/page' },
-      { fetchAndExtract, renderAdapter: createAdapter() },
+      { url: 'https://example.com/page', render: false },
+      { fetchAndExtract, renderAdapters: new Map([['lightpanda', createAdapter()]]) },
     );
 
     expect(fetchAndExtract).toHaveBeenCalledWith(adapter, 'https://example.com/page', {
@@ -269,7 +297,28 @@ describe('executeWebFetchTool', () => {
     });
   });
 
-  it('explains that no browser is available when rendering is requested without one', async () => {
+  it('names the available renderers when the call names one that is not loaded', async () => {
+    const fetchAndExtract = vi.fn(async () => createResult());
+
+    const output = await executeWebFetchTool(
+      createAdapter(),
+      { url: 'https://example.com/app', renderer: 'chrome' },
+      {
+        fetchAndExtract,
+        renderAdapters: new Map([
+          ['lightpanda', createAdapter()],
+          ['obscura', createAdapter()],
+        ]),
+      },
+    );
+
+    expect(fetchAndExtract).not.toHaveBeenCalled();
+    expect(output.content[0]?.text).toBe(
+      'Failed to fetch https://example.com/app: renderer "chrome" is not loaded. Loaded: lightpanda, obscura',
+    );
+  });
+
+  it('explains that no renderer is loaded when rendering is requested without one', async () => {
     const fetchAndExtract = vi.fn(async () => createResult());
 
     const output = await executeWebFetchTool(

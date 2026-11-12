@@ -1,5 +1,5 @@
 /**
- * Built-in renderer for the Lightpanda headless browser (https://lightpanda.io).
+ * Renderer for the Lightpanda headless browser (https://lightpanda.io).
  * Framework-independent — no pi imports.
  */
 

@@ -1,4 +1,4 @@
-// WEB-10: a renderer that an extension registers on the event bus reaches web_fetch in a real
+// WEB-10: renderers that an extension registers on the event bus reach web_fetch in a real
 // session. web_fetch registers at load and again on the first run, once renderers are known.
 // This proves the model sees the final tool from its first request, and that nothing about the
 // prompt or the tool declarations changes afterwards.
@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { RENDERER_FIXTURE_MARKER } from './fixtures/renderer-fixture.js';
+import { RENDERER_FIXTURE_IDS, rendererFixtureMarker } from './fixtures/renderer-fixture.js';
 import { encodeMockScript, MOCK_RECORD_ENV_VAR, MOCK_SCRIPT_ENV_VAR } from './mock-provider.js';
 import { startRpcSession } from './rpc-driver.js';
 
@@ -21,7 +21,10 @@ const PAGE_URL = 'http://127.0.0.1:1/app';
 interface SystemMessage {
   readonly role: 'system';
   readonly sections?: Readonly<Record<string, string>>;
-  readonly toolsAdded?: readonly { readonly name: string; readonly parameters: { readonly properties?: object } }[];
+  readonly toolsAdded?: readonly {
+    readonly name: string;
+    readonly parameters: { readonly properties: { readonly renderer?: { readonly enum?: readonly string[] } } };
+  }[];
 }
 
 interface RecordedRequest {
@@ -44,7 +47,7 @@ describe('web_fetch renderers in a real session (WEB-10)', () => {
         env: {
           [MOCK_RECORD_ENV_VAR]: recordPath,
           [MOCK_SCRIPT_ENV_VAR]: encodeMockScript([
-            { type: 'toolCall', toolName: 'web_fetch', arguments: { url: PAGE_URL, render: true } },
+            { type: 'toolCall', toolName: 'web_fetch', arguments: { url: PAGE_URL, renderer: 'fixture-b' } },
             { type: 'text', text: 'first turn done' },
             { type: 'text', text: 'second turn done' },
           ]),
@@ -59,7 +62,7 @@ describe('web_fetch renderers in a real session (WEB-10)', () => {
           TIMEOUT_MS,
         );
         const result = toolEnd.result as { content: { type: string; text?: string }[] };
-        expect(result.content[0]?.text).toContain(`${RENDERER_FIXTURE_MARKER} for ${PAGE_URL}`);
+        expect(result.content[0]?.text).toContain(rendererFixtureMarker('fixture-b', PAGE_URL));
         await session.waitForEvent((event) => event.type === 'agent_settled', TIMEOUT_MS);
 
         const settledBefore = session.events.filter((event) => event.type === 'agent_settled').length;
@@ -78,6 +81,9 @@ describe('web_fetch renderers in a real session (WEB-10)', () => {
         const [initial] = systemMessages(requests[0]);
         const webFetch = initial?.toolsAdded?.find((tool) => tool.name === 'web_fetch');
         expect(webFetch?.parameters.properties).toHaveProperty('render');
+        expect(webFetch?.parameters.properties.renderer?.enum).toEqual(
+          expect.arrayContaining([...RENDERER_FIXTURE_IDS]),
+        );
         expect(initial?.sections?.tools).toContain('web_fetch');
 
         // A change to the prompt or the tools after the first request would add a system message.

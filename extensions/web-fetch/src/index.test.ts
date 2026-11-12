@@ -56,8 +56,6 @@ function createRenderer(id: string): WebFetchRenderer {
   return { id, render: vi.fn(async () => ({ html: '<html><body>rendered</body></html>' })) };
 }
 
-const noBuiltInRenderer = () => undefined;
-
 function okResult(): WebFetchToolResult {
   return { content: [{ type: 'text', text: 'ok' }], details: { url: 'https://example.com/page', title: 'Example' } };
 }
@@ -66,7 +64,7 @@ describe('web-fetch extension', () => {
   it('opts into the available-tools system prompt list', async () => {
     const pi = createPi();
 
-    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
+    await init(pi.api, { adapter: createAdapter() });
 
     expect(pi.latestTool()?.promptSnippet).toBe('Fetch a web page and return clean markdown content');
   });
@@ -74,7 +72,7 @@ describe('web-fetch extension', () => {
   it('registers both CSS selector and Markdown section filter schemas', async () => {
     const pi = createPi();
 
-    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
+    await init(pi.api, { adapter: createAdapter() });
 
     const schemaText = JSON.stringify(pi.latestTool()?.parameters);
     expect(schemaText).toContain(WebFetchFilterType.CssSelector);
@@ -91,7 +89,7 @@ describe('web-fetch extension', () => {
       const executeWebFetchTool = vi.fn(async () => okResult());
       const pi = createPi();
 
-      await init(pi.api, { adapter: createAdapter(), executeWebFetchTool, createBuiltInRenderer: noBuiltInRenderer });
+      await init(pi.api, { adapter: createAdapter(), executeWebFetchTool });
       await pi.latestTool()?.execute('call-1', { url: 'https://example.com/page', filter });
 
       // The union arm's exact fields (including the 'type' discriminant) must reach our
@@ -114,7 +112,6 @@ describe('web-fetch extension', () => {
     await init(pi.api, {
       adapter: createAdapter(),
       executeWebFetchTool: vi.fn(async () => toolResult),
-      createBuiltInRenderer: noBuiltInRenderer,
     });
 
     expect(await pi.latestTool()?.execute('call-1', { url: 'https://example.com/page' })).toBe(toolResult);
@@ -122,89 +119,69 @@ describe('web-fetch extension', () => {
 });
 
 describe('web-fetch renderers', () => {
-  it('registers the tool at load without rendering, and leaves it alone when no renderer exists', async () => {
-    const pi = createPi();
+  interface Schema {
+    readonly properties: Record<string, { readonly enum?: readonly string[]; readonly description?: string }>;
+  }
 
-    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
+  async function start(rendererIds: readonly string[], executeWebFetchTool = vi.fn(async () => okResult())) {
+    const pi = createPi();
+    const registered = rendererIds.map(createRenderer);
+
+    await init(pi.api, { adapter: createAdapter(), executeWebFetchTool });
     pi.fire('session_start');
+    for (const renderer of registered) pi.emit(WEB_FETCH_RENDERER_CHANNEL, renderer);
     pi.fire('before_agent_start');
+
+    return { pi, registered, executeWebFetchTool, schema: () => pi.latestTool()?.parameters as Schema };
+  }
+
+  it('registers the tool at load without rendering, and leaves it alone when no renderer is registered', async () => {
+    const { pi, schema } = await start([]);
 
     expect(pi.registerTool).toHaveBeenCalledTimes(1);
-    expect(JSON.stringify(pi.latestTool()?.parameters)).not.toContain('"render"');
+    expect(Object.keys(schema().properties)).toEqual(['url', 'followLinks', 'filter']);
   });
 
-  it('offers rendering from the first run when an extension registers a renderer', async () => {
-    const executeWebFetchTool = vi.fn(async () => okResult());
-    const renderer = createRenderer('obscura');
-    const pi = createPi();
-
-    await init(pi.api, { adapter: createAdapter(), executeWebFetchTool, createBuiltInRenderer: noBuiltInRenderer });
-    pi.fire('session_start');
-    pi.emit(WEB_FETCH_RENDERER_CHANNEL, renderer);
-    pi.fire('before_agent_start');
-    await pi.latestTool()?.execute('call-1', { url: 'https://example.com/app', render: true });
+  it('adds only the render switch when one renderer is registered', async () => {
+    const { pi, schema } = await start(['lightpanda']);
 
     expect(pi.registerTool).toHaveBeenCalledTimes(2);
-    expect(JSON.stringify(pi.latestTool()?.parameters)).toContain('"render"');
+    expect(Object.keys(schema().properties)).toEqual(['url', 'followLinks', 'filter', 'render']);
+  });
+
+  it('adds the render switch and a choice of renderer when several are registered', async () => {
+    const { pi, schema } = await start(['obscura', 'lightpanda']);
+
+    expect(pi.registerTool).toHaveBeenCalledTimes(2);
+    expect(Object.keys(schema().properties)).toEqual(['url', 'followLinks', 'filter', 'render', 'renderer']);
+    expect(schema().properties.renderer?.enum).toEqual(['lightpanda', 'obscura']);
+    expect(schema().properties.renderer?.description).toContain('Defaults to lightpanda');
+  });
+
+  it('hands the tool operation one adapter per renderer, in id order', async () => {
+    const { pi, registered, executeWebFetchTool } = await start(['obscura', 'lightpanda']);
+
+    await pi.latestTool()?.execute('call-1', { url: 'https://example.com/app', renderer: 'obscura' });
     const [, , dependencies] = executeWebFetchTool.mock.calls[0] as unknown as [
       unknown,
       unknown,
-      { renderAdapter?: FetchAdapter },
+      { renderAdapters: ReadonlyMap<string, FetchAdapter> },
     ];
-    expect(dependencies.renderAdapter).toBeInstanceOf(RendererFetchAdapter);
-    await dependencies.renderAdapter?.fetch('https://example.com/app');
-    expect(renderer.render).toHaveBeenCalledTimes(1);
+    await dependencies.renderAdapters.get('obscura')?.fetch('https://example.com/app');
+
+    expect([...dependencies.renderAdapters.keys()]).toEqual(['lightpanda', 'obscura']);
+    expect(dependencies.renderAdapters.get('obscura')).toBeInstanceOf(RendererFetchAdapter);
+    expect(registered[0]?.render).toHaveBeenCalledTimes(1);
+    expect(registered[1]?.render).not.toHaveBeenCalled();
   });
 
-  it('uses the built-in renderer when no extension registers one', async () => {
-    const builtIn = createRenderer('lightpanda');
-    const pi = createPi();
+  it('settles the renderers on the first run and does not register the tool again', async () => {
+    const { pi, schema } = await start(['lightpanda']);
 
-    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: () => builtIn });
-    pi.fire('session_start');
-    pi.fire('before_agent_start');
-
-    expect(pi.registerTool).toHaveBeenCalledTimes(2);
-    expect(JSON.stringify(pi.latestTool()?.parameters)).toContain('"render"');
-  });
-
-  it('settles the renderer on the first run and does not register the tool again', async () => {
-    const pi = createPi();
-
-    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
-    pi.fire('session_start');
-    pi.fire('before_agent_start');
     pi.emit(WEB_FETCH_RENDERER_CHANNEL, createRenderer('late'));
     pi.fire('before_agent_start');
 
-    expect(pi.registerTool).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses the renderer the environment names', async () => {
-    const executeWebFetchTool = vi.fn(async () => okResult());
-    const first = createRenderer('first');
-    const second = createRenderer('second');
-    const pi = createPi();
-
-    await init(pi.api, {
-      adapter: createAdapter(),
-      executeWebFetchTool,
-      createBuiltInRenderer: noBuiltInRenderer,
-      env: { SANDPIPER_WEB_FETCH_RENDERER: 'second' },
-    });
-    pi.fire('session_start');
-    pi.emit(WEB_FETCH_RENDERER_CHANNEL, first);
-    pi.emit(WEB_FETCH_RENDERER_CHANNEL, second);
-    pi.fire('before_agent_start');
-    await pi.latestTool()?.execute('call-1', { url: 'https://example.com/app', render: true });
-    const [, , dependencies] = executeWebFetchTool.mock.calls[0] as unknown as [
-      unknown,
-      unknown,
-      { renderAdapter?: FetchAdapter },
-    ];
-    await dependencies.renderAdapter?.fetch('https://example.com/app');
-
-    expect(second.render).toHaveBeenCalledTimes(1);
-    expect(first.render).not.toHaveBeenCalled();
+    expect(pi.registerTool).toHaveBeenCalledTimes(2);
+    expect(Object.keys(schema().properties)).not.toContain('renderer');
   });
 });

@@ -3,16 +3,11 @@
  * Thin glue layer — delegates all logic to framework-independent modules.
  */
 
+import { StringEnum } from '@earendil-works/pi-ai';
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
 import { SimpleFetchAdapter } from './fetch.js';
-import { createLightpandaRenderer } from './lightpanda-renderer.js';
-import {
-  RendererCollector,
-  RendererFetchAdapter,
-  WEB_FETCH_RENDERER_CHANNEL,
-  type WebFetchRenderer,
-} from './render.js';
+import { RendererCollector, RendererFetchAdapter, WEB_FETCH_RENDERER_CHANNEL } from './render.js';
 import { executeWebFetchTool as defaultExecuteWebFetchTool, type WebFetchToolDetails } from './tool-operation.js';
 import { renderWebFetchCall, renderWebFetchResult } from './tool-rendering.js';
 import { type FetchAdapter, WebFetchFilterType } from './types.js';
@@ -20,16 +15,14 @@ import { type FetchAdapter, WebFetchFilterType } from './types.js';
 interface WebFetchExtensionDependencies {
   readonly adapter?: FetchAdapter;
   readonly executeWebFetchTool?: typeof defaultExecuteWebFetchTool;
-  readonly createBuiltInRenderer?: (env: NodeJS.ProcessEnv) => WebFetchRenderer | undefined;
-  readonly env?: NodeJS.ProcessEnv;
 }
 
 export default async function init(pi: ExtensionAPI, dependencies: WebFetchExtensionDependencies = {}) {
   const adapter = dependencies.adapter ?? new SimpleFetchAdapter();
   const executeWebFetchTool = dependencies.executeWebFetchTool ?? defaultExecuteWebFetchTool;
-  const env = dependencies.env ?? process.env;
-  const renderers = new RendererCollector((dependencies.createBuiltInRenderer ?? createLightpandaRenderer)(env));
-  let renderAdapter: FetchAdapter | undefined;
+  const renderers = new RendererCollector();
+  // One adapter per registered renderer, in id order. Empty until the first run settles them.
+  let renderAdapters: ReadonlyMap<string, FetchAdapter> = new Map();
   let renderersSettled = false;
   let stopCollecting: (() => void) | undefined;
 
@@ -73,6 +66,26 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
     }),
   );
 
+  // The schema offers only what can run: no rendering without a renderer, and a choice of
+  // renderer only when there is more than one.
+  const toolParameters = () => {
+    const ids = [...renderAdapters.keys()];
+    if (ids.length === 0) return Type.Object(pageParameters);
+    if (ids.length === 1) return Type.Object({ ...pageParameters, render: renderParameter });
+
+    return Type.Object({
+      ...pageParameters,
+      render: renderParameter,
+      renderer: Type.Optional(
+        StringEnum(ids, {
+          description:
+            `Headless browser to render with. Defaults to ${ids[0]}. ` +
+            'Name another one when a render fails or reports that the site blocked it',
+        }),
+      ),
+    });
+  };
+
   const registerTool = (): void => {
     pi.registerTool({
       name: 'web_fetch',
@@ -87,12 +100,9 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
         'Returns structured metadata (title, excerpt, byline) plus the page ' +
         'content converted to token-efficient markdown.',
       promptSnippet: 'Fetch a web page and return clean markdown content',
-      // Rendering is offered only when a renderer is available, so the model never asks for what cannot run.
-      parameters: renderAdapter
-        ? Type.Object({ ...pageParameters, render: renderParameter })
-        : Type.Object(pageParameters),
+      parameters: toolParameters(),
       async execute(_toolCallId, params): Promise<AgentToolResult<WebFetchToolDetails>> {
-        return executeWebFetchTool(adapter, params, { renderAdapter });
+        return executeWebFetchTool(adapter, params, { renderAdapters });
       },
       renderCall: renderWebFetchCall,
       renderResult: renderWebFetchResult,
@@ -114,9 +124,9 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
     stopCollecting?.();
     stopCollecting = undefined;
 
-    const renderer = renderers.select(env);
-    if (!renderer) return;
-    renderAdapter = new RendererFetchAdapter(renderer);
+    const registered = renderers.renderers();
+    if (registered.length === 0) return;
+    renderAdapters = new Map(registered.map((renderer) => [renderer.id, new RendererFetchAdapter(renderer)]));
     registerTool();
   });
 

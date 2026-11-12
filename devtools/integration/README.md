@@ -117,10 +117,11 @@ threat that isn't real.
 
 ## Renderer coverage (WEB-10)
 
-- [`web-fetch-render.integration.test.ts`](./web-fetch-render.integration.test.ts) — a renderer that
-  [`fixtures/renderer-fixture.ts`](./fixtures/renderer-fixture.ts) registers on the event bus reaches
-  `web_fetch` in a real session. It also checks what the model is sent: the first request declares
-  `web_fetch` with its `render` parameter, and no later request carries a prompt or tool change.
+- [`web-fetch-render.integration.test.ts`](./web-fetch-render.integration.test.ts) — two renderers that
+  [`fixtures/renderer-fixture.ts`](./fixtures/renderer-fixture.ts) registers on the event bus reach
+  `web_fetch` in a real session, and a call that names one is served by it. It also checks what the
+  model is sent: the first request declares `web_fetch` with its `render` and `renderer` parameters,
+  and no later request carries a prompt or tool change.
 
 ## Recording requests
 

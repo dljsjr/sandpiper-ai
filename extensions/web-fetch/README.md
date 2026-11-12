@@ -11,12 +11,13 @@ A Pi extension that adds a `web_fetch` tool. It fetches one web page and returns
 
 ## Parameters
 
-| Parameter     | Type    | Required | Description                                                                          |
-| ------------- | ------- | -------- | ------------------------------------------------------------------------------------ |
-| `url`         | string  | yes      | The page to fetch                                                                    |
-| `followLinks` | boolean | no       | Also return the links found in the content                                           |
-| `filter`      | object  | no       | Return one part of the page: a CSS selector or a Markdown section                    |
-| `render`      | boolean | no       | Load the page in a headless browser first. Present only when a renderer is available |
+| Parameter     | Type    | Required | Description                                                                           |
+| ------------- | ------- | -------- | ------------------------------------------------------------------------------------- |
+| `url`         | string  | yes      | The page to fetch                                                                     |
+| `followLinks` | boolean | no       | Also return the links found in the content                                            |
+| `filter`      | object  | no       | Return one part of the page: a CSS selector or a Markdown section                     |
+| `render`      | boolean | no       | Load the page in a headless browser first. Present only when a renderer is registered |
+| `renderer`    | string  | no       | Id of the renderer to use. Present only when two or more are registered               |
 
 ### Filters
 
@@ -31,21 +32,30 @@ A heading matches when its text equals the requested text. When no heading is an
 
 Some pages build their content with JavaScript, and a normal fetch returns an empty shell or loading placeholders. With `render: true`, `web_fetch` loads the page in a headless browser and reads the result.
 
-A renderer is the code that drives one browser. `web_fetch` has a built-in renderer for [Lightpanda](https://lightpanda.io/), which is available when `lightpanda` is on `PATH`. An extension can register a renderer for another browser. The `render` parameter is offered only when a renderer is available.
+A renderer is the code that drives one browser. `web_fetch` has no renderer of its own: extensions register them. Sandpiper bundles two, and each registers only when its browser is on `PATH`:
+
+| Renderer id  | Browser                              | Reports                                                             |
+| ------------ | ------------------------------------ | ------------------------------------------------------------------- |
+| `lightpanda` | [Lightpanda](https://lightpanda.io/) | Final URL, status, headers, and bot challenges                      |
+| `obscura`    | Obscura                              | Cloudflare challenges. The browser prints no URL, status or headers |
 
 Rendering is slower than a normal fetch, and sites that challenge automated browsers can refuse it. A page that reads correctly without rendering should be fetched without it.
 
-### Which renderer is used
+### What the tool offers
 
-One renderer serves a session. It is chosen when the first run starts:
+The tool's parameters follow the renderers that are registered when the first run of a session starts:
 
-1. The renderer whose id `SANDPIPER_WEB_FETCH_RENDERER` names. When no renderer has that id, rendering is off.
-2. Otherwise the first renderer an extension registered.
-3. Otherwise the built-in Lightpanda renderer, with the id `lightpanda`.
+| Registered renderers | Parameters added                             |
+| -------------------- | -------------------------------------------- |
+| None                 | None. Rendering is not offered               |
+| One                  | `render`                                     |
+| Two or more          | `render`, and `renderer` to choose one by id |
+
+With `render: true` and no `renderer`, the first renderer in id order is used, and the `renderer` description names it. Naming a `renderer` also requests rendering. There is no setting that picks a renderer: the caller chooses for each fetch, which lets it try another browser when one is blocked.
 
 ### Adding a renderer
 
-An extension registers a renderer by emitting it on the `sandpiper:web-fetch-renderer` event bus channel during `resources_discover`. This example drives the Obscura browser:
+An extension registers a renderer by emitting it on the `sandpiper:web-fetch-renderer` event bus channel during `resources_discover`. The bundled renderers use the same channel. This example drives a browser command named `mybrowser`:
 
 ```typescript
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -53,19 +63,14 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 export default function (pi: ExtensionAPI) {
   pi.on("resources_discover", () => {
     pi.events.emit("sandpiper:web-fetch-renderer", {
-      id: "obscura",
+      id: "mybrowser",
       async render(request, tools) {
-        const { stdout, stderr, exitCode } = await tools.run("obscura", [
-          "fetch",
-          "--dump",
-          "html",
-          "--quiet",
-          "--wait-until",
-          "networkidle",
+        const { stdout, stderr, exitCode } = await tools.run("mybrowser", [
+          "--print-html",
           request.url,
         ]);
         if (exitCode !== 0) throw new Error(stderr.trim());
-        if (stdout.includes("Performing security verification")) {
+        if (stdout.includes("Checking your browser")) {
           return { html: "", blocked: "bot challenge" };
         }
         return { html: stdout };
@@ -75,7 +80,7 @@ export default function (pi: ExtensionAPI) {
 }
 ```
 
-Register only when the browser is installed, because a registered renderer outranks the built-in one.
+Register only when the browser is installed. A registered renderer is offered to the model, and one that cannot run fails every call that uses it.
 
 #### The registration
 
@@ -120,6 +125,7 @@ A renderer reports a failure by throwing an error. `web_fetch` reports a thrown 
 The pipeline is framework-independent; only `src/index.ts` imports Pi.
 
 - **`FetchAdapter`** is the interface for getting a page. `SimpleFetchAdapter` uses the Fetch API. `RendererFetchAdapter` calls the session's renderer.
-- `src/render.ts` holds the renderer contract, the collector that picks a renderer, and the command runner. `src/lightpanda-renderer.ts` is the built-in renderer.
+- `src/render.ts` holds the renderer contract, the collector, and the command runner.
+- `src/lightpanda-renderer.ts` and `src/obscura-renderer.ts` are the bundled renderers. `src/renderer-extensions.ts` wraps each one in an extension that registers it.
 - `src/pipeline.ts` turns a fetched page into Markdown and applies filters.
 - `src/llms-txt.ts` and `src/link-relations.ts` find a site's `llms.txt` and a page's Markdown version.

@@ -11,6 +11,10 @@ import {
 } from '../../extensions/system/extension-factories.js';
 import tattlerExtension from '../../extensions/tattler/index.js';
 import webFetchExtension from '../../extensions/web-fetch/src/index.js';
+import {
+  lightpandaRendererExtension,
+  obscuraRendererExtension,
+} from '../../extensions/web-fetch/src/renderer-extensions.js';
 import webSearchExtension from '../../extensions/web-search/src/index.js';
 import { temporaryTrailSkillPaths } from './temporary_trail_skill.js';
 
@@ -31,6 +35,8 @@ export function createNeutralCapabilityExtensionFactories(): readonly InlineExte
     inlineExtension('context-management', createContextManagementExtension()),
     inlineExtension('background-process', createBackgroundProcessExtension()),
     inlineExtension('web-fetch', webFetchExtension),
+    inlineExtension('web-fetch-lightpanda', lightpandaRendererExtension),
+    inlineExtension('web-fetch-obscura', obscuraRendererExtension),
     inlineExtension('web-search', webSearchExtension),
     inlineExtension('autotoon', autotoonExtension),
     inlineExtension('tattler', tattlerExtension),

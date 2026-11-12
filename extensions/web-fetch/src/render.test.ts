@@ -4,7 +4,6 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   findExecutable,
-  RENDERER_ENV,
   RendererCollector,
   RendererFetchAdapter,
   type RenderResult,
@@ -86,46 +85,27 @@ describe('runCommand', () => {
 });
 
 describe('RendererCollector', () => {
-  it('uses the built-in renderer when no other is registered', () => {
-    const builtIn = renderer('lightpanda');
-
-    expect(new RendererCollector(builtIn).select({})).toBe(builtIn);
-    expect(new RendererCollector(undefined).select({})).toBeUndefined();
-  });
-
-  it('prefers a registered renderer over the built-in one, and the first registered over later ones', () => {
-    const collector = new RendererCollector(renderer('lightpanda'));
-    const first = renderer('obscura');
-    collector.add(first);
-    collector.add(renderer('other'));
-
-    expect(collector.select({})?.id).toBe('obscura');
-  });
-
-  it('selects the renderer the environment names', () => {
-    const builtIn = renderer('lightpanda');
-    const collector = new RendererCollector(builtIn);
+  it('lists the registered renderers in id order, whatever order they arrived in', () => {
+    const collector = new RendererCollector();
     collector.add(renderer('obscura'));
-    collector.add(renderer('other'));
+    collector.add(renderer('lightpanda'));
+    collector.add(renderer('another'));
 
-    expect(collector.select({ [RENDERER_ENV]: ' other ' })?.id).toBe('other');
-    expect(collector.select({ [RENDERER_ENV]: 'lightpanda' })).toBe(builtIn);
+    expect(collector.renderers().map((entry) => entry.id)).toEqual(['another', 'lightpanda', 'obscura']);
   });
 
-  it('selects nothing when the named renderer is not registered', () => {
-    const collector = new RendererCollector(renderer('lightpanda'));
-
-    expect(collector.select({ [RENDERER_ENV]: 'missing' })).toBeUndefined();
+  it('lists nothing when no renderer is registered', () => {
+    expect(new RendererCollector().renderers()).toEqual([]);
   });
 
   it('keeps the first renderer registered under an id and acknowledges only that one', () => {
-    const collector = new RendererCollector(undefined);
+    const collector = new RendererCollector();
     const first = { ...renderer('obscura'), acknowledge: vi.fn() };
     const second = { ...renderer(' obscura '), acknowledge: vi.fn() };
     collector.add(first);
     collector.add(second);
 
-    expect(collector.select({})?.render).toBe(first.render);
+    expect(collector.renderers().map((entry) => entry.render)).toEqual([first.render]);
     expect(first.acknowledge).toHaveBeenCalledTimes(1);
     expect(second.acknowledge).not.toHaveBeenCalled();
   });
@@ -137,10 +117,10 @@ describe('RendererCollector', () => {
     { id: '', render: () => undefined },
     { id: 'x', render: 'not a function' },
   ])('ignores a registration that is not a renderer: %j', (value) => {
-    const collector = new RendererCollector(undefined);
+    const collector = new RendererCollector();
     collector.add(value);
 
-    expect(collector.select({})).toBeUndefined();
+    expect(collector.renderers()).toEqual([]);
   });
 });
 

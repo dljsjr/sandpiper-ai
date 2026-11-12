@@ -11,7 +11,10 @@ export interface WebFetchToolInput {
   readonly url: string;
   readonly followLinks?: boolean;
   readonly filter?: WebFetchFilterSpec;
+  /** Load the page in a headless browser. */
   readonly render?: boolean;
+  /** Id of the renderer to use. Naming one requests rendering. */
+  readonly renderer?: string;
 }
 
 // Mirrors Pi's text content item shape without importing Pi SDK types into the operation layer.
@@ -35,8 +38,8 @@ export interface WebFetchToolResult {
 
 export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
-  /** Adapter that loads pages in a headless browser. Absent when no renderer is available. */
-  readonly renderAdapter?: FetchAdapter;
+  /** Adapters that load pages in a headless browser, by renderer id. The first one is the default. */
+  readonly renderAdapters?: ReadonlyMap<string, FetchAdapter>;
 }
 
 const LLMS_TXT_INSTRUCTIONS =
@@ -84,16 +87,23 @@ export function formatWebFetchResult(result: WebFetchResult): string {
   return output;
 }
 
+function wantsRendering(input: WebFetchToolInput): boolean {
+  return input.render === true || input.renderer !== undefined;
+}
+
 function selectAdapter(
   adapter: FetchAdapter,
   input: WebFetchToolInput,
   dependencies: WebFetchToolDependencies,
 ): FetchAdapter {
-  if (!input.render) return adapter;
-  if (!dependencies.renderAdapter) {
-    throw new Error('rendering is not available because no renderer is loaded');
-  }
-  return dependencies.renderAdapter;
+  if (!wantsRendering(input)) return adapter;
+
+  const renderAdapters = dependencies.renderAdapters ?? new Map<string, FetchAdapter>();
+  const selected =
+    input.renderer === undefined ? renderAdapters.values().next().value : renderAdapters.get(input.renderer);
+  if (selected) return selected;
+  if (renderAdapters.size === 0) throw new Error('rendering is not available because no renderer is loaded');
+  throw new Error(`renderer "${input.renderer}" is not loaded. Loaded: ${[...renderAdapters.keys()].join(', ')}`);
 }
 
 export async function executeWebFetchTool(
@@ -107,7 +117,7 @@ export async function executeWebFetchTool(
     const result = await fetchAndExtract(selectAdapter(adapter, input, dependencies), input.url, {
       filter: input.filter,
       followLinks: input.followLinks,
-      ...(input.render ? { render: true } : {}),
+      ...(wantsRendering(input) ? { render: true } : {}),
     });
 
     return {
