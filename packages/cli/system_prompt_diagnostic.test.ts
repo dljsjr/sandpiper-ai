@@ -193,12 +193,14 @@ describe('system prompt diagnostic', () => {
     const userProfile = join(agentDir, 'USER.md');
     const contextFile = join(agentDir, 'AGENTS.md');
     const identityFile = join(tempDir, 'identity.md');
+    const appendFile = join(tempDir, 'append.md');
     const userProfileContent = '# Diagnostic user\r\nPrefers <clear> & "direct" answers\n';
     mkdirSync(agentDir, { recursive: true });
     mkdirSync(join(tempDir, 'home'), { recursive: true });
     writeFileSync(userProfile, userProfileContent);
     writeFileSync(contextFile, '# Diagnostic <context>\n');
     writeFileSync(identityFile, '<identity>from file</identity>\n');
+    writeFileSync(appendFile, '<diagnostic_append>from file</diagnostic_append>\n');
 
     try {
       const output = execFileSync(
@@ -211,6 +213,10 @@ describe('system prompt diagnostic', () => {
           '--approve',
           '--identity',
           identityFile,
+          '--append-system-prompt',
+          '<diagnostic_append>raw text</diagnostic_append>',
+          '--append-system-prompt',
+          appendFile,
         ],
         {
           cwd: repoRoot,
@@ -237,6 +243,7 @@ describe('system prompt diagnostic', () => {
       expect(paths).not.toContain(join(templateDir, 'identity.md'));
       expect(paths).toContain(realpathSync(identityFile));
       expect(paths).toContain(realpathSync(contextFile));
+      expect(paths).toContain(realpathSync(appendFile));
       expect(result.editableSpans.filter((span) => span.path === realpathSync(userProfile))).toEqual([
         expect.objectContaining({ sourceStart: 0, sourceEnd: userProfileContent.length }),
       ]);

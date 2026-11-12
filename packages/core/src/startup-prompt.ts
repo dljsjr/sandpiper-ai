@@ -1,6 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import type { RenderedText } from './prompt-template.js';
-import { buildSandpiperSystemPrompt, type SystemPromptTemplates } from './system-prompt.js';
+import {
+  buildSandpiperSystemPrompt,
+  type SandpiperAppendSystemPromptPart,
+  type SystemPromptTemplates,
+} from './system-prompt.js';
 import { getSandpiperUserProfilePath, readSandpiperUserProfile } from './user-profile.js';
 import { detectVersionControl, type SandpiperVersionControlContext } from './version-control.js';
 
@@ -20,6 +24,7 @@ export interface StartupPromptInput {
   readonly identityContent?: string;
   /** The file `identityContent` was read from. */
   readonly identityPath?: string;
+  readonly appendSystemPromptParts?: readonly SandpiperAppendSystemPromptPart[];
   readonly templates?: SystemPromptTemplates;
   readonly versionControl?: SandpiperVersionControlContext;
   readonly userProfile?: string;
@@ -74,6 +79,7 @@ export async function buildSandpiperStartupPrompt(
       userProfilePath: input.agentDir ? getSandpiperUserProfilePath(input.agentDir) : undefined,
       identityOverride: input.identityContent,
       identityPath: input.identityPath,
+      appendSystemPromptParts: input.appendSystemPromptParts,
       templates: input.templates,
       sessionStartDate: input.sessionStartDate,
       dumpSystemPrompt: input.dumpSystemPrompt,

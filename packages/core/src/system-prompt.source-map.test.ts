@@ -128,6 +128,34 @@ describe('system prompt source map', () => {
     expect(raw.spans.some((span) => span.path === identityPath)).toBe(false);
   });
 
+  it('maps appended prompt parts read from files when they reproduce the appended text', async () => {
+    const appendPath = join(root, 'APPEND_SYSTEM.md');
+    writeFileSync(appendPath, 'From file\n');
+    const appendSystemPromptParts = [{ content: 'From file\n', path: appendPath }, { content: '<raw>text</raw>' }];
+
+    const mapped = await buildSandpiperSystemPrompt(
+      { ...RENDER_DEFAULTS, appendSystemPromptParts },
+      { appendSystemPrompt: 'From file\n\n\n<raw>text</raw>' },
+    );
+    const mismatched = await buildSandpiperSystemPrompt(
+      { ...RENDER_DEFAULTS, appendSystemPromptParts },
+      { appendSystemPrompt: 'Something else' },
+    );
+
+    const start = mapped.text.indexOf('<content>From file') + '<content>'.length;
+    expect(mapped.text).toContain('<content>From file\n\n\n<raw>text</raw></content>');
+    expect(verifyEditableSpans(mapped.text, mapped.spans)).toContainEqual({
+      start,
+      end: start + 'From file\n'.length,
+      path: appendPath,
+      sourceStart: 0,
+      sourceEnd: 'From file\n'.length,
+      codec: 'direct',
+    });
+    expect(mismatched.text).toContain('<content>Something else</content>');
+    expect(mismatched.spans.some((span) => span.path === appendPath)).toBe(false);
+  });
+
   it('renders templates read from the given directory', async () => {
     const templateDir = join(root, 'templates');
     cpSync(dirname(loadSystemPromptTemplates().system_prompt.path), templateDir, { recursive: true });

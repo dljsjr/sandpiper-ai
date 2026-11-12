@@ -54,6 +54,13 @@ export interface SandpiperBaseSystemPromptOptions {
   readonly skills?: readonly SandpiperPromptSkill[];
 }
 
+/** One source of Pi's appended system prompt. Pi joins the sources with a blank line. */
+export interface SandpiperAppendSystemPromptPart {
+  readonly content: string;
+  /** The file `content` was read from; absent for text given directly. */
+  readonly path?: string;
+}
+
 export interface SandpiperSystemPromptOptions {
   readonly piCodingAgentPackage?: string;
   readonly piCodingAgentVersion?: string;
@@ -66,6 +73,8 @@ export interface SandpiperSystemPromptOptions {
   readonly identityOverride?: string;
   /** The file `identityOverride` was read from. */
   readonly identityPath?: string;
+  /** The sources of `appendSystemPrompt`, when known. Pi gives extensions only the joined text. */
+  readonly appendSystemPromptParts?: readonly SandpiperAppendSystemPromptPart[];
   readonly sessionStartDate?: string;
   readonly dumpSystemPrompt?: boolean;
   /** Defaults to the templates shipped in packages/core/system-prompt/, read on each call. */
@@ -246,8 +255,16 @@ function hasAppendedPrompt({ promptOptions }: SystemPromptInput): boolean {
   return Boolean(promptOptions.appendSystemPrompt);
 }
 
-function appendedPromptData({ promptOptions }: SystemPromptInput): TemplateData {
-  return { content: promptOptions.appendSystemPrompt ?? '' };
+function appendedPromptData({ options, promptOptions }: SystemPromptInput): TemplateData {
+  const content = promptOptions.appendSystemPrompt ?? '';
+  const parts = options.appendSystemPromptParts ?? [];
+  if (parts.map((part) => part.content).join('\n\n') !== content) return { content };
+  return {
+    content: joinRendered(
+      parts.map((part) => (part.path ? sourcedText(part.content, part.path) : part.content)),
+      '\n\n',
+    ),
+  };
 }
 
 async function dumpSystemPromptParts(parts: Readonly<Record<string, TemplateValue>>, prompt: string): Promise<void> {

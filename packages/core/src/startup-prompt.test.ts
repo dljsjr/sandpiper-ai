@@ -96,7 +96,7 @@ describe('startup prompt operations', () => {
     expect(prompt?.text).toContain('"userProfile":"# User\\nLikes plans"');
   });
 
-  it('passes the identity file and the session templates into system prompt construction', async () => {
+  it('passes the identity file, appended prompt parts, and session templates into system prompt construction', async () => {
     const templates = loadSystemPromptTemplates();
     const dependencies = createDependencies();
 
@@ -106,6 +106,7 @@ describe('startup prompt operations', () => {
         systemPromptOptions: { cwd: '/repo' },
         identityContent: '<identity>from file</identity>',
         identityPath: '/identity.md',
+        appendSystemPromptParts: [{ content: 'appended', path: '/append.md' }],
         templates,
       },
       dependencies,
@@ -115,6 +116,7 @@ describe('startup prompt operations', () => {
       expect.objectContaining({
         identityOverride: '<identity>from file</identity>',
         identityPath: '/identity.md',
+        appendSystemPromptParts: [{ content: 'appended', path: '/append.md' }],
         userProfilePath: undefined,
         templates,
       }),

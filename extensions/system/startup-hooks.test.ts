@@ -299,6 +299,22 @@ describe('startup hooks', () => {
     expect(event.systemPromptOptions.customPrompt).toBe('<header/>\n\n<system_prompt>sandpiper</system_prompt>');
   });
 
+  it("passes the diagnostic's appended prompt parts into prompt construction", async () => {
+    const parts = [{ content: 'appended', path: '/append.md' }];
+    const { pi, handlers, sessionEntries } = createStartupPromptHookStub();
+    registerStartupPromptHooks(pi, undefined, {
+      commandName: '__sandpiper-system-prompt',
+      onPrompt: vi.fn(),
+      appendSystemPromptParts: () => parts,
+    });
+
+    await handlers.get('before_agent_start')?.(beforeAgentStartEvent(), createPromptSessionContext(sessionEntries));
+
+    expect(mockBuildSandpiperStartupPrompt).toHaveBeenCalledWith(
+      expect.objectContaining({ appendSystemPromptParts: parts }),
+    );
+  });
+
   it('dedupes prompt contributions by id and preserves prepend/append phases', async () => {
     mockBuildSandpiperStartupPrompt.mockResolvedValueOnce(rendered('<system_prompt>sandpiper</system_prompt>'));
 

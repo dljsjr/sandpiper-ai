@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   type Api,
@@ -19,10 +20,12 @@ import {
   ModelRuntime,
   ProjectTrustStore,
   parseArgs,
+  type ResourceLoader,
   SessionManager,
   SettingsManager,
 } from '@earendil-works/pi-coding-agent';
 import { type EditableSpan, type RenderedText, verifyEditableSpans } from '../core/src/prompt-template.js';
+import type { SandpiperAppendSystemPromptPart } from '../core/src/system-prompt.js';
 import { createSandpiperExtensionFactories } from './sandpiper_resources.js';
 
 const DIAGNOSTIC_COMMAND = '__sandpiper-system-prompt';
@@ -60,6 +63,27 @@ function resolveProjectTrust(cwd: string, agentDir: string, override: boolean | 
 function editableSpans(prompt: string, preamble: RenderedText | undefined): EditableSpan[] {
   if (preamble === undefined || !prompt.startsWith(preamble.text)) return [];
   return verifyEditableSpans(prompt, preamble.spans);
+}
+
+function readTextFile(path: string): string | undefined {
+  try {
+    return readFileSync(path, 'utf-8');
+  } catch {
+    return undefined;
+  }
+}
+
+// Pi reads an appended prompt source that names a file and keeps any other source as text, in
+// order. Pair each file's content with its path; a file Pi changed while reading (a BOM) stays text.
+function appendSystemPromptParts(resourceLoader: ResourceLoader | undefined): SandpiperAppendSystemPromptPart[] {
+  if (resourceLoader === undefined) return [];
+  const paths = resourceLoader.getAppendSystemPromptSources().map(({ path }) => path);
+  return resourceLoader.getAppendSystemPrompt().map((content) => {
+    const path = paths[0];
+    if (path === undefined || readTextFile(path) !== content) return { content };
+    paths.shift();
+    return { content, path };
+  });
 }
 
 function emptyReply(model: Model<Api>): AssistantMessage {
@@ -149,6 +173,7 @@ export async function renderSystemPrompt(
   let renderedPrompt: string | undefined;
   let preamble: RenderedText | undefined;
   let identitySource: string | undefined;
+  let sessionResources: ResourceLoader | undefined;
   const extensionFactories = [
     ...createSandpiperExtensionFactories({
       systemPromptDiagnostic: {
@@ -159,6 +184,7 @@ export async function renderSystemPrompt(
         onPreamble: (rendered) => {
           preamble = rendered;
         },
+        appendSystemPromptParts: () => appendSystemPromptParts(sessionResources),
       },
     }),
     createPromptCaptureExtension((prompt) => {
@@ -193,6 +219,7 @@ export async function renderSystemPrompt(
         extensionFactories,
       },
     });
+    sessionResources = services.resourceLoader;
     const created = await createAgentSessionFromServices({
       services,
       sessionManager,

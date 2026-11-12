@@ -16,6 +16,7 @@ import { buildSandpiperStartupPrompt } from '../../packages/core/src/startup-pro
 import {
   formatLocalDate,
   loadSystemPromptTemplates,
+  type SandpiperAppendSystemPromptPart,
   type SystemPromptTemplates,
 } from '../../packages/core/src/system-prompt.js';
 import { readSandpiperUserProfile } from '../../packages/core/src/user-profile.js';
@@ -71,6 +72,8 @@ export interface StartupPromptDiagnosticCommand {
   readonly onPrompt: (prompt: string, sources: StartupPromptDiagnosticSources) => void | Promise<void>;
   /** Receives the prompt Sandpiper gives Pi as its preamble, with its editable spans, on each run. */
   readonly onPreamble?: (preamble: RenderedText) => void;
+  /** The sources of Pi's appended system prompt, which extensions otherwise see only joined. */
+  readonly appendSystemPromptParts?: () => readonly SandpiperAppendSystemPromptPart[];
 }
 
 export function registerStartupPromptHooks(
@@ -156,6 +159,7 @@ export function registerStartupPromptHooks(
       systemPromptOptions,
       identityContent,
       identityPath: identitySource,
+      appendSystemPromptParts: diagnosticCommand?.appendSystemPromptParts?.(),
       templates,
       sessionStartDate,
       dumpSystemPrompt,
