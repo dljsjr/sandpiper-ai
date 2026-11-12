@@ -1,8 +1,16 @@
 import { chmodSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { RENDER_COMMAND_ENV, RenderingFetchAdapter, resolveRenderCommand } from './render.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  findExecutable,
+  RENDERER_ENV,
+  RendererCollector,
+  RendererFetchAdapter,
+  type RenderResult,
+  runCommand,
+  type WebFetchRenderer,
+} from './render.js';
 
 let dir: string;
 
@@ -13,6 +21,10 @@ function script(name: string, body: string, mode = 0o755): string {
   return path;
 }
 
+function renderer(id: string, result: Partial<RenderResult> = {}): WebFetchRenderer {
+  return { id, render: vi.fn(async () => ({ html: `<html><body>${id}</body></html>`, ...result })) };
+}
+
 beforeEach(() => {
   dir = mkdtempSync(join(tmpdir(), 'sp-render-'));
 });
@@ -21,130 +33,202 @@ afterEach(() => {
   rmSync(dir, { recursive: true, force: true });
 });
 
-describe('resolveRenderCommand', () => {
-  it('uses Lightpanda by default when it is on PATH', () => {
-    const lightpanda = script('lightpanda', 'exit 0');
-
-    const command = resolveRenderCommand({ PATH: dir });
-
-    expect(command?.executable).toBe(lightpanda);
-    expect(command?.args).toContain('{url}');
-    expect(command?.args.slice(0, 3)).toEqual(['fetch', '--dump', 'html']);
-  });
-
-  it('returns nothing when no browser is available', () => {
-    expect(resolveRenderCommand({ PATH: dir })).toBeUndefined();
-  });
-
-  it('ignores a file on PATH that is not executable', () => {
-    script('lightpanda', 'exit 0', 0o644);
-
-    expect(resolveRenderCommand({ PATH: dir })).toBeUndefined();
-  });
-
-  it('takes another browser command from the environment', () => {
-    const obscura = script('obscura', 'exit 0');
-
-    const command = resolveRenderCommand({
-      PATH: dir,
-      [RENDER_COMMAND_ENV]: '  obscura fetch --dump html   --quiet {url} ',
-    });
-
-    expect(command).toEqual({ executable: obscura, args: ['fetch', '--dump', 'html', '--quiet', '{url}'] });
-  });
-
-  it('puts the URL last when the command has no placeholder', () => {
+describe('findExecutable', () => {
+  it('finds an executable file on PATH and ignores one that is not executable', () => {
     const browser = script('browser', 'exit 0');
+    script('plain', 'exit 0', 0o644);
 
-    expect(resolveRenderCommand({ PATH: '', [RENDER_COMMAND_ENV]: `${browser} --html` })).toEqual({
-      executable: browser,
-      args: ['--html', '{url}'],
-    });
-  });
-
-  it('returns nothing when the configured browser does not exist, without falling back', () => {
-    script('lightpanda', 'exit 0');
-
-    expect(resolveRenderCommand({ PATH: dir, [RENDER_COMMAND_ENV]: 'no-such-browser {url}' })).toBeUndefined();
+    expect(findExecutable('browser', dir)).toBe(browser);
+    expect(findExecutable('plain', dir)).toBeUndefined();
+    expect(findExecutable('browser', '')).toBeUndefined();
+    expect(findExecutable(browser, '')).toBe(browser);
   });
 });
 
-describe('RenderingFetchAdapter', () => {
-  it('returns the HTML the browser prints', async () => {
-    const browser = script('browser', 'printf "<html><body><h1>Rendered</h1></body></html>"');
-    const adapter = new RenderingFetchAdapter({ executable: browser, args: ['{url}'] });
+describe('runCommand', () => {
+  it('passes each argument through unchanged, with no shell', async () => {
+    const marker = join(dir, 'marker');
+    const echo = script('echo-args', 'printf "%s|%s" "$#" "$2"');
 
-    expect(await adapter.fetch('https://example.com/page')).toEqual({
-      url: 'https://example.com/page',
+    const result = await runCommand(echo, ['--flag', `https://example.com/?a=1&b=$(touch ${marker});\`id\``], {
+      timeoutMs: 5_000,
+    });
+
+    expect(result).toEqual({
+      stdout: `2|https://example.com/?a=1&b=$(touch ${marker});\`id\``,
+      stderr: '',
+      exitCode: 0,
+    });
+    expect(existsSync(marker)).toBe(false);
+  });
+
+  it('returns the output and exit code of a command that fails, so the caller can read its report', async () => {
+    const failing = script('failing', 'printf "partial"; echo "cause" >&2; exit 3');
+
+    expect(await runCommand(failing, [], { timeoutMs: 5_000 })).toEqual({
+      stdout: 'partial',
+      stderr: 'cause\n',
+      exitCode: 3,
+    });
+  });
+
+  it('stops a command that runs past the time limit', async () => {
+    const slow = script('slow', 'exec sleep 10');
+    const started = Date.now();
+
+    await expect(runCommand(slow, [], { timeoutMs: 200 })).rejects.toThrow('no result after 200 ms');
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+
+  it('reports a command that cannot start', async () => {
+    await expect(runCommand(join(dir, 'missing'), [], { timeoutMs: 5_000 })).rejects.toThrow('could not start');
+  });
+});
+
+describe('RendererCollector', () => {
+  it('uses the built-in renderer when no other is registered', () => {
+    const builtIn = renderer('lightpanda');
+
+    expect(new RendererCollector(builtIn).select({})).toBe(builtIn);
+    expect(new RendererCollector(undefined).select({})).toBeUndefined();
+  });
+
+  it('prefers a registered renderer over the built-in one, and the first registered over later ones', () => {
+    const collector = new RendererCollector(renderer('lightpanda'));
+    const first = renderer('obscura');
+    collector.add(first);
+    collector.add(renderer('other'));
+
+    expect(collector.select({})?.id).toBe('obscura');
+  });
+
+  it('selects the renderer the environment names', () => {
+    const builtIn = renderer('lightpanda');
+    const collector = new RendererCollector(builtIn);
+    collector.add(renderer('obscura'));
+    collector.add(renderer('other'));
+
+    expect(collector.select({ [RENDERER_ENV]: ' other ' })?.id).toBe('other');
+    expect(collector.select({ [RENDERER_ENV]: 'lightpanda' })).toBe(builtIn);
+  });
+
+  it('selects nothing when the named renderer is not registered', () => {
+    const collector = new RendererCollector(renderer('lightpanda'));
+
+    expect(collector.select({ [RENDERER_ENV]: 'missing' })).toBeUndefined();
+  });
+
+  it('keeps the first renderer registered under an id and acknowledges only that one', () => {
+    const collector = new RendererCollector(undefined);
+    const first = { ...renderer('obscura'), acknowledge: vi.fn() };
+    const second = { ...renderer(' obscura '), acknowledge: vi.fn() };
+    collector.add(first);
+    collector.add(second);
+
+    expect(collector.select({})?.render).toBe(first.render);
+    expect(first.acknowledge).toHaveBeenCalledTimes(1);
+    expect(second.acknowledge).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    null,
+    'obscura',
+    { id: 'no-render' },
+    { id: '', render: () => undefined },
+    { id: 'x', render: 'not a function' },
+  ])('ignores a registration that is not a renderer: %j', (value) => {
+    const collector = new RendererCollector(undefined);
+    collector.add(value);
+
+    expect(collector.select({})).toBeUndefined();
+  });
+});
+
+describe('RendererFetchAdapter', () => {
+  it('gives the renderer a normalized URL, a time limit and a command runner', async () => {
+    const echo = script('echo-args', 'printf "<html><body>%s</body></html>" "$1"');
+    const spy = vi.fn();
+    const adapter = new RendererFetchAdapter(
+      {
+        id: 'echo',
+        render: async (request, tools) => {
+          spy(request);
+          return { html: (await tools.run(echo, [request.url])).stdout };
+        },
+      },
+      { timeoutMs: 4_000 },
+    );
+
+    const result = await adapter.fetch('HTTPS://Example.com/a b?q=1&r=2');
+
+    expect(spy).toHaveBeenCalledWith({ url: 'https://example.com/a%20b?q=1&r=2', timeoutMs: 4_000 });
+    expect(result).toEqual({
+      url: 'https://example.com/a%20b?q=1&r=2',
       statusCode: 200,
-      body: '<html><body><h1>Rendered</h1></body></html>',
+      body: '<html><body>https://example.com/a%20b?q=1&r=2</body></html>',
       contentType: 'text/html',
     });
   });
 
-  it('passes the URL as one argument that no shell reads', async () => {
-    const marker = join(dir, 'marker');
-    const browser = script('browser', 'printf "%s|%s" "$#" "$2"');
-    const adapter = new RenderingFetchAdapter({ executable: browser, args: ['--flag', '--url={url}'] });
+  it('uses the final URL, status, media type and Link header the renderer reports', async () => {
+    const adapter = new RendererFetchAdapter(
+      renderer('full', {
+        url: 'https://example.com/final',
+        statusCode: 404,
+        contentType: 'Text/HTML; charset=utf-8',
+        linkHeader: '</llms.txt>; rel="describedby"',
+      }),
+    );
 
-    const url = `https://example.com/search?q=one&page=2&x=$(touch%20${marker});\`id\``;
-
-    const result = await adapter.fetch(url);
-
-    expect(result.body).toBe(`2|--url=${new URL(url).toString()}`);
-    expect(result.body).toContain('q=one&page=2&x=$(touch');
-    expect(existsSync(marker)).toBe(false);
+    expect(await adapter.fetch('https://example.com/start')).toEqual({
+      url: 'https://example.com/final',
+      statusCode: 404,
+      body: '<html><body>full</body></html>',
+      contentType: 'text/html',
+      linkHeader: '</llms.txt>; rel="describedby"',
+    });
   });
 
   it.each(['--inject-script-file=/etc/passwd', 'file:///etc/passwd', 'not a url'])(
-    'refuses %s without starting the browser',
+    'refuses %s without calling the renderer',
     async (url) => {
-      const marker = join(dir, 'ran');
-      const browser = script('browser', `touch ${marker}; printf "<html></html>"`);
-      const adapter = new RenderingFetchAdapter({ executable: browser, args: ['{url}'] });
+      const target = renderer('guarded');
 
-      await expect(adapter.fetch(url)).rejects.toThrow('http or https');
-      expect(existsSync(marker)).toBe(false);
+      await expect(new RendererFetchAdapter(target).fetch(url)).rejects.toThrow('http or https');
+      expect(target.render).not.toHaveBeenCalled();
     },
   );
 
-  it('reports the exit code and the end of what the browser wrote to stderr when it fails', async () => {
-    const browser = script('browser', 'echo "page failed err=BotChallenge" >&2; echo "navigation done" >&2; exit 3');
-    const adapter = new RenderingFetchAdapter({ executable: browser, args: ['{url}'] });
+  it('reports a page the renderer says was blocked', async () => {
+    const adapter = new RendererFetchAdapter(renderer('lightpanda', { html: '', blocked: 'cloudflare bot challenge' }));
 
     await expect(adapter.fetch('https://example.com/')).rejects.toThrow(
-      'Rendering failed (exit 3): page failed err=BotChallenge\nnavigation done',
+      'Rendering with lightpanda was blocked: cloudflare bot challenge',
     );
   });
 
-  it('starts a long error report at a whole line', async () => {
-    const browser = script(
-      'browser',
-      'i=0; while [ $i -lt 40 ]; do echo "noise line $i with padding to make it long enough" >&2; i=$((i+1)); done; echo "final cause" >&2; exit 1',
-    );
-    const adapter = new RenderingFetchAdapter({ executable: browser, args: ['{url}'] });
-
-    const error = await adapter.fetch('https://example.com/').catch((caught: Error) => caught);
-
-    expect((error as Error).message).toMatch(/^Rendering failed \(exit 1\): noise line \d+ with padding/);
-    expect((error as Error).message.endsWith('final cause')).toBe(true);
-  });
-
-  it('fails when the browser prints nothing', async () => {
-    const browser = script('browser', 'exit 0');
-    const adapter = new RenderingFetchAdapter({ executable: browser, args: ['{url}'] });
+  it('names the renderer when it fails', async () => {
+    const adapter = new RendererFetchAdapter({
+      id: 'obscura',
+      render: async () => {
+        throw new Error('CouldntResolveHost');
+      },
+    });
 
     await expect(adapter.fetch('https://example.com/')).rejects.toThrow(
-      'Rendering failed: the browser printed nothing',
+      'Rendering with obscura failed: CouldntResolveHost',
     );
   });
 
-  it('stops a browser that runs past the time limit', async () => {
-    const browser = script('browser', 'exec sleep 10');
-    const adapter = new RenderingFetchAdapter({ executable: browser, args: ['{url}'] }, { timeoutMs: 200 });
-    const started = Date.now();
+  it.each([
+    ['nothing', undefined],
+    ['an empty page', { html: '  ' }],
+    ['a result without HTML text', { html: 42 }],
+  ])('fails when the renderer returns %s', async (_name, result) => {
+    const adapter = new RendererFetchAdapter({ id: 'broken', render: async () => result as unknown as RenderResult });
 
-    await expect(adapter.fetch('https://example.com/')).rejects.toThrow('Rendering failed: no result after 200 ms');
-    expect(Date.now() - started).toBeLessThan(5_000);
+    await expect(adapter.fetch('https://example.com/')).rejects.toThrow(
+      'Rendering with broken failed: the renderer returned no HTML',
+    );
   });
 });

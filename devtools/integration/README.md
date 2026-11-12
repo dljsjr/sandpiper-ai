@@ -115,6 +115,20 @@ threat that isn't real.
   separate test: every wave-1 test's `sendCommand()` calls already exercise it, dozens of times
   over.
 
+## Renderer coverage (WEB-10)
+
+- [`web-fetch-render.integration.test.ts`](./web-fetch-render.integration.test.ts) — a renderer that
+  [`fixtures/renderer-fixture.ts`](./fixtures/renderer-fixture.ts) registers on the event bus reaches
+  `web_fetch` in a real session. It also checks what the model is sent: the first request declares
+  `web_fetch` with its `render` parameter, and no later request carries a prompt or tool change.
+
+## Recording requests
+
+Set `MOCK_RECORD_ENV_VAR` to a file path and the mock provider appends each request's context to
+it as one JSON line. Pi carries the prompt sections and the tool declarations in the context's
+system messages: one at the start, then one for each change. A test that expects a stable prompt
+asserts that every request holds the same single system message.
+
 ## Other known limitations
 
 - **The mock provider's scripting**: scripted multi-turn conversations and tool calls via

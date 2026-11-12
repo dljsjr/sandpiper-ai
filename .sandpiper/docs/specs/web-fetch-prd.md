@@ -112,9 +112,23 @@ When a file is found, the tool result ends with an `<additional_content>` block 
 
 ### Rendered fetch
 
-Some pages build their content with JavaScript. With `render: true`, the tool uses `RenderingFetchAdapter`, which runs a headless browser and takes the rendered HTML from its standard output. The rest of the pipeline is unchanged, except that the site's Markdown version is not followed: the caller asked for the rendered page.
+Some pages build their content with JavaScript. With `render: true`, the tool uses `RendererFetchAdapter`, which asks the session's renderer for the page. The rest of the pipeline is unchanged, except that the site's Markdown version is not followed: the caller asked for the rendered page.
 
-The browser is any command that prints rendered HTML for a URL. Lightpanda is the default when it is on `PATH`, and `SANDPIPER_WEB_FETCH_RENDER_COMMAND` names another one. The command is started with an argument list, never through a shell, and only a normalized `http` or `https` URL is passed to it. The Lightpanda Node package was rejected because it builds a shell command from the URL. The `render` parameter is in the tool schema only when a browser is found at session start. See [the extension README](../../../extensions/web-fetch/README.md) for the command contract.
+A renderer is code that drives one browser and returns a normalized result: the HTML, and where the browser reports them the final URL, status, headers, and a `blocked` reason. Browsers differ in their options and in how they report failures, so each renderer owns that translation. A built-in renderer drives Lightpanda through its `--json` report. Other browsers come from extensions. See [the extension README](../../../extensions/web-fetch/README.md) for the contract.
+
+Renderers reach `web_fetch` the way prompt contributions reach the prompt builder ([explanation](../../../docs/dev/prompt-contributions.md)):
+
+1. `session_start`: `web_fetch` listens on the `sandpiper:web-fetch-renderer` event bus channel.
+2. `resources_discover`: an extension emits its renderer on that channel.
+3. First `before_agent_start`: `web_fetch` picks one renderer and registers its tool again, now with the `render` parameter.
+
+The registration carries a `render` function that `web_fetch` calls directly. The event bus is not used for the request and the result: it is synchronous, returns nothing, and drops messages that have no listener.
+
+The tool is registered twice on purpose. Pi copies each tool's prompt entry before the `before_agent_start` handlers run, so a tool first registered in a handler would be missing from the first prompt and would arrive as a prompt change on the next run. Registering at load puts the entry in place. Registering again on the first run changes only the parameter schema, before any request is sent. `devtools/integration/web-fetch-render.integration.test.ts` checks this in a real session.
+
+`SANDPIPER_WEB_FETCH_RENDERER` names the renderer to use by id. Without it, a registered renderer outranks the built-in one. The `render` parameter stays a boolean: the model cannot judge which browser is better.
+
+Every renderer gets a command runner that starts a process from an argument list, never through a shell, and only a normalized `http` or `https` URL is passed in. The Lightpanda Node package was rejected because it builds a shell command from the URL.
 
 Rendering is explicit, not an automatic fallback: a page of loading placeholders looks like valid content, and automated browsers are refused by sites that a normal fetch can read.
 

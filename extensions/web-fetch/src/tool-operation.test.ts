@@ -280,7 +280,7 @@ describe('executeWebFetchTool', () => {
 
     expect(fetchAndExtract).not.toHaveBeenCalled();
     expect(output.content[0]?.text).toBe(
-      'Failed to fetch https://example.com/app: rendering is not available because no headless browser is installed',
+      'Failed to fetch https://example.com/app: rendering is not available because no renderer is loaded',
     );
     expect(output.details.error).toBeDefined();
   });

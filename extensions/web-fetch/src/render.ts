@@ -1,35 +1,67 @@
 /**
- * Fetch adapter that loads a page in a headless browser, so the page's JavaScript runs.
+ * Rendered fetch: load a page in a headless browser, so the page's JavaScript runs.
  * Framework-independent — no pi imports.
  *
- * The browser is any command that takes a URL and prints the rendered HTML on stdout.
- * It is started directly with an argument list. No shell reads the URL.
+ * A renderer is code that drives one browser and returns a normalized result. Extensions
+ * register renderers on WEB_FETCH_RENDERER_CHANNEL; one renderer serves a session.
  */
 
 import { execFile } from 'node:child_process';
 import { accessSync, constants, statSync } from 'node:fs';
 import { delimiter, join, resolve } from 'node:path';
+import { mediaType } from './media-types.js';
 import type { FetchAdapter, FetchResult } from './types.js';
 
-export const RENDER_COMMAND_ENV = 'SANDPIPER_WEB_FETCH_RENDER_COMMAND';
+/** Event bus channel on which extensions register a renderer, during `resources_discover`. */
+export const WEB_FETCH_RENDERER_CHANNEL = 'sandpiper:web-fetch-renderer';
+/** Names the renderer to use, by id, when more than one is registered. */
+export const RENDERER_ENV = 'SANDPIPER_WEB_FETCH_RENDERER';
 
-const URL_PLACEHOLDER = '{url}';
-// Wait for the network to go quiet, so content loaded by script is present. Stop a page that never settles.
-const DEFAULT_RENDER_COMMAND =
-  'lightpanda fetch --dump html --wait-until networkidle --wait-ms 8000 --terminate-ms 20000 --block-private-networks {url}';
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_OUTPUT_BYTES = 20 * 1024 * 1024;
-const STDERR_TAIL_CHARACTERS = 500;
 
-export interface RenderCommand {
-  /** Absolute path of the browser executable. */
-  readonly executable: string;
-  /** Arguments. `{url}` is replaced by the page URL. */
-  readonly args: readonly string[];
+export interface RenderRequest {
+  /** Normalized `http` or `https` URL. */
+  readonly url: string;
+  /** Time the renderer has to answer. */
+  readonly timeoutMs: number;
 }
 
-export interface RenderingFetchAdapterOptions {
-  readonly timeoutMs?: number;
+export interface CommandResult {
+  readonly stdout: string;
+  readonly stderr: string;
+  readonly exitCode: number;
+}
+
+export interface RenderTools {
+  /**
+   * Run a browser command and collect its output. The command starts directly from the argument
+   * list, with no shell, and is stopped at the request's time limit. A non-zero exit is returned,
+   * not thrown, because browsers report failures in their output.
+   */
+  run(executable: string, args: readonly string[]): Promise<CommandResult>;
+}
+
+export interface RenderResult {
+  /** The page's HTML after its scripts ran. */
+  readonly html: string;
+  /** Final URL after redirects. Defaults to the requested URL. */
+  readonly url?: string;
+  /** HTTP status of the page. Defaults to 200. */
+  readonly statusCode?: number;
+  /** Content-Type of the page. Defaults to `text/html`. */
+  readonly contentType?: string;
+  /** Link header of the page, when the browser reports response headers. */
+  readonly linkHeader?: string;
+  /** Set when the site refused the browser, for example with a bot challenge. Names the cause. */
+  readonly blocked?: string;
+}
+
+export interface WebFetchRenderer {
+  readonly id: string;
+  render(request: RenderRequest, tools: RenderTools): Promise<RenderResult>;
+  /** Called once when web_fetch accepts the registration. */
+  readonly acknowledge?: () => void;
 }
 
 function isExecutableFile(path: string): boolean {
@@ -41,7 +73,8 @@ function isExecutableFile(path: string): boolean {
   }
 }
 
-function findExecutable(name: string, pathVariable: string | undefined): string | undefined {
+/** The absolute path of an executable: a name is looked up on the PATH value, a path is used as given. */
+export function findExecutable(name: string, pathVariable: string | undefined): string | undefined {
   const candidates = name.includes('/')
     ? [resolve(name)]
     : (pathVariable ?? '')
@@ -52,21 +85,66 @@ function findExecutable(name: string, pathVariable: string | undefined): string 
   return candidates.find(isExecutableFile);
 }
 
-/**
- * The browser command for this process: the one named in the environment, or Lightpanda.
- * Returns nothing when its executable is not installed.
- *
- * The command is split on whitespace. A command that needs an argument with a space in it
- * belongs in a wrapper script.
- */
-export function resolveRenderCommand(env: NodeJS.ProcessEnv): RenderCommand | undefined {
-  const [name, ...args] = (env[RENDER_COMMAND_ENV]?.trim() || DEFAULT_RENDER_COMMAND).split(/\s+/);
-  if (!name) return undefined;
+export function runCommand(
+  executable: string,
+  args: readonly string[],
+  options: { readonly timeoutMs: number },
+): Promise<CommandResult> {
+  return new Promise((resolveResult, reject) => {
+    execFile(
+      executable,
+      [...args],
+      { timeout: options.timeoutMs, maxBuffer: MAX_OUTPUT_BYTES, encoding: 'utf8' },
+      (error, stdout, stderr) => {
+        if (!error) return resolveResult({ stdout, stderr, exitCode: 0 });
+        if (error.killed) return reject(new Error(`no result after ${options.timeoutMs} ms`));
+        if (typeof error.code === 'number') return resolveResult({ stdout, stderr, exitCode: error.code });
 
-  const executable = findExecutable(name, env.PATH);
-  if (!executable) return undefined;
+        reject(new Error(`could not start ${executable}: ${error.message}`));
+      },
+    );
+  });
+}
 
-  return { executable, args: args.some((arg) => arg.includes(URL_PLACEHOLDER)) ? args : [...args, URL_PLACEHOLDER] };
+function isRenderer(value: unknown): value is WebFetchRenderer {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const renderer = value as Partial<WebFetchRenderer>;
+  return (
+    typeof renderer.id === 'string' &&
+    renderer.id.trim().length > 0 &&
+    typeof renderer.render === 'function' &&
+    (renderer.acknowledge === undefined || typeof renderer.acknowledge === 'function')
+  );
+}
+
+/** Collects renderer registrations and picks the one a session uses. */
+export class RendererCollector {
+  readonly #registered = new Map<string, WebFetchRenderer>();
+
+  constructor(private readonly builtIn: WebFetchRenderer | undefined) {}
+
+  /** Accept a registration from the event bus. The first renderer registered under an id keeps it. */
+  add(value: unknown): void {
+    if (!isRenderer(value)) return;
+
+    const id = value.id.trim();
+    if (this.#registered.has(id)) return;
+
+    this.#registered.set(id, value);
+    value.acknowledge?.();
+  }
+
+  /**
+   * The renderer the environment names. With no name: the first registered renderer, and the
+   * built-in one when none is registered. A name that matches nothing selects nothing.
+   */
+  select(env: NodeJS.ProcessEnv): WebFetchRenderer | undefined {
+    const named = env[RENDERER_ENV]?.trim();
+    if (named) return this.#registered.get(named) ?? (this.builtIn?.id === named ? this.builtIn : undefined);
+
+    return this.#registered.values().next().value ?? this.builtIn;
+  }
 }
 
 /** The URL in normalized form. It always starts with its scheme, so a browser cannot read it as an option. */
@@ -78,49 +156,43 @@ function httpUrl(url: string): string {
   return parsed.toString();
 }
 
-/** The end of the browser's error output, starting at a whole line. */
-function stderrTail(stderr: string): string {
-  const text = stderr.trim();
-  if (text.length <= STDERR_TAIL_CHARACTERS) return text;
-
-  const tail = text.slice(-STDERR_TAIL_CHARACTERS);
-  return tail.slice(tail.indexOf('\n') + 1);
-}
-
-export class RenderingFetchAdapter implements FetchAdapter {
+/** Fetch adapter backed by a renderer. Checks what the renderer returns: it is code this extension does not own. */
+export class RendererFetchAdapter implements FetchAdapter {
   private readonly timeoutMs: number;
 
   constructor(
-    private readonly command: RenderCommand,
-    options: RenderingFetchAdapterOptions = {},
+    private readonly renderer: WebFetchRenderer,
+    options: { readonly timeoutMs?: number } = {},
   ) {
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
   async fetch(url: string): Promise<FetchResult> {
     const target = httpUrl(url);
-    const args = this.command.args.map((arg) => arg.replaceAll(URL_PLACEHOLDER, target));
-    const body = await this.run(args);
-    if (body.trim() === '') throw new Error('Rendering failed: the browser printed nothing');
+    const { id } = this.renderer;
+    const timeoutMs = this.timeoutMs;
 
-    // The browser reports no status or headers. A rendered page is HTML.
-    return { url: target, statusCode: 200, body, contentType: 'text/html' };
-  }
-
-  private run(args: readonly string[]): Promise<string> {
-    return new Promise((resolveOutput, reject) => {
-      execFile(
-        this.command.executable,
-        args,
-        { timeout: this.timeoutMs, maxBuffer: MAX_OUTPUT_BYTES, encoding: 'utf8' },
-        (error, stdout, stderr) => {
-          if (!error) return resolveOutput(stdout);
-          if (error.killed) return reject(new Error(`Rendering failed: no result after ${this.timeoutMs} ms`));
-
-          const detail = stderrTail(stderr) || error.message;
-          reject(new Error(`Rendering failed (exit ${error.code ?? 'unknown'}): ${detail}`));
-        },
+    let result: RenderResult | undefined;
+    try {
+      result = await this.renderer.render(
+        { url: target, timeoutMs },
+        { run: (executable, args) => runCommand(executable, args, { timeoutMs }) },
       );
-    });
+    } catch (error) {
+      throw new Error(`Rendering with ${id} failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    if (result?.blocked) throw new Error(`Rendering with ${id} was blocked: ${result.blocked}`);
+    if (typeof result?.html !== 'string' || result.html.trim() === '') {
+      throw new Error(`Rendering with ${id} failed: the renderer returned no HTML`);
+    }
+
+    return {
+      url: result.url ?? target,
+      statusCode: result.statusCode ?? 200,
+      body: result.html,
+      contentType: mediaType(result.contentType) ?? 'text/html',
+      ...(result.linkHeader ? { linkHeader: result.linkHeader } : {}),
+    };
   }
 }

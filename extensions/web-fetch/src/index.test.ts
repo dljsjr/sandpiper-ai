@@ -1,12 +1,49 @@
 import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it, vi } from 'vitest';
 import init from './index.js';
+import { RendererFetchAdapter, WEB_FETCH_RENDERER_CHANNEL, type WebFetchRenderer } from './render.js';
 import type { WebFetchToolInput, WebFetchToolResult } from './tool-operation.js';
 import { type FetchAdapter, WebFetchFilterType } from './types.js';
 
 interface RegisteredWebFetchTool {
   readonly promptSnippet?: string;
+  readonly parameters?: unknown;
   execute(toolCallId: string, params: WebFetchToolInput): Promise<WebFetchToolResult>;
+}
+
+type Handler = (...args: unknown[]) => unknown;
+
+/** The parts of Pi this extension uses: tool registration, lifecycle events and the event bus. */
+function createPi() {
+  const lifecycle = new Map<string, Handler[]>();
+  const bus = new Map<string, Set<Handler>>();
+  const registerTool = vi.fn<(tool: RegisteredWebFetchTool) => void>();
+  const api = {
+    registerTool,
+    on: (event: string, handler: Handler) => {
+      lifecycle.set(event, [...(lifecycle.get(event) ?? []), handler]);
+    },
+    events: {
+      on: (channel: string, handler: Handler) => {
+        const handlers = bus.get(channel) ?? new Set<Handler>();
+        bus.set(channel, handlers.add(handler));
+        return () => handlers.delete(handler);
+      },
+      emit: (channel: string, data: unknown) => {
+        for (const handler of bus.get(channel) ?? []) handler(data);
+      },
+    },
+  };
+
+  return {
+    api: api as unknown as ExtensionAPI,
+    registerTool,
+    fire: (event: string) => {
+      for (const handler of lifecycle.get(event) ?? []) handler({}, {});
+    },
+    emit: api.events.emit,
+    latestTool: () => registerTool.mock.calls.at(-1)?.[0],
+  };
 }
 
 function createAdapter(): FetchAdapter {
@@ -15,60 +52,34 @@ function createAdapter(): FetchAdapter {
   };
 }
 
+function createRenderer(id: string): WebFetchRenderer {
+  return { id, render: vi.fn(async () => ({ html: '<html><body>rendered</body></html>' })) };
+}
+
+const noBuiltInRenderer = () => undefined;
+
+function okResult(): WebFetchToolResult {
+  return { content: [{ type: 'text', text: 'ok' }], details: { url: 'https://example.com/page', title: 'Example' } };
+}
+
 describe('web-fetch extension', () => {
   it('opts into the available-tools system prompt list', async () => {
-    const pi = {
-      registerTool: vi.fn(),
-    } as unknown as ExtensionAPI;
+    const pi = createPi();
 
-    await init(pi, { adapter: createAdapter() });
+    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
 
-    const registeredTool = vi.mocked(pi.registerTool).mock.calls[0]?.[0] as RegisteredWebFetchTool | undefined;
-    expect(registeredTool?.promptSnippet).toBe('Fetch a web page and return clean markdown content');
+    expect(pi.latestTool()?.promptSnippet).toBe('Fetch a web page and return clean markdown content');
   });
 
   it('registers both CSS selector and Markdown section filter schemas', async () => {
-    const pi = {
-      registerTool: vi.fn(),
-    } as unknown as ExtensionAPI;
+    const pi = createPi();
 
-    await init(pi, { adapter: createAdapter() });
+    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
 
-    const registeredTool = vi.mocked(pi.registerTool).mock.calls[0]?.[0];
-    const schemaText = JSON.stringify(registeredTool?.parameters);
+    const schemaText = JSON.stringify(pi.latestTool()?.parameters);
     expect(schemaText).toContain(WebFetchFilterType.CssSelector);
     expect(schemaText).toContain(WebFetchFilterType.MarkdownSection);
     expect(schemaText).toContain('heading');
-  });
-
-  it('offers rendering, and passes the browser adapter on, only when a browser is available', async () => {
-    const renderAdapter = createAdapter();
-    const executeWebFetchTool = vi.fn(async () => ({
-      content: [{ type: 'text' as const, text: 'ok' }],
-      details: { url: 'https://example.com/app' },
-    }));
-    const register = async (adapter: FetchAdapter | undefined) => {
-      let tool: (RegisteredWebFetchTool & { parameters?: unknown }) | undefined;
-      const pi = {
-        registerTool: vi.fn((registered: RegisteredWebFetchTool) => {
-          tool = registered;
-        }),
-      } as unknown as ExtensionAPI;
-      await init(pi, { adapter: createAdapter(), executeWebFetchTool, resolveRenderAdapter: () => adapter });
-      return tool;
-    };
-
-    const withBrowser = await register(renderAdapter);
-    const withoutBrowser = await register(undefined);
-    await withBrowser?.execute('call-1', { url: 'https://example.com/app', render: true });
-
-    expect(JSON.stringify(withBrowser?.parameters)).toContain('"render"');
-    expect(JSON.stringify(withoutBrowser?.parameters)).not.toContain('"render"');
-    expect(executeWebFetchTool).toHaveBeenCalledWith(
-      expect.anything(),
-      { url: 'https://example.com/app', render: true },
-      { renderAdapter },
-    );
   });
 
   it.each([
@@ -77,19 +88,11 @@ describe('web-fetch extension', () => {
   ] as const)(
     'passes the %s through execute() unmangled (union-arm preservation regression, #7328)',
     async (_label, filter) => {
-      const executeWebFetchTool = vi.fn(async () => ({
-        content: [{ type: 'text' as const, text: 'ok' }],
-        details: { url: 'https://example.com/page', title: 'Example' },
-      }));
-      let registeredTool: RegisteredWebFetchTool | undefined;
-      const pi = {
-        registerTool: vi.fn((tool: RegisteredWebFetchTool) => {
-          registeredTool = tool;
-        }),
-      } as unknown as ExtensionAPI;
+      const executeWebFetchTool = vi.fn(async () => okResult());
+      const pi = createPi();
 
-      await init(pi, { adapter: createAdapter(), executeWebFetchTool });
-      await registeredTool?.execute('call-1', { url: 'https://example.com/page', filter });
+      await init(pi.api, { adapter: createAdapter(), executeWebFetchTool, createBuiltInRenderer: noBuiltInRenderer });
+      await pi.latestTool()?.execute('call-1', { url: 'https://example.com/page', filter });
 
       // The union arm's exact fields (including the 'type' discriminant) must reach our
       // execution layer unchanged -- not coerced, not stripped, not merged with the other arm's
@@ -104,59 +107,104 @@ describe('web-fetch extension', () => {
     },
   );
 
-  it('returns the tool result directly when llms.txt exists', async () => {
-    const toolResult: WebFetchToolResult = {
-      content: [
-        {
-          type: 'text',
-          text: 'URL: https://example.com/page\n\nExample body\n\n---\n\n<additional_content>\n  <llms_txt\n    status="found"\n    url="https://example.com/llms.txt"\n    http_status="200"\n  />\n</additional_content>',
-        },
-      ],
-      details: {
-        url: 'https://example.com/page',
-        title: 'Example title',
-        llmsTxt: {
-          checked: true,
-          exists: true,
-          status: 'found',
-          url: 'https://example.com/llms.txt',
-          checkedAt: '2026-05-13T00:00:00.000Z',
-          statusCode: 200,
-        },
-      },
-    };
-    const executeWebFetchTool = vi.fn(async () => toolResult);
-    let registeredTool: RegisteredWebFetchTool | undefined;
-    const pi = {
-      registerTool: vi.fn((tool: RegisteredWebFetchTool) => {
-        registeredTool = tool;
-      }),
-    } as unknown as ExtensionAPI;
+  it('returns the tool result unchanged', async () => {
+    const toolResult = okResult();
+    const pi = createPi();
 
-    await init(pi, { adapter: createAdapter(), executeWebFetchTool });
-    const output = await registeredTool?.execute('call-1', { url: 'https://example.com/page' });
+    await init(pi.api, {
+      adapter: createAdapter(),
+      executeWebFetchTool: vi.fn(async () => toolResult),
+      createBuiltInRenderer: noBuiltInRenderer,
+    });
 
-    expect(output).toBe(toolResult);
+    expect(await pi.latestTool()?.execute('call-1', { url: 'https://example.com/page' })).toBe(toolResult);
+  });
+});
+
+describe('web-fetch renderers', () => {
+  it('registers the tool at load without rendering, and leaves it alone when no renderer exists', async () => {
+    const pi = createPi();
+
+    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
+    pi.fire('session_start');
+    pi.fire('before_agent_start');
+
+    expect(pi.registerTool).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(pi.latestTool()?.parameters)).not.toContain('"render"');
   });
 
-  it('returns the tool result when probe metadata is absent', async () => {
-    const toolResult: WebFetchToolResult = {
-      content: [{ type: 'text', text: 'URL: https://example.com/page\n\nExample body' }],
-      details: {
-        url: 'https://example.com/page',
-        title: 'Example title',
-      },
-    };
-    let registeredTool: RegisteredWebFetchTool | undefined;
-    const pi = {
-      registerTool: vi.fn((tool: RegisteredWebFetchTool) => {
-        registeredTool = tool;
-      }),
-    } as unknown as ExtensionAPI;
+  it('offers rendering from the first run when an extension registers a renderer', async () => {
+    const executeWebFetchTool = vi.fn(async () => okResult());
+    const renderer = createRenderer('obscura');
+    const pi = createPi();
 
-    await init(pi, { adapter: createAdapter(), executeWebFetchTool: vi.fn(async () => toolResult) });
-    const output = await registeredTool?.execute('call-1', { url: 'https://example.com/page' });
+    await init(pi.api, { adapter: createAdapter(), executeWebFetchTool, createBuiltInRenderer: noBuiltInRenderer });
+    pi.fire('session_start');
+    pi.emit(WEB_FETCH_RENDERER_CHANNEL, renderer);
+    pi.fire('before_agent_start');
+    await pi.latestTool()?.execute('call-1', { url: 'https://example.com/app', render: true });
 
-    expect(output).toBe(toolResult);
+    expect(pi.registerTool).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(pi.latestTool()?.parameters)).toContain('"render"');
+    const [, , dependencies] = executeWebFetchTool.mock.calls[0] as unknown as [
+      unknown,
+      unknown,
+      { renderAdapter?: FetchAdapter },
+    ];
+    expect(dependencies.renderAdapter).toBeInstanceOf(RendererFetchAdapter);
+    await dependencies.renderAdapter?.fetch('https://example.com/app');
+    expect(renderer.render).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the built-in renderer when no extension registers one', async () => {
+    const builtIn = createRenderer('lightpanda');
+    const pi = createPi();
+
+    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: () => builtIn });
+    pi.fire('session_start');
+    pi.fire('before_agent_start');
+
+    expect(pi.registerTool).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(pi.latestTool()?.parameters)).toContain('"render"');
+  });
+
+  it('settles the renderer on the first run and does not register the tool again', async () => {
+    const pi = createPi();
+
+    await init(pi.api, { adapter: createAdapter(), createBuiltInRenderer: noBuiltInRenderer });
+    pi.fire('session_start');
+    pi.fire('before_agent_start');
+    pi.emit(WEB_FETCH_RENDERER_CHANNEL, createRenderer('late'));
+    pi.fire('before_agent_start');
+
+    expect(pi.registerTool).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the renderer the environment names', async () => {
+    const executeWebFetchTool = vi.fn(async () => okResult());
+    const first = createRenderer('first');
+    const second = createRenderer('second');
+    const pi = createPi();
+
+    await init(pi.api, {
+      adapter: createAdapter(),
+      executeWebFetchTool,
+      createBuiltInRenderer: noBuiltInRenderer,
+      env: { SANDPIPER_WEB_FETCH_RENDERER: 'second' },
+    });
+    pi.fire('session_start');
+    pi.emit(WEB_FETCH_RENDERER_CHANNEL, first);
+    pi.emit(WEB_FETCH_RENDERER_CHANNEL, second);
+    pi.fire('before_agent_start');
+    await pi.latestTool()?.execute('call-1', { url: 'https://example.com/app', render: true });
+    const [, , dependencies] = executeWebFetchTool.mock.calls[0] as unknown as [
+      unknown,
+      unknown,
+      { renderAdapter?: FetchAdapter },
+    ];
+    await dependencies.renderAdapter?.fetch('https://example.com/app');
+
+    expect(second.render).toHaveBeenCalledTimes(1);
+    expect(first.render).not.toHaveBeenCalled();
   });
 });

@@ -35,7 +35,7 @@ export interface WebFetchToolResult {
 
 export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
-  /** Adapter that loads pages in a headless browser. Absent when no browser is installed. */
+  /** Adapter that loads pages in a headless browser. Absent when no renderer is available. */
   readonly renderAdapter?: FetchAdapter;
 }
 
@@ -91,7 +91,7 @@ function selectAdapter(
 ): FetchAdapter {
   if (!input.render) return adapter;
   if (!dependencies.renderAdapter) {
-    throw new Error('rendering is not available because no headless browser is installed');
+    throw new Error('rendering is not available because no renderer is loaded');
   }
   return dependencies.renderAdapter;
 }

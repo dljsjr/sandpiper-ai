@@ -11,12 +11,12 @@ A Pi extension that adds a `web_fetch` tool. It fetches one web page and returns
 
 ## Parameters
 
-| Parameter     | Type    | Required | Description                                                                   |
-| ------------- | ------- | -------- | ----------------------------------------------------------------------------- |
-| `url`         | string  | yes      | The page to fetch                                                             |
-| `followLinks` | boolean | no       | Also return the links found in the content                                    |
-| `filter`      | object  | no       | Return one part of the page: a CSS selector or a Markdown section             |
-| `render`      | boolean | no       | Load the page in a headless browser first. Present only when one is installed |
+| Parameter     | Type    | Required | Description                                                                          |
+| ------------- | ------- | -------- | ------------------------------------------------------------------------------------ |
+| `url`         | string  | yes      | The page to fetch                                                                    |
+| `followLinks` | boolean | no       | Also return the links found in the content                                           |
+| `filter`      | object  | no       | Return one part of the page: a CSS selector or a Markdown section                    |
+| `render`      | boolean | no       | Load the page in a headless browser first. Present only when a renderer is available |
 
 ### Filters
 
@@ -31,40 +31,95 @@ A heading matches when its text equals the requested text. When no heading is an
 
 Some pages build their content with JavaScript, and a normal fetch returns an empty shell or loading placeholders. With `render: true`, `web_fetch` loads the page in a headless browser and reads the result.
 
-Rendering uses [Lightpanda](https://lightpanda.io/) when `lightpanda` is on `PATH`. The `render` parameter is not offered when no browser is found. The check runs once, when the session starts.
+A renderer is the code that drives one browser. `web_fetch` has a built-in renderer for [Lightpanda](https://lightpanda.io/), which is available when `lightpanda` is on `PATH`. An extension can register a renderer for another browser. The `render` parameter is offered only when a renderer is available.
 
 Rendering is slower than a normal fetch, and sites that challenge automated browsers can refuse it. A page that reads correctly without rendering should be fetched without it.
 
-### Using another browser
+### Which renderer is used
 
-Set `SANDPIPER_WEB_FETCH_RENDER_COMMAND` to the command that starts your browser:
+One renderer serves a session. It is chosen when the first run starts:
 
-```sh
-export SANDPIPER_WEB_FETCH_RENDER_COMMAND='obscura fetch --dump html --quiet --wait-until networkidle {url}'
+1. The renderer whose id `SANDPIPER_WEB_FETCH_RENDERER` names. When no renderer has that id, rendering is off.
+2. Otherwise the first renderer an extension registered.
+3. Otherwise the built-in Lightpanda renderer, with the id `lightpanda`.
+
+### Adding a renderer
+
+An extension registers a renderer by emitting it on the `sandpiper:web-fetch-renderer` event bus channel during `resources_discover`. This example drives the Obscura browser:
+
+```typescript
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+
+export default function (pi: ExtensionAPI) {
+  pi.on("resources_discover", () => {
+    pi.events.emit("sandpiper:web-fetch-renderer", {
+      id: "obscura",
+      async render(request, tools) {
+        const { stdout, stderr, exitCode } = await tools.run("obscura", [
+          "fetch",
+          "--dump",
+          "html",
+          "--quiet",
+          "--wait-until",
+          "networkidle",
+          request.url,
+        ]);
+        if (exitCode !== 0) throw new Error(stderr.trim());
+        if (stdout.includes("Performing security verification")) {
+          return { html: "", blocked: "bot challenge" };
+        }
+        return { html: stdout };
+      },
+    });
+  });
+}
 ```
 
-The command must print the rendered HTML on standard output and exit with status 0. A non-zero status is reported as a failed fetch, with the end of the command's error output.
+Register only when the browser is installed, because a registered renderer outranks the built-in one.
 
-| Rule        | Detail                                                                                                          |
-| ----------- | --------------------------------------------------------------------------------------------------------------- |
-| Placeholder | `{url}` is replaced by the page URL. Without a placeholder, the URL is added as the last argument               |
-| Splitting   | The command is split on whitespace and started directly, without a shell. Quotes and variables are not expanded |
-| Executable  | A name is looked up on `PATH`. A path is used as given. When it is not found, rendering is off                  |
-| Time limit  | The browser is stopped after 30 seconds                                                                         |
-| URL         | Only `http` and `https` URLs are passed to the browser                                                          |
+#### The registration
 
-For an argument that contains a space, put the command in a wrapper script and name the script.
+| Field         | Type     | Required | Description                                                       |
+| ------------- | -------- | -------- | ----------------------------------------------------------------- |
+| `id`          | string   | yes      | Name of the renderer. The first registration under an id keeps it |
+| `render`      | function | yes      | `(request, tools) => Promise<result>`                             |
+| `acknowledge` | function | no       | Called once when `web_fetch` accepts the registration             |
 
-The default command is:
+Registrations after the first run starts are ignored.
 
-```sh
-lightpanda fetch --dump html --wait-until networkidle --wait-ms 8000 --terminate-ms 20000 --block-private-networks {url}
-```
+#### The request
+
+| Field       | Type   | Description                                        |
+| ----------- | ------ | -------------------------------------------------- |
+| `url`       | string | The page URL, normalized. Always `http` or `https` |
+| `timeoutMs` | number | Time the renderer has to answer. 30 seconds        |
+
+#### The tools
+
+`tools.run(executable, args)` runs a command and resolves with `{ stdout, stderr, exitCode }`.
+
+- The command starts directly from the argument list. No shell reads the arguments, so a URL cannot run a command.
+- A non-zero exit code is returned, not thrown, because browsers report failures in their output.
+- The command is stopped at the request's time limit, and the call then rejects.
+
+#### The result
+
+| Field         | Type   | Required | Description                                                                     |
+| ------------- | ------ | -------- | ------------------------------------------------------------------------------- |
+| `html`        | string | yes      | The page's HTML after its scripts ran                                           |
+| `url`         | string | no       | Final URL after redirects. Defaults to the requested URL                        |
+| `statusCode`  | number | no       | HTTP status of the page. Defaults to 200                                        |
+| `contentType` | string | no       | Content-Type of the page. Defaults to `text/html`                               |
+| `linkHeader`  | string | no       | The page's `Link` header, used to find its `llms.txt`                           |
+| `blocked`     | string | no       | Set when the site refused the browser. Names the cause, such as a bot challenge |
+
+A renderer reports a failure by throwing an error. `web_fetch` reports a thrown error, a `blocked` result, and a result with no HTML as a failed fetch that names the renderer.
 
 ## Architecture
 
 The pipeline is framework-independent; only `src/index.ts` imports Pi.
 
-- **`FetchAdapter`** is the interface for getting a page. `SimpleFetchAdapter` uses the Fetch API. `RenderingFetchAdapter` runs the browser command.
+- **`FetchAdapter`** is the interface for getting a page. `SimpleFetchAdapter` uses the Fetch API. `RendererFetchAdapter` calls the session's renderer.
+- `src/render.ts` holds the renderer contract, the collector that picks a renderer, and the command runner. `src/lightpanda-renderer.ts` is the built-in renderer.
 - `src/pipeline.ts` turns a fetched page into Markdown and applies filters.
 - `src/llms-txt.ts` and `src/link-relations.ts` find a site's `llms.txt` and a page's Markdown version.

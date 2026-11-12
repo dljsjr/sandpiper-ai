@@ -19,6 +19,7 @@
 // wave-1 test extension registers those hooks -- so they're intentionally not invoked here.
 // Revisit if a future test needs that fidelity.
 
+import { appendFileSync } from 'node:fs';
 import {
   type Api,
   type AssistantMessage,
@@ -50,6 +51,10 @@ export type MockScriptStep =
   | { readonly type: 'toolCall'; readonly toolName: string; readonly arguments: JsonObject };
 
 export type MockScript = readonly MockScriptStep[];
+
+/** Env var a test sets to a file path. The mock appends each request's context to it as one
+ * JSON line, so a test can assert what the model was sent: prompt, tool declarations, messages. */
+export const MOCK_RECORD_ENV_VAR = 'SANDPIPER_INTEGRATION_MOCK_RECORD';
 
 /** Serializes a script for MOCK_SCRIPT_ENV_VAR. Tests should go through this rather than
  * hand-rolling JSON.stringify, so the encoding is one place to change if the shape evolves. */
@@ -153,6 +158,8 @@ function mockStreamSimple(
   const stream = createAssistantMessageEventStream();
   const output = baseAssistantMessage(model);
   const step = resolveStep(context);
+  const recordPath = process.env[MOCK_RECORD_ENV_VAR];
+  if (recordPath) appendFileSync(recordPath, `${JSON.stringify(context)}\n`);
 
   queueMicrotask(() => {
     stream.push({ type: 'start', partial: output });
