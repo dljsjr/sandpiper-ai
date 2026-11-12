@@ -1,6 +1,11 @@
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { Window } from 'happy-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { EditableSpan } from '../diagnostic.js';
+import { projectionPayload } from '../markup.js';
+import { buildEditorProjection } from '../regions.js';
 import { installBrowser } from './test-helpers.js';
 
 interface PromptEditorController {
@@ -60,9 +65,83 @@ const emptyStage = {
   warnings: [],
 };
 
+let root: string;
+
+beforeEach(() => {
+  root = mkdtempSync(join(tmpdir(), 'prompt-editor-page-'));
+});
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  rmSync(root, { recursive: true, force: true });
 });
+
+type Piece = string | readonly [file: string, text: string];
+
+/**
+ * The page payload for a prompt rendered from templates: a string is generated text, and a [file, text] pair is
+ * text from that file, reported as an editable span. Pieces of one file are separated by a placeholder there.
+ */
+function templatePayload(pieces: readonly Piece[], pendingRegionIds: readonly string[] = []) {
+  const files = new Map<string, string>();
+  const editableSpans: EditableSpan[] = [];
+  let prompt = '';
+  for (const piece of pieces) {
+    if (typeof piece === 'string') {
+      prompt += piece;
+      continue;
+    }
+    const [file, text] = piece;
+    const path = join(root, file);
+    const before = files.has(path) ? `${files.get(path)}{{value}}` : '';
+    editableSpans.push({
+      start: prompt.length,
+      end: prompt.length + text.length,
+      path,
+      sourceStart: before.length,
+      sourceEnd: before.length + text.length,
+      codec: 'direct',
+    });
+    files.set(path, before + text);
+    prompt += text;
+  }
+  for (const [path, content] of files) writeFileSync(path, content, 'utf-8');
+  const projection = buildEditorProjection(
+    { prompt, warnings: [], sources: { appendSystemPrompts: [], contextFiles: [] }, editableSpans },
+    { promptSources: [] },
+  );
+  return {
+    ...emptyStage,
+    ...projectionPayload(projection, [], 1),
+    pendingRegionIds,
+    pendingRegionCount: pendingRegionIds.length,
+  };
+}
+
+function regionIds(payload: { segments: ReadonlyArray<{ regionId?: string }> }): string[] {
+  return payload.segments.flatMap((segment) => (segment.regionId ? [segment.regionId] : []));
+}
+
+function outlineRows(browser: Window): Array<[string | null | undefined, string | null]> {
+  return [...browser.document.querySelectorAll('#outline .tree-row')].map((row) => [
+    row.querySelector('.row-name')?.textContent,
+    row.getAttribute('aria-level'),
+  ]);
+}
+
+const harnessAndProfile: readonly Piece[] = [
+  '<system_prompt>\n',
+  ['harness.md', '<harness_docs>\nDocs at `'],
+  '/path/one',
+  ['harness.md', '`\n- Version: `'],
+  '1.5.2',
+  ['harness.md', '`\n</harness_docs>'],
+  '\n',
+  ['user_profile.md', '<user_profile>\nAbout the user:\n<content>'],
+  ['USER.md', '# Doug\n'],
+  ['user_profile.md', '</content>\n</user_profile>'],
+  '\n</system_prompt>',
+];
 
 describe('prompt editor page', () => {
   it('inlines no external scripts and has an insertion point for the Markdown editor bundle', () => {
@@ -196,6 +275,50 @@ describe('prompt editor page', () => {
     expect(browser.document.getElementById('identity-name')?.textContent).toBe('Roux');
     expect(browser.document.getElementById('identity-sub')?.textContent).toBe('System prompt · Pilot');
     expect(browser.document.title).toBe('Roux · System Prompt Editor');
+    await browser.happyDOM.close();
+  });
+
+  it('keeps elements open across regions and names an element by the file whose region opens it', async () => {
+    const { browser, promptEditor } = loadPromptEditor();
+
+    promptEditor.render(templatePayload(harnessAndProfile));
+
+    expect(outlineRows(browser)).toEqual([
+      ['harness_docs', '1'],
+      ['user_profile', '1'],
+      ['USER.md', '2'],
+    ]);
+    const rows = browser.document.querySelectorAll('#outline .tree-row');
+    expect(rows[0]?.querySelector('.row-detail')?.textContent).toBe('harness.md');
+    expect(rows[1]?.querySelector('.row-detail')?.textContent).toBe('user_profile.md');
+    await browser.happyDOM.close();
+  });
+
+  it('marks the element a later region of its file continues as changed', async () => {
+    const { browser, promptEditor } = loadPromptEditor();
+    const ids = regionIds(templatePayload(harnessAndProfile));
+
+    promptEditor.render(templatePayload(harnessAndProfile, [ids[1] ?? '']));
+
+    const rows = [...browser.document.querySelectorAll('#outline .tree-row')];
+    expect(rows.map((row) => row.classList.contains('changed'))).toEqual([true, false, false]);
+    await browser.happyDOM.close();
+  });
+
+  it('shows one outline entry for a file split by generated values', async () => {
+    const { browser, promptEditor } = loadPromptEditor();
+
+    promptEditor.render(
+      templatePayload([
+        '<system_prompt>\n',
+        ['notes.md', 'Hello '],
+        'value',
+        ['notes.md', ' world'],
+        '\n</system_prompt>',
+      ]),
+    );
+
+    expect(outlineRows(browser)).toEqual([['notes.md', '1']]);
     await browser.happyDOM.close();
   });
 

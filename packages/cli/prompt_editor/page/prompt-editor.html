@@ -1047,8 +1047,13 @@
         );
       }
 
+      // The ids of the regions an outline entry stands for.
+      function nodeRegionIds(node) {
+        return [node.region?.id, node.source?.id, ...(node.regionIds || [])].filter(Boolean);
+      }
+
       function regionNodes(regionId) {
-        return outline ? outline.nodes.filter((node) => node.region?.id === regionId || node.source?.id === regionId) : [];
+        return outline ? outline.nodes.filter((node) => nodeRegionIds(node).includes(regionId)) : [];
       }
 
       function markPending(regionIds) {
@@ -1058,8 +1063,8 @@
         }
         if (!outline) return;
         for (const node of outline.nodes) {
-          const region = node.region || node.source;
-          if (region && node.row) node.row.classList.toggle('changed', pending.has(region.id));
+          const ids = nodeRegionIds(node);
+          if (ids.length && node.row) node.row.classList.toggle('changed', ids.some((id) => pending.has(id)));
         }
       }
 
@@ -1291,6 +1296,26 @@
         };
       }
 
+      // How the element a region starts with sits in it: closed at the region's end ('whole'), closed with more
+      // text after it ('partial'), or still open when the region ends ('open'), as in a template split at a
+      // placeholder. Null when the region does not start with an opening tag.
+      function leadingElement(parts) {
+        const significant = parts.filter((part) => part.text.trim());
+        const first = significant[0];
+        if (!first?.tag) return null;
+        const info = tagInfo(first.text);
+        if (info.closing || info.selfClosing) return null;
+        let depth = 0;
+        for (const [index, part] of significant.entries()) {
+          if (!part.tag) continue;
+          const tag = tagInfo(part.text);
+          if (tag.selfClosing) continue;
+          depth += tag.closing ? -1 : 1;
+          if (depth === 0) return index === significant.length - 1 ? 'whole' : 'partial';
+        }
+        return 'open';
+      }
+
       function buildOutline(payload, piSegments) {
         const nodes = [];
         let nextId = 0;
@@ -1300,15 +1325,21 @@
           return created;
         };
         const root = node({ kind: 'root' });
+        // Open elements across the whole prompt: a template's tags can open in one region and close in another.
         const stack = [root];
+        // The file entry of the region being read, when no element stands for its file.
+        let leaf = null;
+        let leafDepth = 0;
+        let previous = null;
+        const holders = () => (leaf ? [...stack, leaf] : [...stack]);
         const count = (length, editable) => {
-          for (const holder of stack) {
+          for (const holder of holders()) {
             holder.chars += length;
             if (editable) holder.editableChars += length;
           }
         };
         const open = (part, info, pi) => {
-          const parent = stack[stack.length - 1];
+          const parent = leaf && stack.length === leafDepth ? leaf : stack[stack.length - 1];
           const created = node({ name: info.name, attrs: info.attrs, anchorId: part.anchorId, pi, parent, tagText: part.text });
           parent.children.push(created);
           stack.push(created);
@@ -1316,14 +1347,20 @@
           if (info.selfClosing) stack.pop();
           return created;
         };
-        const close = (part, info, floor) => {
+        const close = (part, info) => {
           count(part.text.length, false);
-          for (let index = stack.length - 1; index >= floor; index -= 1) {
-            if (stack[index].kind === 'element' && stack[index].name === info.name) {
+          for (let index = stack.length - 1; index >= 1; index -= 1) {
+            if (stack[index].name === info.name) {
               stack.length = index;
               return;
             }
           }
+        };
+        const sourceOwner = () => {
+          for (let index = stack.length - 1; index >= 1; index -= 1) {
+            if (stack[index].source) return stack[index];
+          }
+          return null;
         };
 
         payload.segments.forEach((segment, segmentIndex) => {
@@ -1332,7 +1369,7 @@
             for (const part of segment.parts) {
               if (part.tag) {
                 const info = tagInfo(part.text);
-                if (info.closing) close(part, info, 1);
+                if (info.closing) close(part, info);
                 else open(part, info, pi);
               } else {
                 count(part.text.length, false);
@@ -1347,28 +1384,33 @@
             path: segment.path || segment.label,
             anchorId: `region-${segment.regionId}`,
           };
-          const significant = segment.parts.filter((part) => part.text.trim());
-          const first = significant[0];
-          const last = significant[significant.length - 1];
-          const merged = Boolean(
-            first?.tag && last?.tag && first !== last &&
-            !tagInfo(first.text).closing && tagInfo(last.text).closing &&
-            tagInfo(first.text).name === tagInfo(last.text).name,
-          );
-          const floor = stack.length;
-          if (!merged) {
-            const leaf = node({ kind: 'source', region, anchorId: region.anchorId, parent: stack[stack.length - 1] });
-            stack[stack.length - 1].children.push(leaf);
-            stack.push(leaf);
+          const leading = leadingElement(segment.parts);
+          // A region that starts an element names that element's file, even when the element closes later.
+          const ownsElement = leading === 'whole' || leading === 'open';
+          if (!ownsElement) {
+            const owner = sourceOwner();
+            const parent = stack[stack.length - 1];
+            if (owner?.source.path === region.path) {
+              // More of the file of an enclosing element: it counts toward that element.
+              (owner.regionIds ||= []).push(region.id);
+            } else if (previous?.leaf && previous.path === region.path && previous.leaf.parent === parent) {
+              leaf = previous.leaf;
+              leaf.regionIds.push(region.id);
+              leafDepth = stack.length;
+            } else {
+              leaf = node({ kind: 'source', region, anchorId: region.anchorId, parent, regionIds: [] });
+              parent.children.push(leaf);
+              leafDepth = stack.length;
+            }
           }
           const hasTags = segment.parts.some((part) => part.tag);
           segment.parts.forEach((part, partIndex) => {
             if (part.tag) {
               const info = tagInfo(part.text);
-              if (info.closing) close(part, info, floor);
+              if (info.closing) close(part, info);
               else {
                 const created = open(part, info, pi);
-                if (merged && !region.node) {
+                if (ownsElement && !region.node) {
                   created.source = region;
                   created.anchorId ||= region.anchorId;
                   region.node = created;
@@ -1378,9 +1420,10 @@
             }
             const text = hasTags ? part.text : segment.text;
             count(text.length, true);
-            partHolders.set(`${segmentIndex}:${partIndex}`, { nodes: [...stack], chars: text.length });
+            partHolders.set(`${segmentIndex}:${partIndex}`, { nodes: holders(), chars: text.length });
           });
-          stack.length = floor;
+          previous = { path: region.path, leaf };
+          leaf = null;
         });
 
         for (const candidate of nodes) {
