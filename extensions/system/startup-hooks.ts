@@ -10,9 +10,14 @@ import {
   type SessionEntry,
 } from '@earendil-works/pi-coding-agent';
 import { createTwoFilesPatch } from 'diff';
+import type { RenderedText } from '../../packages/core/src/prompt-template.js';
 import { setSandpiperSessionEnv } from '../../packages/core/src/session-continuity.js';
 import { buildSandpiperStartupPrompt } from '../../packages/core/src/startup-prompt.js';
-import { formatLocalDate } from '../../packages/core/src/system-prompt.js';
+import {
+  formatLocalDate,
+  loadSystemPromptTemplates,
+  type SystemPromptTemplates,
+} from '../../packages/core/src/system-prompt.js';
 import { readSandpiperUserProfile } from '../../packages/core/src/user-profile.js';
 import { detectVersionControl, type SandpiperVersionControlContext } from '../../packages/core/src/version-control.js';
 import {
@@ -64,6 +69,8 @@ export interface StartupPromptDiagnosticSources {
 export interface StartupPromptDiagnosticCommand {
   readonly commandName: string;
   readonly onPrompt: (prompt: string, sources: StartupPromptDiagnosticSources) => void | Promise<void>;
+  /** Receives the prompt Sandpiper gives Pi as its preamble, with its editable spans, on each run. */
+  readonly onPreamble?: (preamble: RenderedText) => void;
 }
 
 export function registerStartupPromptHooks(
@@ -80,6 +87,7 @@ export function registerStartupPromptHooks(
   let versionControl: SandpiperVersionControlContext | undefined;
   let userProfile: string | undefined;
   let identity: ReturnType<typeof readIdentity> | undefined;
+  let templates: SystemPromptTemplates | undefined;
   let lastKnownSystemPrompt: string | undefined;
 
   const resetPromptContributionListener = () => {
@@ -97,6 +105,7 @@ export function registerStartupPromptHooks(
     versionControl = undefined;
     userProfile = undefined;
     identity = undefined;
+    templates = undefined;
     lastKnownSystemPrompt = undefined;
     resetPromptContributionListener();
     unsubscribePromptContributions = pi.events.on(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, (payload) => {
@@ -137,6 +146,7 @@ export function registerStartupPromptHooks(
     if (!systemPromptOptions.customPrompt) {
       versionControl ??= detectVersionControl(cwd);
       userProfile ??= readSandpiperUserProfile({ agentDir: getAgentDir() });
+      templates ??= loadSystemPromptTemplates();
     }
     const prompt = await buildSandpiperStartupPrompt({
       versionControl,
@@ -145,13 +155,15 @@ export function registerStartupPromptHooks(
       cwd,
       systemPromptOptions,
       identityContent,
+      identityPath: identitySource,
+      templates,
       sessionStartDate,
       dumpSystemPrompt,
     });
     return { prompt, sources: { identity: identitySource } };
   };
 
-  const applyResolvedContributions = async (systemPrompt: string) => {
+  const applyResolvedContributions = async (systemPrompt: RenderedText) => {
     const resolvedContributions = await promptContributions.resolve();
     return applyPromptContributions(systemPrompt, resolvedContributions);
   };
@@ -167,7 +179,7 @@ export function registerStartupPromptHooks(
         const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
         const result = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions(), sessionStartDate);
         const finalSystemPrompt =
-          result.prompt === undefined ? ctx.getSystemPrompt() : await applyResolvedContributions(result.prompt);
+          result.prompt === undefined ? ctx.getSystemPrompt() : (await applyResolvedContributions(result.prompt)).text;
         await diagnosticCommand.onPrompt(finalSystemPrompt, result.sources);
       },
     });
@@ -200,7 +212,9 @@ export function registerStartupPromptHooks(
       return;
     }
 
-    const finalSystemPrompt = await applyResolvedContributions(result.prompt);
+    const preamble = await applyResolvedContributions(result.prompt);
+    diagnosticCommand?.onPreamble?.(preamble);
+    const finalSystemPrompt = preamble.text;
 
     lastKnownSystemPrompt = lastKnownSystemPrompt ?? finalSystemPrompt;
     if (lastKnownSystemPrompt !== finalSystemPrompt) {

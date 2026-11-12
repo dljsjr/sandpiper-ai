@@ -5,3 +5,6 @@
 
 # Generated task workspaces
 .sandpiper/jj-workspaces/
+
+# System prompt templates are rendered byte for byte
+packages/core/system-prompt/

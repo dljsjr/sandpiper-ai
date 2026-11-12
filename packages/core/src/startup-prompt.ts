@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { buildSandpiperSystemPrompt } from './system-prompt.js';
-import { readSandpiperUserProfile } from './user-profile.js';
+import type { RenderedText } from './prompt-template.js';
+import { buildSandpiperSystemPrompt, type SystemPromptTemplates } from './system-prompt.js';
+import { getSandpiperUserProfilePath, readSandpiperUserProfile } from './user-profile.js';
 import { detectVersionControl, type SandpiperVersionControlContext } from './version-control.js';
 
 type BuildSystemPrompt = typeof buildSandpiperSystemPrompt;
@@ -17,6 +18,9 @@ export interface StartupPromptDependencies {
 export interface StartupPromptInput {
   readonly agentDir?: string;
   readonly identityContent?: string;
+  /** The file `identityContent` was read from. */
+  readonly identityPath?: string;
+  readonly templates?: SystemPromptTemplates;
   readonly versionControl?: SandpiperVersionControlContext;
   readonly userProfile?: string;
   readonly cwd: string;
@@ -46,7 +50,7 @@ function resolveStartupPromptDependencies(dependencies: StartupPromptDependencie
 export async function buildSandpiperStartupPrompt(
   input: StartupPromptInput,
   dependencies: StartupPromptDependencies = {},
-): Promise<string | undefined> {
+): Promise<RenderedText | undefined> {
   if (input.systemPromptOptions.customPrompt) {
     return undefined;
   }
@@ -67,7 +71,10 @@ export async function buildSandpiperStartupPrompt(
           fileExists: resolved.fileExists,
           readFile: resolved.readFile,
         }),
+      userProfilePath: input.agentDir ? getSandpiperUserProfilePath(input.agentDir) : undefined,
       identityOverride: input.identityContent,
+      identityPath: input.identityPath,
+      templates: input.templates,
       sessionStartDate: input.sessionStartDate,
       dumpSystemPrompt: input.dumpSystemPrompt,
     },

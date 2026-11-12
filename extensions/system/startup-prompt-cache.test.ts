@@ -1,12 +1,15 @@
 import { execFileSync } from 'node:child_process';
-import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { BuildSystemPromptOptions } from '@earendil-works/pi-coding-agent';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { registerStartupPromptHooks } from './startup-hooks.js';
 
 const mockGetAgentDir = vi.hoisted(() => vi.fn());
+const templateDir = vi.hoisted((): { current?: string } => ({}));
+const shippedTemplateDir = join(dirname(fileURLToPath(import.meta.url)), '../../packages/core/system-prompt');
 
 vi.mock('@earendil-works/pi-coding-agent', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@earendil-works/pi-coding-agent')>()),
@@ -16,6 +19,13 @@ vi.mock('node:child_process', async (importOriginal) => ({
   ...(await importOriginal<typeof import('node:child_process')>()),
   execFileSync: vi.fn(),
 }));
+vi.mock('../../packages/core/src/system-prompt.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../packages/core/src/system-prompt.js')>();
+  return {
+    ...actual,
+    loadSystemPromptTemplates: (dir?: string) => actual.loadSystemPromptTemplates(dir ?? templateDir.current),
+  };
+});
 vi.mock('node:fs', async (importOriginal) => ({
   ...(await importOriginal<typeof import('node:fs')>()),
   appendFileSync: vi.fn(),
@@ -64,6 +74,7 @@ describe('session-scoped startup prompt inputs', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    templateDir.current = undefined;
     rmSync(root, { recursive: true, force: true });
   });
 
@@ -110,6 +121,26 @@ describe('session-scoped startup prompt inputs', () => {
       const refreshed = await session.build();
       expect(refreshed).toContain('Edited user profile');
       expect(refreshed).not.toContain('Original user profile');
+    },
+  );
+
+  it.each(['startup', 'reload', 'new', 'resume', 'fork'])(
+    'keeps the prompt templates unchanged for two builds and reads edits after session_start (%s)',
+    async (reason) => {
+      templateDir.current = join(root, 'templates');
+      cpSync(shippedTemplateDir, templateDir.current, { recursive: true });
+      const session = createPromptSession(root);
+      await session.start('startup');
+      const first = await session.build();
+      expect(first).toContain('friendly, expert coding agent');
+
+      writeFileSync(join(templateDir.current, 'identity.md'), '<identity>Edited template</identity>\n');
+      expect(await session.build()).toBe(first);
+
+      await session.start(reason);
+      const refreshed = await session.build();
+      expect(refreshed).toContain('<identity>Edited template</identity>');
+      expect(refreshed).not.toContain('friendly, expert coding agent');
     },
   );
 

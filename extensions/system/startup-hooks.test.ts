@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { EditableSpan, RenderedText } from '../../packages/core/src/prompt-template.js';
 import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
 import { SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL } from './prompt-contributions.js';
 import { registerSessionContinuityHooks, registerStartupPromptHooks } from './startup-hooks.js';
@@ -64,6 +65,10 @@ function createStartupPromptHookStub(
   };
 }
 
+function rendered(text: string, spans: readonly EditableSpan[] = []): RenderedText {
+  return { text, spans };
+}
+
 function beforeAgentStartEvent(systemPromptOptions: Record<string, unknown> = {}) {
   return { systemPrompt: 'base prompt', systemPromptOptions: { ...systemPromptOptions } };
 }
@@ -97,12 +102,14 @@ describe('startup hooks', () => {
   beforeEach(() => {
     mockGetAgentDir.mockClear();
     mockGetAgentDir.mockReturnValue('/agent');
-    mockBuildSandpiperStartupPrompt.mockImplementation(async (input: { agentDir?: string; cwd: string }) => {
-      return JSON.stringify({
-        agentDir: input.agentDir,
-        cwd: input.cwd,
-      });
-    });
+    mockBuildSandpiperStartupPrompt.mockImplementation(async (input: { agentDir?: string; cwd: string }) =>
+      rendered(
+        JSON.stringify({
+          agentDir: input.agentDir,
+          cwd: input.cwd,
+        }),
+      ),
+    );
   });
 
   afterEach(() => {
@@ -204,7 +211,7 @@ describe('startup hooks', () => {
   // removed again — the exact regression eff4bda53 introduced when the collector was swept up as
   // "dead code" (no *internal* emitters) and no test guarded it.
   it('appends prompt contributions registered on the contribution channel (first-turn only)', async () => {
-    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce(rendered('<system_prompt>sandpiper</system_prompt>'));
 
     const { pi, handlers, events, sessionEntries } = createStartupPromptHookStub();
     registerStartupPromptHooks(pi);
@@ -231,7 +238,7 @@ describe('startup hooks', () => {
   });
 
   it('renders the contributed prompt from an extension command without starting an agent turn', async () => {
-    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce(rendered('<system_prompt>sandpiper</system_prompt>'));
 
     const onPrompt = vi.fn();
     const { pi, handlers, commands, events, sessionEntries } = createStartupPromptHookStub();
@@ -264,8 +271,36 @@ describe('startup hooks', () => {
     );
   });
 
+  it('hands the diagnostic the preamble with its spans shifted past prepended contributions', async () => {
+    const span: EditableSpan = { start: 15, end: 24, path: '/t.md', sourceStart: 0, sourceEnd: 9, codec: 'direct' };
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce(rendered('<system_prompt>sandpiper</system_prompt>', [span]));
+
+    const onPreamble = vi.fn();
+    const { pi, handlers, events, sessionEntries } = createStartupPromptHookStub();
+    registerStartupPromptHooks(pi, undefined, {
+      commandName: '__sandpiper-system-prompt',
+      onPrompt: vi.fn(),
+      onPreamble,
+    });
+    const sessionContext = createPromptSessionContext(sessionEntries);
+
+    await handlers.get('session_start')?.({ reason: 'startup' }, sessionContext);
+    events.emit(SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL, {
+      id: 'header',
+      phase: 'prepend',
+      getContent: () => '<header/>',
+    });
+    const event = beforeAgentStartEvent();
+    await handlers.get('before_agent_start')?.(event, sessionContext);
+
+    expect(onPreamble).toHaveBeenCalledWith(
+      rendered('<header/>\n\n<system_prompt>sandpiper</system_prompt>', [{ ...span, start: 26, end: 35 }]),
+    );
+    expect(event.systemPromptOptions.customPrompt).toBe('<header/>\n\n<system_prompt>sandpiper</system_prompt>');
+  });
+
   it('dedupes prompt contributions by id and preserves prepend/append phases', async () => {
-    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce('<system_prompt>sandpiper</system_prompt>');
+    mockBuildSandpiperStartupPrompt.mockResolvedValueOnce(rendered('<system_prompt>sandpiper</system_prompt>'));
 
     const { pi, handlers, events, sessionEntries } = createStartupPromptHookStub();
     registerStartupPromptHooks(pi);

@@ -112,7 +112,11 @@ const CASES: readonly PromptCase[] = [
 ];
 
 async function renderPrompt({ options, promptOptions }: PromptCase): Promise<string> {
-  return buildSandpiperSystemPrompt({ platform: 'darwin', sessionStartDate: '2026-09-08', ...options }, promptOptions);
+  const { text } = await buildSandpiperSystemPrompt(
+    { platform: 'darwin', sessionStartDate: '2026-09-08', ...options },
+    promptOptions,
+  );
+  return text;
 }
 
 describe('rendered system prompt', () => {

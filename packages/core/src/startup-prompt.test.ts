@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { buildSandpiperStartupPrompt, type StartupPromptDependencies } from './startup-prompt.js';
+import { loadSystemPromptTemplates } from './system-prompt.js';
 
 function createDependencies(overrides: Partial<StartupPromptDependencies> = {}): StartupPromptDependencies {
   return {
-    buildSystemPrompt: vi.fn(async (options) => JSON.stringify(options)),
+    buildSystemPrompt: vi.fn(async (options) => ({ text: JSON.stringify(options), spans: [] })),
     detectVersionControl: vi.fn(() => ({ system: 'none' as const, detection: 'session_start' as const })),
     env: {
       PI_CODING_AGENT_PACKAGE: '/pi/package',
@@ -47,14 +48,15 @@ describe('startup prompt operations', () => {
       dependencies,
     );
 
-    expect(prompt).not.toContain('"cwd"');
+    expect(prompt?.text).not.toContain('"cwd"');
     expect(dependencies.detectVersionControl).toHaveBeenCalledWith('/repo', { fileExists: dependencies.fileExists });
-    expect(prompt).toContain('"sessionStartDate":"2026-09-08"');
-    expect(prompt).toContain('"piCodingAgentPackage":"/pi/package"');
-    expect(prompt).toContain('"piCodingAgentVersion":"1.2.3"');
-    expect(prompt).toContain('"sandpiperCodingAgentPackage":"/sandpiper/package"');
-    expect(prompt).toContain('"userProfile":""');
-    expect(prompt).toContain('"versionControl":{"system":"jj","colocatedGit":true,"detection":"session_start"}');
+    expect(prompt?.text).toContain('"sessionStartDate":"2026-09-08"');
+    expect(prompt?.text).toContain('"piCodingAgentPackage":"/pi/package"');
+    expect(prompt?.text).toContain('"piCodingAgentVersion":"1.2.3"');
+    expect(prompt?.text).toContain('"sandpiperCodingAgentPackage":"/sandpiper/package"');
+    expect(prompt?.text).toContain('"userProfile":""');
+    expect(prompt?.text).toContain('"userProfilePath":"/agent/USER.md"');
+    expect(prompt?.text).toContain('"versionControl":{"system":"jj","colocatedGit":true,"detection":"session_start"}');
   });
 
   it('builds from supplied session inputs without detecting VCS or reading even an empty profile again', async () => {
@@ -72,8 +74,8 @@ describe('startup prompt operations', () => {
 
     expect(dependencies.detectVersionControl).not.toHaveBeenCalled();
     expect(dependencies.readUserProfile).not.toHaveBeenCalled();
-    expect(prompt).toContain('"versionControl":{"system":"jj","detection":"session_start"}');
-    expect(prompt).toContain('"userProfile":""');
+    expect(prompt?.text).toContain('"versionControl":{"system":"jj","detection":"session_start"}');
+    expect(prompt?.text).toContain('"userProfile":""');
   });
 
   it('passes the user profile into system prompt construction', async () => {
@@ -91,6 +93,32 @@ describe('startup prompt operations', () => {
       fileExists: dependencies.fileExists,
       readFile: dependencies.readFile,
     });
-    expect(prompt).toContain('"userProfile":"# User\\nLikes plans"');
+    expect(prompt?.text).toContain('"userProfile":"# User\\nLikes plans"');
+  });
+
+  it('passes the identity file and the session templates into system prompt construction', async () => {
+    const templates = loadSystemPromptTemplates();
+    const dependencies = createDependencies();
+
+    await buildSandpiperStartupPrompt(
+      {
+        cwd: '/repo',
+        systemPromptOptions: { cwd: '/repo' },
+        identityContent: '<identity>from file</identity>',
+        identityPath: '/identity.md',
+        templates,
+      },
+      dependencies,
+    );
+
+    expect(dependencies.buildSystemPrompt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        identityOverride: '<identity>from file</identity>',
+        identityPath: '/identity.md',
+        userProfilePath: undefined,
+        templates,
+      }),
+      { cwd: '/repo' },
+    );
   });
 });

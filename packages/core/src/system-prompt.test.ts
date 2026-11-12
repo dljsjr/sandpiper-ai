@@ -24,7 +24,11 @@ async function renderPrompt(
   options: SandpiperSystemPromptOptions = {},
   promptOptions: SandpiperBaseSystemPromptOptions = createPromptOptions(),
 ): Promise<string> {
-  return buildSandpiperSystemPrompt({ platform: 'darwin', sessionStartDate: '2026-09-08', ...options }, promptOptions);
+  const { text } = await buildSandpiperSystemPrompt(
+    { platform: 'darwin', sessionStartDate: '2026-09-08', ...options },
+    promptOptions,
+  );
+  return text;
 }
 
 describe('system-prompt', () => {
@@ -176,7 +180,7 @@ describe('system-prompt', () => {
   describe('buildSandpiperSystemPrompt', () => {
     it('produces a prompt with all required sections', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt(
+      const { text: prompt } = await buildSandpiperSystemPrompt(
         { platform: 'darwin', sessionStartDate: '2026-09-08' },
         promptOptions,
       );
@@ -191,13 +195,16 @@ describe('system-prompt', () => {
 
     it("leaves the working directory to Pi's cwd section", async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({ platform: 'darwin' }, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({ platform: 'darwin' }, promptOptions);
       expect(prompt).not.toContain('<cwd>');
     });
 
     it('includes user profile when provided', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({ userProfile: '# Doug\nLikes clear plans' }, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt(
+        { userProfile: '# Doug\nLikes clear plans' },
+        promptOptions,
+      );
 
       expect(prompt).toContain('<user_profile>');
       expect(prompt).toContain('Likes clear plans');
@@ -205,7 +212,7 @@ describe('system-prompt', () => {
 
     it('omits user profile when not provided', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).not.toContain('<user_profile>');
     });
 
@@ -214,7 +221,7 @@ describe('system-prompt', () => {
         contextFiles: [{ path: 'AGENTS.md', content: '# Rules\nDo good things' }],
       });
 
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).toContain('<injected_context>');
       expect(prompt).toContain('AGENTS.md');
       expect(prompt).toContain('Do good things');
@@ -222,7 +229,7 @@ describe('system-prompt', () => {
 
     it('omits injected context when no context files are present', async () => {
       const promptOptions = createPromptOptions({ contextFiles: [] });
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).not.toContain('<injected_context>');
     });
 
@@ -237,19 +244,19 @@ describe('system-prompt', () => {
         ],
       });
 
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).toContain('<skills>');
     });
 
     it('omits skills block when no skills are present', async () => {
       const promptOptions = createPromptOptions({ skills: [] });
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).not.toContain('<skills>');
     });
 
     it('includes harness docs block when package roots are set', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt(
+      const { text: prompt } = await buildSandpiperSystemPrompt(
         {
           piCodingAgentPackage: '/opt/pi',
           piCodingAgentVersion: '1.0.0',
@@ -268,7 +275,7 @@ describe('system-prompt', () => {
 
     it('omits harness docs block when package roots are not set', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).not.toContain('<harness_docs>');
     });
 
@@ -277,7 +284,7 @@ describe('system-prompt', () => {
         appendSystemPrompt: 'Extra instructions from the user',
       });
 
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).toContain('<user_appended_prompt>');
       expect(prompt).toContain('Extra instructions from the user');
       expect(prompt).toContain('</user_appended_prompt>');
@@ -285,7 +292,7 @@ describe('system-prompt', () => {
 
     it('omits user appended prompt block when appendSystemPrompt is not set', async () => {
       const promptOptions = createPromptOptions();
-      const prompt = await buildSandpiperSystemPrompt({}, promptOptions);
+      const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).not.toContain('<user_appended_prompt>');
     });
   });
@@ -712,7 +719,7 @@ describe('system-prompt exact output', () => {
 
   describe('buildSandpiperSystemPrompt', () => {
     it('builds the full prompt exactly', async () => {
-      const prompt = await buildSandpiperSystemPrompt(
+      const { text: prompt } = await buildSandpiperSystemPrompt(
         {
           piCodingAgentPackage: '/opt/pi/pkg',
           piCodingAgentVersion: '1.2.3',

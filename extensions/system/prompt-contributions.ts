@@ -1,3 +1,5 @@
+import { joinRendered, type RenderedText } from '../../packages/core/src/prompt-template.js';
+
 export const SANDPIPER_PROMPT_CONTRIBUTION_CHANNEL = 'sandpiper:prompt-contribution';
 
 export type SandpiperPromptContributionPhase = 'prepend' | 'append';
@@ -29,11 +31,14 @@ export function isSandpiperPromptContribution(value: unknown): value is Sandpipe
   );
 }
 
-export function applyPromptContributions(basePrompt: string, contributions: ResolvedPromptContributions): string {
+export function applyPromptContributions(
+  basePrompt: RenderedText,
+  contributions: ResolvedPromptContributions,
+): RenderedText {
   const sections = [...contributions.prepend, basePrompt, ...contributions.append].filter(
-    (section) => section.length > 0,
+    (section) => (typeof section === 'string' ? section : section.text).length > 0,
   );
-  return sections.join('\n\n');
+  return joinRendered(sections, '\n\n');
 }
 
 export class SandpiperPromptContributionCollector {
