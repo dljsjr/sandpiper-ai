@@ -11,13 +11,13 @@ A Pi extension that adds a `web_fetch` tool. It fetches one web page and returns
 
 ## Parameters
 
-| Parameter     | Type    | Required | Description                                                                           |
-| ------------- | ------- | -------- | ------------------------------------------------------------------------------------- |
-| `url`         | string  | yes      | The page to fetch                                                                     |
-| `followLinks` | boolean | no       | Also return the links found in the content                                            |
-| `filter`      | object  | no       | Return one part of the page: a CSS selector or a Markdown section                     |
-| `render`      | boolean | no       | Load the page in a headless browser first. Present only when a renderer is registered |
-| `renderer`    | string  | no       | Id of the renderer to use. Present only when two or more are registered               |
+| Parameter     | Type    | Required | Description                                                                                           |
+| ------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------- |
+| `url`         | string  | yes      | The page to fetch                                                                                     |
+| `followLinks` | boolean | no       | Also return the links found in the content                                                            |
+| `filter`      | object  | no       | Return one part of the page: a CSS selector or a Markdown section                                     |
+| `render`      | boolean | no       | Load the page in a headless browser first. Present only when exactly one renderer is registered       |
+| `renderer`    | string  | no       | `none`, or the id of the renderer to load the page with. Present only when two or more are registered |
 
 ### Filters
 
@@ -43,15 +43,15 @@ Rendering is slower than a normal fetch, and sites that challenge automated brow
 
 ### What the tool offers
 
-The tool's parameters follow the renderers that are registered when the first run of a session starts:
+The tool's parameters follow the renderers that are registered when the first run of a session starts. Rendering is always one parameter, never two:
 
-| Registered renderers | Parameters added                             |
-| -------------------- | -------------------------------------------- |
-| None                 | None. Rendering is not offered               |
-| One                  | `render`                                     |
-| Two or more          | `render`, and `renderer` to choose one by id |
+| Registered renderers | Parameter                                                                            |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| None                 | None. Rendering is not offered                                                       |
+| One                  | `render`, a boolean                                                                  |
+| Two or more          | `renderer`: `none` or one of the renderer ids. The default is `none`, a normal fetch |
 
-With `render: true` and no `renderer`, the first renderer in id order is used, and the `renderer` description names it. Naming a `renderer` also requests rendering. There is no setting that picks a renderer: the caller chooses for each fetch, which lets it try another browser when one is blocked.
+Nothing is chosen for the caller. With several renderers there is no default browser, and no setting or environment variable picks one: each fetch names the renderer it wants, which lets the caller try another browser when one is blocked. The id `none` is reserved, and a renderer cannot register under it.
 
 ### Adding a renderer
 

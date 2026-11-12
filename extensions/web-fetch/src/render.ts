@@ -14,6 +14,8 @@ import type { FetchAdapter, FetchResult } from './types.js';
 
 /** Event bus channel on which extensions register a renderer, during `resources_discover`. */
 export const WEB_FETCH_RENDERER_CHANNEL = 'sandpiper:web-fetch-renderer';
+/** The value of the tool's renderer choice that means a plain fetch. Not available as a renderer id. */
+export const NO_RENDERER = 'none';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_OUTPUT_BYTES = 20 * 1024 * 1024;
@@ -125,7 +127,7 @@ export class RendererCollector {
     if (!isRenderer(value)) return;
 
     const id = value.id.trim();
-    if (this.#registered.has(id)) return;
+    if (id.toLowerCase() === NO_RENDERER || this.#registered.has(id)) return;
 
     this.#registered.set(id, { ...value, id });
     value.acknowledge?.();

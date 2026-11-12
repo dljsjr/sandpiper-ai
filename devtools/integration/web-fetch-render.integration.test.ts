@@ -80,7 +80,9 @@ describe('web_fetch renderers in a real session (WEB-10)', () => {
 
         const [initial] = systemMessages(requests[0]);
         const webFetch = initial?.toolsAdded?.find((tool) => tool.name === 'web_fetch');
-        expect(webFetch?.parameters.properties).toHaveProperty('render');
+        // Several renderers: one choice that is off by default, and no separate switch.
+        expect(webFetch?.parameters.properties).not.toHaveProperty('render');
+        expect(webFetch?.parameters.properties.renderer?.enum?.[0]).toBe('none');
         expect(webFetch?.parameters.properties.renderer?.enum).toEqual(
           expect.arrayContaining([...RENDERER_FIXTURE_IDS]),
         );

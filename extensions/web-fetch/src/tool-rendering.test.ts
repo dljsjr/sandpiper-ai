@@ -42,6 +42,12 @@ describe('web-fetch tool rendering', () => {
     );
   });
 
+  it('shows a plain fetch when the call names no renderer', () => {
+    expect(formatWebFetchRenderCall({ url: 'https://example.com/page', renderer: 'none' }, theme)).toBe(
+      '**web_fetch** https://example.com/page',
+    );
+  });
+
   it('names the renderer in the tool call when the call names one', () => {
     expect(formatWebFetchRenderCall({ url: 'https://example.com/app', renderer: 'obscura' }, theme)).toBe(
       '**web_fetch** https://example.com/app (rendered with obscura)',

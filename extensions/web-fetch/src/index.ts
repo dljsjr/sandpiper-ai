@@ -7,7 +7,7 @@ import { StringEnum } from '@earendil-works/pi-ai';
 import type { AgentToolResult, ExtensionAPI } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
 import { SimpleFetchAdapter } from './fetch.js';
-import { RendererCollector, RendererFetchAdapter, WEB_FETCH_RENDERER_CHANNEL } from './render.js';
+import { NO_RENDERER, RendererCollector, RendererFetchAdapter, WEB_FETCH_RENDERER_CHANNEL } from './render.js';
 import { executeWebFetchTool as defaultExecuteWebFetchTool, type WebFetchToolDetails } from './tool-operation.js';
 import { renderWebFetchCall, renderWebFetchResult } from './tool-rendering.js';
 import { type FetchAdapter, WebFetchFilterType } from './types.js';
@@ -66,8 +66,8 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
     }),
   );
 
-  // The schema offers only what can run: no rendering without a renderer, and a choice of
-  // renderer only when there is more than one.
+  // The schema offers only what can run, in one field: a switch for a single renderer, a choice
+  // when there are several. Two coupled fields would leave their combinations open to guessing.
   const toolParameters = () => {
     const ids = [...renderAdapters.keys()];
     if (ids.length === 0) return Type.Object(pageParameters);
@@ -75,12 +75,14 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
 
     return Type.Object({
       ...pageParameters,
-      render: renderParameter,
       renderer: Type.Optional(
-        StringEnum(ids, {
+        StringEnum([NO_RENDERER, ...ids], {
+          default: NO_RENDERER,
           description:
-            `Headless browser to render with. Defaults to ${ids[0]}. ` +
-            'Name another one when a render fails or reports that the site blocked it',
+            `Headless browser to load the page in, so its JavaScript runs before the page is read. ` +
+            `"${NO_RENDERER}" (the default) is a normal fetch. A browser is slower, and some sites block it. ` +
+            'Use one only when a normal fetch returns an empty page shell or loading placeholders, ' +
+            'and try another when one reports that the site blocked it',
         }),
       ),
     });

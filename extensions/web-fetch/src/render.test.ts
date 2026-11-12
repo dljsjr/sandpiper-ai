@@ -116,6 +116,8 @@ describe('RendererCollector', () => {
     { id: 'no-render' },
     { id: '', render: () => undefined },
     { id: 'x', render: 'not a function' },
+    { id: 'none', render: () => undefined },
+    { id: ' None ', render: () => undefined },
   ])('ignores a registration that is not a renderer: %j', (value) => {
     const collector = new RendererCollector();
     collector.add(value);

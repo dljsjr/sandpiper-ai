@@ -120,7 +120,7 @@ describe('web-fetch extension', () => {
 
 describe('web-fetch renderers', () => {
   interface Schema {
-    readonly properties: Record<string, { readonly enum?: readonly string[]; readonly description?: string }>;
+    readonly properties: Record<string, { readonly enum?: readonly string[]; readonly default?: string }>;
   }
 
   async function start(rendererIds: readonly string[], executeWebFetchTool = vi.fn(async () => okResult())) {
@@ -149,13 +149,13 @@ describe('web-fetch renderers', () => {
     expect(Object.keys(schema().properties)).toEqual(['url', 'followLinks', 'filter', 'render']);
   });
 
-  it('adds the render switch and a choice of renderer when several are registered', async () => {
+  it('replaces the render switch with one choice of renderer, off by default, when several are registered', async () => {
     const { pi, schema } = await start(['obscura', 'lightpanda']);
 
     expect(pi.registerTool).toHaveBeenCalledTimes(2);
-    expect(Object.keys(schema().properties)).toEqual(['url', 'followLinks', 'filter', 'render', 'renderer']);
-    expect(schema().properties.renderer?.enum).toEqual(['lightpanda', 'obscura']);
-    expect(schema().properties.renderer?.description).toContain('Defaults to lightpanda');
+    expect(Object.keys(schema().properties)).toEqual(['url', 'followLinks', 'filter', 'renderer']);
+    expect(schema().properties.renderer?.enum).toEqual(['none', 'lightpanda', 'obscura']);
+    expect(schema().properties.renderer?.default).toBe('none');
   });
 
   it('hands the tool operation one adapter per renderer, in id order', async () => {

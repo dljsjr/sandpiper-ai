@@ -120,7 +120,7 @@ threat that isn't real.
 - [`web-fetch-render.integration.test.ts`](./web-fetch-render.integration.test.ts) — two renderers that
   [`fixtures/renderer-fixture.ts`](./fixtures/renderer-fixture.ts) registers on the event bus reach
   `web_fetch` in a real session, and a call that names one is served by it. It also checks what the
-  model is sent: the first request declares `web_fetch` with its `render` and `renderer` parameters,
+  model is sent: the first request declares `web_fetch` with its `renderer` parameter,
   and no later request carries a prompt or tool change.
 
 ## Recording requests

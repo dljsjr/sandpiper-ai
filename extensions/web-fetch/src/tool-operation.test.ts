@@ -235,20 +235,20 @@ describe('executeWebFetchTool', () => {
     });
   });
 
-  it('uses the first renderer when rendering is requested without naming one', async () => {
+  const two = () =>
+    new Map([
+      ['lightpanda', createAdapter()],
+      ['obscura', createAdapter()],
+    ]);
+
+  it('uses the only renderer when the render switch is set', async () => {
     const lightpanda = createAdapter();
     const fetchAndExtract = vi.fn(async () => createResult());
 
     await executeWebFetchTool(
       createAdapter(),
       { url: 'https://example.com/app', render: true },
-      {
-        fetchAndExtract,
-        renderAdapters: new Map([
-          ['lightpanda', lightpanda],
-          ['obscura', createAdapter()],
-        ]),
-      },
+      { fetchAndExtract, renderAdapters: new Map([['lightpanda', lightpanda]]) },
     );
 
     expect(fetchAndExtract).toHaveBeenCalledWith(lightpanda, 'https://example.com/app', {
@@ -258,37 +258,35 @@ describe('executeWebFetchTool', () => {
     });
   });
 
-  it('uses the renderer the call names, and treats naming one as a request to render', async () => {
-    const obscura = createAdapter();
+  it('uses the renderer the call names', async () => {
+    const renderAdapters = two();
     const fetchAndExtract = vi.fn(async () => createResult());
 
     await executeWebFetchTool(
       createAdapter(),
       { url: 'https://example.com/app', renderer: 'obscura' },
-      {
-        fetchAndExtract,
-        renderAdapters: new Map([
-          ['lightpanda', createAdapter()],
-          ['obscura', obscura],
-        ]),
-      },
+      { fetchAndExtract, renderAdapters },
     );
 
-    expect(fetchAndExtract).toHaveBeenCalledWith(obscura, 'https://example.com/app', {
+    expect(fetchAndExtract).toHaveBeenCalledWith(renderAdapters.get('obscura'), 'https://example.com/app', {
       filter: undefined,
       followLinks: undefined,
       render: true,
     });
   });
 
-  it('uses the plain adapter when rendering is not requested', async () => {
+  it.each([
+    ['the renderer is none', { renderer: 'none' }],
+    ['no renderer is named', {}],
+    ['the render switch is off', { render: false }],
+  ])('uses the plain adapter when %s', async (_name, rendering) => {
     const adapter = createAdapter();
     const fetchAndExtract = vi.fn(async () => createResult());
 
     await executeWebFetchTool(
       adapter,
-      { url: 'https://example.com/page', render: false },
-      { fetchAndExtract, renderAdapters: new Map([['lightpanda', createAdapter()]]) },
+      { url: 'https://example.com/page', ...rendering },
+      { fetchAndExtract, renderAdapters: two() },
     );
 
     expect(fetchAndExtract).toHaveBeenCalledWith(adapter, 'https://example.com/page', {
@@ -297,19 +295,28 @@ describe('executeWebFetchTool', () => {
     });
   });
 
-  it('names the available renderers when the call names one that is not loaded', async () => {
+  it('does not choose for the caller when the render switch is set and several renderers are loaded', async () => {
+    const fetchAndExtract = vi.fn(async () => createResult());
+
+    const output = await executeWebFetchTool(
+      createAdapter(),
+      { url: 'https://example.com/app', render: true },
+      { fetchAndExtract, renderAdapters: two() },
+    );
+
+    expect(fetchAndExtract).not.toHaveBeenCalled();
+    expect(output.content[0]?.text).toBe(
+      'Failed to fetch https://example.com/app: several renderers are loaded. Set renderer to one of: lightpanda, obscura',
+    );
+  });
+
+  it('names the loaded renderers when the call names one that is not loaded', async () => {
     const fetchAndExtract = vi.fn(async () => createResult());
 
     const output = await executeWebFetchTool(
       createAdapter(),
       { url: 'https://example.com/app', renderer: 'chrome' },
-      {
-        fetchAndExtract,
-        renderAdapters: new Map([
-          ['lightpanda', createAdapter()],
-          ['obscura', createAdapter()],
-        ]),
-      },
+      { fetchAndExtract, renderAdapters: two() },
     );
 
     expect(fetchAndExtract).not.toHaveBeenCalled();

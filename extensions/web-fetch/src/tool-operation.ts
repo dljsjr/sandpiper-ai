@@ -1,4 +1,5 @@
 import { fetchAndExtract as defaultFetchAndExtract } from './pipeline.js';
+import { NO_RENDERER } from './render.js';
 import type {
   FetchAdapter,
   LlmsTxtProbeResult,
@@ -11,9 +12,9 @@ export interface WebFetchToolInput {
   readonly url: string;
   readonly followLinks?: boolean;
   readonly filter?: WebFetchFilterSpec;
-  /** Load the page in a headless browser. */
+  /** Load the page in a headless browser. Offered when exactly one renderer is loaded. */
   readonly render?: boolean;
-  /** Id of the renderer to use. Naming one requests rendering. */
+  /** Id of the renderer to load the page with, or `none`. Offered when several renderers are loaded. */
   readonly renderer?: string;
 }
 
@@ -38,7 +39,7 @@ export interface WebFetchToolResult {
 
 export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
-  /** Adapters that load pages in a headless browser, by renderer id. The first one is the default. */
+  /** Adapters that load pages in a headless browser, by renderer id. */
   readonly renderAdapters?: ReadonlyMap<string, FetchAdapter>;
 }
 
@@ -87,10 +88,19 @@ export function formatWebFetchResult(result: WebFetchResult): string {
   return output;
 }
 
-function wantsRendering(input: WebFetchToolInput): boolean {
-  return input.render === true || input.renderer !== undefined;
+/** The renderer id a call names, when it names one. */
+function namedRenderer(input: WebFetchToolInput): string | undefined {
+  return input.renderer === undefined || input.renderer === NO_RENDERER ? undefined : input.renderer;
 }
 
+function wantsRendering(input: WebFetchToolInput): boolean {
+  return input.render === true || namedRenderer(input) !== undefined;
+}
+
+/**
+ * The adapter for a call. Nothing is chosen on the caller's behalf: the render switch means the
+ * only renderer, and with several loaded the call has to name one.
+ */
 function selectAdapter(
   adapter: FetchAdapter,
   input: WebFetchToolInput,
@@ -99,11 +109,19 @@ function selectAdapter(
   if (!wantsRendering(input)) return adapter;
 
   const renderAdapters = dependencies.renderAdapters ?? new Map<string, FetchAdapter>();
-  const selected =
-    input.renderer === undefined ? renderAdapters.values().next().value : renderAdapters.get(input.renderer);
-  if (selected) return selected;
+  const loaded = [...renderAdapters.keys()].join(', ');
   if (renderAdapters.size === 0) throw new Error('rendering is not available because no renderer is loaded');
-  throw new Error(`renderer "${input.renderer}" is not loaded. Loaded: ${[...renderAdapters.keys()].join(', ')}`);
+
+  const named = namedRenderer(input);
+  if (named === undefined) {
+    const [only, ...others] = renderAdapters.values();
+    if (only && others.length === 0) return only;
+    throw new Error(`several renderers are loaded. Set renderer to one of: ${loaded}`);
+  }
+
+  const selected = renderAdapters.get(named);
+  if (!selected) throw new Error(`renderer "${named}" is not loaded. Loaded: ${loaded}`);
+  return selected;
 }
 
 export async function executeWebFetchTool(

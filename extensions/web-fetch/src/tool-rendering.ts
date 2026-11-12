@@ -5,6 +5,7 @@ import {
   type ToolRenderResultOptions,
 } from '@earendil-works/pi-coding-agent';
 import { Text } from '@earendil-works/pi-tui';
+import { NO_RENDERER } from './render.js';
 import type { WebFetchToolDetails, WebFetchToolInput } from './tool-operation.js';
 
 type WebFetchRenderColor = 'accent' | 'error' | 'muted' | 'success' | 'toolOutput' | 'toolTitle';
@@ -43,7 +44,8 @@ function colorMultiline(theme: WebFetchRenderTheme, color: WebFetchRenderColor, 
 export function formatWebFetchRenderCall(args: WebFetchToolInput, theme: WebFetchRenderTheme): string {
   const url = args.url ? theme.fg('accent', args.url) : theme.fg('toolOutput', '...');
   const followLinks = args.followLinks ? theme.fg('muted', ' (follow links)') : '';
-  const renderedLabel = args.renderer ? ` (rendered with ${args.renderer})` : args.render ? ' (rendered)' : '';
+  const namedRenderer = args.renderer && args.renderer !== NO_RENDERER ? args.renderer : undefined;
+  const renderedLabel = namedRenderer ? ` (rendered with ${namedRenderer})` : args.render ? ' (rendered)' : '';
   const rendered = renderedLabel ? theme.fg('muted', renderedLabel) : '';
   return `${theme.fg('toolTitle', theme.bold('web_fetch'))} ${url}${followLinks}${rendered}`;
 }
