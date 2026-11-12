@@ -15,6 +15,6 @@ Run `bun run build` from the repository root. One Bun invocation bundles both CL
 
 ## Output
 
-Run `bun run pack:cli` from the repository root. It builds, then uses ordinary `bun pm pack --ignore-scripts --destination ./dist`. The tarball includes runtime output, public documentation, the license, stable launchers, and patched runtime dependencies. It does not publish to a registry.
+Run `bun run pack:cli` from the repository root. It builds, then uses ordinary `bun pm pack --ignore-scripts --destination ./dist`. The tarball includes runtime output, the system prompt templates from `packages/core/system-prompt/`, public documentation, the license, stable launchers, and patched runtime dependencies. It does not publish to a registry.
 
 The launchers remain at `packages/cli/bin/sandpiper` and `packages/cli/bin/sandpiper-system-prompt`. They load root `dist/` in both checkout and installed layouts. No resource or documentation staging step runs.

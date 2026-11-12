@@ -68,6 +68,8 @@ It accepts prompt-affecting Sandpiper/Pi flags such as `--identity`, `--append-s
 
 Pass `--json` for machine-readable output containing the rendered prompt and the resolved paths of file-backed identity, system prompt, appended prompt, and context inputs. Raw prompt flag values are intentionally absent from the source list because they have no file to update.
 
+The JSON output also has `editableSpans`: the runs of `prompt` copied verbatim from a system prompt template or a user file, each with its offsets in the prompt and in the file. See [editable spans](../../.sandpiper/docs/specs/sandpiper-system-prompt.md#editable-spans).
+
 The bin also satisfies `birdup`'s runner contract:
 
 ```bash

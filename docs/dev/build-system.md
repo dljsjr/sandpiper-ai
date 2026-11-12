@@ -17,6 +17,7 @@ Use this page to understand the build structure. For commands, see [How to build
 | `package.json`                                     | Product identity, version, runtime dependencies, file list, and both bin entries |
 | `dist/`                                            | Built runtime, system prompt diagnostic, and shared chunks                       |
 | `packages/cli/bin/`                                | Stable launchers that load root output                                           |
+| `packages/core/system-prompt/`                     | System prompt templates, read at run time                                        |
 | `docs/`, `README.md`, `CONTRIBUTING.md`, `LICENSE` | Root-owned documentation and license, packed directly                            |
 
 The CLI bundles its built-in extensions. Pi loads additional user and project extensions from TypeScript through jiti. Core and extension-local modules use source TypeScript. They need no separate JavaScript or declaration build.
@@ -71,7 +72,7 @@ Run `bun run pack:cli` from the repository root. It builds, then runs ordinary `
 
 Direct packing uses the root file list and includes the dependencies named in `bundledDependencies`. The file list selects `dist/**/*.js` and `dist/**/*.js.map`, not arbitrary output or previous tarballs. Packing does not build the application. There is no temporary package directory or pack wrapper.
 
-The installed package includes both launchers, root output, public docs, the license, and patched runtime dependencies. It ships no built-in skills, prompt templates, or custom themes. Stock themes come from Pi. Configured custom resources remain supported through the SDK.
+The installed package includes both launchers, root output, the system prompt templates, public docs, the license, and patched runtime dependencies. It ships no built-in skills, Pi prompt templates, or custom themes. Stock themes come from Pi. Configured custom resources remain supported through the SDK.
 
 The installed CLI requires Bun, but no source checkout or installation scripts. Optional standalone Journal requires Node 24 or later.
 
