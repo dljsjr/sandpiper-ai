@@ -95,6 +95,47 @@ describe('editable spans', () => {
     expect(projection.regions.map((region) => region.promptStart)).toEqual([13]);
   });
 
+  it('locks spans that hold only structural tags and whitespace', () => {
+    const prompt = '<a>\n<b>\nkept text\n</b>\n\n</a>';
+    const template = writeSource('template.md', `${prompt}\n`);
+    const span = (start: number, end: number): EditableSpan => ({
+      start,
+      end,
+      path: template,
+      sourceStart: start,
+      sourceEnd: end,
+      codec: 'direct',
+    });
+    const bodyEnd = prompt.indexOf('</b>');
+
+    const projection = buildEditorProjection(
+      diagnostic(prompt, {
+        editableSpans: [span(0, 4), span(4, bodyEnd), span(bodyEnd, bodyEnd + 6), span(bodyEnd + 6, prompt.length)],
+      }),
+      { promptSources: [] },
+    );
+
+    expect(editableText(projection)).toEqual([[template, 'direct', '<b>\nkept text\n']]);
+  });
+
+  it('keeps a span whose only tags are prose mentions', () => {
+    const prompt = '<a>\nSee `<policy>`.\n</a>';
+    const template = writeSource('template.md', '`<policy>`\n');
+    const start = prompt.indexOf('`');
+    const span: EditableSpan = {
+      start,
+      end: start + 10,
+      path: template,
+      sourceStart: 0,
+      sourceEnd: 10,
+      codec: 'direct',
+    };
+
+    const projection = buildEditorProjection(diagnostic(prompt, { editableSpans: [span] }), { promptSources: [] });
+
+    expect(editableText(projection)).toEqual([[template, 'direct', '`<policy>`']]);
+  });
+
   it('prefers a span over a matched file that overlaps it', () => {
     const outer = writeSource('outer.md', 'outer [inner text] outer\n');
     const inner = writeSource('inner.md', 'inner text\n');
@@ -181,6 +222,16 @@ describe('matched source files', () => {
       .map((segment) => segment.text)
       .join('');
     expect(locked).toContain('<append>raw and locked</append>');
+  });
+
+  it('locks a matched file that holds only structural tags', () => {
+    const source = writeSource('wrapper.md', '<wrapper>\n</wrapper>\n');
+
+    const projection = buildEditorProjection(diagnostic('<root>\n<wrapper>\n</wrapper>\n</root>'), {
+      promptSources: [source],
+    });
+
+    expect(projection.regions).toEqual([]);
   });
 
   it('maps a file named twice once, and skips missing and empty files', () => {

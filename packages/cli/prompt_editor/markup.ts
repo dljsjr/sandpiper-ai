@@ -114,6 +114,11 @@ export function xmlTags(text: string): string[] {
   return structuralElementTags(text).map((tag) => text.slice(tag.start, tag.end));
 }
 
+/** Where the structural tags of `text` are, in order. */
+export function xmlTagSpans(text: string): Array<{ readonly start: number; readonly end: number }> {
+  return structuralElementTags(text).map(({ start, end }) => ({ start, end }));
+}
+
 interface PromptPart {
   readonly text: string;
   readonly editable: boolean;

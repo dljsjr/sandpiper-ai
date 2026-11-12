@@ -1,6 +1,7 @@
 import { realpathSync, statSync } from 'node:fs';
 import type { DiagnosticPrompt, EditableSpan } from './diagnostic.js';
 import { frontmatterBodyStart } from './frontmatter.js';
+import { xmlTagSpans } from './markup.js';
 import {
   buildProjection,
   type PromptProjection,
@@ -73,6 +74,22 @@ function matchedFileCandidate(prompt: string, label: string, path: string): Plac
   return undefined;
 }
 
+/** Whether the candidate's prompt text has anything besides structural tags and whitespace. */
+function hasContent(
+  prompt: string,
+  tags: ReadonlyArray<{ readonly start: number; readonly end: number }>,
+  candidate: PlacedCandidate,
+): boolean {
+  const end = candidate.promptStart + candidate.renderedText.length;
+  let cursor = candidate.promptStart;
+  for (const tag of tags) {
+    if (tag.start < cursor || tag.end > end) continue;
+    if (prompt.slice(cursor, tag.start).trim()) return true;
+    cursor = tag.end;
+  }
+  return prompt.slice(cursor, end).trim() !== '';
+}
+
 function overlaps(left: PlacedCandidate, right: PlacedCandidate): boolean {
   return (
     left.promptStart < right.promptStart + right.renderedText.length &&
@@ -82,7 +99,8 @@ function overlaps(left: PlacedCandidate, right: PlacedCandidate): boolean {
 
 /**
  * Maps the prompt to the files it renders. The diagnostic's editable spans are exact and come first. Other files
- * are found by searching the prompt for their text.
+ * are found by searching the prompt for their text. A region of only structural tags and whitespace, such as the
+ * text between two placeholders of a template, stays locked: there is nothing in it to edit.
  */
 export function buildEditorProjection(diagnostic: DiagnosticPrompt, catalog: PromptSourceCatalog): PromptProjection {
   const { prompt, sources } = diagnostic;
@@ -106,5 +124,9 @@ export function buildEditorProjection(diagnostic: DiagnosticPrompt, catalog: Pro
     if (candidate && !spans.some((span) => overlaps(candidate, span))) matched.push(candidate);
   }
 
-  return buildProjection(prompt, [...spans, ...matched]);
+  const tags = xmlTagSpans(prompt);
+  return buildProjection(
+    prompt,
+    [...spans, ...matched].filter((candidate) => hasContent(prompt, tags, candidate)),
+  );
 }
