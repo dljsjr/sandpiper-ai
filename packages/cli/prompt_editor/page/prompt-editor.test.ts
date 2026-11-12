@@ -322,6 +322,105 @@ describe('prompt editor page', () => {
     await browser.happyDOM.close();
   });
 
+  it('shows regions of one file separated by generated values as one card with the values inline', async () => {
+    const mounted: string[] = [];
+    const { browser, promptEditor } = loadPromptEditor({
+      mount(parent, options) {
+        mounted.push(options.doc);
+        return staticMarkdownEditor.mount(parent, options);
+      },
+    });
+    const payload = templatePayload(harnessAndProfile);
+    const ids = regionIds(payload);
+
+    promptEditor.render(payload);
+
+    const groups = browser.document.querySelectorAll('.source-group');
+    expect(groups).toHaveLength(1);
+    const group = groups[0]!;
+    expect(group.querySelectorAll('.region-head')).toHaveLength(1);
+    expect(group.querySelector('.region-name')?.textContent).toBe('harness.md');
+    expect(
+      [...group.querySelectorAll('.source-region')].map((region) => region.getAttribute('data-region-id')),
+    ).toEqual(ids.slice(0, 3));
+    expect([...group.querySelectorAll('.value-chip')].map((chip) => chip.textContent)).toEqual(['/path/one', '1.5.2']);
+    expect(group.querySelector('.markdown-editor')).toBeNull();
+    expect(group.querySelectorAll('.editable-part').length).toBeGreaterThan(0);
+    expect(browser.document.querySelectorAll('.region-card')).toHaveLength(3);
+    expect(mounted).toEqual(['\nAbout the user:\n', '# Doug\n']);
+    await browser.happyDOM.close();
+  });
+
+  it('stages each region of a shared card by its own id', async () => {
+    const { browser, messages, promptEditor } = loadPromptEditor();
+    const payload = templatePayload(harnessAndProfile);
+    const ids = regionIds(payload);
+    promptEditor.render(payload);
+
+    const part = browser.document.querySelector(`#region-${ids[1]} .editable-part`)!;
+    part.textContent = '`\n- Pi version: `';
+    part.dispatchEvent(new browser.KeyboardEvent('keydown', { key: 's', metaKey: true, bubbles: true }));
+    part.textContent = '`\n- Pi release: `';
+    part.dispatchEvent(new browser.Event('input', { bubbles: true }));
+    (browser.document.getElementById('preview') as unknown as HTMLButtonElement | null)?.click();
+
+    expect(messages).toEqual([
+      { action: 'stage', generation: 1, regionId: ids[1], text: '`\n- Pi version: `' },
+      {
+        action: 'preview',
+        generation: 1,
+        regions: {
+          [ids[0] ?? '']: '<harness_docs>\nDocs at `',
+          [ids[1] ?? '']: '`\n- Pi release: `',
+          [ids[2] ?? '']: '`\n</harness_docs>',
+          [ids[3] ?? '']: '<user_profile>\nAbout the user:\n<content>',
+          [ids[4] ?? '']: '# Doug\n',
+        },
+      },
+    ]);
+    await browser.happyDOM.close();
+  });
+
+  it('reverts every region of a shared card', async () => {
+    const { browser, messages, promptEditor } = loadPromptEditor();
+    const payload = templatePayload(harnessAndProfile);
+    const ids = regionIds(payload);
+    promptEditor.render(payload);
+    for (const id of [ids[0], ids[2]]) {
+      const part = [...browser.document.querySelectorAll(`#region-${id} .editable-part`)].at(-1)!;
+      part.textContent = 'edited';
+    }
+
+    (browser.document.querySelector('.source-group [data-action="revert"]') as unknown as HTMLButtonElement).click();
+
+    expect(messages).toEqual([
+      { action: 'stage', generation: 1, regionId: ids[0], text: '<harness_docs>\nDocs at `' },
+      { action: 'stage', generation: 1, regionId: ids[1], text: '`\n- Version: `' },
+      { action: 'stage', generation: 1, regionId: ids[2], text: '`\n</harness_docs>' },
+    ]);
+    await browser.happyDOM.close();
+  });
+
+  it('updates the card and outline sizes as a shared card is edited', async () => {
+    const { browser, promptEditor } = loadPromptEditor();
+    const payload = templatePayload(harnessAndProfile);
+    const ids = regionIds(payload);
+    promptEditor.render(payload);
+    const size = () => browser.document.querySelector('.source-group .region-size')?.textContent;
+    const rowSize = () => browser.document.querySelector('#outline .tree-row .row-size')?.textContent;
+    expect(size()).toBe('55 chars · ≈14 tokens');
+    expect(rowSize()).toBe('≈17');
+
+    const part = browser.document.querySelector(`#region-${ids[1]} .editable-part`)!;
+    part.textContent = `${part.textContent}${'x'.repeat(400)}`;
+    part.dispatchEvent(new browser.Event('input', { bubbles: true }));
+    await browser.happyDOM.waitUntilComplete();
+
+    expect(size()).toBe('455 chars · ≈114 tokens · +100 tokens');
+    expect(rowSize()).toBe('≈117');
+    await browser.happyDOM.close();
+  });
+
   it('reconstructs a staged source from Markdown islands and locked tags', async () => {
     const values: string[] = [];
     const { browser, messages, promptEditor } = loadPromptEditor({

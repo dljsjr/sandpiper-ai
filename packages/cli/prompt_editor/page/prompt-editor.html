@@ -500,11 +500,19 @@
       color: var(--tag-ink);
     }
     .source-region .locked-tag { background: color-mix(in srgb, var(--editable-line) 22%, transparent); color: var(--editable-ink); }
+    .value-chip {
+      border: 1px dashed var(--line-strong);
+      border-radius: 4px;
+      padding: 0 4px;
+      background: var(--locked);
+      color: var(--locked-ink);
+    }
+    .value-chip.blank { border: 0; padding: 0; background: transparent; }
     .editable-part { border-radius: 3px; outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
     .editable-part:empty::before { content: "\200b"; }
     .editable-part:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
     .markdown-editor { display: block; min-width: 0; border-radius: 4px; }
-    .source-region {
+    .region-card {
       margin: 8px -10px;
       overflow: clip;
       border: 1px solid color-mix(in srgb, var(--editable-line) 55%, transparent);
@@ -514,8 +522,8 @@
       box-shadow: var(--shadow-sm);
       transition: box-shadow 0.2s;
     }
-    .source-region.changed { border-color: var(--editable-strong); box-shadow: 0 0 0 2px color-mix(in srgb, var(--editable-strong) 30%, transparent); }
-    .source-region:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+    .region-card.changed { border-color: var(--editable-strong); box-shadow: 0 0 0 2px color-mix(in srgb, var(--editable-strong) 30%, transparent); }
+    .region-card:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
     .region-head {
       display: flex;
       align-items: center;
@@ -538,13 +546,14 @@
       color: #1f1500;
       font: 650 10px/17px var(--sans);
     }
-    .source-region.changed .region-badge { display: inline-block; }
+    .region-card.changed .region-badge { display: inline-block; }
     .region-actions { display: flex; gap: 2px; margin-left: auto; }
     .region-actions button { padding: 3px 6px; border-color: transparent; background: transparent; color: var(--muted); font-size: 11px; }
     .region-actions button:hover:not(:disabled) { border-color: color-mix(in srgb, var(--editable-line) 60%, transparent); background: var(--editable); color: var(--text); }
     .region-actions .revert { display: none; }
-    .source-region.changed .region-actions .revert { display: inline-flex; color: var(--editable-ink); }
+    .region-card.changed .region-actions .revert { display: inline-flex; color: var(--editable-ink); }
     .region-body { padding: 8px 12px 10px; }
+    .group-body { white-space: pre-wrap; overflow-wrap: anywhere; }
     .flash { animation: flash 1.2s ease-out; }
     .locked-tag.flash, .locked.flash { animation: flash-text 1.2s ease-out; }
     @keyframes flash { 0%, 30% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 45%, transparent); } 100% { box-shadow: 0 0 0 0 transparent; } }
@@ -1061,6 +1070,9 @@
         for (const region of prompt.querySelectorAll('.source-region')) {
           region.classList.toggle('changed', pending.has(region.dataset.regionId));
         }
+        for (const group of prompt.querySelectorAll('.source-group')) {
+          group.classList.toggle('changed', Boolean(group.querySelector('.source-region.changed')));
+        }
         if (!outline) return;
         for (const node of outline.nodes) {
           const ids = nodeRegionIds(node);
@@ -1092,6 +1104,7 @@
         const id = region.dataset.regionId;
         clearTimeout(timers.get(id));
         region.classList.add('changed');
+        region.closest('.source-group')?.classList.add('changed');
         for (const node of regionNodes(id)) node.row?.classList.add('changed');
         previewReady = false;
         timers.set(id, setTimeout(() => stage(region), 400));
@@ -1178,14 +1191,8 @@
         return h('button', { type: 'button', class: extra, dataset: { action }, title: label, html: `${icon(iconName)}<span>${label}</span>` });
       }
 
-      function regionSection(segment, index) {
-        const path = segment.path || segment.label;
-        const region = h('section', {
-          class: 'source-region',
-          id: `region-${segment.regionId}`,
-          dataset: { regionId: segment.regionId, path, codec: segment.codec || 'direct' },
-        });
-        const head = h(
+      function regionHead(path) {
+        return h(
           'header',
           { class: 'region-head' },
           h('span', { html: icon('file') }),
@@ -1202,10 +1209,72 @@
             actionButton('open', 'external', 'Open'),
           ),
         );
+      }
+
+      function regionSection(segment, index) {
+        const path = segment.path || segment.label;
+        const region = h('section', {
+          class: 'source-region region-card',
+          id: `region-${segment.regionId}`,
+          dataset: { regionId: segment.regionId, path, codec: segment.codec || 'direct' },
+        });
         const body = h('div', { class: 'region-body' });
-        region.append(head, body);
+        region.append(regionHead(path), body);
         appendEditableParts(body, region, segment, index);
         return region;
+      }
+
+      // The last region of the card that starts at `start`: regions of the same file with only generated text
+      // between them, such as a template split at its placeholders, share one card.
+      function groupEnd(start) {
+        const path = segments[start].path;
+        let end = start;
+        for (let index = start + 1; index < segments.length; index += 1) {
+          if (!segments[index].editable) continue;
+          if (segments[index].path !== path) break;
+          end = index;
+        }
+        return end;
+      }
+
+      // A region inside a shared card: plain editable text that flows around the generated values.
+      function inlineRegion(segment, index) {
+        const region = h('span', {
+          class: 'source-region',
+          id: `region-${segment.regionId}`,
+          dataset: { regionId: segment.regionId, path: segment.path || segment.label, codec: segment.codec || 'direct' },
+        });
+        const shown = (text) => (segment.codec === 'xml-text' ? unescapeXml(text) : text);
+        segment.parts.forEach((part, partIndex) => {
+          region.append(createPart(part.editable ? { ...part, text: shown(part.text) } : part, region, `${index}:${partIndex}`));
+        });
+        return region;
+      }
+
+      function valueChip(segment, index) {
+        const chip = h('span', {
+          class: `value-chip${segment.text.trim() ? '' : ' blank'}`,
+          id: segment.segmentId,
+          title: 'Generated value',
+        });
+        segment.parts.forEach((part, partIndex) => chip.append(createPart(part, null, `${index}:${partIndex}`)));
+        return chip;
+      }
+
+      function regionGroup(start, end) {
+        const path = segments[start].path || segments[start].label;
+        const group = h('section', { class: 'source-group region-card', id: `group-${segments[start].regionId}`, dataset: { path } });
+        const body = h('div', { class: 'region-body group-body' });
+        for (let index = start; index <= end; index += 1) {
+          body.append(segments[index].editable ? inlineRegion(segments[index], index) : valueChip(segments[index], index));
+        }
+        group.append(regionHead(path), body);
+        return group;
+      }
+
+      // The regions a file card holds: itself, or the regions of a shared card.
+      function cardRegions(card) {
+        return card.matches('.source-region') ? [card] : [...card.querySelectorAll('.source-region')];
       }
 
       // Generated text often carries runs of blank lines that only spread the page out. The
@@ -1264,11 +1333,11 @@
       prompt.addEventListener('click', async (event) => {
         const button = event.target.closest('[data-action]');
         if (!button) return;
-        const region = button.closest('.source-region');
-        const path = region?.dataset.path;
+        const card = button.closest('.region-card');
+        const path = card?.dataset.path;
         switch (button.dataset.action) {
           case 'revert':
-            revertRegion(region);
+            for (const region of cardRegions(card)) revertRegion(region);
             toast(`Reverted ${basename(path)}`);
             break;
           case 'copy-path':
@@ -1649,11 +1718,17 @@
           const bar = node.row?.querySelector('.row-bar span');
           if (bar) bar.style.width = `${Math.max(3, Math.min(100, (node.chars / largest) * 100)).toFixed(1)}%`;
         }
-        for (const region of prompt.querySelectorAll('.source-region')) {
-          const chars = regionSourceLength(region);
-          const size = region.querySelector('.region-size');
+        for (const card of prompt.querySelectorAll('.region-card')) {
+          let chars = 0;
+          let baseline = 0;
+          for (const region of cardRegions(card)) {
+            const length = regionSourceLength(region);
+            chars += length;
+            baseline += regionBaselines.get(region.dataset.regionId) ?? length;
+          }
+          const size = card.querySelector('.region-size');
           size.textContent = `${formatCount(chars)} chars · ≈${formatCount(tokens(chars))} tokens`;
-          const change = deltaText(chars - (regionBaselines.get(region.dataset.regionId) ?? chars));
+          const change = deltaText(chars - baseline);
           if (change) size.append(' · ', h('span', { class: `region-delta ${change.kind}`, text: change.text }));
         }
         const bar = $('sizemap-bar');
@@ -1750,7 +1825,7 @@
         element.closest('.locked.foldable')?.classList.add('expanded');
         const region = node.kind === 'source' || node.source ? element : null;
         scrollToElement(element);
-        flash(region || element);
+        flash(region?.closest('.region-card') || element);
         if (focus && region) {
           const editor = region.querySelector('.markdown-editor, .editable-part');
           const markdownEditor = editor ? markdownEditors.get(editor) : null;
@@ -1764,14 +1839,14 @@
       function stepFile(direction) {
         showEditor();
         const line = editorPane.getBoundingClientRect().top + stickyHeight() + 16;
-        const regions = [...prompt.querySelectorAll('.source-region')];
-        const tops = regions.map((region) => region.getBoundingClientRect().top);
+        const cards = [...prompt.querySelectorAll('.region-card')];
+        const tops = cards.map((card) => card.getBoundingClientRect().top);
         const index = direction > 0
           ? tops.findIndex((top) => top > line + 4)
           : tops.findLastIndex((top) => top < line - 4);
-        const target = regions[index];
+        const target = cards[index];
         if (!target) return;
-        const node = regionNodes(target.dataset.regionId)[0];
+        const node = regionNodes(cardRegions(target)[0].dataset.regionId)[0];
         if (node) navigateTo(node, { focus: true });
       }
 
@@ -2058,9 +2133,16 @@
         lockedLookup = new Map();
 
         const piSegments = new Set((payload.lockedRegions || []).filter((region) => region.generatedBy === 'pi').map((region) => region.anchorId));
-        payload.segments.forEach((segment, index) => {
-          prompt.append(segment.editable ? regionSection(segment, index) : lockedSegment(segment, index, piSegments.has(segment.segmentId)));
-        });
+        for (let index = 0; index < segments.length; index += 1) {
+          const segment = segments[index];
+          if (!segment.editable) {
+            prompt.append(lockedSegment(segment, index, piSegments.has(segment.segmentId)));
+            continue;
+          }
+          const end = groupEnd(index);
+          prompt.append(end === index ? regionSection(segment, index) : regionGroup(index, end));
+          index = end;
+        }
         outline = buildOutline(payload, piSegments);
         baselineChars = outline.root.chars;
         regionBaselines.clear();
