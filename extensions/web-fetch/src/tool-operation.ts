@@ -11,6 +11,7 @@ export interface WebFetchToolInput {
   readonly url: string;
   readonly followLinks?: boolean;
   readonly filter?: WebFetchFilterSpec;
+  readonly render?: boolean;
 }
 
 // Mirrors Pi's text content item shape without importing Pi SDK types into the operation layer.
@@ -34,6 +35,8 @@ export interface WebFetchToolResult {
 
 export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
+  /** Adapter that loads pages in a headless browser. Absent when no browser is installed. */
+  readonly renderAdapter?: FetchAdapter;
 }
 
 const LLMS_TXT_INSTRUCTIONS =
@@ -81,6 +84,18 @@ export function formatWebFetchResult(result: WebFetchResult): string {
   return output;
 }
 
+function selectAdapter(
+  adapter: FetchAdapter,
+  input: WebFetchToolInput,
+  dependencies: WebFetchToolDependencies,
+): FetchAdapter {
+  if (!input.render) return adapter;
+  if (!dependencies.renderAdapter) {
+    throw new Error('rendering is not available because no headless browser is installed');
+  }
+  return dependencies.renderAdapter;
+}
+
 export async function executeWebFetchTool(
   adapter: FetchAdapter,
   input: WebFetchToolInput,
@@ -89,7 +104,11 @@ export async function executeWebFetchTool(
   const fetchAndExtract = dependencies.fetchAndExtract ?? defaultFetchAndExtract;
 
   try {
-    const result = await fetchAndExtract(adapter, input.url, { filter: input.filter, followLinks: input.followLinks });
+    const result = await fetchAndExtract(selectAdapter(adapter, input, dependencies), input.url, {
+      filter: input.filter,
+      followLinks: input.followLinks,
+      ...(input.render ? { render: true } : {}),
+    });
 
     return {
       content: [{ type: 'text', text: formatWebFetchResult(result) }],

@@ -380,6 +380,25 @@ describe('fetchAndExtract (end-to-end)', () => {
     expect(alternateRequests).toBe(0);
   });
 
+  it('should keep the rendered page instead of the advertised Markdown version when rendering', async () => {
+    const fetch = vi.fn(async (url: string) => ({
+      url,
+      statusCode: 200,
+      contentType: 'text/html',
+      body: TARGETED_PAGE.replace('<head>', '<head><link rel="alternate" type="text/markdown" href="/page.md">'),
+    }));
+
+    const result = await fetchAndExtract({ fetch }, 'https://example.com/page', {
+      render: true,
+      probeLlmsTxt: async (url) => missingLlmsTxt(url),
+    });
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith('https://example.com/page', { htmlOnly: true });
+    expect(result.content).toContain('Only API content should be returned.');
+    expect(result.markdownSource).toBeUndefined();
+  });
+
   it('should extract links when followLinks is true', async () => {
     const result = await fetchAndExtract(adapter, `${baseUrl}/article`, { followLinks: true });
     expect(result.links).toBeDefined();

@@ -36,6 +36,12 @@ describe('web-fetch tool rendering', () => {
     );
   });
 
+  it('includes render mode in the tool call when enabled', () => {
+    expect(formatWebFetchRenderCall({ url: 'https://example.com/app', render: true }, theme)).toBe(
+      '**web_fetch** https://example.com/app (rendered)',
+    );
+  });
+
   it('collapses fetched markdown by default', () => {
     expect(
       formatWebFetchRenderResult(createResult(), { expanded: false, isPartial: false }, theme, 'Ctrl+O to expand'),

@@ -41,6 +41,36 @@ describe('web-fetch extension', () => {
     expect(schemaText).toContain('heading');
   });
 
+  it('offers rendering, and passes the browser adapter on, only when a browser is available', async () => {
+    const renderAdapter = createAdapter();
+    const executeWebFetchTool = vi.fn(async () => ({
+      content: [{ type: 'text' as const, text: 'ok' }],
+      details: { url: 'https://example.com/app' },
+    }));
+    const register = async (adapter: FetchAdapter | undefined) => {
+      let tool: (RegisteredWebFetchTool & { parameters?: unknown }) | undefined;
+      const pi = {
+        registerTool: vi.fn((registered: RegisteredWebFetchTool) => {
+          tool = registered;
+        }),
+      } as unknown as ExtensionAPI;
+      await init(pi, { adapter: createAdapter(), executeWebFetchTool, resolveRenderAdapter: () => adapter });
+      return tool;
+    };
+
+    const withBrowser = await register(renderAdapter);
+    const withoutBrowser = await register(undefined);
+    await withBrowser?.execute('call-1', { url: 'https://example.com/app', render: true });
+
+    expect(JSON.stringify(withBrowser?.parameters)).toContain('"render"');
+    expect(JSON.stringify(withoutBrowser?.parameters)).not.toContain('"render"');
+    expect(executeWebFetchTool).toHaveBeenCalledWith(
+      expect.anything(),
+      { url: 'https://example.com/app', render: true },
+      { renderAdapter },
+    );
+  });
+
   it.each([
     ['css_selector filter arm', { type: WebFetchFilterType.CssSelector, selector: '.article' }],
     ['markdown_section filter arm', { type: WebFetchFilterType.MarkdownSection, heading: 'Usage', level: 2 }],
@@ -69,6 +99,7 @@ describe('web-fetch extension', () => {
       expect(executeWebFetchTool).toHaveBeenCalledWith(
         expect.anything(),
         expect.objectContaining({ url: 'https://example.com/page', filter }),
+        expect.anything(),
       );
     },
   );

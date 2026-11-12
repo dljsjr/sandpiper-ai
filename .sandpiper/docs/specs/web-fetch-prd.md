@@ -1,7 +1,7 @@
 # Web Fetch Tool — PRD
 
 - **Diátaxis mode**: Reference spec
-- **Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ✅ `llms.txt` probing complete (WEB-14) | ✅ targeted extraction complete (WEB-15, WEB-16) | ⏸️ **Deferred**: WEB-10–13
+- **Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ✅ `llms.txt` probing complete (WEB-14) | ✅ targeted extraction complete (WEB-15, WEB-16) | ⏸️ **Deferred**: WEB-12, WEB-13
 - **Date**: 2026-03-26
 - **Implementation**: `extensions/web-fetch/`
 - **Last verified**: 2026-05-14
@@ -10,22 +10,22 @@
 
 ## Implementation Status
 
-| Feature                                      | Status         | Ticket |
-| -------------------------------------------- | -------------- | ------ |
-| Fetch single URL + return markdown           | ✅ Complete    | WEB-1  |
-| Extract page links (followLinks)             | ✅ Complete    | WEB-1  |
-| Passive `llms.txt` existence probing         | ✅ Complete    | WEB-14 |
-| CSS selector targeting                       | ✅ Complete    | WEB-15 |
-| Markdown section targeting                   | ✅ Complete    | WEB-16 |
-| Markdown and plain-text responses unchanged  | ✅ Complete    | WEB-18 |
-| Section matching by parsed heading text      | ✅ Complete    | WEB-19 |
-| Site's own Markdown version of a page        | ✅ Complete    | WEB-26 |
-| `llms.txt` discovery by link and by path     | ✅ Complete    | WEB-25 |
-| `llms.txt` instructions for the model        | ✅ Complete    | WEB-24 |
-| JS rendering adapter (lightpanda/Playwright) | ❌ Not started | WEB-10 |
-| Single-query web search                      | ❌ Not started | WEB-11 |
-| Site crawling with robots.txt                | ❌ Not started | WEB-12 |
-| Browser automation                           | ❌ Not started | WEB-13 |
+| Feature                                     | Status         | Ticket |
+| ------------------------------------------- | -------------- | ------ |
+| Fetch single URL + return markdown          | ✅ Complete    | WEB-1  |
+| Extract page links (followLinks)            | ✅ Complete    | WEB-1  |
+| Passive `llms.txt` existence probing        | ✅ Complete    | WEB-14 |
+| CSS selector targeting                      | ✅ Complete    | WEB-15 |
+| Markdown section targeting                  | ✅ Complete    | WEB-16 |
+| Markdown and plain-text responses unchanged | ✅ Complete    | WEB-18 |
+| Section matching by parsed heading text     | ✅ Complete    | WEB-19 |
+| Site's own Markdown version of a page       | ✅ Complete    | WEB-26 |
+| `llms.txt` discovery by link and by path    | ✅ Complete    | WEB-25 |
+| `llms.txt` instructions for the model       | ✅ Complete    | WEB-24 |
+| JS rendering through a headless browser     | ✅ Complete    | WEB-10 |
+| Single-query web search                     | ❌ Not started | WEB-11 |
+| Site crawling with robots.txt               | ❌ Not started | WEB-12 |
+| Browser automation                          | ❌ Not started | WEB-13 |
 
 ---
 
@@ -49,12 +49,11 @@ The agent frequently needs to read web content — documentation, READMEs, API r
 
 ### Deferred
 
-| Capability                       | Why deferred                                                                                                                                                                    |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Site crawling** (scope 2)      | Ethical concerns — LLM crawling is contentious. Would need `robots.txt` respect, conservative rate limiting. No personal need identified.                                       |
-| **Search + research** (scope 3)  | High value but latency concerns. Single-query search (API call + fetch top 3-5 results) is a natural v2. Deep research may need the background task framework (AGENT-15).       |
-| **Browser automation** (scope 4) | Valuable for personal-assistant agents but not a priority for a coding agent. Punt.                                                                                             |
-| **JS rendering** (lightpanda)    | Most sites an agent reads are SSR (docs, GitHub, npm, MDN, Stack Overflow). Deferred to v2 when we have real failure cases. Adapter interface designed to accommodate it later. |
+| Capability                       | Why deferred                                                                                                                                                              |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Site crawling** (scope 2)      | Ethical concerns — LLM crawling is contentious. Would need `robots.txt` respect, conservative rate limiting. No personal need identified.                                 |
+| **Search + research** (scope 3)  | High value but latency concerns. Single-query search (API call + fetch top 3-5 results) is a natural v2. Deep research may need the background task framework (AGENT-15). |
+| **Browser automation** (scope 4) | Valuable for personal-assistant agents but not a priority for a coding agent. Punt.                                                                                       |
 
 ## Architecture
 
@@ -110,6 +109,14 @@ An `llms.txt` file is a site's index of its pages for language models ([llmstxt.
 Discovery starts together with the page request, and the result waits for it, so output does not depend on timing. Each location is asked once per process. A failure or timeout is kept as the answer: some sites resist automated requests, and a missed file costs little. The file's content is not read.
 
 When a file is found, the tool result ends with an `<additional_content>` block that holds an `<instructions>` element and the file's URL. The instructions tell the model what the index is and how to read one part of it. The block is left out when the fetched page is the file itself.
+
+### Rendered fetch
+
+Some pages build their content with JavaScript. With `render: true`, the tool uses `RenderingFetchAdapter`, which runs a headless browser and takes the rendered HTML from its standard output. The rest of the pipeline is unchanged, except that the site's Markdown version is not followed: the caller asked for the rendered page.
+
+The browser is any command that prints rendered HTML for a URL. Lightpanda is the default when it is on `PATH`, and `SANDPIPER_WEB_FETCH_RENDER_COMMAND` names another one. The command is started with an argument list, never through a shell, and only a normalized `http` or `https` URL is passed to it. The Lightpanda Node package was rejected because it builds a shell command from the URL. The `render` parameter is in the tool schema only when a browser is found at session start. See [the extension README](../../../extensions/web-fetch/README.md) for the command contract.
+
+Rendering is explicit, not an automatic fallback: a page of loading placeholders looks like valid content, and automated browsers are refused by sites that a normal fetch can read.
 
 ### Adapter Interface
 
@@ -189,7 +196,7 @@ Three reasons:
 2. Adding lightpanda means dependency detection (is it installed?), platform support, and fallback orchestration — complexity that distracts from the core value.
 3. The content extraction pipeline (readability + turndown) is where the actual quality lives. A perfectly fetched SPA handed to the model as raw HTML is worse than a `fetch()`-only page run through proper extraction.
 
-When we have real sites that fail with `fetch()`, we add lightpanda as an adapter (v2).
+When we have real sites that fail with `fetch()`, we add lightpanda as an adapter (v2). That happened under WEB-10; see Rendered fetch above.
 
 ### Why jsdom with no JS execution?
 

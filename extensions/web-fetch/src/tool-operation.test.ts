@@ -234,4 +234,54 @@ describe('executeWebFetchTool', () => {
       details: { url: 'https://example.com', error: 'network down' },
     });
   });
+
+  it('uses the rendering adapter when rendering is requested', async () => {
+    const adapter = createAdapter();
+    const renderAdapter = createAdapter();
+    const fetchAndExtract = vi.fn(async () => createResult());
+
+    await executeWebFetchTool(
+      adapter,
+      { url: 'https://example.com/app', render: true },
+      { fetchAndExtract, renderAdapter },
+    );
+
+    expect(fetchAndExtract).toHaveBeenCalledWith(renderAdapter, 'https://example.com/app', {
+      filter: undefined,
+      followLinks: undefined,
+      render: true,
+    });
+  });
+
+  it('uses the plain adapter when rendering is not requested', async () => {
+    const adapter = createAdapter();
+    const fetchAndExtract = vi.fn(async () => createResult());
+
+    await executeWebFetchTool(
+      adapter,
+      { url: 'https://example.com/page' },
+      { fetchAndExtract, renderAdapter: createAdapter() },
+    );
+
+    expect(fetchAndExtract).toHaveBeenCalledWith(adapter, 'https://example.com/page', {
+      filter: undefined,
+      followLinks: undefined,
+    });
+  });
+
+  it('explains that no browser is available when rendering is requested without one', async () => {
+    const fetchAndExtract = vi.fn(async () => createResult());
+
+    const output = await executeWebFetchTool(
+      createAdapter(),
+      { url: 'https://example.com/app', render: true },
+      { fetchAndExtract },
+    );
+
+    expect(fetchAndExtract).not.toHaveBeenCalled();
+    expect(output.content[0]?.text).toBe(
+      'Failed to fetch https://example.com/app: rendering is not available because no headless browser is installed',
+    );
+    expect(output.details.error).toBeDefined();
+  });
 });

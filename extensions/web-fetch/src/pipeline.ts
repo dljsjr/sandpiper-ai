@@ -34,6 +34,8 @@ export interface PipelineOptions {
   readonly filter?: WebFetchFilterSpec;
   /** Whether to extract and return page links. */
   readonly followLinks?: boolean;
+  /** The adapter renders the page in a browser. Keep that page: do not swap in the site's Markdown version. */
+  readonly render?: boolean;
   /** Override llms.txt discovery for tests or specialized callers. */
   readonly probeLlmsTxt?: (url: string) => Promise<LlmsTxtProbeResult>;
 }
@@ -164,7 +166,7 @@ export async function fetchAndExtract(
 ): Promise<WebFetchResult> {
   const discover = options?.probeLlmsTxt ?? discoverLlmsTxt;
   const filter = createWebFetchFilter(options?.filter);
-  const needsHtml = filter?.stage === 'html';
+  const needsHtml = filter?.stage === 'html' || options?.render === true;
   // Start discovery with the page request, so the page rarely waits for it.
   const earlyDiscovery = discover(url);
   const fetchResult = await adapter.fetch(url, { htmlOnly: needsHtml });
