@@ -36,6 +36,8 @@ export interface PipelineOptions {
   readonly followLinks?: boolean;
   /** The adapter renders the page in a browser. Keep that page: do not swap in the site's Markdown version. */
   readonly render?: boolean;
+  /** Aborting it stops the page requests. */
+  readonly signal?: AbortSignal;
   /** Override llms.txt discovery for tests or specialized callers. */
   readonly probeLlmsTxt?: (url: string) => Promise<LlmsTxtProbeResult>;
 }
@@ -134,9 +136,13 @@ function isTextResponse(fetchResult: FetchResult): boolean {
 }
 
 /** The Markdown version a page advertises, or nothing when it cannot be fetched as text. */
-async function fetchMarkdownAlternate(adapter: FetchAdapter, url: string): Promise<FetchResult | undefined> {
+async function fetchMarkdownAlternate(
+  adapter: FetchAdapter,
+  url: string,
+  signal: AbortSignal | undefined,
+): Promise<FetchResult | undefined> {
   try {
-    const alternate = await adapter.fetch(url);
+    const alternate = await adapter.fetch(url, { signal });
     return alternate.statusCode < 400 && isTextResponse(alternate) ? alternate : undefined;
   } catch {
     return undefined;
@@ -169,7 +175,7 @@ export async function fetchAndExtract(
   const needsHtml = filter?.stage === 'html' || options?.render === true;
   // Start discovery with the page request, so the page rarely waits for it.
   const earlyDiscovery = discover(url);
-  const fetchResult = await adapter.fetch(url, { htmlOnly: needsHtml });
+  const fetchResult = await adapter.fetch(url, { htmlOnly: needsHtml, signal: options?.signal });
   const isText = isTextResponse(fetchResult);
   const relations = declaredRelations(fetchResult, isText);
   const declared = findLlmsTxtLink(relations);
@@ -180,8 +186,10 @@ export async function fetchAndExtract(
       : fetchResult.url === url
         ? earlyDiscovery
         : discover(fetchResult.url),
-    alternateUrl === undefined ? undefined : fetchMarkdownAlternate(adapter, alternateUrl),
+    alternateUrl === undefined ? undefined : fetchMarkdownAlternate(adapter, alternateUrl, options?.signal),
   ]);
+  // The Markdown version request turns its failures into a fallback to the page, an abort included.
+  options?.signal?.throwIfAborted();
 
   if (fetchResult.statusCode >= 400) {
     return {

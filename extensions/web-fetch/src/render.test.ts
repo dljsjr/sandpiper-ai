@@ -79,6 +79,19 @@ describe('runCommand', () => {
     expect(Date.now() - started).toBeLessThan(5_000);
   });
 
+  it('stops a command when the caller aborts it', async () => {
+    const slow = script('slow', 'exec sleep 10');
+    const controller = new AbortController();
+    const started = Date.now();
+    setTimeout(() => controller.abort(), 50);
+
+    const result = runCommand(slow, [], { timeoutMs: 5_000, signal: controller.signal });
+
+    await expect(result).rejects.toThrow(/abort/i);
+    await expect(result).rejects.not.toThrow(/could not start/);
+    expect(Date.now() - started).toBeLessThan(5_000);
+  });
+
   it('reports a command that cannot start', async () => {
     await expect(runCommand(join(dir, 'missing'), [], { timeoutMs: 5_000 })).rejects.toThrow('could not start');
   });
@@ -150,6 +163,20 @@ describe('RendererFetchAdapter', () => {
       body: '<html><body>https://example.com/a%20b?q=1&r=2</body></html>',
       contentType: 'text/html',
     });
+  });
+
+  it('stops the commands the renderer runs when the caller aborts', async () => {
+    const slow = script('slow', 'exec sleep 10');
+    const adapter = new RendererFetchAdapter(
+      { id: 'slow', render: async (_request, tools) => ({ html: (await tools.run(slow, [])).stdout }) },
+      { timeoutMs: 5_000 },
+    );
+    const controller = new AbortController();
+    const started = Date.now();
+    setTimeout(() => controller.abort(), 50);
+
+    await expect(adapter.fetch('https://example.com/', { signal: controller.signal })).rejects.toThrow(/abort/i);
+    expect(Date.now() - started).toBeLessThan(5_000);
   });
 
   it('uses the final URL, status, media type and Link header the renderer reports', async () => {

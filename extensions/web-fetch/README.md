@@ -9,6 +9,8 @@ A Pi extension that adds a `web_fetch` tool. It fetches one web page and returns
 - When a site offers its own Markdown version of a page, that version is returned and its URL is shown as `Markdown source`.
 - When the site publishes an `llms.txt` index that covers the page, the result ends with a block that points to it.
 
+Cancelling the turn, for example with Escape, stops a fetch that is still running, including a page that a headless browser is loading.
+
 ## Parameters
 
 | Parameter     | Type    | Required | Description                                                                                           |
@@ -105,7 +107,7 @@ Registrations after the first run starts are ignored.
 
 - The command starts directly from the argument list. No shell reads the arguments, so a URL cannot run a command.
 - A non-zero exit code is returned, not thrown, because browsers report failures in their output.
-- The command is stopped at the request's time limit, and the call then rejects.
+- The command is stopped at the request's time limit, or when the user cancels the fetch, and the call then rejects. Work a renderer does without `tools.run` is not stopped by a cancel.
 
 #### The result
 

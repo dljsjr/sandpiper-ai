@@ -41,6 +41,8 @@ export interface WebFetchToolDependencies {
   readonly fetchAndExtract?: typeof defaultFetchAndExtract;
   /** Adapters that load pages in a headless browser, by renderer id. */
   readonly renderAdapters?: ReadonlyMap<string, FetchAdapter>;
+  /** The agent turn's abort signal. Aborting it stops the fetch. */
+  readonly signal?: AbortSignal;
 }
 
 const LLMS_TXT_INSTRUCTIONS =
@@ -135,6 +137,7 @@ export async function executeWebFetchTool(
     const result = await fetchAndExtract(selectAdapter(adapter, input, dependencies), input.url, {
       filter: input.filter,
       followLinks: input.followLinks,
+      signal: dependencies.signal,
       ...(wantsRendering(input) ? { render: true } : {}),
     });
 

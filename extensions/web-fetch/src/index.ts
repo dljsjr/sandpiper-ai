@@ -103,8 +103,8 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
         'content converted to token-efficient markdown.',
       promptSnippet: 'Fetch a web page and return clean markdown content',
       parameters: toolParameters(),
-      async execute(_toolCallId, params): Promise<AgentToolResult<WebFetchToolDetails>> {
-        return executeWebFetchTool(adapter, params, { renderAdapters });
+      async execute(_toolCallId, params, signal): Promise<AgentToolResult<WebFetchToolDetails>> {
+        return executeWebFetchTool(adapter, params, { renderAdapters, signal });
       },
       renderCall: renderWebFetchCall,
       renderResult: renderWebFetchResult,

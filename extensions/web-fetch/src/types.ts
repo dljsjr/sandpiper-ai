@@ -102,6 +102,8 @@ export interface WebFetchResult {
 export interface FetchOptions {
   /** Ask for HTML only. By default the adapter asks for a Markdown version first. */
   readonly htmlOnly?: boolean;
+  /** Aborting it stops the request. */
+  readonly signal?: AbortSignal;
 }
 
 /** Adapter interface for fetching a page. Extensible for future backends. */

@@ -241,6 +241,20 @@ describe('executeWebFetchTool', () => {
       ['obscura', createAdapter()],
     ]);
 
+  it("passes the caller's signal to the fetch", async () => {
+    const adapter = createAdapter();
+    const fetchAndExtract = vi.fn(async () => createResult());
+    const { signal } = new AbortController();
+
+    await executeWebFetchTool(adapter, { url: 'https://example.com/page' }, { fetchAndExtract, signal });
+
+    expect(fetchAndExtract).toHaveBeenCalledWith(
+      adapter,
+      'https://example.com/page',
+      expect.objectContaining({ signal }),
+    );
+  });
+
   it('uses the only renderer when the render switch is set', async () => {
     const lightpanda = createAdapter();
     const fetchAndExtract = vi.fn(async () => createResult());

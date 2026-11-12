@@ -399,6 +399,53 @@ describe('fetchAndExtract (end-to-end)', () => {
     expect(result.markdownSource).toBeUndefined();
   });
 
+  it("should pass the caller's signal to the page request and the Markdown version request", async () => {
+    const controller = new AbortController();
+    const fetch = vi.fn(async (url: string) =>
+      url.endsWith('.md')
+        ? { url, statusCode: 200, contentType: 'text/markdown', body: ALTERNATE_MARKDOWN }
+        : {
+            url,
+            statusCode: 200,
+            contentType: 'text/html',
+            body: TARGETED_PAGE.replace('<head>', '<head><link rel="alternate" type="text/markdown" href="/page.md">'),
+          },
+    );
+
+    await fetchAndExtract({ fetch }, 'https://example.com/page', {
+      signal: controller.signal,
+      probeLlmsTxt: async (url) => missingLlmsTxt(url),
+    });
+
+    expect(fetch.mock.calls).toEqual([
+      ['https://example.com/page', { htmlOnly: false, signal: controller.signal }],
+      ['https://example.com/page.md', { signal: controller.signal }],
+    ]);
+  });
+
+  it('should stop instead of using the HTML page when the caller aborts the Markdown version request', async () => {
+    const controller = new AbortController();
+    const fetch = vi.fn(async (url: string) => {
+      if (url.endsWith('.md')) {
+        controller.abort();
+        controller.signal.throwIfAborted();
+      }
+      return {
+        url,
+        statusCode: 200,
+        contentType: 'text/html',
+        body: TARGETED_PAGE.replace('<head>', '<head><link rel="alternate" type="text/markdown" href="/page.md">'),
+      };
+    });
+
+    await expect(
+      fetchAndExtract({ fetch }, 'https://example.com/page', {
+        signal: controller.signal,
+        probeLlmsTxt: async (url) => missingLlmsTxt(url),
+      }),
+    ).rejects.toThrow(/abort/i);
+  });
+
   it('should extract links when followLinks is true', async () => {
     const result = await fetchAndExtract(adapter, `${baseUrl}/article`, { followLinks: true });
     expect(result.links).toBeDefined();

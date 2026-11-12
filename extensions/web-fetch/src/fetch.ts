@@ -22,7 +22,7 @@ export class SimpleFetchAdapter implements FetchAdapter {
     try {
       const response = await globalThis.fetch(url, {
         headers: { 'User-Agent': USER_AGENT, Accept: options.htmlOnly ? ACCEPT_HTML : ACCEPT_MARKDOWN_FIRST },
-        signal: controller.signal,
+        signal: options.signal ? AbortSignal.any([controller.signal, options.signal]) : controller.signal,
         redirect: 'follow',
       });
 

@@ -33,6 +33,12 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
+  if (url === '/hang') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.write('<html>');
+    return;
+  }
+
   if (url === '/not-found') {
     res.writeHead(404, { 'Content-Type': 'text/html' });
     res.end('<html><body>Not Found</body></html>');
@@ -99,6 +105,15 @@ describe('SimpleFetchAdapter', () => {
 
     expect(preferred).toMatchObject({ contentType: 'text/markdown', body: '# Negotiated' });
     expect(html.contentType).toBe('text/html');
+  });
+
+  it('should stop a request when the caller aborts it', async () => {
+    const controller = new AbortController();
+    const started = Date.now();
+    setTimeout(() => controller.abort(), 50);
+
+    await expect(adapter.fetch(`${baseUrl}/hang`, { signal: controller.signal })).rejects.toThrow(/abort/i);
+    expect(Date.now() - started).toBeLessThan(5_000);
   });
 
   it('should return 404 status for not-found pages', async () => {

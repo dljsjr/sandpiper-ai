@@ -10,7 +10,7 @@ import { execFile } from 'node:child_process';
 import { accessSync, constants, statSync } from 'node:fs';
 import { delimiter, join, resolve } from 'node:path';
 import { mediaType } from './media-types.js';
-import type { FetchAdapter, FetchResult } from './types.js';
+import type { FetchAdapter, FetchOptions, FetchResult } from './types.js';
 
 /** Event bus channel on which extensions register a renderer, during `resources_discover`. */
 export const WEB_FETCH_RENDERER_CHANNEL = 'sandpiper:web-fetch-renderer';
@@ -36,8 +36,8 @@ export interface CommandResult {
 export interface RenderTools {
   /**
    * Run a browser command and collect its output. The command starts directly from the argument
-   * list, with no shell, and is stopped at the request's time limit. A non-zero exit is returned,
-   * not thrown, because browsers report failures in their output.
+   * list, with no shell, and is stopped at the request's time limit or when the fetch is cancelled.
+   * A non-zero exit is returned, not thrown, because browsers report failures in their output.
    */
   run(executable: string, args: readonly string[]): Promise<CommandResult>;
 }
@@ -88,15 +88,16 @@ export function findExecutable(name: string, pathVariable: string | undefined): 
 export function runCommand(
   executable: string,
   args: readonly string[],
-  options: { readonly timeoutMs: number },
+  options: { readonly timeoutMs: number; readonly signal?: AbortSignal },
 ): Promise<CommandResult> {
   return new Promise((resolveResult, reject) => {
     execFile(
       executable,
       [...args],
-      { timeout: options.timeoutMs, maxBuffer: MAX_OUTPUT_BYTES, encoding: 'utf8' },
+      { timeout: options.timeoutMs, maxBuffer: MAX_OUTPUT_BYTES, encoding: 'utf8', signal: options.signal },
       (error, stdout, stderr) => {
         if (!error) return resolveResult({ stdout, stderr, exitCode: 0 });
+        if (options.signal?.aborted) return reject(options.signal.reason);
         if (error.killed) return reject(new Error(`no result after ${options.timeoutMs} ms`));
         if (typeof error.code === 'number') return resolveResult({ stdout, stderr, exitCode: error.code });
 
@@ -159,16 +160,17 @@ export class RendererFetchAdapter implements FetchAdapter {
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
 
-  async fetch(url: string): Promise<FetchResult> {
+  async fetch(url: string, options: FetchOptions = {}): Promise<FetchResult> {
     const target = httpUrl(url);
     const { id } = this.renderer;
     const timeoutMs = this.timeoutMs;
+    const { signal } = options;
 
     let result: RenderResult | undefined;
     try {
       result = await this.renderer.render(
         { url: target, timeoutMs },
-        { run: (executable, args) => runCommand(executable, args, { timeoutMs }) },
+        { run: (executable, args) => runCommand(executable, args, { timeoutMs, signal }) },
       );
     } catch (error) {
       throw new Error(`Rendering with ${id} failed: ${error instanceof Error ? error.message : String(error)}`);

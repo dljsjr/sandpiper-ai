@@ -8,7 +8,7 @@ import { type FetchAdapter, WebFetchFilterType } from './types.js';
 interface RegisteredWebFetchTool {
   readonly promptSnippet?: string;
   readonly parameters?: unknown;
-  execute(toolCallId: string, params: WebFetchToolInput): Promise<WebFetchToolResult>;
+  execute(toolCallId: string, params: WebFetchToolInput, signal?: AbortSignal): Promise<WebFetchToolResult>;
 }
 
 type Handler = (...args: unknown[]) => unknown;
@@ -104,6 +104,21 @@ describe('web-fetch extension', () => {
       );
     },
   );
+
+  it("passes the turn's abort signal to the tool operation", async () => {
+    const executeWebFetchTool = vi.fn(async () => okResult());
+    const { signal } = new AbortController();
+    const pi = createPi();
+
+    await init(pi.api, { adapter: createAdapter(), executeWebFetchTool });
+    await pi.latestTool()?.execute('call-1', { url: 'https://example.com/page' }, signal);
+
+    expect(executeWebFetchTool).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.objectContaining({ signal }),
+    );
+  });
 
   it('returns the tool result unchanged', async () => {
     const toolResult = okResult();
