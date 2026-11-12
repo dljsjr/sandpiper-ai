@@ -1824,8 +1824,9 @@
         if (!element) return;
         element.closest('.locked.foldable')?.classList.add('expanded');
         const region = node.kind === 'source' || node.source ? element : null;
-        scrollToElement(element);
-        flash(region?.closest('.region-card') || element);
+        const card = region?.closest('.region-card');
+        scrollToElement(card || element);
+        flash(card || element);
         if (focus && region) {
           const editor = region.querySelector('.markdown-editor, .editable-part');
           const markdownEditor = editor ? markdownEditors.get(editor) : null;
