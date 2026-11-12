@@ -1,0 +1,2314 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>System Prompt Editor</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f4f6;
+      --panel: #ffffff;
+      --panel-2: #f9fafb;
+      --text: #1f2328;
+      --muted: #687080;
+      --faint: #9aa1ad;
+      --line: #e4e7ec;
+      --line-strong: #d0d5dd;
+      --editable: #fffbeb;
+      --editable-head: #fef3c7;
+      --editable-line: #f0c454;
+      --editable-strong: #f2b01e;
+      --editable-ink: #8a5a00;
+      --locked: #eef0f3;
+      --locked-ink: #4b5260;
+      --seg-locked: #c9ced6;
+      --tag-bg: #e3e7ee;
+      --tag-ink: #4f5b70;
+      --pi: #5b6b86;
+      --pi-seg: #8d9ab0;
+      --pi-bg: #eef2f8;
+      --accent: #2563eb;
+      --accent-bg: #e8effd;
+      --accent-ink: #1d4ed8;
+      --error: #c4320a;
+      --error-bg: #fef3f2;
+      --success: #12804a;
+      --add: #12804a;
+      --add-bg: #e6f6ec;
+      --del: #c4320a;
+      --del-bg: #fdeceb;
+      --search-match: rgba(250, 204, 21, 0.45);
+      --search-current: #f59e0b;
+      --search-current-text: #111111;
+      --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+      --shadow-md: 0 6px 18px rgba(16, 24, 40, 0.12), 0 1px 3px rgba(16, 24, 40, 0.08);
+      --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #111317;
+      --panel: #1a1d23;
+      --panel-2: #16191e;
+      --text: #e6e8ec;
+      --muted: #9aa3b2;
+      --faint: #6b7383;
+      --line: #2b3039;
+      --line-strong: #3a414c;
+      --editable: #221f14;
+      --editable-head: #2d2817;
+      --editable-line: #8f7426;
+      --editable-strong: #e0a928;
+      --editable-ink: #f2c95c;
+      --locked: #23272f;
+      --locked-ink: #b4bbc8;
+      --seg-locked: #3d4450;
+      --tag-bg: #262c36;
+      --tag-ink: #a4b1c6;
+      --pi: #93a4c2;
+      --pi-seg: #56637a;
+      --pi-bg: #1d2330;
+      --accent: #6ea8fe;
+      --accent-bg: #1b2a44;
+      --accent-ink: #9cc3ff;
+      --error: #ff8a70;
+      --error-bg: #2b1a17;
+      --success: #4ad48a;
+      --add: #5fd68f;
+      --add-bg: #15291d;
+      --del: #ff8a70;
+      --del-bg: #2e1915;
+      --search-match: rgba(234, 179, 8, 0.35);
+      --search-current: #f59e0b;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font: 13px/1.55 var(--mono);
+    }
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 5px 10px;
+      cursor: pointer;
+      font: 500 12px/1.2 var(--sans);
+      white-space: nowrap;
+    }
+    button:hover:not(:disabled) { border-color: var(--line-strong); background: var(--panel-2); }
+    button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+    button:disabled { cursor: default; opacity: 0.42; }
+    button.primary { border-color: var(--accent); background: var(--accent); color: #fff; }
+    button.primary:hover:not(:disabled) { border-color: var(--accent-ink); background: var(--accent-ink); }
+    button.danger:hover:not(:disabled) { border-color: var(--error); color: var(--error); }
+    button.icon { padding: 5px 6px; }
+    button.ghost { border-color: transparent; background: transparent; }
+    button.ghost:hover:not(:disabled) { border-color: var(--line); background: var(--panel-2); }
+    button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-bg); color: var(--accent-ink); }
+    svg.i { width: 15px; height: 15px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    kbd {
+      display: inline-block;
+      min-width: 17px;
+      padding: 0 4px;
+      border: 1px solid var(--line-strong);
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      background: var(--panel);
+      color: var(--muted);
+      font: 600 10px/15px var(--sans);
+      text-align: center;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    #avatar {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #f6c453, #e9892f);
+      color: #fff;
+      font: 700 16px var(--sans);
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    }
+    .brand-text { min-width: 0; font-family: var(--sans); }
+    #identity-name { font-weight: 650; font-size: 15px; line-height: 1.2; }
+    #identity-sub { color: var(--muted); font-size: 12px; }
+    #stats { display: flex; gap: 6px; min-width: 0; overflow: hidden; mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent); }
+    .brand-text, #identity-sub { white-space: nowrap; }
+    .chip {
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font: 500 11px/18px var(--sans);
+      white-space: nowrap;
+    }
+    .chip strong { color: var(--text); font-weight: 650; }
+    .spacer { flex: 1; }
+    #status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      max-width: 260px;
+      flex: 0 0 auto;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font: 500 12px/18px var(--sans);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    #status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      flex: 0 0 7px;
+      border-radius: 50%;
+      background: var(--faint);
+    }
+    #status.pending { color: var(--editable-ink); background: var(--editable); }
+    #status.pending::before { background: var(--editable-strong); }
+    #status.success { color: var(--success); }
+    #status.success::before { background: var(--success); }
+    #status.error { color: var(--error); background: var(--error-bg); }
+    #status.error::before { background: var(--error); }
+    #status.busy::before {
+      border: 2px solid var(--accent);
+      border-right-color: transparent;
+      background: transparent;
+      width: 9px;
+      height: 9px;
+      flex-basis: 9px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toolbar { display: flex; align-items: center; gap: 6px; }
+    .divider { width: 1px; height: 22px; background: var(--line); }
+
+    /* Size map */
+    #sizemap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 7px 14px 8px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      font: 11px var(--sans);
+      color: var(--muted);
+    }
+    #sizemap-bar {
+      display: flex;
+      flex: 1;
+      gap: 2px;
+      height: 12px;
+      min-width: 0;
+    }
+    .map-seg {
+      flex: 1 1 0;
+      min-width: 3px;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 3px;
+      background: linear-gradient(to right, var(--editable-strong) 0 var(--editable, 0%), var(--seg-locked) var(--editable, 0%) 100%);
+      transition: filter 0.12s, transform 0.12s;
+    }
+    .map-seg.pi { background: var(--pi-seg); }
+    .map-seg:hover, .map-seg.active { filter: brightness(1.08) saturate(1.15); transform: scaleY(1.35); }
+    .map-seg.active { box-shadow: 0 0 0 1.5px var(--accent); }
+    .legend { display: flex; gap: 10px; white-space: nowrap; }
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 5px;
+      border-radius: 2px;
+      vertical-align: -0.5px;
+      background: var(--swatch);
+    }
+
+    /* Workspace */
+    #workspace { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 0; }
+    aside {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+    .sidebar-head {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+    .sidebar-title {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--muted);
+      font: 650 11px var(--sans);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .sidebar-title span { flex: 1; padding-left: 4px; }
+    .field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-2);
+      color: var(--muted);
+    }
+    .field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+    .field input {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 0;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font: 12px var(--sans);
+    }
+    #outline { flex: 1; overflow-y: auto; padding: 6px 6px 24px; }
+    .tree-group {
+      margin: 12px 8px 4px;
+      color: var(--faint);
+      font: 650 10px var(--sans);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .tree-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      padding: 3px 8px 3px calc(4px + var(--depth) * 14px);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--sans);
+    }
+    .tree-row:hover { background: var(--panel-2); }
+    .tree-row:focus { outline: none; }
+    .tree-row:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+    .tree-row.active { background: var(--accent-bg); }
+    .tree-row.active .row-name { color: var(--accent-ink); }
+    .row-hits {
+      display: none;
+      flex: 0 0 auto;
+      min-width: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--search-current);
+      color: var(--search-current-text);
+      font: 650 10px/16px var(--sans);
+      text-align: center;
+    }
+    .tree-row.has-hits .row-hits { display: inline-block; }
+    .tree-row.match .row-name { text-decoration: underline; text-decoration-color: var(--search-current); text-decoration-thickness: 2px; }
+    .twisty {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      justify-content: center;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--faint);
+    }
+    .twisty:hover:not(:disabled) { background: transparent; color: var(--text); }
+    .twisty svg { width: 12px; height: 12px; transition: transform 0.12s; }
+    .tree-item:not(.collapsed) > .tree-row .twisty svg { transform: rotate(90deg); }
+    .tree-item.collapsed > .tree-children { display: none; }
+    .glyph { width: 8px; height: 8px; flex: 0 0 8px; border-radius: 2px; border: 1.5px solid var(--faint); }
+    .glyph.source { border-radius: 50%; border-color: var(--editable-strong); background: var(--editable-strong); }
+    .glyph.pi { border-color: var(--pi); }
+    .tree-row.changed .glyph.source { box-shadow: 0 0 0 3px color-mix(in srgb, var(--editable-strong) 30%, transparent); }
+    .row-text { display: flex; align-items: baseline; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
+    .row-name { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; }
+    .kind-element .row-name { font-family: var(--mono); font-size: 12px; }
+    .kind-source .row-name { font-weight: 600; }
+    .row-detail { flex: 1 1 0; min-width: 0; overflow: hidden; color: var(--faint); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+    .tree-row.two-line { padding-top: 4px; padding-bottom: 4px; }
+    .tree-row.two-line .row-text { flex-direction: column; align-items: stretch; gap: 0; }
+    .tree-row.two-line .row-name, .tree-row.two-line .row-detail { flex: none; max-width: 100%; }
+    .tree-row.two-line .row-detail { line-height: 1.3; }
+    .row-detail.file { color: var(--editable-ink); }
+    .row-chip {
+      flex: 0 0 auto;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: var(--editable-head);
+      color: var(--editable-ink);
+      font: 600 10px/16px var(--sans);
+    }
+    .row-pi { background: var(--pi-bg); color: var(--pi); }
+    .row-modified { color: var(--editable-ink); font-size: 11px; display: none; }
+    .tree-row.changed .row-modified { display: inline; }
+    .row-size { flex: 0 0 auto; min-width: 34px; color: var(--faint); font: 10.5px var(--sans); font-variant-numeric: tabular-nums; text-align: right; }
+    .row-bar { flex: 0 0 28px; height: 4px; overflow: hidden; border-radius: 2px; background: var(--locked); }
+    .row-bar span { display: block; height: 100%; border-radius: 2px; background: var(--seg-locked); }
+    .glyph.source ~ .row-bar span, .tree-row.two-line .row-bar span { background: var(--editable-strong); }
+    .tree-row.pi .row-bar span { background: var(--pi-seg); }
+    .tree-empty { padding: 16px 10px; color: var(--muted); font: 12px var(--sans); }
+
+    /* Editor pane */
+    #editor-pane, #preview-pane { position: relative; min-width: 0; min-height: 0; overflow: auto; }
+    #editor-pane[hidden], #preview-pane[hidden] { display: none; }
+    .pane-top { position: sticky; top: 0; z-index: 5; background: var(--bg); }
+    #searchbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+    }
+    #searchbar[hidden] { display: none; }
+    #searchbar .field { flex: 0 1 420px; }
+    #search-count { min-width: 74px; color: var(--muted); font: 12px var(--sans); font-variant-numeric: tabular-nums; }
+    #search-count.none { color: var(--error); }
+    #breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      min-height: 32px;
+      padding: 4px 16px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(6px);
+      overflow: hidden;
+      white-space: nowrap;
+      font: 12px var(--sans);
+      color: var(--muted);
+    }
+    #breadcrumb button { padding: 2px 6px; border-color: transparent; background: transparent; color: var(--muted); font-family: var(--mono); font-size: 11.5px; }
+    #breadcrumb button:hover { color: var(--text); background: var(--panel); border-color: var(--line); }
+    #breadcrumb button.file { font-family: var(--sans); font-weight: 600; color: var(--editable-ink); }
+    #breadcrumb .sep { color: var(--faint); }
+    #warnings {
+      display: none;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 14px 20px 0;
+      padding: 10px 12px;
+      border: 1px solid color-mix(in srgb, var(--error) 35%, transparent);
+      border-radius: 8px;
+      background: var(--error-bg);
+      color: var(--error);
+      white-space: pre-wrap;
+      font-size: 12px;
+    }
+    #warnings.visible { display: flex; }
+    #warnings .i { margin-top: 2px; }
+    #warning-text { flex: 1; }
+    #warnings button { padding: 2px; border: 0; background: transparent; color: inherit; }
+    #notice {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      padding: 7px 12px 7px 20px;
+      border: 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+      background: var(--accent-bg);
+      color: var(--accent-ink);
+      font: 12.5px var(--sans);
+    }
+    #notice.visible { display: flex; }
+    #notice-text { flex: 1; }
+    .chip.delta.down { border-color: color-mix(in srgb, var(--success) 40%, transparent); color: var(--success); }
+    .chip.delta.up { border-color: color-mix(in srgb, var(--editable-strong) 60%, transparent); color: var(--editable-ink); }
+    .chip.delta strong { color: inherit; }
+    .region-delta { font-weight: 600; }
+    .region-delta.down { color: var(--success); }
+    .region-delta.up { color: var(--editable-ink); }
+    #rendered-at { color: var(--faint); }
+    #prompt { padding: 14px 20px 120px; }
+    .locked {
+      margin: 0;
+      color: var(--locked-ink);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .locked.blank { display: none; }
+    .locked.pi { padding-left: 10px; border-left: 2px solid var(--pi-seg); }
+    body.focus-mode .locked.pi.foldable:not(.expanded) { padding-left: 0; border-left: 0; }
+    .locked-fold, .locked-collapse { display: none; }
+    body.focus-mode .locked.foldable:not(.expanded) .locked-body { display: none; }
+    body.focus-mode .locked.foldable:not(.expanded) .locked-fold {
+      display: flex;
+      width: 100%;
+      margin: 6px 0;
+      padding: 7px 10px;
+      border: 1px dashed var(--line-strong);
+      background: transparent;
+      color: var(--muted);
+      gap: 10px;
+    }
+    body.focus-mode .locked.foldable:not(.expanded) .locked-fold:hover { border-color: var(--accent); color: var(--text); }
+    .fold-tags { min-width: 0; overflow: hidden; color: var(--faint); font-family: var(--mono); text-overflow: ellipsis; }
+    .fold-hint { margin-left: auto; color: var(--accent-ink); }
+    body.focus-mode .locked.foldable.expanded { position: relative; }
+    body.focus-mode .locked.foldable.expanded .locked-collapse {
+      display: inline-flex;
+      position: sticky;
+      float: right;
+      top: 80px;
+      margin: 4px 0 0 8px;
+      padding: 2px 8px;
+      font-size: 11px;
+    }
+    .locked-tag {
+      border-radius: 4px;
+      padding: 0 3px;
+      background: var(--tag-bg);
+      color: var(--tag-ink);
+    }
+    .source-region .locked-tag { background: color-mix(in srgb, var(--editable-line) 22%, transparent); color: var(--editable-ink); }
+    .editable-part { border-radius: 3px; outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .editable-part:empty::before { content: "\200b"; }
+    .editable-part:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .markdown-editor { display: block; min-width: 0; border-radius: 4px; }
+    .source-region {
+      margin: 8px -10px;
+      overflow: clip;
+      border: 1px solid color-mix(in srgb, var(--editable-line) 55%, transparent);
+      border-left: 3px solid var(--editable-line);
+      border-radius: 8px;
+      background: var(--editable);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+    .source-region.changed { border-color: var(--editable-strong); box-shadow: 0 0 0 2px color-mix(in srgb, var(--editable-strong) 30%, transparent); }
+    .source-region:focus-within { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+    .region-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      padding: 5px 6px 5px 10px;
+      border-bottom: 1px solid color-mix(in srgb, var(--editable-line) 40%, transparent);
+      background: var(--editable-head);
+      font: 12px var(--sans);
+    }
+    .region-head .i { color: var(--editable-ink); }
+    .region-name { font-weight: 650; }
+    .region-dir { min-width: 0; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+    .region-size { color: var(--faint); font-size: 11px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .region-badge {
+      display: none;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: var(--editable-strong);
+      color: #1f1500;
+      font: 650 10px/17px var(--sans);
+    }
+    .source-region.changed .region-badge { display: inline-block; }
+    .region-actions { display: flex; gap: 2px; margin-left: auto; }
+    .region-actions button { padding: 3px 6px; border-color: transparent; background: transparent; color: var(--muted); font-size: 11px; }
+    .region-actions button:hover:not(:disabled) { border-color: color-mix(in srgb, var(--editable-line) 60%, transparent); background: var(--editable); color: var(--text); }
+    .region-actions .revert { display: none; }
+    .source-region.changed .region-actions .revert { display: inline-flex; color: var(--editable-ink); }
+    .region-body { padding: 8px 12px 10px; }
+    .flash { animation: flash 1.2s ease-out; }
+    .locked-tag.flash, .locked.flash { animation: flash-text 1.2s ease-out; }
+    @keyframes flash { 0%, 30% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 45%, transparent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+    @keyframes flash-text { 0%, 30% { background: color-mix(in srgb, var(--accent) 30%, transparent); } }
+    ::highlight(prompt-search) { background-color: var(--search-match); }
+    ::highlight(prompt-search-current) { background-color: var(--search-current); color: var(--search-current-text); }
+    body.busy .markdown-editor, body.busy .editable-part { opacity: 0.7; }
+
+    /* Preview */
+    .preview-header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      font-family: var(--sans);
+    }
+    .preview-header strong { font-size: 14px; }
+    #preview-summary { color: var(--muted); font-size: 12px; }
+    #preview-summary .add { color: var(--add); font-weight: 600; }
+    #preview-summary .del { color: var(--del); font-weight: 600; }
+    #diffs { display: flex; flex-direction: column; gap: 16px; padding: 18px 20px 100px; }
+    .diff-file { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: var(--shadow-sm); }
+    .diff-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
+      font: 12px var(--sans);
+    }
+    .diff-head .i { color: var(--editable-ink); }
+    .diff-name { font-weight: 650; }
+    .diff-dir { min-width: 0; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+    .diff-counts { margin-left: auto; font-weight: 600; white-space: nowrap; }
+    .diff-counts .add { color: var(--add); }
+    .diff-counts .del { color: var(--del); margin-left: 6px; }
+    .diff-body { padding: 4px 0; font-size: 12px; line-height: 1.5; }
+    .diff-line { display: grid; grid-template-columns: 26px minmax(0, 1fr); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .diff-line::before { content: attr(data-sign); color: var(--faint); text-align: center; user-select: none; }
+    .diff-line.add { background: var(--add-bg); }
+    .diff-line.add::before { color: var(--add); }
+    .diff-line.del { background: var(--del-bg); }
+    .diff-line.del::before { color: var(--del); }
+    .diff-line mark { border-radius: 3px; color: inherit; }
+    .diff-line.add mark { background: color-mix(in srgb, var(--add) 28%, transparent); }
+    .diff-line.del mark { background: color-mix(in srgb, var(--del) 26%, transparent); }
+    .diff-line.hunk { margin: 4px 0; background: var(--accent-bg); color: var(--accent-ink); font-size: 11px; }
+    .empty-preview { color: var(--muted); font-family: var(--sans); }
+
+    /* Footer */
+    footer {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 4px 14px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      font: 11px var(--sans);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    footer .hint { display: inline-flex; align-items: center; gap: 4px; }
+    footer button { padding: 2px 8px; font-size: 11px; }
+
+    /* Overlays */
+    #tooltip {
+      position: fixed;
+      z-index: 50;
+      max-width: 320px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow-md);
+      color: var(--text);
+      font: 12px/1.45 var(--sans);
+      pointer-events: none;
+    }
+    #tooltip[hidden] { display: none; }
+    #tooltip .tt-name { font-family: var(--mono); font-weight: 600; }
+    #tooltip .tt-meta { color: var(--muted); }
+    #toasts { position: fixed; bottom: 40px; left: 50%; z-index: 60; display: flex; flex-direction: column; align-items: center; gap: 8px; transform: translateX(-50%); }
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      box-shadow: var(--shadow-md);
+      color: var(--text);
+      font: 500 12.5px var(--sans);
+      animation: toast-in 0.18s ease-out;
+    }
+    .toast.success .i { color: var(--success); }
+    .toast.error { color: var(--error); }
+    .toast.leaving { opacity: 0; transform: translateY(6px); transition: opacity 0.25s, transform 0.25s; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
+    #modal {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: grid;
+      place-items: center;
+      background: rgba(10, 12, 16, 0.38);
+      animation: fade-in 0.12s ease-out;
+    }
+    #modal[hidden] { display: none; }
+    @keyframes fade-in { from { opacity: 0; } }
+    .modal-card {
+      width: min(420px, calc(100vw - 40px));
+      padding: 18px 18px 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      box-shadow: var(--shadow-md);
+      font-family: var(--sans);
+    }
+    .modal-card h2 { margin: 0 0 6px; font-size: 15px; }
+    .modal-card p { margin: 0 0 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-actions .danger-solid { border-color: var(--error); background: var(--error); color: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div id="avatar" aria-hidden="true">S</div>
+      <div class="brand-text">
+        <div id="identity-name">System prompt</div>
+        <div id="identity-sub">Prompt editor</div>
+      </div>
+    </div>
+    <div id="stats"></div>
+    <div class="spacer"></div>
+    <div id="status">Loading…</div>
+    <div class="toolbar">
+      <button id="search-toggle" class="icon ghost" type="button" title="Find in prompt (⌘F)" data-icon="search"></button>
+      <button id="focus-toggle" class="ghost" type="button" aria-pressed="false" title="Fold generated text (⌘E)" data-icon="pencil">Editable only</button>
+      <button id="copy-prompt" class="icon ghost" type="button" title="Copy the rendered prompt" data-icon="copy"></button>
+      <button id="refresh" class="icon ghost" type="button" title="Render again (⌘R)" data-icon="refresh"></button>
+    </div>
+    <div class="divider"></div>
+    <div class="toolbar">
+      <button id="discard" class="danger" type="button" disabled data-icon="trash">Discard</button>
+      <button id="preview" type="button" disabled data-icon="eye">Preview</button>
+      <button id="apply" class="primary" type="button" disabled data-icon="check">Apply</button>
+    </div>
+    <div class="divider"></div>
+    <button id="close" class="icon ghost" type="button" title="Close" data-icon="x"></button>
+  </header>
+  <div id="sizemap">
+    <div id="sizemap-bar" role="list" aria-label="Prompt size by section"></div>
+    <div class="legend">
+      <span style="--swatch: var(--editable-strong)">Editable</span>
+      <span style="--swatch: var(--seg-locked)">Generated</span>
+      <span style="--swatch: var(--pi-seg)">Added by Pi</span>
+    </div>
+  </div>
+  <div id="workspace">
+    <aside>
+      <div class="sidebar-head">
+        <div class="sidebar-title">
+          <span>Outline</span>
+          <button id="expand-all" class="icon ghost" type="button" title="Expand all" data-icon="expand"></button>
+          <button id="collapse-all" class="icon ghost" type="button" title="Collapse all" data-icon="collapse"></button>
+        </div>
+        <label class="field">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          <input id="outline-filter" type="search" placeholder="Filter sections (⌘K)" autocomplete="off" spellcheck="false">
+        </label>
+      </div>
+      <nav id="outline" aria-label="Prompt outline"></nav>
+    </aside>
+    <section id="editor-pane">
+      <div class="pane-top" id="pane-top">
+        <div id="searchbar" hidden>
+          <label class="field">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="search-input" type="text" placeholder="Find in prompt" autocomplete="off" spellcheck="false">
+          </label>
+          <span id="search-count"></span>
+          <button id="search-prev" class="icon" type="button" title="Previous match (⇧↵)" data-icon="up"></button>
+          <button id="search-next" class="icon" type="button" title="Next match (↵)" data-icon="down"></button>
+          <button id="search-case" type="button" aria-pressed="false" title="Match case">Aa</button>
+          <button id="search-close" class="icon ghost" type="button" title="Close (Esc)" data-icon="x"></button>
+        </div>
+        <nav id="breadcrumb" aria-label="Current section"></nav>
+        <div id="notice" role="status">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          <div id="notice-text"></div>
+          <button id="notice-action" type="button">Render again</button>
+          <button id="dismiss-notice" class="icon ghost" type="button" title="Dismiss" data-icon="x"></button>
+        </div>
+      </div>
+      <div id="warnings" role="alert">
+        <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>
+        <div id="warning-text"></div>
+        <button id="dismiss-warnings" type="button" title="Dismiss" data-icon="x"></button>
+      </div>
+      <main id="prompt"></main>
+    </section>
+    <section id="preview-pane" hidden>
+      <div class="preview-header">
+        <strong>Review changes</strong>
+        <span id="preview-summary"></span>
+        <span class="spacer"></span>
+        <button id="copy-patch" class="ghost" type="button" data-icon="copy">Copy patch</button>
+        <button id="back-to-editor" type="button" data-icon="back">Back to editor</button>
+        <button id="apply-from-preview" class="primary" type="button" data-icon="check">Apply changes</button>
+      </div>
+      <div id="diffs"></div>
+    </section>
+  </div>
+  <footer>
+    <span class="hint"><kbd>⌘F</kbd> Find</span>
+    <span class="hint"><kbd>⌘K</kbd> Jump to section</span>
+    <span class="hint"><kbd>⌘E</kbd> Editable only</span>
+    <span class="hint"><kbd>⌘[</kbd><kbd>⌘]</kbd> Previous / next file</span>
+    <span class="hint"><kbd>⌘S</kbd> Stage</span>
+    <span class="hint"><kbd>⌘↵</kbd> Preview, then apply</span>
+    <span class="hint"><kbd>Esc</kbd> Back</span>
+    <span class="spacer"></span>
+    <span id="rendered-at"></span>
+    <button id="theme-toggle" class="ghost" type="button" title="Color theme"></button>
+  </footer>
+  <div id="tooltip" hidden></div>
+  <div id="toasts" aria-live="polite"></div>
+  <div id="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <h2 id="modal-title"></h2>
+      <p id="modal-message"></p>
+      <div class="modal-actions">
+        <button id="modal-cancel" type="button">Cancel</button>
+        <button id="modal-confirm" type="button"></button>
+      </div>
+    </div>
+  </div>
+  <script data-prompt-markdown-bundle></script>
+  <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const prompt = $('prompt');
+      const outlineView = $('outline');
+      const editorPane = $('editor-pane');
+      const previewPane = $('preview-pane');
+      const paneTop = $('pane-top');
+      const previewButton = $('preview');
+      const applyButton = $('apply');
+      const applyFromPreview = $('apply-from-preview');
+      const discardButton = $('discard');
+      const focusToggle = $('focus-toggle');
+      const status = $('status');
+      const tooltip = $('tooltip');
+      const searchBar = $('searchbar');
+      const searchInput = $('search-input');
+      const outlineFilter = $('outline-filter');
+      const isMac = /Mac/.test(navigator.platform || navigator.userAgent || '');
+
+      const ICONS = {
+        search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+        pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+        copy: '<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>',
+        refresh: '<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
+        trash: '<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',
+        eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+        check: '<path d="M20 6 9 17l-5-5"/>',
+        x: '<path d="M18 6 6 18M6 6l12 12"/>',
+        up: '<path d="m6 15 6-6 6 6"/>',
+        down: '<path d="m6 9 6 6 6-6"/>',
+        back: '<path d="M19 12H5M11 18l-6-6 6-6"/>',
+        chevron: '<path d="m9 6 6 6-6 6"/>',
+        expand: '<path d="m7 15 5 5 5-5M7 9l5-5 5 5"/>',
+        collapse: '<path d="m7 20 5-5 5 5M7 4l5 5 5-5"/>',
+        file: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/>',
+        folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+        external: '<path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>',
+        undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+        lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+        sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+        moon: '<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10Z"/>',
+        auto: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor"/>',
+      };
+
+      function icon(name) {
+        return `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+      }
+
+      for (const button of document.querySelectorAll('[data-icon]')) {
+        button.insertAdjacentHTML('afterbegin', icon(button.dataset.icon));
+      }
+
+      function h(tag, props = {}, ...children) {
+        const element = document.createElement(tag);
+        for (const [key, value] of Object.entries(props)) {
+          if (value === null || value === undefined || value === false) continue;
+          if (key === 'class') element.className = value;
+          else if (key === 'text') element.textContent = value;
+          else if (key === 'html') element.innerHTML = value;
+          else if (key === 'dataset') Object.assign(element.dataset, value);
+          else if (key === 'style') element.setAttribute('style', value);
+          else element.setAttribute(key, value === true ? '' : String(value));
+        }
+        for (const child of children.flat()) {
+          if (child !== null && child !== undefined && child !== false) element.append(child);
+        }
+        return element;
+      }
+
+      const formatCount = (count) => {
+        const value = Math.max(0, count);
+        if (value >= 10000) return `${Math.round(value / 1000)}k`;
+        if (value >= 1000) return `${(value / 1000).toFixed(1)}k`;
+        return String(value);
+      };
+      const tokens = (chars) => Math.round(chars / 4);
+      const formatTokens = (chars) => `≈${formatCount(tokens(chars))}`;
+      const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
+
+      function homePath(path) {
+        return String(path || '')
+          .replace(/^\/private(?=\/(tmp|var)\/)/, '')
+          .replace(/^\/(Users|home)\/[^/]+/, '~');
+      }
+      function basename(path) {
+        return String(path || '').split('/').filter(Boolean).pop() || String(path || '');
+      }
+      function dirname(path) {
+        const home = homePath(path);
+        const index = home.lastIndexOf('/');
+        return index > 0 ? home.slice(0, index) : '';
+      }
+      function shortPath(path, keep = 2) {
+        const parts = homePath(path).split('/').filter(Boolean);
+        return parts.length <= keep ? homePath(path) : parts.slice(-keep).join('/');
+      }
+
+      // ---------------------------------------------------------------- state
+
+      const timers = new Map();
+      const markdownEditors = new WeakMap();
+      const mountedEditors = new Set();
+      const originals = new WeakMap();
+      const partHolders = new Map();
+      let generation = 0;
+      let draftRevision = 0;
+      let pendingRegionCount = 0;
+      let pendingFileCount = 0;
+      let previewReady = false;
+      let segments = [];
+      let outline = null;
+      let activeNode = null;
+      let pendingAction = null;
+      let sizeFrame = 0;
+      let baselineChars = 0;
+      const regionBaselines = new Map();
+
+      function send(data) {
+        window.glimpse.send(data);
+      }
+
+      function setStatus(text, kind = '') {
+        status.textContent = text;
+        status.title = text;
+        status.className = kind;
+      }
+
+      function setBusy(text) {
+        document.body.classList.add('busy');
+        previewButton.disabled = true;
+        applyButton.disabled = true;
+        applyFromPreview.disabled = true;
+        discardButton.disabled = true;
+        setStatus(text, 'busy');
+      }
+
+      function syncButtons() {
+        const drafting = pendingRegionCount > 0 || timers.size > 0;
+        previewButton.disabled = !drafting;
+        discardButton.disabled = !drafting;
+        applyButton.disabled = !previewReady;
+        applyFromPreview.disabled = !previewReady;
+      }
+
+      // --------------------------------------------------------------- theme
+
+      const darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+      const THEMES = ['auto', 'light', 'dark'];
+      let themeChoice = 'auto';
+      try { themeChoice = localStorage.getItem('prompt-editor-theme') || 'auto'; } catch { /* opaque origin */ }
+
+      function applyTheme() {
+        const dark = themeChoice === 'dark' || (themeChoice === 'auto' && darkQuery?.matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        const button = $('theme-toggle');
+        const label = themeChoice[0].toUpperCase() + themeChoice.slice(1);
+        button.innerHTML = `${icon(themeChoice === 'auto' ? 'auto' : themeChoice === 'dark' ? 'moon' : 'sun')}${label}`;
+      }
+      $('theme-toggle').addEventListener('click', () => {
+        themeChoice = THEMES[(THEMES.indexOf(themeChoice) + 1) % THEMES.length];
+        try { localStorage.setItem('prompt-editor-theme', themeChoice); } catch { /* opaque origin */ }
+        applyTheme();
+      });
+      darkQuery?.addEventListener?.('change', applyTheme);
+      applyTheme();
+
+      // ------------------------------------------------------ toasts & modal
+
+      function toast(text, kind = 'success', duration = 2600) {
+        const item = h('div', { class: `toast ${kind}`, html: icon(kind === 'error' ? 'x' : 'check') });
+        item.append(text);
+        $('toasts').append(item);
+        setTimeout(() => {
+          item.classList.add('leaving');
+          setTimeout(() => item.remove(), 300);
+        }, duration);
+      }
+
+      let modalResolve = null;
+      function confirmDialog({ title, message, confirm, danger = true }) {
+        $('modal-title').textContent = title;
+        $('modal-message').textContent = message;
+        const confirmButton = $('modal-confirm');
+        confirmButton.textContent = confirm;
+        confirmButton.className = danger ? 'danger-solid' : 'primary';
+        $('modal').hidden = false;
+        confirmButton.focus();
+        return new Promise((resolve) => { modalResolve = resolve; });
+      }
+      function closeModal(result) {
+        if (!modalResolve) return;
+        $('modal').hidden = true;
+        const resolve = modalResolve;
+        modalResolve = null;
+        resolve(result);
+      }
+      $('modal-cancel').addEventListener('click', () => closeModal(false));
+      $('modal-confirm').addEventListener('click', () => closeModal(true));
+      $('modal').addEventListener('click', (event) => {
+        if (event.target === $('modal')) closeModal(false);
+      });
+
+      async function copyText(text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          const area = h('textarea', { style: 'position:fixed;opacity:0;top:0;left:0' });
+          area.value = text;
+          document.body.append(area);
+          area.select();
+          let copied = false;
+          try { copied = document.execCommand('copy'); } catch { copied = false; }
+          area.remove();
+          return copied;
+        }
+      }
+
+      // ------------------------------------------------------------- editing
+
+      function destroyEditors() {
+        for (const editor of mountedEditors) editor.destroy();
+        mountedEditors.clear();
+      }
+
+      function promptPartText(part) {
+        return markdownEditors.get(part)?.value() ?? part.textContent ?? '';
+      }
+
+      // Some sources are XML-escaped in the prompt. The editor shows and edits their source text,
+      // and escapes it again for staging, so the prompt and the file stay exact.
+      const escapeXml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const unescapeXml = (text) => text.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+      function regionText(region) {
+        const escaped = region.dataset.codec === 'xml-text';
+        return [...region.querySelectorAll('[data-prompt-part]')]
+          .map((part) => (escaped && originals.has(part) ? escapeXml(promptPartText(part)) : promptPartText(part)))
+          .join('');
+      }
+
+      function regionSourceLength(region) {
+        return [...region.querySelectorAll('[data-prompt-part]')].map(promptPartText).join('').length;
+      }
+
+      function renderedRegions() {
+        return Object.fromEntries(
+          [...prompt.querySelectorAll('.source-region')].map((region) => [
+            region.dataset.regionId,
+            regionText(region),
+          ]),
+        );
+      }
+
+      function regionNodes(regionId) {
+        return outline ? outline.nodes.filter((node) => node.region?.id === regionId || node.source?.id === regionId) : [];
+      }
+
+      function markPending(regionIds) {
+        const pending = new Set(regionIds);
+        for (const region of prompt.querySelectorAll('.source-region')) {
+          region.classList.toggle('changed', pending.has(region.dataset.regionId));
+        }
+        if (!outline) return;
+        for (const node of outline.nodes) {
+          const region = node.region || node.source;
+          if (region && node.row) node.row.classList.toggle('changed', pending.has(region.id));
+        }
+      }
+
+      function updateStage(payload) {
+        draftRevision = payload.draftRevision;
+        pendingRegionCount = payload.pendingRegionCount;
+        pendingFileCount = payload.pendingFileCount ?? pendingFileCount;
+        previewReady = payload.previewReady;
+        markPending(payload.pendingRegionIds || []);
+        syncButtons();
+        document.body.classList.remove('busy');
+        if (pendingRegionCount === 0) setStatus('No pending edits');
+        else setStatus(`${plural(payload.pendingFileCount, 'file')} staged`, 'pending');
+      }
+
+      function stage(region) {
+        const id = region.dataset.regionId;
+        clearTimeout(timers.get(id));
+        timers.delete(id);
+        setStatus('Staging…', 'busy');
+        send({ action: 'stage', generation, regionId: id, text: regionText(region) });
+      }
+
+      function scheduleStage(region) {
+        const id = region.dataset.regionId;
+        clearTimeout(timers.get(id));
+        region.classList.add('changed');
+        for (const node of regionNodes(id)) node.row?.classList.add('changed');
+        previewReady = false;
+        timers.set(id, setTimeout(() => stage(region), 400));
+        syncButtons();
+        setStatus('Editing…', 'pending');
+      }
+
+      function onPartEdited(part, region) {
+        scheduleStage(region);
+        const holder = partHolders.get(part.dataset.partKey);
+        if (holder) {
+          const length = promptPartText(part).length;
+          const delta = length - holder.chars;
+          holder.chars = length;
+          for (const node of holder.nodes) {
+            node.chars += delta;
+            node.editableChars += delta;
+          }
+        }
+        scheduleSizeRender();
+        if (search.open) scheduleSearch(true);
+      }
+
+      function attachPlainEditorEvents(element, region) {
+        element.spellcheck = false;
+        element.addEventListener('input', () => onPartEdited(element, region));
+        element.addEventListener('keydown', (event) => {
+          if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+            event.preventDefault();
+            stage(region);
+          }
+        });
+      }
+
+      function tagName(text) {
+        return /^<\/?([A-Za-z_][\w.:-]*)/.exec(text)?.[1] || '?';
+      }
+
+      function createPart(part, region, key) {
+        const element = document.createElement('span');
+        element.textContent = part.text;
+        element.dataset.promptPart = '';
+        element.dataset.partKey = key;
+        if (part.tag) {
+          element.className = 'locked-tag';
+        } else if (part.editable && region) {
+          element.className = 'editable-part';
+          element.setAttribute('contenteditable', 'plaintext-only');
+          originals.set(element, part.text);
+          attachPlainEditorEvents(element, region);
+        }
+        if (part.anchorId) element.id = part.anchorId;
+        return element;
+      }
+
+      function appendMarkdownEditor(body, region, text, key) {
+        if (!window.promptMarkdown) throw new Error('Markdown editor bundle did not load');
+        const container = h('div', { class: 'markdown-editor', dataset: { promptPart: '', partKey: key } });
+        body.append(container);
+        const editor = window.promptMarkdown.mount(container, {
+          doc: text,
+          onChange: () => onPartEdited(container, region),
+          onSave: () => stage(region),
+        });
+        originals.set(container, text);
+        markdownEditors.set(container, editor);
+        mountedEditors.add(editor);
+      }
+
+      function appendEditableParts(body, region, segment, index) {
+        const shown = (text) => (segment.codec === 'xml-text' ? unescapeXml(text) : text);
+        if (!segment.parts.some((part) => part.tag)) {
+          appendMarkdownEditor(body, region, shown(segment.text), `${index}:0`);
+          return;
+        }
+        segment.parts.forEach((part, partIndex) => {
+          const key = `${index}:${partIndex}`;
+          if (part.editable && part.text.trim()) appendMarkdownEditor(body, region, shown(part.text), key);
+          else body.append(createPart(part.editable ? { ...part, text: shown(part.text) } : part, region, key));
+        });
+      }
+
+      function actionButton(action, iconName, label, extra = '') {
+        return h('button', { type: 'button', class: extra, dataset: { action }, title: label, html: `${icon(iconName)}<span>${label}</span>` });
+      }
+
+      function regionSection(segment, index) {
+        const path = segment.path || segment.label;
+        const region = h('section', {
+          class: 'source-region',
+          id: `region-${segment.regionId}`,
+          dataset: { regionId: segment.regionId, path, codec: segment.codec || 'direct' },
+        });
+        const head = h(
+          'header',
+          { class: 'region-head' },
+          h('span', { html: icon('file') }),
+          h('span', { class: 'region-name', text: basename(path) }),
+          h('span', { class: 'region-dir', text: dirname(path), title: path }),
+          h('span', { class: 'region-size' }),
+          h('span', { class: 'region-badge', text: 'Modified' }),
+          h(
+            'span',
+            { class: 'region-actions' },
+            actionButton('revert', 'undo', 'Revert', 'revert'),
+            actionButton('copy-path', 'copy', 'Copy path'),
+            actionButton('reveal', 'folder', isMac ? 'Reveal' : 'Folder'),
+            actionButton('open', 'external', 'Open'),
+          ),
+        );
+        const body = h('div', { class: 'region-body' });
+        region.append(head, body);
+        appendEditableParts(body, region, segment, index);
+        return region;
+      }
+
+      // Generated text often carries runs of blank lines that only spread the page out. The
+      // display keeps at most one, and none against a file card; the prompt text is unchanged.
+      function displayParts(segment, index) {
+        const previous = segments[index - 1];
+        const next = segments[index + 1];
+        const parts = segment.parts.map((part) => (part.tag ? part : { ...part, text: part.text.replace(/\n{3,}/g, '\n\n') }));
+        const first = parts[0];
+        const last = parts[parts.length - 1];
+        if (previous?.editable && first && !first.tag) parts[0] = { ...first, text: first.text.replace(/^\s*\n/, '') };
+        if (next?.editable && last && !last.tag) parts[parts.length - 1] = { ...parts[parts.length - 1], text: parts[parts.length - 1].text.replace(/\s+$/, '') };
+        return parts;
+      }
+
+      function lockedSegment(segment, index, pi) {
+        const box = h('div', { class: `locked${pi ? ' pi' : ''}`, id: segment.segmentId });
+        const body = h('div', { class: 'locked-body' });
+        if (!segment.text.trim()) box.classList.add('blank');
+        displayParts(segment, index).forEach((part, partIndex) => body.append(createPart(part, null, `${index}:${partIndex}`)));
+        box.append(body);
+        if (segment.text.trim().length > 240) {
+          box.classList.add('foldable');
+          const names = [...new Set(segment.parts.filter((part) => part.tag && !part.text.startsWith('</')).map((part) => tagName(part.text)))];
+          const fold = h(
+            'button',
+            { type: 'button', class: 'locked-fold' },
+            h('span', { html: icon('lock') }),
+            h('span', { text: `${formatCount(segment.text.length)} characters ${pi ? 'added by Pi' : 'generated'}` }),
+            names.length ? h('span', { class: 'fold-tags', text: names.slice(0, 6).map((name) => `<${name}>`).join(' ') }) : null,
+            h('span', { class: 'fold-hint', text: 'Show' }),
+          );
+          fold.addEventListener('click', () => box.classList.add('expanded'));
+          const collapse = h('button', { type: 'button', class: 'locked-collapse', text: 'Fold' });
+          collapse.addEventListener('click', () => box.classList.remove('expanded'));
+          box.prepend(collapse);
+          box.append(fold);
+        }
+        return box;
+      }
+
+      async function revertRegion(region) {
+        for (const part of region.querySelectorAll('[data-prompt-part]')) {
+          if (!originals.has(part)) continue;
+          const original = originals.get(part);
+          const editor = markdownEditors.get(part);
+          if (editor) editor.setValue(original);
+          else if (part.textContent !== original) {
+            part.textContent = original;
+            onPartEdited(part, region);
+          }
+        }
+        stage(region);
+      }
+
+      prompt.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-action]');
+        if (!button) return;
+        const region = button.closest('.source-region');
+        const path = region?.dataset.path;
+        switch (button.dataset.action) {
+          case 'revert':
+            revertRegion(region);
+            toast(`Reverted ${basename(path)}`);
+            break;
+          case 'copy-path':
+            toast((await copyText(path)) ? 'Copied path' : 'Could not copy the path', 'success');
+            break;
+          case 'reveal':
+          case 'open':
+            send({ action: button.dataset.action, path });
+            break;
+        }
+      });
+
+      // ------------------------------------------------------------- outline
+
+      function tagInfo(text) {
+        const attrs = {};
+        for (const match of text.matchAll(/([A-Za-z_][\w.:-]*)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) {
+          attrs[match[1]] = match[2] ?? match[3] ?? '';
+        }
+        return {
+          name: tagName(text),
+          closing: text.startsWith('</'),
+          selfClosing: /\/\s*>$/.test(text),
+          attrs,
+        };
+      }
+
+      function buildOutline(payload, piSegments) {
+        const nodes = [];
+        let nextId = 0;
+        const node = (props) => {
+          const created = { id: nextId++, kind: 'element', children: [], chars: 0, editableChars: 0, ownText: 0, ...props };
+          if (created.kind !== 'root') nodes.push(created);
+          return created;
+        };
+        const root = node({ kind: 'root' });
+        const stack = [root];
+        const count = (length, editable) => {
+          for (const holder of stack) {
+            holder.chars += length;
+            if (editable) holder.editableChars += length;
+          }
+        };
+        const open = (part, info, pi) => {
+          const parent = stack[stack.length - 1];
+          const created = node({ name: info.name, attrs: info.attrs, anchorId: part.anchorId, pi, parent, tagText: part.text });
+          parent.children.push(created);
+          stack.push(created);
+          count(part.text.length, false);
+          if (info.selfClosing) stack.pop();
+          return created;
+        };
+        const close = (part, info, floor) => {
+          count(part.text.length, false);
+          for (let index = stack.length - 1; index >= floor; index -= 1) {
+            if (stack[index].kind === 'element' && stack[index].name === info.name) {
+              stack.length = index;
+              return;
+            }
+          }
+        };
+
+        payload.segments.forEach((segment, segmentIndex) => {
+          const pi = piSegments.has(segment.segmentId);
+          if (!segment.editable) {
+            for (const part of segment.parts) {
+              if (part.tag) {
+                const info = tagInfo(part.text);
+                if (info.closing) close(part, info, 1);
+                else open(part, info, pi);
+              } else {
+                count(part.text.length, false);
+                stack[stack.length - 1].ownText += part.text.trim().length;
+              }
+            }
+            return;
+          }
+
+          const region = {
+            id: segment.regionId,
+            path: segment.path || segment.label,
+            anchorId: `region-${segment.regionId}`,
+          };
+          const significant = segment.parts.filter((part) => part.text.trim());
+          const first = significant[0];
+          const last = significant[significant.length - 1];
+          const merged = Boolean(
+            first?.tag && last?.tag && first !== last &&
+            !tagInfo(first.text).closing && tagInfo(last.text).closing &&
+            tagInfo(first.text).name === tagInfo(last.text).name,
+          );
+          const floor = stack.length;
+          if (!merged) {
+            const leaf = node({ kind: 'source', region, anchorId: region.anchorId, parent: stack[stack.length - 1] });
+            stack[stack.length - 1].children.push(leaf);
+            stack.push(leaf);
+          }
+          const hasTags = segment.parts.some((part) => part.tag);
+          segment.parts.forEach((part, partIndex) => {
+            if (part.tag) {
+              const info = tagInfo(part.text);
+              if (info.closing) close(part, info, floor);
+              else {
+                const created = open(part, info, pi);
+                if (merged && !region.node) {
+                  created.source = region;
+                  created.anchorId ||= region.anchorId;
+                  region.node = created;
+                }
+              }
+              return;
+            }
+            const text = hasTags ? part.text : segment.text;
+            count(text.length, true);
+            partHolders.set(`${segmentIndex}:${partIndex}`, { nodes: [...stack], chars: text.length });
+          });
+          stack.length = floor;
+        });
+
+        for (const candidate of nodes) {
+          const visible = candidate.children.filter((child) => !child.hidden);
+          if (candidate.kind === 'element' && !candidate.source && candidate.ownText === 0 &&
+              visible.length === 1 && visible[0].kind === 'source') {
+            candidate.hidden = true;
+            visible[0].wrapper = candidate.name;
+          }
+        }
+        const lift = (children) => children.flatMap((child) =>
+          child.hidden ? lift(child.children) : [child]);
+        for (const candidate of nodes) candidate.visibleChildren = lift(candidate.children);
+        const top = lift(root.children).flatMap((child) =>
+          child.kind === 'element' && child.name === 'system_prompt' ? child.visibleChildren : [child]);
+        return { root, nodes, top };
+      }
+
+      function nodeLabel(node) {
+        if (node.kind === 'source') {
+          return { name: basename(node.region.path), detail: shortPath(dirname(node.region.path)) };
+        }
+        const attrs = node.attrs || {};
+        const detail = attrs.path ? shortPath(attrs.path) : attrs.name || attrs.id || attrs.source_type || '';
+        return { name: node.name, detail };
+      }
+
+      function ancestors(node) {
+        const chain = [];
+        for (let current = node; current && current.kind !== 'root'; current = current.parent) {
+          if (!current.hidden && !(current.kind === 'element' && current.name === 'system_prompt')) chain.unshift(current);
+        }
+        return chain;
+      }
+
+      function treeItem(node, depth) {
+        const item = h('div', { class: 'tree-item', role: 'none' });
+        const kids = node.visibleChildren;
+        const editable = node.kind === 'source' || Boolean(node.source);
+        const label = nodeLabel(node);
+        const row = h('div', {
+          class: `tree-row kind-${node.kind}`,
+          role: 'treeitem',
+          tabindex: -1,
+          'aria-level': depth + 1,
+          style: `--depth:${depth}`,
+          title: node.kind === 'source' ? node.region.path : node.tagText || '',
+        });
+        const twisty = h('button', { type: 'button', class: 'twisty', tabindex: -1, 'aria-label': 'Toggle', html: kids.length ? icon('chevron') : '' });
+        const text = h('span', { class: 'row-text' }, h('span', { class: 'row-name', text: label.name }));
+        const detail = node.source ? basename(node.source.path) : label.detail;
+        if (detail) text.append(h('span', { class: `row-detail${node.source ? ' file' : ''}`, text: detail }));
+        row.classList.toggle('two-line', editable);
+        row.append(
+          twisty,
+          h('span', { class: `glyph${editable ? ' source' : node.pi ? ' pi' : ''}` }),
+          text,
+        );
+        if (node.pi && depth === 0) row.append(h('span', { class: 'row-chip row-pi', text: 'Pi' }));
+        row.classList.toggle('pi', Boolean(node.pi));
+        row.append(
+          h('span', { class: 'row-hits' }),
+          h('span', { class: 'row-modified', text: '●' }),
+          h('span', { class: 'row-bar' }, h('span')),
+          h('span', { class: 'row-size', text: formatTokens(node.chars) }),
+        );
+        item.append(row);
+        node.row = row;
+        row.outlineNode = node;
+        node.item = item;
+        node.expanded = depth === 0 ? node.editableChars > 0 : node.editableChars > 0 && depth < 2;
+        item.classList.toggle('collapsed', !node.expanded);
+        twisty.addEventListener('click', (event) => {
+          event.stopPropagation();
+          setExpanded(node, !node.expanded);
+        });
+        row.addEventListener('click', () => {
+          navigateTo(node, { focus: editable });
+          if (!editable) focusRow(row);
+        });
+        row.addEventListener('dblclick', () => kids.length && setExpanded(node, !node.expanded));
+        if (kids.length) {
+          const children = h('div', { class: 'tree-children', role: 'group' });
+          for (const child of kids) children.append(treeItem(child, depth + 1));
+          item.append(children);
+        }
+        return item;
+      }
+
+      function setExpanded(node, expanded) {
+        node.expanded = expanded;
+        node.item?.classList.toggle('collapsed', !expanded);
+      }
+
+      function renderOutline() {
+        outlineView.replaceChildren();
+        const tree = h('div', { class: 'tree', role: 'tree' });
+        let piStarted = false;
+        for (const node of outline.top) {
+          if (node.pi && !piStarted) {
+            piStarted = true;
+            tree.append(h('div', { class: 'tree-group', text: 'Added by Pi' }));
+          }
+          tree.append(treeItem(node, 0));
+        }
+        outlineView.append(tree);
+        if (outlineFilter.value) filterOutline(outlineFilter.value);
+      }
+
+      function filterOutline(query) {
+        const needle = query.trim().toLowerCase();
+        let shown = 0;
+        const visit = (node) => {
+          const label = nodeLabel(node);
+          const own = !needle || `${label.name} ${label.detail} ${node.source ? basename(node.source.path) : ''}`.toLowerCase().includes(needle);
+          let child = false;
+          for (const kid of node.visibleChildren) child = visit(kid) || child;
+          const visible = own || child;
+          node.item.style.display = visible ? '' : 'none';
+          node.row.classList.toggle('match', Boolean(needle) && own);
+          if (needle) node.item.classList.toggle('collapsed', !child);
+          else node.item.classList.toggle('collapsed', !node.expanded);
+          if (visible) shown += 1;
+          return visible;
+        };
+        for (const node of outline.top) visit(node);
+        outlineView.querySelector('.tree-empty')?.remove();
+        for (const group of outlineView.querySelectorAll('.tree-group')) group.style.display = needle ? 'none' : '';
+        if (!shown) outlineView.append(h('div', { class: 'tree-empty', text: `No sections match “${query}”` }));
+        return outline.nodes.find((node) => needle && node.row?.classList.contains('match') && node.item.style.display !== 'none');
+      }
+
+      function visibleRows() {
+        return [...outlineView.querySelectorAll('.tree-row')].filter((row) => row.offsetParent !== null);
+      }
+
+      function focusRow(row) {
+        if (!row) return;
+        for (const other of outlineView.querySelectorAll('.tree-row[tabindex="0"]')) other.tabIndex = -1;
+        row.tabIndex = 0;
+        row.focus({ preventScroll: true });
+        row.scrollIntoView({ block: 'nearest' });
+      }
+
+      outlineView.addEventListener('keydown', (event) => {
+        const row = event.target.closest('.tree-row');
+        if (!row) return;
+        const node = row.outlineNode;
+        const rows = visibleRows();
+        const index = rows.indexOf(row);
+        const kids = node.visibleChildren.length > 0;
+        switch (event.key) {
+          case 'ArrowDown': focusRow(rows[index + 1]); break;
+          case 'ArrowUp': focusRow(rows[index - 1]); break;
+          case 'Home': focusRow(rows[0]); break;
+          case 'End': focusRow(rows[rows.length - 1]); break;
+          case 'ArrowRight':
+            if (kids && !node.expanded) setExpanded(node, true);
+            else if (kids) focusRow(rows[index + 1]);
+            break;
+          case 'ArrowLeft':
+            if (kids && node.expanded) setExpanded(node, false);
+            else if (node.parent?.row) focusRow(node.parent.row);
+            break;
+          case 'Enter':
+          case ' ':
+            navigateTo(node, { focus: event.key === 'Enter' && (node.kind === 'source' || Boolean(node.source)) });
+            if (event.key === ' ') focusRow(row);
+            break;
+          default:
+            return;
+        }
+        event.preventDefault();
+      });
+      outlineView.addEventListener('focusin', (event) => {
+        const row = event.target.closest('.tree-row');
+        if (row) for (const other of outlineView.querySelectorAll('.tree-row[tabindex="0"]')) if (other !== row) other.tabIndex = -1;
+      });
+
+      outlineFilter.addEventListener('input', () => filterOutline(outlineFilter.value));
+      outlineFilter.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          const first = filterOutline(outlineFilter.value);
+          if (first) navigateTo(first, { focus: first.kind === 'source' });
+        } else if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          focusRow(visibleRows()[0]);
+        } else if (event.key === 'Escape') {
+          outlineFilter.value = '';
+          filterOutline('');
+          outlineFilter.blur();
+          event.stopPropagation();
+        }
+      });
+      $('expand-all').addEventListener('click', () => outline?.nodes.forEach((node) => node.item && setExpanded(node, true)));
+      $('collapse-all').addEventListener('click', () => outline?.nodes.forEach((node) => node.item && setExpanded(node, false)));
+
+      // ------------------------------------------------------- sizes and map
+
+      function renderSizes() {
+        if (!outline) return;
+        const total = outline.root.chars;
+        const editable = outline.root.editableChars;
+        const files = new Set(outline.nodes.filter((node) => node.region || node.source).map((node) => (node.region || node.source).path)).size;
+        const chip = (strong, rest) => h('span', { class: 'chip' }, h('strong', { text: strong }), rest);
+        const chips = [
+          chip(`≈${formatCount(tokens(total))}`, ' tokens'),
+          chip(formatCount(total), ' chars'),
+          chip(`${total ? Math.round((editable / total) * 100) : 0}%`, ` editable in ${plural(files, 'file')}`),
+        ];
+        const change = deltaText(total - baselineChars);
+        if (change) {
+          const delta = chip(change.text, ' since render');
+          delta.classList.add('delta', change.kind);
+          delta.title = 'Change in prompt size from your pending edits';
+          chips.splice(1, 0, delta);
+        }
+        $('stats').replaceChildren(...chips);
+        const largest = Math.max(1, ...outline.top.map((node) => node.chars));
+        for (const node of outline.nodes) {
+          const size = node.row?.querySelector('.row-size');
+          if (size) size.textContent = formatTokens(node.chars);
+          const bar = node.row?.querySelector('.row-bar span');
+          if (bar) bar.style.width = `${Math.max(3, Math.min(100, (node.chars / largest) * 100)).toFixed(1)}%`;
+        }
+        for (const region of prompt.querySelectorAll('.source-region')) {
+          const chars = regionSourceLength(region);
+          const size = region.querySelector('.region-size');
+          size.textContent = `${formatCount(chars)} chars · ≈${formatCount(tokens(chars))} tokens`;
+          const change = deltaText(chars - (regionBaselines.get(region.dataset.regionId) ?? chars));
+          if (change) size.append(' · ', h('span', { class: `region-delta ${change.kind}`, text: change.text }));
+        }
+        const bar = $('sizemap-bar');
+        bar.replaceChildren();
+        for (const node of outline.top) {
+          const share = node.chars ? (node.editableChars / node.chars) * 100 : 0;
+          const segment = h('button', {
+            type: 'button',
+            class: `map-seg${node.pi ? ' pi' : ''}`,
+            role: 'listitem',
+            style: `flex-grow:${Math.max(node.chars, 1)};--editable:${share.toFixed(1)}%`,
+            'aria-label': `${nodeLabel(node).name}, about ${tokens(node.chars)} tokens`,
+          });
+          segment.addEventListener('click', () => navigateTo(node));
+          segment.addEventListener('mouseenter', (event) => showTooltip(node, event));
+          segment.addEventListener('mousemove', (event) => moveTooltip(event));
+          segment.addEventListener('mouseleave', () => { tooltip.hidden = true; });
+          node.mapSegment = segment;
+          bar.append(segment);
+        }
+        highlightMap();
+      }
+
+      function deltaText(chars) {
+        if (!chars) return null;
+        const tokenDelta = tokens(Math.abs(chars));
+        const sign = chars < 0 ? '−' : '+';
+        return {
+          kind: chars < 0 ? 'down' : 'up',
+          text: tokenDelta ? `${sign}${formatCount(tokenDelta)} tokens` : `${sign}${Math.abs(chars)} chars`,
+        };
+      }
+
+      function scheduleSizeRender() {
+        cancelAnimationFrame(sizeFrame);
+        sizeFrame = requestAnimationFrame(renderSizes);
+      }
+
+      function showTooltip(node, event) {
+        const label = nodeLabel(node);
+        const total = outline.root.chars || 1;
+        const editable = node.chars ? Math.round((node.editableChars / node.chars) * 100) : 0;
+        const kind = node.pi ? 'Added by Pi' : editable ? `${editable}% editable` : 'Generated';
+        tooltip.replaceChildren(
+          h('div', { class: 'tt-name', text: label.detail ? `${label.name} · ${label.detail}` : label.name }),
+          h('div', { class: 'tt-meta', text: `≈${formatCount(tokens(node.chars))} tokens · ${formatCount(node.chars)} chars · ${((node.chars / total) * 100).toFixed(1)}% of prompt` }),
+          h('div', { class: 'tt-meta', text: kind }),
+        );
+        tooltip.hidden = false;
+        moveTooltip(event);
+      }
+      function moveTooltip(event) {
+        const width = tooltip.offsetWidth;
+        tooltip.style.left = `${Math.min(Math.max(8, event.clientX - width / 2), window.innerWidth - width - 8)}px`;
+        tooltip.style.top = `${event.clientY + 16}px`;
+      }
+
+      // ---------------------------------------------------------- navigation
+
+      function anchorFor(node) {
+        if (node.source) return document.getElementById(node.source.anchorId);
+        return node.anchorId ? document.getElementById(node.anchorId) : null;
+      }
+
+      function stickyHeight() {
+        return paneTop.offsetHeight;
+      }
+
+      function scrollToElement(element) {
+        const offset = () => element.getBoundingClientRect().top - editorPane.getBoundingClientRect().top - stickyHeight() - 12;
+        editorPane.scrollTop += offset();
+        // Editors measure their lines only once they are near the viewport, so the target can
+        // move after the first jump. Correct for a few frames until it settles.
+        let frames = 0;
+        const settle = () => {
+          const delta = offset();
+          if (Math.abs(delta) > 1) editorPane.scrollTop += delta;
+          if (frames++ < 10) requestAnimationFrame(settle);
+        };
+        requestAnimationFrame(settle);
+      }
+
+      function flash(element) {
+        element.classList.remove('flash');
+        void element.offsetWidth;
+        element.classList.add('flash');
+        setTimeout(() => element.classList.remove('flash'), 1300);
+      }
+
+      function navigateTo(node, { focus = false } = {}) {
+        showEditor();
+        const element = anchorFor(node);
+        if (!element) return;
+        element.closest('.locked.foldable')?.classList.add('expanded');
+        const region = node.kind === 'source' || node.source ? element : null;
+        scrollToElement(element);
+        flash(region || element);
+        if (focus && region) {
+          const editor = region.querySelector('.markdown-editor, .editable-part');
+          const markdownEditor = editor ? markdownEditors.get(editor) : null;
+          if (markdownEditor) markdownEditor.focus();
+          else editor?.focus({ preventScroll: true });
+        }
+        setActive(node);
+        spyHold = performance.now() + 400;
+      }
+
+      function stepFile(direction) {
+        showEditor();
+        const line = editorPane.getBoundingClientRect().top + stickyHeight() + 16;
+        const regions = [...prompt.querySelectorAll('.source-region')];
+        const tops = regions.map((region) => region.getBoundingClientRect().top);
+        const index = direction > 0
+          ? tops.findIndex((top) => top > line + 4)
+          : tops.findLastIndex((top) => top < line - 4);
+        const target = regions[index];
+        if (!target) return;
+        const node = regionNodes(target.dataset.regionId)[0];
+        if (node) navigateTo(node, { focus: true });
+      }
+
+      function setActive(node) {
+        if (activeNode === node) return;
+        activeNode?.row?.classList.remove('active');
+        activeNode = node;
+        if (node?.row) {
+          node.row.classList.add('active');
+          const rect = node.row.getBoundingClientRect();
+          const view = outlineView.getBoundingClientRect();
+          if (node.item.offsetParent && (rect.top < view.top || rect.bottom > view.bottom)) {
+            node.row.scrollIntoView({ block: 'nearest' });
+          }
+        }
+        renderBreadcrumb();
+        highlightMap();
+      }
+
+      function highlightMap() {
+        if (!outline) return;
+        const chain = activeNode ? ancestors(activeNode) : [];
+        for (const node of outline.top) node.mapSegment?.classList.toggle('active', chain.includes(node));
+      }
+
+      function renderBreadcrumb() {
+        const crumbs = $('breadcrumb');
+        crumbs.replaceChildren();
+        const chain = activeNode ? ancestors(activeNode) : [];
+        if (!chain.length) {
+          crumbs.append(h('span', { text: 'Top of prompt' }));
+          return;
+        }
+        chain.forEach((node, index) => {
+          if (index) crumbs.append(h('span', { class: 'sep', text: '›' }));
+          const label = nodeLabel(node);
+          const isFile = node.kind === 'source';
+          const button = h('button', { type: 'button', class: isFile ? 'file' : '', text: isFile ? label.name : node.source ? `${label.name} (${basename(node.source.path)})` : label.detail ? `${label.name} ${label.detail}` : label.name });
+          button.addEventListener('click', () => navigateTo(node));
+          crumbs.append(button);
+        });
+      }
+
+      let spyFrame = 0;
+      let spyHold = 0;
+      function updateScrollSpy() {
+        spyFrame = 0;
+        if (!outline || editorPane.hidden || performance.now() < spyHold) return;
+        const line = editorPane.getBoundingClientRect().top + stickyHeight() + 16;
+        let current = null;
+        for (const node of outline.nodes) {
+          if (node.hidden || !node.row) continue;
+          let element = anchorFor(node);
+          if (!element) continue;
+          const folded = element.closest('body.focus-mode .locked.foldable:not(.expanded)');
+          if (folded) element = folded;
+          const top = element.getBoundingClientRect().top;
+          if (top <= line) current = node;
+          else break;
+        }
+        setActive(current);
+      }
+      editorPane.addEventListener('scroll', () => {
+        if (!spyFrame) spyFrame = requestAnimationFrame(updateScrollSpy);
+      });
+
+      // -------------------------------------------------------------- search
+
+      const search = { open: false, caseSensitive: false, matches: [], index: -1, currentEditor: null, timer: 0 };
+      const supportsHighlights = Boolean(window.CSS?.highlights && window.Highlight);
+
+      function openSearch() {
+        searchBar.hidden = false;
+        search.open = true;
+        searchInput.focus();
+        searchInput.select();
+        if (searchInput.value) runSearch(false);
+      }
+
+      function closeSearch() {
+        searchBar.hidden = true;
+        search.open = false;
+        for (const editor of mountedEditors) editor.search?.('', false);
+        if (supportsHighlights) {
+          CSS.highlights.delete('prompt-search');
+          CSS.highlights.delete('prompt-search-current');
+        }
+        search.matches = [];
+        search.index = -1;
+        showSearchHits([]);
+        updateSearchCount();
+      }
+
+      let lockedLookup = new Map();
+      // The innermost outline section a prompt element sits in: the last section, in prompt
+      // order, whose anchor comes before it.
+      function sectionFor(element) {
+        const region = element.closest('.source-region');
+        if (region) {
+          const nodes = regionNodes(region.dataset.regionId);
+          return nodes[nodes.length - 1] || null;
+        }
+        if (lockedLookup.has(element)) return lockedLookup.get(element);
+        let found = null;
+        for (const node of outline.nodes) {
+          if (node.hidden || !node.row) continue;
+          const anchor = anchorFor(node);
+          if (!anchor) continue;
+          if (anchor === element || anchor.compareDocumentPosition(element) & Node.DOCUMENT_POSITION_FOLLOWING) found = node;
+          else break;
+        }
+        lockedLookup.set(element, found);
+        return found;
+      }
+
+      function showSearchHits(matches) {
+        if (!outline) return;
+        const counts = new Map();
+        for (const match of matches) {
+          for (let node = sectionFor(match.element); node; node = node.parent) {
+            if (node.kind === 'root') break;
+            counts.set(node, (counts.get(node) || 0) + 1);
+          }
+        }
+        for (const node of outline.nodes) {
+          if (!node.row) continue;
+          const count = counts.get(node) || 0;
+          node.row.classList.toggle('has-hits', count > 0);
+          node.row.querySelector('.row-hits').textContent = count ? String(count) : '';
+        }
+      }
+
+      function findAll(text, query, caseSensitive) {
+        const haystack = caseSensitive ? text : text.toLowerCase();
+        const needle = caseSensitive ? query : query.toLowerCase();
+        const found = [];
+        if (!needle) return found;
+        for (let at = haystack.indexOf(needle); at >= 0; at = haystack.indexOf(needle, at + needle.length)) {
+          found.push(at);
+        }
+        return found;
+      }
+
+      function runSearch(keepPosition) {
+        const query = searchInput.value;
+        const matches = [];
+        const ranges = [];
+        for (const element of prompt.querySelectorAll('[data-prompt-part]')) {
+          const editor = markdownEditors.get(element);
+          if (editor) {
+            const count = editor.search?.(query, search.caseSensitive) ?? 0;
+            for (let index = 0; index < count; index += 1) matches.push({ editor, element, index });
+            continue;
+          }
+          const textNode = element.firstChild;
+          if (!query || !textNode || textNode.nodeType !== Node.TEXT_NODE) continue;
+          for (const at of findAll(textNode.data, query, search.caseSensitive)) {
+            const range = document.createRange();
+            range.setStart(textNode, at);
+            range.setEnd(textNode, at + query.length);
+            ranges.push(range);
+            matches.push({ element, range });
+          }
+        }
+        if (supportsHighlights) {
+          CSS.highlights.set('prompt-search', new Highlight(...ranges));
+          CSS.highlights.delete('prompt-search-current');
+        }
+        search.currentEditor = null;
+        search.matches = matches;
+        showSearchHits(matches);
+        if (!matches.length) search.index = -1;
+        else if (keepPosition) search.index = Math.min(Math.max(search.index, 0), matches.length - 1);
+        else search.index = 0;
+        updateSearchCount();
+        if (matches.length) goToMatch(search.index, !keepPosition);
+      }
+
+      function scheduleSearch(keepPosition) {
+        clearTimeout(search.timer);
+        search.timer = setTimeout(() => runSearch(keepPosition), keepPosition ? 300 : 120);
+      }
+
+      function goToMatch(index, scroll = true) {
+        const match = search.matches[index];
+        if (!match) return;
+        search.index = index;
+        if (search.currentEditor && search.currentEditor !== match.editor) {
+          search.currentEditor.search?.(searchInput.value, search.caseSensitive);
+        }
+        search.currentEditor = null;
+        if (match.editor) {
+          if (supportsHighlights) CSS.highlights.delete('prompt-search-current');
+          if (scroll) match.editor.revealMatch?.(match.index);
+          search.currentEditor = match.editor;
+        } else {
+          match.element.closest('.locked.foldable')?.classList.add('expanded');
+          if (supportsHighlights) CSS.highlights.set('prompt-search-current', new Highlight(match.range));
+          if (scroll) {
+            const rect = match.range.getBoundingClientRect();
+            const pane = editorPane.getBoundingClientRect();
+            editorPane.scrollTop += rect.top - pane.top - pane.height / 2;
+          }
+        }
+        updateSearchCount();
+      }
+
+      function stepMatch(direction) {
+        if (!search.matches.length) return;
+        goToMatch((search.index + direction + search.matches.length) % search.matches.length);
+      }
+
+      function updateSearchCount() {
+        const label = $('search-count');
+        const empty = !searchInput.value;
+        label.textContent = empty ? '' : search.matches.length ? `${search.index + 1} of ${search.matches.length}` : 'No results';
+        label.classList.toggle('none', !empty && !search.matches.length);
+      }
+
+      searchInput.addEventListener('input', () => scheduleSearch(false));
+      searchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          stepMatch(event.shiftKey ? -1 : 1);
+        }
+      });
+      $('search-next').addEventListener('click', () => stepMatch(1));
+      $('search-prev').addEventListener('click', () => stepMatch(-1));
+      $('search-close').addEventListener('click', closeSearch);
+      $('search-toggle').addEventListener('click', () => (search.open ? closeSearch() : openSearch()));
+      $('search-case').addEventListener('click', (event) => {
+        search.caseSensitive = !search.caseSensitive;
+        event.currentTarget.setAttribute('aria-pressed', String(search.caseSensitive));
+        runSearch(false);
+      });
+
+      // ------------------------------------------------------------ rendering
+
+      let editorScroll = 0;
+      let patchText = '';
+      function hideEditor() {
+        if (!editorPane.hidden) editorScroll = editorPane.scrollTop;
+        editorPane.hidden = true;
+        previewPane.hidden = false;
+      }
+      function showEditor() {
+        previewPane.hidden = true;
+        if (editorPane.hidden) {
+          editorPane.hidden = false;
+          editorPane.scrollTop = editorScroll;
+        }
+      }
+
+      function setFocusMode(on) {
+        document.body.classList.toggle('focus-mode', on);
+        focusToggle.setAttribute('aria-pressed', String(on));
+        if (!on) for (const box of prompt.querySelectorAll('.locked.expanded')) box.classList.remove('expanded');
+        requestAnimationFrame(updateScrollSpy);
+      }
+
+      function renderIdentity(identity) {
+        if (!identity) return;
+        $('avatar').textContent = (identity.name || 'S').trim()[0].toUpperCase();
+        $('identity-name').textContent = identity.name || 'System prompt';
+        $('identity-sub').textContent = identity.job && identity.job !== identity.name ? `System prompt · ${identity.job}` : 'System prompt';
+        document.title = `${identity.name} · System Prompt Editor`;
+      }
+
+      function render(payload) {
+        for (const timer of timers.values()) clearTimeout(timer);
+        timers.clear();
+        generation = payload.generation;
+        draftRevision = payload.draftRevision;
+        pendingRegionCount = payload.pendingRegionCount;
+        pendingFileCount = payload.pendingFileCount ?? 0;
+        previewReady = payload.previewReady;
+        const scrollTop = editorPane.hidden ? editorScroll : editorPane.scrollTop;
+        destroyEditors();
+        partHolders.clear();
+        activeNode = null;
+        prompt.replaceChildren();
+        segments = payload.segments;
+        renderIdentity(payload.identity);
+        lockedLookup = new Map();
+
+        const piSegments = new Set((payload.lockedRegions || []).filter((region) => region.generatedBy === 'pi').map((region) => region.anchorId));
+        payload.segments.forEach((segment, index) => {
+          prompt.append(segment.editable ? regionSection(segment, index) : lockedSegment(segment, index, piSegments.has(segment.segmentId)));
+        });
+        outline = buildOutline(payload, piSegments);
+        baselineChars = outline.root.chars;
+        regionBaselines.clear();
+        for (const region of prompt.querySelectorAll('.source-region')) {
+          regionBaselines.set(region.dataset.regionId, regionSourceLength(region));
+        }
+        renderOutline();
+        renderSizes();
+        $('rendered-at').textContent = `Rendered ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' })}`;
+        hideNotice();
+        renderBreadcrumb();
+
+        $('warning-text').textContent = (payload.warnings || []).join('\n');
+        $('warnings').classList.toggle('visible', (payload.warnings || []).length > 0);
+        markPending(payload.pendingRegionIds || []);
+        syncButtons();
+        document.body.classList.remove('busy');
+        previewPane.hidden = true;
+        editorPane.hidden = false;
+        setStatus(pendingRegionCount ? `${plural(pendingFileCount, 'file')} staged` : 'No pending edits', pendingRegionCount ? 'pending' : '');
+
+        if (pendingAction?.kind === 'apply') toast(`Applied changes to ${plural(pendingAction.files, 'file')}. Prompt rendered again.`);
+        else if (pendingAction?.kind === 'discard') toast('Discarded pending edits');
+        else if (pendingAction?.kind === 'refresh') toast('Rendered again');
+        else if (pendingAction?.kind === 'external') toast(`${pendingAction.names} changed on disk · rendered again`);
+        if (pendingAction) editorPane.scrollTop = scrollTop;
+        pendingAction = null;
+        if (search.open && searchInput.value) runSearch(true);
+        requestAnimationFrame(updateScrollSpy);
+      }
+
+      function changedSpan(before, after) {
+        let start = 0;
+        while (start < before.length && start < after.length && before[start] === after[start]) start += 1;
+        let end = 0;
+        while (end < before.length - start && end < after.length - start &&
+               before[before.length - 1 - end] === after[after.length - 1 - end]) end += 1;
+        return { start, beforeEnd: before.length - end, afterEnd: after.length - end };
+      }
+
+      function diffText(text, from, to) {
+        const span = h('span');
+        if (from === undefined || from >= to) span.textContent = text || ' ';
+        else span.append(text.slice(0, from), h('mark', { text: text.slice(from, to) }), text.slice(to));
+        return span;
+      }
+
+      function diffLines(diff) {
+        const rows = [];
+        let added = 0;
+        let removed = 0;
+        for (const line of diff.replace(/\n$/, '').split('\n')) {
+          if (line.startsWith('+++') || line.startsWith('---')) continue;
+          if (line.startsWith('@@')) rows.push({ kind: 'hunk', sign: '', text: line });
+          else if (line.startsWith('+')) { rows.push({ kind: 'add', sign: '+', text: line.slice(1) }); added += 1; }
+          else if (line.startsWith('-')) { rows.push({ kind: 'del', sign: '−', text: line.slice(1) }); removed += 1; }
+          else rows.push({ kind: 'ctx', sign: ' ', text: line.slice(1) });
+        }
+        // Pair each run of removed lines with the run of added lines after it, line by line.
+        for (let index = 0; index < rows.length; index += 1) {
+          if (rows[index].kind !== 'del') continue;
+          let dels = index;
+          while (rows[dels]?.kind === 'del') dels += 1;
+          let adds = dels;
+          while (rows[adds]?.kind === 'add') adds += 1;
+          for (let offset = 0; offset < Math.min(dels - index, adds - dels); offset += 1) {
+            const before = rows[index + offset];
+            const after = rows[dels + offset];
+            if (!before.text.trim() || !after.text.trim()) continue;
+            const span = changedSpan(before.text, after.text);
+            before.mark = [span.start, span.beforeEnd];
+            after.mark = [span.start, span.afterEnd];
+          }
+          index = adds - 1;
+        }
+        const lines = rows.map((row) => h(
+          'div',
+          { class: `diff-line ${row.kind}`, dataset: { sign: row.sign } },
+          diffText(row.text, row.mark?.[0], row.mark?.[1]),
+        ));
+        return { lines, added, removed };
+      }
+
+      function showPreview(payload) {
+        draftRevision = payload.draftRevision;
+        pendingRegionCount = payload.pendingRegionCount;
+        pendingFileCount = payload.fileCount ?? pendingFileCount;
+        previewReady = payload.previewReady;
+        markPending(payload.pendingRegionIds || []);
+        const diffs = $('diffs');
+        diffs.replaceChildren();
+        patchText = payload.files.map((file) => file.diff).join('');
+        let added = 0;
+        let removed = 0;
+        for (const file of payload.files) {
+          const parsed = diffLines(file.diff);
+          added += parsed.added;
+          removed += parsed.removed;
+          diffs.append(h(
+            'article',
+            { class: 'diff-file' },
+            h(
+              'div',
+              { class: 'diff-head' },
+              h('span', { html: icon('file') }),
+              h('span', { class: 'diff-name', text: basename(file.path) }),
+              h('span', { class: 'diff-dir', text: dirname(file.path), title: file.path }),
+              h('span', { class: 'diff-counts' }, h('span', { class: 'add', text: `+${parsed.added}` }), h('span', { class: 'del', text: `−${parsed.removed}` })),
+            ),
+            h('div', { class: 'diff-body' }, parsed.lines),
+          ));
+        }
+        if (payload.fileCount === 0) diffs.append(h('p', { class: 'empty-preview', text: 'No source files would change.' }));
+        $('preview-summary').replaceChildren(
+          `${plural(payload.fileCount, 'file')} would change · `,
+          h('span', { class: 'add', text: `+${added}` }),
+          ' ',
+          h('span', { class: 'del', text: `−${removed}` }),
+        );
+        hideEditor();
+        previewPane.scrollTop = 0;
+        syncButtons();
+        document.body.classList.remove('busy');
+        setStatus(previewReady ? 'Ready to apply' : 'Preview is out of date', previewReady ? 'pending' : '');
+        applyFromPreview.focus();
+      }
+
+      function showError(message) {
+        document.body.classList.remove('busy');
+        pendingAction = null;
+        syncButtons();
+        setStatus(message, 'error');
+        toast(message, 'error', 4200);
+      }
+
+      // ------------------------------------------------------ on-disk changes
+
+      let noticeAction = null;
+      function showNotice(text, actionLabel, action) {
+        $('notice-text').textContent = text;
+        $('notice-action').textContent = actionLabel;
+        noticeAction = action;
+        $('notice').classList.add('visible');
+      }
+      function hideNotice() {
+        $('notice').classList.remove('visible');
+        noticeAction = null;
+      }
+      $('notice-action').addEventListener('click', () => noticeAction?.());
+      $('dismiss-notice').addEventListener('click', hideNotice);
+
+      function sourcesChanged(paths) {
+        const names = [...new Set(paths.map(basename))].join(', ');
+        const drafting = pendingRegionCount > 0 || timers.size > 0;
+        if (!drafting && previewPane.hidden && !document.body.classList.contains('busy')) {
+          pendingAction = { kind: 'external', names };
+          setBusy('Rendering…');
+          send({ action: 'refresh' });
+          return;
+        }
+        showNotice(
+          `${names} changed on disk. Staged edits to a changed file can no longer be applied.`,
+          'Discard edits and render again',
+          requestRefresh,
+        );
+      }
+
+      // -------------------------------------------------------------- actions
+
+      function requestPreview() {
+        if (previewButton.disabled) return;
+        for (const timer of timers.values()) clearTimeout(timer);
+        timers.clear();
+        setBusy('Building preview…');
+        send({ action: 'preview', generation, regions: renderedRegions() });
+      }
+
+      function requestApply() {
+        if (!previewReady) return;
+        pendingAction = { kind: 'apply', files: pendingFileCount };
+        setBusy('Applying source changes…');
+        send({ action: 'apply', generation, draftRevision });
+      }
+
+      async function requestDiscard() {
+        const drafting = pendingRegionCount > 0 || timers.size > 0;
+        if (!drafting) return;
+        const confirmed = await confirmDialog({
+          title: 'Discard pending edits?',
+          message: 'Your staged edits have not been written to any file. Discarding them renders the prompt again from the files as they are.',
+          confirm: 'Discard edits',
+        });
+        if (!confirmed) return;
+        for (const timer of timers.values()) clearTimeout(timer);
+        timers.clear();
+        pendingAction = { kind: 'discard' };
+        setBusy('Discarding…');
+        send({ action: 'discard' });
+      }
+
+      async function requestRefresh() {
+        if (pendingRegionCount > 0 || timers.size > 0) {
+          const confirmed = await confirmDialog({
+            title: 'Render again and discard edits?',
+            message: 'Rendering again reads every source file from disk. Your pending edits will be lost.',
+            confirm: 'Discard and render',
+          });
+          if (!confirmed) return;
+          for (const timer of timers.values()) clearTimeout(timer);
+          timers.clear();
+          pendingAction = { kind: 'refresh' };
+          setBusy('Rendering…');
+          send({ action: 'discard' });
+          return;
+        }
+        pendingAction ||= { kind: 'refresh' };
+        setBusy('Rendering…');
+        send({ action: 'refresh' });
+      }
+
+      async function requestClose() {
+        if (pendingRegionCount > 0 || timers.size > 0) {
+          const confirmed = await confirmDialog({
+            title: 'Close and discard edits?',
+            message: 'Pending edits are only staged. Closing the editor throws them away.',
+            confirm: 'Discard and close',
+          });
+          if (!confirmed) return;
+        }
+        window.glimpse.close();
+      }
+
+      previewButton.addEventListener('click', requestPreview);
+      applyButton.addEventListener('click', requestApply);
+      applyFromPreview.addEventListener('click', requestApply);
+      discardButton.addEventListener('click', requestDiscard);
+      $('back-to-editor').addEventListener('click', showEditor);
+      $('copy-patch').addEventListener('click', async () => {
+        toast((await copyText(patchText)) ? 'Copied the patch' : 'Could not copy the patch', 'success');
+      });
+      $('refresh').addEventListener('click', requestRefresh);
+      $('close').addEventListener('click', requestClose);
+      $('dismiss-warnings').addEventListener('click', () => $('warnings').classList.remove('visible'));
+      focusToggle.addEventListener('click', () => setFocusMode(!document.body.classList.contains('focus-mode')));
+      $('copy-prompt').addEventListener('click', async () => {
+        const text = segments.map((segment) => segment.text).join('');
+        toast((await copyText(text)) ? `Copied the rendered prompt (${formatCount(text.length)} chars)` : 'Could not copy the prompt', 'success');
+      });
+
+      document.addEventListener('keydown', (event) => {
+        const mod = event.metaKey || event.ctrlKey;
+        const key = event.key.toLowerCase();
+        if (modalResolve) {
+          if (event.key === 'Escape') { event.preventDefault(); closeModal(false); }
+          else if (event.key === 'Enter') { event.preventDefault(); closeModal(true); }
+          return;
+        }
+        if (mod && key === 'f') {
+          event.preventDefault();
+          event.stopPropagation();
+          openSearch();
+        } else if (mod && key === 'g') {
+          event.preventDefault();
+          if (search.open) stepMatch(event.shiftKey ? -1 : 1);
+        } else if (mod && key === 'k') {
+          event.preventDefault();
+          outlineFilter.focus();
+          outlineFilter.select();
+        } else if (mod && (event.key === ']' || event.key === '[')) {
+          event.preventDefault();
+          event.stopPropagation();
+          stepFile(event.key === ']' ? 1 : -1);
+        } else if (mod && key === 'e') {
+          event.preventDefault();
+          setFocusMode(!document.body.classList.contains('focus-mode'));
+        } else if (mod && key === 'r') {
+          event.preventDefault();
+          requestRefresh();
+        } else if (mod && event.key === 'Enter') {
+          event.preventDefault();
+          event.stopPropagation();
+          if (!previewPane.hidden) requestApply();
+          else requestPreview();
+        } else if (event.key === 'Escape') {
+          if (search.open) closeSearch();
+          else if (!previewPane.hidden) showEditor();
+        }
+      }, true);
+
+      window.promptEditor = { render, showError, showPreview, updateStage, sourcesChanged };
+    })();
+  </script>
+</body>
+</html>

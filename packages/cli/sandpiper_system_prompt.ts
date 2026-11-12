@@ -62,12 +62,19 @@ function printHelp(): void {
 
 Usage:
   sandpiper-system-prompt [sandpiper options]
+  sandpiper-system-prompt --edit [editor options] [sandpiper options]
 
 The command performs normal extension, tool, skill, and context discovery without
 loading stored provider credentials or sending a request to a model. The rendered
 prompt is written to stdout. Use
 --approve to include untrusted project-local resources and --json to include
-file-backed prompt source metadata.`);
+file-backed prompt source metadata.
+
+--edit opens the prompt in a Glimpse window instead, where edits to file-backed
+parts are staged, previewed as diffs, and written to their files. Editor options:
+  --prompt-source <path>  another file to look for in the prompt (repeatable)
+  --edit-title <text>     header title (default: Sandpiper)
+  --edit-subtitle <text>  header subtitle`);
 }
 
 const args = process.argv.slice(2);
@@ -96,17 +103,22 @@ if (args.includes('--help') || args.includes('-h')) {
     );
     mirrorPiSandpiperEnvironment(process.env);
 
-    const { renderSystemPrompt } = await import('./system_prompt_diagnostic.js');
-    const result = await withExtensionStdoutDiscarded(() =>
-      renderSystemPrompt({
-        args,
-        cwd: process.cwd(),
-      }),
-    );
-    for (const warning of result.warnings) {
-      console.error(`Warning: ${warning}`);
+    if (args.includes('--edit')) {
+      const { runPromptEditor } = await import('./prompt_editor/command.js');
+      await runPromptEditor({ args, cwd: process.cwd(), entry: fileURLToPath(import.meta.url) });
+    } else {
+      const { renderSystemPrompt } = await import('./system_prompt_diagnostic.js');
+      const result = await withExtensionStdoutDiscarded(() =>
+        renderSystemPrompt({
+          args,
+          cwd: process.cwd(),
+        }),
+      );
+      for (const warning of result.warnings) {
+        console.error(`Warning: ${warning}`);
+      }
+      await writeStdout(result.json ? JSON.stringify(result) : result.prompt);
     }
-    await writeStdout(result.json ? JSON.stringify(result) : result.prompt);
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
