@@ -70,6 +70,8 @@ Pass `--json` for machine-readable output containing the rendered prompt and the
 
 The JSON output also has `editableSpans`: the runs of `prompt` copied verbatim from a system prompt template or a user file, each with its offsets in the prompt and in the file. See [editable spans](../../.sandpiper/docs/specs/sandpiper-system-prompt.md#editable-spans).
 
+Pass `--edit` to open the rendered prompt in a Glimpse editor window instead. File-backed text is editable there; edits are previewed as diffs before they are written to their files. See "Prompt editor" in the [system prompt spec](../../.sandpiper/docs/specs/sandpiper-system-prompt.md#prompt-editor) for the editor flags.
+
 The bin also satisfies `birdup`'s runner contract:
 
 ```bash
@@ -83,6 +85,7 @@ birdup roux --runner "$PWD/packages/cli/bin/sandpiper-system-prompt" > /tmp/roux
 | `sandpiper_standalone.ts`     | Normal runtime entrypoint that selects installed package metadata before loading Pi and registers built-in extensions and resources |
 | `sandpiper_system_prompt.ts`  | Diagnostic entrypoint that configures the Sandpiper runtime and renders the prompt without a model request                          |
 | `system_prompt_diagnostic.ts` | SDK-based diagnostic session orchestration                                                                                          |
+| `prompt_editor/`              | `sandpiper-system-prompt --edit`: maps the rendered prompt to its files, and serves the editor page in a Glimpse window             |
 | `bin/sandpiper`               | Stable workspace bin shim for the normal runtime                                                                                    |
 | `bin/sandpiper-system-prompt` | Stable workspace bin shim for the system prompt diagnostic                                                                          |
 | `deferred_pi_import.ts`       | Load-order shim so Sandpiper imports Pi only after package metadata env vars are set                                                |

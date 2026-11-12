@@ -150,6 +150,24 @@ If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports 
 - `sandpiper-system-prompt` (`packages/cli/system_prompt_diagnostic.ts`) runs one turn against an in-process capture provider and prints the first request's system prompt: the prompt Pi sends, including Pi's sections, with no credentials, network, or provider request. `--json` adds source metadata and [editable spans](#editable-spans).
 - When the system extension is created with dump mode enabled, or when `SANDPIPER_DUMP_SYSTEM_PROMPT=1`, a `context_with_system` hook prints the same request-time prompt and shuts the session down.
 
+### Prompt editor
+
+`sandpiper-system-prompt --edit [sandpiper options]` (`packages/cli/prompt_editor/`) opens the rendered prompt in a [Glimpse](https://github.com/hazat/glimpse) window. Text that comes from a file is editable; everything else is locked, and so are structural XML tags inside editable text. Edits are staged, previewed as unified diffs per file, and applied to the files only after a preview of the current draft. Applying writes each file atomically, keeps its mode, edits a symlink's target, and renders again; when that render fails, the files are restored.
+
+Editor flags, removed before rendering:
+
+| Flag                     | Meaning                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| `--prompt-source <path>` | Another file to look for in the prompt. Repeatable.                                |
+| `--edit-title <text>`    | Header title. Default: `Sandpiper`.                                                |
+| `--edit-subtitle <text>` | Header subtitle, shown as `System prompt · <text>` when it differs from the title. |
+
+- Every render runs the diagnostic again as a subprocess, `--json` plus the remaining options, in the same directory and environment.
+- Editable regions come first from the diagnostic's `editableSpans` (`{ start, end, path, sourceStart, sourceEnd, codec }`, offsets into `prompt`), each checked against its file. Files without a span are found by text: the `--prompt-source` files, the reported identity, system prompt, appended prompt, and context files, and the agent directory's `USER.md`. Each is tried whole, then without its frontmatter, each verbatim and then XML-escaped (`codec: 'xml-text'`). A match counts only when its text occurs exactly once.
+- A file changed on disk while the editor is open is reported in the page, polled once a second.
+- Glimpse is optional. The editor finds the `glimpseui` executable through `SANDPIPER_GLIMPSEUI` or `PATH`, and imports `src/glimpse.mjs` from its package.
+- The page is `page/prompt-editor.html`. Its CodeMirror editor, `page/prompt-markdown.ts`, is built into an IIFE and inlined into the page by a Bun macro (`page_assets.ts`), so `bun run build` embeds the finished page in `dist/`, and a run from source builds it on load.
+
 ## Invariants
 
 - Keep prompt construction in `packages/core/src/`; extension code should stay glue-only.
