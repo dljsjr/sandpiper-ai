@@ -22,6 +22,7 @@ import {
   SessionManager,
   SettingsManager,
 } from '@earendil-works/pi-coding-agent';
+import { type EditableSpan, type RenderedText, verifyEditableSpans } from '../core/src/prompt-template.js';
 import { createSandpiperExtensionFactories } from './sandpiper_resources.js';
 
 const DIAGNOSTIC_COMMAND = '__sandpiper-system-prompt';
@@ -44,6 +45,8 @@ export interface SystemPromptDiagnosticResult {
   readonly prompt: string;
   readonly warnings: readonly string[];
   readonly sources: SystemPromptDiagnosticSources;
+  /** Runs of `prompt` copied verbatim from a template or user file, with their offsets in that file. */
+  readonly editableSpans: readonly EditableSpan[];
   readonly json: boolean;
 }
 
@@ -51,6 +54,12 @@ function resolveProjectTrust(cwd: string, agentDir: string, override: boolean | 
   if (override !== undefined) return override;
   if (!hasTrustRequiringProjectResources(cwd)) return true;
   return new ProjectTrustStore(agentDir).get(cwd) === true;
+}
+
+// Pi renders the preamble first, so its span offsets are offsets into the captured prompt.
+function editableSpans(prompt: string, preamble: RenderedText | undefined): EditableSpan[] {
+  if (preamble === undefined || !prompt.startsWith(preamble.text)) return [];
+  return verifyEditableSpans(prompt, preamble.spans);
 }
 
 function emptyReply(model: Model<Api>): AssistantMessage {
@@ -138,6 +147,7 @@ export async function renderSystemPrompt(
     signal: AbortSignal.timeout(15_000),
   });
   let renderedPrompt: string | undefined;
+  let preamble: RenderedText | undefined;
   let identitySource: string | undefined;
   const extensionFactories = [
     ...createSandpiperExtensionFactories({
@@ -145,6 +155,9 @@ export async function renderSystemPrompt(
         commandName: DIAGNOSTIC_COMMAND,
         onPrompt: (_prompt, sources) => {
           identitySource = sources.identity;
+        },
+        onPreamble: (rendered) => {
+          preamble = rendered;
         },
       },
     }),
@@ -247,6 +260,7 @@ export async function renderSystemPrompt(
       appendSystemPrompts: resourceLoader.getAppendSystemPromptSources().map(({ path }) => path),
       contextFiles: resourceLoader.getAgentsFiles().agentsFiles.map(({ path }) => path),
     },
+    editableSpans: editableSpans(renderedPrompt, preamble),
     json,
   };
 }

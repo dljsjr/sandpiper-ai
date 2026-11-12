@@ -1,9 +1,10 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import type { EditableSpan } from '../core/src/prompt-template.js';
 import { findPackageRoot } from './standalone_bootstrap.js';
 
 const repoRoot = findPackageRoot(dirname(fileURLToPath(import.meta.url)), 'sandpiper-ai-cli');
@@ -169,6 +170,7 @@ describe('system prompt diagnostic', () => {
           appendSystemPrompts: string[];
           contextFiles: string[];
         };
+        editableSpans: EditableSpan[];
       };
 
       expect(result.prompt).toContain('<diagnostic_base>from file</diagnostic_base>');
@@ -178,6 +180,66 @@ describe('system prompt diagnostic', () => {
       expect(result.sources.systemPrompt).toBe(systemPromptFile);
       expect(result.sources.appendSystemPrompts).toEqual([appendFile]);
       expect(result.sources.contextFiles).toContain(contextFile);
+      // A custom system prompt replaces Sandpiper's, so no Sandpiper template text is rendered.
+      expect(result.editableSpans).toEqual([]);
+    } finally {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+  }, 30_000);
+
+  it('maps prompt text back to its template and user files', () => {
+    const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-spans-'));
+    const agentDir = join(tempDir, 'agent');
+    const userProfile = join(agentDir, 'USER.md');
+    const contextFile = join(agentDir, 'AGENTS.md');
+    const identityFile = join(tempDir, 'identity.md');
+    const userProfileContent = '# Diagnostic user\r\nPrefers <clear> & "direct" answers\n';
+    mkdirSync(agentDir, { recursive: true });
+    mkdirSync(join(tempDir, 'home'), { recursive: true });
+    writeFileSync(userProfile, userProfileContent);
+    writeFileSync(contextFile, '# Diagnostic <context>\n');
+    writeFileSync(identityFile, '<identity>from file</identity>\n');
+
+    try {
+      const output = execFileSync(
+        bunExecutable,
+        [
+          'run',
+          '--bun',
+          './packages/cli/sandpiper_system_prompt.ts',
+          '--json',
+          '--approve',
+          '--identity',
+          identityFile,
+        ],
+        {
+          cwd: repoRoot,
+          encoding: 'utf-8',
+          env: diagnosticEnv(agentDir),
+          stdio: ['ignore', 'pipe', 'pipe'],
+          timeout: 30_000,
+        },
+      );
+      const result = JSON.parse(output) as { prompt: string; editableSpans: EditableSpan[] };
+
+      for (const span of result.editableSpans) {
+        expect(realpathSync(span.path)).toBe(span.path);
+        expect(span.codec).toBe('direct');
+        expect(result.prompt.slice(span.start, span.end)).toBe(
+          readFileSync(span.path, 'utf-8').slice(span.sourceStart, span.sourceEnd),
+        );
+      }
+      const paths = new Set(result.editableSpans.map((span) => span.path));
+      const templateDir = join(realpathSync(repoRoot), 'packages', 'core', 'system-prompt');
+      for (const template of ['system_prompt', 'user_profile', 'harness_docs', 'injected_context']) {
+        expect(paths).toContain(join(templateDir, `${template}.md`));
+      }
+      expect(paths).not.toContain(join(templateDir, 'identity.md'));
+      expect(paths).toContain(realpathSync(identityFile));
+      expect(paths).toContain(realpathSync(contextFile));
+      expect(result.editableSpans.filter((span) => span.path === realpathSync(userProfile))).toEqual([
+        expect.objectContaining({ sourceStart: 0, sourceEnd: userProfileContent.length }),
+      ]);
     } finally {
       rmSync(tempDir, { recursive: true, force: true });
     }
