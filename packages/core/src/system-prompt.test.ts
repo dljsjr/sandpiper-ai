@@ -2,15 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   buildSandpiperSystemPrompt,
   environmentBlock,
-  injectedContextBlock,
-  piDocsBlock,
   type SandpiperBaseSystemPromptOptions,
   type SandpiperPromptSkill,
-  skillsBlock,
-  systemNotificationProtocolBlock,
-  systemPromptPersonaBlock,
-  userAppendedPromptBlock,
-  userProfileBlock,
+  type SandpiperSystemPromptOptions,
 } from './system-prompt.js';
 import type { SandpiperVersionControlContext } from './version-control.js';
 
@@ -26,182 +20,156 @@ function createPromptOptions(
   };
 }
 
+async function renderPrompt(
+  options: SandpiperSystemPromptOptions = {},
+  promptOptions: SandpiperBaseSystemPromptOptions = createPromptOptions(),
+): Promise<string> {
+  return buildSandpiperSystemPrompt({ platform: 'darwin', sessionStartDate: '2026-09-08', ...options }, promptOptions);
+}
+
 describe('system-prompt', () => {
-  describe('piDocsBlock', () => {
-    it('includes the pi package directory path', () => {
-      const block = piDocsBlock('/opt/pi', '1.0.0');
-      expect(block).toContain('<harness_docs>');
-      expect(block).toContain('Pi: `/opt/pi`');
-      expect(block).toContain('Main docs: `README.md`');
-      expect(block).toContain('Additional docs: `docs/`');
-      expect(block).toContain('Examples: `examples/`');
+  describe('harness docs', () => {
+    it('includes the pi package directory path', async () => {
+      const prompt = await renderPrompt({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
+      expect(prompt).toContain('<harness_docs>');
+      expect(prompt).toContain('Pi: `/opt/pi`');
+      expect(prompt).toContain('Main docs: `README.md`');
+      expect(prompt).toContain('Additional docs: `docs/`');
+      expect(prompt).toContain('Examples: `examples/`');
     });
 
-    it('includes the Sandpiper package directory path when provided', () => {
-      const block = piDocsBlock('/opt/pi', '1.0.0', '/opt/sandpiper');
-      expect(block).toContain('Sandpiper: `/opt/sandpiper`');
+    it('includes the Sandpiper package directory path when provided', async () => {
+      const prompt = await renderPrompt({
+        piCodingAgentPackage: '/opt/pi',
+        piCodingAgentVersion: '1.0.0',
+        sandpiperCodingAgentPackage: '/opt/sandpiper',
+      });
+      expect(prompt).toContain('Sandpiper: `/opt/sandpiper`');
     });
 
-    it('includes the pi version', () => {
-      const block = piDocsBlock('/opt/pi', '1.0.0');
-      expect(block).toContain('Pi version: `1.0.0`');
+    it('includes the pi version', async () => {
+      const prompt = await renderPrompt({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
+      expect(prompt).toContain('Pi version: `1.0.0`');
     });
 
-    it('uses <unknown> as default version', () => {
-      const block = piDocsBlock('/opt/pi');
-      expect(block).toContain('Pi version: `<unknown>`');
+    it('uses <unknown> as default version', async () => {
+      const prompt = await renderPrompt({ piCodingAgentPackage: '/opt/pi' });
+      expect(prompt).toContain('Pi version: `<unknown>`');
     });
 
-    it('includes sandpiper-specific config directory differences', () => {
-      const block = piDocsBlock('/opt/pi', '1.0.0');
-      expect(block).toContain('global config: `~/.sandpiper`, not `~/.pi`');
-      expect(block).toContain('project config: `.sandpiper`, not `.pi`');
+    it('includes sandpiper-specific config directory differences', async () => {
+      const prompt = await renderPrompt({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
+      expect(prompt).toContain('global config: `~/.sandpiper`, not `~/.pi`');
+      expect(prompt).toContain('project config: `.sandpiper`, not `.pi`');
     });
   });
 
-  describe('systemPromptPersonaBlock', () => {
-    it('renders identity and operating guidance fragments', () => {
-      const block = systemPromptPersonaBlock({});
-      expect(block).toContain('<identity>');
-      expect(block).toContain('</identity>');
-      expect(block).toContain('<interaction_style>');
-      expect(block).toContain('<role>');
+  describe('persona', () => {
+    it('renders identity and operating guidance fragments', async () => {
+      const prompt = await renderPrompt();
+      expect(prompt).toContain('<identity>');
+      expect(prompt).toContain('</identity>');
+      expect(prompt).toContain('<interaction_style>');
+      expect(prompt).toContain('<role>');
     });
 
-    it('includes the identity block content', () => {
-      const block = systemPromptPersonaBlock({});
-      expect(block).toContain('expert coding agent');
-      expect(block).toContain('sandpiper coding agent harness');
-      expect(block).toContain('Operating Principles');
-      expect(block).toContain('Coding Defaults');
+    it('includes the identity block content', async () => {
+      const prompt = await renderPrompt();
+      expect(prompt).toContain('expert coding agent');
+      expect(prompt).toContain('sandpiper coding agent harness');
+      expect(prompt).toContain('Operating Principles');
+      expect(prompt).toContain('Coding Defaults');
     });
 
-    it('does not include harness docs', () => {
-      const block = systemPromptPersonaBlock({ piCodingAgentPackage: '/opt/pi', piCodingAgentVersion: '1.0.0' });
-      expect(block).not.toContain('<harness_docs>');
-    });
-  });
-
-  describe('userProfileBlock', () => {
-    it('returns undefined when no user profile content is present', () => {
-      expect(userProfileBlock('')).toBeUndefined();
-      expect(userProfileBlock('  \n')).toBeUndefined();
-    });
-
-    it('renders user profile content as XML', () => {
-      const block = userProfileBlock('# User\nPrefers <clear> & direct communication')!;
-
-      expect(block).toContain('<user_profile>');
-      expect(block).toContain('</user_profile>');
-      expect(block).toContain('working preferences');
-      expect(block).toContain('<content># User\nPrefers <clear> & direct communication</content>');
+    it('replaces the identity, interaction style, and role with the identity override', async () => {
+      const prompt = await renderPrompt({ identityOverride: '<identity>custom</identity>' });
+      expect(prompt.startsWith('<system_prompt><identity>custom</identity>\n\n  ')).toBe(true);
+      expect(prompt).not.toContain('<interaction_style>');
+      expect(prompt).not.toContain('<role>');
     });
   });
 
-  describe('injectedContextBlock', () => {
-    it('returns undefined when no context files are present', () => {
-      const options = createPromptOptions({ contextFiles: [] });
-      expect(injectedContextBlock(options)).toBeUndefined();
+  describe('user profile', () => {
+    it('is omitted when no user profile content is present', async () => {
+      expect(await renderPrompt({ userProfile: '' })).not.toContain('<user_profile>');
+      expect(await renderPrompt({ userProfile: '  \n' })).not.toContain('<user_profile>');
     });
 
-    it('renders context files with XML tags', () => {
-      const options = createPromptOptions({
-        contextFiles: [{ path: 'AGENTS.md', content: '# Rules\nDo good things' }],
-      });
+    it('renders user profile content as XML', async () => {
+      const prompt = await renderPrompt({ userProfile: '# User\nPrefers <clear> & direct communication' });
 
-      const block = injectedContextBlock(options)!;
-      expect(block).toContain('<injected_context>');
-      expect(block).toContain('</injected_context>');
-      expect(block).toContain('<context_file path="AGENTS.md">');
-      expect(block).toContain('</context_file>');
-      expect(block).toContain('Do good things');
-    });
-
-    it('renders multiple context files', () => {
-      const options = createPromptOptions({
-        contextFiles: [
-          { path: 'AGENTS.md', content: 'First' },
-          { path: 'CLAUDE.md', content: 'Second' },
-        ],
-      });
-
-      const block = injectedContextBlock(options)!;
-      expect(block).toContain('<context_file path="AGENTS.md">');
-      expect(block).toContain('<context_file path="CLAUDE.md">');
+      expect(prompt).toContain('<user_profile>');
+      expect(prompt).toContain('</user_profile>');
+      expect(prompt).toContain('working preferences');
+      expect(prompt).toContain('<content># User\nPrefers <clear> & direct communication</content>');
     });
   });
 
-  describe('skillsBlock', () => {
-    it('returns undefined when no skills are present', () => {
-      const options = createPromptOptions({ skills: [] });
-      expect(skillsBlock(options)).toBeUndefined();
+  describe('injected context', () => {
+    it('renders context files with XML tags', async () => {
+      const prompt = await renderPrompt(
+        {},
+        createPromptOptions({ contextFiles: [{ path: 'AGENTS.md', content: '# Rules\nDo good things' }] }),
+      );
+      expect(prompt).toContain('<injected_context>');
+      expect(prompt).toContain('</injected_context>');
+      expect(prompt).toContain('<context_file path="AGENTS.md">');
+      expect(prompt).toContain('</context_file>');
+      expect(prompt).toContain('Do good things');
     });
 
-    it('renders skills catalogue as XML', () => {
-      const options = createPromptOptions({
-        skills: [
-          {
-            name: 'jj',
-            description: 'Jujutsu version control',
-            filePath: '/skills/jj/SKILL.md',
-          },
-        ],
-      });
-
-      const block = skillsBlock(options)!;
-      expect(block).toContain('<skills>');
-      expect(block).toContain('</skills>');
-      expect(block).toContain('<available_skills>');
-      expect(block).toContain('<skill name="jj" location="/skills/jj/SKILL.md">');
-      expect(block).toContain('Jujutsu version control');
-    });
-
-    it('renders focused skill loading rules', () => {
-      const options = createPromptOptions({
-        skills: [
-          {
-            name: 'jj',
-            description: 'Jujutsu version control',
-            filePath: '/skills/jj/SKILL.md',
-          },
-        ],
-      });
-
-      const block = skillsBlock(options)!;
-      expect(block).toContain('The following skills provide specialized instructions');
-      expect(block).toContain("Use the `read` tool to load the skill's SKILL.md file from the exact `location`");
-      expect(block).toContain('If multiple skills match, load all relevant skills.');
-      expect(block).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
-    });
-
-    it('uses skill for skill loading rules when the tool is active', () => {
-      const options = createPromptOptions({
-        selectedTools: ['read', 'skill'],
-        skills: [
-          {
-            name: 'jj',
-            description: 'Jujutsu version control',
-            filePath: '/skills/jj/SKILL.md',
-          },
-        ],
-      });
-
-      const block = skillsBlock(options)!;
-      expect(block).toContain('Use the `skill` tool to load relevant skills by name');
-      expect(block).toContain('If multiple skills match, load all relevant skills.');
-      expect(block).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
-      expect(block).not.toContain("Use the `read` tool to load the skill's SKILL.md");
+    it('renders multiple context files', async () => {
+      const prompt = await renderPrompt(
+        {},
+        createPromptOptions({
+          contextFiles: [
+            { path: 'AGENTS.md', content: 'First' },
+            { path: 'CLAUDE.md', content: 'Second' },
+          ],
+        }),
+      );
+      expect(prompt).toContain('<context_file path="AGENTS.md">');
+      expect(prompt).toContain('<context_file path="CLAUDE.md">');
     });
   });
 
-  describe('systemNotificationProtocolBlock', () => {
-    it('defines system notification XML authorship semantics', () => {
-      const block = systemNotificationProtocolBlock();
+  describe('skills', () => {
+    const jj = { name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' };
 
-      expect(block).toContain('<system_notification_protocol>');
-      expect(block).toContain('<sandpiper_system_notification>');
-      expect(block).toContain('These are not user messages');
-      expect(block).toContain('This guidance is scoped to the handling of that notification only');
+    it('renders skills catalogue as XML', async () => {
+      const prompt = await renderPrompt({}, createPromptOptions({ skills: [jj] }));
+      expect(prompt).toContain('<skills>');
+      expect(prompt).toContain('</skills>');
+      expect(prompt).toContain('<available_skills>');
+      expect(prompt).toContain('<skill name="jj" location="/skills/jj/SKILL.md">');
+      expect(prompt).toContain('Jujutsu version control');
+    });
+
+    it('renders focused skill loading rules', async () => {
+      const prompt = await renderPrompt({}, createPromptOptions({ skills: [jj] }));
+      expect(prompt).toContain('The following skills provide specialized instructions');
+      expect(prompt).toContain("Use the `read` tool to load the skill's SKILL.md file from the exact `location`");
+      expect(prompt).toContain('If multiple skills match, load all relevant skills.');
+      expect(prompt).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
+    });
+
+    it('uses skill for skill loading rules when the tool is active', async () => {
+      const prompt = await renderPrompt({}, createPromptOptions({ selectedTools: ['read', 'skill'], skills: [jj] }));
+      expect(prompt).toContain('Use the `skill` tool to load relevant skills by name');
+      expect(prompt).toContain('If multiple skills match, load all relevant skills.');
+      expect(prompt).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
+      expect(prompt).not.toContain("Use the `read` tool to load the skill's SKILL.md");
+    });
+  });
+
+  describe('system notification protocol', () => {
+    it('defines system notification XML authorship semantics', async () => {
+      const prompt = await renderPrompt();
+
+      expect(prompt).toContain('<system_notification_protocol>');
+      expect(prompt).toContain('<sandpiper_system_notification>');
+      expect(prompt).toContain('These are not user messages');
+      expect(prompt).toContain('This guidance is scoped to the handling of that notification only');
     });
   });
 
@@ -362,8 +330,8 @@ function expectedSkillsBlock(instruction: string, availableSkills: string): stri
 }
 
 describe('system-prompt exact output', () => {
-  describe('userProfileBlock', () => {
-    it.each<[string, string, string | undefined]>([
+  describe('user profile', () => {
+    it.each<[string, string, string]>([
       ['single line', 'Prefers short answers', '<content>Prefers short answers</content>'],
       ['multi-line', 'line one\nline two\n  indented three', '<content>line one\nline two\n  indented three</content>'],
       [
@@ -371,8 +339,6 @@ describe('system-prompt exact output', () => {
         '\n\n  leading\ntrailing   \n\n',
         '<content>\n\n  leading\ntrailing   \n\n</content>',
       ],
-      ['empty string', '', undefined],
-      ['whitespace-only string', '   \n\t \n', undefined],
       [
         'angle brackets, ampersand, and quotes',
         'a < b > c & d "quoted" \'single\'',
@@ -391,14 +357,21 @@ describe('system-prompt exact output', () => {
       ],
       ['CRLF and tabs', 'one\r\ntwo\tthree\r\n', '<content>one\r\ntwo\tthree\r\n</content>'],
       ['non-ASCII text', 'Grüße — 日本語 🙂', '<content>Grüße — 日本語 🙂</content>'],
-    ])('wraps %s exactly', (_label, content, fragment) => {
-      expect(userProfileBlock(content)).toBe(
-        fragment === undefined ? undefined : `${USER_PROFILE_HEAD}${fragment}\n</user_profile>\n`,
+    ])('wraps %s exactly', async (_label, content, fragment) => {
+      expect(await renderPrompt({ userProfile: content })).toContain(
+        `\n${USER_PROFILE_HEAD}${fragment}\n</user_profile>\n`,
       );
+    });
+
+    it.each([
+      ['empty string', ''],
+      ['whitespace-only string', '   \n\t \n'],
+    ])('omits a profile that is an %s', async (_label, content) => {
+      expect(await renderPrompt({ userProfile: content })).not.toContain('<user_profile>');
     });
   });
 
-  describe('userAppendedPromptBlock', () => {
+  describe('user appended prompt', () => {
     it.each<[string, string, string]>([
       ['single line', 'Prefers short answers', '<content>Prefers short answers</content>'],
       ['multi-line', 'line one\nline two\n  indented three', '<content>line one\nline two\n  indented three</content>'],
@@ -407,7 +380,6 @@ describe('system-prompt exact output', () => {
         '\n\n  leading\ntrailing   \n\n',
         '<content>\n\n  leading\ntrailing   \n\n</content>',
       ],
-      ['empty string', '', '<content/>'],
       ['whitespace-only string', '   \n\t \n', '<content>   \n\t \n</content>'],
       [
         'angle brackets, ampersand, and quotes',
@@ -427,12 +399,20 @@ describe('system-prompt exact output', () => {
       ],
       ['CRLF and tabs', 'one\r\ntwo\tthree\r\n', '<content>one\r\ntwo\tthree\r\n</content>'],
       ['non-ASCII text', 'Grüße — 日本語 🙂', '<content>Grüße — 日本語 🙂</content>'],
-    ])('wraps %s exactly', (_label, content, fragment) => {
-      expect(userAppendedPromptBlock(content)).toBe(`${APPENDED_HEAD}${fragment}\n</user_appended_prompt>\n`);
+    ])('wraps %s exactly', async (_label, content, fragment) => {
+      expect(await renderPrompt({}, createPromptOptions({ appendSystemPrompt: content }))).toContain(
+        `\n${APPENDED_HEAD}${fragment}\n</user_appended_prompt>\n`,
+      );
+    });
+
+    it('omits an empty appended prompt', async () => {
+      expect(await renderPrompt({}, createPromptOptions({ appendSystemPrompt: '' }))).not.toContain(
+        '<user_appended_prompt>',
+      );
     });
   });
 
-  describe('injectedContextBlock', () => {
+  describe('injected context', () => {
     it.each<[string, string, string]>([
       ['single line', 'Prefers short answers', '<context_file path="AGENTS.md">Prefers short answers</context_file>'],
       [
@@ -469,9 +449,9 @@ describe('system-prompt exact output', () => {
       ],
       ['CRLF and tabs', 'one\r\ntwo\tthree\r\n', '<context_file path="AGENTS.md">one\r\ntwo\tthree\r\n</context_file>'],
       ['non-ASCII text', 'Grüße — 日本語 🙂', '<context_file path="AGENTS.md">Grüße — 日本語 🙂</context_file>'],
-    ])('renders a context file with %s exactly', (_label, content, fragment) => {
-      expect(injectedContextBlock(createPromptOptions({ contextFiles: [{ path: 'AGENTS.md', content }] }))).toBe(
-        `${INJECTED_CONTEXT_HEAD}${fragment}\n</injected_context>\n`,
+    ])('renders a context file with %s exactly', async (_label, content, fragment) => {
+      expect(await renderPrompt({}, createPromptOptions({ contextFiles: [{ path: 'AGENTS.md', content }] }))).toContain(
+        `\n${INJECTED_CONTEXT_HEAD}${fragment}\n</injected_context>\n`,
       );
     });
 
@@ -496,21 +476,21 @@ describe('system-prompt exact output', () => {
         '/a b/"c"&<d>\'é.md',
         '<context_file path="/a b/&quot;c&quot;&<d>&apos;é.md">Body text</context_file>',
       ],
-    ])('renders a context file path with %s exactly', (_label, path, fragment) => {
-      expect(injectedContextBlock(createPromptOptions({ contextFiles: [{ path, content: 'Body text' }] }))).toBe(
-        `${INJECTED_CONTEXT_HEAD}${fragment}\n</injected_context>\n`,
+    ])('renders a context file path with %s exactly', async (_label, path, fragment) => {
+      expect(await renderPrompt({}, createPromptOptions({ contextFiles: [{ path, content: 'Body text' }] }))).toContain(
+        `\n${INJECTED_CONTEXT_HEAD}${fragment}\n</injected_context>\n`,
       );
     });
 
-    it('renders several context files separated by a blank line', () => {
+    it('renders several context files separated by a blank line', async () => {
       const contextFiles = [
         { path: 'AGENTS.md', content: 'First <file>\nwith tag' },
         { path: 'docs/b c.md', content: '' },
         { path: 'CLAUDE.md', content: 'Third & last\n' },
       ];
 
-      expect(injectedContextBlock(createPromptOptions({ contextFiles }))).toBe(
-        `${INJECTED_CONTEXT_HEAD}${[
+      expect(await renderPrompt({}, createPromptOptions({ contextFiles }))).toContain(
+        `\n${INJECTED_CONTEXT_HEAD}${[
           '<context_file path="AGENTS.md">\nFirst <file>\nwith tag</context_file>',
           '<context_file path="docs/b c.md"/>',
           '<context_file path="CLAUDE.md">Third & last\n</context_file>',
@@ -519,7 +499,7 @@ describe('system-prompt exact output', () => {
     });
   });
 
-  describe('skillsBlock', () => {
+  describe('skills', () => {
     it.each<[string, SandpiperPromptSkill[], string]>([
       [
         'one plain skill',
@@ -615,33 +595,35 @@ describe('system-prompt exact output', () => {
         ],
         '<available_skills>\n  <skill name="jj" location="/skills/jj/SKILL.md">Visible</skill>\n  <skill name="gh" location="/skills/gh/SKILL.md">Also visible</skill>\n</available_skills>',
       ],
-    ])('renders %s exactly', (_label, skills, availableSkills) => {
-      expect(skillsBlock(createPromptOptions({ skills }))).toBe(
-        expectedSkillsBlock(SKILLS_READ_INSTRUCTION, availableSkills),
+    ])('renders %s exactly', async (_label, skills, availableSkills) => {
+      expect(await renderPrompt({}, createPromptOptions({ skills }))).toContain(
+        `\n${expectedSkillsBlock(SKILLS_READ_INSTRUCTION, availableSkills)}`,
       );
     });
 
-    it('switches the loading instruction when the skill tool is selected', () => {
+    it('switches the loading instruction when the skill tool is selected', async () => {
       const skills = [{ name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' }];
 
-      expect(skillsBlock(createPromptOptions({ selectedTools: ['read', 'skill'], skills }))).toBe(
-        expectedSkillsBlock(SKILLS_SKILL_INSTRUCTION, JJ_AVAILABLE_SKILLS),
+      expect(await renderPrompt({}, createPromptOptions({ selectedTools: ['read', 'skill'], skills }))).toContain(
+        `\n${expectedSkillsBlock(SKILLS_SKILL_INSTRUCTION, JJ_AVAILABLE_SKILLS)}`,
       );
     });
 
-    it('uses the read instruction when no tools are selected', () => {
+    it('uses the read instruction when no tools are selected', async () => {
       const skills = [{ name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' }];
 
-      expect(skillsBlock({ skills })).toBe(expectedSkillsBlock(SKILLS_READ_INSTRUCTION, JJ_AVAILABLE_SKILLS));
+      expect(await renderPrompt({}, { skills })).toContain(
+        `\n${expectedSkillsBlock(SKILLS_READ_INSTRUCTION, JJ_AVAILABLE_SKILLS)}`,
+      );
     });
 
-    it('returns undefined when every skill disables model invocation', () => {
+    it('omits the section when every skill disables model invocation', async () => {
       const skills = [
         { name: 'a', description: 'A', filePath: '/skills/a/SKILL.md', disableModelInvocation: true },
         { name: 'b', description: 'B', filePath: '/skills/b/SKILL.md', disableModelInvocation: true },
       ];
 
-      expect(skillsBlock(createPromptOptions({ skills }))).toBeUndefined();
+      expect(await renderPrompt({}, createPromptOptions({ skills }))).not.toContain('<skills>');
     });
   });
 
