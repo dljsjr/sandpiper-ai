@@ -37,10 +37,12 @@ Most tools that Sandpiper's bundled extensions register have `exposure: "deferre
 | ------------------------------------------------------ | ---------- | ----------------------------------------------- |
 | `list_peers`, `send_peer_message`, `tattler_receive`   | `deferred` | `extensions/tattler/`                           |
 | `send_chorus_reply`                                    | `deferred` | `extensions/chorus.ts`                          |
-| `start_background_process`, `check_background_process` | `deferred` | `extensions/system/background-process-tools.ts` |
 | `web_fetch`                                            | `deferred` | `extensions/web-fetch/`                         |
 | `web_search`                                           | `deferred` | `extensions/web-search/`                        |
 | `skill`, `done`                                        | `direct`   | `extensions/system/`                            |
+| `start_background_process`, `check_background_process` | `direct`   | `extensions/system/background-process-tools.ts` |
+
+The background process tools stay loaded because Pi lists a tool's guidelines in `rules` only while the tool is declared, and their guideline ("Prefer `start_background_process` over nohup, `&`, or manually backgrounding jobs with bash") steers ordinary coding work.
 
 `extensions/system/deferred-tools.ts`, registered by the system extension, does two things:
 

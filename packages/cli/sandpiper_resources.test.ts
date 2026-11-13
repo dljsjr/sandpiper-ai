@@ -128,23 +128,21 @@ describe('Sandpiper resource adapter', () => {
     expect(flags).not.toContain('identity');
   });
 
-  it('defers the rarely used tools and keeps skill and done loaded', () => {
+  it('defers the rarely used tools and keeps skill, done, and the background process tools loaded', () => {
     const { exposures } = applyFactories(createNeutralCapabilityExtensionFactories());
 
-    for (const name of [
-      'start_background_process',
-      'check_background_process',
-      'web_fetch',
-      'web_search',
-      'tattler_receive',
-      'send_chorus_reply',
-    ]) {
+    for (const name of ['web_fetch', 'web_search', 'tattler_receive', 'send_chorus_reply']) {
       expect(exposures.get(name), name).toBe('deferred');
     }
     expect(exposures.has('skill')).toBe(true);
     expect(exposures.get('skill')).toBeUndefined();
     expect(exposures.has('done')).toBe(true);
     expect(exposures.get('done')).toBeUndefined();
+    // Their guideline steers backgrounding away from bash, and Pi lists guidelines only for loaded tools.
+    for (const name of ['start_background_process', 'check_background_process']) {
+      expect(exposures.has(name), name).toBe(true);
+      expect(exposures.get(name), name).toBeUndefined();
+    }
   });
 
   it('adds the opt-in system prompt diagnostic command to the identity extension', () => {
