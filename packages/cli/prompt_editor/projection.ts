@@ -2,21 +2,17 @@ import { createHash, randomBytes } from 'node:crypto';
 import { chmodSync, readFileSync, realpathSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 
-/** How a source's text appears in the prompt: verbatim, or with `&`, `<`, and `>` escaped as XML text. */
-export type SourceCodec = 'direct' | 'xml-text';
-
 export class SourceChangedError extends Error {
   override name = 'SourceChangedError';
 }
 
-/** A span of a source file and the exact text it renders as in the prompt. */
+/** A span of a source file and its text, which the prompt holds verbatim. */
 export interface SourceCandidate {
   /** Real path: symlinks resolved, so writes edit the target and keep the link. */
   readonly path: string;
   readonly sourceStart: number;
   readonly sourceEnd: number;
   readonly renderedText: string;
-  readonly codec: SourceCodec;
   readonly label: string;
   /** Where the text starts in the prompt. Unset: the text must occur exactly once. */
   readonly promptStart?: number;
@@ -29,7 +25,6 @@ export interface SourceRegion {
   readonly sourceEnd: number;
   readonly promptStart: number;
   readonly promptEnd: number;
-  readonly codec: SourceCodec;
   readonly sourceRevision: string;
   readonly label: string;
 }
@@ -67,22 +62,11 @@ export function readSource(path: string): string {
   return readFileSync(path, 'utf-8');
 }
 
-export function renderSourceText(text: string, codec: SourceCodec): string {
-  return codec === 'xml-text' ? text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') : text;
-}
-
-function sourceTextFromRendered(text: string, codec: SourceCodec): string {
-  if (codec === 'direct') return text;
-  const entities: Readonly<Record<string, string>> = { '&amp;': '&', '&lt;': '<', '&gt;': '>' };
-  return text.replace(/&(?:amp|lt|gt);/g, (entity) => entities[entity] ?? entity);
-}
-
-/** A candidate for a span of `path`, rendered with `codec`. */
+/** A candidate for a span of `path`. */
 export function sourceCandidate(
   path: string,
   sourceStart: number,
   sourceEnd: number,
-  codec: SourceCodec = 'direct',
   promptStart?: number,
 ): SourceCandidate {
   const sourcePath = realpathSync(path);
@@ -91,16 +75,15 @@ export function sourceCandidate(
     path: sourcePath,
     sourceStart,
     sourceEnd,
-    renderedText: renderSourceText(source.slice(sourceStart, sourceEnd), codec),
-    codec,
+    renderedText: source.slice(sourceStart, sourceEnd),
     label: path,
     ...(promptStart === undefined ? {} : { promptStart }),
   };
 }
 
 /** A candidate for the whole of `path`, without its trailing whitespace. */
-export function fileCandidate(path: string, codec: SourceCodec = 'direct'): SourceCandidate {
-  return sourceCandidate(path, 0, readSource(realpathSync(path)).trimEnd().length, codec);
+export function fileCandidate(path: string): SourceCandidate {
+  return sourceCandidate(path, 0, readSource(realpathSync(path)).trimEnd().length);
 }
 
 function regionId(candidate: SourceCandidate): string {
@@ -129,7 +112,6 @@ function candidateRegion(prompt: string, candidate: SourceCandidate): SourceRegi
     sourceEnd: candidate.sourceEnd,
     promptStart,
     promptEnd,
-    codec: candidate.codec,
     sourceRevision: contentRevision(readSource(candidate.path)),
     label: candidate.label,
   };
@@ -189,10 +171,7 @@ export function buildSourceChanges(
 
     let updatedSource = previousSource;
     for (const { region, renderedText } of [...edits].sort((a, b) => b.region.sourceStart - a.region.sourceStart)) {
-      updatedSource =
-        updatedSource.slice(0, region.sourceStart) +
-        sourceTextFromRendered(renderedText, region.codec) +
-        updatedSource.slice(region.sourceEnd);
+      updatedSource = updatedSource.slice(0, region.sourceStart) + renderedText + updatedSource.slice(region.sourceEnd);
     }
     if (updatedSource !== previousSource) {
       changes.push({ path, previousSource, updatedSource, previousRevision });

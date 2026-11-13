@@ -95,11 +95,10 @@ interface EditableSpan {
   path: string; // absolute path of the source file
   sourceStart: number; // offsets into that file's text
   sourceEnd: number;
-  codec: "direct";
 }
 ```
 
-Offsets are UTF-16 code units (JavaScript string indices). `text.slice(start, end)` equals the file's text from `sourceStart` to `sourceEnd`. The diagnostic contract also reserves codec `'xml-text'` for XML-escaped text; Sandpiper inserts all sourced text verbatim, so every span is `'direct'`.
+Offsets are UTF-16 code units (JavaScript string indices). `text.slice(start, end)` equals the file's text from `sourceStart` to `sourceEnd`. Sourced text is never escaped: the prompt's XML-like tags are a convention for the model, and nothing parses them.
 
 Spans cover:
 
@@ -156,15 +155,14 @@ If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports 
 
 Editor flags, removed before rendering:
 
-| Flag                         | Meaning                                                                                    |
-| ---------------------------- | ------------------------------------------------------------------------------------------ |
-| `--prompt-source <path>`     | Another file to look for in the prompt. Repeatable.                                        |
-| `--prompt-source-xml <path>` | A file the prompt holds XML-escaped, such as a document inside an XML element. Repeatable. |
-| `--edit-title <text>`        | Header title. Default: `Sandpiper`.                                                        |
-| `--edit-subtitle <text>`     | Header subtitle, shown as `System prompt · <text>` when it differs from the title.         |
+| Flag                     | Meaning                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------- |
+| `--prompt-source <path>` | Another file to look for in the prompt. Repeatable.                                |
+| `--edit-title <text>`    | Header title. Default: `Sandpiper`.                                                |
+| `--edit-subtitle <text>` | Header subtitle, shown as `System prompt · <text>` when it differs from the title. |
 
 - Every render runs the diagnostic again as a subprocess, `--json` plus the remaining options, in the same directory and environment.
-- Editable regions come first from the diagnostic's `editableSpans` (`{ start, end, path, sourceStart, sourceEnd, codec }`, offsets into `prompt`), each checked against its file. Files without a span are found by text: the `--prompt-source` files, the reported identity, system prompt, appended prompt, and context files, and the agent directory's `USER.md`. Each is tried whole, then without its frontmatter, each verbatim and then XML-escaped (`codec: 'xml-text'`). A `--prompt-source-xml` file is tried XML-escaped only: a file without `&`, `<` or `>` reads the same either way, and the codec decides how new text is written back. A leading byte order mark is skipped, as Pi skips it, and kept when the file is written. A match counts only when its text occurs exactly once. A region of only structural tags and whitespace, such as the text between two template placeholders, stays locked.
+- Editable regions come first from the diagnostic's `editableSpans` (`{ start, end, path, sourceStart, sourceEnd }`, offsets into `prompt`), each checked against its file; a `codec` field from older output is ignored. Files without a span are found by text: the `--prompt-source` files, the reported identity, system prompt, appended prompt, and context files, and the agent directory's `USER.md`. Each is tried whole, then without its frontmatter. Text is matched and written back verbatim: the editor never escapes or unescapes it. A leading byte order mark is skipped, as Pi skips it, and kept when the file is written. A match counts only when its text occurs exactly once. A region of only structural tags and whitespace, such as the text between two template placeholders, stays locked.
 - Regions of one file with only generated text between them, such as a template split at its placeholders, share one card in the page: the regions are inline editable text, and the generated values between them show as inline value chips. A short region (up to 400 characters) of another file in the same directory, such as a sentence one template takes from a sibling template, sits inside that card with its file name. The outline lists that file once: as the element its first region opens, or as one file entry.
 - A file changed on disk while the editor is open is reported in the page, polled once a second.
 - Glimpse is optional. The editor finds the `glimpseui` executable through `SANDPIPER_GLIMPSEUI` or `PATH`, and imports `src/glimpse.mjs` from its package.

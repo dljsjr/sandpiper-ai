@@ -1,4 +1,4 @@
-import type { PromptProjection, PromptSegment, SourceCodec } from './projection.js';
+import type { PromptProjection, PromptSegment } from './projection.js';
 
 // The name must end at a word boundary. Python's `\b` is Unicode-aware, and JavaScript's is not.
 const XML_TAG_START =
@@ -223,7 +223,6 @@ interface PayloadSegment {
   readonly regionId?: string;
   readonly path?: string;
   readonly label?: string;
-  readonly codec?: SourceCodec;
 }
 
 interface SourceEntry {
@@ -283,7 +282,7 @@ export function projectionPayload(
 
     if (segment.region) {
       const { region } = segment;
-      segments.push({ ...item, regionId: region.id, path: region.path, label: region.label, codec: region.codec });
+      segments.push({ ...item, regionId: region.id, path: region.path, label: region.label });
       let source = sources.get(region.path);
       if (!source) {
         source = { kind: 'source', path: region.path, label: region.label, regionIds: [], tags: [] };

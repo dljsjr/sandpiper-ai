@@ -230,7 +230,7 @@ describe('system prompt diagnostic', () => {
 
       for (const span of result.editableSpans) {
         expect(realpathSync(span.path)).toBe(span.path);
-        expect(span.codec).toBe('direct');
+        expect(Object.keys(span).sort()).toEqual(['end', 'path', 'sourceEnd', 'sourceStart', 'start']);
         expect(result.prompt.slice(span.start, span.end)).toBe(
           readFileSync(span.path, 'utf-8').slice(span.sourceStart, span.sourceEnd),
         );

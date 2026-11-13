@@ -1,5 +1,4 @@
 import { spawn } from 'node:child_process';
-import type { SourceCodec } from './projection.js';
 
 export class PromptDiagnosticError extends Error {
   override name = 'PromptDiagnosticError';
@@ -19,7 +18,6 @@ export interface EditableSpan {
   readonly path: string;
   readonly sourceStart: number;
   readonly sourceEnd: number;
-  readonly codec: SourceCodec;
 }
 
 export interface DiagnosticPrompt {
@@ -55,8 +53,6 @@ function optionalField<T>(object: JsonObject, key: string, parse: (value: unknow
 const asString = (value: unknown): string | undefined => (typeof value === 'string' ? value : undefined);
 const asOffset = (value: unknown): number | undefined =>
   typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : undefined;
-const asCodec = (value: unknown): SourceCodec | undefined =>
-  value === 'direct' || value === 'xml-text' ? value : undefined;
 const asObject = (value: unknown): JsonObject | undefined => (isObject(value) ? value : undefined);
 const asUnknown = (value: unknown): unknown => value;
 
@@ -80,10 +76,9 @@ function asSpan(value: unknown): EditableSpan | undefined {
   const path = asString(value.path);
   const sourceStart = asOffset(value.sourceStart);
   const sourceEnd = asOffset(value.sourceEnd);
-  const codec = asCodec(value.codec);
   if (start === undefined || end === undefined || path === undefined) return undefined;
-  if (sourceStart === undefined || sourceEnd === undefined || codec === undefined) return undefined;
-  return { start, end, path, sourceStart, sourceEnd, codec };
+  if (sourceStart === undefined || sourceEnd === undefined) return undefined;
+  return { start, end, path, sourceStart, sourceEnd };
 }
 
 /** Reads the `--json` output of `sandpiper-system-prompt`. `editableSpans` is optional; older output lacks it. */

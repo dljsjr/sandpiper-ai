@@ -1,9 +1,9 @@
-import { mkdtempSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { DiagnosticPrompt, EditableSpan } from './diagnostic.js';
-import { buildSourceChanges, type PromptProjection } from './projection.js';
+import { applySourceChanges, buildSourceChanges, type PromptProjection } from './projection.js';
 import { buildEditorProjection } from './regions.js';
 
 let root: string;
@@ -32,10 +32,9 @@ function diagnostic(prompt: string, overrides: Partial<DiagnosticPrompt> = {}): 
   };
 }
 
-function editableText(projection: PromptProjection): Array<[string, string, string]> {
+function editableText(projection: PromptProjection): Array<[string, string]> {
   return projection.regions.map((region) => [
     region.path,
-    region.codec,
     projection.prompt.slice(region.promptStart, region.promptEnd),
   ]);
 }
@@ -43,26 +42,25 @@ function editableText(projection: PromptProjection): Array<[string, string, stri
 describe('editable spans', () => {
   it('maps each span whose prompt text matches its source span exactly', () => {
     const source = writeSource('AGENTS.md', 'intro\n> quoted & kept\n');
-    const prompt = 'before &gt; quoted &amp; kept after';
+    const prompt = 'before > quoted & kept after';
     const span: EditableSpan = {
-      start: prompt.indexOf('&gt;'),
+      start: prompt.indexOf('>'),
       end: prompt.indexOf(' after'),
       path: source,
       sourceStart: 6,
       sourceEnd: 21,
-      codec: 'xml-text',
     };
 
     const projection = buildEditorProjection(diagnostic(prompt, { editableSpans: [span] }), { promptSources: [] });
 
-    expect(editableText(projection)).toEqual([[source, 'xml-text', '&gt; quoted &amp; kept']]);
+    expect(editableText(projection)).toEqual([[source, '> quoted & kept']]);
     expect(projection.regions[0]).toMatchObject({ sourceStart: 6, sourceEnd: 21, label: source });
   });
 
   it('makes text editable where a span pins it, even when the text repeats', () => {
     const source = writeSource('AGENTS.md', 'repeated\n');
     const prompt = 'repeated | repeated';
-    const span: EditableSpan = { start: 11, end: 19, path: source, sourceStart: 0, sourceEnd: 8, codec: 'direct' };
+    const span: EditableSpan = { start: 11, end: 19, path: source, sourceStart: 0, sourceEnd: 8 };
 
     const projection = buildEditorProjection(diagnostic(prompt, { editableSpans: [span] }), { promptSources: [] });
 
@@ -72,7 +70,7 @@ describe('editable spans', () => {
   it('drops a span whose prompt text does not match its source', () => {
     const source = writeSource('AGENTS.md', 'repeated\n');
     const prompt = 'repeated | repeated';
-    const span: EditableSpan = { start: 0, end: 8, path: source, sourceStart: 0, sourceEnd: 7, codec: 'direct' };
+    const span: EditableSpan = { start: 0, end: 8, path: source, sourceStart: 0, sourceEnd: 7 };
 
     const projection = buildEditorProjection(
       diagnostic(prompt, { editableSpans: [span, { ...span, path: join(root, 'missing.md') }] }),
@@ -85,7 +83,7 @@ describe('editable spans', () => {
   it('does not search for text from a file a span already covers', () => {
     const source = writeSource('AGENTS.md', 'alpha beta\n');
     const prompt = 'alpha beta | beta';
-    const span: EditableSpan = { start: 13, end: 17, path: source, sourceStart: 6, sourceEnd: 10, codec: 'direct' };
+    const span: EditableSpan = { start: 13, end: 17, path: source, sourceStart: 6, sourceEnd: 10 };
 
     const projection = buildEditorProjection(
       diagnostic(prompt, { editableSpans: [span], sources: { appendSystemPrompts: [], contextFiles: [source] } }),
@@ -104,7 +102,6 @@ describe('editable spans', () => {
       path: template,
       sourceStart: start,
       sourceEnd: end,
-      codec: 'direct',
     });
     const bodyEnd = prompt.indexOf('</b>');
 
@@ -115,7 +112,7 @@ describe('editable spans', () => {
       { promptSources: [] },
     );
 
-    expect(editableText(projection)).toEqual([[template, 'direct', '<b>\nkept text\n']]);
+    expect(editableText(projection)).toEqual([[template, '<b>\nkept text\n']]);
   });
 
   it('keeps a span whose only tags are prose mentions', () => {
@@ -128,25 +125,24 @@ describe('editable spans', () => {
       path: template,
       sourceStart: 0,
       sourceEnd: 10,
-      codec: 'direct',
     };
 
     const projection = buildEditorProjection(diagnostic(prompt, { editableSpans: [span] }), { promptSources: [] });
 
-    expect(editableText(projection)).toEqual([[template, 'direct', '`<policy>`']]);
+    expect(editableText(projection)).toEqual([[template, '`<policy>`']]);
   });
 
   it('prefers a span over a matched file that overlaps it', () => {
     const outer = writeSource('outer.md', 'outer [inner text] outer\n');
     const inner = writeSource('inner.md', 'inner text\n');
     const prompt = 'outer [inner text] outer';
-    const span: EditableSpan = { start: 7, end: 17, path: inner, sourceStart: 0, sourceEnd: 10, codec: 'direct' };
+    const span: EditableSpan = { start: 7, end: 17, path: inner, sourceStart: 0, sourceEnd: 10 };
 
     const projection = buildEditorProjection(diagnostic(prompt, { editableSpans: [span] }), {
       promptSources: [outer],
     });
 
-    expect(editableText(projection)).toEqual([[inner, 'direct', 'inner text']]);
+    expect(editableText(projection)).toEqual([[inner, 'inner text']]);
   });
 });
 
@@ -158,7 +154,7 @@ describe('matched source files', () => {
       promptSources: [source],
     });
 
-    expect(editableText(projection)).toEqual([[source, 'direct', '<voice>steady</voice>']]);
+    expect(editableText(projection)).toEqual([[source, '<voice>steady</voice>']]);
   });
 
   it('leaves a file locked when its text occurs more than once', () => {
@@ -169,37 +165,24 @@ describe('matched source files', () => {
     expect(projection.regions).toEqual([]);
   });
 
-  it('maps an XML-escaped file as xml-text', () => {
-    const source = writeSource('IDENTITY.md', '> identity & voice\n');
+  it('maps a file with ampersands, angle brackets, and inline tags verbatim, and writes edits back byte for byte', () => {
+    const content = '# Identity\n\nA & B: 1 < 2 > 0, with <em>x</em>.\n';
+    const source = writeSource('IDENTITY.md', content);
+    const prompt = `<identity>\n<content>\n${content.trimEnd()}\n</content>\n</identity>`;
 
-    const projection = buildEditorProjection(
-      diagnostic('<identity><content>&gt; identity &amp; voice</content></identity>'),
-      { promptSources: [source] },
-    );
+    const projection = buildEditorProjection(diagnostic(prompt), { promptSources: [source] });
 
-    expect(editableText(projection)).toEqual([[source, 'xml-text', '&gt; identity &amp; voice']]);
+    expect(editableText(projection)).toEqual([[source, content.trimEnd()]]);
+    const edited = '# Identity\n\nA && B: 1 << 2 >> 0, with <em>y</em> &amp; &lt;z&gt;.';
+    applySourceChanges(buildSourceChanges(projection, new Map([[projection.regions[0]?.id ?? '', edited]])));
+    expect(readFileSync(source, 'utf-8')).toBe(`${edited}\n`);
   });
 
-  it('maps a file the caller marks as escaped as xml-text, even when nothing in it needs escaping', () => {
-    const plain = writeSource('IDENTITY.md', '# Identity\n\nPlain words.\n');
-    const prompt = '<identity><content># Identity\n\nPlain words.</content></identity>';
+  it('does not map a file whose text the prompt holds XML-escaped', () => {
+    const source = writeSource('SELF.md', 'a < b & c\n');
 
-    const guessed = buildEditorProjection(diagnostic(prompt), { promptSources: [plain] });
-    const marked = buildEditorProjection(diagnostic(prompt), {
-      promptSources: [plain],
-      escapedPromptSources: [plain],
-    });
-
-    expect(editableText(guessed)).toEqual([[plain, 'direct', '# Identity\n\nPlain words.']]);
-    expect(editableText(marked)).toEqual([[plain, 'xml-text', '# Identity\n\nPlain words.']]);
-  });
-
-  it('does not map a file marked as escaped where its text appears unescaped', () => {
-    const source = writeSource('SELF.md', 'a < b\n');
-
-    const projection = buildEditorProjection(diagnostic('<self>a < b</self>'), {
-      promptSources: [],
-      escapedPromptSources: [source],
+    const projection = buildEditorProjection(diagnostic('<self>a &lt; b &amp; c</self>'), {
+      promptSources: [source],
     });
 
     expect(projection.regions).toEqual([]);
@@ -212,7 +195,7 @@ describe('matched source files', () => {
       promptSources: [source],
     });
 
-    expect(editableText(projection)).toEqual([[source, 'direct', '# Profile\n\nPrefers fish.']]);
+    expect(editableText(projection)).toEqual([[source, '# Profile\n\nPrefers fish.']]);
     const region = projection.regions[0];
     expect(region).toMatchObject({ sourceStart: 1 });
     const [change] = buildSourceChanges(projection, new Map([[region?.id ?? '', '# Profile\n\nPrefers bash.']]));
@@ -222,13 +205,12 @@ describe('matched source files', () => {
   it('maps the body after frontmatter with an extended hyphen delimiter', () => {
     const body = '# SELF.md — Roux\n\nMost of the self & more.\n\n---\n\nFooter.';
     const self = writeSource('SELF.md', `---\n\nname: Roux\njob: Pilot\n----------------------\n\n${body}\n`);
-    const escapedBody = body.replace('&', '&amp;');
 
-    const projection = buildEditorProjection(diagnostic(`<self><content>${escapedBody}</content></self>`), {
+    const projection = buildEditorProjection(diagnostic(`<self><content>${body}</content></self>`), {
       promptSources: [self],
     });
 
-    expect(editableText(projection)).toEqual([[self, 'xml-text', escapedBody]]);
+    expect(editableText(projection)).toEqual([[self, body]]);
   });
 
   it('maps identity, user profile, context, and appended prompt files the diagnostic reports', () => {
@@ -282,6 +264,6 @@ describe('matched source files', () => {
       { promptSources: [context, empty, join(root, 'missing.md')] },
     );
 
-    expect(editableText(projection)).toEqual([[context, 'direct', '# Context']]);
+    expect(editableText(projection)).toEqual([[context, '# Context']]);
   });
 });

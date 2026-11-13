@@ -47,8 +47,8 @@ describe('prompt templates', () => {
     expect(rendered).toEqual({
       text: 'A computed BB',
       spans: [
-        { start: 0, end: 2, path: '/t.md', sourceStart: 0, sourceEnd: 2, codec: 'direct' },
-        { start: 10, end: 13, path: '/t.md', sourceStart: 7, sourceEnd: 10, codec: 'direct' },
+        { start: 0, end: 2, path: '/t.md', sourceStart: 0, sourceEnd: 2 },
+        { start: 10, end: 13, path: '/t.md', sourceStart: 7, sourceEnd: 10 },
       ],
     });
   });
@@ -61,9 +61,9 @@ describe('prompt templates', () => {
 
     expect(outer.text).toBe('[pre\nuser text]');
     expect(outer.spans).toEqual([
-      { start: 0, end: 1, path: '/outer.md', sourceStart: 0, sourceEnd: 1, codec: 'direct' },
-      { start: 5, end: 14, path: '/user.md', sourceStart: 0, sourceEnd: 9, codec: 'direct' },
-      { start: 14, end: 15, path: '/outer.md', sourceStart: 9, sourceEnd: 10, codec: 'direct' },
+      { start: 0, end: 1, path: '/outer.md', sourceStart: 0, sourceEnd: 1 },
+      { start: 5, end: 14, path: '/user.md', sourceStart: 0, sourceEnd: 9 },
+      { start: 14, end: 15, path: '/outer.md', sourceStart: 9, sourceEnd: 10 },
     ]);
   });
 
@@ -90,7 +90,7 @@ describe('prompt templates', () => {
       const rendered = joinRendered(['> ', sourcedText('world', join(root, 'link', 'user.md'), 6)]);
 
       expect(verifyEditableSpans(rendered.text, rendered.spans)).toEqual([
-        { start: 2, end: 7, path: join(root, 'real', 'user.md'), sourceStart: 6, sourceEnd: 11, codec: 'direct' },
+        { start: 2, end: 7, path: join(root, 'real', 'user.md'), sourceStart: 6, sourceEnd: 11 },
       ]);
     });
 
@@ -99,7 +99,7 @@ describe('prompt templates', () => {
       const rendered = joinRendered(['<context>', sourcedText('# Rules', join(root, 'AGENTS.md')), '</context>']);
 
       expect(verifyEditableSpans(rendered.text, rendered.spans)).toEqual([
-        { start: 9, end: 16, path: join(root, 'AGENTS.md'), sourceStart: 1, sourceEnd: 8, codec: 'direct' },
+        { start: 9, end: 16, path: join(root, 'AGENTS.md'), sourceStart: 1, sourceEnd: 8 },
       ]);
     });
 

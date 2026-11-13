@@ -272,7 +272,7 @@ describe('startup hooks', () => {
   });
 
   it('hands the diagnostic the preamble with its spans shifted past prepended contributions', async () => {
-    const span: EditableSpan = { start: 15, end: 24, path: '/t.md', sourceStart: 0, sourceEnd: 9, codec: 'direct' };
+    const span: EditableSpan = { start: 15, end: 24, path: '/t.md', sourceStart: 0, sourceEnd: 9 };
     mockBuildSandpiperStartupPrompt.mockResolvedValueOnce(rendered('<system_prompt>sandpiper</system_prompt>', [span]));
 
     const onPreamble = vi.fn();

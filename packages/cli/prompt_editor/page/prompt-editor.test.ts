@@ -100,7 +100,6 @@ function templatePayload(pieces: readonly Piece[], pendingRegionIds: readonly st
       path,
       sourceStart: before.length,
       sourceEnd: before.length + text.length,
-      codec: 'direct',
     });
     files.set(path, before + text);
     prompt += text;

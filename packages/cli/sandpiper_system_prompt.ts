@@ -73,8 +73,6 @@ file-backed prompt source metadata.
 --edit opens the prompt in a Glimpse window instead, where edits to file-backed
 parts are staged, previewed as diffs, and written to their files. Editor options:
   --prompt-source <path>  another file to look for in the prompt (repeatable)
-  --prompt-source-xml <path>
-                          a file the prompt holds XML-escaped (repeatable)
   --edit-title <text>     header title (default: Sandpiper)
   --edit-subtitle <text>  header subtitle`);
 }

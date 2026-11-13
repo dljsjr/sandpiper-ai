@@ -6,9 +6,7 @@ import {
   buildProjection,
   type PromptProjection,
   readSource,
-  renderSourceText,
   type SourceCandidate,
-  type SourceCodec,
   uniqueOffset,
 } from './projection.js';
 
@@ -16,16 +14,9 @@ import {
 export interface PromptSourceCatalog {
   /** `--prompt-source` paths, absolute. */
   readonly promptSources: readonly string[];
-  /**
-   * `--prompt-source-xml` paths, absolute: files the prompt holds XML-escaped. A file without `&`, `<` or `>` reads
-   * the same either way, so only the caller can say which it is; it decides how new text is written back.
-   */
-  readonly escapedPromptSources?: readonly string[];
   /** The agent directory's USER.md. */
   readonly userProfile?: string;
 }
-
-const CODECS: readonly SourceCodec[] = ['direct', 'xml-text'];
 
 type PlacedCandidate = SourceCandidate & { readonly promptStart: number };
 
@@ -43,7 +34,7 @@ function spanCandidate(prompt: string, span: EditableSpan): PlacedCandidate | un
   if (!path) return undefined;
   const source = readSource(path);
   if (span.sourceStart > span.sourceEnd || span.sourceEnd > source.length) return undefined;
-  const renderedText = renderSourceText(source.slice(span.sourceStart, span.sourceEnd), span.codec);
+  const renderedText = source.slice(span.sourceStart, span.sourceEnd);
   if (!renderedText || span.start + renderedText.length !== span.end) return undefined;
   if (prompt.slice(span.start, span.end) !== renderedText) return undefined;
   return {
@@ -51,7 +42,6 @@ function spanCandidate(prompt: string, span: EditableSpan): PlacedCandidate | un
     sourceStart: span.sourceStart,
     sourceEnd: span.sourceEnd,
     renderedText,
-    codec: span.codec,
     label: span.path,
     promptStart: span.start,
   };
@@ -60,29 +50,20 @@ function spanCandidate(prompt: string, span: EditableSpan): PlacedCandidate | un
 const BYTE_ORDER_MARK = '\uFEFF';
 
 /**
- * The first rendering of the file that occurs exactly once in the prompt: the whole file, then the body after its
- * frontmatter, in each of `codecs`. A leading byte order mark is skipped, as Pi skips it when it reads a file.
+ * The first text of the file that occurs exactly once in the prompt, verbatim: the whole file, then the body after
+ * its frontmatter. A leading byte order mark is skipped, as Pi skips it when it reads a file.
  */
-function matchedFileCandidate(
-  prompt: string,
-  label: string,
-  path: string,
-  codecs: readonly SourceCodec[],
-): PlacedCandidate | undefined {
+function matchedFileCandidate(prompt: string, label: string, path: string): PlacedCandidate | undefined {
   const source = readSource(path);
   const contentStart = source.startsWith(BYTE_ORDER_MARK) ? BYTE_ORDER_MARK.length : 0;
   const sourceEnd = source.trimEnd().length;
   const bodyStart = contentStart + frontmatterBodyStart(source.slice(contentStart));
   const starts = bodyStart > contentStart && bodyStart < sourceEnd ? [contentStart, bodyStart] : [contentStart];
   for (const sourceStart of starts) {
-    const text = source.slice(sourceStart, sourceEnd);
-    if (!text) continue;
-    for (const [index, codec] of codecs.entries()) {
-      const renderedText = renderSourceText(text, codec);
-      if (index > 0 && renderedText === text) continue;
-      const promptStart = uniqueOffset(prompt, renderedText);
-      if (promptStart !== undefined) return { path, sourceStart, sourceEnd, renderedText, codec, label, promptStart };
-    }
+    const renderedText = source.slice(sourceStart, sourceEnd);
+    if (!renderedText) continue;
+    const promptStart = uniqueOffset(prompt, renderedText);
+    if (promptStart !== undefined) return { path, sourceStart, sourceEnd, renderedText, label, promptStart };
   }
   return undefined;
 }
@@ -129,12 +110,11 @@ export function buildEditorProjection(diagnostic: DiagnosticPrompt, catalog: Pro
     ...sources.contextFiles,
     ...(catalog.userProfile ? [catalog.userProfile] : []),
   ];
-  const escaped = new Set((catalog.escapedPromptSources ?? []).flatMap((label) => realFile(label) ?? []));
-  for (const label of [...(catalog.escapedPromptSources ?? []), ...labels]) {
+  for (const label of labels) {
     const path = realFile(label);
     if (!path || seen.has(path)) continue;
     seen.add(path);
-    const candidate = matchedFileCandidate(prompt, label, path, escaped.has(path) ? ['xml-text'] : CODECS);
+    const candidate = matchedFileCandidate(prompt, label, path);
     if (candidate && !spans.some((span) => overlaps(candidate, span))) matched.push(candidate);
   }
 

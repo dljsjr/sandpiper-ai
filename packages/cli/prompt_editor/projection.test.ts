@@ -61,27 +61,11 @@ describe('prompt projection', () => {
     expect(projection.regions).toEqual([]);
   });
 
-  it('writes xml-text edits back as Markdown', () => {
-    const content = 'frontmatter\n> original & literal\ntrailer\n';
-    const source = writeSource('source.md', content);
-    const candidate = sourceCandidate(source, content.indexOf('> original'), content.indexOf('\ntrailer'), 'xml-text');
-    const projection = buildProjection('locked\n&gt; original &amp; literal\nlocked\n', [candidate]);
-
-    const changes = buildSourceChanges(
-      projection,
-      new Map([[projection.regions[0]!.id, '&gt; changed &amp; literal']]),
-    );
-    expect(readFileSync(source, 'utf-8')).toBe(content);
-    applySourceChanges(changes);
-
-    expect(readFileSync(source, 'utf-8')).toBe('frontmatter\n> changed & literal\ntrailer\n');
-  });
-
   it('builds one shadow source from multiple fragment edits', () => {
     const source = writeSource('template.md', 'before LOCKED after\n');
     const projection = buildProjection('before LOCKED after', [
-      sourceCandidate(source, 0, 7, 'direct', 0),
-      sourceCandidate(source, 13, 19, 'direct', 13),
+      sourceCandidate(source, 0, 7, 0),
+      sourceCandidate(source, 13, 19, 13),
     ]);
 
     const changes = buildSourceChanges(

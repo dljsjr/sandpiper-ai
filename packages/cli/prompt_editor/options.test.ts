@@ -13,7 +13,7 @@ describe('parsePromptEditorOptions', () => {
         'read',
         '--edit-title',
         'Roux',
-        '--prompt-source-xml',
+        '--prompt-source',
         '/abs/SELF.md',
         '--edit-subtitle',
         'Pilot',
@@ -24,8 +24,7 @@ describe('parsePromptEditorOptions', () => {
 
     expect(options).toEqual({
       diagnosticArgs: ['--approve', '--tools', 'read'],
-      promptSources: ['/work/prompts/voice.md'],
-      escapedPromptSources: ['/abs/SELF.md'],
+      promptSources: ['/work/prompts/voice.md', '/abs/SELF.md'],
       title: 'Roux',
       subtitle: 'Pilot',
     });
@@ -35,7 +34,6 @@ describe('parsePromptEditorOptions', () => {
     expect(parsePromptEditorOptions(['--edit'], '/work')).toEqual({
       diagnosticArgs: [],
       promptSources: [],
-      escapedPromptSources: [],
       title: 'Sandpiper',
     });
   });

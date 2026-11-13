@@ -122,7 +122,6 @@ describe('system prompt source map', () => {
       path: identityPath,
       sourceStart: 0,
       sourceEnd: identity.length,
-      codec: 'direct',
     });
     expect(raw.text).toBe(fromFile.text);
     expect(raw.spans.some((span) => span.path === identityPath)).toBe(false);
@@ -150,7 +149,6 @@ describe('system prompt source map', () => {
       path: appendPath,
       sourceStart: 0,
       sourceEnd: 'From file\n'.length,
-      codec: 'direct',
     });
     expect(mismatched.text).toContain('<content>Something else</content>');
     expect(mismatched.spans.some((span) => span.path === appendPath)).toBe(false);

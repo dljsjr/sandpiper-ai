@@ -48,7 +48,6 @@ describe('projection payload', () => {
     expect(payload.segments.map((segment) => segment.editable)).toEqual([false, true, false]);
     expect(payload.navigation.map((entry) => entry.kind)).toEqual(['locked', 'source', 'locked']);
     expect(payload.segments[1]?.path).toBe(realpathSync(source));
-    expect(payload.segments[1]?.codec).toBe('direct');
     expect(payload.promptBytes).toBe(22);
     expect(payload.editableBytes).toBe(8);
   });
@@ -183,8 +182,8 @@ describe('projection payload', () => {
   it('groups several editable ranges of one source under one outline entry', () => {
     const source = writeSource('template.md', 'left LOCK right\n');
     const projection = buildProjection('left LOCK right', [
-      sourceCandidate(source, 0, 5, 'direct', 0),
-      sourceCandidate(source, 9, 15, 'direct', 9),
+      sourceCandidate(source, 0, 5, 0),
+      sourceCandidate(source, 9, 15, 9),
     ]);
 
     const payload = projectionPayload(projection, [], 1);

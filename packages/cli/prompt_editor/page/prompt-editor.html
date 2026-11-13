@@ -1041,20 +1041,8 @@
         return markdownEditors.get(part)?.value() ?? part.textContent ?? '';
       }
 
-      // Some sources are XML-escaped in the prompt. The editor shows and edits their source text,
-      // and escapes it again for staging, so the prompt and the file stay exact.
-      const escapeXml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const unescapeXml = (text) => text.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-
       function regionText(region) {
-        const escaped = region.dataset.codec === 'xml-text';
-        return [...region.querySelectorAll('[data-prompt-part]')]
-          .map((part) => (escaped && originals.has(part) ? escapeXml(promptPartText(part)) : promptPartText(part)))
-          .join('');
-      }
-
-      function regionSourceLength(region) {
-        return [...region.querySelectorAll('[data-prompt-part]')].map(promptPartText).join('').length;
+        return [...region.querySelectorAll('[data-prompt-part]')].map(promptPartText).join('');
       }
 
       function renderedRegions() {
@@ -1185,15 +1173,14 @@
       }
 
       function appendEditableParts(body, region, segment, index) {
-        const shown = (text) => (segment.codec === 'xml-text' ? unescapeXml(text) : text);
         if (!segment.parts.some((part) => part.tag)) {
-          appendMarkdownEditor(body, region, shown(segment.text), `${index}:0`);
+          appendMarkdownEditor(body, region, segment.text, `${index}:0`);
           return;
         }
         segment.parts.forEach((part, partIndex) => {
           const key = `${index}:${partIndex}`;
-          if (part.editable && part.text.trim()) appendMarkdownEditor(body, region, shown(part.text), key);
-          else body.append(createPart(part.editable ? { ...part, text: shown(part.text) } : part, region, key));
+          if (part.editable && part.text.trim()) appendMarkdownEditor(body, region, part.text, key);
+          else body.append(createPart(part, region, key));
         });
       }
 
@@ -1226,7 +1213,7 @@
         const region = h('section', {
           class: 'source-region region-card',
           id: `region-${segment.regionId}`,
-          dataset: { regionId: segment.regionId, path, codec: segment.codec || 'direct' },
+          dataset: { regionId: segment.regionId, path },
         });
         const body = h('div', { class: 'region-body' });
         region.append(regionHead(path), body);
@@ -1263,11 +1250,10 @@
         const region = h('span', {
           class: 'source-region',
           id: `region-${segment.regionId}`,
-          dataset: { regionId: segment.regionId, path: segment.path || segment.label, codec: segment.codec || 'direct' },
+          dataset: { regionId: segment.regionId, path: segment.path || segment.label },
         });
-        const shown = (text) => (segment.codec === 'xml-text' ? unescapeXml(text) : text);
         segment.parts.forEach((part, partIndex) => {
-          region.append(createPart(part.editable ? { ...part, text: shown(part.text) } : part, region, `${index}:${partIndex}`));
+          region.append(createPart(part, region, `${index}:${partIndex}`));
         });
         return region;
       }
@@ -1746,7 +1732,7 @@
           let chars = 0;
           let baseline = 0;
           for (const region of cardRegions(card)) {
-            const length = regionSourceLength(region);
+            const length = regionText(region).length;
             chars += length;
             baseline += regionBaselines.get(region.dataset.regionId) ?? length;
           }
@@ -2172,7 +2158,7 @@
         baselineChars = outline.root.chars;
         regionBaselines.clear();
         for (const region of prompt.querySelectorAll('.source-region')) {
-          regionBaselines.set(region.dataset.regionId, regionSourceLength(region));
+          regionBaselines.set(region.dataset.regionId, regionText(region).length);
         }
         renderOutline();
         renderSizes();

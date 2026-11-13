@@ -3,8 +3,7 @@ import { readFileSync, realpathSync } from 'node:fs';
 /**
  * A run of rendered text copied verbatim from a file: `text.slice(start, end)` equals
  * `source.slice(sourceStart, sourceEnd)`. Offsets are UTF-16 code units (JavaScript string
- * indices). The diagnostic contract reserves codec 'xml-text' for XML-escaped text; Sandpiper
- * inserts every sourced text verbatim today.
+ * indices).
  */
 export interface EditableSpan {
   readonly start: number;
@@ -12,7 +11,6 @@ export interface EditableSpan {
   readonly path: string;
   readonly sourceStart: number;
   readonly sourceEnd: number;
-  readonly codec: 'direct';
 }
 
 export interface RenderedText {
@@ -65,7 +63,7 @@ export function sourcedText(text: string, path: string, sourceStart = 0): Render
   if (text === '') return { text, spans: [] };
   return {
     text,
-    spans: [{ start: 0, end: text.length, path, sourceStart, sourceEnd: sourceStart + text.length, codec: 'direct' }],
+    spans: [{ start: 0, end: text.length, path, sourceStart, sourceEnd: sourceStart + text.length }],
   };
 }
 

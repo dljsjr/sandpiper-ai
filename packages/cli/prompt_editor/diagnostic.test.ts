@@ -65,16 +65,16 @@ describe('runPromptDiagnostic', () => {
 });
 
 describe('parseDiagnosticOutput', () => {
-  it('reads editable spans and drops malformed ones', () => {
-    const span = { start: 1, end: 5, path: '/tmp/a.md', sourceStart: 0, sourceEnd: 4, codec: 'xml-text' };
+  it('reads editable spans, ignores a codec field, and drops malformed ones', () => {
+    const span = { start: 1, end: 5, path: '/tmp/a.md', sourceStart: 0, sourceEnd: 4 };
     const stdout = JSON.stringify({
       prompt: 'xabcd',
       warnings: [],
       sources: { appendSystemPrompts: [], contextFiles: [] },
-      editableSpans: [span, { ...span, codec: 'html' }, { ...span, start: -1 }],
+      editableSpans: [span, { ...span, codec: 'direct' }, { ...span, start: -1 }, { ...span, sourceEnd: '4' }],
     });
 
-    expect(parseDiagnosticOutput(stdout, '').editableSpans).toEqual([span]);
+    expect(parseDiagnosticOutput(stdout, '').editableSpans).toEqual([span, span]);
   });
 
   it('rejects output without a prompt', () => {
