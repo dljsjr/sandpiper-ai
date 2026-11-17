@@ -50,9 +50,10 @@ One root `vitest.config.ts` defines the catch-all project and the core, web-fetc
 
 Sandpiper carries a local patch of `@earendil-works/pi-coding-agent`. The patch is stored under `patches/` and applied by `bun install` through `patchedDependencies` in the root `package.json`.
 
-The patch changes six Pi modules:
+The patch changes seven Pi modules:
 
 - `dist/core/system-prompt.js` preserves the tools and rules sections when Sandpiper supplies a custom prompt. It also adds a `deferredTools` option. When `tool_search` is declared, the tools section lists the deferred tools that are not loaded yet in a `<deferred_tools>` block. `dist/core/system-prompt.d.ts` declares the option.
+- `dist/index.js` exports `isMcpToolName`, Pi's check for MCP tool names. Sandpiper's deferred tools list uses it to leave out MCP tools. `dist/index.d.ts` declares the export.
 - `dist/config.js` resolves themes, UI assets, and HTML export templates from `PI_CODING_AGENT_PACKAGE`. Product metadata still comes from `PI_PACKAGE_DIR`.
 - `dist/modes/interactive/interactive-mode.js` gives Pi's update check the Pi version from `PI_CODING_AGENT_VERSION`. Unpatched, the check compares the product version from `PI_PACKAGE_DIR`.
 - `dist/utils/pi-user-agent.js`, `dist/core/client-identity.js`, and `dist/extensions/mcp/runtime.js` identify Pi by the Pi version from `PI_CODING_AGENT_VERSION`. This covers the `User-Agent` of requests to pi.dev, GitHub, and model providers, and the client information sent to MCP servers. Unpatched, they send the product version.

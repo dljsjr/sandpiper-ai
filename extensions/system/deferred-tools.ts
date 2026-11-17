@@ -1,17 +1,22 @@
 // Deferred tools are registered but not declared to the model until `tool_search` loads them. Pi's
 // tools section lists the ones not loaded yet (Sandpiper's local Pi patch renders the block from
 // `systemPromptOptions.deferredTools`), and `tool_search` must be active to load them.
-import type { ExtensionAPI, ExtensionContext, ToolInfo } from '@earendil-works/pi-coding-agent';
+import {
+  type ExtensionAPI,
+  type ExtensionContext,
+  isMcpToolName,
+  type ToolInfo,
+} from '@earendil-works/pi-coding-agent';
 
 const TOOL_SEARCH_TOOL_NAME = 'tool_search';
 
 /**
  * Names of the deferred tools the tools section lists, sorted so the prompt stays stable. MCP tools
- * have a namespace and are listed under `<mcp_servers>` instead.
+ * are left out: Pi lists their servers under `<mcp_servers>` instead.
  */
 export function deferredToolNames(tools: readonly ToolInfo[]): string[] {
   return tools
-    .filter((tool) => tool.exposure === 'deferred' && tool.namespace === undefined)
+    .filter((tool) => tool.exposure === 'deferred' && !isMcpToolName(tool.name))
     .map((tool) => tool.name)
     .sort();
 }

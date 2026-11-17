@@ -23,6 +23,13 @@ function tool(name: string, overrides: Partial<ToolInfo> = {}): ToolInfo {
 
 const toolSearch = tool('tool_search', { exposure: 'model-only', reachesTools: () => 'all' });
 
+// Pi's MCP extension registers server tools under a namespace and its resource tools without one.
+function mcpTool(name: string, overrides: Partial<ToolInfo> = {}): ToolInfo {
+  return tool(name, { exposure: 'deferred', ...overrides });
+}
+
+const mcpServerTool = mcpTool('mcp__linear__issues', { namespace: { name: 'mcp__linear' } });
+
 function createDeferredToolHarness(tools: readonly ToolInfo[], initiallyActive: readonly string[] = ['read']) {
   const handlers = new Map<string, Handler[]>();
   let active = [...initiallyActive];
@@ -58,17 +65,20 @@ function createDeferredToolHarness(tools: readonly ToolInfo[], initiallyActive: 
 }
 
 describe('deferredToolNames', () => {
-  it('names deferred tools outside an MCP namespace, sorted', () => {
+  it('names deferred tools that Pi does not count as MCP tools, sorted', () => {
     const names = deferredToolNames([
       tool('web_search', { exposure: 'deferred' }),
       tool('read'),
-      tool('mcp__linear__issues', { exposure: 'deferred', namespace: { name: 'mcp__linear' } }),
+      mcpServerTool,
+      mcpTool('list_mcp_resources'),
+      mcpTool('read_mcp_resource'),
       tool('scripted', { exposure: 'codemode' }),
       toolSearch,
+      tool('notes_search', { exposure: 'deferred', namespace: { name: 'notes' } }),
       tool('list_peers', { exposure: 'deferred' }),
     ]);
 
-    expect(names).toEqual(['list_peers', 'web_search']);
+    expect(names).toEqual(['list_peers', 'notes_search', 'web_search']);
   });
 });
 
@@ -76,7 +86,7 @@ describe('registerDeferredToolHooks', () => {
   it('sets the deferred tool names on every run', async () => {
     const harness = createDeferredToolHarness([
       tool('web_fetch', { exposure: 'deferred' }),
-      tool('mcp__linear__issues', { exposure: 'deferred', namespace: { name: 'mcp__linear' } }),
+      mcpServerTool,
       tool('read'),
       toolSearch,
       tool('list_peers', { exposure: 'deferred' }),
@@ -112,11 +122,7 @@ describe('registerDeferredToolHooks', () => {
   });
 
   it('leaves tool_search inactive when only MCP or non-deferred tools are registered', async () => {
-    const harness = createDeferredToolHarness([
-      tool('read'),
-      toolSearch,
-      tool('mcp__linear__issues', { exposure: 'deferred', namespace: { name: 'mcp__linear' } }),
-    ]);
+    const harness = createDeferredToolHarness([tool('read'), toolSearch, mcpServerTool, mcpTool('list_mcp_resources')]);
 
     await harness.startSession();
     await harness.startRun();

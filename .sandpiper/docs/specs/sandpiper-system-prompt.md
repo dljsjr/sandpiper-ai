@@ -46,7 +46,7 @@ The background process tools stay loaded because Pi lists a tool's guidelines in
 
 `extensions/system/deferred-tools.ts`, registered by the system extension, does two things:
 
-- In `before_agent_start`, it sets `systemPromptOptions.deferredTools` to the names of the registered tools with `deferred` exposure and no namespace, sorted by name. MCP tools have a namespace, so `<mcp_servers>` describes them instead. This is a separate handler from the prompt hook, so it also runs under a user's custom prompt.
+- In `before_agent_start`, it sets `systemPromptOptions.deferredTools` to the names of the registered tools with `deferred` exposure, sorted by name, except the tools Pi counts as MCP tools. `<mcp_servers>` describes MCP servers instead. The check is Pi's `isMcpToolName`, which the local patch exports. A namespace check would miss Pi's MCP resource tools (`list_mcp_resources`, `list_mcp_resource_templates`, `read_mcp_resource`), which have no namespace, and would also leave out namespaced tools from other extensions. This is a separate handler from the prompt hook, so it also runs under a user's custom prompt.
 - In `session_start` and `before_agent_start`, it activates `tool_search` when a deferred tool is registered, as Pi's MCP extension does for MCP tools. Only a `tool_search` that declares `reachesTools` counts. When no such tool is registered and a deferred tool is not active, it warns once per session with `ctx.ui.notify`.
 
 The patched `tools` section lists each deferred tool that is not active in a `<deferred_tools>` block, between the tool list and the closing line. A tool without a snippet is listed by its name alone. The block is present only when `tool_search` is declared and at least one deferred tool is not active:
