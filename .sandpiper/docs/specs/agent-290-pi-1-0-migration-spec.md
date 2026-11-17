@@ -158,9 +158,10 @@ Production extension code needs no other API changes: `tsc` against Pi 1.0.3 rep
 
 ## Follow-up
 
-| Item                                                      | Where    |
-| --------------------------------------------------------- | -------- |
-| Retain only the workspace runtime and local helper builds | TOOLS-30 |
+| Item                                                                                                                                                   | Where     |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
+| Retain only the workspace runtime and local helper builds                                                                                              | TOOLS-30  |
+| Defer rarely used Sandpiper tools and list them for `tool_search` in the `tools` section ([Deferred tools](sandpiper-system-prompt.md#deferred-tools)) | AGENT-330 |
 
 ### Adoption candidates
 
@@ -170,7 +171,6 @@ These were discussed but are not authorized. Each needs Doug's go-ahead before i
 - Remove the synthetic-runs part of the local Pi patch once upstream fixes [#5581](https://github.com/earendil-works/pi/issues/5581). The tests in `extensions/system/prompt-ownership.test.ts` should still pass without it.
 - Declare `outputSchema` and return `structuredContent` from Sandpiper tools that return data.
 - Add tool `annotations` (`readOnlyHint` and related hints) to Sandpiper tools.
-- Register rarely used Sandpiper tools with `exposure: "deferred"` and enable `tool_search`, so their snippets and guidelines leave the `tools` and `rules` sections until the model loads them. `pi-claude-code-cli-provider` delivers mid-run tool additions through `tools/list_changed` since PCCP-304, so a loaded tool is callable in the same run.
 - Register turn-control tools (`done`, `tattler_receive`) with `exposure: "model-only"` if codemode scripts calling them becomes a measured problem: calls from scripts ignore `terminate`.
 
 ### MCP client adoption

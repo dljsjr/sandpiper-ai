@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/system-prompt/` (templates), `packages/core/src/system-prompt.ts`, `packages/core/src/prompt-template.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/skill-loading-tool.ts`, `packages/cli/system_prompt_diagnostic.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
+- **Implementation**: `packages/core/system-prompt/` (templates), `packages/core/src/system-prompt.ts`, `packages/core/src/prompt-template.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/deferred-tools.ts`, `extensions/system/skill-loading-tool.ts`, `packages/cli/system_prompt_diagnostic.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
 - **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (decisions and invariants), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md)
 - **Supersedes**: archived April 2026 parsing-plan notes
 
@@ -17,7 +17,7 @@ Sandpiper owns Pi's base prompt through Pi's custom base prompt. In the system e
 
 Pi renders its own sections after Sandpiper's text: `tools` and `rules` (the tool list and every active tool's guidelines), `cwd`, and extension sections such as `mcp_servers`. Pi re-renders them before every model call and sends only changed sections.
 
-Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` so that a `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble.
+Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` so that a `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble. The patch also adds the `deferredTools` prompt option, which lists the [deferred tools](#deferred-tools) that are not loaded yet inside the `tools` section.
 
 Runs started by extensions, such as an idle `triggerTurn`, emit `before_agent_start` like prompted runs (Pi 1.2.0+), so they carry the Sandpiper prompt too, including a fresh session's first run.
 
@@ -28,6 +28,42 @@ extensions/system/startup-hooks.ts
     -> buildSandpiperSystemPrompt()
       -> render packages/core/system-prompt/*.md
 ```
+
+## Deferred tools
+
+Most tools that Sandpiper's bundled extensions register have `exposure: "deferred"`. Pi does not declare them to the model, and leaves their snippets and guidelines out of the `tools` and `rules` sections, until Pi's `tool_search` tool loads them.
+
+| Tool                                                   | Exposure   | Registered by                                   |
+| ------------------------------------------------------ | ---------- | ----------------------------------------------- |
+| `list_peers`, `send_peer_message`, `tattler_receive`   | `deferred` | `extensions/tattler/`                           |
+| `send_chorus_reply`                                    | `deferred` | `extensions/chorus.ts`                          |
+| `start_background_process`, `check_background_process` | `deferred` | `extensions/system/background-process-tools.ts` |
+| `web_fetch`                                            | `deferred` | `extensions/web-fetch/`                         |
+| `web_search`                                           | `deferred` | `extensions/web-search/`                        |
+| `skill`, `done`                                        | `direct`   | `extensions/system/`                            |
+
+`extensions/system/deferred-tools.ts`, registered by the system extension, does two things:
+
+- In `before_agent_start`, it sets `systemPromptOptions.deferredTools` to the names of the registered tools with `deferred` exposure and no namespace, sorted by name. MCP tools have a namespace, so `<mcp_servers>` describes them instead. This is a separate handler from the prompt hook, so it also runs under a user's custom prompt.
+- In `session_start` and `before_agent_start`, it activates `tool_search` when a deferred tool is registered, as Pi's MCP extension does for MCP tools. Only a `tool_search` that declares `reachesTools` counts. When no such tool is registered and a deferred tool is not active, it warns once per session with `ctx.ui.notify`.
+
+The patched `tools` section lists each deferred tool that is not active in a `<deferred_tools>` block, between the tool list and the closing line. A tool without a snippet is listed by its name alone. The block is present only when `tool_search` is declared and at least one deferred tool is not active:
+
+```text
+<tools>
+- read: Read file contents
+- tool_search: Search for tools that are not loaded yet and load the matches
+
+<deferred_tools>
+  <instructions>These tools are not loaded yet. Load one with `tool_search`, searching for its name. It can be called from your next call.</instructions>
+  - web_fetch: Fetch a web page and return clean markdown content
+</deferred_tools>
+
+Additional tools may be available.
+</tools>
+```
+
+Pi renders the sections again before every model call, against the tools active at that moment. When `tool_search` loads a tool, the next request declares it, adds its snippet to the tool list and its guidelines to `rules`, and drops it from the block. Pi records the loaded tool in the transcript, so it stays active after a resume.
 
 ## Prompt sections
 
@@ -142,11 +178,11 @@ Volatile one-shot startup context is not rendered into the system prompt. Moving
 
 ## Custom prompts
 
-If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports it as `systemPromptOptions.customPrompt` and Sandpiper does not replace it. `buildSandpiperStartupPrompt()` returns `undefined`, and the system extension leaves Pi's prompt handling intact. Because of the local patch, Pi still renders its `tools` and `rules` sections after a user's custom prompt.
+If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports it as `systemPromptOptions.customPrompt` and Sandpiper does not replace it. `buildSandpiperStartupPrompt()` returns `undefined`, and the system extension leaves Pi's prompt handling intact. Because of the local patch, Pi still renders its `tools` and `rules` sections after a user's custom prompt, including the `<deferred_tools>` block.
 
 ## Diagnostics
 
-- `sandpiper-system-prompt` (`packages/cli/system_prompt_diagnostic.ts`) runs one turn against an in-process capture provider and prints the first request's system prompt: the prompt Pi sends, including Pi's sections, with no credentials, network, or provider request. `--json` adds source metadata and [editable spans](#editable-spans).
+- `sandpiper-system-prompt` (`packages/cli/system_prompt_diagnostic.ts`) runs one turn against an in-process capture provider and prints the first request's system prompt: the prompt Pi sends, including Pi's sections, with no credentials, network, or provider request. `--json` adds source metadata and [editable spans](#editable-spans). It loads Pi's `tool_search` as a built-in extension, as Pi's CLI does, so the output shows the `<deferred_tools>` block. It does not load Pi's other built-in extensions (MCP, codemode, and llama.cpp), so `<mcp_servers>` never appears in its output.
 - When the system extension is created with dump mode enabled, or when `SANDPIPER_DUMP_SYSTEM_PROMPT=1`, a `context_with_system` hook prints the same request-time prompt and shuts the session down.
 
 ### Prompt editor
