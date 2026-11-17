@@ -7,7 +7,7 @@
 - **Status**: Audit complete. The update was performed under AGENT-319, with target 1.5.2. The audit itself changed no product code.
 - **Versions compared**: `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui`, and `pi-mcp` at 1.3.0 (current pin), 1.4.0, 1.5.0, 1.5.1, and 1.5.2
 - **Date**: 2026-11-10
-- **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (the last migration record), [Sandpiper system prompt architecture](../docs/specs/sandpiper-system-prompt.md), [Pi 1.0 system prompt sections](../docs/specs/pi-1-0-prompt-sections.md), [Build system reference](../../docs/dev/build-system.md#local-pi-patch)
+- **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (the last migration record), [Sandpiper system prompt architecture](../docs/specs/sandpiper-system-prompt.md), [Pi system prompt sections](../docs/specs/pi-prompt-sections.md), [Build system reference](../../docs/dev/build-system.md#local-pi-patch)
 
 This document tells you what an update from Pi 1.3.0 to 1.5.x involves. A statement is a verified fact unless it is marked **Inference**. Citations of the form `coding-agent 1.5.0: dist/config.js:336` name a file and line in the published npm package of that version.
 
@@ -464,6 +464,8 @@ Not tested: a login, and a real request to the model.
 **An observation about the current installation.** Pi overlays a model catalog from pi.dev on the built-in one, in 1.3.0 as well. `~/.sandpiper/agent/models-store.json` on this machine already holds a pi.dev catalog for `openai-codex` that includes `gpt-6.1-terra`, checked on 2026-11-10, with `lastModified: 0`. **Inference**, from reading `coding-agent 1.3.0: dist/core/remote-catalog-provider.js:50-55` and not from running it: Pi applies a stored catalog only when its `lastModified` is later than the build date of the bundled catalog, so an entry with `lastModified: 0` is ignored. That would explain why the model is stored but not offered on 1.3.0. It also means the catalog overlay cannot be relied on to deliver new models between Pi updates.
 
 ## Overlap candidates
+
+> The current list, checked against the code, is [Pi adoption candidates](../docs/specs/pi-adoption-candidates.md).
 
 Pi features in 1.4.0 to 1.5.2 that touch something Sandpiper implements. These are candidates only. Nothing is removed in this task, and this document recommends no removal.
 

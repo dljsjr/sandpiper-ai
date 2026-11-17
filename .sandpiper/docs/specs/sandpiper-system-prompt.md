@@ -3,7 +3,7 @@
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
 - **Implementation**: `packages/core/system-prompt/` (templates), `packages/core/src/system-prompt.ts`, `packages/core/src/skill-tool-reachability.ts`, `packages/core/src/prompt-template.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/deferred-tools.ts`, `extensions/system/skill-loading-tool.ts`, `packages/cli/system_prompt_diagnostic.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
-- **Related**: [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md), [Local Pi patch](../../../docs/dev/build-system.md#local-pi-patch), [AGENT-290 Pi 1.0 migration spec](../../archive/agent-290-pi-1-0-migration-spec.md) (archived: the original ownership decision and the alternatives considered)
+- **Related**: [Pi system prompt sections](pi-prompt-sections.md), [Pi adoption candidates](pi-adoption-candidates.md), [Local Pi patch](../../../docs/dev/build-system.md#local-pi-patch), [AGENT-290 Pi 1.0 migration spec](../../archive/agent-290-pi-1-0-migration-spec.md) (archived: the original ownership decision and the alternatives considered)
 - **Supersedes**: archived April 2026 parsing-plan notes
 
 ## Current architecture

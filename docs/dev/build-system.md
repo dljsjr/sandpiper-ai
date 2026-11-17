@@ -10,6 +10,8 @@ Use this page to understand the build structure. For commands, see [How to build
 
 `bun run build` removes root `dist/`, then runs one Bun build for both entrypoints. It produces JavaScript bundles and shared chunks. It does not produce a compiled executable.
 
+Bundling is a size choice, not a requirement. Running the source TypeScript directly also worked when the build was simplified, but the prototype tarball grew from about 39.8 MB to 52.9 MB, because complete dependency packages replaced the bundled code.
+
 ## Product layout
 
 | Path                                               | Purpose                                                                          |

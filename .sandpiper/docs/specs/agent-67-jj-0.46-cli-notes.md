@@ -3,6 +3,7 @@
 - **Diátaxis mode**: Reference (research notes for the AGENT-67 jj skill rewrite)
 - **Source**: `jj <cmd> --help` for all 125 commands and subcommands of jj 0.46.0, crawled depth-first from `jj --help` (2026-10-17). `help` subcommands skipped.
 - **Coverage**: every visible command. Hidden commands (for example `jj debug`) do not appear in help and are not covered.
+- **Version**: jj 0.46.0 only. jj 0.47 has been released since and is not covered; check its changelog before relying on a version-specific detail.
 
 ## How to read these notes
 

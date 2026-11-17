@@ -1,6 +1,6 @@
 // RPC-mode (`--mode rpc`) driver for multi-turn/stateful/streaming assertions. See
-// .sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md for the full RPC
-// grounding this driver implements against.
+// devtools/integration/README.md; the RPC grounding this driver was built against is archived in
+// .sandpiper/archive/agent-249-headless-cli-integration-harness-design.md.
 //
 // Framing note (docs/rpc.md): RPC mode uses strict JSONL with LF as the only record
 // delimiter. Node's `readline` is explicitly NOT protocol-compliant here (it also splits on

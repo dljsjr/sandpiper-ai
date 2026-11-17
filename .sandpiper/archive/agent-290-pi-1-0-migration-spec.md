@@ -5,7 +5,7 @@
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented and merged (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30.
 - **Task**: AGENT-290 (subtasks AGENT-293 and AGENT-295 to AGENT-302)
-- **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (archived rationale and evidence), [Pi 1.0 system prompt sections](../docs/specs/pi-1-0-prompt-sections.md) (Pi reference), [work plan](agent-290-pi-1-0-migration-work-plan.md) (archived)
+- **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (archived rationale and evidence), [Pi system prompt sections](../docs/specs/pi-prompt-sections.md) (Pi reference), [work plan](agent-290-pi-1-0-migration-work-plan.md) (archived)
 
 ## Scope
 
@@ -166,6 +166,8 @@ Production extension code needs no other API changes: `tsc` against Pi 1.0.3 rep
 | Defer rarely used Sandpiper tools and list them for `tool_search` in the `tools` section ([Deferred tools](../docs/specs/sandpiper-system-prompt.md#deferred-tools)) | AGENT-330 |
 
 ### Adoption candidates
+
+> The current list, checked against the code, is [Pi adoption candidates](../docs/specs/pi-adoption-candidates.md).
 
 These were discussed but are not authorized. Each needs Doug's go-ahead before it becomes a task:
 

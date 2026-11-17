@@ -1,5 +1,7 @@
 # Build simplification exploration
 
+> Archived 2026-11-17 as the record of the TOOLS-92 exploration behind the TOOLS-30 build simplification. For the current build, read [Build system reference](../../docs/dev/build-system.md).
+
 - Mode: Explanation
 - Task: TOOLS-92, under TOOLS-30
 - Status: Exploration results. No implementation approval.

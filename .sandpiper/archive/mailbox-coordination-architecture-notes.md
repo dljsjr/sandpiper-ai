@@ -1,5 +1,7 @@
 # Agent Conversation Coordination Architecture Review Notes
 
+> Archived 2026-11-17 as the record of the AGENT-201 review, which is complete. Its decisions are input to the Tattler v1 tasks (TAT-6 to TAT-10). For current Tattler guidance, read [Tattler v0 dogfood notes](../docs/specs/tattler-v0-dogfood-notes.md).
+
 - **Diátaxis mode**: Explanation / working design notes
 - **Status**: Complete. The AGENT-201 review is finished.
 - **Task**: AGENT-201

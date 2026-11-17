@@ -1,5 +1,7 @@
 # Pi's MCP client behind the web search tool
 
+> Archived 2026-11-17 as the record of the TOOLS-99 investigation and the TOOLS-100 to TOOLS-102 adoption. For current behaviour, read [the web-search README](../../extensions/web-search/README.md).
+
 Mode: Explanation
 Task: TOOLS-99, related to TOOLS-92 and TOOLS-30
 Status: Research accepted. Native adoption under TOOLS-100–102 is implemented, verified, and independently reviewed. Final implementation acceptance remains separate. Evidence distinguishes the research baseline from integrated verification.

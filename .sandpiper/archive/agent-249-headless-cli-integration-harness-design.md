@@ -1,5 +1,7 @@
 # AGENT-249: Headless CLI Integration-Test Harness — Grounding + Design (AGENT-250)
 
+> Archived 2026-11-17 as the record of the AGENT-249 harness design and its postmortem. For current behaviour, read [the integration test README](../../devtools/integration/README.md).
+
 Status: approved (AGENT-250); implemented (AGENT-251/252) at devtools/integration/. Carries a
 postmortem (§3): the original incident behind this whole design was misdiagnosed as an
 ambient/OS-keychain credential leak, which motivated building a "network-deny guard" (a

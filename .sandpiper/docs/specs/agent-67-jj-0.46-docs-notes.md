@@ -4,7 +4,9 @@
 - **Source**: the docs site at <https://docs.jj-vcs.dev/latest/> (sitemap dated 2026-10-07, the 0.46.0 release), read from its markdown source at tag `v0.46.0` (`docs/` plus `mkdocs.yml`). A `lightpanda fetch --dump markdown` of a rendered page had identical headings. Three pages are macro-generated: `cli-reference` (= `jj util markdown-help`, covered in the CLI notes), `changelog` (read separately), and `git-command-table` (read from `docs/git-command-table.yml`).
 - **Companion**: [agent-67-jj-0.46-cli-notes.md](agent-67-jj-0.46-cli-notes.md) covers every command's flags. These notes avoid repeating it and add concepts, the languages, config, workflows, and gotchas.
 - **Skipped, because they're about the project rather than about using jj**: contributing, code of conduct, style guide, design-docs index and blueprint, releasing, governance (both pages), testimonials, paid contributors.
-- **Tags**: `[AGENT]` matters for agent use. `[SKILL-STALE]` contradicts or updates what the current skill says. `[DESIGN]` comes from a design doc; check whether it's implemented.
+- **Tags**: `[AGENT]` matters for agent use. `[SKILL-STALE]` contradicts or updates what the jj skill said on 2026-10-17. `[DESIGN]` comes from a design doc; check whether it's implemented.
+- **The skill**: "the skill" and "the current skill" mean the jj skill as it stood on 2026-10-17, before the AGENT-67 rewrite. This repository bundled it then and no longer ships skills, so line references such as `SKILL.md:302` point at that version, not at a file here.
+- **Version**: jj 0.46.0 only. jj 0.47 has been released since and is not covered; check its changelog before relying on a version-specific detail.
 
 ## Getting started
 

@@ -3,7 +3,7 @@
 - **Diátaxis mode**: Explanation / proposal
 - **Status**: D and E done under AGENT-301; A, B, and C moved to TOOLS-30 (post-migration build simplification)
 - **Task**: AGENT-301 (subtask of AGENT-290)
-- **Related**: [migration spec](agent-290-pi-1-0-migration-spec.md), [build system reference](../../../docs/dev/build-system.md)
+- **Related**: [migration spec](agent-290-pi-1-0-migration-spec.md), [build system reference](../../docs/dev/build-system.md)
 
 ## Current topology
 

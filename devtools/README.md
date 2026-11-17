@@ -14,4 +14,4 @@ The former production helpers `clean.ts`, `packCli.ts`, and `stageCliResources.t
 
 [`integration/`](./integration/) contains the headless CLI and remote procedure call (RPC) integration tests. They start real `pi` or `sandpiper` processes with mock providers and isolated configuration directories. The jj isolation fixture remains under `test-fixtures/`.
 
-See [`integration/README.md`](./integration/README.md) and the [AGENT-249 harness design](../.sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md).
+See [`integration/README.md`](./integration/README.md).

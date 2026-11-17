@@ -1,5 +1,7 @@
 # Web Fetch Tool — PRD
 
+> Archived 2026-11-17 as the record of the web fetch design. For current behaviour, read [the web-fetch README](../../extensions/web-fetch/README.md).
+
 - **Diátaxis mode**: Reference spec
 - **Status**: ✅ **MVP COMPLETE** (WEB-1 archived) | ✅ `llms.txt` probing complete (WEB-14) | ✅ targeted extraction complete (WEB-15, WEB-16) | ⏸️ **Deferred**: WEB-12, WEB-13
 - **Date**: 2026-03-26
@@ -114,9 +116,9 @@ When a file is found, the tool result ends with an `<additional_content>` block 
 
 Some pages build their content with JavaScript. A call that sets `render`, or names a `renderer`, goes through a `RendererFetchAdapter`, which asks a renderer for the page. The rest of the pipeline is unchanged, except that the site's Markdown version is not followed: the caller asked for the rendered page.
 
-A renderer is code that drives one browser and returns a normalized result: the HTML, and where the browser reports them the final URL, status, headers, and a `blocked` reason. Browsers differ in their options and in how they report failures, so each renderer owns that translation. See [the extension README](../../../extensions/web-fetch/README.md) for the contract.
+A renderer is code that drives one browser and returns a normalized result: the HTML, and where the browser reports them the final URL, status, headers, and a `blocked` reason. Browsers differ in their options and in how they report failures, so each renderer owns that translation. See [the extension README](../../extensions/web-fetch/README.md) for the contract.
 
-`web_fetch` has no renderer of its own. Renderers reach it the way prompt contributions reach the prompt builder ([explanation](../../../docs/dev/prompt-contributions.md)):
+`web_fetch` has no renderer of its own. Renderers reach it the way prompt contributions reach the prompt builder ([explanation](../../docs/dev/prompt-contributions.md)):
 
 1. `session_start`: `web_fetch` listens on the `sandpiper:web-fetch-renderer` event bus channel.
 2. `resources_discover`: an extension emits its renderer on that channel.

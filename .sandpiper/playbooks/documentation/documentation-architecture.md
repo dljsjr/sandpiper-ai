@@ -9,15 +9,15 @@ Use this playbook before reorganizing or writing documentation in this repositor
 
 ## Location Rules
 
-| Location                | Use for                                                                                                                            |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/`                 | Public Sandpiper project docs that follow Diátaxis: tutorials, how-to guides, reference, and explanation                           |
-| `.sandpiper/playbooks/` | Agent-operational repo guidance: conditional workflows and procedures agents should read on demand                                 |
-| `.sandpiper/docs/`      | Active internal Diátaxis docs that are not operational guidance: in-flight specs, PRDs, design notes, current implementation plans |
-| `.sandpiper/archive/`   | Completed, superseded, stale, or removed-feature documents                                                                         |
-| `.sandpiper/notes/`     | Scratch notes and temporary working material                                                                                       |
-| `AGENTS.md`             | Always-loaded repo invariants and routing to local playbooks/docs                                                                  |
-| `README.md`             | Human-facing entrypoint for the repository or package/directory                                                                    |
+| Location                | Use for                                                                                                                                                                                                                                         |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/`                 | Public Sandpiper project docs that follow Diátaxis: tutorials, how-to guides, reference, and explanation                                                                                                                                        |
+| `.sandpiper/playbooks/` | Agent-operational repo guidance: conditional workflows and procedures agents should read on demand                                                                                                                                              |
+| `.sandpiper/docs/`      | Active internal Diátaxis docs that are not operational guidance: in-flight specs, PRDs, design notes, current implementation plans, and lists of ideas that are not authorized tasks yet, each with its current state and what would trigger it |
+| `.sandpiper/archive/`   | Completed, superseded, stale, or removed-feature documents                                                                                                                                                                                      |
+| `.sandpiper/notes/`     | Scratch notes and temporary working material                                                                                                                                                                                                    |
+| `AGENTS.md`             | Always-loaded repo invariants and routing to local playbooks/docs                                                                                                                                                                               |
+| `README.md`             | Human-facing entrypoint for the repository or package/directory                                                                                                                                                                                 |
 
 All content in `docs/` and `.sandpiper/docs/` must have a clear Diátaxis mode. Pick the location by the doc's primary job, then link to secondary readers where useful.
 

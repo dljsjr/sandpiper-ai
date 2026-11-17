@@ -33,7 +33,8 @@ For current Tattler context, read:
 For v1 architecture work, route to the broader design/task surfaces instead of
 stretching v0 guidance:
 
-- `.sandpiper/docs/specs/mailbox-coordination-architecture-notes.md`
+- `.sandpiper/archive/mailbox-coordination-architecture-notes.md`, the completed
+  AGENT-201 review whose decisions TAT-6 reconciles with the spike findings.
 - `TAT-6` for drafting the v1 mini-spec.
 - `TAT-7` for stable identity and directory.
 - `TAT-8` for runtime claims and handshake receipts.

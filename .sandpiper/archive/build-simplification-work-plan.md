@@ -1,5 +1,7 @@
 # Implement the minimal Sandpiper build
 
+> Archived 2026-11-17 as the record of the TOOLS-30 build simplification, completed 2026-11-11. For the current build, read [Build system reference](../../docs/dev/build-system.md).
+
 - Mode: How-to plan
 - Parent: TOOLS-30
 - Exploration: TOOLS-92

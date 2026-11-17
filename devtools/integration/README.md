@@ -1,10 +1,11 @@
 # Headless CLI/RPC Integration Tests
 
 The second validation lane alongside the unit suite (AGENT-249): tests driven through real
-`pi`/`sandpiper` process spawns instead of mocked extension APIs. See
-[`.sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md`](../../.sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md)
-for the full design, grounding, and a postmortem worth reading before touching isolation code
-here (short version below).
+`pi`/`sandpiper` process spawns instead of mocked extension APIs. Read the
+[postmortem](#postmortem-the-incident-and-the-network-deny-guard-that-was-built-then-torn-down)
+below before touching isolation code here. The original design record, with its grounding
+against Pi 0.84.0, is archived at
+[`.sandpiper/archive/agent-249-headless-cli-integration-harness-design.md`](../../.sandpiper/archive/agent-249-headless-cli-integration-harness-design.md).
 
 ## Isolation-by-construction
 
@@ -14,7 +15,7 @@ every spawn:
 
 - A fresh temp agent dir, set under **both** `SANDPIPER_CODING_AGENT_DIR` and
   `PI_CODING_AGENT_DIR`. This is the actual fix for the incident described below — see the
-  design doc for why only one of these two names being set is a real, previously-hit failure
+  postmortem for why only one of these two names being set is a real, previously-hit failure
   mode, not theoretical.
 - `HOME` points at the temporary agent directory, so external user skills cannot load from the real home directory.
 - `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` neutralized and `JJ_CONFIG` pointed at
@@ -50,7 +51,12 @@ unreasonably large scripted conversation.
 - [`rpc-driver.ts`](./rpc-driver.ts) — `--mode rpc` sessions for multi-turn/streaming assertions.
   Splits stdout strictly on `\n` (per `docs/rpc.md`'s own warning that Node's `readline` is not
   protocol-compliant here), buffers `message_update` text deltas by `contentIndex`, and treats
-  `message_end.message` as authoritative — never the buffered deltas alone.
+  `message_end.message` as authoritative — never the buffered deltas alone. Tests assert a
+  tool's behavior on the `tool_execution_end` event, which carries the tool's actual result and
+  error flag, rather than on the assistant's tool-call deltas, which carry only the call.
+
+The mock provider registers with `pi.registerProvider()` and its own `streamSimple`, so the
+provider owns the whole event stream and Pi never builds an HTTP client for it.
 
 ## Postmortem: the incident, and the network-deny guard that was built then torn down
 
@@ -68,8 +74,8 @@ affected** — it has set both agent-dir names unconditionally since it was writ
 Believing the wrong explanation, this design built a "network-deny guard": an extension that
 monkeypatched `fetch`/`https.request`/`http2.connect` inside every spawned process, with tests
 that deliberately misconfigured spawns to prove it fired. That work found and fixed two real
-implementation bugs along the way (documented in the design doc's git/task history for the
-curious) — both real, both moot for the reason below.
+implementation bugs along the way (recorded in the archived design doc and its task history
+for the curious) — both real, both moot for the reason below.
 
 **The guard was torn down entirely, not reframed, once the actual question got asked: what
 situation causes a pinned `--provider` invocation to _not_ use the mock?** Answer: none exists.
@@ -87,9 +93,9 @@ threat model that doesn't describe how pi actually behaves. What replaced it:
   network calls made tests non-hermetic (slow, network-dependent) even when nothing was ever
   going to succeed. That's a determinism fix, not a safety one.
 
-If you're tempted to rebuild interception machinery here, read the design doc's postmortem
-section first — it exists specifically so this doesn't get rebuilt from scratch against a
-threat that isn't real.
+If you're tempted to rebuild interception machinery here, read the archived design doc's
+postmortem section first — it exists specifically so this doesn't get rebuilt from scratch
+against a threat that isn't real.
 
 ## Wave 1 coverage (AGENT-253)
 
@@ -100,12 +106,17 @@ threat that isn't real.
   isolated (a padded bash-tool JSON result) and combinatoric (autotoon transforming
   [`probe-tool.ts`](./probe-tool.ts)'s JSON result — the real cross-extension seam, since
   autotoon has no knowledge of what produced the JSON it's converting), plus a below-threshold
-  case proving the 256-byte `MIN_JSON_BYTES` cutoff is real, not cosmetic.
+  case proving the `MIN_JSON_BYTES` cutoff (256 characters, despite the name) is real, not
+  cosmetic.
 - [`wave1-compaction.integration.test.ts`](./wave1-compaction.integration.test.ts) — the
   AGENT-237(e) payoff hypothesis: manual compaction and steer-message delivery driven headlessly
-  against the mock provider. See the design doc's "AGENT-237(e) payoff, realized" subsection for
-  the full account, including two real findings (`compaction.keepRecentTokens` and a compaction
-  summarization call context-shape difference) surfaced building it.
+  against the mock provider, through Pi's real compaction and turn machinery. Building it found
+  two things. Pi's default `compaction.keepRecentTokens` leaves a short scripted conversation
+  nothing to compact, so the test lowers it through `settingsJson`. The compaction summarization
+  call does not receive the same context shape as a normal turn, so the mock's script cannot
+  reliably serve it a chosen summary. The test therefore asserts structural claims (compaction
+  succeeds with a non-empty summary, a steer-delivered message is in `get_entries` before
+  compaction, a normal turn completes after it), not the summary's content.
 - [`rpc-driver.test.ts`](./rpc-driver.test.ts) — direct unit coverage of `rpc-driver.ts`'s line
   buffering, added because real spawns don't reliably exercise multi-line-per-chunk or
   split-across-chunks stdout delivery (OS/timing-dependent, not something a passing integration
@@ -137,7 +148,8 @@ asserts that every request holds the same single system message.
   and `encodeMockScript()`), indexed by how many assistant messages already exist in context —
   not a call counter, so it's immune to retries. Falls back to
   `SANDPIPER_INTEGRATION_MOCK_REPLY`'s single canned reply when no script is set. Does not
-  reliably index compaction-summarization calls the same way (see the design doc).
+  reliably index compaction-summarization calls the same way: that call does not receive the
+  same context shape as a normal turn.
 - **`entry: 'sandpiper'` runs from source** (`packages/cli/sandpiper_standalone.ts` directly via
   `bun`, no build step). This keeps the development loop fast but does not test built output.
   Historically, AGENT-243 found a bug that appeared only in the compiled standalone binary,
@@ -145,10 +157,14 @@ asserts that every request holds the same single system message.
   Compiled executable delivery is now retired. Test the current JavaScript bundles and packed
   installation through the [build workflows](../../docs/dev/build-workflows.md) and
   [`packedCli.test.ts`](../packedCli.test.ts), rather than adding a compiled-binary lane.
+- **Not covered**: background processes and Tattler between two processes. Both were left out
+  of wave 1. Background-process tests need real waits or a fake-timer design, and Tattler tests
+  need the harness to run and correlate two isolated processes with distinct identities.
 
 ## Placement note
 
 This directory is discovered by the root `bun run test:vitest`'s default `**/*.test.ts` glob like
 everything else in the repo — nothing here is excluded from the default gate. That's a deliberate
-choice (see the design doc's §4), not an oversight: revisit if wave-1+ coverage measurably slows
-the default suite.
+choice, not an oversight: the tests use the in-process mock provider, so they make no network
+calls and wait for no model. They run in the `legacy-root` project of the root
+`vitest.config.ts`. Revisit if wave-1+ coverage measurably slows the default suite.

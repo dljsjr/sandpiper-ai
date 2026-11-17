@@ -1,5 +1,7 @@
 # Retained-surface inventory
 
+> Archived 2026-11-17 as the record of the TOOLS-92 retained-surface review. Every row is decided and its tasks are complete. For the current build, read [Build system reference](../../docs/dev/build-system.md).
+
 - Mode: Reference
 - Task: TOOLS-92, under TOOLS-30
 - Status: Every row has a decision. The `Decision` column names the task that carries out each approved change.
@@ -12,7 +14,7 @@ This inventory records the audited revision after the root-product build and nat
 
 Doug authorized all ten approved tasks on 2026-11-11 and chose GPT-6.1 Sol for the subagents. All are implemented: AGENT-321 to AGENT-323, WEB-22, and TOOLS-109 to TOOLS-114. Parent and independent reviews found no outstanding actionable findings. Markdown formatting and its gate landed last, in separate commits.
 
-Every implementation unit passed a frozen install, a clean check and a full serial test run in an isolated checkout, and Doug rebuilt the live checkout from the result. Doug then made two further decisions on 2026-11-11. TOOLS-126 deleted `packages/cli/standalone_cli_smoke.test.ts`, because the packed CLI test already makes the same assertions; that closed the verification blocker TOOLS-122 as moot. `bunfig.toml` (row K-4) was removed under TOOLS-111 once a probe showed it had no effect with one manifest. Doug signed off all ten tasks as COMPLETE/DONE on 2026-11-11. Trail holds per-task evidence. The continuation entrypoint is [the simplification handoff](../../notes/simplification-handoff.md).
+Every implementation unit passed a frozen install, a clean check and a full serial test run in an isolated checkout, and Doug rebuilt the live checkout from the result. Doug then made two further decisions on 2026-11-11. TOOLS-126 deleted `packages/cli/standalone_cli_smoke.test.ts`, because the packed CLI test already makes the same assertions; that closed the verification blocker TOOLS-122 as moot. `bunfig.toml` (row K-4) was removed under TOOLS-111 once a probe showed it had no effect with one manifest. Doug signed off all ten tasks as COMPLETE/DONE on 2026-11-11. Trail holds per-task evidence. The continuation entrypoint is [the simplification handoff](simplification-handoff.md).
 
 ## How to read the tables
 
@@ -291,7 +293,7 @@ Left to the Tattler project, not decided here: Chorus registers its tool and two
 
 Eight read-only audit runs covered the repository. Six covered the four lanes of the first pass: root toolchain and configuration, `extensions/`, `packages/` with `devtools/`, and documentation. Two of those stopped early and were repeated in full. On 2026-11-10 two more applied the stricter test to `extensions/system`, `packages/core`, `packages/cli`, and to Tattler, Chorus, web-fetch, web-search, and AutoTOON.
 
-On 2026-11-10 the coordinator re-ran the check behind every row in Sections 4 to 7 against the tree after the Shell Relay removal and the Pi 1.5.2 update. That included `tsc`, Knip, the ast-grep scan, and Prettier's check mode. A separate audit covered the Pi 1.3.0 to 1.5.x update; see [Pi update audit](../../archive/pi-1-5-update-audit.md). Nothing was built, packed, or installed for the re-check.
+On 2026-11-10 the coordinator re-ran the check behind every row in Sections 4 to 7 against the tree after the Shell Relay removal and the Pi 1.5.2 update. That included `tsc`, Knip, the ast-grep scan, and Prettier's check mode. A separate audit covered the Pi 1.3.0 to 1.5.x update; see [Pi update audit](pi-1-5-update-audit.md). Nothing was built, packed, or installed for the re-check.
 
 Not examined:
 

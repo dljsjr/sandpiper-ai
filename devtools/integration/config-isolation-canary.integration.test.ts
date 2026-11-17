@@ -1,4 +1,4 @@
-// AGENT-252's load-bearing test. See the design doc's postmortem for the full arc: an earlier
+// AGENT-252's load-bearing test. See the postmortem in README.md for the full arc: an earlier
 // revision of this harness built and then tore down a network-interception layer (a
 // "network-deny guard" patching fetch/https/http2) chasing a threat that turned out not to
 // exist -- pi has no silent-substitution path for an explicit `--provider` pin; an unknown

@@ -1,6 +1,6 @@
 // Print-mode (`-p`) driver for one-shot prompt/stdout assertions. See
-// .sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md and AGENT-248 for
-// the print-mode landmines this driver exists to handle by construction rather than per-test.
+// devtools/integration/README.md and AGENT-248 for the print-mode landmines this driver exists to
+// handle by construction rather than per-test.
 
 import { spawnSync } from 'node:child_process';
 import { type IsolatedSpawnOptions, prepareIsolatedSpawn } from './harness.js';

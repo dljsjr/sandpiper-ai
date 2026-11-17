@@ -23,6 +23,8 @@ Mirrors `web-fetch`'s adapter pattern:
 
 Provider selection lives in `src/adapter-selection.ts`. Parallel runs behind our existing `web_search` tool. It does not register upstream tools or require a separate MCP server configuration.
 
+The adapter uses Pi's standalone MCP client (`@earendil-works/pi-mcp`), not Pi's host-managed MCP servers. A host-managed server would register Parallel's own tools with the model. The standalone client keeps our tool name, schema, provider selection, and result format, and reads no user MCP configuration or credentials.
+
 ## Configuration
 
 ### Brave Search API (recommended)
@@ -49,7 +51,13 @@ The config resolver supports:
 
 No API key or separate MCP server configuration is needed. Our `web_search` tool calls Parallel through Pi's standalone MCP client. Upstream tools do not enter the model's tool catalogue.
 
-Connection setup has a 60-second limit. The tool-call limit defaults to 15 seconds, followed by best-effort session cleanup.
+## Timeouts and limits
+
+- A Brave request has a 10-second limit.
+- A Parallel search has a 60-second limit for connection setup, including the client's initialized notification, and a 15-second limit for the tool call. Each search opens its own client and ends with best-effort session cleanup, which cannot replace a result with a close error.
+- Cancelling the turn does not stop a search that is already running.
+- The Parallel path speaks Streamable HTTP only, not the older HTTP+SSE transport, and has no sign-in: an authentication failure is reported as an error.
+- An MCP tool error result from Parallel is not reported as an error. Its text does not parse as search results, so the tool reports no results.
 
 ## Result format
 

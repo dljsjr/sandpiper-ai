@@ -137,7 +137,7 @@ Upstream issue [#9932](https://github.com/earendil-works/pi/issues/9932) (open) 
 
 ## Where Pi's prompt sections overlap Sandpiper's
 
-[Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) describes how Pi assembles the prompt. Under the hybrid, Sandpiper's whole prompt sits in `preamble`. Setting `customPrompt` suppresses Pi's `tools`, `rules`, and `docs`, but the remaining sections still render after Sandpiper's text:
+[Pi 1.0 system prompt sections](../docs/specs/pi-prompt-sections.md) describes how Pi assembles the prompt. Under the hybrid, Sandpiper's whole prompt sits in `preamble`. Setting `customPrompt` suppresses Pi's `tools`, `rules`, and `docs`, but the remaining sections still render after Sandpiper's text:
 
 | Pi section        | Sandpiper block                | Effect under the hybrid                                                                        |
 | ----------------- | ------------------------------ | ---------------------------------------------------------------------------------------------- |

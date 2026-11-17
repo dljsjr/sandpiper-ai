@@ -28,7 +28,37 @@ Cancelling the turn, for example with Escape, stops a fetch that is still runnin
 | `css_selector`     | `selector`                    | HTML pages. Returns every matching element                                   |
 | `markdown_section` | `heading`, `level` (optional) | The Markdown text. Returns the section under a heading, with its subsections |
 
-A heading matches when its text equals the requested text. When no heading is an exact match, headings that contain the text as a whole phrase match: `0.80.1` finds `## [0.80.1] - 2026-06-23` but not `## [0.80.10]`.
+A heading matches when its text equals the requested text. When no heading is an exact match, headings that contain the text as a whole phrase match: `0.80.1` finds `## [0.80.1] - 2026-06-23` but not `## [0.80.10]`. Matching ignores case, repeated whitespace, and Markdown markup, and every matching section is returned.
+
+## How a page is read
+
+`web_fetch` requests the page with the Fetch API, follows redirects, and gives up after 30 seconds. A status of 400 or more is returned as `HTTP error: <status>`.
+
+The response's media type picks the path. A `text/markdown`, `text/x-markdown`, or `text/plain` response is Markdown text and is returned as it is. Every other response is read as HTML:
+
+1. jsdom parses the HTML. It runs no scripts and loads no remote resources.
+2. A `css_selector` filter keeps the matching elements. Without one, Readability extracts the main content and the title, excerpt, byline, and site name. When Readability finds no content, the whole page is converted.
+3. Turndown converts the HTML to Markdown.
+
+A `markdown_section` filter works on the Markdown text from either path. It finds the headings at the top level of the document and cuts each matching section out of the source text, so the section keeps its original formatting. A `css_selector` filter on a Markdown or plain-text response returns an error.
+
+### The site's own Markdown version
+
+A page that a site wrote in Markdown is better than a conversion of its HTML. `web_fetch` gets that version in two ways:
+
+1. The request lists `text/markdown` first in its `Accept` header. A server that honors it answers with Markdown.
+2. When the answer is HTML and the page advertises `rel="alternate" type="text/markdown"`, in its `Link` header or a `<link>` element, `web_fetch` fetches that URL. It uses the answer only when the URL is on the page's own origin and the answer has a Markdown media type. The title and the other metadata still come from the HTML page.
+
+`web_fetch` does not guess `.md` URLs. A call with a `css_selector` filter or with rendering asks for HTML and ignores the Markdown version.
+
+### `llms.txt` discovery
+
+An `llms.txt` file is a site's index of its pages for language models ([llmstxt.org](https://llmstxt.org/)). It covers the pages under its directory, and the most specific file wins.
+
+- **Declared**: a page can name its file with `rel="describedby"`, in its `Link` header or a `<link>` element, with a target whose path ends in `/llms.txt`. A declared file is taken as found without a request.
+- **Probed**: otherwise `web_fetch` sends a `HEAD` request to the `llms.txt` location of each directory above the page, all at once, and uses the most specific answer that is a 2xx with a Markdown media type. `text/plain` counts. An HTML answer does not, because some servers answer every path with a page. A deep page probes only the root and the first three directory levels of its path. Each probe waits up to 3 seconds.
+
+Discovery starts together with the page request. Each location is probed once per process, and a failure or timeout is kept as the answer. The file's content is not read. When a file is found, the result ends with an `<additional_content>` block that holds instructions for the model and the file's URL. The block is left out when the fetched page is the file itself.
 
 ## Rendering pages that need JavaScript
 
@@ -131,3 +161,13 @@ The pipeline is framework-independent; only `src/index.ts` imports Pi.
 - `src/lightpanda-renderer.ts` and `src/obscura-renderer.ts` are the bundled renderers. `src/renderer-extensions.ts` wraps each one in an extension that registers it.
 - `src/pipeline.ts` turns a fetched page into Markdown and applies filters.
 - `src/llms-txt.ts` and `src/link-relations.ts` find a site's `llms.txt` and a page's Markdown version.
+
+Renderers reach `web_fetch` the way prompt contributions reach the prompt builder ([explanation](../../docs/dev/prompt-contributions.md)). From `session_start`, `web_fetch` listens on the `sandpiper:web-fetch-renderer` event bus channel. Extensions emit their renderers during `resources_discover`. On the first `before_agent_start`, `web_fetch` stops listening and, when a renderer is registered, registers its tool again with the matching parameters. A registration carries the `render` function that `web_fetch` calls. The event bus carries only the registration, because it is synchronous, returns nothing, and drops messages that have no listener.
+
+The tool is registered twice on purpose. Registering at load puts its prompt entry in place for the first run. Registering again on the first run changes only the parameter schema, before any request is sent. `devtools/integration/web-fetch-render.integration.test.ts` checks in a real session that the first request declares the final tool and that no later request carries a prompt or tool change.
+
+Some design choices:
+
+- Rendering is explicit, not an automatic fallback. A page of loading placeholders looks like valid content, and sites that a normal fetch can read can refuse automated browsers.
+- Renderers run commands from an argument list, never through a shell, and receive only a normalized `http` or `https` URL. The Lightpanda Node package was rejected because it builds a shell command from the URL.
+- HTML becomes Markdown rather than a syntax tree: a tree encoded for the model carries per-node overhead and is several times larger than the Markdown for the same page.

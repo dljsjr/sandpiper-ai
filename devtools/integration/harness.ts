@@ -4,12 +4,12 @@
 // VCS config neutralization, mock-provider pinning) is guaranteed by construction, not by
 // per-test discipline.
 //
-// See .sandpiper/docs/specs/agent-249-headless-cli-integration-harness-design.md for the full
-// design rationale and the postmortem on why an earlier, more elaborate network-interception
-// layer was built, then torn down: agent-dir isolation (below) was always the actual fix for
-// the incident that motivated it, and pi has no silent-substitution path for an explicit
-// `--provider` pin to fall through from -- an unknown provider or unresolvable model is a hard
-// error, not a fallback. The scar tissue is documented so it doesn't get rebuilt from scratch.
+// See devtools/integration/README.md for the isolation rules and the postmortem on why an
+// earlier, more elaborate network-interception layer was built, then torn down. The full design
+// record is .sandpiper/archive/agent-249-headless-cli-integration-harness-design.md. In short:
+// agent-dir isolation (below) was always the actual fix for the incident that motivated it, and
+// pi has no silent-substitution path for an explicit `--provider` pin to fall through from -- an
+// unknown provider or unresolvable model is a hard error, not a fallback. The scar tissue is documented so it doesn't get rebuilt from scratch.
 
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -146,7 +146,7 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     // pinned-but-unused provider like amazon-bedrock triggered repeated
     // https://pi.dev/api/models/providers/... catalog fetches at startup, independent of
     // whether a turn was ever attempted; with it, those fetches don't happen. This is not a
-    // security boundary (see the design doc's postmortem for why this harness doesn't need
+    // security boundary (see the postmortem in README.md for why this harness doesn't need
     // one) -- it's a determinism/hermeticity measure, so isolated tests don't depend on
     // reaching a real network endpoint just to start up.
     '--offline',
