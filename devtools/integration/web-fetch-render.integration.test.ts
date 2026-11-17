@@ -1,7 +1,8 @@
 // WEB-10: renderers that an extension registers on the event bus reach web_fetch in a real
 // session. web_fetch registers at load and again on the first run, once renderers are known.
-// This proves the model sees the final tool from its first request, and that nothing about the
-// prompt or the tool declarations changes afterwards.
+// web_fetch is deferred (AGENT-330): the first request lists it for tool_search, and the model
+// loads it before calling it. This proves the model gets the final tool when it loads it, and
+// that nothing about the prompt or the tool declarations changes afterwards.
 
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -47,6 +48,7 @@ describe('web_fetch renderers in a real session (WEB-10)', () => {
         env: {
           [MOCK_RECORD_ENV_VAR]: recordPath,
           [MOCK_SCRIPT_ENV_VAR]: encodeMockScript([
+            { type: 'toolCall', toolName: 'tool_search', arguments: { query: 'web_fetch' } },
             { type: 'toolCall', toolName: 'web_fetch', arguments: { url: PAGE_URL, renderer: 'fixture-b' } },
             { type: 'text', text: 'first turn done' },
             { type: 'text', text: 'second turn done' },
@@ -76,21 +78,29 @@ describe('web_fetch renderers in a real session (WEB-10)', () => {
           .trim()
           .split('\n')
           .map((line) => JSON.parse(line) as RecordedRequest);
-        expect(requests).toHaveLength(3);
+        expect(requests).toHaveLength(4);
 
         const [initial] = systemMessages(requests[0]);
-        const webFetch = initial?.toolsAdded?.find((tool) => tool.name === 'web_fetch');
+        expect(initial?.toolsAdded?.map((tool) => tool.name)).not.toContain('web_fetch');
+        expect(initial?.sections?.tools).toContain('<deferred_tools>');
+        expect(initial?.sections?.tools).toContain('  - web_fetch: ');
+
+        const afterLoad = systemMessages(requests[1]);
+        expect(afterLoad).toHaveLength(2);
+        expect(afterLoad[0]).toEqual(initial);
+        const webFetch = afterLoad[1]?.toolsAdded?.find((tool) => tool.name === 'web_fetch');
         // Several renderers: one choice that is off by default, and no separate switch.
         expect(webFetch?.parameters.properties).not.toHaveProperty('render');
         expect(webFetch?.parameters.properties.renderer?.enum?.[0]).toBe('none');
         expect(webFetch?.parameters.properties.renderer?.enum).toEqual(
           expect.arrayContaining([...RENDERER_FIXTURE_IDS]),
         );
-        expect(initial?.sections?.tools).toContain('web_fetch');
+        expect(afterLoad[1]?.sections?.tools).toContain('\n- web_fetch: ');
+        expect(afterLoad[1]?.sections?.tools).not.toContain('  - web_fetch: ');
 
-        // A change to the prompt or the tools after the first request would add a system message.
-        for (const request of requests) {
-          expect(systemMessages(request)).toEqual([initial]);
+        // A change to the prompt or the tools after loading would add a system message.
+        for (const request of requests.slice(2)) {
+          expect(systemMessages(request)).toEqual(afterLoad);
         }
       } finally {
         await session.close();

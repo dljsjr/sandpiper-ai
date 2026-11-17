@@ -62,6 +62,7 @@ function registerListPeersTool(tattlerRuntimeDir: string, ownIdentity: TattlerId
   pi.registerTool({
     name: 'list_peers',
     label: 'List Peers',
+    exposure: 'deferred',
     promptSnippet:
       'Lists routing information for other Tattler participants with active endpoints for Tattler messages',
     promptGuidelines: [TATTLER_ROUTING_PROMPT_GUIDELINE],
@@ -111,6 +112,7 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
   pi.registerTool({
     name: 'send_peer_message',
     label: 'Send Peer Message',
+    exposure: 'deferred',
     description: 'Send a message to a live/active peer',
     promptSnippet:
       'Send a message to another Tattler participant. Use `addressType` to control how the `id` property should be interpreted',

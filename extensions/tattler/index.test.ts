@@ -53,6 +53,24 @@ function setUpIsolatedRuntimeDir(namespace: string): void {
   process.env.TATTLER_RUNTIME_NAMESPACE = namespace;
 }
 
+describe('Tattler tools', () => {
+  it('registers its tools as deferred, so tool_search loads them', async () => {
+    setUpIsolatedRuntimeDir('tt-deferred');
+    const { pi, handlers } = fakePi();
+    await tattlerExtension(pi);
+
+    await handlers.get('session_start')?.({ type: 'session_start', reason: 'startup' }, fakeContext('sess-d', []));
+
+    const registered = vi.mocked(pi.registerTool).mock.calls.map(([tool]) => [tool.name, tool.exposure]);
+    expect(registered).toEqual([
+      ['tattler_receive', 'deferred'],
+      ['list_peers', 'deferred'],
+      ['send_peer_message', 'deferred'],
+    ]);
+    await handlers.get('session_shutdown')?.({ type: 'session_shutdown', reason: 'quit' }, fakeContext('sess-d', []));
+  });
+});
+
 describe('Tattler session lifecycle', () => {
   it('survives /reload: shutdown then session_start again for the same session without throwing', async () => {
     setUpIsolatedRuntimeDir('tt-reload');

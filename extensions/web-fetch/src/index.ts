@@ -92,6 +92,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebFetchExten
     pi.registerTool({
       name: 'web_fetch',
       label: 'Web Fetch',
+      exposure: 'deferred',
       description:
         'Fetch a web page and return its content as clean markdown. ' +
         'Use this to read documentation, READMEs, API references, blog posts, ' +

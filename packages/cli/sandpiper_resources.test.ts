@@ -43,12 +43,14 @@ function createExtensionCapture(): {
   readonly flags: string[];
   readonly renderers: string[];
   readonly tools: string[];
+  readonly exposures: Map<string, string | undefined>;
 } {
   const commands: string[] = [];
   const events: string[] = [];
   const flags: string[] = [];
   const renderers: string[] = [];
   const tools: string[] = [];
+  const exposures = new Map<string, string | undefined>();
 
   return {
     pi: {
@@ -72,8 +74,9 @@ function createExtensionCapture(): {
       registerMessageRenderer: ((customType: string) => {
         renderers.push(customType);
       }) as ExtensionAPI['registerMessageRenderer'],
-      registerTool: ((tool: { readonly name: string }) => {
+      registerTool: ((tool: { readonly name: string; readonly exposure?: string }) => {
         tools.push(tool.name);
+        exposures.set(tool.name, tool.exposure);
       }) as ExtensionAPI['registerTool'],
     },
     commands,
@@ -81,6 +84,7 @@ function createExtensionCapture(): {
     flags,
     renderers,
     tools,
+    exposures,
   };
 }
 
@@ -122,6 +126,25 @@ describe('Sandpiper resource adapter', () => {
     expect(tools).toContain('send_chorus_reply');
     expect(commands).toContain('chorus');
     expect(flags).not.toContain('identity');
+  });
+
+  it('defers the rarely used tools and keeps skill and done loaded', () => {
+    const { exposures } = applyFactories(createNeutralCapabilityExtensionFactories());
+
+    for (const name of [
+      'start_background_process',
+      'check_background_process',
+      'web_fetch',
+      'web_search',
+      'tattler_receive',
+      'send_chorus_reply',
+    ]) {
+      expect(exposures.get(name), name).toBe('deferred');
+    }
+    expect(exposures.has('skill')).toBe(true);
+    expect(exposures.get('skill')).toBeUndefined();
+    expect(exposures.has('done')).toBe(true);
+    expect(exposures.get('done')).toBeUndefined();
   });
 
   it('adds the opt-in system prompt diagnostic command to the identity extension', () => {

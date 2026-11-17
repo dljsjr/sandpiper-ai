@@ -14,6 +14,7 @@ import {
   createAgentSessionFromServices,
   createAgentSessionRuntime,
   createAgentSessionServices,
+  createToolSearchExtension,
   type ExtensionFactory,
   getAgentDir,
   hasTrustRequiringProjectResources,
@@ -175,6 +176,9 @@ export async function renderSystemPrompt(
   let identitySource: string | undefined;
   let sessionResources: ResourceLoader | undefined;
   const extensionFactories = [
+    // Pi's CLI loads tool_search as a built-in extension in this shape, so the prompt lists deferred
+    // tools as it does there. The other built-ins (MCP, codemode, llama.cpp) are not loaded.
+    { name: 'tool-search', factory: createToolSearchExtension(), replaceable: true, builtin: true },
     ...createSandpiperExtensionFactories({
       systemPromptDiagnostic: {
         commandName: DIAGNOSTIC_COMMAND,

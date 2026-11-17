@@ -24,6 +24,7 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
   pi.registerTool({
     name: 'start_background_process',
     label: 'Start Background Process',
+    exposure: 'deferred',
     description:
       'Start a long-running background process. Returns immediately with a process ID. ' +
       'The process runs independently, and you will be notified automatically when it exits — no need to poll. ' +
@@ -97,6 +98,7 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
   pi.registerTool({
     name: 'check_background_process',
     label: 'Check Background Process',
+    exposure: 'deferred',
     description:
       'Check the status of a background process. By default returns only status and exit code (no output, low context cost). ' +
       'Set include_stdout/include_stderr to true to retrieve buffered output. Use tail_lines to limit output volume.',

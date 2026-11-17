@@ -1,8 +1,8 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { getCurrentTools } from '@earendil-works/pi-ai';
-import { createToolSearchExtension, type ExtensionFactory } from '@earendil-works/pi-coding-agent';
+import { createToolSearchExtension, type ExtensionFactory, SessionManager } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Pi does not export the prompt builder; this is the installed module that Sandpiper's local patch changes.
@@ -10,6 +10,8 @@ import {
   type BuildSystemPromptOptions,
   buildSystemPromptSections,
 } from '../../node_modules/@earendil-works/pi-coding-agent/dist/core/system-prompt.js';
+import webFetchExtension from '../web-fetch/src/index.js';
+import { createRendererExtension } from '../web-fetch/src/renderer-extensions.js';
 import { registerDeferredToolHooks } from './deferred-tools.js';
 import {
   createPromptRecordingSession,
@@ -158,6 +160,12 @@ function declaredTools(request: RecordedRequest | undefined): string[] {
   return getCurrentTools(request?.messages ?? []).map((tool) => tool.name);
 }
 
+// One renderer, so web_fetch registers again on the first run with a `render` switch.
+const fixtureRendererExtension = createRendererExtension(() => ({
+  id: 'fixture',
+  render: async () => ({ html: '<html><body>fixture</body></html>' }),
+}));
+
 describe('loading a deferred tool in a session', () => {
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), 'sandpiper-deferred-tools-'));
@@ -193,6 +201,38 @@ describe('loading a deferred tool in a session', () => {
     expect(section(second, 'tools')).toContain('\n- deferred_probe: Report the probe state\n');
     expect(section(second, 'deferred_tools')).not.toContain('deferred_probe');
     expect(section(second, 'deferred_tools')).toContain('  - idle_helper: Wait for nothing');
+  });
+
+  it('keeps web_fetch loaded after resuming, when it registers again on the first run', async () => {
+    const sessionDir = join(root, 'sessions');
+    const extensions = [...sandpiperExtensions, webFetchExtension, fixtureRendererExtension];
+    const first = await startSession({
+      extensions,
+      sessionManager: SessionManager.create(join(root, 'project'), sessionDir),
+      responses: [{ toolCall: 'tool_search', arguments: { query: 'web_fetch' } }, 'text'],
+    });
+    await first.prompt('hello');
+    expect(declaredTools(first.requests[1])).toContain('web_fetch');
+    first.dispose();
+    open = [];
+    const [sessionFile] = readdirSync(sessionDir);
+
+    const resumed = await startSession({
+      extensions,
+      sessionManager: SessionManager.open(join(sessionDir, sessionFile ?? ''), sessionDir),
+    });
+    expect(resumed.extensionApi.getActiveTools()).toContain('web_fetch');
+    // Registered at load without the renderer's switch, so far.
+    expect(resumed.session.getToolDefinition('web_fetch')?.parameters).not.toHaveProperty('properties.render');
+
+    await resumed.prompt('after resume');
+
+    const [request] = resumed.requests;
+    expect(resumed.session.getToolDefinition('web_fetch')?.parameters).toHaveProperty('properties.render');
+    expect(resumed.extensionApi.getActiveTools()).toContain('web_fetch');
+    expect(declaredTools(request)).toContain('web_fetch');
+    expect(section(request, 'tools')).toContain('\n- web_fetch: ');
+    expect(section(request, 'deferred_tools')).not.toContain('web_fetch');
   });
 
   it('lists deferred tools under a user custom prompt', async () => {

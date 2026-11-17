@@ -347,6 +347,7 @@ function registerChorusReplyTool(pi: ExtensionAPI): void {
   pi.registerTool<typeof SendChorusReplyParameters, ChorusReplyToolDetails>({
     name: 'send_chorus_reply',
     label: 'Send Chorus Reply',
+    exposure: 'deferred',
     description: 'Reply to a Chorus room message through the broker route embedded in that message',
     promptSnippet:
       'Send a reply to a Chorus room via the provided broker route. Use this instead of a plain Tattler DM for Chorus replies.',

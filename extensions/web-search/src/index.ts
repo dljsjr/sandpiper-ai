@@ -36,6 +36,7 @@ export default async function init(pi: ExtensionAPI, dependencies: WebSearchExte
   pi.registerTool({
     name: TOOL_NAME,
     label: TOOL_LABEL,
+    exposure: 'deferred',
     description: TOOL_DESCRIPTION,
     promptSnippet: TOOL_PROMPT_SNIPPET,
     promptGuidelines: TOOL_PROMPT_GUIDELINES,

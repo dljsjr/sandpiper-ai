@@ -22,6 +22,7 @@ export function registerTattlerReceiveTool(
   pi.registerTool({
     name: 'tattler_receive',
     label: 'Receive Tattler Messages',
+    exposure: 'deferred',
     description: 'Yield the current turn so pending Tattler/Chorus messages can be delivered as a batch.',
     promptSnippet: 'Cooperatively receive pending Tattler/Chorus messages when they may affect current work.',
     promptGuidelines: [
