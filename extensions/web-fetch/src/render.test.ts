@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   findExecutable,
+  NO_TIME_LIMIT,
   RendererCollector,
   RendererFetchAdapter,
   type RenderResult,
@@ -50,7 +51,7 @@ describe('runCommand', () => {
     const echo = script('echo-args', 'printf "%s|%s" "$#" "$2"');
 
     const result = await runCommand(echo, ['--flag', `https://example.com/?a=1&b=$(touch ${marker});\`id\``], {
-      timeoutMs: 5_000,
+      timeoutMs: NO_TIME_LIMIT,
     });
 
     expect(result).toEqual({
@@ -64,7 +65,7 @@ describe('runCommand', () => {
   it('returns the output and exit code of a command that fails, so the caller can read its report', async () => {
     const failing = script('failing', 'printf "partial"; echo "cause" >&2; exit 3');
 
-    expect(await runCommand(failing, [], { timeoutMs: 5_000 })).toEqual({
+    expect(await runCommand(failing, [], { timeoutMs: NO_TIME_LIMIT })).toEqual({
       stdout: 'partial',
       stderr: 'cause\n',
       exitCode: 3,
@@ -93,8 +94,25 @@ describe('runCommand', () => {
   });
 
   it('reports a command that cannot start', async () => {
-    await expect(runCommand(join(dir, 'missing'), [], { timeoutMs: 5_000 })).rejects.toThrow('could not start');
+    await expect(runCommand(join(dir, 'missing'), [], { timeoutMs: NO_TIME_LIMIT })).rejects.toThrow('could not start');
   });
+
+  // A missing command shows whether runCommand tried to start it: only an accepted limit reaches "could not start".
+  it.each([1, 30_000, 2 ** 31 - 1])('accepts a time limit of %d ms', async (timeoutMs) => {
+    await expect(runCommand(join(dir, 'missing'), [], { timeoutMs })).rejects.toThrow('could not start');
+  });
+
+  it.each([Number.POSITIVE_INFINITY, Number.NaN, -1, 1.5, 2 ** 31])(
+    'refuses a time limit of %d ms before starting the command',
+    async (timeoutMs) => {
+      const result = runCommand(join(dir, 'missing'), [], { timeoutMs });
+
+      await expect(result).rejects.toThrow(
+        `timeoutMs must be NO_TIME_LIMIT (0) or a whole number of milliseconds from 1 to 2147483647, not ${timeoutMs}`,
+      );
+      await expect(result).rejects.toBeInstanceOf(RangeError);
+    },
+  );
 });
 
 describe('RendererCollector', () => {
@@ -141,22 +159,30 @@ describe('RendererCollector', () => {
 
 describe('RendererFetchAdapter', () => {
   it('gives the renderer a normalized URL, a time limit and a command runner', async () => {
-    const echo = script('echo-args', 'printf "<html><body>%s</body></html>" "$1"');
+    const run = vi.fn<typeof runCommand>(async (_executable, args) => ({
+      stdout: `<html><body>${args[0]}</body></html>`,
+      stderr: '',
+      exitCode: 0,
+    }));
     const spy = vi.fn();
     const adapter = new RendererFetchAdapter(
       {
         id: 'echo',
         render: async (request, tools) => {
           spy(request);
-          return { html: (await tools.run(echo, [request.url])).stdout };
+          return { html: (await tools.run('echo-browser', [request.url])).stdout };
         },
       },
-      { timeoutMs: 4_000 },
+      { timeoutMs: 4_000, run },
     );
+    const { signal } = new AbortController();
 
-    const result = await adapter.fetch('HTTPS://Example.com/a b?q=1&r=2');
+    const result = await adapter.fetch('HTTPS://Example.com/a b?q=1&r=2', { signal });
 
     expect(spy).toHaveBeenCalledWith({ url: 'https://example.com/a%20b?q=1&r=2', timeoutMs: 4_000 });
+    expect(run.mock.calls).toEqual([
+      ['echo-browser', ['https://example.com/a%20b?q=1&r=2'], { timeoutMs: 4_000, signal }],
+    ]);
     expect(result).toEqual({
       url: 'https://example.com/a%20b?q=1&r=2',
       statusCode: 200,
@@ -166,17 +192,36 @@ describe('RendererFetchAdapter', () => {
   });
 
   it('stops the commands the renderer runs when the caller aborts', async () => {
-    const slow = script('slow', 'exec sleep 10');
+    // Like runCommand, the fake runs until the signal aborts it, then rejects with the abort reason.
+    const run = vi.fn<typeof runCommand>(
+      (_executable, _args, { signal }) =>
+        new Promise((_resolve, reject) => {
+          if (signal?.aborted) return reject(signal.reason);
+          signal?.addEventListener('abort', () => reject(signal.reason), { once: true });
+        }),
+    );
     const adapter = new RendererFetchAdapter(
-      { id: 'slow', render: async (_request, tools) => ({ html: (await tools.run(slow, [])).stdout }) },
-      { timeoutMs: 5_000 },
+      { id: 'slow', render: async (_request, tools) => ({ html: (await tools.run('slow-browser', [])).stdout }) },
+      { timeoutMs: 5_000, run },
     );
     const controller = new AbortController();
-    const started = Date.now();
-    setTimeout(() => controller.abort(), 50);
 
-    await expect(adapter.fetch('https://example.com/', { signal: controller.signal })).rejects.toThrow(/abort/i);
-    expect(Date.now() - started).toBeLessThan(5_000);
+    const result = adapter.fetch('https://example.com/', { signal: controller.signal });
+    controller.abort();
+
+    await expect(result).rejects.toThrow(/abort/i);
+    expect(run.mock.calls).toEqual([['slow-browser', [], { timeoutMs: 5_000, signal: controller.signal }]]);
+  });
+
+  it('runs the renderer commands with runCommand when no runner is given', async () => {
+    const adapter = new RendererFetchAdapter({
+      id: 'missing',
+      render: async (_request, tools) => ({ html: (await tools.run(join(dir, 'missing'), [])).stdout }),
+    });
+
+    await expect(adapter.fetch('https://example.com/')).rejects.toThrow(
+      'Rendering with missing failed: could not start',
+    );
   });
 
   it('uses the final URL, status, media type and Link header the renderer reports', async () => {

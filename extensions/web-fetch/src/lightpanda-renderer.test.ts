@@ -1,22 +1,28 @@
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createLightpandaRenderer } from './lightpanda-renderer.js';
-import { type RenderTools, runCommand } from './render.js';
+import type { CommandResult, RenderTools } from './render.js';
 
 let dir: string;
-const tools: RenderTools = { run: (executable, args) => runCommand(executable, args, { timeoutMs: 5_000 }) };
 
-/** A stand-in browser that prints a fixed report, and its arguments when asked. */
-function fakeLightpanda(report: unknown, exitCode = 0): void {
+/** Put a `lightpanda` file on PATH, so the renderer counts as installed. The tests never start it. */
+function installLightpanda(): string {
   const path = join(dir, 'lightpanda');
-  const json = JSON.stringify(report).replaceAll("'", "'\\''");
-  writeFileSync(
-    path,
-    `#!/bin/sh\nprintf '%s' "$*" > "${join(dir, 'args')}"\nprintf '%s' '${json}'\nexit ${exitCode}\n`,
-  );
+  writeFileSync(path, '#!/bin/sh\nexit 1\n');
   chmodSync(path, 0o755);
+  return path;
+}
+
+/** Tools whose `run` records each command and answers it with the given output. */
+function answering(output: Partial<CommandResult>) {
+  return { run: vi.fn<RenderTools['run']>(async () => ({ stdout: '', stderr: '', exitCode: 0, ...output })) };
+}
+
+/** Tools whose `run` answers with a Lightpanda report, as `lightpanda fetch --json` prints it. */
+function reporting(report: unknown, exitCode = 0) {
+  return answering({ stdout: JSON.stringify(report), exitCode });
 }
 
 beforeEach(() => {
@@ -33,7 +39,8 @@ describe('createLightpandaRenderer', () => {
   });
 
   it('returns the rendered page with its final URL, status and headers', async () => {
-    fakeLightpanda({
+    installLightpanda();
+    const tools = reporting({
       url: 'https://example.com/final',
       http_status: 200,
       headers: [
@@ -58,17 +65,35 @@ describe('createLightpandaRenderer', () => {
   });
 
   it('waits for the network to settle, blocks private networks and stops inside the time limit', async () => {
-    fakeLightpanda({ url: 'https://example.com/', http_status: 200, headers: [], content: '<html></html>' });
+    const executable = installLightpanda();
+    const tools = reporting({ url: 'https://example.com/', http_status: 200, headers: [], content: '<html></html>' });
 
     await createLightpandaRenderer({ PATH: dir })?.render({ url: 'https://example.com/', timeoutMs: 12_000 }, tools);
 
-    expect(readFileSync(join(dir, 'args'), 'utf8')).toBe(
-      'fetch --dump html --json --wait-until networkidle --wait-ms 7000 --terminate-ms 7000 --block-private-networks https://example.com/',
-    );
+    expect(tools.run.mock.calls).toEqual([
+      [
+        executable,
+        [
+          'fetch',
+          '--dump',
+          'html',
+          '--json',
+          '--wait-until',
+          'networkidle',
+          '--wait-ms',
+          '7000',
+          '--terminate-ms',
+          '7000',
+          '--block-private-networks',
+          'https://example.com/',
+        ],
+      ],
+    ]);
   });
 
   it('reports a bot challenge as blocked', async () => {
-    fakeLightpanda(
+    installLightpanda();
+    const tools = reporting(
       {
         url: 'https://example.com/',
         http_status: 403,
@@ -86,7 +111,8 @@ describe('createLightpandaRenderer', () => {
   });
 
   it('fails with the error Lightpanda names', async () => {
-    fakeLightpanda(
+    installLightpanda();
+    const tools = reporting(
       { url: 'https://nonexistent.invalid/', http_status: 0, headers: [], content: '', error: 'CouldntResolveHost' },
       1,
     );
@@ -100,12 +126,20 @@ describe('createLightpandaRenderer', () => {
   });
 
   it('fails with the exit code when the output is not a report', async () => {
-    const path = join(dir, 'lightpanda');
-    writeFileSync(path, '#!/bin/sh\necho "unknown option --json" >&2\nexit 2\n');
-    chmodSync(path, 0o755);
+    installLightpanda();
+    const tools = answering({ stderr: 'unknown option --json\n', exitCode: 2 });
 
     await expect(
       createLightpandaRenderer({ PATH: dir })?.render({ url: 'https://example.com/', timeoutMs: 30_000 }, tools),
     ).rejects.toThrow('lightpanda exited with 2: unknown option --json');
+  });
+
+  it('fails when Lightpanda cannot start', async () => {
+    const executable = installLightpanda();
+    const tools = { run: vi.fn<RenderTools['run']>().mockRejectedValue(new Error(`could not start ${executable}`)) };
+
+    await expect(
+      createLightpandaRenderer({ PATH: dir })?.render({ url: 'https://example.com/', timeoutMs: 30_000 }, tools),
+    ).rejects.toThrow(`could not start ${executable}`);
   });
 });

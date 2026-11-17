@@ -20,6 +20,11 @@ export const NO_RENDERER = 'none';
 const DEFAULT_TIMEOUT_MS = 30_000;
 const MAX_OUTPUT_BYTES = 20 * 1024 * 1024;
 
+/** The `timeoutMs` that lets {@link runCommand} run a command with no time limit. */
+export const NO_TIME_LIMIT = 0;
+// The longest delay a Node or Bun timer holds. A longer one overflows, and the command is stopped after 1 ms.
+const MAX_TIME_LIMIT_MS = 2 ** 31 - 1;
+
 export interface RenderRequest {
   /** Normalized `http` or `https` URL. */
   readonly url: string;
@@ -85,11 +90,33 @@ export function findExecutable(name: string, pathVariable: string | undefined): 
   return candidates.find(isExecutableFile);
 }
 
+function isTimeLimit(timeoutMs: number): boolean {
+  return (
+    timeoutMs === NO_TIME_LIMIT || (Number.isInteger(timeoutMs) && timeoutMs >= 1 && timeoutMs <= MAX_TIME_LIMIT_MS)
+  );
+}
+
+/**
+ * Run a command directly from its argument list, with no shell, and collect its output. A non-zero
+ * exit resolves with its code. A command that cannot start, runs past the time limit, or is aborted
+ * through `signal` rejects.
+ *
+ * `timeoutMs` is a whole number of milliseconds from 1 to 2**31-1, or {@link NO_TIME_LIMIT} for no
+ * limit (execFile reads a timeout of 0 as none). Any other value rejects before the command starts.
+ */
 export function runCommand(
   executable: string,
   args: readonly string[],
   options: { readonly timeoutMs: number; readonly signal?: AbortSignal },
 ): Promise<CommandResult> {
+  if (!isTimeLimit(options.timeoutMs)) {
+    return Promise.reject(
+      new RangeError(
+        `timeoutMs must be NO_TIME_LIMIT (0) or a whole number of milliseconds from 1 to ${MAX_TIME_LIMIT_MS}, not ${options.timeoutMs}`,
+      ),
+    );
+  }
+
   return new Promise((resolveResult, reject) => {
     execFile(
       executable,
@@ -152,12 +179,18 @@ function httpUrl(url: string): string {
 /** Fetch adapter backed by a renderer. Checks what the renderer returns: it is code this extension does not own. */
 export class RendererFetchAdapter implements FetchAdapter {
   private readonly timeoutMs: number;
+  private readonly run: typeof runCommand;
 
   constructor(
     private readonly renderer: WebFetchRenderer,
-    options: { readonly timeoutMs?: number } = {},
+    options: {
+      readonly timeoutMs?: number;
+      /** Runs the renderer's commands with the request's time limit and the fetch's signal. Defaults to `runCommand`. */
+      readonly run?: typeof runCommand;
+    } = {},
   ) {
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.run = options.run ?? runCommand;
   }
 
   async fetch(url: string, options: FetchOptions = {}): Promise<FetchResult> {
@@ -170,7 +203,7 @@ export class RendererFetchAdapter implements FetchAdapter {
     try {
       result = await this.renderer.render(
         { url: target, timeoutMs },
-        { run: (executable, args) => runCommand(executable, args, { timeoutMs, signal }) },
+        { run: (executable, args) => this.run(executable, args, { timeoutMs, signal }) },
       );
     } catch (error) {
       throw new Error(`Rendering with ${id} failed: ${error instanceof Error ? error.message : String(error)}`);
