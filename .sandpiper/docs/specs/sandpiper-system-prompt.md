@@ -2,7 +2,7 @@
 
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
-- **Implementation**: `packages/core/system-prompt/` (templates), `packages/core/src/system-prompt.ts`, `packages/core/src/prompt-template.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/deferred-tools.ts`, `extensions/system/skill-loading-tool.ts`, `packages/cli/system_prompt_diagnostic.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
+- **Implementation**: `packages/core/system-prompt/` (templates), `packages/core/src/system-prompt.ts`, `packages/core/src/skill-tool-reachability.ts`, `packages/core/src/prompt-template.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/deferred-tools.ts`, `extensions/system/skill-loading-tool.ts`, `packages/cli/system_prompt_diagnostic.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
 - **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (decisions and invariants), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md)
 - **Supersedes**: archived April 2026 parsing-plan notes
 
@@ -12,10 +12,10 @@ Sandpiper owns Pi's base prompt through Pi's custom base prompt. In the system e
 
 1. renders the Sandpiper prompt from Pi's `event.systemPromptOptions` with `buildSandpiperStartupPrompt()` in `packages/core/src/startup-prompt.ts`
 2. sets `systemPromptOptions.customPrompt` to the rendered prompt, so Pi records it in the transcript as the `preamble` section
-3. clears `appendSystemPrompt`, `contextFiles`, and `skills`, which Sandpiper renders itself
+3. clears `appendSystemPrompt` and `contextFiles`, which Sandpiper renders itself, and clears `skills` when Sandpiper renders them (see [Skill loading behavior](#skill-loading-behavior))
 4. returns no `systemPrompt`: Pi applies a returned prompt to one run only and does not record it
 
-Pi renders its own sections after Sandpiper's text: `tools` and `rules` (the tool list and every active tool's guidelines), `cwd`, and extension sections such as `mcp_servers`. Pi re-renders them before every model call and sends only changed sections.
+Pi renders its own sections after Sandpiper's text: `tools` and `rules` (the tool list and every active tool's guidelines), `skills` when Sandpiper leaves the skills to Pi, `cwd`, and extension sections such as `mcp_servers`. Pi re-renders them before every model call and sends only changed sections.
 
 Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` so that a `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble. The patch also adds the `deferredTools` prompt option, which lists the [deferred tools](#deferred-tools) that are not loaded yet inside the `tools` section.
 
@@ -74,7 +74,7 @@ Pi renders the sections again before every model call, against the tools active 
 1. Persona (`<identity>`, `<interaction_style>`, and `<role>`, or the `--identity` override) — Sandpiper identity, operating principles, communication rules, and coding defaults.
 2. `<user_profile>` — user-wide `USER.md` profile and working preferences, if present.
 3. `<harness_docs>` — Pi/Sandpiper documentation routing and path differences when package roots are available.
-4. `<skills>` — skill-loading rules plus available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries.
+4. `<skills>` — skill-loading rules plus available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries. Rendered only when the model can reach the `skill` tool.
 5. `<injected_context>` — injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
 6. `<user_appended_prompt>` — user-appended system prompt content, if present.
 7. `<system_notification_protocol>` — how to treat hidden system notifications.
@@ -84,20 +84,20 @@ Pi renders the sections again before every model call, against the tools active 
 
 All prose Sandpiper writes into its prompt lives in Markdown templates in `packages/core/system-prompt/`, one file per section, named after its XML tag. TypeScript supplies only computed values.
 
-| Template                               | Renders                                                      | Placeholders                                                                 |
-| -------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `system_prompt.md`                     | The `<system_prompt>` frame and the whitespace between parts | `identity`, `sections`, `system_notification_protocol`, `environment`        |
-| `identity.md`                          | `<identity>`                                                 | none                                                                         |
-| `interaction_style.md`                 | `<interaction_style>`                                        | none                                                                         |
-| `role.md`                              | `<role>`                                                     | none                                                                         |
-| `user_profile.md`                      | `<user_profile>`                                             | `content`: `USER.md` text                                                    |
-| `harness_docs.md`                      | `<harness_docs>`                                             | `piRoot`, `sandpiperRoot`, `piPackage`, `sandpiperPackage`, `piVersion`      |
-| `skills.md`                            | `<skills>`                                                   | `loadInstruction`, `availableSkills`: the computed `<available_skills>` list |
-| `skill_load_instruction_skill_tool.md` | The `loadInstruction` when the `skill` tool is selected      | none                                                                         |
-| `skill_load_instruction_read_tool.md`  | The `loadInstruction` otherwise                              | none                                                                         |
-| `injected_context.md`                  | `<injected_context>`                                         | `contextFiles`: the computed `<context_file>` elements                       |
-| `user_appended_prompt.md`              | `<user_appended_prompt>`                                     | `content`: the appended prompt text                                          |
-| `system_notification_protocol.md`      | `<system_notification_protocol>`                             | none                                                                         |
+| Template                                | Renders                                                      | Placeholders                                                                 |
+| --------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| `system_prompt.md`                      | The `<system_prompt>` frame and the whitespace between parts | `identity`, `sections`, `system_notification_protocol`, `environment`        |
+| `identity.md`                           | `<identity>`                                                 | none                                                                         |
+| `interaction_style.md`                  | `<interaction_style>`                                        | none                                                                         |
+| `role.md`                               | `<role>`                                                     | none                                                                         |
+| `user_profile.md`                       | `<user_profile>`                                             | `content`: `USER.md` text                                                    |
+| `harness_docs.md`                       | `<harness_docs>`                                             | `piRoot`, `sandpiperRoot`, `piPackage`, `sandpiperPackage`, `piVersion`      |
+| `skills.md`                             | `<skills>`                                                   | `loadInstruction`, `availableSkills`: the computed `<available_skills>` list |
+| `skill_load_instruction_skill_tool.md`  | The `loadInstruction` when the `skill` tool is declared      | none                                                                         |
+| `skill_load_instruction_tool_search.md` | The `loadInstruction` when the `skill` tool is deferred      | none                                                                         |
+| `injected_context.md`                   | `<injected_context>`                                         | `contextFiles`: the computed `<context_file>` elements                       |
+| `user_appended_prompt.md`               | `<user_appended_prompt>`                                     | `content`: the appended prompt text                                          |
+| `system_notification_protocol.md`       | `<system_notification_protocol>`                             | none                                                                         |
 
 `piRoot` and `sandpiperRoot` fall back to the environment variable names `PI_CODING_AGENT_PACKAGE` and `SANDPIPER_CODING_AGENT_PACKAGE`. `piPackage` and `sandpiperPackage` render an unset root as `undefined`, as the prompt always has. `piVersion` falls back to `<unknown>`. `<environment>` has no prose; TypeScript renders it whole.
 
@@ -165,7 +165,19 @@ With a custom system prompt, Sandpiper renders nothing and `editableSpans` is em
 
 ## Skill loading behavior
 
-The `<skills>` section treats `<available_skills>` as routing metadata. When the `skill` tool is available, the prompt tells agents to load matching skills by exact catalogue name. When the tool is unavailable, the prompt falls back to reading the matching `SKILL.md` from the exact catalogue location. Relative scripts and references are resolved against the skill root returned by the tool, or the `SKILL.md` directory in fallback mode.
+Sandpiper renders its `<skills>` section only when the model can reach the `skill` tool. `skillToolReachability()` in `packages/core/src/skill-tool-reachability.ts` decides this from Pi's `selectedTools` and `hiddenTools` and the `skill` tool's exposure, which the system extension reads from `pi.getAllTools()`. The first matching row applies:
+
+| The `skill` tool is                            | Who renders `<skills>` | Load instruction                                  |
+| ---------------------------------------------- | ---------------------- | ------------------------------------------------- |
+| `deferred`, and `tool_search` is declared      | Sandpiper              | `skill_load_instruction_tool_search.md`           |
+| declared: selected and not hidden              | Sandpiper              | `skill_load_instruction_skill_tool.md`            |
+| not reachable: absent, not selected, or hidden | Pi                     | Pi's wording, naming `read` or `bash`, or neither |
+
+A tool is declared when it is in `selectedTools` and not in `hiddenTools`; codemode's `only` mode hides the tools it wraps, so a hidden `skill` tool is not reachable. A deferred `skill` tool keeps the `tool_search` instruction after `tool_search` loads it, so loading it does not change the prompt mid-session.
+
+When Sandpiper renders the section, it clears `systemPromptOptions.skills` so Pi does not render the skills again. The section treats `<available_skills>` as routing metadata: it tells agents to load matching skills by exact catalogue name, and to resolve relative scripts and references against the skill root the tool returns.
+
+Otherwise Sandpiper leaves `systemPromptOptions.skills` intact and Pi renders its own `<skills>` section, in Pi's format, before its `cwd` section. Pi names the first of `read` and `bash` that is declared, names no tool when they are selected but hidden, and leaves the section out when neither is selected. That text comes from Pi, so it has no [editable span](#editable-spans).
 
 ## Startup context
 

@@ -17,6 +17,7 @@ type TestCommand = {
 function createStartupPromptHookStub(
   flags: Record<string, boolean | string | undefined> = {},
   initialEntries: readonly unknown[] = [],
+  tools: readonly { readonly name: string; readonly exposure: string }[] = [],
 ) {
   const handlers = new Map<string, TestEventHandler>();
   const commands = new Map<string, TestCommand>();
@@ -53,6 +54,7 @@ function createStartupPromptHookStub(
       sessionEntries.push({ type: 'custom', customType, data });
     }) as Parameters<typeof registerStartupPromptHooks>[0]['appendEntry'],
     events: events as Parameters<typeof registerStartupPromptHooks>[0]['events'],
+    getAllTools: (() => tools) as Parameters<typeof registerStartupPromptHooks>[0]['getAllTools'],
   } as Parameters<typeof registerStartupPromptHooks>[0];
 
   return {
@@ -136,9 +138,14 @@ describe('startup hooks', () => {
   });
 
   it('clears the inputs Sandpiper renders itself so Pi does not render them again', async () => {
-    const { pi, handlers, sessionEntries } = createStartupPromptHookStub();
+    const { pi, handlers, sessionEntries } = createStartupPromptHookStub(
+      {},
+      [],
+      [{ name: 'skill', exposure: 'direct' }],
+    );
     registerStartupPromptHooks(pi);
     const event = beforeAgentStartEvent({
+      selectedTools: ['read', 'skill'],
       appendSystemPrompt: 'appended',
       contextFiles: [{ path: '/repo/AGENTS.md', content: 'rules' }],
       skills: [{ name: 'jj' }],
@@ -147,7 +154,52 @@ describe('startup hooks', () => {
     await handlers.get('before_agent_start')?.(event, createPromptSessionContext(sessionEntries));
 
     expect(event.systemPromptOptions).toMatchObject({ appendSystemPrompt: '', contextFiles: [], skills: [] });
+    expect(mockBuildSandpiperStartupPrompt).toHaveBeenCalledWith(
+      expect.objectContaining({ skillToolExposure: 'direct' }),
+    );
   });
+
+  it('clears skills when the skill tool is deferred and tool_search is declared', async () => {
+    const { pi, handlers, sessionEntries } = createStartupPromptHookStub(
+      {},
+      [],
+      [{ name: 'skill', exposure: 'deferred' }],
+    );
+    registerStartupPromptHooks(pi);
+    const event = beforeAgentStartEvent({ selectedTools: ['read', 'tool_search'], skills: [{ name: 'jj' }] });
+
+    await handlers.get('before_agent_start')?.(event, createPromptSessionContext(sessionEntries));
+
+    expect(event.systemPromptOptions).toMatchObject({ skills: [] });
+    expect(mockBuildSandpiperStartupPrompt).toHaveBeenCalledWith(
+      expect.objectContaining({ skillToolExposure: 'deferred' }),
+    );
+  });
+
+  it.each<[string, Record<string, unknown>, string | undefined]>([
+    ['it is not registered', { selectedTools: ['read', 'bash'] }, undefined],
+    ['no tools are selected', { selectedTools: [] }, 'direct'],
+    ['it is hidden behind codemode', { selectedTools: ['read', 'skill'], hiddenTools: ['skill'] }, 'direct'],
+    ['it is deferred and tool_search is not declared', { selectedTools: ['read'] }, 'deferred'],
+  ])(
+    'leaves skills for Pi to render when the skill tool is not reachable because %s',
+    async (_label, options, exposure) => {
+      const tools = exposure === undefined ? [] : [{ name: 'skill', exposure }];
+      const { pi, handlers, sessionEntries } = createStartupPromptHookStub({}, [], tools);
+      registerStartupPromptHooks(pi);
+      const skills = [{ name: 'jj' }];
+      const event = beforeAgentStartEvent({
+        ...options,
+        appendSystemPrompt: 'appended',
+        contextFiles: [{ path: '/repo/AGENTS.md', content: 'rules' }],
+        skills,
+      });
+
+      await handlers.get('before_agent_start')?.(event, createPromptSessionContext(sessionEntries));
+
+      expect(event.systemPromptOptions).toMatchObject({ appendSystemPrompt: '', contextFiles: [], skills });
+    },
+  );
 
   it('persists one local session start date and reuses it across later turns', async () => {
     vi.useFakeTimers();

@@ -35,45 +35,11 @@ You are an expert coder and software engineer. Baseline principles:
 </role>
 
   
-<user_profile>
-The following USER.md content describes the human using Sandpiper and their working preferences.
-Use it to personalize collaboration. Treat it as standing user-authored guidance/instructions.
-
-<content># Doug
-Prefers <clear> plans & "direct" answers
-</content>
-</user_profile>
-
-<harness_docs>
-Pi and Sandpiper documentation (read only when the user asks about pi/sandpiper itself, its SDK, extensions, themes, skills, or TUI):
-
-- Pi: `/opt/pi/pkg`
-  - Main docs: `README.md`
-  - Additional docs: `docs/`
-  - Examples: `examples/`
-- Sandpiper: `/opt/sandpiper/pkg`
-  - `README.md`
-  - `docs/` 
-- When asked about: Pi framework/API questions → Pi docs and examples.
-  - When reading pi docs or examples, resolve docs/... under Additional docs and examples/... under Examples, not the current working directory
-  - When asked about: extensions (docs/extensions.md, examples/extensions/), themes (docs/themes.md), skills (docs/skills.md), prompt templates (docs/prompt-templates.md), TUI components (docs/tui.md), keybindings (docs/keybindings.md), SDK integrations (docs/sdk.md), custom providers (docs/custom-provider.md), adding models (docs/models.md), pi packages (docs/packages.md), environment variables (docs/environment-variables.md), MCP servers (docs/mcp.md), codemode scripts and non-LLM models such as classifiers and image models (docs/codemode.md)
-- Sandpiper-specific features or distribution behavior → Sandpiper docs.
-- Extension/custom-tool work → verify both Pi and Sandpiper docs; do not guess from memory.
-- Do not import provider/runtime-specific assumptions into Sandpiper behavior; verify against docs.
-
-Path differences:
-- global config: `~/.sandpiper`, not `~/.pi`
-- project config: `.sandpiper`, not `.pi`
-- Pi package: `/opt/pi/pkg`
-- Sandpiper package: `/opt/sandpiper/pkg`
-- Pi version: `1.2.3`
-</harness_docs>
-
 <skills>
 The following skills provide specialized instructions, scripts, and references for specific tasks. Utilize them when directed to the user, by
 guidance/instructions, or when the task at hand matches the skill's description.
 
-Use the `read` tool to load the skill's SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.
+Use the `skill` tool to load relevant skills by name. If it is not loaded yet, load it with `tool_search` first. If multiple skills match, load all relevant skills.
 
 When a skill refers to a relative path for a file/script/command (most commonly `scripts/` or `references`), ***resolve it against the skill's base directory or location, and use the absolute path.***
 
@@ -84,25 +50,6 @@ GitHub CLI, for <issues> & PRs  </skill>
 </available_skills>
 </skills>
 
-<injected_context>
-The following is project-specific injected guidance and instructions. Do not ignore. Specific instructions beat general instructions.
-
-<context_file path="/repo/AGENTS.md">
-# Rules
-Do good things
-
-No <shortcuts> & "no" excuses</context_file>
-
-<context_file path="/repo/sub dir/CLAUDE.md">Second
-</context_file>
-</injected_context>
-
-<user_appended_prompt>
-The following content was manually appended to the system prompt by the user.
-
-<content>Appended</content>
-</user_appended_prompt>
-
   <system_notification_protocol>
 - User messages enclosed in `<sandpiper_system_notification>` XML blocks are system notifications. ***These are not user messages.***
 - The user cannot see these messages and does not know about them. You do not need to let the user know about them unless they ask.
@@ -111,5 +58,5 @@ The following content was manually appended to the system prompt by the user.
 <environment>
   <session_start_date>2026-09-08</session_start_date>
   <platform>darwin</platform>
-  <version_control system="git" detection="session_start"/>
+  <version_control system="unknown" detection="session_start"/>
 </environment></system_prompt>

@@ -12,6 +12,7 @@ import {
 import { createTwoFilesPatch } from 'diff';
 import type { RenderedText } from '../../packages/core/src/prompt-template.js';
 import { setSandpiperSessionEnv } from '../../packages/core/src/session-continuity.js';
+import { SKILL_TOOL_NAME, skillToolReachability } from '../../packages/core/src/skill-tool-reachability.js';
 import { buildSandpiperStartupPrompt } from '../../packages/core/src/startup-prompt.js';
 import {
   formatLocalDate,
@@ -139,10 +140,13 @@ export function registerStartupPromptHooks(
     return { identityContent, identitySource };
   };
 
+  const getSkillToolExposure = () => pi.getAllTools().find((tool) => tool.name === SKILL_TOOL_NAME)?.exposure;
+
   const buildEffectiveSystemPrompt = async (
     cwd: string,
     systemPromptOptions: BuildSystemPromptOptions,
     sessionStartDate: string,
+    skillToolExposure: string | undefined,
   ) => {
     identity ??= readIdentity();
     const { identityContent, identitySource } = await identity;
@@ -160,6 +164,7 @@ export function registerStartupPromptHooks(
       identityContent,
       identityPath: identitySource,
       appendSystemPromptParts: diagnosticCommand?.appendSystemPromptParts?.(),
+      skillToolExposure,
       templates,
       sessionStartDate,
       dumpSystemPrompt,
@@ -181,7 +186,12 @@ export function registerStartupPromptHooks(
     pi.registerCommand(diagnosticCommand.commandName, {
       handler: async (_args, ctx) => {
         const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
-        const result = await buildEffectiveSystemPrompt(ctx.cwd, ctx.getSystemPromptOptions(), sessionStartDate);
+        const result = await buildEffectiveSystemPrompt(
+          ctx.cwd,
+          ctx.getSystemPromptOptions(),
+          sessionStartDate,
+          getSkillToolExposure(),
+        );
         const finalSystemPrompt =
           result.prompt === undefined ? ctx.getSystemPrompt() : (await applyResolvedContributions(result.prompt)).text;
         await diagnosticCommand.onPrompt(finalSystemPrompt, result.sources);
@@ -211,7 +221,13 @@ export function registerStartupPromptHooks(
 
   pi.on('before_agent_start', async (event, ctx) => {
     const sessionStartDate = getOrCreateSessionStartDate(pi, ctx.sessionManager.getEntries());
-    const result = await buildEffectiveSystemPrompt(ctx.cwd, event.systemPromptOptions, sessionStartDate);
+    const skillToolExposure = getSkillToolExposure();
+    const result = await buildEffectiveSystemPrompt(
+      ctx.cwd,
+      event.systemPromptOptions,
+      sessionStartDate,
+      skillToolExposure,
+    );
     if (result.prompt === undefined) {
       return;
     }
@@ -234,12 +250,16 @@ export function registerStartupPromptHooks(
 
     // Own the prompt through Pi's custom base prompt so the transcript records it; a returned
     // systemPrompt would apply to this run only and leave /export on Pi's default. Sandpiper
-    // renders these inputs itself, so Pi must not render them again.
+    // renders these inputs itself, so Pi must not render them again. Sandpiper renders skills
+    // only when the model can reach the skill tool; otherwise Pi's skills section stays.
     const options = event.systemPromptOptions;
     options.customPrompt = finalSystemPrompt;
     options.appendSystemPrompt = '';
     options.contextFiles = [];
-    options.skills = [];
+    const { selectedTools, hiddenTools } = options;
+    if (skillToolReachability({ selectedTools, hiddenTools, skillToolExposure }) !== undefined) {
+      options.skills = [];
+    }
   });
 }
 

@@ -25,6 +25,8 @@ export interface StartupPromptInput {
   /** The file `identityContent` was read from. */
   readonly identityPath?: string;
   readonly appendSystemPromptParts?: readonly SandpiperAppendSystemPromptPart[];
+  /** The registered `skill` tool's exposure, which decides whether Sandpiper renders the skills section. */
+  readonly skillToolExposure?: string;
   readonly templates?: SystemPromptTemplates;
   readonly versionControl?: SandpiperVersionControlContext;
   readonly userProfile?: string;
@@ -80,6 +82,7 @@ export async function buildSandpiperStartupPrompt(
       identityOverride: input.identityContent,
       identityPath: input.identityPath,
       appendSystemPromptParts: input.appendSystemPromptParts,
+      skillToolExposure: input.skillToolExposure,
       templates: input.templates,
       sessionStartDate: input.sessionStartDate,
       dumpSystemPrompt: input.dumpSystemPrompt,

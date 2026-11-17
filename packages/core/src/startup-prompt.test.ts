@@ -96,7 +96,7 @@ describe('startup prompt operations', () => {
     expect(prompt?.text).toContain('"userProfile":"# User\\nLikes plans"');
   });
 
-  it('passes the identity file, appended prompt parts, and session templates into system prompt construction', async () => {
+  it('passes the identity file, appended prompt parts, skill tool exposure, and session templates into system prompt construction', async () => {
     const templates = loadSystemPromptTemplates();
     const dependencies = createDependencies();
 
@@ -107,6 +107,7 @@ describe('startup prompt operations', () => {
         identityContent: '<identity>from file</identity>',
         identityPath: '/identity.md',
         appendSystemPromptParts: [{ content: 'appended', path: '/append.md' }],
+        skillToolExposure: 'deferred',
         templates,
       },
       dependencies,
@@ -118,6 +119,7 @@ describe('startup prompt operations', () => {
         identityPath: '/identity.md',
         appendSystemPromptParts: [{ content: 'appended', path: '/append.md' }],
         userProfilePath: undefined,
+        skillToolExposure: 'deferred',
         templates,
       }),
       { cwd: '/repo' },

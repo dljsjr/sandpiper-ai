@@ -141,7 +141,7 @@ describe('system-prompt', () => {
     const jj = { name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' };
 
     it('renders skills catalogue as XML', async () => {
-      const prompt = await renderPrompt({}, createPromptOptions({ skills: [jj] }));
+      const prompt = await renderPrompt({}, createPromptOptions({ selectedTools: ['read', 'skill'], skills: [jj] }));
       expect(prompt).toContain('<skills>');
       expect(prompt).toContain('</skills>');
       expect(prompt).toContain('<available_skills>');
@@ -149,20 +149,29 @@ describe('system-prompt', () => {
       expect(prompt).toContain('Jujutsu version control');
     });
 
-    it('renders focused skill loading rules', async () => {
-      const prompt = await renderPrompt({}, createPromptOptions({ skills: [jj] }));
-      expect(prompt).toContain('The following skills provide specialized instructions');
-      expect(prompt).toContain("Use the `read` tool to load the skill's SKILL.md file from the exact `location`");
-      expect(prompt).toContain('If multiple skills match, load all relevant skills.');
-      expect(prompt).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
-    });
-
     it('uses skill for skill loading rules when the tool is active', async () => {
       const prompt = await renderPrompt({}, createPromptOptions({ selectedTools: ['read', 'skill'], skills: [jj] }));
+      expect(prompt).toContain('The following skills provide specialized instructions');
       expect(prompt).toContain('Use the `skill` tool to load relevant skills by name');
       expect(prompt).toContain('If multiple skills match, load all relevant skills.');
       expect(prompt).toContain("resolve it against the skill's base directory or location, and use the absolute path.");
-      expect(prompt).not.toContain("Use the `read` tool to load the skill's SKILL.md");
+      expect(prompt).not.toContain('tool_search');
+    });
+
+    it('tells the model to load a deferred skill tool with tool_search first', async () => {
+      const prompt = await renderPrompt(
+        { skillToolExposure: 'deferred' },
+        createPromptOptions({ selectedTools: ['read', 'tool_search'], skills: [jj] }),
+      );
+      expect(prompt).toContain('<available_skills>');
+      expect(prompt).toContain('load it with `tool_search` first');
+    });
+
+    it('leaves the section to Pi when the skill tool is not reachable', async () => {
+      const prompt = await renderPrompt({}, createPromptOptions({ skills: [jj] }));
+      expect(prompt).not.toContain('<skills>');
+      expect(prompt).not.toContain('<available_skills>');
+      expect(prompt).not.toContain('Use the `read` tool');
     });
   });
 
@@ -235,6 +244,7 @@ describe('system-prompt', () => {
 
     it('includes skills block when skills are present', async () => {
       const promptOptions = createPromptOptions({
+        selectedTools: ['read', 'skill'],
         skills: [
           {
             name: 'jj',
@@ -249,7 +259,7 @@ describe('system-prompt', () => {
     });
 
     it('omits skills block when no skills are present', async () => {
-      const promptOptions = createPromptOptions({ skills: [] });
+      const promptOptions = createPromptOptions({ selectedTools: ['read', 'skill'], skills: [] });
       const { text: prompt } = await buildSandpiperSystemPrompt({}, promptOptions);
       expect(prompt).not.toContain('<skills>');
     });
@@ -320,11 +330,11 @@ guidance/instructions, or when the task at hand matches the skill's description.
 
 `;
 
-const SKILLS_READ_INSTRUCTION =
-  "Use the `read` tool to load the skill's SKILL.md file from the exact `location`. If multiple skills match, load all relevant skills.";
-
 const SKILLS_SKILL_INSTRUCTION =
   'Use the `skill` tool to load relevant skills by name. If multiple skills match, load all relevant skills.';
+
+const SKILLS_TOOL_SEARCH_INSTRUCTION =
+  'Use the `skill` tool to load relevant skills by name. If it is not loaded yet, load it with `tool_search` first. If multiple skills match, load all relevant skills.';
 
 const SKILLS_PATH_RULE =
   "When a skill refers to a relative path for a file/script/command (most commonly `scripts/` or `references`), ***resolve it against the skill's base directory or location, and use the absolute path.***";
@@ -603,25 +613,35 @@ describe('system-prompt exact output', () => {
         '<available_skills>\n  <skill name="jj" location="/skills/jj/SKILL.md">Visible</skill>\n  <skill name="gh" location="/skills/gh/SKILL.md">Also visible</skill>\n</available_skills>',
       ],
     ])('renders %s exactly', async (_label, skills, availableSkills) => {
-      expect(await renderPrompt({}, createPromptOptions({ skills }))).toContain(
-        `\n${expectedSkillsBlock(SKILLS_READ_INSTRUCTION, availableSkills)}`,
-      );
-    });
-
-    it('switches the loading instruction when the skill tool is selected', async () => {
-      const skills = [{ name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' }];
-
       expect(await renderPrompt({}, createPromptOptions({ selectedTools: ['read', 'skill'], skills }))).toContain(
-        `\n${expectedSkillsBlock(SKILLS_SKILL_INSTRUCTION, JJ_AVAILABLE_SKILLS)}`,
+        `\n${expectedSkillsBlock(SKILLS_SKILL_INSTRUCTION, availableSkills)}`,
       );
     });
 
-    it('uses the read instruction when no tools are selected', async () => {
+    it('renders the tool_search instruction when the skill tool is deferred', async () => {
       const skills = [{ name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' }];
 
-      expect(await renderPrompt({}, { skills })).toContain(
-        `\n${expectedSkillsBlock(SKILLS_READ_INSTRUCTION, JJ_AVAILABLE_SKILLS)}`,
-      );
+      expect(
+        await renderPrompt(
+          { skillToolExposure: 'deferred' },
+          createPromptOptions({ selectedTools: ['read', 'tool_search'], skills }),
+        ),
+      ).toContain(`\n${expectedSkillsBlock(SKILLS_TOOL_SEARCH_INSTRUCTION, JJ_AVAILABLE_SKILLS)}`);
+    });
+
+    it.each<[string, Partial<SandpiperBaseSystemPromptOptions>, SandpiperSystemPromptOptions]>([
+      ['no tools are selected', { selectedTools: [] }, {}],
+      ['only file readers are selected', { selectedTools: ['read', 'bash'] }, {}],
+      ['the skill tool is hidden', { selectedTools: ['read', 'skill'], hiddenTools: ['skill'] }, {}],
+      [
+        'the skill tool is deferred without tool_search',
+        { selectedTools: ['read'] },
+        { skillToolExposure: 'deferred' },
+      ],
+    ])('omits the section when %s', async (_label, promptOptions, options) => {
+      const skills = [{ name: 'jj', description: 'Jujutsu version control', filePath: '/skills/jj/SKILL.md' }];
+
+      expect(await renderPrompt(options, createPromptOptions({ ...promptOptions, skills }))).not.toContain('<skills>');
     });
 
     it('omits the section when every skill disables model invocation', async () => {
@@ -630,7 +650,9 @@ describe('system-prompt exact output', () => {
         { name: 'b', description: 'B', filePath: '/skills/b/SKILL.md', disableModelInvocation: true },
       ];
 
-      expect(await renderPrompt({}, createPromptOptions({ skills }))).not.toContain('<skills>');
+      expect(await renderPrompt({}, createPromptOptions({ selectedTools: ['skill'], skills }))).not.toContain(
+        '<skills>',
+      );
     });
   });
 

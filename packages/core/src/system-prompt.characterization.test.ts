@@ -54,9 +54,15 @@ const CASES: readonly PromptCase[] = [
     }),
   },
   {
-    name: 'all-sections-read-tool',
+    // Pi renders the skills section when the skill tool is not reachable, so Sandpiper leaves it out.
+    name: 'skill-tool-unreachable',
     options: { ...PACKAGES, userProfile: PROFILE, versionControl: { system: 'git', detection: 'session_start' } },
     promptOptions: base({ appendSystemPrompt: 'Appended', contextFiles: CONTEXT_FILES, skills: SKILLS }),
+  },
+  {
+    name: 'deferred-skill-tool',
+    options: { skillToolExposure: 'deferred' },
+    promptOptions: base({ selectedTools: ['read', 'tool_search'], skills: SKILLS }),
   },
   {
     name: 'identity-override',

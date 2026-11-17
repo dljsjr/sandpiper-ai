@@ -49,6 +49,7 @@ function createPromptSession(cwd: string, identity?: string) {
     registerFlag: vi.fn(),
     getFlag: () => identity,
     events: { on: () => () => {} },
+    getAllTools: () => [],
   } as unknown as Parameters<typeof registerStartupPromptHooks>[0];
   registerStartupPromptHooks(pi);
   return {

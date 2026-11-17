@@ -190,6 +190,72 @@ describe('system prompt diagnostic', () => {
     }
   }, 30_000);
 
+  // The skill tool is loaded by default. `--tools bash` leaves it out, so Pi renders its own skills section,
+  // naming bash; `--no-tools` leaves out every reader too, so neither renders one.
+  it.each<[string, readonly string[], 'sandpiper' | 'pi' | 'none']>([
+    ['the skill tool is loaded', [], 'sandpiper'],
+    ['only bash is available', ['--tools', 'bash'], 'pi'],
+    ['no tools are available', ['--no-tools'], 'none'],
+  ])(
+    'renders the skills section and its editable spans when %s',
+    (_label, args, renderer) => {
+      const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-skills-'));
+      const agentDir = join(tempDir, 'agent');
+      const skillFile = join(agentDir, 'skills', 'diagnostic-skill', 'SKILL.md');
+      mkdirSync(dirname(skillFile), { recursive: true });
+      mkdirSync(join(tempDir, 'home'), { recursive: true });
+      writeFileSync(skillFile, '---\nname: diagnostic-skill\ndescription: Checks the skills section\n---\n\n# Skill\n');
+
+      try {
+        const output = execFileSync(
+          bunExecutable,
+          ['run', '--bun', './packages/cli/sandpiper_system_prompt.ts', '--json', '--approve', ...args],
+          {
+            cwd: repoRoot,
+            encoding: 'utf-8',
+            env: diagnosticEnv(agentDir),
+            stdio: ['ignore', 'pipe', 'pipe'],
+            timeout: 30_000,
+          },
+        );
+        const result = JSON.parse(output) as { prompt: string; editableSpans: EditableSpan[] };
+        const skillsSections = result.prompt.match(/<skills>\n[\s\S]*?\n<\/skills>/g) ?? [];
+        const templateDir = join(realpathSync(repoRoot), 'packages', 'core', 'system-prompt');
+        const paths = new Set(result.editableSpans.map((span) => span.path));
+
+        expect(skillsSections).toHaveLength(renderer === 'none' ? 0 : 1);
+        const skills = skillsSections[0] ?? '';
+        if (renderer === 'sandpiper') {
+          expect(skills).toContain('Use the `skill` tool to load relevant skills by name.');
+          expect(skills).toContain(`<skill name="diagnostic-skill" location="${skillFile}">`);
+          expect(paths).toContain(join(templateDir, 'skills.md'));
+          expect(paths).toContain(join(templateDir, 'skill_load_instruction_skill_tool.md'));
+        } else {
+          expect(paths).not.toContain(join(templateDir, 'skills.md'));
+        }
+        if (renderer === 'pi') {
+          expect(skills).toContain("Use bash to load a skill's file when the task matches its description.");
+          expect(skills).toContain(`<name>diagnostic-skill</name>`);
+          expect(skills).toContain(`<location>${skillFile}</location>`);
+          // Pi renders its sections after Sandpiper's preamble, so no span reaches into them.
+          expect(Math.max(...result.editableSpans.map((span) => span.end))).toBeLessThan(
+            result.prompt.indexOf('<skills>'),
+          );
+        }
+        expect(result.prompt).not.toContain('Use the `read` tool');
+        expect(paths).toContain(join(templateDir, 'system_prompt.md'));
+        for (const span of result.editableSpans) {
+          expect(result.prompt.slice(span.start, span.end)).toBe(
+            readFileSync(span.path, 'utf-8').slice(span.sourceStart, span.sourceEnd),
+          );
+        }
+      } finally {
+        rmSync(tempDir, { recursive: true, force: true });
+      }
+    },
+    30_000,
+  );
+
   it('maps prompt text back to its template and user files', () => {
     const tempDir = mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-spans-'));
     const agentDir = join(tempDir, 'agent');

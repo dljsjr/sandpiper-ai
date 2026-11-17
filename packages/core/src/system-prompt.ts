@@ -12,6 +12,7 @@ import {
   sourcedText,
   type TemplateValue,
 } from './prompt-template.js';
+import { skillToolReachability } from './skill-tool-reachability.js';
 import type { SandpiperVersionControlContext } from './version-control.js';
 
 const TEMPLATE_NAMES = [
@@ -23,7 +24,7 @@ const TEMPLATE_NAMES = [
   'harness_docs',
   'skills',
   'skill_load_instruction_skill_tool',
-  'skill_load_instruction_read_tool',
+  'skill_load_instruction_tool_search',
   'injected_context',
   'user_appended_prompt',
   'system_notification_protocol',
@@ -48,6 +49,7 @@ export interface SandpiperPromptSkill {
 export interface SandpiperBaseSystemPromptOptions {
   readonly customPrompt?: string;
   readonly selectedTools?: readonly string[];
+  readonly hiddenTools?: readonly string[];
   readonly appendSystemPrompt?: string;
   readonly cwd?: string;
   readonly contextFiles?: readonly SandpiperPromptContextFile[];
@@ -75,6 +77,8 @@ export interface SandpiperSystemPromptOptions {
   readonly identityPath?: string;
   /** The sources of `appendSystemPrompt`, when known. Pi gives extensions only the joined text. */
   readonly appendSystemPromptParts?: readonly SandpiperAppendSystemPromptPart[];
+  /** The registered `skill` tool's exposure, which Pi's prompt options do not carry. */
+  readonly skillToolExposure?: string;
   readonly sessionStartDate?: string;
   readonly dumpSystemPrompt?: boolean;
   /** Defaults to the templates shipped in packages/core/system-prompt/, read on each call. */
@@ -180,7 +184,7 @@ interface PromptSection {
 const SECTIONS: readonly PromptSection[] = [
   { template: 'user_profile', condition: hasUserProfile, data: userProfileData },
   { template: 'harness_docs', condition: hasPackageRoots, data: harnessDocsData },
-  { template: 'skills', condition: (input) => visibleSkills(input).length > 0, data: skillsData },
+  { template: 'skills', condition: hasReachableSkills, data: skillsData },
   { template: 'injected_context', condition: hasContextFiles, data: injectedContextData },
   { template: 'user_appended_prompt', condition: hasAppendedPrompt, data: appendedPromptData },
 ];
@@ -225,10 +229,24 @@ function visibleSkills({ promptOptions }: SystemPromptInput): readonly Sandpiper
   return (promptOptions.skills ?? []).filter((skill) => !skill.disableModelInvocation);
 }
 
+function skillTool({ options, promptOptions }: SystemPromptInput) {
+  return skillToolReachability({
+    selectedTools: promptOptions.selectedTools,
+    hiddenTools: promptOptions.hiddenTools,
+    skillToolExposure: options.skillToolExposure,
+  });
+}
+
+// Without a reachable skill tool, the section is Pi's: it names a file reader the model has, or is left out.
+function hasReachableSkills(input: SystemPromptInput): boolean {
+  return skillTool(input) !== undefined && visibleSkills(input).length > 0;
+}
+
 function skillsData(input: SystemPromptInput): TemplateData {
-  const loadInstruction = (input.promptOptions.selectedTools ?? []).includes('skill')
-    ? input.templates.skill_load_instruction_skill_tool
-    : input.templates.skill_load_instruction_read_tool;
+  const loadInstruction =
+    skillTool(input) === 'deferred'
+      ? input.templates.skill_load_instruction_tool_search
+      : input.templates.skill_load_instruction_skill_tool;
   const skillEntries = visibleSkills(input)
     .map((skill) => element('skill', { name: skill.name, location: skill.filePath }, skill.description, '  ').text)
     .map((entry) => `${entry}\n`)
