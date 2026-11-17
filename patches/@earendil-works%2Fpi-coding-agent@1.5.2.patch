@@ -60,19 +60,76 @@ index bb263af7e5acf406be56edbdd1aafb32828af835..ed5e6ed3e8ab9fcfc0fff64ee73cdab3
          attribution: isInstallTelemetryEnabled(settingsManager) ? PI_ATTRIBUTION : null,
      };
  }
+diff --git a/dist/core/system-prompt.d.ts b/dist/core/system-prompt.d.ts
+index 4af86187b69e25f58d4f1959df02629da2c53621..c4d2db0580ebafef3ea87c66e795563fbb371e3c 100644
+--- a/dist/core/system-prompt.d.ts
++++ b/dist/core/system-prompt.d.ts
+@@ -14,6 +14,11 @@ export interface BuildSystemPromptOptions {
+      * They are reachable only through another tool, so the tool list and rules leave them out too.
+      */
+     hiddenTools?: string[];
++    /**
++     * Sandpiper local patch: tools that `tool_search` can load. With a custom prompt and `tool_search`
++     * declared, the tools section lists those not in `selectedTools`, with their snippets.
++     */
++    deferredTools?: string[];
+     /** Optional one-line tool snippets keyed by tool name. */
+     toolSnippets?: Record<string, string>;
+     /** Guideline bullets contributed by each tool, keyed by tool name. */
+@@ -37,6 +42,7 @@ export interface BuildSystemPromptOptions {
+ export type NormalizedBuildSystemPromptOptions = BuildSystemPromptOptions & {
+     selectedTools: string[];
+     hiddenTools: string[];
++    deferredTools: string[];
+     toolSnippets: Record<string, string>;
+     toolGuidelines: Record<string, string[]>;
+     promptGuidelines: string[];
 diff --git a/dist/core/system-prompt.js b/dist/core/system-prompt.js
-index 94c320ec7175265d067891d044d5b37407bdbbb4..aab994c6d907bb80200d8e70c137916f6859ab1d 100644
+index 94c320ec7175265d067891d044d5b37407bdbbb4..a7830400d1796944882494a5fc6cb7cf74296592 100644
 --- a/dist/core/system-prompt.js
 +++ b/dist/core/system-prompt.js
-@@ -77,6 +77,12 @@ export function buildSystemPromptSections(input) {
+@@ -12,6 +12,8 @@ export function normalizeBuildSystemPromptOptions(input) {
+         forceSystemPrompt: input.forceSystemPrompt,
+         selectedTools: [...(input.selectedTools ?? ["read", "bash", "edit", "write"])],
+         hiddenTools: [...(input.hiddenTools ?? [])],
++        // Sandpiper local patch: deferred tools, listed in the tools section by renderDeferredTools.
++        deferredTools: [...(input.deferredTools ?? [])],
+         toolSnippets: { ...(input.toolSnippets ?? {}) },
+         toolGuidelines: Object.fromEntries(Object.entries(input.toolGuidelines ?? {}).map(([name, guidelines]) => [name, [...guidelines]])),
+         promptGuidelines: [...(input.promptGuidelines ?? [])],
+@@ -64,6 +66,21 @@ function buildRules(selectedTools, toolGuidelines, promptGuidelines) {
+     addRule("Show file paths clearly when working with files");
+     return rules.map((rule) => `- ${rule}`).join("\n");
+ }
++// Sandpiper local patch: the deferred tools that are not loaded yet, so the model knows tool_search can
++// load them. Rendered only when tool_search is declared and at least one deferred tool is not selected.
++function renderDeferredTools(declaredTools, selectedTools, deferredTools, toolSnippets) {
++    if (!declaredTools.includes("tool_search"))
++        return undefined;
++    const pending = deferredTools.filter((name) => !selectedTools.includes(name));
++    if (pending.length === 0)
++        return undefined;
++    return [
++        "<deferred_tools>",
++        "  <instructions>These tools are not loaded yet. Load one with `tool_search`, searching for its name. It can be called from your next call.</instructions>",
++        ...pending.map((name) => (toolSnippets[name] ? `  - ${name}: ${toolSnippets[name]}` : `  - ${name}`)),
++        "</deferred_tools>",
++    ].join("\n");
++}
+ /** Build the ordered, independently replaceable sections of the structured system prompt. */
+ export function buildSystemPromptSections(input) {
+     const options = normalizeBuildSystemPromptOptions(input);
+@@ -77,6 +94,14 @@ export function buildSystemPromptSections(input) {
      const promptSections = {};
      if (customPrompt) {
          promptSections.preamble = customPrompt;
 +        // Sandpiper local patch: a custom preamble keeps Pi's tools and rules sections, so the tool
 +        // list and guidelines stay current as tools change. Only docs goes with the default preamble.
++        // The deferred tools that are not loaded yet go between the tool list and the closing line.
 +        const visibleTools = declaredTools.filter((name) => !!toolSnippets[name]);
 +        const tools = visibleTools.length > 0 ? visibleTools.map((name) => `- ${name}: ${toolSnippets[name]}`).join("\n") : "(none)";
-+        promptSections.tools = `${tools}\n\nAdditional tools may be available.`;
++        const deferredTools = renderDeferredTools(declaredTools, selectedTools, options.deferredTools, toolSnippets);
++        promptSections.tools = [tools, deferredTools, "Additional tools may be available."].filter(Boolean).join("\n\n");
 +        promptSections.rules = buildRules(declaredTools, toolGuidelines, promptGuidelines);
      }
      else {
