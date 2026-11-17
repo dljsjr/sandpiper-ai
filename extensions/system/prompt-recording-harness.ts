@@ -7,6 +7,7 @@ import {
   type AssistantMessage,
   createAssistantMessageEventStream,
   getCurrentSystemPrompt,
+  type JsonObject,
   type Message,
   type Model,
   type TranscriptContext,
@@ -26,8 +27,11 @@ export const RECORDING_PROVIDER = 'prompt-recorder';
 export const RECORDING_MODEL = 'recorder-1';
 export const NOOP_TOOL = 'noop';
 
-/** 'toolCall' calls the harness's noop tool; `{ toolCall }` calls the named tool with no arguments. */
-export type ScriptedResponse = 'text' | 'toolCall' | { readonly toolCall: string };
+/**
+ * 'toolCall' calls the harness's noop tool; `{ toolCall }` calls the named tool with `arguments`, or
+ * with no arguments when they are left out.
+ */
+export type ScriptedResponse = 'text' | 'toolCall' | { readonly toolCall: string; readonly arguments?: JsonObject };
 
 export interface RecordedRequest {
   readonly messages: readonly Message[];
@@ -63,7 +67,14 @@ function assistantMessage(model: Model<Api>, response: ScriptedResponse, callNum
     content:
       toolName === undefined
         ? [{ type: 'text', text: 'ok' }]
-        : [{ type: 'toolCall', id: `call-${callNumber}`, name: toolName, arguments: {} }],
+        : [
+            {
+              type: 'toolCall',
+              id: `call-${callNumber}`,
+              name: toolName,
+              arguments: typeof response === 'object' ? { ...response.arguments } : {},
+            },
+          ],
     api: model.api,
     provider: model.provider,
     model: model.id,

@@ -106,6 +106,8 @@ describe('system extension factory split', () => {
       'before_agent_start', // registerStartupPromptHooks
       'session_start', // registerSessionContinuityHooks
       'session_start', // registerStartupHeader
+      'session_start', // registerDeferredToolHooks
+      'before_agent_start', // registerDeferredToolHooks
     ]);
   });
 });

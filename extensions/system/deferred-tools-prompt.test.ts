@@ -1,9 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { getCurrentTools } from '@earendil-works/pi-ai';
+import { createToolSearchExtension, type ExtensionFactory } from '@earendil-works/pi-coding-agent';
+import { Type } from 'typebox';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // Pi does not export the prompt builder; this is the installed module that Sandpiper's local patch changes.
 import {
   type BuildSystemPromptOptions,
   buildSystemPromptSections,
 } from '../../node_modules/@earendil-works/pi-coding-agent/dist/core/system-prompt.js';
+import { registerDeferredToolHooks } from './deferred-tools.js';
+import {
+  createPromptRecordingSession,
+  type PromptRecordingSession,
+  type RecordedRequest,
+} from './prompt-recording-harness.js';
+import { registerStartupPromptHooks } from './startup-hooks.js';
 
 const DEFERRED_INSTRUCTIONS =
   'These tools are not loaded yet. Load one with `tool_search`, searching for its name. It can be called from your next call.';
@@ -89,5 +102,107 @@ describe('deferred tools in the patched tools section', () => {
     const tools = toolsSection({ selectedTools: ['tool_search'], deferredTools: ['bare_tool'] });
 
     expect(tools).toContain('</instructions>\n  - bare_tool\n</deferred_tools>');
+  });
+});
+
+const deferredProbeExtension: ExtensionFactory = (pi) => {
+  for (const [name, snippet] of [
+    ['deferred_probe', 'Report the probe state'],
+    ['idle_helper', 'Wait for nothing'],
+  ] as const) {
+    pi.registerTool({
+      name,
+      label: name,
+      description: `${snippet}.`,
+      promptSnippet: snippet,
+      exposure: 'deferred',
+      parameters: Type.Object({}),
+      async execute() {
+        return { content: [{ type: 'text', text: snippet }], details: undefined };
+      },
+    });
+  }
+};
+
+const sandpiperExtensions: readonly ExtensionFactory[] = [
+  (pi) => registerStartupPromptHooks(pi),
+  (pi) => registerDeferredToolHooks(pi),
+  createToolSearchExtension(),
+  deferredProbeExtension,
+];
+
+let root: string;
+let open: PromptRecordingSession[] = [];
+
+async function startSession(
+  options: Partial<Parameters<typeof createPromptRecordingSession>[0]> = {},
+): Promise<PromptRecordingSession> {
+  const recording = await createPromptRecordingSession({
+    cwd: join(root, 'project'),
+    agentDir: join(root, 'agent'),
+    extensions: sandpiperExtensions,
+    ...options,
+  });
+  open.push(recording);
+  return recording;
+}
+
+function section(request: RecordedRequest | undefined, name: string): string {
+  const systemPrompt = request?.systemPrompt ?? '';
+  const start = systemPrompt.indexOf(`<${name}>`);
+  const end = systemPrompt.indexOf(`</${name}>`, start);
+  return start === -1 || end === -1 ? '' : systemPrompt.slice(start, end);
+}
+
+function declaredTools(request: RecordedRequest | undefined): string[] {
+  return getCurrentTools(request?.messages ?? []).map((tool) => tool.name);
+}
+
+describe('loading a deferred tool in a session', () => {
+  beforeEach(() => {
+    root = mkdtempSync(join(tmpdir(), 'sandpiper-deferred-tools-'));
+    mkdirSync(join(root, 'project'));
+    mkdirSync(join(root, 'agent'));
+    mkdirSync(join(root, 'home'));
+    vi.stubEnv('HOME', join(root, 'home'));
+    vi.stubEnv('PI_CODING_AGENT_DIR', join(root, 'agent'));
+  });
+
+  afterEach(() => {
+    for (const recording of open) recording.dispose();
+    open = [];
+    vi.unstubAllEnvs();
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('moves a tool that tool_search loads from the deferred block to the declared tools', async () => {
+    const recording = await startSession({
+      responses: [{ toolCall: 'tool_search', arguments: { query: 'deferred_probe' } }, 'text'],
+    });
+
+    await recording.prompt('hello');
+
+    const [first, second] = recording.requests;
+    expect(declaredTools(first)).toContain('tool_search');
+    expect(declaredTools(first)).not.toContain('deferred_probe');
+    expect(section(first, 'deferred_tools')).toContain('  - deferred_probe: Report the probe state');
+    expect(section(first, 'deferred_tools')).toContain('  - idle_helper: Wait for nothing');
+
+    expect(declaredTools(second)).toContain('deferred_probe');
+    expect(declaredTools(second)).not.toContain('idle_helper');
+    expect(section(second, 'tools')).toContain('\n- deferred_probe: Report the probe state\n');
+    expect(section(second, 'deferred_tools')).not.toContain('deferred_probe');
+    expect(section(second, 'deferred_tools')).toContain('  - idle_helper: Wait for nothing');
+  });
+
+  it('lists deferred tools under a user custom prompt', async () => {
+    writeFileSync(join(root, 'agent', 'SYSTEM.md'), 'Custom user prompt.');
+    const recording = await startSession();
+
+    await recording.prompt('hello');
+
+    const [request] = recording.requests;
+    expect(request?.systemPrompt.startsWith('Custom user prompt.')).toBe(true);
+    expect(section(request, 'deferred_tools')).toContain('  - deferred_probe: Report the probe state');
   });
 });

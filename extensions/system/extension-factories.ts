@@ -1,4 +1,5 @@
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
+import { registerDeferredToolHooks } from './deferred-tools.js';
 import { registerStartupHeader } from './startup-header.js';
 import {
   registerSessionContinuityHooks,
@@ -25,5 +26,6 @@ export function createSandpiperIdentityExtension(options: SandpiperIdentityExten
     registerStartupPromptHooks(pi, dumpSystemPrompt, options.systemPromptDiagnostic);
     registerSessionContinuityHooks(pi);
     registerStartupHeader(pi);
+    registerDeferredToolHooks(pi);
   };
 }
