@@ -1,3 +1,4 @@
+import { constants } from 'node:os';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ManagedProcess, ProcessManager } from './process-manager.js';
 
@@ -206,6 +207,15 @@ describe('ProcessManager', () => {
       await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.exitCode).not.toBeNull();
       expect(proc.readStderr()).toContain('spawn error');
+    });
+
+    it('should report a spawn failure as one exit, with the code that exitCode reports', async () => {
+      const proc = pm.spawn({ id: 'test', command: 'nonexistent-command-that-does-not-exist' });
+      const exits: Array<[number | null, string | null]> = [];
+      proc.onExit((code, signal) => exits.push([code, signal]));
+      await waitFor(() => expect(exits.length).toBeGreaterThan(0), { timeout: 2000 });
+      expect(exits).toEqual([[-constants.errno.ENOENT, null]]);
+      expect(proc.exitCode).toBe(-constants.errno.ENOENT);
     });
   });
 });

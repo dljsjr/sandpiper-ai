@@ -23,7 +23,7 @@ Both tools have `direct` exposure.
 - The process starts with `child_process.spawn()`, the given arguments, Sandpiper's environment, and piped stdin, stdout, and stderr. Nothing is written to stdin.
 - The tool returns at once with the PID: `details` is `{ id, pid, status: 'running' }`.
 - An `id` whose process is still running is refused with an error. An `id` whose process has exited is reused, and the old process's output is discarded.
-- A command that cannot start, such as a missing executable, still returns a started result, with no PID. Its stderr then holds `spawn error: <message>`, and its exit handlers run twice: with code 1 from the spawn error, then with a negative error number (`-2` for a missing executable) when the process closes. The model gets two exit notifications, and `check_background_process` reports the second code. Measured under Bun and Node on 2026-11-17; AGENT-335 tracks the fix.
+- A command that cannot start, such as a missing executable, still returns a started result, with no PID. Its stderr then holds `spawn error: <message>`, and it exits once, with the negative error number as its exit code: `-2` for a missing executable or working directory, `-13` for a file that is not executable. The model gets one exit notification, and `check_background_process` reports the same code.
 
 ### `check_background_process`
 
@@ -80,15 +80,14 @@ Both tools carry a guideline that tells the model not to poll in a loop and to w
 
 ## Known gaps
 
-| Gap                          | Notes                                                                                                                                            |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| No stop tool                 | AGENT-70                                                                                                                                         |
-| Double exit on spawn failure | See [`start_background_process`](#start_background_process). AGENT-335                                                                           |
-| Unbounded buffers            | A chatty process grows memory for the rest of the session. AGENT-28                                                                              |
-| Lines split at chunks        | See [Output buffers](#output-buffers)                                                                                                            |
-| No restart                   | A process that exits stays exited. AGENT-46                                                                                                      |
-| No terminal                  | Pipes, not a PTY. Programs that check for a terminal can behave differently. AGENT-65                                                            |
-| One reader                   | `clear_buffer` empties the buffer for every later reader. AGENT-47 dropped a broadcast design when its second consumer, Shell Relay, was removed |
+| Gap                   | Notes                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| No stop tool          | AGENT-70                                                                                                                                         |
+| Unbounded buffers     | A chatty process grows memory for the rest of the session. AGENT-28                                                                              |
+| Lines split at chunks | See [Output buffers](#output-buffers)                                                                                                            |
+| No restart            | A process that exits stays exited. AGENT-46                                                                                                      |
+| No terminal           | Pipes, not a PTY. Programs that check for a terminal can behave differently. AGENT-65                                                            |
+| One reader            | `clear_buffer` empties the buffer for every later reader. AGENT-47 dropped a broadcast design when its second consumer, Shell Relay, was removed |
 
 ## Design notes
 

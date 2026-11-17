@@ -150,12 +150,9 @@ export class ManagedProcess {
       for (const handler of this.exitHandlers) handler(code, signal);
     });
 
+    // A spawn failure emits 'error' and then 'close' with the negative error number, so 'close' alone reports the exit.
     proc.on('error', (err) => {
-      this._running = false;
-      this._exitCode = 1;
-      this.process = null;
       this.appendToBuffer(this.stderrBuffer, Buffer.from(`spawn error: ${err.message}\n`));
-      for (const handler of this.exitHandlers) handler(1, null);
     });
   }
 
