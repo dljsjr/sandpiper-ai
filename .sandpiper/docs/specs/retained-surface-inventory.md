@@ -291,7 +291,7 @@ Left to the Tattler project, not decided here: Chorus registers its tool and two
 
 Eight read-only audit runs covered the repository. Six covered the four lanes of the first pass: root toolchain and configuration, `extensions/`, `packages/` with `devtools/`, and documentation. Two of those stopped early and were repeated in full. On 2026-11-10 two more applied the stricter test to `extensions/system`, `packages/core`, `packages/cli`, and to Tattler, Chorus, web-fetch, web-search, and AutoTOON.
 
-On 2026-11-10 the coordinator re-ran the check behind every row in Sections 4 to 7 against the tree after the Shell Relay removal and the Pi 1.5.2 update. That included `tsc`, Knip, the ast-grep scan, and Prettier's check mode. A separate audit covered the Pi 1.3.0 to 1.5.x update; see [Pi update audit](pi-1-5-update-audit.md). Nothing was built, packed, or installed for the re-check.
+On 2026-11-10 the coordinator re-ran the check behind every row in Sections 4 to 7 against the tree after the Shell Relay removal and the Pi 1.5.2 update. That included `tsc`, Knip, the ast-grep scan, and Prettier's check mode. A separate audit covered the Pi 1.3.0 to 1.5.x update; see [Pi update audit](../../archive/pi-1-5-update-audit.md). Nothing was built, packed, or installed for the re-check.
 
 Not examined:
 

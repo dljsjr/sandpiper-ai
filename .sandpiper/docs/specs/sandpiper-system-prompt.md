@@ -3,7 +3,7 @@
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented
 - **Implementation**: `packages/core/system-prompt/` (templates), `packages/core/src/system-prompt.ts`, `packages/core/src/skill-tool-reachability.ts`, `packages/core/src/prompt-template.ts`, `packages/core/src/startup-prompt.ts`, `packages/core/src/user-profile.ts`, `packages/core/src/version-control.ts`, `extensions/system/startup-hooks.ts`, `extensions/system/deferred-tools.ts`, `extensions/system/skill-loading-tool.ts`, `packages/cli/system_prompt_diagnostic.ts`, `patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch`
-- **Related**: [AGENT-290 Pi 1.0 migration spec](agent-290-pi-1-0-migration-spec.md) (decisions and invariants), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md)
+- **Related**: [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md), [Local Pi patch](../../../docs/dev/build-system.md#local-pi-patch), [AGENT-290 Pi 1.0 migration spec](../../archive/agent-290-pi-1-0-migration-spec.md) (archived: the original ownership decision and the alternatives considered)
 - **Supersedes**: archived April 2026 parsing-plan notes
 
 ## Current architecture
@@ -17,7 +17,7 @@ Sandpiper owns Pi's base prompt through Pi's custom base prompt. In the system e
 
 Pi renders its own sections after Sandpiper's text: `tools` and `rules` (the tool list and every active tool's guidelines), `skills` when Sandpiper leaves the skills to Pi, `cwd`, and extension sections such as `mcp_servers`. Pi re-renders them before every model call and sends only changed sections.
 
-Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` so that a `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble. The patch also adds the `deferredTools` prompt option, which lists the [deferred tools](#deferred-tools) that are not loaded yet inside the `tools` section.
+Sandpiper carries a local `bun patch` of `@earendil-works/pi-coding-agent` so that a `customPrompt` keeps Pi's `tools` and `rules` sections; stock Pi drops them along with its default preamble. Pi's `docs` section still goes with the default preamble; Sandpiper's `<harness_docs>` covers it. The patch also adds the `deferredTools` prompt option, which lists the [deferred tools](#deferred-tools) that are not loaded yet inside the `tools` section. [Local Pi patch](../../../docs/dev/build-system.md#local-pi-patch) lists every module the patch changes and how to redo it after a Pi upgrade.
 
 Runs started by extensions, such as an idle `triggerTurn`, emit `before_agent_start` like prompted runs (Pi 1.2.0+), so they carry the Sandpiper prompt too, including a fresh session's first run.
 
@@ -194,10 +194,39 @@ Volatile one-shot startup context is not rendered into the system prompt. Moving
 
 If the user sets a custom prompt (`--system-prompt` or `SYSTEM.md`), Pi reports it as `systemPromptOptions.customPrompt` and Sandpiper does not replace it. `buildSandpiperStartupPrompt()` returns `undefined`, and the system extension leaves Pi's prompt handling intact. Because of the local patch, Pi still renders its `tools` and `rules` sections after a user's custom prompt, including the `<deferred_tools>` block.
 
+## Provider requests
+
+### Request invariants
+
+`extensions/system/prompt-ownership.test.ts` runs the system extension's prompt hooks in a Pi session against a recording provider and asserts these invariants. "The Sandpiper prompt" means a replayed system prompt that starts with `<system_prompt>`.
+
+| Invariant                                                                                                                  | Applies to                                                                                                                                                  |
+| -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Every request carries the Sandpiper prompt                                                                                 | User-prompted runs. Every turn of a run started by an extension, including a fresh session's first run. Resumed sessions, whichever kind of run comes first |
+| `session.state.systemPrompt`, which `/export` renders, carries the Sandpiper prompt                                        | After user-prompted runs and after runs started by extensions                                                                                               |
+| A run started by an extension adds no system message when the prompt and tools are unchanged                               | Every request of such a run                                                                                                                                 |
+| Each request extends the previous request byte-for-byte                                                                    | Consecutive requests without a prompt or tool change, across user-prompted runs and runs started by extensions                                              |
+| Extension sections reach the provider                                                                                      | Every request, including the turns of runs started by extensions. The test sets `mcp_servers`.                                                              |
+| Tool snippets and guidelines are in Pi's `tools` and `rules` sections; Sandpiper's preamble has no tool list or guidelines | Prompt rendering                                                                                                                                            |
+| Tools whose declarations a `prepareLoadout` hook hides appear in neither section                                           | Prompt rendering                                                                                                                                            |
+| After an active-tool change, the next request's `tools` section and tool declarations match the active tools               | Changes between user prompts, within a run, and during a run started by an extension                                                                        |
+
+### Request shape
+
+Custom providers, such as `pi-claude-code-cli-provider`, receive a `TranscriptContext` that holds only `messages`. The prompt and the tools travel in system messages:
+
+| Part                           | Shape                                                                                                                                                                                                                                   |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Leading system message         | `content: ""`. `sections` holds `preamble` (the Sandpiper prompt) and Pi's sections: `tools`, `rules`, `skills` when Pi renders the skills, `cwd`, and any extension sections. `toolsAdded` holds the initial tool declarations.        |
+| Later system messages          | Section patches, in which `null` removes a section, and `toolsAdded` and `toolsRemoved` deltas, in transcript order                                                                                                                     |
+| Reading the prompt and tools   | `getCurrentSystemPrompt(messages)` and `getCurrentTools(messages)` from `@earendil-works/pi-ai` replay every system message. `resolveTranscript()` and `collapseSystemMessages()` handle APIs without mid-conversation system messages. |
+| Sessions written before Pi 1.0 | They have no system messages. Pi writes the first one when the next run starts, after the old history, so it does not lead the transcript. A provider that reads the prompt only from a leading system message must handle this case.   |
+
 ## Diagnostics
 
 - `sandpiper-system-prompt` (`packages/cli/system_prompt_diagnostic.ts`) runs one turn against an in-process capture provider and prints the first request's system prompt: the prompt Pi sends, including Pi's sections, with no credentials, network, or provider request. `--json` adds source metadata and [editable spans](#editable-spans). It loads Pi's `tool_search` as a built-in extension, as Pi's CLI does, so the output shows the `<deferred_tools>` block. It does not load Pi's other built-in extensions (MCP, codemode, and llama.cpp), so `<mcp_servers>` never appears in its output.
 - When the system extension is created with dump mode enabled, or when `SANDPIPER_DUMP_SYSTEM_PROMPT=1`, a `context_with_system` hook prints the same request-time prompt and shuts the session down.
+- The prompt is expected to stay the same for a whole session, so the system extension compares each prompt it renders with the session's first. When they differ, it warns "unexpected system prompt change!" with `ctx.ui.notify` and appends a unified diff to `<home directory>/<timestamp>-CHANGED-SYSPROMPT.diff`.
 
 ### Prompt editor
 
@@ -224,4 +253,5 @@ Editor flags, removed before rendering:
 - Keep Sandpiper's prompt prose in `packages/core/system-prompt/` templates, not in TypeScript.
 - Preserve Pi-provided context-file and skill metadata instead of re-discovering it in the extension. Tool text is Pi's `tools` and `rules` sections; Sandpiper's prompt renders none.
 - Do not parse Pi's rendered prompt string. Older notes that proposed parsing and replacing sections are archived.
+- Keep Sandpiper's prompt provider-neutral. Provider-specific prompt text, such as the Claude Code CLI provider's clause that declares its synthetic update frames to be system prompt updates, belongs to that provider's extension and applies only to that provider's requests.
 - Keep volatile task, Journal, and working-copy state out of the system prompt unless a separate design explicitly accounts for provider cache behavior.

@@ -1,9 +1,11 @@
 # AGENT-290 Pi 1.0 migration spec
 
+> Archived 2026-11-17 as a record of the Pi 1.0 migration. For current behaviour, read [Sandpiper system prompt architecture](../docs/specs/sandpiper-system-prompt.md) and [Local Pi patch](../../docs/dev/build-system.md#local-pi-patch).
+
 - **Diátaxis mode**: Reference spec
 - **Status**: Implemented and merged (2026-10-06). AGENT-301's packaging decisions moved to TOOLS-30.
 - **Task**: AGENT-290 (subtasks AGENT-293 and AGENT-295 to AGENT-302)
-- **Related**: [discovery notes](../../archive/agent-290-pi-1-0-discovery.md) (archived rationale and evidence), [Pi 1.0 system prompt sections](pi-1-0-prompt-sections.md) (Pi reference), [work plan](../../archive/agent-290-pi-1-0-migration-work-plan.md) (archived)
+- **Related**: [discovery notes](agent-290-pi-1-0-discovery.md) (archived rationale and evidence), [Pi 1.0 system prompt sections](../docs/specs/pi-1-0-prompt-sections.md) (Pi reference), [work plan](agent-290-pi-1-0-migration-work-plan.md) (archived)
 
 ## Scope
 
@@ -20,7 +22,7 @@ Out of scope:
 | Item                                                 | Requirement                                                                                                                               |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `@earendil-works/pi-coding-agent`, `pi-ai`, `pi-tui` | `1.0.4` everywhere they appear (root, `packages/cli`, and `extensions/*`). Published to npm 2026-10-05.                                   |
-| Version policy                                       | Exact versions. Current dependency ownership is in the [build system reference](../../../docs/dev/build-system.md#dependency-resolution). |
+| Version policy                                       | Exact versions. Current dependency ownership is in the [build system reference](../../docs/dev/build-system.md#dependency-resolution). |
 
 ## System prompt
 
@@ -161,7 +163,7 @@ Production extension code needs no other API changes: `tsc` against Pi 1.0.3 rep
 | Item                                                                                                                                                   | Where     |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
 | Retain only the workspace runtime and local helper builds                                                                                              | TOOLS-30  |
-| Defer rarely used Sandpiper tools and list them for `tool_search` in the `tools` section ([Deferred tools](sandpiper-system-prompt.md#deferred-tools)) | AGENT-330 |
+| Defer rarely used Sandpiper tools and list them for `tool_search` in the `tools` section ([Deferred tools](../docs/specs/sandpiper-system-prompt.md#deferred-tools)) | AGENT-330 |
 
 ### Adoption candidates
 

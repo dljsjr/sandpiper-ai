@@ -26,6 +26,8 @@ When a tool result is available:
 
 The `read` exemption preserves exact file text for edits. The adapter returns no patch, so Pi keeps all content blocks and result metadata unchanged.
 
+When it converts a block, the adapter returns the new content together with the event's `structuredContent`. Returning the content alone would drop the structured result that Pi passes to codemode scripts.
+
 ## Size thresholds
 
 | Constant         | Value   | Rationale                                                                     |
