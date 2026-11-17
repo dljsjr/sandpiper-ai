@@ -6,272 +6,22 @@ import { markdown, markdownKeymap, markdownLanguage } from '@codemirror/lang-mar
 import { HighlightStyle, syntaxHighlighting, syntaxTree } from '@codemirror/language';
 import { EditorState, StateEffect, StateField } from '@codemirror/state';
 import { Decoration, type DecorationSet, EditorView, type KeyBinding, keymap, WidgetType } from '@codemirror/view';
-import type { SyntaxNode, SyntaxNodeRef } from '@lezer/common';
 import { tags } from '@lezer/highlight';
-
-export type MarkdownStyleKind =
-  | 'heading-1'
-  | 'heading-2'
-  | 'heading-3'
-  | 'heading-4'
-  | 'heading-5'
-  | 'heading-6'
-  | 'strong'
-  | 'emphasis'
-  | 'strikethrough'
-  | 'inline-code'
-  | 'link'
-  | 'blockquote'
-  | 'list'
-  | 'fenced-code'
-  | 'table';
-
-export type MarkdownLineKind =
-  | 'heading-1'
-  | 'heading-2'
-  | 'heading-3'
-  | 'heading-4'
-  | 'heading-5'
-  | 'heading-6'
-  | 'blockquote'
-  | 'fenced-code'
-  | 'table-source';
-
-export interface MarkdownRange {
-  readonly from: number;
-  readonly to: number;
-}
-
-export interface MarkdownStyleRange extends MarkdownRange {
-  readonly kind: MarkdownStyleKind;
-}
-
-export interface MarkdownLineStyle {
-  readonly from: number;
-  readonly kind: MarkdownLineKind;
-}
-
-export interface MarkdownTable extends MarkdownRange {
-  readonly headers: readonly string[];
-  readonly alignments: ReadonlyArray<'left' | 'center' | 'right' | null>;
-  readonly rows: ReadonlyArray<readonly string[]>;
-}
-
-export interface MarkdownPresentation {
-  readonly styles: readonly MarkdownStyleRange[];
-  readonly hiddenMarkers: readonly MarkdownRange[];
-  readonly lines: readonly MarkdownLineStyle[];
-  readonly tables: readonly MarkdownTable[];
-}
+import {
+  buildMarkdownPresentation,
+  type InlineMarkdownNode,
+  type MarkdownLineKind,
+  type MarkdownRange,
+  type MarkdownStyleKind,
+  type MarkdownTable,
+  parseInlineMarkdown,
+} from './markdown-presentation.js';
 
 const markdownSupport = markdown({
   base: markdownLanguage,
   completeHTMLTags: false,
   pasteURLAsLink: false,
 });
-
-const styleKinds: Readonly<Record<string, MarkdownStyleKind>> = {
-  ATXHeading1: 'heading-1',
-  ATXHeading2: 'heading-2',
-  ATXHeading3: 'heading-3',
-  ATXHeading4: 'heading-4',
-  ATXHeading5: 'heading-5',
-  ATXHeading6: 'heading-6',
-  StrongEmphasis: 'strong',
-  Emphasis: 'emphasis',
-  Strikethrough: 'strikethrough',
-  InlineCode: 'inline-code',
-  Link: 'link',
-  Blockquote: 'blockquote',
-  BulletList: 'list',
-  OrderedList: 'list',
-  FencedCode: 'fenced-code',
-  Table: 'table',
-};
-
-export function createPromptMarkdownState(doc: string, anchor = 0): EditorState {
-  const cursor = Math.max(0, Math.min(anchor, doc.length));
-  return EditorState.create({
-    doc,
-    selection: { anchor: cursor },
-    extensions: [markdownSupport],
-  });
-}
-
-function selectionTouches(state: EditorState, from: number, to: number): boolean {
-  return state.selection.ranges.some((range) =>
-    range.empty ? range.head >= from && range.head < to : range.from < to && range.to > from,
-  );
-}
-
-function appendLines(
-  state: EditorState,
-  from: number,
-  to: number,
-  kind: MarkdownLineKind,
-  lines: MarkdownLineStyle[],
-): void {
-  for (let position = from; position <= to; ) {
-    const line = state.doc.lineAt(position);
-    lines.push({ from: line.from, kind });
-    if (line.to >= to || line.to === state.doc.length) break;
-    position = line.to + 1;
-  }
-}
-
-function directChildren(node: SyntaxNode, name: string): SyntaxNode[] {
-  const matches: SyntaxNode[] = [];
-  for (let child = node.firstChild; child; child = child.nextSibling) {
-    if (child.name === name) matches.push(child);
-  }
-  return matches;
-}
-
-function tableAlignment(cell: string): 'left' | 'center' | 'right' | null {
-  const marker = cell.trim();
-  const left = marker.startsWith(':');
-  const right = marker.endsWith(':');
-  if (left && right) return 'center';
-  if (right) return 'right';
-  if (left) return 'left';
-  return null;
-}
-
-function tableData(state: EditorState, table: SyntaxNode): MarkdownTable | null {
-  let header: SyntaxNode | null = null;
-  let delimiter: SyntaxNode | null = null;
-  const rows: SyntaxNode[] = [];
-  for (let child = table.firstChild; child; child = child.nextSibling) {
-    if (child.name === 'TableHeader') header = child;
-    else if (child.name === 'TableDelimiter') delimiter = child;
-    else if (child.name === 'TableRow') rows.push(child);
-  }
-  if (!header || !delimiter) return null;
-
-  const headers = directChildren(header, 'TableCell').map((cell) => state.doc.sliceString(cell.from, cell.to).trim());
-  const delimiterSource = state.doc
-    .sliceString(delimiter.from, delimiter.to)
-    .trim()
-    .replace(/^\|/, '')
-    .replace(/\|$/, '');
-  const alignments = delimiterSource.split('|').map(tableAlignment);
-  if (headers.length === 0 || alignments.length !== headers.length) return null;
-
-  return {
-    from: table.from,
-    to: table.to,
-    headers,
-    alignments,
-    rows: rows.map((row) =>
-      directChildren(row, 'TableCell').map((cell) => state.doc.sliceString(cell.from, cell.to).trim()),
-    ),
-  };
-}
-
-function formattingParent(node: SyntaxNodeRef): SyntaxNode | null {
-  const parent = node.node.parent;
-  if (!parent) return null;
-  if (
-    parent.name === 'StrongEmphasis' ||
-    parent.name === 'Emphasis' ||
-    parent.name === 'Strikethrough' ||
-    parent.name === 'InlineCode' ||
-    parent.name === 'Link'
-  ) {
-    return parent;
-  }
-  return null;
-}
-
-type MarkdownHeadingKind = Extract<MarkdownStyleKind, `heading-${number}`>;
-
-interface PresentationAccumulator {
-  readonly styles: MarkdownStyleRange[];
-  readonly hiddenMarkers: MarkdownRange[];
-  readonly lines: MarkdownLineStyle[];
-  readonly tables: MarkdownTable[];
-}
-
-const inlineMarkerNames = new Set(['EmphasisMark', 'StrikethroughMark', 'CodeMark', 'LinkMark', 'URL']);
-
-function isHeadingKind(kind: MarkdownStyleKind): kind is MarkdownHeadingKind {
-  return kind.startsWith('heading-');
-}
-
-function appendBlockPresentation(
-  state: EditorState,
-  focused: boolean,
-  node: SyntaxNodeRef,
-  accumulator: PresentationAccumulator,
-): boolean {
-  const headingKind = styleKinds[node.name];
-  if (headingKind && isHeadingKind(headingKind)) {
-    accumulator.lines.push({
-      from: state.doc.lineAt(node.from).from,
-      kind: headingKind,
-    });
-  } else if (node.name === 'Blockquote') {
-    appendLines(state, node.from, node.to, 'blockquote', accumulator.lines);
-  } else if (node.name === 'FencedCode') {
-    appendLines(state, node.from, node.to, 'fenced-code', accumulator.lines);
-  } else if (node.name === 'Table') {
-    if (focused && selectionTouches(state, node.from, node.to)) {
-      appendLines(state, node.from, node.to, 'table-source', accumulator.lines);
-    } else {
-      const table = tableData(state, node.node);
-      if (table) accumulator.tables.push(table);
-      return false;
-    }
-  }
-  return true;
-}
-
-function appendHiddenMarker(
-  state: EditorState,
-  focused: boolean,
-  node: SyntaxNodeRef,
-  hiddenMarkers: MarkdownRange[],
-): void {
-  if (node.name === 'HeaderMark') {
-    const line = state.doc.lineAt(node.from);
-    if (!(focused && selectionTouches(state, line.from, line.to + 1))) {
-      hiddenMarkers.push({ from: node.from, to: node.to });
-    }
-    return;
-  }
-  if (!inlineMarkerNames.has(node.name)) return;
-
-  const parent = formattingParent(node);
-  if (parent && !(focused && selectionTouches(state, parent.from, parent.to))) {
-    hiddenMarkers.push({ from: node.from, to: node.to });
-  }
-}
-
-export function buildMarkdownPresentation(state: EditorState, focused: boolean): MarkdownPresentation {
-  const accumulator: PresentationAccumulator = {
-    styles: [],
-    hiddenMarkers: [],
-    lines: [],
-    tables: [],
-  };
-
-  syntaxTree(state).iterate({
-    enter(node) {
-      const kind = styleKinds[node.name];
-      if (kind) {
-        accumulator.styles.push({ from: node.from, to: node.to, kind });
-      }
-      if (!appendBlockPresentation(state, focused, node, accumulator)) return false;
-      appendHiddenMarker(state, focused, node, accumulator.hiddenMarkers);
-      return undefined;
-    },
-  });
-
-  return {
-    ...accumulator,
-    hiddenMarkers: accumulator.hiddenMarkers.sort((left, right) => left.from - right.from),
-  };
-}
 
 const focusChanged = StateEffect.define<boolean>();
 
@@ -299,7 +49,7 @@ class TableWidget extends WidgetType {
     const headerRow = document.createElement('tr');
     this.table.headers.forEach((text, index) => {
       const cell = document.createElement('th');
-      appendInlineMarkdown(cell, text);
+      appendInlineMarkdown(cell, parseInlineMarkdown(text));
       applyAlignment(cell, this.table.alignments[index]);
       headerRow.appendChild(cell);
     });
@@ -311,7 +61,7 @@ class TableWidget extends WidgetType {
       const tableRow = document.createElement('tr');
       row.forEach((text, index) => {
         const cell = document.createElement('td');
-        appendInlineMarkdown(cell, text);
+        appendInlineMarkdown(cell, parseInlineMarkdown(text));
         applyAlignment(cell, this.table.alignments[index]);
         tableRow.appendChild(cell);
       });
@@ -336,74 +86,29 @@ function applyAlignment(cell: HTMLTableCellElement, alignment: 'left' | 'center'
   if (alignment) cell.style.textAlign = alignment;
 }
 
-interface InlineMatch {
-  readonly index: number;
-  readonly source: string;
-  readonly content: string;
-  readonly kind: 'code' | 'strong' | 'emphasis' | 'strikethrough' | 'link';
-  readonly detail?: string;
-}
+const inlineTagNames: Readonly<Record<Exclude<InlineMarkdownNode['kind'], 'text'>, string>> = {
+  code: 'code',
+  strong: 'strong',
+  emphasis: 'em',
+  strikethrough: 's',
+  link: 'span',
+};
 
-function nextInlineMatch(text: string, from: number): InlineMatch | null {
-  const patterns: ReadonlyArray<{
-    readonly kind: InlineMatch['kind'];
-    readonly expression: RegExp;
-  }> = [
-    { kind: 'code', expression: /`([^`\n]+)`/g },
-    { kind: 'strong', expression: /\*\*([^*\n]+)\*\*/g },
-    { kind: 'strong', expression: /__([^_\n]+)__/g },
-    { kind: 'strikethrough', expression: /~~([^~\n]+)~~/g },
-    { kind: 'link', expression: /\[([^\]\n]+)\]\(([^)\n]+)\)/g },
-    { kind: 'emphasis', expression: /\*([^*\n]+)\*/g },
-    { kind: 'emphasis', expression: /_([^_\n]+)_/g },
-  ];
-  let nearest: InlineMatch | null = null;
-  for (const { kind, expression } of patterns) {
-    expression.lastIndex = from;
-    const match = expression.exec(text);
-    if (!match || (nearest && match.index >= nearest.index)) continue;
-    nearest = {
-      index: match.index,
-      source: match[0] ?? '',
-      content: match[1] ?? '',
-      kind,
-      ...(match[2] ? { detail: match[2] } : {}),
-    };
-  }
-  return nearest;
-}
-
-function appendInlineMarkdown(parent: HTMLElement, text: string): void {
-  let cursor = 0;
-  while (cursor < text.length) {
-    const match = nextInlineMatch(text, cursor);
-    if (!match) {
-      parent.appendChild(document.createTextNode(text.slice(cursor)));
-      return;
+function appendInlineMarkdown(parent: HTMLElement, nodes: readonly InlineMarkdownNode[]): void {
+  for (const node of nodes) {
+    if (node.kind === 'text') {
+      parent.appendChild(document.createTextNode(node.text));
+      continue;
     }
-    if (match.index > cursor) {
-      parent.appendChild(document.createTextNode(text.slice(cursor, match.index)));
-    }
-    const tagName =
-      match.kind === 'code'
-        ? 'code'
-        : match.kind === 'strong'
-          ? 'strong'
-          : match.kind === 'emphasis'
-            ? 'em'
-            : match.kind === 'strikethrough'
-              ? 's'
-              : 'span';
-    const element = document.createElement(tagName);
-    element.className = `cm-live-${match.kind}`;
-    if (match.kind === 'link' && match.detail) element.title = match.detail;
-    if (match.kind === 'code') {
-      element.textContent = match.content;
+    const element = document.createElement(inlineTagNames[node.kind]);
+    element.className = `cm-live-${node.kind}`;
+    if (node.kind === 'code') {
+      element.textContent = node.text;
     } else {
-      appendInlineMarkdown(element, match.content);
+      if (node.kind === 'link') element.title = node.url;
+      appendInlineMarkdown(element, node.children);
     }
     parent.appendChild(element);
-    cursor = match.index + match.source.length;
   }
 }
 
@@ -438,7 +143,12 @@ const lineClass: Readonly<Record<MarkdownLineKind, string>> = {
 };
 
 function presentationDecorations(state: EditorState, focused: boolean): DecorationSet {
-  const presentation = buildMarkdownPresentation(state, focused);
+  const presentation = buildMarkdownPresentation(
+    state.doc.toString(),
+    syntaxTree(state),
+    state.selection.ranges,
+    focused,
+  );
   const ranges = [
     ...presentation.styles.map((style) =>
       Decoration.mark({ class: styleClass[style.kind] }).range(style.from, style.to),
