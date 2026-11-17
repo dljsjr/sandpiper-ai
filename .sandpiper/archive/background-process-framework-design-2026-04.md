@@ -1,5 +1,7 @@
 # Background Process Framework — Design Sketch
 
+> Archived 2026-11-17 as the original AGENT-15 design sketch. The exit notification and the tool details changed since. For current behaviour, read [Background processes](../docs/specs/background-processes.md).
+
 - **Diátaxis mode**: Reference spec with explanatory design notes
 - **Status**: ✅ **IMPLEMENTED** (Core) + ⚠️ **PARTIAL** (Notifications, Buffer Limits)
 - **Implementation**: `packages/core/src/process-manager.ts`, `extensions/system/background-process-tools.ts`

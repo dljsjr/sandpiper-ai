@@ -66,5 +66,5 @@ Adding a new module to a workspace package and re-exporting it often requires a 
 
 ## Related Docs
 
-- [build-system.md](build-system.md) — when to build, postinstall, and how `dist/` is assembled
-- [pi-api-pitfalls.md](pi-api-pitfalls.md) — extension lifecycle and cross-extension behavior gotchas
+- [build-system.md](../../docs/dev/build-system.md) — when to build, postinstall, and how `dist/` is assembled
+- [pi-api-pitfalls.md](pi-api-pitfalls-2026-03.md) — extension lifecycle and cross-extension behavior gotchas

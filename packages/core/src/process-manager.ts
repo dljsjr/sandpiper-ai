@@ -193,7 +193,7 @@ export class ProcessManager {
    */
   spawn(options: SpawnOptions): ManagedProcess {
     if (this.processes.get(options.id)?.running) {
-      throw new Error(`Process "${options.id}" is already running. Kill it first or use a different ID.`);
+      throw new Error(`Process "${options.id}" is already running. Wait for it to exit or use a different ID.`);
     }
 
     const managed = new ManagedProcess(options.id);

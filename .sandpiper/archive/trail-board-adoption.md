@@ -19,7 +19,7 @@ VCS means a version control system, such as Git or jj.
 
 The output is `<project-root>/.trail/config.json`. It uses Trail's version-2 schema and points `tasks_dir` at the existing task directory. `.sandpiper/tasks` is the usual legacy location, not an implicit choice by the utility.
 
-The CLI reports JSON with the result, selected source, task directory, configuration path, existing candidates, and complete configuration. An already-adopted result identifies the existing configuration file. [Usage and recovery](../../../devtools/README.md#trail-board-adoption) cover operator commands.
+The CLI reports JSON with the result, selected source, task directory, configuration path, existing candidates, and complete configuration. An already-adopted result identifies the existing configuration file. Usage and recovery cover operator commands.
 
 ## Legacy discovery
 

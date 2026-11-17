@@ -22,12 +22,12 @@ Each document includes:
 
 | I want to... | Read this first | Then read |
 |--------------|-----------------|-----------|
-| Create my first extension | [PI-DEV-QUICKSTART.md](#pi-dev-quickstartmd) | [PI-DEV-EVENTS.md](#pi-dev-eventsmD) |
+| Create my first extension | [PI-DEV-QUICKSTART.md](#pi-dev-quickstartmd) | [PI-DEV-EVENTS.md](#pi-dev-eventsmd) |
 | Work in Sandpiper (not vanilla Pi) | [PI-DEV-SANDPIPER-PATTERNS.md](#pi-dev-sandpiper-patternsmd) | `.sandpiper/docs/` |
-| Understand Pi's architecture | [PI-DEV-ARCHITECTURE.md](#pi-dev-architecturemd) | [PI-DEV-EVENTS.md](#pi-dev-eventsmD) |
+| Understand Pi's architecture | [PI-DEV-ARCHITECTURE.md](#pi-dev-architecturemd) | [PI-DEV-EVENTS.md](#pi-dev-eventsmd) |
 | Build a custom tool | [PI-DEV-TOOLS.md](#pi-dev-toolsmd) | [PI-DEV-STATE.md](#pi-dev-statemd) |
 | Create custom UI | [PI-DEV-UI.md](#pi-dev-uimd) | [PI-DEV-QUICKSTART.md](#pi-dev-quickstartmd) |
-| Persist extension state | [PI-DEV-STATE.md](#pi-dev-statemd) | [PI-DEV-EVENTS.md](#pi-dev-eventsmD) |
+| Persist extension state | [PI-DEV-STATE.md](#pi-dev-statemd) | [PI-DEV-EVENTS.md](#pi-dev-eventsmd) |
 | Register a custom provider | [PI-DEV-PROVIDERS.md](#pi-dev-providersmd) | [PI-DEV-SDK.md](#pi-dev-sdkmd) |
 | Use Pi programmatically | [PI-DEV-SDK.md](#pi-dev-sdkmd) | [PI-DEV-ARCHITECTURE.md](#pi-dev-architecturemd) |
 | Follow best practices | [PI-DEV-PATTERNS.md](#pi-dev-patternsmd) | [PI-DEV-SECURITY.md](#pi-dev-securitymd) |

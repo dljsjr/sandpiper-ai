@@ -36,7 +36,10 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       BACKGROUND_PROCESS_POLLING_GUIDELINE,
     ],
     parameters: Type.Object({
-      id: Type.String({ description: 'Unique identifier for this process (used to check/kill it later)' }),
+      id: Type.String({
+        description:
+          'Unique identifier for this process. Use it with check_background_process; the exit notification names it too.',
+      }),
       command: Type.String({
         description:
           "Executable command to run. This is not a shell: do not include '&&', '|', '>', '&', or other shell syntax; use args for arguments, or use bash -c only when compound shell syntax is genuinely required.",

@@ -8,19 +8,19 @@
 
 ## Table of Contents
 
-1. [Architecture Overview](#architecture-overview)
-2. [Core Systems](#core-systems)
-3. [Extension System](#extension-system)
-4. [TUI System](#tui-system)
-5. [Session Management](#session-management)
-6. [Tool System](#tool-system)
-7. [Skills System](#skills-system)
-8. [Provider & Model System](#provider--model-system)
-9. [Compaction System](#compaction-system)
-10. [RPC & SDK](#rpc--sdk)
-11. [Design Patterns](#design-patterns)
-12. [Key Insights](#key-insights)
-13. [Questions & Explorations](#questions--explorations)
+1. [Architecture Overview](#1-architecture-overview)
+2. [Core Systems](#2-core-systems)
+3. [Extension System](#3-extension-system)
+4. [TUI System](#4-tui-system)
+5. [Session Management](#5-session-management)
+6. [Tool System](#6-tool-system)
+7. [Skills System](#7-skills-system)
+8. [Provider & Model System](#8-provider--model-system)
+9. [Compaction System](#9-compaction-system)
+10. [RPC & SDK](#10-rpc--sdk)
+11. [Design Patterns](#11-design-patterns)
+12. [Key Insights](#12-key-insights)
+13. [Questions & Explorations](#13-questions--explorations)
 
 ---
 

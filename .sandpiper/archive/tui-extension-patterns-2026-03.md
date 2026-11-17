@@ -32,7 +32,7 @@ Specific topics:
 
 Practical reference for building TUI components in sandpiper extensions. Based on
 studying Pi's internals, the extension API, and the `@mariozechner/pi-tui` component
-library. Complements the official [TUI docs](../../node_modules/@mariozechner/pi-coding-agent/docs/tui.md)
+library. Complements the official [TUI docs](../../node_modules/@earendil-works/pi-coding-agent/docs/tui.md)
 with patterns specific to our use cases.
 
 **Official resources:**

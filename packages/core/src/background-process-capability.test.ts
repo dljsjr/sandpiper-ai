@@ -67,7 +67,7 @@ describe('background process capability operations', () => {
 
     expect(result).toEqual({
       ok: false,
-      error: 'Process "server" is already running. Kill it first or use a different ID.',
+      error: 'Process "server" is already running. Wait for it to exit or use a different ID.',
     });
   });
 

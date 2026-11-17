@@ -287,7 +287,7 @@ Build the smallest useful proof of concept:
 - Sandpiper app/config identity proven in a temp config directory
 - asset/package behavior documented for `bun compile`
 
-Spike findings are captured in [standalone-cli-spike.md](standalone-cli-spike.md). Initial result: Pi's `main(args, { extensionFactories })` works for inline extension injection, `resources_discover` works for bundled resource discovery, and the first standalone deliverable should be an app bundle with sidecar package metadata/assets rather than a true single-file binary.
+Spike findings are captured in [standalone-cli-spike.md](standalone-cli-spike-2026-04.md). Initial result: Pi's `main(args, { extensionFactories })` works for inline extension injection, `resources_discover` works for bundled resource discovery, and the first standalone deliverable should be an app bundle with sidecar package metadata/assets rather than a true single-file binary.
 
 ### Phase 2 — Host context and path abstraction
 

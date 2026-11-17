@@ -115,5 +115,5 @@ if (candidate && "addChild" in candidate) { ... }
 
 ## Related Docs
 
-- [extension-loading.md](extension-loading.md) — how jiti loads extensions and where module-scope boundaries come from
-- [agent-guidance-evolution.md](agent-guidance-evolution.md) — current prompt-side vs hook-side guidance plan
+- [extension-loading.md](extension-loading-2026-04.md) — how jiti loads extensions and where module-scope boundaries come from
+- [agent-guidance-evolution.md](agent-guidance-evolution-2026-04.md) — current prompt-side vs hook-side guidance plan

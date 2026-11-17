@@ -18,7 +18,7 @@ This is a research document evaluating whether to vendor OpenClaw's process supe
 **Result**: The background process framework (`packages/core/src/process-manager.ts`) was built **without PTY support** because standard `child_process.spawn()` was sufficient for background builds, test watchers, and similar tasks. The PTY adapter (which would have replaced `unbuffer-relay` and provided color output) was deemed unnecessary.
 
 **See**: 
-- [Background Process Framework Design](./background-process-framework-design.md) - the implemented approach
+- [Background Process Framework Design](background-process-framework-design-2026-04.md) - the implemented approach
 - `packages/core/src/process-manager.ts` - current implementation using `child_process.spawn()`
 
 ---
@@ -48,7 +48,7 @@ This is a research document evaluating whether to vendor OpenClaw's process supe
 ---
 
 
-**See**: [Background Process Framework Design](./background-process-framework-design.md) for the implemented approach.
+**See**: [Background Process Framework Design](background-process-framework-design-2026-04.md) for the implemented approach.
 
 ---
 

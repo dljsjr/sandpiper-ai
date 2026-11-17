@@ -59,5 +59,5 @@ This gives users flexibility in how they configure the agent while keeping inter
 
 ## Related Docs
 
-- [pi-api-pitfalls.md](pi-api-pitfalls.md) — extension lifecycle and API gotchas often encountered alongside env work
-- [agent-guidance-evolution.md](agent-guidance-evolution.md) — prompt-architecture plan for agent guidance docs
+- [pi-api-pitfalls.md](pi-api-pitfalls-2026-03.md) — extension lifecycle and API gotchas often encountered alongside env work
+- [agent-guidance-evolution.md](agent-guidance-evolution-2026-04.md) — prompt-architecture plan for agent guidance docs
