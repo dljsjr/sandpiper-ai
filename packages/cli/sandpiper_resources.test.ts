@@ -118,7 +118,7 @@ describe('Sandpiper resource adapter', () => {
     expect(handlers.get('resources_discover')?.()).toEqual({ skillPaths: ['/trail/skill'] });
   });
 
-  it('adds the clock reading at the start of every run', async () => {
+  it('adds the clock reading at the start of every run and records each run when it settles', async () => {
     const events: string[] = [];
     const pi = {
       ...createExtensionCapture().pi,
@@ -134,7 +134,7 @@ describe('Sandpiper resource adapter', () => {
 
     await clock.factory(pi as ExtensionAPI);
 
-    expect(events).toEqual(['before_agent_start']);
+    expect(events).toEqual(['before_agent_start', 'agent_settled']);
   });
 
   it('can create neutral capability factories without Sandpiper identity behavior', () => {

@@ -1,6 +1,12 @@
 import type { ExtensionAPI, SessionEntry } from '@earendil-works/pi-coding-agent';
 
 const CLOCK_CUSTOM_TYPE = 'sandpiper:clock';
+const CLOCK_RUN_ENTRY_TYPE = 'sandpiper:clock-run';
+
+interface ClockRunEntryV1 {
+  readonly version: 1;
+  readonly durationMs: number;
+}
 
 const ELAPSED_UNITS = [
   { label: 'd', seconds: 86_400 },
@@ -42,26 +48,52 @@ export function formatClockTime(date: Date, timeZone: string): string {
   return `${part('weekday')}, ${part('year')}-${part('month')}-${part('day')} ${part('hour')}:${part('minute')}:${part('second')} ${offset} (${timeZone})`;
 }
 
+function parseClockRunEntry(data: unknown): ClockRunEntryV1 | undefined {
+  if (typeof data !== 'object' || data === null) return undefined;
+  const { version, durationMs } = data as Record<string, unknown>;
+  return version === 1 && typeof durationMs === 'number' && Number.isFinite(durationMs)
+    ? { version, durationMs }
+    : undefined;
+}
+
+function previousRunDuration(branch: readonly SessionEntry[]): number | undefined {
+  const lastRun = branch.findLast((entry) => entry.type === 'custom' && entry.customType === CLOCK_RUN_ENTRY_TYPE);
+  return lastRun?.type === 'custom' ? parseClockRunEntry(lastRun.data)?.durationMs : undefined;
+}
+
 function lastMessageTime(branch: readonly SessionEntry[]): number | undefined {
   const lastMessage = branch.findLast((entry) => entry.type === 'message');
   return lastMessage ? Date.parse(lastMessage.timestamp) : undefined;
 }
 
-export function registerClockHooks(pi: Pick<ExtensionAPI, 'on'>): void {
+export function registerClockHooks(pi: Pick<ExtensionAPI, 'on' | 'appendEntry'>): void {
+  let runStartedAt: number | undefined;
+
   pi.on('before_agent_start', (_event, ctx) => {
     const now = new Date();
+    runStartedAt = now.getTime();
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     // Pi adds this run's starting message to the session after before_agent_start, so the last
     // message entry belongs to an earlier run.
-    const lastMessage = lastMessageTime(ctx.sessionManager.getBranch());
+    const branch = ctx.sessionManager.getBranch();
+    const lastMessage = lastMessageTime(branch);
+    const previousRun = previousRunDuration(branch);
     const sinceLastMessage =
       lastMessage === undefined ? '' : ` timeSinceLastMessage="${formatElapsed(now.getTime() - lastMessage)}"`;
+    const previousTurn = previousRun === undefined ? '' : ` previousTurnDuration="${formatElapsed(previousRun)}"`;
     return {
       message: {
         customType: CLOCK_CUSTOM_TYPE,
-        content: `<clock currentTime="${formatClockTime(now, timeZone)}"${sinceLastMessage}/>`,
+        content: `<clock currentTime="${formatClockTime(now, timeZone)}"${sinceLastMessage}${previousTurn}/>`,
         display: false,
       },
     };
+  });
+
+  pi.on('agent_settled', () => {
+    if (runStartedAt === undefined) return;
+    const run: ClockRunEntryV1 = { version: 1, durationMs: Date.now() - runStartedAt };
+    pi.appendEntry(CLOCK_RUN_ENTRY_TYPE, run);
+    runStartedAt = undefined;
   });
 }
