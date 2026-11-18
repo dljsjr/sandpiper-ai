@@ -152,8 +152,9 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
 
       try {
         const sendResult: SendAgentMessageResult = await sendAgentMessage(peer, message);
+        const deliveredText = `Message ${sendResult.messageIdAck} delivered to ${peer.name}. This confirms delivery only; any reply from ${peer.name} arrives as a separate message.`;
         return {
-          content: [{ type: 'text', text: `message ${sendResult.messageIdAck} acknowledged by ${peer.name}` }],
+          content: [{ type: 'text', text: deliveredText }],
           details: sendResult,
         };
       } catch (sendErr) {

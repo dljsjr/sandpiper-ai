@@ -1,6 +1,11 @@
 import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import { createEventBus, type ExtensionAPI, type ExtensionContext } from '@earendil-works/pi-coding-agent';
+import {
+  createEventBus,
+  type ExtensionAPI,
+  type ExtensionContext,
+  type ExtensionToolContext,
+} from '@earendil-works/pi-coding-agent';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import tattlerExtension from './index';
 
@@ -68,6 +73,44 @@ describe('Tattler tools', () => {
       ['send_peer_message', 'deferred'],
     ]);
     await handlers.get('session_shutdown')?.({ type: 'session_shutdown', reason: 'quit' }, fakeContext('sess-d', []));
+  });
+
+  it('reports a sent message as delivered, not as acknowledged by the peer', async () => {
+    setUpIsolatedRuntimeDir('tt-send');
+    const sender = fakePi({ 'tattler-id': 'alice' });
+    const receiver = fakePi({ 'tattler-id': 'bob' });
+    await tattlerExtension(sender.pi);
+    await tattlerExtension(receiver.pi);
+    await sender.handlers.get('session_start')?.(
+      { type: 'session_start', reason: 'startup' },
+      fakeContext('sess-s', []),
+    );
+    await receiver.handlers.get('session_start')?.(
+      { type: 'session_start', reason: 'startup' },
+      fakeContext('sess-r', []),
+    );
+
+    const sendTool = vi.mocked(sender.pi.registerTool).mock.calls.find(([tool]) => tool.name === 'send_peer_message');
+    const result = await sendTool?.[0].execute(
+      'call-1',
+      { id: 'bob', message: 'hello' },
+      undefined,
+      undefined,
+      {} as ExtensionToolContext,
+    );
+
+    const text = result?.content[0]?.type === 'text' ? result.content[0].text : '';
+    expect(text).toMatch(/^Message \S+ delivered to bob\. /);
+    expect(text).not.toMatch(/acknowledged/i);
+
+    await sender.handlers.get('session_shutdown')?.(
+      { type: 'session_shutdown', reason: 'quit' },
+      fakeContext('sess-s', []),
+    );
+    await receiver.handlers.get('session_shutdown')?.(
+      { type: 'session_shutdown', reason: 'quit' },
+      fakeContext('sess-r', []),
+    );
   });
 });
 

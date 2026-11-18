@@ -76,7 +76,8 @@ For user-visible dogfood, prefer the Tattler tools when available:
 
 1. `list_peers`
 2. `send_peer_message`
-3. Confirm protocol ACK from the tool result.
+3. Confirm the tool result reports the message as delivered, which means the
+   peer returned a protocol ACK.
 4. Confirm receiving agents wake via TAT-4 system notifications when relevant.
 
 For lower-level protocol debugging, manually inspect the runtime directory and
