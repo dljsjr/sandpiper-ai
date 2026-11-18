@@ -118,6 +118,25 @@ describe('Sandpiper resource adapter', () => {
     expect(handlers.get('resources_discover')?.()).toEqual({ skillPaths: ['/trail/skill'] });
   });
 
+  it('adds the clock reading at the start of every run', async () => {
+    const events: string[] = [];
+    const pi = {
+      ...createExtensionCapture().pi,
+      on: ((event: string) => {
+        events.push(event);
+        return () => {};
+      }) as ExtensionAPI['on'],
+    };
+    const clock = createNeutralCapabilityExtensionFactories().find(
+      (extension) => typeof extension !== 'function' && extension.name === 'clock',
+    );
+    if (!clock || typeof clock === 'function') throw new Error('clock extension is missing');
+
+    await clock.factory(pi as ExtensionAPI);
+
+    expect(events).toEqual(['before_agent_start']);
+  });
+
   it('can create neutral capability factories without Sandpiper identity behavior', () => {
     const { commands, flags, tools } = applyFactories(createNeutralCapabilityExtensionFactories());
 

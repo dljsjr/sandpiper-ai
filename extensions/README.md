@@ -15,7 +15,9 @@ Pi extensions that extend the coding agent with custom tools, lifecycle hooks, a
 
 ### system/
 
-`system/` owns Sandpiper identity and startup behavior, prompt assembly, session continuity, the model-callable `skill` tool, background process tools, and completion hooks.
+`system/` owns Sandpiper identity and startup behavior, prompt assembly, session continuity, the model-callable `skill` tool, background process tools, completion hooks, context usage notices, and the clock.
+
+The clock (`system/clock.ts`) adds a hidden message at the start of every run: a bare `<clock currentTime="…" timeSinceLastMessage="…"/>` element with the local time, its UTC offset and IANA zone, and the time since the last message in the session branch. The first run of a session has no `timeSinceLastMessage`. It is not wrapped in a system notification, to save about 100 characters per run; the `<system_notification_protocol>` prompt section says what it is.
 
 The entrypoints are intentionally thin glue layers. Framework-independent logic belongs in `packages/core/` or focused extension-local modules. Pi-specific system wiring lives under `extensions/system/`.
 

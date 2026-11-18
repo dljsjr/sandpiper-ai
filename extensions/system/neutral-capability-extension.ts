@@ -2,6 +2,7 @@ import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-a
 import { ProcessManager } from '../../packages/core/src/process-manager.js';
 import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
 import { registerBackgroundProcessTools } from './background-process-tools.js';
+import { registerClockHooks } from './clock.js';
 import { registerContextManagementHooks } from './context-management.js';
 import { registerSkillLoadingTool } from './skill-loading-tool.js';
 import { registerTurnControlTool } from './turn-control-tool.js';
@@ -21,6 +22,12 @@ export function createTurnControlExtension(): ExtensionFactory {
 export function createContextManagementExtension(): ExtensionFactory {
   return (pi: ExtensionAPI) => {
     registerContextManagementHooks(pi);
+  };
+}
+
+export function createClockExtension(): ExtensionFactory {
+  return (pi: ExtensionAPI) => {
+    registerClockHooks(pi);
   };
 }
 

@@ -3,6 +3,7 @@ import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import chorusExtension from '../../extensions/chorus.js';
 import {
   createBackgroundProcessExtension,
+  createClockExtension,
   createContextManagementExtension,
   createSandpiperIdentityExtension,
   createSkillLoadingExtension,
@@ -33,6 +34,7 @@ export function createNeutralCapabilityExtensionFactories(): readonly InlineExte
     inlineExtension('skill-loading', createSkillLoadingExtension()),
     inlineExtension('turn-control', createTurnControlExtension()),
     inlineExtension('context-management', createContextManagementExtension()),
+    inlineExtension('clock', createClockExtension()),
     inlineExtension('background-process', createBackgroundProcessExtension()),
     inlineExtension('web-fetch', webFetchExtension),
     inlineExtension('web-fetch-lightpanda', lightpandaRendererExtension),

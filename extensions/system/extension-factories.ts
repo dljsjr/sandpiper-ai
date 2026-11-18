@@ -9,6 +9,7 @@ import {
 
 export {
   createBackgroundProcessExtension,
+  createClockExtension,
   createContextManagementExtension,
   createSkillLoadingExtension,
   createTurnControlExtension,
