@@ -62,8 +62,8 @@ export interface IsolatedSpawnOptions {
    * touch this repo's own tree as a cwd side effect. */
   readonly cwd?: string;
   /** Extra env vars layered on top of the isolation defaults. Isolation vars (agent-dir
-   * names, HOME, GIT_CONFIG_*, JJ_CONFIG) always win over this -- pass agent-dir-relative state
-   * through `agentDir` instead of trying to override them. */
+   * names, HOME, XDG_RUNTIME_DIR, GIT_CONFIG_*, JJ_CONFIG) always win over this -- pass
+   * agent-dir-relative state through `agentDir` instead of trying to override them. */
   readonly env?: Readonly<NodeJS.ProcessEnv>;
   /** Written as `<agentDir>/settings.json` before the spawn is returned (so it exists on disk
    * before any test actually starts the process). Isolated-by-construction like everything
@@ -81,7 +81,9 @@ export interface IsolatedSpawn {
   readonly env: NodeJS.ProcessEnv;
   readonly cwd: string;
   readonly agentDir: string;
-  /** Removes the temp agent dir (and the temp cwd, if one was created for this spawn).
+  /** This spawn's `XDG_RUNTIME_DIR`, where Tattler publishes its socket and identity file. */
+  readonly runtimeDir: string;
+  /** Removes the temp agent dir and runtime dir (and the temp cwd, if one was created for this spawn).
    * Best-effort: leftover temp dirs are a cleanliness nit, not a correctness or isolation
    * problem, since each is uniquely named per mkdtempSync call. */
   readonly cleanup: () => void;
@@ -108,6 +110,10 @@ function withoutPiAndSandpiperVariables(source: NodeJS.ProcessEnv): NodeJS.Proce
  */
 export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpawn {
   const agentDir = mkdtempSync(join(tmpdir(), 'sandpiper-integration-agent-'));
+  // Tattler publishes its Unix socket under XDG_RUNTIME_DIR; without this, test sessions join the
+  // user's real Tattler network. Socket paths are capped near 104 bytes on macOS, whose tmpdir()
+  // is already long, so this stays directly under /tmp.
+  const runtimeDir = mkdtempSync('/tmp/sp-rt-');
   const ownsCwd = options.cwd === undefined;
   const cwd = options.cwd ?? mkdtempSync(join(tmpdir(), 'sandpiper-integration-cwd-'));
 
@@ -127,6 +133,7 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     // names silently inherited the *real* agent dir under the other name.
     // External user skills must also resolve inside this spawn's sandbox.
     HOME: agentDir,
+    XDG_RUNTIME_DIR: runtimeDir,
     SANDPIPER_CODING_AGENT_DIR: agentDir,
     PI_CODING_AGENT_DIR: agentDir,
     PI_SKIP_VERSION_CHECK: '1',
@@ -166,10 +173,12 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     options.entry === 'sandpiper' ? join(repoRoot, 'packages', 'cli', 'sandpiper_standalone.ts') : resolvePiCliPath();
 
   const cleanup = () => {
-    try {
-      rmSync(agentDir, { recursive: true, force: true });
-    } catch {
-      // Non-fatal; see class doc comment on IsolatedSpawn.cleanup.
+    for (const dir of [agentDir, runtimeDir]) {
+      try {
+        rmSync(dir, { recursive: true, force: true });
+      } catch {
+        // Non-fatal; see class doc comment on IsolatedSpawn.cleanup.
+      }
     }
     if (ownsCwd) {
       try {
@@ -186,6 +195,7 @@ export function prepareIsolatedSpawn(options: IsolatedSpawnOptions): IsolatedSpa
     env,
     cwd,
     agentDir,
+    runtimeDir,
     cleanup,
   };
 }

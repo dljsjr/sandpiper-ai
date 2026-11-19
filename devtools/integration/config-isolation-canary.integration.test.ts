@@ -22,10 +22,12 @@
 // directly while investigating the incident this test guards against -- relying on that
 // rather than adding untested undefined-value env-stripping logic to the harness.
 
-import { readdirSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it, vi } from 'vitest';
 import { prepareIsolatedSpawn } from './harness.js';
 import { runPrintMode } from './print-mode-driver.js';
+import { startRpcSession } from './rpc-driver.js';
 
 describe('config isolation containment canary (AGENT-252)', () => {
   it('exits deterministically with no completion when keyless and unpinned (the exact incident shape)', () => {
@@ -61,4 +63,25 @@ describe('config isolation containment canary (AGENT-252)', () => {
       spawn.cleanup();
     }
   });
+});
+
+describe('Tattler runtime isolation (AGENT-337)', () => {
+  it("publishes a spawned session's Tattler socket and identity inside the spawn's own runtime dir", async () => {
+    const session = startRpcSession({ entry: 'sandpiper', commandTimeoutMs: 30_000 });
+    try {
+      const tattlerDir = join(session.runtimeDir, 'sandpiper');
+      await vi.waitFor(
+        () => expect(existsSync(tattlerDir) && readdirSync(tattlerDir).some((name) => name.endsWith('.id'))).toBe(true),
+        { timeout: 20_000, interval: 100 },
+      );
+      const [identityFile] = readdirSync(tattlerDir).filter((name) => name.endsWith('.id'));
+      const identity = JSON.parse(readFileSync(join(tattlerDir, identityFile ?? ''), 'utf8').trim()) as {
+        readonly socketPath: string;
+      };
+
+      expect(identity.socketPath.startsWith(`${tattlerDir}/`)).toBe(true);
+    } finally {
+      await session.close();
+    }
+  }, 40_000);
 });

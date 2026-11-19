@@ -148,6 +148,23 @@ describe('prepareIsolatedSpawn', () => {
     }
   });
 
+  it('gives each spawn its own short Tattler runtime directory and removes it on cleanup', () => {
+    vi.stubEnv('XDG_RUNTIME_DIR', '/real/runtime');
+    const first = prepareIsolatedSpawn({ entry: 'sandpiper', env: { XDG_RUNTIME_DIR: '/caller/override' } });
+    const second = prepareIsolatedSpawn({ entry: 'sandpiper' });
+    try {
+      expect(first.runtimeDir.startsWith('/tmp/')).toBe(true);
+      expect(first.env.XDG_RUNTIME_DIR).toBe(first.runtimeDir);
+      expect(second.env.XDG_RUNTIME_DIR).toBe(second.runtimeDir);
+      expect(first.runtimeDir).not.toBe(second.runtimeDir);
+      expect(existsSync(first.runtimeDir)).toBe(true);
+    } finally {
+      first.cleanup();
+      second.cleanup();
+    }
+    expect(existsSync(first.runtimeDir)).toBe(false);
+  });
+
   it('cleanup removes the temp agent dir', () => {
     const spawn = prepareIsolatedSpawn({ entry: 'pi' });
     expect(existsSync(spawn.agentDir)).toBe(true);

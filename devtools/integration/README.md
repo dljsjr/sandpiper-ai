@@ -18,6 +18,7 @@ every spawn:
   postmortem for why only one of these two names being set is a real, previously-hit failure
   mode, not theoretical.
 - `HOME` points at the temporary agent directory, so external user skills cannot load from the real home directory.
+- `XDG_RUNTIME_DIR` points at a fresh directory under `/tmp`, so a spawned Sandpiper's Tattler socket and identity file stay out of the user's real Tattler network. It sits directly under `/tmp` because macOS caps Unix socket paths near 104 bytes and its `tmpdir()` is already long. `cleanup` removes it.
 - `GIT_CONFIG_GLOBAL`/`GIT_CONFIG_SYSTEM` neutralized and `JJ_CONFIG` pointed at
   `devtools/test-fixtures/jj-test-config.toml`. Each spawn sets these paths directly so the
   isolation also holds when a caller runs outside the root Vitest command.

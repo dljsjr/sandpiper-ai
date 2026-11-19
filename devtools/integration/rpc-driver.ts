@@ -45,6 +45,8 @@ export interface StartRpcSessionOptions extends Omit<IsolatedSpawnOptions, 'args
 export interface RpcSession {
   /** The isolated agent directory this session runs with. Removed by `close`. */
   readonly agentDir: string;
+  /** This session's isolated `XDG_RUNTIME_DIR`, where Tattler publishes. Removed by `close`. */
+  readonly runtimeDir: string;
   /** Send a command and resolve with its correlated response. Auto-assigns an `id` if the
    * command doesn't supply one. */
   readonly sendCommand: (command: RpcCommand) => Promise<RpcResponse>;
@@ -288,6 +290,7 @@ export function startRpcSession(options: StartRpcSessionOptions): RpcSession {
 
   return {
     agentDir: spawnPlan.agentDir,
+    runtimeDir: spawnPlan.runtimeDir,
     sendCommand,
     events,
     waitForEvent,
