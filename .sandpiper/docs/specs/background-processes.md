@@ -27,15 +27,15 @@ Both tools have `direct` exposure.
 
 ### `check_background_process`
 
-| Parameter        | Type    | Required | Description                                       |
-| ---------------- | ------- | -------- | ------------------------------------------------- |
-| `id`             | string  | yes      | The process to check                              |
-| `include_stdout` | boolean | no       | Include buffered stdout. Default: false           |
-| `include_stderr` | boolean | no       | Include buffered stderr. Default: false           |
-| `tail_lines`     | number  | no       | Return only the last N lines of each stream       |
-| `clear_buffer`   | boolean | no       | Empty each returned stream's buffer after reading |
+| Parameter        | Type    | Required | Description                                                                                            |
+| ---------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------ |
+| `id`             | string  | yes      | The process to check                                                                                   |
+| `include_stdout` | boolean | no       | Include buffered stdout. Default: false                                                                |
+| `include_stderr` | boolean | no       | Include buffered stderr. Default: false                                                                |
+| `tail_lines`     | number  | no       | Return only the last N lines of each stream                                                            |
+| `clear_buffer`   | boolean | no       | Start a fresh buffer for each returned stream after reading, so the next check shows only newer output |
 
-The result text is `Process "<id>": running` or `exited`, with the PID, then `Exit code: <code>` once the process has exited, then each requested stream with its count of buffered lines. `details` is `{ id, pid, running, exitCode, exitSignal }`. An unknown `id` is an error.
+The result text is `Process "<id>": running` or `exited`, with the PID, then `Exit code: <code>` once the process has exited, then each requested stream with its total line count and size. A stream that outgrew its buffer ends with a note in the `bash` tool's form, `[Showing lines <first>-<last> of <total>. Full output: <path>]`. `details` is `{ id, pid, running, exitCode, exitSignal }`. An unknown `id` is an error.
 
 ## Exit notification
 
@@ -57,37 +57,38 @@ Both tools carry a guideline that tells the model not to poll in a loop and to w
 
 ## Output buffers
 
-- stdout and stderr are kept in separate in-memory lists of lines until the process's `id` is reused or the session ends.
-- Each chunk the process writes is split on newlines, and empty lines are dropped. A line that arrives in two chunks is stored as two lines.
-- The buffers have no size limit.
+Each stream has its own Pi `OutputAccumulator`, the buffer behind Pi's `bash` tool. The local Pi patch exports it from Pi's root (see [the build system](../../../docs/dev/build-system.md#local-pi-patch)).
+
+- The output is kept exactly as written, blank lines included, until the process's `id` is reused or the session ends.
+- A read shows at most the last 2000 lines or 50 KB of a stream. Memory holds a bounded tail of about twice that.
+- Once a stream passes either limit, the whole stream, from its first byte, also goes to `$TMPDIR/sandpiper-bg-<id>-<stream>-<random>.log`. Only the user can read it (mode 0600). Characters other than letters, digits, `_`, and `-` in the `id` become `_`. The files are never deleted, like the `bash` tool's.
+- When the process exits, both buffers finish and their files are flushed before the exit handlers run, so the exit notification never points at a partial file.
+- `clear_buffer` closes the stream's buffer and starts an empty one. A file the old buffer wrote stays on disk; the result that cleared it gave its path.
 
 ## `ProcessManager`
 
-`packages/core/src/process-manager.ts` imports nothing from Pi or Sandpiper.
+`packages/core/src/process-manager.ts` imports nothing from Pi or Sandpiper. `new ProcessManager({ createOutputBuffer })` takes a factory that makes one buffer per process and stream; the system extension passes `createBackgroundProcessOutputBuffer` from `background-process-tools.ts`, which returns Pi's `OutputAccumulator`.
 
-| Member                                                                  | Meaning                                                                                  |
-| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `ProcessManager.spawn({ id, command, args, cwd })`                      | Starts a process and returns its `ManagedProcess`. Throws if `id` is running             |
-| `ProcessManager.get(id)`                                                | The `ManagedProcess` for `id`, running or exited                                         |
-| `ProcessManager.killAll(signal?)`                                       | Sends `signal`, default `SIGTERM`, to every running process                              |
-| `ManagedProcess.id`, `pid`, `running`, `exitCode`, `exitSignal`, `info` | State. `info` is a plain `ProcessInfo` snapshot                                          |
-| `ManagedProcess.onExit(handler)`                                        | Calls `handler(code, signal)` when the process closes or fails to start                  |
-| `ManagedProcess.readStdout(options?)`, `readStderr(options?)`           | Buffered lines joined with newlines. `tail` keeps the last N; `clear` empties the buffer |
-| `ManagedProcess.stdoutLineCount`, `stderrLineCount`                     | Buffered line counts                                                                     |
-| `ManagedProcess.kill(signal?)`                                          | Sends `signal`, default `SIGTERM`, if the process is running                             |
+| Member                                                                  | Meaning                                                                                                                                |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `ProcessManager.spawn({ id, command, args, cwd })`                      | Starts a process and returns its `ManagedProcess`. Throws if `id` is running                                                           |
+| `ProcessManager.get(id)`                                                | The `ManagedProcess` for `id`, running or exited                                                                                       |
+| `ProcessManager.killAll(signal?)`                                       | Sends `signal`, default `SIGTERM`, to every running process                                                                            |
+| `ManagedProcess.id`, `pid`, `running`, `exitCode`, `exitSignal`, `info` | State. `info` is a plain `ProcessInfo` snapshot                                                                                        |
+| `ManagedProcess.onExit(handler)`                                        | Calls `handler(code, signal)` when the process closes or fails to start                                                                |
+| `ManagedProcess.readStdout(options?)`, `readStderr(options?)`           | `{ text, totalLines, totalBytes, truncated, fullOutputPath? }`. `tail` keeps the last N lines of `text`; `clear` starts a fresh buffer |
+| `ManagedProcess.kill(signal?)`                                          | Sends `signal`, default `SIGTERM`, if the process is running                                                                           |
 
 `background-process-capability.ts` maps the tool parameters onto these calls without Pi types.
 
 ## Known gaps
 
-| Gap                   | Notes                                                                                                                                            |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| No stop tool          | AGENT-70                                                                                                                                         |
-| Unbounded buffers     | A chatty process grows memory for the rest of the session. AGENT-28                                                                              |
-| Lines split at chunks | See [Output buffers](#output-buffers)                                                                                                            |
-| No restart            | A process that exits stays exited. AGENT-46                                                                                                      |
-| No terminal           | Pipes, not a PTY. Programs that check for a terminal can behave differently. AGENT-65                                                            |
-| One reader            | `clear_buffer` empties the buffer for every later reader. AGENT-47 dropped a broadcast design when its second consumer, Shell Relay, was removed |
+| Gap          | Notes                                                                                                                                            |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| No stop tool | AGENT-70                                                                                                                                         |
+| No restart   | A process that exits stays exited; start the same `id` again. Not planned: AGENT-46 was closed in the 2026-11-19 triage                          |
+| No terminal  | Pipes, not a PTY. Programs that check for a terminal can behave differently. Not planned: AGENT-65 was closed in the 2026-11-19 triage           |
+| One reader   | `clear_buffer` empties the buffer for every later reader. AGENT-47 dropped a broadcast design when its second consumer, Shell Relay, was removed |
 
 ## Design notes
 

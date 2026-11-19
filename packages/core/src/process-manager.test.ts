@@ -1,6 +1,7 @@
 import { constants } from 'node:os';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ManagedProcess, ProcessManager } from './process-manager.js';
+import { recordingOutputBuffers } from './test-output-buffer.js';
 
 interface WaitForOptions {
   readonly timeout?: number;
@@ -31,9 +32,11 @@ async function waitFor(assertion: () => void, options: WaitForOptions = {}): Pro
 
 describe('ProcessManager', () => {
   let pm: ProcessManager;
+  let buffers: ReturnType<typeof recordingOutputBuffers>;
 
   beforeEach(() => {
-    pm = new ProcessManager();
+    buffers = recordingOutputBuffers();
+    pm = new ProcessManager({ createOutputBuffer: buffers.create });
   });
 
   afterEach(() => {
@@ -108,38 +111,45 @@ describe('ProcessManager', () => {
   // ─── output buffering ──────────────────────────────────────────
 
   describe('output buffering', () => {
-    it('should buffer stdout', async () => {
-      const proc = pm.spawn({ id: 'test', command: 'echo', args: ['hello world'] });
+    it('writes each stream to the buffer created for that process and stream', async () => {
+      const proc = pm.spawn({ id: 'test', command: 'bash', args: ['-c', 'echo out; echo err >&2'] });
       await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      expect(proc.readStdout()).toContain('hello world');
-      expect(proc.stdoutLineCount).toBeGreaterThan(0);
+
+      expect(buffers.created.map(({ processId, stream }) => [processId, stream])).toEqual([
+        ['test', 'stdout'],
+        ['test', 'stderr'],
+      ]);
+      expect(proc.readStdout()).toEqual({ text: 'out', totalLines: 1, totalBytes: 4, truncated: false });
+      expect(proc.readStderr()).toMatchObject({ text: 'err', totalLines: 1 });
     });
 
-    it('should buffer stderr', async () => {
-      const proc = pm.spawn({ id: 'test', command: 'bash', args: ['-c', 'echo error >&2'] });
+    it('keeps blank lines and returns the last N lines when asked for a tail', async () => {
+      const proc = pm.spawn({ id: 'test', command: 'bash', args: ['-c', 'echo line1; echo; echo line3'] });
       await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      expect(proc.readStderr()).toContain('error');
-      expect(proc.stderrLineCount).toBeGreaterThan(0);
+
+      expect(proc.readStdout().text).toBe('line1\n\nline3');
+      expect(proc.readStdout({ tail: 2 }).text).toBe('\nline3');
     });
 
-    it('should support tail option', async () => {
-      const proc = pm.spawn({
-        id: 'test',
-        command: 'bash',
-        args: ['-c', 'echo line1; echo line2; echo line3'],
-      });
-      await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      const tailed = proc.readStdout({ tail: 2 });
-      expect(tailed).toBe('line2\nline3');
-    });
-
-    it('should support clear option', async () => {
+    it('starts a fresh buffer for the stream after a read that clears it', async () => {
       const proc = pm.spawn({ id: 'test', command: 'echo', args: ['hello'] });
       await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
-      expect(proc.readStdout()).toContain('hello');
-      proc.readStdout({ clear: true });
-      expect(proc.readStdout()).toBe('');
-      expect(proc.stdoutLineCount).toBe(0);
+
+      expect(proc.readStdout({ clear: true }).text).toBe('hello');
+      expect(proc.readStdout()).toMatchObject({ text: '', totalLines: 0 });
+      expect(buffers.created.filter(({ stream }) => stream === 'stdout')).toHaveLength(2);
+    });
+
+    it('finishes both buffers and closes their files before it reports the exit', async () => {
+      const proc = pm.spawn({ id: 'test', command: 'true' });
+      const eventsAtExit: string[][] = [];
+      proc.onExit(() => eventsAtExit.push(...buffers.created.map(({ buffer }) => [...buffer.events])));
+      await waitFor(() => expect(eventsAtExit).toHaveLength(2), { timeout: 2000 });
+
+      expect(eventsAtExit).toEqual([
+        ['finish', 'closeTempFile'],
+        ['finish', 'closeTempFile'],
+      ]);
     });
   });
 
@@ -206,7 +216,7 @@ describe('ProcessManager', () => {
       const proc = pm.spawn({ id: 'test', command: 'nonexistent-command-that-does-not-exist' });
       await waitFor(() => expect(proc.running).toBe(false), { timeout: 2000 });
       expect(proc.exitCode).not.toBeNull();
-      expect(proc.readStderr()).toContain('spawn error');
+      expect(proc.readStderr().text).toContain('spawn error');
     });
 
     it('should report a spawn failure as one exit, with the code that exitCode reports', async () => {

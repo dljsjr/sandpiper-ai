@@ -1,4 +1,4 @@
-import type { ProcessInfo, ProcessManager } from './process-manager.js';
+import type { ProcessInfo, ProcessManager, ProcessOutput } from './process-manager.js';
 
 export interface StartBackgroundProcessRequest {
   readonly id: string;
@@ -19,17 +19,12 @@ export interface CheckBackgroundProcessRequest {
   readonly clearBuffer?: boolean;
 }
 
-export interface BackgroundProcessOutput {
-  readonly text: string;
-  readonly lineCount: number;
-}
-
 export type CheckBackgroundProcessResult =
   | {
       readonly found: true;
       readonly process: ProcessInfo;
-      readonly stdout?: BackgroundProcessOutput;
-      readonly stderr?: BackgroundProcessOutput;
+      readonly stdout?: ProcessOutput;
+      readonly stderr?: ProcessOutput;
     }
   | { readonly found: false; readonly id: string };
 
@@ -65,11 +60,7 @@ export function checkBackgroundProcess(
   return {
     found: true,
     process: process.info,
-    stdout: request.includeStdout
-      ? { text: process.readStdout(readOptions), lineCount: process.stdoutLineCount }
-      : undefined,
-    stderr: request.includeStderr
-      ? { text: process.readStderr(readOptions), lineCount: process.stderrLineCount }
-      : undefined,
+    stdout: request.includeStdout ? process.readStdout(readOptions) : undefined,
+    stderr: request.includeStderr ? process.readStderr(readOptions) : undefined,
   };
 }

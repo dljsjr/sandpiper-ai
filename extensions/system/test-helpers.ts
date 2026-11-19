@@ -71,10 +71,8 @@ function createManagedProcessStub(info: ProcessInfo): ReturnType<ProcessManager[
   return {
     id: info.id,
     info,
-    readStdout: vi.fn(() => ''),
-    readStderr: vi.fn(() => ''),
-    stdoutLineCount: 0,
-    stderrLineCount: 0,
+    readStdout: vi.fn(() => ({ text: '', totalLines: 0, totalBytes: 0, truncated: false })),
+    readStderr: vi.fn(() => ({ text: '', totalLines: 0, totalBytes: 0, truncated: false })),
   } as unknown as ReturnType<ProcessManager['spawn']>;
 }
 

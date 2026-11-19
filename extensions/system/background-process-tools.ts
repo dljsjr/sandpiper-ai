@@ -1,10 +1,14 @@
-import type { ExtensionAPI } from '@earendil-works/pi-coding-agent';
+import { type ExtensionAPI, formatSize, OutputAccumulator } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
 import {
   checkBackgroundProcess,
   startBackgroundProcess,
 } from '../../packages/core/src/background-process-capability.js';
-import type { ProcessManager } from '../../packages/core/src/process-manager.js';
+import type {
+  CreateProcessOutputBuffer,
+  ProcessManager,
+  ProcessOutput,
+} from '../../packages/core/src/process-manager.js';
 import {
   SystemNotificationDelivery,
   SystemNotificationSourceType,
@@ -19,6 +23,21 @@ const BACKGROUND_PROCESS_POLLING_GUIDELINE =
   'You will automatically get a system notification the moment it exits, so there is nothing to gain by checking early — ' +
   'keep working on other things and let the notification tell you when to look. ' +
   'Call check_background_process proactively only if you need to inspect output while the process is still running.';
+
+/** Buffers a stream the way Pi's bash tool does: a bounded tail, and the whole stream in a temp file once it outgrows that. */
+export const createBackgroundProcessOutputBuffer: CreateProcessOutputBuffer = (processId, stream) =>
+  new OutputAccumulator({
+    tempFilePrefix: `sandpiper-bg-${processId.replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 40)}-${stream}`,
+  });
+
+function formatStreamOutput(label: string, output: ProcessOutput): string {
+  const lines = `${output.totalLines} line${output.totalLines === 1 ? '' : 's'}`;
+  const header = `\n${label} (${lines}, ${formatSize(output.totalBytes)}):\n${output.text || '(empty)'}`;
+  if (!output.truncated) return header;
+  const shownLines = output.text === '' ? 0 : output.text.split('\n').length;
+  const fullOutput = output.fullOutputPath ? ` Full output: ${output.fullOutputPath}` : '';
+  return `${header}\n\n[Showing lines ${output.totalLines - shownLines + 1}-${output.totalLines} of ${output.totalLines}.${fullOutput}]`;
+}
 
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
   pi.registerTool({
@@ -102,7 +121,8 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
     label: 'Check Background Process',
     description:
       'Check the status of a background process. By default returns only status and exit code (no output, low context cost). ' +
-      'Set include_stdout/include_stderr to true to retrieve buffered output. Use tail_lines to limit output volume.',
+      'Set include_stdout/include_stderr to true to retrieve buffered output. Use tail_lines to limit output volume. ' +
+      'Each stream shows at most its last 2000 lines or 50KB; a longer stream is saved in full to a temp file, whose path the result gives.',
     promptSnippet: 'Poll background process status and buffered output',
     promptGuidelines: [BACKGROUND_PROCESS_POLLING_GUIDELINE],
     parameters: Type.Object({
@@ -110,7 +130,12 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       include_stdout: Type.Optional(Type.Boolean({ description: 'Include buffered stdout (default: false)' })),
       include_stderr: Type.Optional(Type.Boolean({ description: 'Include buffered stderr (default: false)' })),
       tail_lines: Type.Optional(Type.Number({ description: 'Only include last N lines of output' })),
-      clear_buffer: Type.Optional(Type.Boolean({ description: 'Clear output buffers after reading (default: false)' })),
+      clear_buffer: Type.Optional(
+        Type.Boolean({
+          description:
+            'Start fresh output buffers after reading, so the next check shows only newer output (default: false)',
+        }),
+      ),
     }),
     async execute(_toolCallId, params) {
       const result = checkBackgroundProcess(processManager, {
@@ -138,11 +163,11 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
       }
 
       if (result.stdout) {
-        parts.push(`\nSTDOUT (${result.stdout.lineCount} lines buffered):\n${result.stdout.text || '(empty)'}`);
+        parts.push(formatStreamOutput('STDOUT', result.stdout));
       }
 
       if (result.stderr) {
-        parts.push(`\nSTDERR (${result.stderr.lineCount} lines buffered):\n${result.stderr.text || '(empty)'}`);
+        parts.push(formatStreamOutput('STDERR', result.stderr));
       }
 
       return {

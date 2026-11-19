@@ -149,28 +149,32 @@ index bad9188620334cb89268bff888f8117d075d1660..813fb7529df28cd43719ffa003d7c01a
              roots: [{ uri: pathToFileURL(this.cwd).href, name: basename(this.cwd) }],
          });
 diff --git a/dist/index.d.ts b/dist/index.d.ts
-index bb8acdb1b034f89e8fcb86a5933fa513d49a8ef3..89fc3646f573a99097c00b1b389a6b6c132c3cba 100644
+index bb8acdb1b034f89e8fcb86a5933fa513d49a8ef3..6cf30a227c364c31b7462f870f62d6cf966c1d98 100644
 --- a/dist/index.d.ts
 +++ b/dist/index.d.ts
-@@ -9,6 +9,8 @@ export type { AfterProviderResponseEvent, AgentActivityOutcome, AgentBeforeSettl
+@@ -9,6 +9,10 @@ export type { AfterProviderResponseEvent, AgentActivityOutcome, AgentBeforeSettl
  export { createExtensionRuntime, defineTool, discoverAndLoadExtensions, ExtensionRunner, isBashToolResult, isEditToolResult, isFindToolResult, isGrepToolResult, isLsToolResult, isPowerShellToolResult, isReadToolResult, isToolCallEventType, isWriteToolResult, wrapRegisteredTool, wrapRegisteredTools, } from "./core/extensions/index.ts";
  export type { ReadonlyFooterDataProvider } from "./core/footer-data-provider.ts";
  export type { RegisteredMcpServer } from "./core/mcp-servers.ts";
 +// Sandpiper local patch: Sandpiper's deferred tools list leaves out the tools Pi counts as MCP tools.
 +export { isMcpToolName } from "./core/mcp-servers.ts";
++// Sandpiper local patch: background processes buffer their output the way the bash tool does.
++export { OutputAccumulator, type OutputAccumulatorOptions, type OutputSnapshot } from "./core/tools/output-accumulator.ts";
  export { convertToLlm } from "./core/messages.ts";
  export { ModelRegistry } from "./core/model-registry.ts";
  export { type ModelScopeDiagnostic, type ResolveCliModelResult, type ResolveModelScopeResult, resolveCliModel, resolveModelScopeWithDiagnostics, type ScopedModel, } from "./core/model-resolver.ts";
 diff --git a/dist/index.js b/dist/index.js
-index ab5cfccc3a90939e533b9118122189507a7af326..d3644843b6c313963da54e540f347252da4b8d19 100644
+index ab5cfccc3a90939e533b9118122189507a7af326..c3433be037eafcce7f8aaf98aa2d2598c901a6cb 100644
 --- a/dist/index.js
 +++ b/dist/index.js
-@@ -8,6 +8,8 @@ export { readStoredCredential } from "./core/auth-storage.js";
+@@ -8,6 +8,10 @@ export { readStoredCredential } from "./core/auth-storage.js";
  export { calculateContextTokens, collectEntriesForBranchSummary, compact, DEFAULT_COMPACTION_SETTINGS, estimateTokens, findCutPoint, findTurnStartIndex, generateBranchSummary, generateSummary, generateSummaryWithUsage, getLastAssistantUsage, prepareBranchEntries, serializeConversation, shouldCompact, } from "./core/compaction/index.js";
  export { createEventBus } from "./core/event-bus.js";
  export { createExtensionRuntime, defineTool, discoverAndLoadExtensions, ExtensionRunner, isBashToolResult, isEditToolResult, isFindToolResult, isGrepToolResult, isLsToolResult, isPowerShellToolResult, isReadToolResult, isToolCallEventType, isWriteToolResult, wrapRegisteredTool, wrapRegisteredTools, } from "./core/extensions/index.js";
 +// Sandpiper local patch: Sandpiper's deferred tools list leaves out the tools Pi counts as MCP tools.
 +export { isMcpToolName } from "./core/mcp-servers.js";
++// Sandpiper local patch: background processes buffer their output the way the bash tool does.
++export { OutputAccumulator } from "./core/tools/output-accumulator.js";
  export { convertToLlm } from "./core/messages.js";
  export { ModelRegistry } from "./core/model-registry.js";
  export { resolveCliModel, resolveModelScopeWithDiagnostics, } from "./core/model-resolver.js";

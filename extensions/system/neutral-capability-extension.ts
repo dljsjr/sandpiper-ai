@@ -1,7 +1,7 @@
 import type { ExtensionAPI, ExtensionFactory } from '@earendil-works/pi-coding-agent';
 import { ProcessManager } from '../../packages/core/src/process-manager.js';
 import { registerBackgroundProcessLifecycleHooks } from './background-process-hooks.js';
-import { registerBackgroundProcessTools } from './background-process-tools.js';
+import { createBackgroundProcessOutputBuffer, registerBackgroundProcessTools } from './background-process-tools.js';
 import { registerClockHooks } from './clock.js';
 import { registerContextManagementHooks } from './context-management.js';
 import { registerSkillLoadingTool } from './skill-loading-tool.js';
@@ -36,7 +36,8 @@ export interface BackgroundProcessExtensionOptions {
 }
 
 export function createBackgroundProcessExtension(options: BackgroundProcessExtensionOptions = {}): ExtensionFactory {
-  const processManager = options.processManager ?? new ProcessManager();
+  const processManager =
+    options.processManager ?? new ProcessManager({ createOutputBuffer: createBackgroundProcessOutputBuffer });
 
   return (pi: ExtensionAPI) => {
     registerBackgroundProcessTools(pi, processManager);

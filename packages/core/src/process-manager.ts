@@ -2,7 +2,8 @@
  * Background process manager.
  *
  * Manages long-lived child processes with lifecycle control, output buffering,
- * and exit tracking. Framework-independent — no pi/sandpiper imports.
+ * and exit tracking. Framework-independent — no pi/sandpiper imports: the caller
+ * supplies the output buffers.
  *
  * Consumers register callbacks for exit events and can read
  * buffered output on demand.
@@ -26,8 +27,39 @@ export interface SpawnOptions {
 export interface ReadOutputOptions {
   /** Only return the last N lines. */
   readonly tail?: number;
-  /** Clear the buffer after reading. */
+  /** Start a fresh buffer for the stream after reading. */
   readonly clear?: boolean;
+}
+
+export type ProcessOutputStream = 'stdout' | 'stderr';
+
+/** Holds one stream's output. Pi's OutputAccumulator has this shape. */
+export interface ProcessOutputBuffer {
+  append(data: Buffer): void;
+  finish(): void;
+  snapshot(): {
+    readonly content: string;
+    readonly truncation: { readonly truncated: boolean; readonly totalLines: number; readonly totalBytes: number };
+    readonly fullOutputPath?: string;
+  };
+  closeTempFile(): Promise<void>;
+}
+
+export type CreateProcessOutputBuffer = (processId: string, stream: ProcessOutputStream) => ProcessOutputBuffer;
+
+export interface ProcessManagerOptions {
+  readonly createOutputBuffer: CreateProcessOutputBuffer;
+}
+
+export interface ProcessOutput {
+  /** The buffered tail of the stream, without a final newline. */
+  readonly text: string;
+  readonly totalLines: number;
+  readonly totalBytes: number;
+  /** Whether `text` leaves out earlier output. */
+  readonly truncated: boolean;
+  /** File holding the complete stream, once it outgrew the buffer. */
+  readonly fullOutputPath?: string;
 }
 
 export interface ProcessInfo {
@@ -49,13 +81,17 @@ export class ManagedProcess {
   private _exitSignal: string | null = null;
   private _running = false;
 
-  private stdoutBuffer: string[] = [];
-  private stderrBuffer: string[] = [];
+  private readonly createOutputBuffer: CreateProcessOutputBuffer;
+  private stdoutBuffer: ProcessOutputBuffer;
+  private stderrBuffer: ProcessOutputBuffer;
 
   private exitHandlers: ExitHandler[] = [];
 
-  constructor(id: string) {
+  constructor(id: string, createOutputBuffer: CreateProcessOutputBuffer) {
     this.id = id;
+    this.createOutputBuffer = createOutputBuffer;
+    this.stdoutBuffer = createOutputBuffer(id, 'stdout');
+    this.stderrBuffer = createOutputBuffer(id, 'stderr');
   }
 
   get pid(): number | undefined {
@@ -89,24 +125,18 @@ export class ManagedProcess {
     this.exitHandlers.push(handler);
   }
 
-  /** Read buffered stdout lines. */
-  readStdout(options?: ReadOutputOptions): string {
-    return this.readBuffer(this.stdoutBuffer, options);
+  /** Read buffered stdout. */
+  readStdout(options?: ReadOutputOptions): ProcessOutput {
+    const output = readOutput(this.stdoutBuffer, options);
+    if (options?.clear) this.stdoutBuffer = this.replaceBuffer(this.stdoutBuffer, 'stdout');
+    return output;
   }
 
-  /** Read buffered stderr lines. */
-  readStderr(options?: ReadOutputOptions): string {
-    return this.readBuffer(this.stderrBuffer, options);
-  }
-
-  /** Number of buffered stdout lines. */
-  get stdoutLineCount(): number {
-    return this.stdoutBuffer.length;
-  }
-
-  /** Number of buffered stderr lines. */
-  get stderrLineCount(): number {
-    return this.stderrBuffer.length;
+  /** Read buffered stderr. */
+  readStderr(options?: ReadOutputOptions): ProcessOutput {
+    const output = readOutput(this.stderrBuffer, options);
+    if (options?.clear) this.stderrBuffer = this.replaceBuffer(this.stderrBuffer, 'stderr');
+    return output;
   }
 
   /** Kill the process. */
@@ -135,52 +165,70 @@ export class ManagedProcess {
     this._running = true;
 
     proc.stdout?.on('data', (data: Buffer) => {
-      this.appendToBuffer(this.stdoutBuffer, data);
+      this.stdoutBuffer.append(data);
     });
 
     proc.stderr?.on('data', (data: Buffer) => {
-      this.appendToBuffer(this.stderrBuffer, data);
+      this.stderrBuffer.append(data);
     });
 
     proc.on('close', (code, signal) => {
-      this._running = false;
-      this._exitCode = code;
-      this._exitSignal = signal;
-      this.process = null;
-      for (const handler of this.exitHandlers) handler(code, signal);
+      void this.settle(code, signal);
     });
 
     // A spawn failure emits 'error' and then 'close' with the negative error number, so 'close' alone reports the exit.
     proc.on('error', (err) => {
-      this.appendToBuffer(this.stderrBuffer, Buffer.from(`spawn error: ${err.message}\n`));
+      this.stderrBuffer.append(Buffer.from(`spawn error: ${err.message}\n`));
     });
   }
 
-  private appendToBuffer(buffer: string[], data: Buffer): void {
-    const text = data.toString();
-    const lines = text.split('\n');
-    // If the last line is empty (trailing newline), don't add an empty entry
-    for (const line of lines) {
-      if (line.length > 0) {
-        buffer.push(line);
-      }
-    }
+  // The exit handlers notify the model, which may then read a full-output file, so the files are
+  // flushed first.
+  private async settle(code: number | null, signal: string | null): Promise<void> {
+    this.stdoutBuffer.finish();
+    this.stderrBuffer.finish();
+    await Promise.allSettled([this.stdoutBuffer.closeTempFile(), this.stderrBuffer.closeTempFile()]);
+    this._running = false;
+    this._exitCode = code;
+    this._exitSignal = signal;
+    this.process = null;
+    for (const handler of this.exitHandlers) handler(code, signal);
   }
 
-  private readBuffer(buffer: string[], options?: ReadOutputOptions): string {
-    const lines = options?.tail ? buffer.slice(-options.tail) : buffer;
-    const result = lines.join('\n');
-    if (options?.clear) {
-      buffer.length = 0;
+  private replaceBuffer(buffer: ProcessOutputBuffer, stream: ProcessOutputStream): ProcessOutputBuffer {
+    if (this._running) {
+      buffer.finish();
+      void buffer.closeTempFile().catch(() => {});
+      return this.createOutputBuffer(this.id, stream);
     }
-    return result;
+    // After the exit the old buffer is already finished and closed.
+    const fresh = this.createOutputBuffer(this.id, stream);
+    fresh.finish();
+    return fresh;
   }
+}
+
+function readOutput(buffer: ProcessOutputBuffer, options?: ReadOutputOptions): ProcessOutput {
+  const { content, truncation, fullOutputPath } = buffer.snapshot();
+  const text = content.endsWith('\n') ? content.slice(0, -1) : content;
+  return {
+    text: options?.tail ? text.split('\n').slice(-options.tail).join('\n') : text,
+    totalLines: truncation.totalLines,
+    totalBytes: truncation.totalBytes,
+    truncated: truncation.truncated,
+    ...(fullOutputPath === undefined ? {} : { fullOutputPath }),
+  };
 }
 
 // ─── ProcessManager ─────────────────────────────────────────────
 
 export class ProcessManager {
   private processes = new Map<string, ManagedProcess>();
+  private readonly createOutputBuffer: CreateProcessOutputBuffer;
+
+  constructor(options: ProcessManagerOptions) {
+    this.createOutputBuffer = options.createOutputBuffer;
+  }
 
   /**
    * Spawn a new managed process. Throws if a process with this ID is still running.
@@ -193,7 +241,7 @@ export class ProcessManager {
       throw new Error(`Process "${options.id}" is already running. Wait for it to exit or use a different ID.`);
     }
 
-    const managed = new ManagedProcess(options.id);
+    const managed = new ManagedProcess(options.id, this.createOutputBuffer);
     this.processes.set(options.id, managed);
     managed._start(options);
     return managed;
