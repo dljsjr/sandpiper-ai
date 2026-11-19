@@ -1,189 +1,187 @@
-import type {
-  ContextUsage,
-  ExtensionAPI,
-  ExtensionContext,
-  SessionCompactEvent,
-  SessionStartEvent,
-  TurnEndEvent,
-} from '@earendil-works/pi-coding-agent';
-import { describe, expect, it, vi } from 'vitest';
+import type { ContextUsage, ExtensionAPI, ExtensionContext, SessionEntry } from '@earendil-works/pi-coding-agent';
+import { describe, expect, it } from 'vitest';
 import { createContextManagementExtension } from './neutral-capability-extension.js';
 
-function createContextManagementStub(extension = createContextManagementExtension()) {
-  type Context = Pick<ExtensionContext, 'getContextUsage' | 'model'>;
-  type Handler = (...args: readonly unknown[]) => unknown;
-  const handlers = new Map<string, Handler>();
-  const sendMessage = vi.fn();
-  let usage: ContextUsage | undefined;
-  const ctx: Context = { model: undefined, getContextUsage: () => usage };
-  const pi: Pick<ExtensionAPI, 'on' | 'sendMessage'> = {
-    on: ((event: string, handler: Handler) => {
-      handlers.set(event, handler);
-      return () => {
-        handlers.delete(event);
-      };
-    }) as ExtensionAPI['on'],
-    sendMessage,
-  };
-  extension(pi as ExtensionAPI);
+type Handler = (event: unknown, ctx: ExtensionContext) => unknown;
 
-  async function emit(event: TurnEndEvent | SessionCompactEvent | SessionStartEvent) {
-    if (event.type === 'session_compact') {
-      // Pi cannot estimate post-compaction usage until the next assistant response.
-      usage = { tokens: null, contextWindow: 1000, percent: null };
-    }
-    await handlers.get(event.type)?.(event, ctx);
-  }
-
-  async function turn(percent: number) {
-    usage = { tokens: percent * 10, contextWindow: 1000, percent };
-    const message: TurnEndEvent['message'] = {
-      role: 'assistant',
-      content: [{ type: 'text', text: 'Done.' }],
-      api: 'anthropic-messages',
-      provider: 'anthropic',
-      model: 'test-model',
-      usage: {
-        input: percent * 10,
-        output: 0,
-        cacheRead: 0,
-        cacheWrite: 0,
-        totalTokens: percent * 10,
-        cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
-      },
-      stopReason: 'stop',
-      timestamp: 0,
-    };
-    await emit({
-      type: 'turn_end',
-      turnIndex: 0,
-      message,
-      toolResults: [],
-      messageEntryId: 'assistant-entry',
-      toolResultEntryIds: [],
-      entries: [],
-      continue: false,
-      outcome: 'completed',
-      context: {
-        contextEntries: [],
-        contextMessages: [message],
-        llmMessages: [message],
-        pendingMessages: [],
-        canContinue: true,
-      },
-    });
-  }
-
-  return { emit, turn, sendMessage };
+interface ModelLike {
+  readonly provider: string;
+  readonly id: string;
+  readonly name: string;
 }
 
-describe('context management notifications', () => {
-  it('sends the 50% warning as plain hidden instructions through the real formatter', async () => {
-    const { turn, sendMessage } = createContextManagementStub();
+const WINDOW = 1_000_000;
 
-    await turn(51);
+function usageAt(percent: number | null): ContextUsage {
+  return { tokens: percent === null ? null : (percent * WINDOW) / 100, contextWindow: WINDOW, percent };
+}
 
-    expect(sendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        display: false,
-        content: expect.stringContaining('<instructions>Context usage is above 50%.</instructions>'),
-      }),
-      { deliverAs: 'nextTurn', triggerTurn: false },
-    );
-    expect(sendMessage.mock.calls[0]?.[0].content).not.toContain('&lt;');
-  });
+function createStub(branch: readonly SessionEntry[] = [], model?: ModelLike) {
+  const handlers = new Map<string, Handler>();
+  const pi = {
+    on: ((event: string, handler: Handler) => {
+      handlers.set(event, handler);
+    }) as ExtensionAPI['on'],
+  };
+  createContextManagementExtension()(pi as ExtensionAPI);
+  let usage: ContextUsage | undefined;
+  const ctx = {
+    model,
+    getContextUsage: () => usage,
+    sessionManager: { getBranch: () => branch },
+  } as unknown as ExtensionContext;
 
-  it('sends the 80% alert without nested markup while preserving formatter escaping', async () => {
-    const { turn, sendMessage } = createContextManagementStub();
+  return {
+    turnEnd(percent: number | null, outcome: 'completed' | 'aborted' | 'error' = 'completed') {
+      usage = usageAt(percent);
+      return handlers.get('turn_end')?.({ type: 'turn_end', entries: [], continue: false, outcome }, ctx);
+    },
+    startRun() {
+      return handlers.get('before_agent_start')?.(
+        { type: 'before_agent_start', messageType: 'user', prompt: 'hi' },
+        ctx,
+      );
+    },
+  };
+}
 
-    await turn(81);
+function usageReport(percentUsed: number): SessionEntry {
+  return {
+    type: 'custom_message',
+    id: `usage-${percentUsed}`,
+    parentId: null,
+    timestamp: '2026-11-19T00:00:00.000Z',
+    customType: 'sandpiper:context-usage',
+    content: '',
+    display: false,
+    details: { version: 1, percentUsed, tokensUsed: (percentUsed * WINDOW) / 100, contextWindow: WINDOW },
+  } as SessionEntry;
+}
 
-    expect(sendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        display: false,
-        content: expect.stringContaining(
-          '<instructions>Context usage is above 80%. Make sure you&apos;ve persisted anything you don&apos;t want to forget before continuing your current work.</instructions>',
-        ),
-      }),
-      { deliverAs: 'nextTurn', triggerTurn: false },
-    );
-    expect(sendMessage.mock.calls[0]?.[0].content).not.toContain('&lt;');
-  });
+function modelReport(model: ModelLike): SessionEntry {
+  return {
+    type: 'custom_message',
+    id: `model-${model.id}`,
+    parentId: null,
+    timestamp: '2026-11-19T00:00:00.000Z',
+    customType: 'sandpiper:model',
+    content: '',
+    display: false,
+    details: { version: 1, ...model },
+  } as SessionEntry;
+}
 
-  it.each(['manual', 'threshold', 'overflow'] as const)(
-    'resumes usage notifications in 10-percent steps after %s compaction below the old peak',
-    async (reason) => {
-      const { emit, turn, sendMessage } = createContextManagementStub();
-      await turn(81);
-      sendMessage.mockClear();
+const compaction = { type: 'compaction', id: 'compaction', parentId: null, timestamp: '' } as SessionEntry;
 
-      await emit({
-        type: 'session_compact',
-        reason,
-        willRetry: reason === 'overflow',
-        fromExtension: false,
-        compactionEntry: {
-          type: 'compaction',
-          id: 'compaction-entry',
-          parentId: 'assistant-entry',
-          timestamp: '2026-11-11T00:00:00.000Z',
-          summary: 'Earlier work summarized.',
-          firstKeptEntryId: 'kept-entry',
-          tokensBefore: 810,
+describe('context usage reports', () => {
+  it('appends a bare element with the tokens left at the end of the turn that crosses a 10% step', () => {
+    expect(createStub().turnEnd(51.4)).toEqual({
+      entries: [
+        {
+          type: 'custom_message',
+          customType: 'sandpiper:context-usage',
+          content: '<contextUsage percentUsed="51" tokensLeft="486k" contextWindow="1M"/>',
+          display: false,
+          details: { version: 1, percentUsed: 51, tokensUsed: 514_000, contextWindow: WINDOW },
         },
-      });
-      expect(sendMessage).not.toHaveBeenCalled();
+      ],
+    });
+  });
 
-      await turn(15);
-      expect(sendMessage).toHaveBeenCalledTimes(1);
-      expect(sendMessage).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          details: {
-            sourceType: 'harness',
-            sourceId: 'system',
-            data: { contextUsage: { contextWindow: 1000, percentUsed: 15, tokensUsed: 150 } },
-          },
-        }),
-        { deliverAs: 'nextTurn', triggerTurn: false },
-      );
+  it('reports each 10% step once, reading the last report from the session branch', () => {
+    const stub = createStub([usageReport(51)]);
 
-      await turn(16);
-      expect(sendMessage).toHaveBeenCalledTimes(1);
-      await turn(21);
-      expect(sendMessage).toHaveBeenCalledTimes(2);
-    },
-  );
+    expect(stub.turnEnd(58)).toBeUndefined();
+    expect(stub.turnEnd(61)).toMatchObject({ entries: [{ details: { percentUsed: 61 } }] });
+  });
 
-  it.each(['new', 'resume', 'fork', 'reload'] as const)(
-    'starts with fresh thresholds when Pi reinstantiates the extension for %s',
-    async (reason) => {
-      const extension = createContextManagementExtension();
-      const previous = createContextManagementStub(extension);
-      await previous.emit({ type: 'session_start', reason: 'startup' });
-      await previous.turn(81);
+  it('adds the save-your-work alert to the report that crosses 80%', () => {
+    const result = createStub([usageReport(71)]).turnEnd(80.2) as { entries: { content: string }[] };
 
-      // Pi reloads/rebinds inline factories before session_start, even when reusing the factory function.
-      const replacement = createContextManagementStub(extension);
-      await replacement.emit({
-        type: 'session_start',
-        reason,
-        ...(reason === 'reload' ? {} : { previousSessionFile: '/fixtures/previous-session.jsonl' }),
-      });
-      await replacement.turn(15);
+    expect(result.entries[0]?.content).toBe(
+      '<contextUsage percentUsed="80" tokensLeft="198k" contextWindow="1M"/>\n' +
+        '<sandpiper_system_notification source_type="harness" source_id="system">\n' +
+        '  <instructions>Context usage is above 80%. Make sure you&apos;ve persisted anything you don&apos;t want to forget before continuing your current work.</instructions>\n' +
+        '</sandpiper_system_notification>',
+    );
+  });
 
-      expect(replacement.sendMessage).toHaveBeenCalledTimes(1);
-      expect(replacement.sendMessage).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          content: expect.stringContaining('<contextUsage contextWindow="1000" percentUsed="15" tokensUsed="150"/>'),
-        }),
-        { deliverAs: 'nextTurn', triggerTurn: false },
-      );
-      await replacement.turn(51);
-      expect(replacement.sendMessage.mock.lastCall?.[0].content).toContain(
-        '<instructions>Context usage is above 50%.</instructions>',
-      );
-      await replacement.turn(81);
-      expect(replacement.sendMessage.mock.lastCall?.[0].content).toContain('<instructions>Context usage is above 80%.');
-    },
-  );
+  it('does not report again or re-alert when a reading dips and rises without a compaction', () => {
+    const stub = createStub([usageReport(81)]);
+
+    expect(stub.turnEnd(45)).toBeUndefined();
+    expect(stub.turnEnd(83)).toBeUndefined();
+  });
+
+  it('starts over after a compaction in the branch', () => {
+    expect(createStub([usageReport(81), compaction]).turnEnd(15)).toMatchObject({
+      entries: [{ details: { percentUsed: 15 } }],
+    });
+  });
+
+  it('skips turns that did not complete and readings Pi cannot estimate yet', () => {
+    const stub = createStub();
+
+    expect(stub.turnEnd(55, 'aborted')).toBeUndefined();
+    expect(stub.turnEnd(null)).toBeUndefined();
+  });
+
+  it('keeps entries that earlier handlers proposed', () => {
+    const handlers = new Map<string, Handler>();
+    createContextManagementExtension()({
+      on: ((event: string, handler: Handler) => {
+        handlers.set(event, handler);
+      }) as ExtensionAPI['on'],
+    } as ExtensionAPI);
+    const earlier = { type: 'custom', customType: 'other', data: {} };
+    const ctx = {
+      getContextUsage: () => usageAt(12),
+      sessionManager: { getBranch: () => [] },
+    } as unknown as ExtensionContext;
+
+    const result = handlers.get('turn_end')?.(
+      { type: 'turn_end', entries: [earlier], continue: false, outcome: 'completed' },
+      ctx,
+    ) as { entries: unknown[] };
+
+    expect(result.entries[0]).toBe(earlier);
+    expect(result.entries).toHaveLength(2);
+  });
+});
+
+describe('model reports', () => {
+  const opus: ModelLike = { provider: 'claude-cli', id: 'claude-opus-5-5', name: 'Claude Opus 5.5 (via CC CLI)' };
+
+  it('names the model at the start of the first run on it', () => {
+    expect(createStub([], opus).startRun()).toEqual({
+      message: {
+        customType: 'sandpiper:model',
+        content: '<model provider="claude-cli" id="claude-opus-5-5" name="Claude Opus 5.5 (via CC CLI)"/>',
+        display: false,
+        details: { version: 1, provider: 'claude-cli', id: 'claude-opus-5-5', name: 'Claude Opus 5.5 (via CC CLI)' },
+      },
+    });
+  });
+
+  it('stays quiet while the model matches the last report in the branch, even as a new object', () => {
+    expect(createStub([modelReport(opus)], { ...opus }).startRun()).toBeUndefined();
+  });
+
+  it('reports a switch to another model, escaping its attributes', () => {
+    const other: ModelLike = { provider: 'local', id: 'q&a', name: 'A "quoted" model' };
+
+    expect(createStub([modelReport(opus)], other).startRun()).toMatchObject({
+      message: { content: '<model provider="local" id="q&amp;a" name="A &quot;quoted&quot; model"/>' },
+    });
+  });
+
+  it('names the model again after a compaction, as the summary may drop the last report', () => {
+    expect(createStub([modelReport(opus), compaction], opus).startRun()).toMatchObject({
+      message: { customType: 'sandpiper:model', details: { id: 'claude-opus-5-5' } },
+    });
+  });
+
+  it('stays quiet without a model', () => {
+    expect(createStub([]).startRun()).toBeUndefined();
+  });
 });

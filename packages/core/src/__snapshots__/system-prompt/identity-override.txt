@@ -54,6 +54,7 @@ No <shortcuts> & "no" excuses</context_file>
 - The user cannot see these messages and does not know about them. You do not need to let the user know about them unless they ask.
 - Some notifications include `<instructions>`. This guidance is scoped to the handling of that notification only.
 - `<clock>` elements are also hidden from the user. They help you measure the passage of time.
+- `<model>` and `<contextUsage>` elements are also hidden from the user. They tell you which model you are running on and how much of the context window is left.
 </system_notification_protocol>
 <environment>
   <session_start_date>2026-09-08</session_start_date>

@@ -80,7 +80,7 @@ Pi renders the sections again before every model call, against the tools active 
 4. `<skills>` — skill-loading rules plus available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries. Rendered only when the model can reach the `skill` tool.
 5. `<injected_context>` — injected `AGENTS.md` / `CLAUDE.md` context files from Pi's `systemPromptOptions`.
 6. `<user_appended_prompt>` — user-appended system prompt content, if present.
-7. `<system_notification_protocol>` — how to treat hidden system notifications and the `<clock>` element that the clock extension (`extensions/system/clock.ts`) adds at the start of each run.
+7. `<system_notification_protocol>` — how to treat hidden system notifications, the `<clock>` element that the clock extension (`extensions/system/clock.ts`) adds at the start of each run, and the `<model>` and `<contextUsage>` elements from the context management hooks (`extensions/system/context-management.ts`).
 8. `<environment>` — session start date, platform, and session-start VCS detection. Pi's `cwd` section carries the working directory.
 
 ## Templates

@@ -67,7 +67,7 @@ describe('system extension factory split', () => {
     const contextManagement = createExtensionCapture();
     createContextManagementExtension()(contextManagement.pi as ExtensionAPI);
     expect(contextManagement.tools).toEqual([]);
-    expect(contextManagement.events).toEqual(['session_compact', 'turn_end']);
+    expect(contextManagement.events).toEqual(['turn_end', 'before_agent_start']);
 
     const backgroundProcess = createExtensionCapture();
     createBackgroundProcessExtension()(backgroundProcess.pi as ExtensionAPI);
