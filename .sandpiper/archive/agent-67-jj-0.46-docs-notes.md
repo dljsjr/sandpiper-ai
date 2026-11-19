@@ -1,5 +1,7 @@
 # jj 0.46.0 docs site notes
 
+> Archived 2026-11-19 with AGENT-67: the jj skill rewrite these notes served continues in `~/git/jujutsu-vcs-skill`.
+
 - **Diátaxis mode**: Reference (research notes for the AGENT-67 jj skill rewrite)
 - **Source**: the docs site at <https://docs.jj-vcs.dev/latest/> (sitemap dated 2026-10-07, the 0.46.0 release), read from its markdown source at tag `v0.46.0` (`docs/` plus `mkdocs.yml`). A `lightpanda fetch --dump markdown` of a rendered page had identical headings. Three pages are macro-generated: `cli-reference` (= `jj util markdown-help`, covered in the CLI notes), `changelog` (read separately), and `git-command-table` (read from `docs/git-command-table.yml`).
 - **Companion**: [agent-67-jj-0.46-cli-notes.md](agent-67-jj-0.46-cli-notes.md) covers every command's flags. These notes avoid repeating it and add concepts, the languages, config, workflows, and gotchas.

@@ -1,5 +1,7 @@
 # jj 0.46.0 CLI help notes
 
+> Archived 2026-11-19 with AGENT-67: the jj skill rewrite these notes served continues in `~/git/jujutsu-vcs-skill`.
+
 - **Diátaxis mode**: Reference (research notes for the AGENT-67 jj skill rewrite)
 - **Source**: `jj <cmd> --help` for all 125 commands and subcommands of jj 0.46.0, crawled depth-first from `jj --help` (2026-10-17). `help` subcommands skipped.
 - **Coverage**: every visible command. Hidden commands (for example `jj debug`) do not appear in help and are not covered.
