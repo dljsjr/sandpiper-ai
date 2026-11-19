@@ -54,10 +54,14 @@ export interface SystemPromptDiagnosticResult {
   readonly json: boolean;
 }
 
+// Follows Pi's resolveProjectTrusted() for a session that cannot prompt, without project_trust
+// extension handlers: the diagnostic loads no extensions before trust is decided.
 function resolveProjectTrust(cwd: string, agentDir: string, override: boolean | undefined): boolean {
   if (override !== undefined) return override;
-  if (!hasTrustRequiringProjectResources(cwd)) return true;
-  return new ProjectTrustStore(agentDir).get(cwd) === true;
+  const savedDecision = new ProjectTrustStore(agentDir).get(cwd);
+  if (!hasTrustRequiringProjectResources(cwd)) return savedDecision ?? true;
+  if (savedDecision !== null) return savedDecision;
+  return SettingsManager.create(cwd, agentDir, { projectTrusted: false }).getDefaultProjectTrust() === 'always';
 }
 
 // Pi renders the preamble first, so its span offsets are offsets into the captured prompt.

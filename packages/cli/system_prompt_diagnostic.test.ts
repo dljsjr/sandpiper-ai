@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync,
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ProjectTrustStore } from '@earendil-works/pi-coding-agent';
 import { describe, expect, it } from 'vitest';
 import type { EditableSpan } from '../core/src/prompt-template.js';
 import { findPackageRoot } from './standalone_bootstrap.js';
@@ -320,4 +321,92 @@ describe('system prompt diagnostic', () => {
       rmSync(tempDir, { recursive: true, force: true });
     }
   }, 30_000);
+});
+
+interface ProjectTrustCase {
+  readonly savedDecision?: boolean;
+  readonly trustRequiringResources: boolean;
+  readonly defaultProjectTrust?: 'always' | 'never' | 'ask';
+}
+
+// Renders the trust state the diagnostic gives extensions, which is the one the runtime would use.
+function diagnosticProjectTrust(trustCase: ProjectTrustCase): string | undefined {
+  const tempDir = realpathSync(mkdtempSync(join(tmpdir(), 'sandpiper-system-prompt-trust-')));
+  const agentDir = join(tempDir, 'agent');
+  const project = join(tempDir, 'project');
+  const probe = join(tempDir, 'trust-probe.ts');
+  mkdirSync(agentDir, { recursive: true });
+  mkdirSync(join(tempDir, 'home'), { recursive: true });
+  mkdirSync(project, { recursive: true });
+  if (trustCase.trustRequiringResources) mkdirSync(join(project, '.agents', 'skills'), { recursive: true });
+  if (trustCase.savedDecision !== undefined) new ProjectTrustStore(agentDir).set(project, trustCase.savedDecision);
+  if (trustCase.defaultProjectTrust !== undefined) {
+    writeFileSync(
+      join(agentDir, 'settings.json'),
+      `${JSON.stringify({ defaultProjectTrust: trustCase.defaultProjectTrust })}\n`,
+    );
+  }
+  writeFileSync(
+    probe,
+    `export default function trustProbe(pi) {
+  pi.on('before_agent_start', (event, ctx) => {
+    event.systemPromptOptions.sections.trust_probe = 'trusted=' + ctx.isProjectTrusted();
+  });
+}
+`,
+  );
+
+  try {
+    const run = spawnSync(
+      bunExecutable,
+      ['run', '--bun', join(repoRoot, 'packages', 'cli', 'sandpiper_system_prompt.ts'), '--extension', probe],
+      {
+        cwd: project,
+        encoding: 'utf-8',
+        env: diagnosticEnv(agentDir),
+        stdio: ['ignore', 'pipe', 'pipe'],
+        timeout: 30_000,
+      },
+    );
+    expect(run.status, run.stderr).toBe(0);
+    return /<trust_probe>\n(trusted=\w+)\n<\/trust_probe>/.exec(run.stdout)?.[1];
+  } finally {
+    rmSync(tempDir, { recursive: true, force: true });
+  }
+}
+
+describe('system prompt diagnostic project trust', () => {
+  it.each([
+    [
+      'honours a saved "do not trust" for a project without trust-requiring resources',
+      { savedDecision: false, trustRequiringResources: false },
+      'trusted=false',
+    ],
+    [
+      'trusts a project without trust-requiring resources and no saved decision',
+      { trustRequiringResources: false },
+      'trusted=true',
+    ],
+    [
+      'follows a saved "trust" for a project with trust-requiring resources',
+      { savedDecision: true, trustRequiringResources: true },
+      'trusted=true',
+    ],
+    [
+      'does not trust a project with trust-requiring resources and no saved decision by default',
+      { trustRequiringResources: true },
+      'trusted=false',
+    ],
+    [
+      'follows defaultProjectTrust "always" for a project with trust-requiring resources and no saved decision',
+      { trustRequiringResources: true, defaultProjectTrust: 'always' },
+      'trusted=true',
+    ],
+  ] satisfies ReadonlyArray<readonly [string, ProjectTrustCase, string]>)(
+    '%s',
+    (_name, trustCase, expected) => {
+      expect(diagnosticProjectTrust(trustCase)).toBe(expected);
+    },
+    30_000,
+  );
 });
