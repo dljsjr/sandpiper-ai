@@ -93,6 +93,9 @@ Useful cases to re-test after changes:
 - silent-but-open peer should timeout rather than hanging;
 - early-close peer should produce a deterministic send error;
 - identity-file peers should only list when their socket path is still live;
+- a session that exits without `session_shutdown` should not leave its socket,
+  and a session start should sweep old dead sockets and identity files
+  (`tattler-endpoint-cleanup.integration.test.ts`, `tattler-identity.test.ts`);
 - startup should not leave half-alive sessions where a socket is listening but
   identity publication or tool registration failed.
 

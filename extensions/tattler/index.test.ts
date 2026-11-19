@@ -162,6 +162,34 @@ describe('Tattler session lifecycle', () => {
     await sessionShutdown?.({ type: 'session_shutdown', reason: 'quit' }, fakeContext('sess-b', []));
   });
 
+  it('keeps one exit listener for its socket across /reload and drops it at shutdown', async () => {
+    setUpIsolatedRuntimeDir('tt-exit');
+    const baseline = process.listenerCount('exit');
+    const { pi, handlers } = fakePi();
+    await tattlerExtension(pi);
+    const entries: unknown[] = [];
+
+    await handlers.get('session_start')?.(
+      { type: 'session_start', reason: 'startup' },
+      fakeContext('eeee3333', entries),
+    );
+    expect(process.listenerCount('exit')).toBe(baseline + 1);
+    await handlers.get('session_shutdown')?.(
+      { type: 'session_shutdown', reason: 'reload' },
+      fakeContext('eeee3333', entries),
+    );
+    await handlers.get('session_start')?.(
+      { type: 'session_start', reason: 'reload' },
+      fakeContext('eeee3333', entries),
+    );
+    expect(process.listenerCount('exit')).toBe(baseline + 1);
+    await handlers.get('session_shutdown')?.(
+      { type: 'session_shutdown', reason: 'quit' },
+      fakeContext('eeee3333', entries),
+    );
+    expect(process.listenerCount('exit')).toBe(baseline);
+  });
+
   it('does not leave a stale identity file behind after /reload', async () => {
     setUpIsolatedRuntimeDir('tt-reload-id');
 

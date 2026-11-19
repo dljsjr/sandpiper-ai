@@ -22,7 +22,8 @@
         "devtools/integration/mock-provider.ts",
         "devtools/integration/probe-tool.ts",
         "devtools/integration/fixtures/native-mcp/transport-probe.ts",
-        "devtools/integration/fixtures/renderer-fixture.ts"
+        "devtools/integration/fixtures/renderer-fixture.ts",
+        "devtools/integration/fixtures/exit-after-run.ts"
       ],
       "project": ["packages/**/*.ts!", "extensions/**/*.ts!", "devtools/**/*.ts"]
     }

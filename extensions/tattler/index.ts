@@ -2,6 +2,7 @@
 // Intentionally single-file and not a stable API.
 // Do not extend this into the v1 architecture without first extracting core/runtime boundaries.
 
+import { unlinkSync } from 'node:fs';
 import { appendFile, stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
 import { basename, dirname, join, normalize } from 'node:path';
@@ -10,7 +11,7 @@ import type { CustomEntry, ExtensionAPI, ExtensionContext } from '@earendil-work
 import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { sessionShortIdGenerator } from '../../packages/core/src/utils.js';
-import { listPeerSockets } from './tattler-identity';
+import { listPeerSockets, sweepDeadEndpoints } from './tattler-identity';
 import { createTattlerPendingInbox, TATTLER_PENDING_INBOX_ENTRY_KEY } from './tattler-inbox';
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
 import { createTattlerPendingInboxSnapshot, restoreTattlerPendingInboxFromSession } from './tattler-inbox-persistence';
@@ -43,6 +44,28 @@ const tmp = require('tmp');
 
 // extension-global variable for now
 let server: net.Server | undefined;
+let stopRemovingSocketOnExit: (() => void) | undefined;
+
+// A session waits this long before treating another session's refused socket as dead, so it never
+// removes one that is between bind and listen.
+const DEAD_ENDPOINT_MIN_AGE_MS = 10_000;
+
+// process.exit skips session_shutdown (Pi's emergencyTerminalExit and uncaughtCrash call it), and
+// Node does not remove a Unix socket file on exit, so remove it from the exit event, which allows
+// only synchronous work.
+function removeSocketOnExit(socketPath: string): void {
+  stopRemovingSocketOnExit?.();
+  const removeSocket = () => {
+    try {
+      unlinkSync(socketPath);
+    } catch {}
+  };
+  process.on('exit', removeSocket);
+  stopRemovingSocketOnExit = () => {
+    process.off('exit', removeSocket);
+    stopRemovingSocketOnExit = undefined;
+  };
+}
 let eventResponderUnsubscribers: Array<() => void> = [];
 
 function clearEventResponders(): void {
@@ -288,6 +311,9 @@ is used to resume an existing session.
       console.error("Couldn't create IPC server, Tattler will be unavailable for this agent session");
       return;
     }
+    removeSocketOnExit(ownIdentity.socketPath);
+    // A SIGKILLed session leaves its socket and identity file; clear those without delaying startup.
+    void sweepDeadEndpoints(tattlerRuntimeDir, { minAgeMs: DEAD_ENDPOINT_MIN_AGE_MS }).catch(() => {});
 
     tmp.setGracefulCleanup();
     const fileSanitizedIdentity = sanitize(ownIdentity.name);
@@ -341,6 +367,7 @@ is used to resume an existing session.
     pendingInbox.clear();
     pendingInboxNotifier.reset();
     activeContext = undefined;
+    stopRemovingSocketOnExit?.();
     if (server) {
       const closingServer = server;
       server = undefined;

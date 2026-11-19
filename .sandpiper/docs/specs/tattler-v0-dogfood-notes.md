@@ -75,6 +75,15 @@ when the two files overlap, prefer this document for current guidance.
   file or registered tools. Treat this as a v0 startup bug/regression, and keep
   related failure modes visible during dogfood so half-alive sessions are easy to
   spot.
+- Endpoint cleanup (TAT-84). `session_shutdown` closes the server and removes
+  the socket file; Pi runs it on quit, `/reload`, SIGTERM, and SIGHUP. Paths that
+  skip it are covered separately: an `exit` listener removes the socket on
+  `process.exit` (Pi's `emergencyTerminalExit` and `uncaughtCrash`), and `tmp`
+  removes the identity file. After SIGKILL both remain, so each session start
+  sweeps the runtime directory in the background: it removes socket files that
+  refuse connections and identity files whose socket is missing or refuses,
+  once they are at least 10 seconds old, so a session between bind and listen
+  is never mistaken for a dead one. A socket that times out is kept.
 
 ## TAT-4 and Multi-Agent Dogfood Findings
 
@@ -104,8 +113,6 @@ NAV-51 to NAV-55.
 
 ## Open Questions
 
-- Does Tattler v0 need any explicit cleanup on session shutdown, or is dead
-  socket pruning during discovery enough for the spike?
 - Should the v0 internal Pi config import be replaced by a hardcoded Sandpiper
   namespace for this plugin, or kept because it has been manually verified for
   both Pi and Sandpiper?

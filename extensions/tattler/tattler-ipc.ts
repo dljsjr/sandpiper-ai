@@ -32,28 +32,35 @@ import {
 } from './tattler-protocol';
 
 // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
-export async function isSocketAlive(socketPath: string): Promise<boolean> {
+/** `refused` means no process listens on the socket file; a timeout or other error is `unknown`. */
+export type SocketProbeResult = 'alive' | 'refused' | 'unknown';
+
+export async function probeSocket(socketPath: string): Promise<SocketProbeResult> {
   return await new Promise((resolve) => {
     const socket = net.createConnection(socketPath);
     const timeout = setTimeout(() => {
       socket.destroy();
-      resolve(false);
+      resolve('unknown');
     }, 300);
 
-    const cleanup = (alive: boolean) => {
+    const cleanup = (result: SocketProbeResult) => {
       clearTimeout(timeout);
       socket.removeAllListeners();
-      resolve(alive);
+      resolve(result);
     };
 
     socket.once('connect', () => {
       socket.end();
-      cleanup(true);
+      cleanup('alive');
     });
-    socket.once('error', () => {
-      cleanup(false);
+    socket.once('error', (error: NodeJS.ErrnoException) => {
+      cleanup(error.code === 'ECONNREFUSED' ? 'refused' : 'unknown');
     });
   });
+}
+
+export async function isSocketAlive(socketPath: string): Promise<boolean> {
+  return (await probeSocket(socketPath)) === 'alive';
 }
 
 type TattlerMessageSender = {
