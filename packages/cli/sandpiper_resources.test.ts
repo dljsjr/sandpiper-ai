@@ -10,8 +10,6 @@ vi.mock('../../extensions/web-search/src/config-resolver.js', async (importOrigi
   return { ...actual, readSettingsKey: vi.fn(() => undefined) };
 });
 
-vi.mock('./temporary_trail_skill.js', () => ({ temporaryTrailSkillPaths: () => ['/trail/skill'] }));
-
 import { createNeutralCapabilityExtensionFactories, createSandpiperExtensionFactories } from './sandpiper_resources.js';
 
 const savedBraveApiKey = process.env.BRAVE_API_KEY;
@@ -98,26 +96,6 @@ function applyFactories(factories: readonly InlineExtension[]): ReturnType<typeo
 }
 
 describe('Sandpiper resource adapter', () => {
-  it('offers only the temporary Trail skill path for resource discovery', async () => {
-    const handlers = new Map<string, () => unknown>();
-    const capture = createExtensionCapture();
-    const pi = {
-      ...capture.pi,
-      on: ((event: string, handler: () => unknown) => {
-        handlers.set(event, handler);
-        return () => {};
-      }) as ExtensionAPI['on'],
-    };
-    const resources = createNeutralCapabilityExtensionFactories().find(
-      (extension) => typeof extension !== 'function' && extension.name === 'sandpiper-resources',
-    );
-    if (!resources || typeof resources === 'function') throw new Error('sandpiper-resources extension is missing');
-
-    await resources.factory(pi as ExtensionAPI);
-
-    expect(handlers.get('resources_discover')?.()).toEqual({ skillPaths: ['/trail/skill'] });
-  });
-
   it('adds the clock reading at the start of every run and records each run when it settles', async () => {
     const events: string[] = [];
     const pi = {

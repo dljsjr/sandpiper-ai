@@ -1,4 +1,4 @@
-import type { ExtensionAPI, ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
+import type { ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
 import chorusExtension from '../../extensions/chorus.js';
 import {
@@ -17,16 +17,9 @@ import {
   obscuraRendererExtension,
 } from '../../extensions/web-fetch/src/renderer-extensions.js';
 import webSearchExtension from '../../extensions/web-search/src/index.js';
-import { temporaryTrailSkillPaths } from './temporary_trail_skill.js';
 
 function inlineExtension(name: string, factory: ExtensionFactory): InlineExtension {
   return { name, factory };
-}
-
-function createSandpiperResourceExtension(): ExtensionFactory {
-  return (pi: ExtensionAPI) => {
-    pi.on('resources_discover', () => ({ skillPaths: temporaryTrailSkillPaths() }));
-  };
 }
 
 export function createNeutralCapabilityExtensionFactories(): readonly InlineExtension[] {
@@ -43,7 +36,6 @@ export function createNeutralCapabilityExtensionFactories(): readonly InlineExte
     inlineExtension('autotoon', autotoonExtension),
     inlineExtension('tattler', tattlerExtension),
     inlineExtension('chorus', chorusExtension),
-    inlineExtension('sandpiper-resources', createSandpiperResourceExtension()),
   ];
 }
 

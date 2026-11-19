@@ -38,7 +38,6 @@ The build replaces only root `dist/`. Packing writes `dist/sandpiper-ai-cli-0.0.
 
 - Root `package.json` owns product metadata, bins, file selection, dependencies, and build/test commands.
 - `packages/cli/` contains both source entrypoints and the stable `bin/` launchers.
-- `packages/cli/temporary_trail_skill.ts` temporarily loads `~/git/skills-incubator/skills/trail` when `trail` is executable on PATH. TOOLS-43 tracks replacing this local bridge. There are no Trail flags, downloads, or discovery commands yet.
 - `packages/core/src/` contains shared modules imported directly by relative path. It has no separate package manifest.
 - `extensions/autotoon/core.ts` owns the framework-independent JSON→TOON transform.
 - `devtools/` retains build/pack regressions, isolated RPC and print-mode drivers, mock providers, and the jj test fixture.
