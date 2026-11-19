@@ -1,11 +1,15 @@
+import { StringEnum } from '@earendil-works/pi-ai';
 import { type ExtensionAPI, formatSize, OutputAccumulator } from '@earendil-works/pi-coding-agent';
 import { Type } from 'typebox';
 import {
   checkBackgroundProcess,
   startBackgroundProcess,
+  stopBackgroundProcess,
 } from '../../packages/core/src/background-process-capability.js';
 import type {
   CreateProcessOutputBuffer,
+  ManagedProcess,
+  ProcessInfo,
   ProcessManager,
   ProcessOutput,
 } from '../../packages/core/src/process-manager.js';
@@ -30,6 +34,13 @@ export const createBackgroundProcessOutputBuffer: CreateProcessOutputBuffer = (p
     tempFilePrefix: `sandpiper-bg-${processId.replace(/[^A-Za-z0-9_-]/g, '_').slice(0, 40)}-${stream}`,
   });
 
+const STOP_WAIT_MS = 5_000;
+const STOP_SIGNALS = ['SIGTERM', 'SIGINT', 'SIGKILL'] as const;
+
+function describeExit(process: ProcessInfo): string {
+  return process.exitSignal ? `signal: ${process.exitSignal}` : `exit code: ${process.exitCode}`;
+}
+
 function formatStreamOutput(label: string, output: ProcessOutput): string {
   const lines = `${output.totalLines} line${output.totalLines === 1 ? '' : 's'}`;
   const header = `\n${label} (${lines}, ${formatSize(output.totalBytes)}):\n${output.text || '(empty)'}`;
@@ -40,6 +51,9 @@ function formatStreamOutput(label: string, output: ProcessOutput): string {
 }
 
 export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager: ProcessManager): void {
+  // The agent already learns the outcome of a stop it asked for, so no exit notification follows.
+  const stopRequested = new WeakSet<ManagedProcess>();
+
   pi.registerTool({
     name: 'start_background_process',
     label: 'Start Background Process',
@@ -57,7 +71,7 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
     parameters: Type.Object({
       id: Type.String({
         description:
-          'Unique identifier for this process. Use it with check_background_process; the exit notification names it too.',
+          'Unique identifier for this process. Use it with check_background_process and stop_background_process; the exit notification names it too.',
       }),
       command: Type.String({
         description:
@@ -91,7 +105,9 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
         };
       }
 
-      processManager.get(result.process.id)?.onExit((exitCode, exitSignal) => {
+      const managed = processManager.get(result.process.id);
+      managed?.onExit((exitCode, exitSignal) => {
+        if (stopRequested.has(managed)) return;
         sendSystemNotification(pi, {
           sourceType: SystemNotificationSourceType.Tool,
           sourceId: 'background_process',
@@ -174,6 +190,46 @@ export function registerBackgroundProcessTools(pi: ExtensionAPI, processManager:
         content: [{ type: 'text' as const, text: parts.join('\n') }],
         details: process,
       };
+    },
+  });
+
+  pi.registerTool({
+    name: 'stop_background_process',
+    label: 'Stop Background Process',
+    exposure: 'deferred',
+    description:
+      `Stop a background process started with start_background_process. Sends SIGTERM unless told otherwise and waits up to ${STOP_WAIT_MS / 1000} seconds for the process to exit. ` +
+      'The result reports the exit, and no exit notification follows. ' +
+      'If the process is still running after the wait, call again with signal SIGKILL.',
+    promptSnippet: 'Stop a background process started with start_background_process',
+    parameters: Type.Object({
+      id: Type.String({ description: 'Process ID to stop' }),
+      signal: Type.Optional(
+        StringEnum(STOP_SIGNALS, {
+          description: 'Signal to send (default: SIGTERM)',
+        }),
+      ),
+    }),
+    async execute(_toolCallId, params) {
+      const signal = STOP_SIGNALS.find((name) => name === params.signal) ?? 'SIGTERM';
+      const managed = processManager.get(params.id);
+      if (managed?.running) stopRequested.add(managed);
+      const result = await stopBackgroundProcess(processManager, { id: params.id, signal, timeoutMs: STOP_WAIT_MS });
+
+      if (!result.found) {
+        return {
+          content: [{ type: 'text' as const, text: `No background process found with ID "${params.id}".` }],
+          details: { id: params.id, pid: undefined, running: false, exitCode: null, exitSignal: null },
+          isError: true,
+        };
+      }
+
+      const text = !result.wasRunning
+        ? `Background process "${params.id}" had already exited (${describeExit(result.process)}).`
+        : result.exited
+          ? `Background process "${params.id}" stopped (${describeExit(result.process)}).`
+          : `Sent ${signal} to background process "${params.id}", but it is still running after ${STOP_WAIT_MS / 1000} seconds. Call stop_background_process again with signal SIGKILL to force it.`;
+      return { content: [{ type: 'text' as const, text }], details: result.process };
     },
   });
 }

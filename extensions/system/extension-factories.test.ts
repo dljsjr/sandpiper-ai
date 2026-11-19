@@ -71,7 +71,11 @@ describe('system extension factory split', () => {
 
     const backgroundProcess = createExtensionCapture();
     createBackgroundProcessExtension()(backgroundProcess.pi as ExtensionAPI);
-    expect(backgroundProcess.tools).toEqual(['start_background_process', 'check_background_process']);
+    expect(backgroundProcess.tools).toEqual([
+      'start_background_process',
+      'check_background_process',
+      'stop_background_process',
+    ]);
     expect(backgroundProcess.events).toEqual(['session_shutdown']);
 
     for (const capture of [skillLoading, turnControl, contextManagement, backgroundProcess]) {

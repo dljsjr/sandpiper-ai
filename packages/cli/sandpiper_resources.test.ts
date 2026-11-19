@@ -128,7 +128,7 @@ describe('Sandpiper resource adapter', () => {
   it('defers the rarely used tools and keeps skill, done, and the background process tools loaded', () => {
     const { exposures } = applyFactories(createNeutralCapabilityExtensionFactories());
 
-    for (const name of ['web_fetch', 'web_search', 'tattler_receive', 'send_chorus_reply']) {
+    for (const name of ['web_fetch', 'web_search', 'tattler_receive', 'send_chorus_reply', 'stop_background_process']) {
       expect(exposures.get(name), name).toBe('deferred');
     }
     expect(exposures.has('skill')).toBe(true);

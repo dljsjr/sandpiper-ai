@@ -37,6 +37,7 @@ Most tools that Sandpiper's bundled extensions register have `exposure: "deferre
 | ------------------------------------------------------ | ---------- | ----------------------------------------------- |
 | `list_peers`, `send_peer_message`, `tattler_receive`   | `deferred` | `extensions/tattler/`                           |
 | `send_chorus_reply`                                    | `deferred` | `extensions/chorus.ts`                          |
+| `stop_background_process`                              | `deferred` | `extensions/system/background-process-tools.ts` |
 | `web_fetch`                                            | `deferred` | `extensions/web-fetch/`                         |
 | `web_search`                                           | `deferred` | `extensions/web-search/`                        |
 | `skill`, `done`                                        | `direct`   | `extensions/system/`                            |

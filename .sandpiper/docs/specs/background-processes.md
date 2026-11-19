@@ -1,24 +1,24 @@
 # Background processes
 
 - **Diátaxis mode**: Reference spec with explanatory notes
-- **Status**: Implemented. AGENT-70, a tool to stop one process, is open.
+- **Status**: Implemented.
 - **Implementation**: `packages/core/src/process-manager.ts`, `packages/core/src/background-process-capability.ts`, `extensions/system/background-process-tools.ts`, `extensions/system/background-process-hooks.ts`, `packages/core/src/system-notification.ts`
-- **Related**: [Deferred tools](sandpiper-system-prompt.md#deferred-tools) (why both tools stay loaded), [original design sketch](../../archive/background-process-framework-design-2026-04.md) (archived)
+- **Related**: [Deferred tools](sandpiper-system-prompt.md#deferred-tools) (why the start and check tools stay loaded), [original design sketch](../../archive/background-process-framework-design-2026-04.md) (archived)
 
 The system extension lets the model run long-lived commands, such as dev servers, watchers, and test suites, without blocking the conversation. A Pi tool call returns before the model continues, so a background process has to outlive the tool call that starts it.
 
 ## Tools
 
-Both tools have `direct` exposure.
+`start_background_process` and `check_background_process` have `direct` exposure. `stop_background_process` is `deferred`: `tool_search` loads it when the model needs it.
 
 ### `start_background_process`
 
-| Parameter | Type     | Required | Description                                                                             |
-| --------- | -------- | -------- | --------------------------------------------------------------------------------------- |
-| `id`      | string   | yes      | Identifier for the process. `check_background_process` and the exit notification use it |
-| `command` | string   | yes      | Executable to run. No shell parses it                                                   |
-| `args`    | string[] | no       | Arguments, one per element                                                              |
-| `cwd`     | string   | no       | Absolute working directory. Default: the session's working directory                    |
+| Parameter | Type     | Required | Description                                                                                                         |
+| --------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| `id`      | string   | yes      | Identifier for the process. `check_background_process`, `stop_background_process`, and the exit notification use it |
+| `command` | string   | yes      | Executable to run. No shell parses it                                                                               |
+| `args`    | string[] | no       | Arguments, one per element                                                                                          |
+| `cwd`     | string   | no       | Absolute working directory. Default: the session's working directory                                                |
 
 - The process starts with `child_process.spawn()`, the given arguments, Sandpiper's environment, and piped stdin, stdout, and stderr. Nothing is written to stdin.
 - The tool returns at once with the PID: `details` is `{ id, pid, status: 'running' }`.
@@ -37,9 +37,22 @@ Both tools have `direct` exposure.
 
 The result text is `Process "<id>": running` or `exited`, with the PID, then `Exit code: <code>` once the process has exited, then each requested stream with its total line count and size. A stream that outgrew its buffer ends with a note in the `bash` tool's form, `[Showing lines <first>-<last> of <total>. Full output: <path>]`. `details` is `{ id, pid, running, exitCode, exitSignal }`. An unknown `id` is an error.
 
+### `stop_background_process`
+
+| Parameter | Type   | Required | Description                                           |
+| --------- | ------ | -------- | ----------------------------------------------------- |
+| `id`      | string | yes      | The process to stop                                   |
+| `signal`  | string | no       | `SIGTERM`, `SIGINT`, or `SIGKILL`. Default: `SIGTERM` |
+
+- The tool sends the signal and waits up to 5 seconds for the process to exit. The result is `Background process "<id>" stopped (signal: <signal>)`, or `(exit code: <code>)` when the process exits on its own terms.
+- A process still running after the wait gets a result that says so and suggests calling again with `SIGKILL`.
+- A process that had already exited is reported as such and not signalled. An unknown `id` is an error.
+- No exit notification follows a stop the model asked for, even when the process exits after the wait. The tool result already carries the outcome, and a notification would start another run to repeat it.
+- `details` is `{ id, pid, running, exitCode, exitSignal }`.
+
 ## Exit notification
 
-When a process exits, the tool sends a hidden system notification with `deliverAs: "steer"` and `triggerTurn: true`. A busy session receives it as a steering message. An idle session starts a run for it, which carries the Sandpiper prompt like any other run. The notification is recorded in the session.
+When a process exits, unless `stop_background_process` stopped it, the tool sends a hidden system notification with `deliverAs: "steer"` and `triggerTurn: true`. A busy session receives it as a steering message. An idle session starts a run for it, which carries the Sandpiper prompt like any other run. The notification is recorded in the session.
 
 ```text
 <sandpiper_system_notification source_type="tool" source_id="background_process">
@@ -53,7 +66,7 @@ Both tools carry a guideline that tells the model not to poll in a loop and to w
 ## Lifecycle
 
 - On `session_shutdown`, every process gets `SIGTERM` (`background-process-hooks.ts`). No process outlives the session, and none is restored when a session resumes.
-- No tool stops a single process. `ManagedProcess.kill()` exists for code; AGENT-70 tracks a stop tool.
+- `stop_background_process` stops one process. Code can call `ManagedProcess.kill()` or `stopBackgroundProcess()` in `background-process-capability.ts`.
 
 ## Output buffers
 
@@ -83,12 +96,11 @@ Each stream has its own Pi `OutputAccumulator`, the buffer behind Pi's `bash` to
 
 ## Known gaps
 
-| Gap          | Notes                                                                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| No stop tool | AGENT-70                                                                                                                                         |
-| No restart   | A process that exits stays exited; start the same `id` again. Not planned: AGENT-46 was closed in the 2026-11-19 triage                          |
-| No terminal  | Pipes, not a PTY. Programs that check for a terminal can behave differently. Not planned: AGENT-65 was closed in the 2026-11-19 triage           |
-| One reader   | `clear_buffer` empties the buffer for every later reader. AGENT-47 dropped a broadcast design when its second consumer, Shell Relay, was removed |
+| Gap         | Notes                                                                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| No restart  | A process that exits stays exited; start the same `id` again. Not planned: AGENT-46 was closed in the 2026-11-19 triage                          |
+| No terminal | Pipes, not a PTY. Programs that check for a terminal can behave differently. Not planned: AGENT-65 was closed in the 2026-11-19 triage           |
+| One reader  | `clear_buffer` empties the buffer for every later reader. AGENT-47 dropped a broadcast design when its second consumer, Shell Relay, was removed |
 
 ## Design notes
 

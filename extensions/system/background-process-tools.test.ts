@@ -20,7 +20,12 @@ describe('registerBackgroundProcessTools', () => {
       processManager as Parameters<typeof registerBackgroundProcessTools>[1],
     );
 
-    expect(tools.map((tool) => tool.name)).toEqual(['start_background_process', 'check_background_process']);
+    expect(tools.map((tool) => tool.name)).toEqual([
+      'start_background_process',
+      'check_background_process',
+      'stop_background_process',
+    ]);
+    expect((tools[2] as { exposure?: string }).exposure).toBe('deferred');
 
     const startTool = tools[0];
     if (!startTool) {
@@ -186,6 +191,47 @@ describe('registerBackgroundProcessTools', () => {
       const fullOutput = readFileSync(fullOutputPath, 'utf-8');
       expect(fullOutput.startsWith('line-1\n')).toBe(true);
       expect(fullOutput.endsWith('line-3000\n')).toBe(true);
+    });
+  });
+
+  describe('stopping a process on purpose', () => {
+    const managers: ProcessManager[] = [];
+
+    afterEach(() => {
+      for (const manager of managers.splice(0)) manager.killAll();
+    });
+
+    it('reports the exit itself and sends no exit notification', async () => {
+      const { pi, tools, sendMessage } = createToolRegistrationStub();
+      const processManager = new ProcessManager({ createOutputBuffer: createBackgroundProcessOutputBuffer });
+      managers.push(processManager);
+      registerBackgroundProcessTools(pi as Parameters<typeof registerBackgroundProcessTools>[0], processManager);
+      const startTool = tools.find((tool) => tool.name === 'start_background_process');
+      const stopTool = tools.find((tool) => tool.name === 'stop_background_process');
+      if (!startTool || !stopTool) throw new Error('Expected background process tools to be registered');
+
+      await startTool.execute('tool-call-id', { id: 'server', command: 'sleep', args: ['60'] }, undefined, undefined, {
+        cwd: '/tmp',
+      });
+      const result = await stopTool.execute('tool-call-id', { id: 'server' }, undefined, undefined, {});
+
+      expect(result.isError).toBeUndefined();
+      expect(result.content[0]?.text).toBe('Background process "server" stopped (signal: SIGTERM).');
+      expect(result.details).toMatchObject({ id: 'server', running: false, exitSignal: 'SIGTERM' });
+      expect(sendMessage).not.toHaveBeenCalled();
+    });
+
+    it('reports an unknown process id as an error', async () => {
+      const { pi, tools } = createToolRegistrationStub();
+      const processManager = new ProcessManager({ createOutputBuffer: createBackgroundProcessOutputBuffer });
+      registerBackgroundProcessTools(pi as Parameters<typeof registerBackgroundProcessTools>[0], processManager);
+      const stopTool = tools.find((tool) => tool.name === 'stop_background_process');
+      if (!stopTool) throw new Error('Expected stop_background_process to be registered');
+
+      const result = await stopTool.execute('tool-call-id', { id: 'missing' }, undefined, undefined, {});
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toBe('No background process found with ID "missing".');
     });
   });
 });

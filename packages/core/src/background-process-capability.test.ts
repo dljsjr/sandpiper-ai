@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { checkBackgroundProcess, startBackgroundProcess } from './background-process-capability.js';
+import {
+  checkBackgroundProcess,
+  startBackgroundProcess,
+  stopBackgroundProcess,
+} from './background-process-capability.js';
 import { ProcessManager } from './process-manager.js';
 import { recordingOutputBuffers } from './test-output-buffer.js';
 
@@ -99,5 +103,45 @@ describe('background process capability operations', () => {
     const result = checkBackgroundProcess(processManager, { id: 'missing' });
 
     expect(result).toEqual({ found: false, id: 'missing' });
+  });
+
+  describe('stopping a process', () => {
+    it('signals a running process and reports its exit', async () => {
+      processManager.spawn({ id: 'server', command: 'sleep', args: ['60'] });
+
+      const result = await stopBackgroundProcess(processManager, { id: 'server', signal: 'SIGTERM', timeoutMs: 2000 });
+
+      expect(result).toMatchObject({ found: true, wasRunning: true, exited: true });
+      if (result.found) expect(result.process).toMatchObject({ running: false, exitSignal: 'SIGTERM' });
+    });
+
+    it('reports a process that is still running when the wait ends', async () => {
+      const started = processManager.spawn({ id: 'stubborn', command: 'sh', args: ['-c', 'trap "" TERM; sleep 30'] });
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const result = await stopBackgroundProcess(processManager, { id: 'stubborn', signal: 'SIGTERM', timeoutMs: 200 });
+
+      expect(result).toMatchObject({ found: true, wasRunning: true, exited: false });
+      expect(started.running).toBe(true);
+    });
+
+    it('reports an already exited process without signalling it', async () => {
+      const started = processManager.spawn({ id: 'done', command: 'true' });
+      await waitFor(() => expect(started.running).toBe(false), { timeout: 2000 });
+
+      const result = await stopBackgroundProcess(processManager, { id: 'done', signal: 'SIGTERM', timeoutMs: 200 });
+
+      expect(result).toMatchObject({ found: true, wasRunning: false, exited: true });
+      if (result.found) expect(result.process.exitCode).toBe(0);
+    });
+
+    it('returns a typed miss for an unknown process id', async () => {
+      expect(await stopBackgroundProcess(processManager, { id: 'missing', signal: 'SIGTERM', timeoutMs: 200 })).toEqual(
+        {
+          found: false,
+          id: 'missing',
+        },
+      );
+    });
   });
 });
