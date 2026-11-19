@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "tasks_dir": ".sandpiper/tasks",
+  "version_control": {
+    "enabled": true,
+    "mode": {
+      "branch": "tasks"
+    },
+    "auto_commit": false,
+    "auto_push": false
+  }
+}
