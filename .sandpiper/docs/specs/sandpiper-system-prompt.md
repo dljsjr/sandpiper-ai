@@ -44,6 +44,8 @@ Most tools that Sandpiper's bundled extensions register have `exposure: "deferre
 
 The background process tools stay loaded because Pi lists a tool's guidelines in `rules` only while the tool is declared, and their guideline ("Prefer `start_background_process` over nohup, `&`, or manually backgrounding jobs with bash") steers ordinary coding work.
 
+Pi's `tool_search` loads every tool that shares one query word with its name, description, parameter schema, or MCP server name, description, and instructions, up to its limit. A server's instructions count for each of its tools, so a query with one of those words loads that server's tools whether or not they fit. With cua-driver configured, most searches also load some of its tools. This is Pi's ranking, not Sandpiper's, and Doug chose to leave it: loading too many tools is safer than too few.
+
 `extensions/system/deferred-tools.ts`, registered by the system extension, does two things:
 
 - In `before_agent_start`, it sets `systemPromptOptions.deferredTools` to the names of the registered tools with `deferred` exposure, sorted by name, except the tools Pi counts as MCP tools. `<mcp_servers>` describes MCP servers instead. The check is Pi's `isMcpToolName`, which the local patch exports. A namespace check would miss Pi's MCP resource tools (`list_mcp_resources`, `list_mcp_resource_templates`, `read_mcp_resource`), which have no namespace, and would also leave out namespaced tools from other extensions. This is a separate handler from the prompt hook, so it also runs under a user's custom prompt.
