@@ -308,11 +308,18 @@ export function createAck(correlatedMessageId: TattlerMessageId): TattlerAckV0 {
   });
 }
 
+// Senders read at most MAX_PROTOCOL_REPLY_BYTES; an error text quoting a long input is cut so the
+// reply still fits.
+const MAX_PROTOCOL_ERROR_TEXT_LENGTH = 400;
+
 export function createProtocolError(message: string, correlatedMessageId?: TattlerMessageId): TattlerErrorV0 {
   return buildMessage('tattler.error.v0', {
     error: {
       code: 'protocol-error',
-      message,
+      message:
+        message.length > MAX_PROTOCOL_ERROR_TEXT_LENGTH
+          ? `${message.slice(0, MAX_PROTOCOL_ERROR_TEXT_LENGTH)}… (cut)`
+          : message,
       ...(correlatedMessageId === undefined ? {} : { correlatedMessageId }),
     },
   });

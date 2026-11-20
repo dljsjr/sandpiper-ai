@@ -92,6 +92,17 @@ when the two files overlap, prefer this document for current guidance.
   socket is missing or refuses, once they are at least 10 seconds old, so a
   session between bind and listen is never mistaken for a dead one. A socket
   that times out is kept.
+- Self-repair (TAT-88). Once a second the session checks its files: it writes
+  a missing identity file again, and listens again if its socket file is gone.
+  A long-suspended session can refuse connections once its backlog fills, so
+  another session's sweep may remove its files; this restores them when it
+  runs again. A socket file at its path that is not its own is left alone.
+- Limits checked before sending (TAT-88): an empty message, a message over 4096
+  bytes, and a frame over 6144 bytes once JSON-encoded (quotes, backslashes,
+  and line breaks count double) are refused with a clear error before the peer
+  lookup. The server closes a connection that sends nothing for 10 seconds,
+  and cuts error texts to 400 characters so replies fit the 2048-byte reply
+  limit.
 - Ownership (TAT-87). Startup reuses its socket path only when the old socket
   refuses connections; otherwise it grows the short id. A name whose identity
   file names another live session's socket stays with that session: the new

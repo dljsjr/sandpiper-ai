@@ -50,7 +50,8 @@ export async function probeSocket(socketPath: string): Promise<SocketProbeResult
     };
 
     socket.once('connect', () => {
-      socket.end();
+      // destroy, not end: a hung peer never answers the FIN, which would leave this socket half open.
+      socket.destroy();
       cleanup('alive');
     });
     socket.once('error', (error: NodeJS.ErrnoException) => {
@@ -76,7 +77,11 @@ type TattlerIpcRuntime = TattlerMessageSender &
     isIdle?(): boolean;
     persistPendingInboxSnapshot?(): void;
     notifyPendingInbox?(): void;
+    /** How long a connection may stay silent before the server closes it. Default 10 s. */
+    readonly idleTimeoutMs?: number;
   };
+
+const DEFAULT_IDLE_TIMEOUT_MS = 10_000;
 
 function sendAgentMessageBatch(sender: TattlerMessageSender, message: TattlerAgentMessageV0): void {
   sender.sendMessage(createTattlerPendingBatchMessageFromMessages([createTattlerPendingAgentMessage(message)]), {
@@ -131,6 +136,8 @@ async function serverHandler(socket: net.Socket, runtime?: TattlerIpcRuntime): P
   socket.on('error', (err) => {
     console.error('Tattler socket error while receiving message: ', err);
   });
+  // A client that connects and sends nothing would otherwise hold the connection forever.
+  socket.setTimeout(runtime?.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS, () => socket.destroy());
 
   try {
     const line = await readIncomingFrameLine(socket);

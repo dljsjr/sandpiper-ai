@@ -33,8 +33,10 @@ import { onListPeersRequest, onOwnIdentityRequest, onTattlerPendingMessageQueueR
 import {
   buildMessage,
   MAX_MESSAGE_BYTES,
+  MAX_PROTOCOL_REQUEST_BYTES,
   type MessageProps,
   type SendAgentMessageResult,
+  serializeToJsonl,
   stripProtocolFrame,
   TATTLER_ID_ENTRY_KEY,
   type TattlerAgentMessageV0,
@@ -47,6 +49,11 @@ import { runtimeDir } from './tattler-runtime-dir';
 let server: net.Server | undefined;
 let ownEndpoint: OwnEndpoint | undefined;
 let stopRemovingEndpointOnExit: (() => void) | undefined;
+let stopEndpointWatch: (() => void) | undefined;
+
+// Another session's sweep can remove a long-suspended session's files, since its socket may refuse
+// connections while its backlog is full. Checking once a second restores them when it runs again.
+const ENDPOINT_WATCH_INTERVAL_MS = 1_000;
 
 interface OwnEndpoint {
   readonly socketPath: string;
@@ -157,22 +164,19 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
       }),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
-      const addressType = (params.addressType || 'name') as keyof TattlerIdentityV0;
-      // TODO: don't probe for live sockets every single time we send a message; this could add significant latency.
-      // fine for initial dogfooding though.
-      const peer = (await listPeerSockets(tattlerRuntimeDir, ownIdentity)).find(
-        (peer) => Object.hasOwn(peer, addressType) && peer[addressType] === params.id,
-      );
-
-      if (!peer) {
-        const errMessage = `No live peer with id ${params.id} to receive message`;
-        return { content: [{ type: 'text', text: errMessage }], isError: true, details: { error: errMessage } };
+      const refuse = (errMessage: string) => ({
+        content: [{ type: 'text' as const, text: errMessage }],
+        isError: true,
+        details: { error: errMessage },
+      });
+      if (params.message.trim() === '') {
+        return refuse('Message is empty');
       }
-
       const messageLength = Buffer.byteLength(params.message, 'utf8');
       if (messageLength > MAX_MESSAGE_BYTES) {
-        const errMessage = `Message ${params.id} length ${messageLength} > ${MAX_MESSAGE_BYTES}         (maximum allowed message size)`;
-        return { content: [{ type: 'text', text: errMessage }], isError: true, details: { error: errMessage } };
+        return refuse(
+          `Message length ${messageLength} bytes > ${MAX_MESSAGE_BYTES} bytes (maximum allowed message size)`,
+        );
       }
 
       // TODO(TAT-7) shortId is a local session locator, not a stable agent identity. Useful for v0, replace it
@@ -181,6 +185,24 @@ function registerSendMessageTool(tattlerRuntimeDir: string, ownIdentity: Tattler
         message: params.message,
         from: ownIdentity.name,
       });
+      // JSON encoding doubles quotes, backslashes, and newlines, so a message within its own limit
+      // can still produce a frame the peer rejects with an uncorrelated error.
+      const frameLength = Buffer.byteLength(serializeToJsonl(message), 'utf8');
+      if (frameLength > MAX_PROTOCOL_REQUEST_BYTES) {
+        return refuse(
+          `Message frame ${frameLength} bytes > ${MAX_PROTOCOL_REQUEST_BYTES} bytes once encoded; quotes, backslashes, and line breaks count double. Shorten the message.`,
+        );
+      }
+
+      const addressType = (params.addressType || 'name') as keyof TattlerIdentityV0;
+      // TODO: don't probe for live sockets every single time we send a message; this could add significant latency.
+      // fine for initial dogfooding though.
+      const peer = (await listPeerSockets(tattlerRuntimeDir, ownIdentity)).find(
+        (peer) => Object.hasOwn(peer, addressType) && peer[addressType] === params.id,
+      );
+      if (!peer) {
+        return refuse(`No live peer with id ${params.id} to receive message`);
+      }
 
       try {
         const sendResult: SendAgentMessageResult = await sendAgentMessage(peer, message);
@@ -240,6 +262,78 @@ is used to resume an existing session.
     type: 'string',
   });
 
+  const listenOn = async (socketPath: string): Promise<net.Server> => {
+    const serverDef = createServerWithNotificationSender({
+      events: pi.events,
+      sendMessage: pi.sendMessage.bind(pi),
+      pendingInbox,
+      isIdle: () => activeContext?.isIdle() ?? true,
+      persistPendingInboxSnapshot,
+      notifyPendingInbox,
+    });
+    // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
+    try {
+      await new Promise<void>((resolve, reject) => {
+        serverDef.once('error', reject);
+        serverDef.listen(socketPath, () => {
+          serverDef.removeListener('error', reject);
+          resolve();
+        });
+      });
+    } catch (netErr) {
+      serverDef.close();
+      throw netErr;
+    }
+    return serverDef;
+  };
+
+  // Restores the identity file if it is missing, and listens again if the socket file is gone. A
+  // socket file that is there but is not ours is left alone.
+  const watchEndpoint = (endpoint: OwnEndpoint, socketInode: number): void => {
+    stopEndpointWatch?.();
+    let checking = false;
+    let inode = socketInode;
+    const check = async () => {
+      const identityFile = endpoint.identityFile;
+      if (checking || ownEndpoint !== endpoint || !identityFile) return;
+      checking = true;
+      try {
+        const socketStat = await stat(endpoint.socketPath, { throwIfNoEntry: false });
+        if (socketStat === undefined) {
+          // Close the old server first: closing it can unlink the path, which by then would be the
+          // new socket's.
+          const previous = server;
+          server = undefined;
+          if (previous) await shutdownTattlerServer(previous);
+          const restored = await listenOn(endpoint.socketPath);
+          if (ownEndpoint !== endpoint) {
+            // The session shut down while this check ran.
+            await shutdownTattlerServer(restored);
+            await unlink(endpoint.socketPath).catch(() => {});
+            return;
+          }
+          server = restored;
+          inode = (await stat(endpoint.socketPath)).ino;
+        } else if (socketStat.ino !== inode) {
+          return;
+        }
+        if ((await stat(identityFile, { throwIfNoEntry: false })) === undefined) {
+          await writeIdentityFile(identityFile, ownIdentity);
+        }
+      } catch (watchErr) {
+        console.warn('Tattler could not restore its endpoint: ', watchErr);
+      } finally {
+        checking = false;
+      }
+    };
+    const timer = setInterval(() => void check(), ENDPOINT_WATCH_INTERVAL_MS);
+    timer.unref();
+    stopEndpointWatch = () => {
+      clearInterval(timer);
+      stopEndpointWatch = undefined;
+    };
+  };
+
   pi.on('session_start', async (evt, ctx) => {
     clearEventResponders();
     pendingInbox.clear();
@@ -280,28 +374,7 @@ is used to resume an existing session.
       }
 
       try {
-        const serverDef = createServerWithNotificationSender({
-          events: pi.events,
-          sendMessage: pi.sendMessage.bind(pi),
-          pendingInbox,
-          isIdle: () => activeContext?.isIdle() ?? true,
-          persistPendingInboxSnapshot,
-          notifyPendingInbox,
-        });
-        // Adapted from https://github.com/mitsuhiko/agent-stuff, Apache 2.0
-        try {
-          await new Promise<void>((resolve, reject) => {
-            serverDef.once('error', reject);
-            serverDef.listen(socketPath, () => {
-              serverDef.removeListener('error', reject);
-              resolve();
-            });
-          });
-        } catch (netErr) {
-          serverDef.close();
-          throw netErr;
-        }
-        server = serverDef;
+        server = await listenOn(socketPath);
         ownIdentity = buildMessage('tattler.identity.v0', {
           name: tattlerIdOverride ? tattlerIdOverride : `session:${shortId}`,
           shortId: shortId,
@@ -342,6 +415,7 @@ is used to resume an existing session.
     await writeIdentityFile(identityFile, ownIdentity);
     endpoint.identityFile = identityFile;
     ownEndpoint = endpoint;
+    watchEndpoint(endpoint, (await stat(endpoint.socketPath)).ino);
 
     eventResponderUnsubscribers = [
       onListPeersRequest(pi, () => listPeerSockets(tattlerRuntimeDir, ownIdentity)),
@@ -375,6 +449,7 @@ is used to resume an existing session.
     pendingInbox.clear();
     pendingInboxNotifier.reset();
     activeContext = undefined;
+    stopEndpointWatch?.();
     stopRemovingEndpointOnExit?.();
     const endpoint = ownEndpoint;
     ownEndpoint = undefined;

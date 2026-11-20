@@ -18,6 +18,7 @@ import {
   type ChorusReplyRouteV0,
   type ChorusRoomDeliveryV0,
   createChorusRoomPost,
+  MAX_PROTOCOL_REPLY_BYTES,
   roomId,
   serializeToJsonl,
   type TattlerAgentMessageV0,
@@ -34,6 +35,7 @@ function fakeRuntime(
     readonly idle?: boolean;
     readonly persistPendingInboxSnapshot?: () => void;
     readonly notifyPendingInbox?: () => void;
+    readonly idleTimeoutMs?: number;
   } = {},
 ) {
   const notifications: SentMessage[] = [];
@@ -44,6 +46,7 @@ function fakeRuntime(
     pendingInbox,
     persistPendingInboxSnapshot: options.persistPendingInboxSnapshot,
     notifyPendingInbox: options.notifyPendingInbox,
+    idleTimeoutMs: options.idleTimeoutMs,
     isIdle: () => options.idle ?? true,
     sendMessage(message: SentMessage['message'], options: SentMessage['options']) {
       notifications.push({ message, options });
@@ -289,5 +292,50 @@ describe('shutdownTattlerServer', () => {
     expect(Date.now() - started).toBeLessThan(1_500);
 
     client.destroy();
+  });
+});
+
+describe('Tattler IPC connection handling', () => {
+  test('closes a connection that sends nothing within the idle timeout', async () => {
+    const { socketPath } = await listen(fakeRuntime({ idleTimeoutMs: 100 }));
+    const socket = net.createConnection(socketPath);
+    try {
+      await once(socket, 'connect');
+      const closed = once(socket, 'close');
+
+      await expect(
+        Promise.race([closed, new Promise((resolve) => setTimeout(() => resolve('open'), 2000))]),
+      ).resolves.not.toBe('open');
+    } finally {
+      socket.destroy();
+    }
+  });
+
+  test('replies to a sender that half-closes after writing its frame', async () => {
+    const { socketPath } = await listen(fakeRuntime());
+    const message: TattlerAgentMessageV0 = buildMessage('tattler.agent-message.v0', { from: 'peer', message: 'hi' });
+    const socket = new net.Socket({ allowHalfOpen: true });
+    socket.setEncoding('utf8');
+    try {
+      socket.connect(socketPath);
+      await once(socket, 'connect');
+      const reply = readReplyLine(socket);
+      socket.end(serializeToJsonl(message));
+
+      expect(JSON.parse(await reply)).toMatchObject({
+        format: 'tattler.ack.v0',
+        ack: { correlatedMessageId: message.id },
+      });
+    } finally {
+      socket.destroy();
+    }
+  });
+
+  test('keeps an error reply within the reply limit however long the error is', async () => {
+    const { socketPath } = await listen(fakeRuntime());
+    const reply = await sendRawLine(socketPath, JSON.stringify({ format: `x${'y'.repeat(3000)}`, id: 'abc' }));
+
+    expect(Buffer.byteLength(reply)).toBeLessThan(MAX_PROTOCOL_REPLY_BYTES);
+    expect(JSON.parse(reply)).toMatchObject({ format: 'tattler.error.v0', error: { correlatedMessageId: 'abc' } });
   });
 });

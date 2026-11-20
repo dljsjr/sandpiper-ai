@@ -127,6 +127,51 @@ describe('Tattler tools', () => {
   });
 });
 
+describe('send_peer_message checks', () => {
+  async function sendTool() {
+    setUpIsolatedRuntimeDir('tt-send-checks');
+    const { pi, handlers } = fakePi({ 'tattler-id': 'sender' });
+    await tattlerExtension(pi);
+    const ctx = fakeContext('sess-checks', []);
+    await handlers.get('session_start')?.({ type: 'session_start', reason: 'startup' }, ctx);
+    const tool = vi
+      .mocked(pi.registerTool)
+      .mock.calls.find(([candidate]) => candidate.name === 'send_peer_message')?.[0];
+    const send = async (message: string) => {
+      const result = await tool?.execute(
+        'call',
+        { id: 'nobody', message },
+        undefined,
+        undefined,
+        {} as ExtensionToolContext,
+      );
+      return { isError: result?.isError, text: result?.content[0]?.type === 'text' ? result.content[0].text : '' };
+    };
+    return {
+      send,
+      shutdown: () => handlers.get('session_shutdown')?.({ type: 'session_shutdown', reason: 'quit' }, ctx),
+    };
+  }
+
+  it('refuses an empty message and an oversized frame before looking for the peer', async () => {
+    const { send, shutdown } = await sendTool();
+    try {
+      expect(await send('  ')).toEqual({ isError: true, text: 'Message is empty' });
+      expect(await send('a'.repeat(4097))).toEqual({
+        isError: true,
+        text: 'Message length 4097 bytes > 4096 bytes (maximum allowed message size)',
+      });
+      // Quotes double when the frame is JSON-encoded, so 4096 bytes of them cannot fit the request limit.
+      const quoted = await send('"'.repeat(4096));
+      expect(quoted.isError).toBe(true);
+      expect(quoted.text).toMatch(/^Message frame \d+ bytes > 6144 bytes once encoded/);
+      expect((await send('hello')).text).toBe('No live peer with id nobody to receive message');
+    } finally {
+      await shutdown();
+    }
+  });
+});
+
 describe('Tattler session lifecycle', () => {
   it('survives /reload: shutdown then session_start again for the same session without throwing', async () => {
     setUpIsolatedRuntimeDir('tt-reload');
@@ -302,6 +347,32 @@ describe('Tattler endpoint ownership', () => {
     await session.shutdown();
 
     expect(existsSync(join(dir, 'shared.id'))).toBe(true);
+  });
+
+  it('restores its socket and identity file after another session sweeps them away', async () => {
+    const dir = runtimeDirFor('tt-own-heal');
+    const session = await start({ 'tattler-id': 'healer' }, 'cafe0005-0000');
+    const socketPath = join(dir, 'cafe0005.sock');
+    rmSync(socketPath);
+    rmSync(join(dir, 'healer.id'));
+
+    await vi.waitFor(
+      () => {
+        expect(readIdentity(join(dir, 'healer.id')).socketPath).toBe(socketPath);
+        expect(existsSync(socketPath)).toBe(true);
+      },
+      { timeout: 4000, interval: 100 },
+    );
+    const connected = await new Promise<boolean>((resolve) => {
+      const socket = net.createConnection(socketPath);
+      socket.once('connect', () => {
+        socket.destroy();
+        resolve(true);
+      });
+      socket.once('error', () => resolve(false));
+    });
+    expect(connected).toBe(true);
+    await session.shutdown();
   });
 
   it('takes over its socket path only when the old socket refuses connections', async () => {
