@@ -75,6 +75,11 @@ when the two files overlap, prefer this document for current guidance.
   file or registered tools. Treat this as a v0 startup bug/regression, and keep
   related failure modes visible during dogfood so half-alive sessions are easy to
   spot.
+- Delivery (TAT-85). A message to an idle session starts a run. A message to a
+  busy session waits in the pending inbox; the model gets one cue and may call
+  `tattler_receive` to end its turn. Whatever is still pending when the run
+  settles is delivered then, starting a new run, unless the user aborted the run
+  and the model did not ask; those wait for the next prompt.
 - Endpoint cleanup (TAT-84). `session_shutdown` closes the server and removes
   the socket file; Pi runs it on quit, `/reload`, SIGTERM, and SIGHUP. Paths that
   skip it are covered separately: an `exit` listener removes the socket on

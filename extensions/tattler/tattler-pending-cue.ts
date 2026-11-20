@@ -45,7 +45,7 @@ export function createTattlerPendingInboxNotifier(
         // compaction) triggerTurn would start a new run instead, so only set it while one is active.
         triggerTurn: isAgentRunActive(),
         instructions:
-          'Pending Tattler/Chorus messages arrived while you were busy. If these messages may affect your current work, call the tattler_receive tool by itself to end this turn and receive them as a batch. This cue is best-effort; the pending inbox is the source of truth.',
+          'Pending Tattler/Chorus messages arrived while you were busy. If these messages may affect your current work, call the tattler_receive tool by itself to end this turn and receive them as a batch. Otherwise they are delivered when this run ends.',
         data: {
           pendingMessageCount: pendingMessageCount(),
         },

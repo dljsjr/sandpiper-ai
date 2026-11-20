@@ -45,17 +45,17 @@ export function registerTattlerReceiveTool(
   });
 
   // agent_settled fires once Pi will not continue running automatically (no pending
-  // retry/compaction/follow-up) -- the precise signal tattler_receive needs, replacing the
-  // old agent_end + 25ms isIdle() poll loop entirely. Per Pi's docs, isIdle() is true here
-  // "unless another extension started a new run" -- keep the defensive check for that case;
-  // if it's not idle, drop this attempt and let the existing before_agent_start drain hook
-  // (registerTattlerPendingInboxHooks) pick the batch up on the next turn instead of retrying.
-  pi.on('agent_settled', () => {
-    if (!receiveRequested) {
+  // retry/compaction/follow-up). Messages still pending then would otherwise wait for the next
+  // prompt, which may never come, so deliver them whether or not the model called tattler_receive.
+  // After the user aborts a run, leave them for the next prompt unless tattler_receive asked.
+  // Per Pi's docs, isIdle() is true here "unless another extension started a new run"; if not idle,
+  // the before_agent_start drain hook (registerTattlerPendingInboxHooks) picks the batch up instead.
+  pi.on('agent_settled', (event) => {
+    const requested = receiveRequested;
+    receiveRequested = false;
+    if (event.aborted && !requested) {
       return;
     }
-
-    receiveRequested = false;
 
     let idle = false;
     try {

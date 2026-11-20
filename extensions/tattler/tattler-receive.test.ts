@@ -87,6 +87,31 @@ describe('tattler_receive tool', () => {
     expect(inbox.counts()).toEqual({ pending: 1, reserved: 0, handedToTurn: 0, total: 1 });
   });
 
+  test('delivers messages left pending when the run settles, even if the model ignored the cue', () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'arrived mid-run' }));
+    const { pi, handlers, sentMessages } = fakePi();
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
+
+    handlers.get('agent_settled')?.({ type: 'agent_settled', aborted: false });
+
+    expect(sentMessages).toHaveLength(1);
+    expect(sentMessages[0]?.options).toEqual({ triggerTurn: true, deliverAs: 'steer' });
+    expect(inbox.counts()).toMatchObject({ pending: 0, handedToTurn: 1 });
+  });
+
+  test('keeps pending messages for the next prompt after the user aborts the run', async () => {
+    const inbox = createTattlerPendingInbox();
+    inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'arrived mid-run' }));
+    const { pi, handlers, sentMessages } = fakePi();
+    registerTattlerReceiveTool(pi, inbox, { isIdle: () => true });
+
+    handlers.get('agent_settled')?.({ type: 'agent_settled', aborted: true });
+
+    expect(sentMessages).toHaveLength(0);
+    expect(inbox.counts()).toMatchObject({ pending: 1 });
+  });
+
   test('does not fire again on a second agent_settled without a new tattler_receive call', async () => {
     const inbox = createTattlerPendingInbox();
     inbox.enqueueAgentMessage(buildMessage('tattler.agent-message.v0', { from: 'Piper', message: 'urgent note' }));

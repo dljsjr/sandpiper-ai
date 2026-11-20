@@ -23,6 +23,7 @@ import { requestOwnIdentity } from './tattler-pi-events';
 import { buildMessage } from './tattler-protocol';
 
 const CUE_TEXT = 'Pending Tattler/Chorus messages arrived while you were busy';
+const PEER_MESSAGE = 'hello from a peer';
 const DELIVER_TOOL = 'deliver_peer_message';
 
 const cleanups: Array<() => void> = [];
@@ -74,7 +75,7 @@ async function deliverPeerMessageToSelf(pi: ExtensionAPI): Promise<void> {
   const ownIdentity = await requestOwnIdentity(pi);
   await sendAgentMessage(
     ownIdentity,
-    buildMessage('tattler.agent-message.v0', { message: 'hello from a peer', from: 'peer' }),
+    buildMessage('tattler.agent-message.v0', { message: PEER_MESSAGE, from: 'peer' }),
   );
 }
 
@@ -129,7 +130,10 @@ function createProbeExtension(requests: string[], firstResponseCallsTool: boolea
 // runs once Tattler's own handler has drained the pending inbox: the run is starting but not yet
 // running, and Pi 1.2.0+ counts the session as busy.
 function deliverDuringRunSetup(pi: ExtensionAPI): void {
+  let delivered = false;
   pi.on('before_agent_start', async () => {
+    if (delivered) return;
+    delivered = true;
     await deliverPeerMessageToSelf(pi);
   });
 }
@@ -178,22 +182,25 @@ async function promptProbeSession(extensionFactories: Array<(pi: ExtensionAPI) =
 }
 
 describe('Tattler pending inbox cue in a real Pi session', () => {
-  it('reaches the model in the same run when a peer message arrives mid-run', async () => {
+  it('cues the model in the same run when a peer message arrives mid-run, then delivers it when the run settles', async () => {
     const requests: string[] = [];
 
     await promptProbeSession([createProbeExtension(requests, true)]);
 
-    expect(requests).toHaveLength(2);
+    expect(requests).toHaveLength(3);
     expect(requests[0]).not.toContain(CUE_TEXT);
     expect(requests[1]).toContain(CUE_TEXT);
+    expect(requests[1]).not.toContain(PEER_MESSAGE);
+    expect(requests[2]).toContain(PEER_MESSAGE);
   });
 
-  it('reaches the model in the same run when a peer message arrives during run setup', async () => {
+  it('cues the model in the same run when a peer message arrives during run setup, then delivers it when the run settles', async () => {
     const requests: string[] = [];
 
     await promptProbeSession([createProbeExtension(requests, false), deliverDuringRunSetup]);
 
-    expect(requests).toHaveLength(1);
+    expect(requests).toHaveLength(2);
     expect(requests[0]).toContain(CUE_TEXT);
+    expect(requests[1]).toContain(PEER_MESSAGE);
   });
 });
