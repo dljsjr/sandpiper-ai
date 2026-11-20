@@ -93,9 +93,10 @@ function registerListPeersTool(tattlerRuntimeDir: string, ownIdentity: TattlerId
     parameters: Type.Object({}),
     async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
       const peerSockets = await listPeerSockets(tattlerRuntimeDir, ownIdentity);
+      const thisSession = `This session: ${ownIdentity.name} [shortId: ${ownIdentity.shortId}]`;
       if (peerSockets.length === 0) {
         return {
-          content: [{ type: 'text', text: 'No active peers available' }],
+          content: [{ type: 'text', text: `${thisSession}\nNo active peers available` }],
           details: { peers: [] },
         };
       }
@@ -104,7 +105,7 @@ function registerListPeersTool(tattlerRuntimeDir: string, ownIdentity: TattlerId
         return `- ${peer.name}         [shortId: ${peer.shortId}]`;
       });
 
-      const resultText = `Peers:\n${lines.join('\n')}`;
+      const resultText = `${thisSession}\nPeers:\n${lines.join('\n')}`;
 
       return {
         content: [{ type: 'text', text: resultText }],

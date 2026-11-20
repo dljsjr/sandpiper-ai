@@ -3,7 +3,7 @@ import { existsSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node
 import * as net from 'node:net';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { sweepDeadEndpoints } from './tattler-identity';
+import { listPeerSockets, sweepDeadEndpoints } from './tattler-identity';
 import { buildMessage, serializeToJsonl, type TattlerIdentityV0 } from './tattler-protocol';
 
 const dirs: string[] = [];
@@ -82,5 +82,26 @@ describe('sweepDeadEndpoints', () => {
 
     expect(await sweepDeadEndpoints(dir, { minAgeMs: 10_000 })).toEqual([orphan]);
     expect(existsSync(unreadable)).toBe(true);
+  });
+});
+
+describe('listPeerSockets', () => {
+  it('leaves out the session itself, whether found through its identity file or its bare socket', async () => {
+    const dir = runtimeDir();
+    const own = join(dir, 'own.sock');
+    const peer = join(dir, 'peer.sock');
+    await liveSocket(own);
+    await liveSocket(peer);
+    identityFile(dir, 'me', own);
+    identityFile(dir, 'them', peer);
+    const ownIdentity: TattlerIdentityV0 = buildMessage('tattler.identity.v0', {
+      name: 'me',
+      shortId: 'own',
+      socketPath: own,
+    });
+
+    const peers = await listPeerSockets(dir, ownIdentity);
+
+    expect(peers.map((p) => p.name)).toEqual(['them']);
   });
 });

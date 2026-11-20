@@ -75,7 +75,7 @@ describe('Tattler tools', () => {
     await handlers.get('session_shutdown')?.({ type: 'session_shutdown', reason: 'quit' }, fakeContext('sess-d', []));
   });
 
-  it('reports a sent message as delivered, not as acknowledged by the peer', async () => {
+  it('reports a sent message as delivered, not as acknowledged by the peer, and refuses one to itself', async () => {
     setUpIsolatedRuntimeDir('tt-send');
     const sender = fakePi({ 'tattler-id': 'alice' });
     const receiver = fakePi({ 'tattler-id': 'bob' });
@@ -102,6 +102,18 @@ describe('Tattler tools', () => {
     const text = result?.content[0]?.type === 'text' ? result.content[0].text : '';
     expect(text).toMatch(/^Message \S+ delivered to bob\. /);
     expect(text).not.toMatch(/acknowledged/i);
+
+    const toSelf = await sendTool?.[0].execute(
+      'call-2',
+      { id: 'alice', message: 'hello me' },
+      undefined,
+      undefined,
+      {} as ExtensionToolContext,
+    );
+    expect(toSelf?.isError).toBe(true);
+    expect(toSelf?.content[0]?.type === 'text' ? toSelf.content[0].text : '').toBe(
+      'No live peer with id alice to receive message',
+    );
 
     await sender.handlers.get('session_shutdown')?.(
       { type: 'session_shutdown', reason: 'quit' },

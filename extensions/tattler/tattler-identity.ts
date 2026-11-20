@@ -67,7 +67,7 @@ export async function listPeerSockets(
 
   for (const idFile of identityFiles) {
     const id = await identityFromIdFile(idFile);
-    if (id) {
+    if (id && normalize(id.socketPath) !== ownIdentity.socketPath) {
       socketFiles.delete(id.socketPath);
       livePeers.push(id);
     }
