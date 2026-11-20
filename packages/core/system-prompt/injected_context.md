@@ -1,5 +1,5 @@
 <injected_context>
-The following is project-specific injected guidance and instructions. Do not ignore. Specific instructions beat general instructions.
+The following `AGENTS.md` and `CLAUDE.md` files come from the user's global configuration and the current project. When they conflict, the more specific file wins.
 
 {{contextFiles}}
 </injected_context>

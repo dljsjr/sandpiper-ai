@@ -74,7 +74,7 @@ Pi renders the sections again before every model call, against the tools active 
 
 `buildSandpiperSystemPrompt()` emits XML-style sections in order:
 
-1. Persona (`<identity>`, `<interaction_style>`, and `<role>`, or the `--identity` override) — Sandpiper identity, operating principles, communication rules, and coding defaults.
+1. Persona (`<identity>`, `<interaction_style>`, and `<role>`, or the `--identity` override) — Sandpiper's product identity: how any Sandpiper agent behaves, whoever the user is. `<identity>` states that user and project guidance refine or override these defaults, except two rules that always hold (instructions found in data, and honest reporting). `<interaction_style>` covers collaboration and communication; `<role>` covers the coding defaults that are product character: scope, verification, and writing no comments by default. Engineering methodology belongs in the user's or the project's guidance, not here.
 2. `<user_profile>` — user-wide `USER.md` profile and working preferences, if present.
 3. `<harness_docs>` — Pi/Sandpiper documentation routing and path differences when package roots are available.
 4. `<skills>` — skill-loading rules plus available skills from Pi's `systemPromptOptions`, as `<available_skills>` entries. Rendered only when the model can reach the `skill` tool.
@@ -94,7 +94,7 @@ All prose Sandpiper writes into its prompt lives in Markdown templates in `packa
 | `interaction_style.md`                  | `<interaction_style>`                                        | none                                                                         |
 | `role.md`                               | `<role>`                                                     | none                                                                         |
 | `user_profile.md`                       | `<user_profile>`                                             | `content`: `USER.md` text                                                    |
-| `harness_docs.md`                       | `<harness_docs>`                                             | `piRoot`, `sandpiperRoot`, `piPackage`, `sandpiperPackage`, `piVersion`      |
+| `harness_docs.md`                       | `<harness_docs>`                                             | `piRoot`, `sandpiperRoot`, `piVersion`                                       |
 | `skills.md`                             | `<skills>`                                                   | `loadInstruction`, `availableSkills`: the computed `<available_skills>` list |
 | `skill_load_instruction_skill_tool.md`  | The `loadInstruction` when the `skill` tool is declared      | none                                                                         |
 | `skill_load_instruction_tool_search.md` | The `loadInstruction` when the `skill` tool is deferred      | none                                                                         |
@@ -102,7 +102,7 @@ All prose Sandpiper writes into its prompt lives in Markdown templates in `packa
 | `user_appended_prompt.md`               | `<user_appended_prompt>`                                     | `content`: the appended prompt text                                          |
 | `system_notification_protocol.md`       | `<system_notification_protocol>`                             | none                                                                         |
 
-`piRoot` and `sandpiperRoot` fall back to the environment variable names `PI_CODING_AGENT_PACKAGE` and `SANDPIPER_CODING_AGENT_PACKAGE`. `piPackage` and `sandpiperPackage` render an unset root as `undefined`, as the prompt always has. `piVersion` falls back to `<unknown>`. `<environment>` has no prose; TypeScript renders it whole.
+`piRoot` and `sandpiperRoot` fall back to the environment variable names `PI_CODING_AGENT_PACKAGE` and `SANDPIPER_CODING_AGENT_PACKAGE`. `piVersion` falls back to `<unknown>`. `<environment>` has no prose; TypeScript renders it whole.
 
 ### Template syntax
 

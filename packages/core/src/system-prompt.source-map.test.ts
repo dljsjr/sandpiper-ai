@@ -67,11 +67,9 @@ describe('system prompt source map', () => {
       '\n',
       '\n',
       '\n\n',
-      '/opt/pi',
-      '/opt/sp',
-      '/opt/pi',
-      '/opt/sp',
       '1.2.3',
+      '/opt/pi',
+      '/opt/sp',
       '\n\n',
       '<available_skills>\n  <skill name="jj" location="/skills/jj/SKILL.md">Jujutsu</skill>\n</available_skills>',
       '\n\n',
@@ -158,14 +156,17 @@ describe('system prompt source map', () => {
     const templateDir = join(root, 'templates');
     cpSync(dirname(loadSystemPromptTemplates().system_prompt.path), templateDir, { recursive: true });
     const identityPath = join(templateDir, 'identity.md');
-    writeFileSync(identityPath, readFileSync(identityPath, 'utf-8').replace('friendly, expert', 'edited'));
+    writeFileSync(
+      identityPath,
+      readFileSync(identityPath, 'utf-8').replace('an expert software engineer', 'an edited engineer'),
+    );
 
     const { text, spans } = await buildSandpiperSystemPrompt(
       { ...RENDER_DEFAULTS, templates: loadSystemPromptTemplates(templateDir) },
       {},
     );
 
-    expect(text).toContain('You are a edited coding agent');
+    expect(text).toContain('You are an edited engineer working as a coding agent');
     expect(verifyEditableSpans(text, spans).filter((span) => span.path === identityPath)).toHaveLength(1);
   });
 

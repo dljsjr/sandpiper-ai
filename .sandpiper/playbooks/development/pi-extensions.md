@@ -10,6 +10,7 @@ Read this before changing Pi extensions, custom tools, TUI behavior, provider ad
 ## Key Rules
 
 - Verify against installed Pi docs and source, not stale memory.
+- Do not carry provider- or runtime-specific assumptions into Sandpiper behavior. Verify them against the docs first.
 - Keep framework-independent logic in package-owned or extension-local modules; keep Pi entrypoints as thin glue.
 - Do not use dynamic imports except for optional dependencies.
 - Use host-neutral package seams where available before adding Sandpiper-specific logic.

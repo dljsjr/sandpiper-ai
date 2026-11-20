@@ -1,6 +1,5 @@
 <user_profile>
-The following USER.md content describes the human using Sandpiper and their working preferences.
-Use it to personalize collaboration. Treat it as standing user-authored guidance/instructions.
+The user's `USER.md`: who they are and how they like to work. Treat it as standing guidance from the user.
 
 <content>{{content}}</content>
 </user_profile>

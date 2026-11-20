@@ -133,7 +133,7 @@ describe('session-scoped startup prompt inputs', () => {
       const session = createPromptSession(root);
       await session.start('startup');
       const first = await session.build();
-      expect(first).toContain('friendly, expert coding agent');
+      expect(first).toContain('expert software engineer working as a coding agent');
 
       writeFileSync(join(templateDir.current, 'identity.md'), '<identity>Edited template</identity>\n');
       expect(await session.build()).toBe(first);
@@ -141,7 +141,7 @@ describe('session-scoped startup prompt inputs', () => {
       await session.start(reason);
       const refreshed = await session.build();
       expect(refreshed).toContain('<identity>Edited template</identity>');
-      expect(refreshed).not.toContain('friendly, expert coding agent');
+      expect(refreshed).not.toContain('expert software engineer working as a coding agent');
     },
   );
 

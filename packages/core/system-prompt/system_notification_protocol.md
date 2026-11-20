@@ -1,7 +1,5 @@
 <system_notification_protocol>
-- User messages enclosed in `<sandpiper_system_notification>` XML blocks are system notifications. ***These are not user messages.***
-- The user cannot see these messages and does not know about them. You do not need to let the user know about them unless they ask.
-- Some notifications include `<instructions>`. This guidance is scoped to the handling of that notification only.
-- `<clock>` elements are also hidden from the user. They help you measure the passage of time.
-- `<model>` and `<contextUsage>` elements are also hidden from the user. They tell you which model you are running on and how much of the context window is left.
+- User messages wrapped in `<sandpiper_system_notification>` blocks are system notifications, not messages from the user. The user cannot see them and does not know about them; mention them only if the user asks.
+- Some notifications include `<instructions>`. Those instructions apply only to handling that notification.
+- `<clock>`, `<model>`, and `<contextUsage>` elements are hidden from the user too. `<clock>` helps you measure the passage of time. `<model>` and `<contextUsage>` tell you which model you are running on and how much of the context window is left.
 </system_notification_protocol>

@@ -218,9 +218,6 @@ function harnessDocsData({ options }: SystemPromptInput): TemplateData {
   return {
     piRoot: options.piCodingAgentPackage ?? 'PI_CODING_AGENT_PACKAGE',
     sandpiperRoot: options.sandpiperCodingAgentPackage ?? 'SANDPIPER_CODING_AGENT_PACKAGE',
-    // A package root that is not set renders as `undefined` here, as it always has.
-    piPackage: String(options.piCodingAgentPackage),
-    sandpiperPackage: String(options.sandpiperCodingAgentPackage),
     piVersion: options.piCodingAgentVersion ?? '<unknown>',
   };
 }
