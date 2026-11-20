@@ -1,4 +1,5 @@
-import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import * as net from 'node:net';
 import { join } from 'node:path';
 import {
   createEventBus,
@@ -225,5 +226,94 @@ describe('Tattler session lifecycle', () => {
     expect(idFiles).toHaveLength(1);
 
     await sessionShutdown?.({ type: 'session_shutdown', reason: 'quit' }, fakeContext(sessionId, entries));
+  });
+});
+
+describe('Tattler endpoint ownership', () => {
+  const servers: net.Server[] = [];
+
+  afterEach(async () => {
+    for (const server of servers.splice(0)) await new Promise<void>((resolve) => server.close(() => resolve()));
+  });
+
+  async function livePeerSocket(path: string): Promise<void> {
+    const server = net.createServer((socket) => socket.end());
+    servers.push(server);
+    await new Promise<void>((resolve) => server.listen(path, resolve));
+  }
+
+  function runtimeDirFor(namespace: string): string {
+    setUpIsolatedRuntimeDir(namespace);
+    return join(process.env.XDG_RUNTIME_DIR as string, namespace);
+  }
+
+  function readIdentity(path: string): { readonly name: string; readonly socketPath: string } {
+    return JSON.parse(readFileSync(path, 'utf8')) as { readonly name: string; readonly socketPath: string };
+  }
+
+  async function start(flags: Record<string, string>, sessionId: string) {
+    const { pi, handlers } = fakePi(flags);
+    await tattlerExtension(pi);
+    const ctx = fakeContext(sessionId, []);
+    await handlers.get('session_start')?.({ type: 'session_start', reason: 'startup' }, ctx);
+    return {
+      shutdown: () => handlers.get('session_shutdown')?.({ type: 'session_shutdown', reason: 'quit' }, ctx),
+    };
+  }
+
+  it('leaves a name to the live peer holding it and uses its default name', async () => {
+    const dir = runtimeDirFor('tt-own-name');
+    mkdirSync(dir, { recursive: true });
+    const peerSocket = join(dir, 'peer.sock');
+    await livePeerSocket(peerSocket);
+    writeFileSync(join(dir, 'taken.id'), JSON.stringify({ name: 'taken', shortId: 'peer', socketPath: peerSocket }));
+
+    const session = await start({ 'tattler-id': 'taken' }, 'cafe0001-0000');
+
+    expect(readIdentity(join(dir, 'taken.id')).socketPath).toBe(peerSocket);
+    expect(readIdentity(join(dir, 'sessioncafe0001.id')).name).toBe('session:cafe0001');
+    await session.shutdown();
+    expect(existsSync(join(dir, 'taken.id'))).toBe(true);
+  });
+
+  it('takes a name whose holder is gone, and removes its identity file at shutdown', async () => {
+    const dir = runtimeDirFor('tt-own-gone');
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(
+      join(dir, 'free.id'),
+      JSON.stringify({ name: 'free', shortId: 'x', socketPath: join(dir, 'gone.sock') }),
+    );
+
+    const session = await start({ 'tattler-id': 'free' }, 'cafe0002-0000');
+
+    expect(readIdentity(join(dir, 'free.id')).socketPath).toBe(join(dir, 'cafe0002.sock'));
+    await session.shutdown();
+    expect(existsSync(join(dir, 'free.id'))).toBe(false);
+  });
+
+  it('leaves its identity file alone at shutdown once another session has rewritten it', async () => {
+    const dir = runtimeDirFor('tt-own-rewrite');
+    const session = await start({ 'tattler-id': 'shared' }, 'cafe0003-0000');
+    writeFileSync(
+      join(dir, 'shared.id'),
+      JSON.stringify({ name: 'shared', shortId: 'y', socketPath: join(dir, 'other.sock') }),
+    );
+
+    await session.shutdown();
+
+    expect(existsSync(join(dir, 'shared.id'))).toBe(true);
+  });
+
+  it('takes over its socket path only when the old socket refuses connections', async () => {
+    const dir = runtimeDirFor('tt-own-sock');
+    mkdirSync(dir, { recursive: true });
+    // Not a refused socket (connecting gives ENOTSOCK), so not proof that a session died.
+    writeFileSync(join(dir, 'cafe0004.sock'), '');
+
+    const session = await start({}, 'cafe0004-beef');
+
+    expect(existsSync(join(dir, 'cafe0004.sock'))).toBe(true);
+    expect(readIdentity(join(dir, 'sessioncafe0004-beef.id')).socketPath).toBe(join(dir, 'cafe0004-beef.sock'));
+    await session.shutdown();
   });
 });

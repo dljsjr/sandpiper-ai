@@ -73,7 +73,6 @@ describe('root Sandpiper product', () => {
       '@types/turndown': '5.0.6',
       diff: '9.0.0',
       'sanitize-filename': '1.6.4',
-      tmp: '0.2.7',
       turndown: '7.2.4',
       uuid: '14.0.2',
     });

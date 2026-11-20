@@ -3,22 +3,28 @@
 // Do not extend this into the v1 architecture without first extracting core/runtime boundaries.
 
 import { unlinkSync } from 'node:fs';
-import { appendFile, stat, unlink } from 'node:fs/promises';
+import { stat, unlink } from 'node:fs/promises';
 import type * as net from 'node:net';
-import { basename, dirname, join, normalize } from 'node:path';
+import { join, normalize } from 'node:path';
 import { StringEnum } from '@earendil-works/pi-ai';
 import type { CustomEntry, ExtensionAPI, ExtensionContext } from '@earendil-works/pi-coding-agent';
-import sanitize from 'sanitize-filename';
 import { Type } from 'typebox';
 import { sessionShortIdGenerator } from '../../packages/core/src/utils.js';
-import { listPeerSockets, sweepDeadEndpoints } from './tattler-identity';
+import {
+  identityFilePathFor,
+  isIdentityFileHeldByLivePeer,
+  listPeerSockets,
+  removeIdentityFileIfOwn,
+  sweepDeadEndpoints,
+  writeIdentityFile,
+} from './tattler-identity';
 import { createTattlerPendingInbox, TATTLER_PENDING_INBOX_ENTRY_KEY } from './tattler-inbox';
 import { registerTattlerPendingInboxHooks } from './tattler-inbox-hooks';
 import { createTattlerPendingInboxSnapshot, restoreTattlerPendingInboxFromSession } from './tattler-inbox-persistence';
 import { registerTattlerPendingBatchRenderer } from './tattler-inbox-renderer';
 import {
   createServerWithNotificationSender,
-  isSocketAlive,
+  probeSocket,
   sendAgentMessage,
   shutdownTattlerServer,
 } from './tattler-ipc';
@@ -29,7 +35,6 @@ import {
   MAX_MESSAGE_BYTES,
   type MessageProps,
   type SendAgentMessageResult,
-  serializeToJsonl,
   stripProtocolFrame,
   TATTLER_ID_ENTRY_KEY,
   type TattlerAgentMessageV0,
@@ -38,32 +43,35 @@ import {
 import { registerTattlerReceiveTool } from './tattler-receive';
 import { runtimeDir } from './tattler-runtime-dir';
 
-// we have to use `require` here because `tmp` is old, and relies on
-// an explicit reference to `module.exports` in its code.
-const tmp = require('tmp');
-
 // extension-global variable for now
 let server: net.Server | undefined;
-let stopRemovingSocketOnExit: (() => void) | undefined;
+let ownEndpoint: OwnEndpoint | undefined;
+let stopRemovingEndpointOnExit: (() => void) | undefined;
+
+interface OwnEndpoint {
+  readonly socketPath: string;
+  identityFile?: string;
+}
 
 // A session waits this long before treating another session's refused socket as dead, so it never
 // removes one that is between bind and listen.
 const DEAD_ENDPOINT_MIN_AGE_MS = 10_000;
 
 // process.exit skips session_shutdown (Pi's emergencyTerminalExit and uncaughtCrash call it), and
-// Node does not remove a Unix socket file on exit, so remove it from the exit event, which allows
-// only synchronous work.
-function removeSocketOnExit(socketPath: string): void {
-  stopRemovingSocketOnExit?.();
-  const removeSocket = () => {
+// Node does not remove a Unix socket file on exit, so remove the endpoint from the exit event, which
+// allows only synchronous work.
+function removeEndpointOnExit(endpoint: OwnEndpoint): void {
+  stopRemovingEndpointOnExit?.();
+  const removeEndpoint = () => {
     try {
-      unlinkSync(socketPath);
+      unlinkSync(endpoint.socketPath);
     } catch {}
+    if (endpoint.identityFile) removeIdentityFileIfOwn(endpoint.identityFile, endpoint.socketPath);
   };
-  process.on('exit', removeSocket);
-  stopRemovingSocketOnExit = () => {
-    process.off('exit', removeSocket);
-    stopRemovingSocketOnExit = undefined;
+  process.on('exit', removeEndpoint);
+  stopRemovingEndpointOnExit = () => {
+    process.off('exit', removeEndpoint);
+    stopRemovingEndpointOnExit = undefined;
   };
 }
 let eventResponderUnsubscribers: Array<() => void> = [];
@@ -260,12 +268,12 @@ is used to resume an existing session.
 
     for (const shortId of sessionShortIdGenerator(sessionUuid)) {
       const socketPath = normalize(join(tattlerRuntimeDir, `${shortId}.sock`));
-      // If the socket file exists, but is dead, we unlink it so we can recreate it.
-      // If, however, it exists and is *not* dead, we grow the number of shortIdSections
-      // and try again. This is functionally equivalent to checking for UUID
+      // A socket file that refuses connections is dead: unlink it and reuse the path. Anything
+      // else, including a socket too busy to answer, may be a live session, so grow the number of
+      // shortIdSections and try again. This is functionally equivalent to checking for UUID
       // collision.
       if (await stat(socketPath, { throwIfNoEntry: false })) {
-        if (await isSocketAlive(socketPath)) {
+        if ((await probeSocket(socketPath)) !== 'refused') {
           continue;
         }
         await unlink(socketPath);
@@ -312,29 +320,28 @@ is used to resume an existing session.
       console.error("Couldn't create IPC server, Tattler will be unavailable for this agent session");
       return;
     }
-    removeSocketOnExit(ownIdentity.socketPath);
+    const endpoint: OwnEndpoint = { socketPath: ownIdentity.socketPath };
+    removeEndpointOnExit(endpoint);
     // A SIGKILLed session leaves its socket and identity file; clear those without delaying startup.
     void sweepDeadEndpoints(tattlerRuntimeDir, { minAgeMs: DEAD_ENDPOINT_MIN_AGE_MS }).catch(() => {});
 
-    tmp.setGracefulCleanup();
-    const fileSanitizedIdentity = sanitize(ownIdentity.name);
-    const idFileName = `${fileSanitizedIdentity}.id`;
-    // /reload keeps the same session UUID (and, with a fixed `--tattler-id`, /new keeps the same
-    // override name too), so this identity file can already exist from the session we're replacing.
-    // tmp.fileSync creates with O_EXCL and throws EEXIST on a pre-existing file, so clear it first.
-    const idFilePath = normalize(join(tattlerRuntimeDir, idFileName));
-    if (await stat(idFilePath, { throwIfNoEntry: false })) {
-      await unlink(idFilePath);
+    // A live peer keeps its name: two sessions with one name would share one identity file. The
+    // chosen name stays stored, so a later start takes it once it is free. On /reload the existing
+    // file names our own socket and is replaced.
+    let identityFile = identityFilePathFor(tattlerRuntimeDir, ownIdentity.name);
+    if (identityFile === undefined || (await isIdentityFileHeldByLivePeer(identityFile, ownIdentity.socketPath))) {
+      const defaultName = `session:${ownIdentity.shortId}`;
+      console.warn(`Tattler name "${ownIdentity.name}" is in use or unusable; this session uses ${defaultName}`);
+      ownIdentity = buildMessage('tattler.identity.v0', {
+        name: defaultName,
+        shortId: ownIdentity.shortId,
+        socketPath: ownIdentity.socketPath,
+      });
+      identityFile = identityFilePathFor(tattlerRuntimeDir, defaultName) as string;
     }
-    const idTmpFile = tmp.fileSync({
-      name: idFileName,
-      tmpdir: dirname(tattlerRuntimeDir),
-      dir: basename(tattlerRuntimeDir),
-      mode: 0o644,
-      discardDescriptor: true,
-    });
-
-    await appendFile(idTmpFile.name, serializeToJsonl(ownIdentity));
+    await writeIdentityFile(identityFile, ownIdentity);
+    endpoint.identityFile = identityFile;
+    ownEndpoint = endpoint;
 
     eventResponderUnsubscribers = [
       onListPeersRequest(pi, () => listPeerSockets(tattlerRuntimeDir, ownIdentity)),
@@ -368,7 +375,10 @@ is used to resume an existing session.
     pendingInbox.clear();
     pendingInboxNotifier.reset();
     activeContext = undefined;
-    stopRemovingSocketOnExit?.();
+    stopRemovingEndpointOnExit?.();
+    const endpoint = ownEndpoint;
+    ownEndpoint = undefined;
+    if (endpoint?.identityFile) removeIdentityFileIfOwn(endpoint.identityFile, endpoint.socketPath);
     if (server) {
       const closingServer = server;
       server = undefined;

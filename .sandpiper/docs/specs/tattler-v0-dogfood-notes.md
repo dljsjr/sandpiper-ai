@@ -57,8 +57,10 @@ when the two files overlap, prefer this document for current guidance.
 - Socket collision handling currently probes existing socket files with a
   connect-based liveness check adapted from `agent-stuff` (`control.ts`,
   Apache-2.0).
-- If a socket path exists and is dead, v0 unlinks it and reuses the path.
-- If a socket path exists and is alive, v0 tries the next longer short id.
+- If a socket path exists and refuses connections, v0 unlinks it and reuses
+  the path.
+- If a socket path exists and does anything else, including not answering in
+  time, v0 tries the next longer short id.
 - `net.Server.listen()` is callback/event based, not Promise based. Awaiting
   `server.listen(...)` does not wait for bind completion; wrapping `listening` /
   `error` in a Promise is the right pattern.
@@ -80,15 +82,24 @@ when the two files overlap, prefer this document for current guidance.
   `tattler_receive` to end its turn. Whatever is still pending when the run
   settles is delivered then, starting a new run, unless the user aborted the run
   and the model did not ask; those wait for the next prompt.
-- Endpoint cleanup (TAT-84). `session_shutdown` closes the server and removes
-  the socket file; Pi runs it on quit, `/reload`, SIGTERM, and SIGHUP. Paths that
-  skip it are covered separately: an `exit` listener removes the socket on
-  `process.exit` (Pi's `emergencyTerminalExit` and `uncaughtCrash`), and `tmp`
-  removes the identity file. After SIGKILL both remain, so each session start
-  sweeps the runtime directory in the background: it removes socket files that
-  refuse connections and identity files whose socket is missing or refuses,
-  once they are at least 10 seconds old, so a session between bind and listen
-  is never mistaken for a dead one. A socket that times out is kept.
+- Endpoint cleanup (TAT-84, TAT-87). `session_shutdown` closes the server and
+  removes the socket file and the identity file; Pi runs it on quit, `/reload`,
+  SIGTERM, and SIGHUP. An `exit` listener does the same on `process.exit`
+  (Pi's `emergencyTerminalExit` and `uncaughtCrash`). The identity file is
+  removed only while it still names this session's socket. After SIGKILL both
+  remain, so each session start sweeps the runtime directory in the background:
+  it removes socket files that refuse connections and identity files whose
+  socket is missing or refuses, once they are at least 10 seconds old, so a
+  session between bind and listen is never mistaken for a dead one. A socket
+  that times out is kept.
+- Ownership (TAT-87). Startup reuses its socket path only when the old socket
+  refuses connections; otherwise it grows the short id. A name whose identity
+  file names another live session's socket stays with that session: the new
+  session uses `session:<shortId>` and logs a warning, and the chosen name stays
+  stored for a later start. Names that sanitize to the same file name count as
+  the same name, and a name that sanitizes to nothing (such as `..`) is not
+  used. The identity file is written to a temporary file and renamed into
+  place.
 
 ## TAT-4 and Multi-Agent Dogfood Findings
 
