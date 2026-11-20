@@ -1,7 +1,7 @@
 # Pi system prompt sections
 
 - **Diátaxis mode**: Reference
-- **Status**: Current for Pi 1.5.2. Notes mark where Sandpiper's local Pi patch changes the result.
+- **Status**: Current for Pi 1.6.0, whose prompt code is unchanged from 1.5.2. Notes mark where Sandpiper's local Pi patch changes the result.
 - **Source**: in `@earendil-works/pi-coding-agent`, `buildSystemPromptSections()` in `dist/core/system-prompt.js`, `formatSkillsForPrompt()` in `dist/core/skills.js`, and `renderServersSection()` in `dist/extensions/mcp/index.js`; in `@earendil-works/pi-ai`, `getSystemMessageText()` and `renderSystemMessageUpdate()` in `dist/utils/text.js`. Pi describes the hook in the `before_agent_start` section of `$PI_CODING_AGENT_PACKAGE/docs/extensions.md`.
 - **Related**: [Sandpiper system prompt architecture](sandpiper-system-prompt.md), [Local Pi patch](../../../docs/dev/build-system.md#local-pi-patch)
 

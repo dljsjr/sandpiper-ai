@@ -56,10 +56,10 @@ describe('root Sandpiper product', () => {
   it('ships all pinned external runtime dependencies and keeps bundled source dependencies build-only', () => {
     const product = manifest();
     expect(product.dependencies).toEqual({
-      '@earendil-works/pi-ai': '1.5.2',
-      '@earendil-works/pi-coding-agent': '1.5.2',
-      '@earendil-works/pi-mcp': '1.5.2',
-      '@earendil-works/pi-tui': '1.5.2',
+      '@earendil-works/pi-ai': '1.6.0',
+      '@earendil-works/pi-coding-agent': '1.6.0',
+      '@earendil-works/pi-mcp': '1.6.0',
+      '@earendil-works/pi-tui': '1.6.0',
       jsdom: '30.0.1',
     });
     expect([...product.bundledDependencies].sort()).toEqual(Object.keys(product.dependencies).sort());

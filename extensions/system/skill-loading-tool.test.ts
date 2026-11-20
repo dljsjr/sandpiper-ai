@@ -160,7 +160,7 @@ function resultText(result: AgentToolResult<SkillToolTestDetails>): string {
 
 const ansiEscapePattern = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 
-function renderComponentText(component: { render: (width: number) => string[] }): string {
+function renderComponentText(component: { render: (width: number) => readonly string[] }): string {
   return component
     .render(500)
     .map((line) => line.replace(ansiEscapePattern, '').trimEnd())

@@ -179,10 +179,10 @@ index ab5cfccc3a90939e533b9118122189507a7af326..c3433be037eafcce7f8aaf98aa2d2598
  export { ModelRegistry } from "./core/model-registry.js";
  export { resolveCliModel, resolveModelScopeWithDiagnostics, } from "./core/model-resolver.js";
 diff --git a/dist/modes/interactive/interactive-mode.js b/dist/modes/interactive/interactive-mode.js
-index d4e4b09197dec6ab4e2a3d5dab6f9cb8620e7644..a0a4f08015cc3001aa82273b3a4fd64828252a42 100644
+index cbd936501adcf0663f06ab29c1e5466207350f64..a42e0cc14daf6fdf86bc551b72c4f000ca10bbf0 100644
 --- a/dist/modes/interactive/interactive-mode.js
 +++ b/dist/modes/interactive/interactive-mode.js
-@@ -869,7 +869,8 @@ export class InteractiveMode {
+@@ -909,7 +909,8 @@ export class InteractiveMode {
                  .finally(() => clearTimeout(timeout));
          }
          // Start version check asynchronously

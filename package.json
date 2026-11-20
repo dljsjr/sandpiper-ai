@@ -47,10 +47,10 @@
     "check:knip:production": "knip --production"
   },
   "dependencies": {
-    "@earendil-works/pi-ai": "1.5.2",
-    "@earendil-works/pi-coding-agent": "1.5.2",
-    "@earendil-works/pi-mcp": "1.5.2",
-    "@earendil-works/pi-tui": "1.5.2",
+    "@earendil-works/pi-ai": "1.6.0",
+    "@earendil-works/pi-coding-agent": "1.6.0",
+    "@earendil-works/pi-mcp": "1.6.0",
+    "@earendil-works/pi-tui": "1.6.0",
     "jsdom": "30.0.1"
   },
   "bundledDependencies": [
@@ -90,6 +90,6 @@
   "license": "MIT",
   "type": "module",
   "patchedDependencies": {
-    "@earendil-works/pi-coding-agent@1.5.2": "patches/@earendil-works%2Fpi-coding-agent@1.5.2.patch"
+    "@earendil-works/pi-coding-agent@1.6.0": "patches/@earendil-works%2Fpi-coding-agent@1.6.0.patch"
   }
 }

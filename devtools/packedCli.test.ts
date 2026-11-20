@@ -172,10 +172,10 @@ console.log(JSON.stringify(jiti.options.fsCache));`,
       ) as { dependencies: Record<string, string>; bundledDependencies: string[] };
       expect(packagedManifest).not.toHaveProperty('workspaces');
       expect(packagedManifest.dependencies).toEqual({
-        '@earendil-works/pi-ai': '1.5.2',
-        '@earendil-works/pi-coding-agent': '1.5.2',
-        '@earendil-works/pi-mcp': '1.5.2',
-        '@earendil-works/pi-tui': '1.5.2',
+        '@earendil-works/pi-ai': '1.6.0',
+        '@earendil-works/pi-coding-agent': '1.6.0',
+        '@earendil-works/pi-mcp': '1.6.0',
+        '@earendil-works/pi-tui': '1.6.0',
         jsdom: '30.0.1',
       });
       expect([...packagedManifest.bundledDependencies].sort()).toEqual(
@@ -221,7 +221,7 @@ console.log(JSON.stringify({ resolved, client: typeof McpClient, transport: type
       expect(
         JSON.parse(readFileSync(join(installed, 'node_modules', '@earendil-works', 'pi-mcp', 'package.json'), 'utf8'))
           .version,
-      ).toBe('1.5.2');
+      ).toBe('1.6.0');
       const stockThemes = execFileSync(
         bun,
         [

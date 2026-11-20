@@ -295,7 +295,9 @@ class ChorusRoomEditor extends CustomEditor {
   }
 
   override render(width: number): string[] {
-    const lines = super.render(width);
+    // Pi's TUI contract treats render output as read-only (built-in components may cache it), so
+    // copy before writing the room label.
+    const lines = [...super.render(width)];
     const label = ` #${this.room} · /agent · // `;
     const last = lines.length - 1;
     const lastLine = lines[last];
