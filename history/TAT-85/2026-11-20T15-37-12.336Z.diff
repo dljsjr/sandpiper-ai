@@ -1,0 +1,30 @@
+===================================================================
+--- a/TAT-85.md
++++ b/TAT-85.md
+@@ -1,14 +1,23 @@
+ ---
+ title: "Messages that arrive mid-run wait for the next user prompt when the model ignores the cue"
+-status: NOT STARTED
++status: IN PROGRESS
+ kind: BUG
+ priority: HIGH
+-assignee: UNASSIGNED
++assignee: AGENT
+ reporter: AGENT
+ created_at: 2026-11-20T15:27:07.418Z
+-updated_at: 2026-11-20T15:27:07.418Z
++updated_at: 2026-11-20T15:37:12.336Z
+ ---
+ 
+ # Messages that arrive mid-run wait for the next user prompt when the model ignores the cue
+ 
+ Messages received while busy go to the pending inbox and are drained only at the next before_agent_start or after tattler_receive. If the model ignores the cue, an idle session keeps them until the user types (seen in the 2026-11-19 TAT-68 probe). Fix: at agent_settled, if the inbox is non-empty and the session is idle, deliver the batch with triggerTurn. Comparison with the claude-tattler port (2026-11-20, its candidate 9), which delivers at turn end.
++
++---
++
++# Activity Log
++
++## 2026-11-20T15:37:12.336Z
++
++- **status**: NOT STARTED → IN PROGRESS
++- **assignee**: UNASSIGNED → AGENT
