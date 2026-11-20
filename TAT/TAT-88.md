@@ -1,12 +1,13 @@
 ---
 title: "Harden Tattler sending and serving against edge cases found by claude-tattler"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: LOW
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-11-20T15:27:07.754Z
-updated_at: 2026-11-20T15:47:22.000Z
+updated_at: 2026-11-20T16:02:31.404Z
 ---
 
 # Harden Tattler sending and serving against edge cases found by claude-tattler
@@ -28,3 +29,8 @@ Outcome (xsxzqpol): empty/oversize message and >6144-byte encoded frame refused 
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **description**: 1 line → updated (3 lines)
+
+## 2026-11-20T16:02:31.404Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

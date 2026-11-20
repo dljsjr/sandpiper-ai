@@ -1,12 +1,13 @@
 ---
 title: "list_peers lists the session itself, and a send to itself is delivered"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-11-20T15:27:07.523Z
-updated_at: 2026-11-20T15:47:21.612Z
+updated_at: 2026-11-20T16:02:31.404Z
 ---
 
 # list_peers lists the session itself, and a send to itself is delivered
@@ -28,3 +29,8 @@ Outcome (yzworynq): listPeerSockets filters identity files by socket path too; a
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **description**: 1 line → updated (3 lines)
+
+## 2026-11-20T16:02:31.404Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

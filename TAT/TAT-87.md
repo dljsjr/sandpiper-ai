@@ -1,12 +1,13 @@
 ---
 title: "Tattler startup can take over a live peer's socket or identity file"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: BUG
 priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-11-20T15:27:07.638Z
-updated_at: 2026-11-20T15:47:21.805Z
+updated_at: 2026-11-20T16:02:31.404Z
 ---
 
 # Tattler startup can take over a live peer's socket or identity file
@@ -28,3 +29,8 @@ Outcome (xzvkksvz): startup reuses its socket path only on a refused connection;
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **description**: 1 line → updated (3 lines)
+
+## 2026-11-20T16:02:31.404Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE
