@@ -1,0 +1,28 @@
+===================================================================
+--- a/AGENT-341.md
++++ b/AGENT-341.md
+@@ -1,13 +1,13 @@
+ ---
+ title: "Sweep AGENTS.md: verify facts, cut duplication, slim"
+-status: IN PROGRESS
++status: NEEDS REVIEW
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-21T18:17:49.933Z
+-updated_at: 2026-11-21T18:17:58.987Z
++updated_at: 2026-11-21T18:20:03.351Z
+ ---
+ 
+ # Sweep AGENTS.md: verify facts, cut duplication, slim
+ 
+@@ -20,4 +20,8 @@
+ ## 2026-11-21T18:17:58.987Z
+ 
+ - **status**: NOT STARTED → IN PROGRESS
+ - **assignee**: UNASSIGNED → AGENT
++
++## 2026-11-21T18:20:03.351Z
++
++- **status**: IN PROGRESS → NEEDS REVIEW

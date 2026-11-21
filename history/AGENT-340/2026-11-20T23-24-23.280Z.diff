@@ -1,0 +1,30 @@
+===================================================================
+--- a/AGENT-340.md
++++ b/AGENT-340.md
+@@ -1,13 +1,14 @@
+ ---
+ title: "Trim the system prompt to Sandpiper's product identity"
+-status: NEEDS REVIEW
++status: COMPLETE
++resolution: DONE
+ kind: TASK
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-20T23:09:24.932Z
+-updated_at: 2026-11-20T23:12:58.080Z
++updated_at: 2026-11-20T23:24:23.280Z
+ ---
+ 
+ # Trim the system prompt to Sandpiper's product identity
+ 
+@@ -28,4 +29,9 @@
+ 
+ ## 2026-11-20T23:12:58.080Z
+ 
+ - **status**: IN PROGRESS → NEEDS REVIEW
++
++## 2026-11-20T23:24:23.280Z
++
++- **status**: NEEDS REVIEW → COMPLETE
++- **resolution**: UNRESOLVED → DONE
