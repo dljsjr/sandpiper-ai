@@ -23,7 +23,7 @@ All content in `docs/` and `.sandpiper/docs/` must have a clear Diátaxis mode. 
 
 ## Diátaxis
 
-Use the `docs-diataxis` skill and the global librarian `diataxis.md` guidance when creating, editing, or auditing docs.
+Use the `docs-diataxis` skill when creating, editing, or auditing docs.
 
 Do not create empty `tutorials/`, `how-to/`, `reference`, or `explanation` directories just to satisfy the framework. Sandpiper's docs can be structured by feature, package, contributor concern, or documentation status, as long as each page has one clear mode.
 
