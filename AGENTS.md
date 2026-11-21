@@ -4,8 +4,8 @@ This repository is the Sandpiper source tree: a Bun/Node repository for the Sand
 
 ## Start Here
 
-- Work against a task. Use the installed `trail` CLI for this repository's task tracking; it is not part of the Sandpiper distribution. If no relevant task exists, create one before making changes. Use `trail --help` or an available task skill for command guidance.
-- This is a jj repository. Use `jj`, not `git`, for version-control operations. Write commit subjects as `type(scope): Capitalized summary` and reference tasks with a `Refs: AGENT-123` trailer.
+- Trail is a development dependency: contributing requires the `trail` CLI, which tracks this repository's tasks and is not part of the Sandpiper distribution. Create a task for work that must be remembered after the session: it will not finish now, it is work found for later, or it spans several commits or carries decisions that a commit message cannot hold. A change requested and finished in one session needs no task; its commit message is the record. Use `trail --help` or an available task skill for command guidance.
+- This is a jj repository. Use `jj`, not `git`, for version-control operations. Write commit subjects as `type(scope): Capitalized summary`, and when the change has a task, add a `Refs: AGENT-123` trailer.
 - Before working in a subdirectory for the first time, read its `README.md` and `AGENTS.md` if they exist.
 
 ## Core Invariants

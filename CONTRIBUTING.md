@@ -11,6 +11,8 @@ bun install
 bun run build
 ```
 
+You also need the `trail` CLI: Sandpiper tracks its work in Trail, and contributing requires it.
+
 Sandpiper pins Bun 1.4.4 for package management and scripts. Run installs from the repository root. One root manifest and lockfile own all dependencies. Installation only installs dependencies. `bun run build` writes both commands and shared chunks under root `dist/`.
 
 ## Development checks
@@ -79,8 +81,8 @@ bun run check:biome-check --write
 
 ## Pull requests
 
-1. Work against a focused task or issue.
+1. Keep each pull request to one focused change. Create a Trail task for work that needs tracking: it spans sessions or several commits, or you found it for later.
 2. Keep changes surgical.
 3. Update docs when behavior changes.
 4. Run the relevant checks and include them in the PR notes.
-5. Mention task keys in commits or PR descriptions when applicable.
+5. When the change has a task, put its key in the commits (`Refs: AGENT-123`) or the PR description.
