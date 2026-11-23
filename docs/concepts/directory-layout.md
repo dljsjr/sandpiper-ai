@@ -12,7 +12,6 @@ Sandpiper stores global state under `~/.sandpiper` and project-local state under
 | `~/.sandpiper/agent/inbox/`      | Cross-project handoff notes for agents                                    |
 | `~/.sandpiper/agent/projects.md` | Optional user-maintained Markdown routing table for projects              |
 | `~/.sandpiper/agent/sessions/`   | JSONL session logs                                                        |
-| `~/.sandpiper/pi-acp/`           | ACP adapter state                                                         |
 
 ### User profile (`USER.md`)
 
