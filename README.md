@@ -54,7 +54,7 @@ sandpiper-ai/
 │   ├── system/          # Sandpiper identity + system capabilities
 │   ├── autotoon/        # AutoTOON adapter
 │   ├── tattler/         # Peer messaging
-│   ├── chorus.ts        # Chorus rooms
+│   ├── chorus.ts        # Chorus rooms (parked, not loaded)
 │   ├── web-fetch/       # web_fetch tool
 │   └── web-search/      # web_search tool
 ├── dist/                # Built entrypoints and shared chunks

@@ -154,7 +154,7 @@ For verification, use:
 
 ### Turns started by extensions
 
-Since Pi 1.2.0, a run started by `pi.sendMessage(..., { triggerTurn: true })` while the agent is idle, as Tattler, Chorus, and background-process wakes do, emits `before_agent_start` with `messageType: "custom"`. Sandpiper's prompt, contributions included, reaches those turns the same way it reaches prompted runs, including a fresh session whose first run is such a turn. Earlier Pi versions skipped the hook for these runs (upstream [pi#5581](https://github.com/earendil-works/pi/issues/5581)). See the [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md).
+Since Pi 1.2.0, a run started by `pi.sendMessage(..., { triggerTurn: true })` while the agent is idle, as Tattler and background-process wakes do, emits `before_agent_start` with `messageType: "custom"`. Sandpiper's prompt, contributions included, reaches those turns the same way it reaches prompted runs, including a fresh session whose first run is such a turn. Earlier Pi versions skipped the hook for these runs (upstream [pi#5581](https://github.com/earendil-works/pi/issues/5581)). See the [Sandpiper system prompt architecture](../../.sandpiper/docs/specs/sandpiper-system-prompt.md).
 
 The CC bridge `begin_turn` drift handling (described above) is a separate improvement but was not the live root cause.
 

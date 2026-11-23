@@ -1,6 +1,5 @@
 import type { ExtensionFactory, InlineExtension } from '@earendil-works/pi-coding-agent';
 import autotoonExtension from '../../extensions/autotoon/autotoon.js';
-import chorusExtension from '../../extensions/chorus.js';
 import {
   createBackgroundProcessExtension,
   createClockExtension,
@@ -35,7 +34,6 @@ export function createNeutralCapabilityExtensionFactories(): readonly InlineExte
     inlineExtension('web-search', webSearchExtension),
     inlineExtension('autotoon', autotoonExtension),
     inlineExtension('tattler', tattlerExtension),
-    inlineExtension('chorus', chorusExtension),
   ];
 }
 

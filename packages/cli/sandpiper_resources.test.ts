@@ -120,15 +120,16 @@ describe('Sandpiper resource adapter', () => {
 
     expect(tools).toEqual(expect.arrayContaining(['skill', 'start_background_process', 'check_background_process']));
     expect(tools).toEqual(expect.arrayContaining(['web_fetch']));
-    expect(tools).toContain('send_chorus_reply');
-    expect(commands).toContain('chorus');
+    // Chorus is parked until its rewrite: neither its tool nor its commands load.
+    expect(tools).not.toContain('send_chorus_reply');
+    expect(commands).not.toContain('chorus');
     expect(flags).not.toContain('identity');
   });
 
   it('defers the rarely used tools and keeps skill, done, and the background process tools loaded', () => {
     const { exposures } = applyFactories(createNeutralCapabilityExtensionFactories());
 
-    for (const name of ['web_fetch', 'web_search', 'tattler_receive', 'send_chorus_reply', 'stop_background_process']) {
+    for (const name of ['web_fetch', 'web_search', 'tattler_receive', 'stop_background_process']) {
       expect(exposures.get(name), name).toBe('deferred');
     }
     expect(exposures.has('skill')).toBe(true);

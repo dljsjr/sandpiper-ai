@@ -22,7 +22,7 @@ Read this before changing Pi extensions, custom tools, TUI behavior, provider ad
 - `extensions/system/` — Sandpiper identity, system prompt, session continuity, system capabilities
 - `extensions/autotoon/` — Pi adapter for AutoTOON and its framework-independent transform in `core.ts`
 - `extensions/tattler/` — Tattler peer messaging: `list_peers`, `send_peer_message`, and the inbox
-- `extensions/chorus.ts` — Chorus rooms: the `/chorus` and `/agent` commands and `send_chorus_reply`
+- `extensions/chorus.ts` — Chorus rooms. Parked until a rewrite: the CLI does not load it, and its tests keep it working.
 - `extensions/web-fetch/` — `web_fetch` tool
 - `extensions/web-search/` — `web_search` tool
 
