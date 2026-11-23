@@ -52,6 +52,11 @@ pi-session*.html
 .sandpiper/jj-workspaces/
 .sandpiper/.journal.lock
 
+# Agent session notes stay local to each checkout
+.sandpiper/journal.md
+.sandpiper/notes/
+.sandpiper/reviews/
+
 # Claude Code local state
 .claude/
 .sandpiper/claude-code/

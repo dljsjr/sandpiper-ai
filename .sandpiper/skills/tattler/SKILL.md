@@ -27,8 +27,6 @@ For current Tattler context, read:
 
 - `.sandpiper/docs/specs/tattler-v0-dogfood-notes.md` for the curated active
   summary.
-- `.sandpiper/archive/tattler-v0-dogfood-session-2026-05-19.md` only when
-  reviewing original dogfood chronology/evidence or preserving findings from it.
 
 For v1 architecture work, route to the broader design/task surfaces instead of
 stretching v0 guidance:

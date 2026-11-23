@@ -1,9 +1,6 @@
 # Tattler v0 Dogfood Notes
 
 These notes are the curated active summary for the Tattler v0 validation spike.
-The chronological session notes in
-`../../archive/tattler-v0-dogfood-session-2026-05-19.md` are source material;
-when the two files overlap, prefer this document for current guidance.
 
 ## Current Tattler v0 Direction
 

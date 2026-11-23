@@ -61,7 +61,7 @@
 
 All source references use `$PI_CODING_AGENT_PACKAGE` which resolves to:
 ```
-/Users/dstephen/.local/share/mise/installs/npm-mariozechner-pi-coding-agent/0.67.3/node_modules/@mariozechner/pi-coding-agent
+~/.local/share/mise/installs/npm-mariozechner-pi-coding-agent/0.67.3/node_modules/@mariozechner/pi-coding-agent
 ```
 
 ### Key Source Files

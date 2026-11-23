@@ -1,6 +1,6 @@
 # Agent Journal v1 specification
 
-Status: approved design, standalone implementation complete. Sandpiper cutover: TOOLS-51. Design checkpoint: TOOLS-50. Background: [standup safety review](standup-review-2026-10-26.md).
+Status: approved design, standalone implementation complete. Sandpiper cutover: TOOLS-51. Design checkpoint: TOOLS-50.
 
 This document records the decisions from the journal design discussion. The standalone `agent-journal` repository now carries the implementation reference in `docs/spec.md` and the session handoff in `HANDOFF.md`. This copy preserves the agreed design and Sandpiper integration boundary.
 

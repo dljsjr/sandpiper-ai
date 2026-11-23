@@ -15,6 +15,4 @@ Older artifacts, superseded before the removal:
 
 - `shell-relay-prd.md` — older product/design requirements document
 - `shell-relay-workplan.md` — older implementation plan
-- `shell-relay-session-context.jsonl` — preserved design-session context artifact
-- `code-review-shr-v1.md` — review notes for the older shell-relay implementation
 - `lessons-learned-shell-relay-v1.md` — lessons learned from the older implementation
