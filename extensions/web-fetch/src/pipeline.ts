@@ -14,6 +14,7 @@ import {
 import {
   findLlmsTxtLink,
   findMarkdownAlternate,
+  findPageLinks,
   type LinkRelation,
   parseHtmlLinks,
   parseLinkHeader,
@@ -191,6 +192,20 @@ export async function fetchAndExtract(
   // The Markdown version request turns its failures into a fallback to the page, an abort included.
   options?.signal?.throwIfAborted();
 
+  const result = await pageResult(fetchResult, isText, alternate, llmsTxt, filter, options);
+  const pageLinks = findPageLinks(relations, fetchResult.url);
+  return pageLinks ? { ...result, pageLinks } : result;
+}
+
+/** The page's content and metadata, read from whichever version of the page was fetched. */
+async function pageResult(
+  fetchResult: FetchResult,
+  isText: boolean,
+  alternate: FetchResult | undefined,
+  llmsTxt: LlmsTxtProbeResult,
+  filter: WebFetchFilter | undefined,
+  options: PipelineOptions | undefined,
+): Promise<WebFetchResult> {
   if (fetchResult.statusCode >= 400) {
     return {
       url: fetchResult.url,

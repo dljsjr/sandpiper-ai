@@ -76,6 +76,23 @@ export interface LlmsTxtProbeResult {
   readonly allow?: string;
 }
 
+/** A link from the fetched page to another resource. */
+export interface PageLink {
+  readonly url: string;
+  /** The link's title, with its whitespace collapsed. */
+  readonly title?: string;
+}
+
+/** The links a page declares that lead an agent to more information. Each is absent when not declared. */
+export interface PageLinks {
+  readonly canonical?: PageLink;
+  readonly latestVersion?: PageLink;
+  readonly prev?: PageLink;
+  readonly next?: PageLink;
+  readonly up?: PageLink;
+  readonly agentSkills?: PageLink;
+}
+
 export interface WebFetchResult {
   /** Final URL after redirects. */
   readonly url: string;
@@ -93,6 +110,8 @@ export interface WebFetchResult {
   readonly markdownSource?: string;
   /** Supplemental llms.txt existence probe metadata. */
   readonly llmsTxt?: LlmsTxtProbeResult;
+  /** Links the page declares to related resources, when it declares any. */
+  readonly pageLinks?: PageLinks;
   /** Targeted extraction filter metadata, when a filter was applied. */
   readonly filter?: WebFetchFilterDetails;
   /** Extracted links (when requested). */

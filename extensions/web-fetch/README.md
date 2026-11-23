@@ -7,7 +7,7 @@ A Pi extension that adds a `web_fetch` tool. It fetches one web page and returns
 - An HTML page is reduced to its main content and converted to Markdown.
 - A Markdown or plain-text response is returned unchanged.
 - When a site offers its own Markdown version of a page, that version is returned and its URL is shown as `Markdown source`.
-- When the site publishes an `llms.txt` index that covers the page, the result ends with a block that points to it.
+- When the page links to related pages or to an index for agents, the result ends with an `<additional_content>` block that lists them. See [Additional content](#additional-content).
 
 Cancelling the turn, for example with Escape, stops a fetch that is still running, including a page that a headless browser is loading.
 
@@ -47,7 +47,7 @@ A `markdown_section` filter works on the Markdown text from either path. It find
 A page that a site wrote in Markdown is better than a conversion of its HTML. `web_fetch` gets that version in two ways:
 
 1. The request lists `text/markdown` first in its `Accept` header. A server that honors it answers with Markdown.
-2. When the answer is HTML and the page advertises `rel="alternate" type="text/markdown"`, in its `Link` header or a `<link>` element, `web_fetch` fetches that URL. It uses the answer only when the URL is on the page's own origin and the answer has a Markdown media type. The title and the other metadata still come from the HTML page.
+2. When the answer is HTML and the page advertises `rel="alternate" type="text/markdown"`, in its `Link` header or a `<link>` element, `web_fetch` fetches that URL. It uses the answer only when the URL is on the page's own origin, is not an `llms.txt` file such as `llms-full.txt`, and the answer has a Markdown media type. An `llms.txt` file covers many pages, and one site declares its whole-site file as the Markdown version of every page. The title and the other metadata still come from the HTML page.
 
 `web_fetch` does not guess `.md` URLs. A call with a `css_selector` filter or with rendering asks for HTML and ignores the Markdown version.
 
@@ -55,10 +55,37 @@ A page that a site wrote in Markdown is better than a conversion of its HTML. `w
 
 An `llms.txt` file is a site's index of its pages for language models ([llmstxt.org](https://llmstxt.org/)). It covers the pages under its directory, and the most specific file wins.
 
-- **Declared**: a page can name its file with `rel="describedby"`, in its `Link` header or a `<link>` element, with a target whose path ends in `/llms.txt`. A declared file is taken as found without a request.
+- **Declared**: a page can name its file with `rel="describedby"`, as llms.txt recommends, or with `rel="index"`, as GitHub Docs does, in its `Link` header or a `<link>` element, with a target whose path ends in `/llms.txt`. A declared file is taken as found without a request.
 - **Probed**: otherwise `web_fetch` sends a `HEAD` request to the `llms.txt` location of each directory above the page, all at once, and uses the most specific answer that is a 2xx with a Markdown media type. `text/plain` counts. An HTML answer does not, because some servers answer every path with a page. A deep page probes only the root and the first three directory levels of its path. Each probe waits up to 3 seconds.
 
-Discovery starts together with the page request. Each location is probed once per process, and a failure or timeout is kept as the answer. The file's content is not read. When a file is found, the result ends with an `<additional_content>` block that holds instructions for the model and the file's URL. The block is left out when the fetched page is the file itself.
+Discovery starts together with the page request. Each location is probed once per process, and a failure or timeout is kept as the answer. The file's content is not read. A found file is listed in the result's [additional content](#additional-content), except when the fetched page is the file itself.
+
+### Additional content
+
+When the page leads to more information, the result ends with an `<additional_content>` block. Its elements come from the page's `<link>` elements and its `Link` header, and from `llms.txt` discovery. Each element appears only when the page provides it, always in this order, and the block is left out when none applies:
+
+| Element          | Source                                                                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `canonical`      | `rel="canonical"` ([RFC 6596](https://www.rfc-editor.org/rfc/rfc6596)), the page's preferred URL                   |
+| `latest_version` | `rel="latest-version"` ([RFC 5829](https://www.rfc-editor.org/rfc/rfc5829))                                        |
+| `prev`           | `rel="prev"`, or its synonym `rel="previous"`, from the HTML standard                                              |
+| `next`           | `rel="next"`, from the HTML standard                                                                               |
+| `up`             | `rel="up"` ([RFC 8288](https://www.rfc-editor.org/rfc/rfc8288)), the parent page                                   |
+| `llms_txt`       | The `llms.txt` file that covers the page                                                                           |
+| `agent_skills`   | A link, with any relation, to `/.well-known/agent-skills/index.json` or the older `/.well-known/skills/index.json` |
+
+Every element has a `url`. A link element's `title`, when the page gives one, becomes a `title` attribute, shortened to 100 characters and XML-escaped. A link to the fetched page itself is ignored. `llms_txt` and `agent_skills` hold one line of text: that the file is an index and site map of the site for AI agents, and that skills are read as page content, never installed. The tool description names the block, so the other elements need no explanation.
+
+```xml
+<additional_content>
+  <canonical url="https://docs.example.com/guide/install/"/>
+  <prev url="https://example.com/guide/overview/" title="Overview"/>
+  <next url="https://example.com/guide/configure/" title="Configuration"/>
+  <llms_txt url="https://example.com/llms.txt">An index and site map of this site for AI agents.</llms_txt>
+</additional_content>
+```
+
+`web_fetch` reports only what the page declares. It does not probe for any of these files, the `llms.txt` probes above aside. The [Agent Skills Discovery](https://github.com/cloudflare/agent-skills-discovery-rfc) draft defines no relation for advertising its index, so the index is recognized by its path. Stripe Docs, for example, sends it with `rel="service-meta"`.
 
 ## Rendering pages that need JavaScript
 
@@ -147,7 +174,7 @@ Registrations after the first run starts are ignored.
 | `url`         | string | no       | Final URL after redirects. Defaults to the requested URL                        |
 | `statusCode`  | number | no       | HTTP status of the page. Defaults to 200                                        |
 | `contentType` | string | no       | Content-Type of the page. Defaults to `text/html`                               |
-| `linkHeader`  | string | no       | The page's `Link` header, used to find its `llms.txt`                           |
+| `linkHeader`  | string | no       | The page's `Link` header, used to find its `llms.txt` and page links            |
 | `blocked`     | string | no       | Set when the site refused the browser. Names the cause, such as a bot challenge |
 
 A renderer reports a failure by throwing an error. `web_fetch` reports a thrown error, a `blocked` result, and a result with no HTML as a failed fetch that names the renderer.
@@ -160,7 +187,7 @@ The pipeline is framework-independent; only `src/index.ts` imports Pi.
 - `src/render.ts` holds the renderer contract, the collector, and the command runner.
 - `src/lightpanda-renderer.ts` and `src/obscura-renderer.ts` are the bundled renderers. `src/renderer-extensions.ts` wraps each one in an extension that registers it.
 - `src/pipeline.ts` turns a fetched page into Markdown and applies filters.
-- `src/llms-txt.ts` and `src/link-relations.ts` find a site's `llms.txt` and a page's Markdown version.
+- `src/llms-txt.ts` and `src/link-relations.ts` find a site's `llms.txt`, a page's Markdown version, and the page links in the additional content.
 
 Renderers reach `web_fetch` the way prompt contributions reach the prompt builder ([explanation](../../docs/dev/prompt-contributions.md)). From `session_start`, `web_fetch` listens on the `sandpiper:web-fetch-renderer` event bus channel. Extensions emit their renderers during `resources_discover`. On the first `before_agent_start`, `web_fetch` stops listening and, when a renderer is registered, registers its tool again with the matching parameters. A registration carries the `render` function that `web_fetch` calls. The event bus carries only the registration, because it is synchronous, returns nothing, and drops messages that have no listener.
 

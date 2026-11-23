@@ -159,6 +159,20 @@ function handler(req: IncomingMessage, res: ServerResponse) {
     return;
   }
 
+  if (url === '/page-links') {
+    res.writeHead(200, {
+      'Content-Type': 'text/html',
+      Link: '</guide/>; rel="up", </.well-known/skills/index.json>; rel="service-meta"',
+    });
+    res.end(
+      ARTICLE_PAGE.replace(
+        '<head>',
+        '<head><link rel="canonical" href="https://docs.example.com/guide/page"><link rel="prev" href="/guide/intro" title="Intro"><link rel="next" href="/guide/next">',
+      ),
+    );
+    return;
+  }
+
   if (url === '/declared-link') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(ARTICLE_PAGE.replace('<head>', '<head><link rel="describedby" href="/guide/llms.txt">'));
@@ -256,6 +270,24 @@ describe('fetchAndExtract (end-to-end)', () => {
   it('should strip navigation and footer content', async () => {
     const result = await fetchAndExtract(adapter, `${baseUrl}/article`);
     expect(result.content).not.toContain('Footer content');
+  });
+
+  it('reports the page links declared in link elements and the Link header', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/page-links`);
+
+    expect(result.pageLinks).toEqual({
+      canonical: { url: 'https://docs.example.com/guide/page' },
+      prev: { url: `${baseUrl}/guide/intro`, title: 'Intro' },
+      next: { url: `${baseUrl}/guide/next` },
+      up: { url: `${baseUrl}/guide/` },
+      agentSkills: { url: `${baseUrl}/.well-known/skills/index.json` },
+    });
+  });
+
+  it('reports no page links for a page that declares none', async () => {
+    const result = await fetchAndExtract(adapter, `${baseUrl}/article`);
+
+    expect(result.pageLinks).toBeUndefined();
   });
 
   it('should include llms.txt probe metadata', async () => {
