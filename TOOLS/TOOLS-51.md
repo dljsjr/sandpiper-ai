@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-27T22:13:40.756Z
-updated_at: 2026-10-27T23:52:36.700Z
+updated_at: 2026-11-23T22:05:42.160Z
 related:
   - TOOLS-47
   - TOOLS-50
@@ -19,7 +19,7 @@ User explicitly approved a full cutover: install the local standalone Journal pa
 
 ## Implementation and verification complete; pending lead acceptance
 
-Full runtime/guidance/global-adoption cutover is implemented and independently accepted through Sandpiper source c9fc7a05. Parent retains final completion authority. Complete packet: /private/tmp/journal-cutover-jt1zotyw/final-packet.md. Owner/file/revision manifest: final-source-manifest.json in that directory.
+Full runtime/guidance/global-adoption cutover is implemented and independently accepted through Sandpiper source c9fc7a05. Parent retains final completion authority.
 
 Final developer and reviewer checks are clean; full Sandpiper suite87files/640tests, standalone Journal42tests. Real-Turbo cache-hit upgrade defect was reproduced and fixed at both root build seams, then independently verified by seeded output probes. Final tarball16985entries has no old page/skill/helper or rebundledJournal. Both built entrypoints and changed-cwd children pass8default/override cases. Real global install only appends ../../git/agent-journal after all5existingpackages/order; other settings unchanged.
 
@@ -35,7 +35,7 @@ Developer and reviewer full gates: Sandpiper87files/640tests and standalone Jour
 
 Lead post-cleanup preservation:26 original saved-note/CHECKPOINT paths,20 unrelated file hashes/absences and1689 protected closed/archive/all-standalone-Trail records match. The27th note baseline was an identical copy in our newly created review checkout; it was verified against the unchanged canonical original before owned-workspace removal. Eleven unversioned backups/current hashes/modes match. The real persistent Journal lock is ignored/untracked and retains inode83736154; the lead-published first journal entry is committed unchanged. No existing note migration/deletion, closed-ticket edits, evaluations, release, push or bookmark advance occurred.
 
-Evidence: /private/tmp/journal-cutover-jt1zotyw/final-packet.md, final-source-manifest.json, semantic-residual-audit.md, lead-final-probes.json, lead-final-preservation-after-cleanup.json and adoption-tail-*.json. Existing historical evidence/negative fixtures/ignore safeguards remain classified, not rewritten to force keyword-zero. Both Fling workers are closed; only the owned temporary review workspace was removed. Current already-running Sandpiper process needs restart for its cached package catalogue/bootstrap environment; fresh compiled processes already pass. This is an activation caveat, not unfinished implementation.
+Existing historical evidence/negative fixtures/ignore safeguards remain classified, not rewritten to force keyword-zero. Both Fling workers are closed; only the owned temporary review workspace was removed. Current already-running Sandpiper process needs restart for its cached package catalogue/bootstrap environment; fresh compiled processes already pass. This is an activation caveat, not unfinished implementation.
 
 Final completion uses the user's delegated lead acceptance authority.
 
@@ -68,3 +68,11 @@ Final completion uses the user's delegated lead acceptance authority.
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:44.263Z
+
+- **description**: updated
+
+## 2026-11-23T22:05:42.160Z
+
+- **description**: updated

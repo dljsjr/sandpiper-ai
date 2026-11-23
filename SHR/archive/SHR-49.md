@@ -23,8 +23,6 @@ Tests should cover:
 
 Tests should be conditional on tclsh availability to avoid CI failures.
 
-Reference: code-review-shr-v1.md Finding 7
-
 ---
 
 # Activity Log

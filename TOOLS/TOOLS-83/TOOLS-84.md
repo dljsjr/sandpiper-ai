@@ -7,16 +7,16 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T21:15:55.382Z
-updated_at: 2026-10-28T22:07:27.421Z
+updated_at: 2026-11-23T22:02:45.447Z
 ---
 
 # Preserve the bundled jj skill unchanged in the incubator
 
 ## Accepted and verified closeout — 2026-10-28
 
-Complete original jj copy preserved unchanged at ~/git/skills-incubator/skills/jj. Independent and final snapshots match all paths/bytes/modes; four prior archives, global settings, independent Claude copy and WIP replacement skills remain unchanged.
+Complete original jj copy preserved unchanged in the separate skills-incubator repository. Independent and final snapshots match all paths/bytes/modes; four prior archives, global settings, independent Claude copy and WIP replacement skills remain unchanged.
 
-Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
+Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed.
 
 User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
 
@@ -47,3 +47,7 @@ No existing incubator jj copy was found. Archive all 16 files/188,007 bytes with
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:45.447Z
+
+- **description**: updated

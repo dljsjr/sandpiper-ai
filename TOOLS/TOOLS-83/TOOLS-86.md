@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T21:15:55.551Z
-updated_at: 2026-10-28T22:07:27.962Z
+updated_at: 2026-11-23T22:02:56.590Z
 ---
 
 # Retire jj skill deployment and hard routing without adopting the WIP replacement
@@ -16,7 +16,7 @@ updated_at: 2026-10-28T22:07:27.962Z
 
 Owned Claude jj link and provisioner retired with exact backups. Five canonical guidance docs and source/deployed CLAUDE make the installed skill optional, retaining jj-over-git, checkpoint/workspace/commit safety and current CLI documentation/help fallback. No archive autoload, replacement adoption or deferred AGENT-35 policy rewrite.
 
-Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
+Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks were recorded.
 
 User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
 
@@ -47,3 +47,7 @@ Retire only the owned Claude symlink/provisioner. Make active global and Claude 
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:56.590Z
+
+- **description**: updated

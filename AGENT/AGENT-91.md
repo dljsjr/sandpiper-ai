@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-27T18:20:53.289Z
-updated_at: 2026-05-04T17:51:23.597Z
+updated_at: 2026-11-23T22:02:53.516Z
 depends_on:
   - AGENT-85
   - AGENT-88
@@ -18,7 +18,7 @@ related:
 
 # Build standalone Sandpiper Bun binary distribution
 
-Build the standalone Sandpiper Bun binary/app distribution.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- bun compile/app-bundle flow produces a runnable Sandpiper distribution\n- Sandpiper identity and config dir are active\n- bundled neutral capabilities/resources load from the distribution artifact\n- asset/package metadata requirements are documented
+Build the standalone Sandpiper Bun binary/app distribution.\n\nSee .sandpiper/archive/package-first-multi-distribution-2026-04.md.\n\nCompletion signal:\n- bun compile/app-bundle flow produces a runnable Sandpiper distribution\n- Sandpiper identity and config dir are active\n- bundled neutral capabilities/resources load from the distribution artifact\n- asset/package metadata requirements are documented
 
 ---
 
@@ -41,3 +41,7 @@ Build the standalone Sandpiper Bun binary/app distribution.\n\nSee .sandpiper/do
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:53.516Z
+
+- **description**: updated

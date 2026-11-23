@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-05-14T15:12:36.104Z
-updated_at: 2026-05-21T04:13:12.232Z
+updated_at: 2026-11-23T22:02:51.435Z
 ---
 
 # Review mailbox-based multi-agent coordination architecture
@@ -20,7 +20,7 @@ Architecture review complete. All five key changes have accepted decisions. Outp
 - Same-host IPC reframe: claims/<agentId>.claim + sockets/<short-agentId>.sock with flock for liveness (accepted with revisions)
 - Key Change 5: Minimal live DM payloads — id, from, message only (accepted with revisions)
 
-Full notes at .sandpiper/docs/specs/mailbox-coordination-architecture-notes.md.
+Full notes at .sandpiper/archive/mailbox-coordination-architecture-notes.md.
 Refs: TAT-6, TAT-7, TAT-8, TAT-9
 
 ---
@@ -48,3 +48,7 @@ Refs: TAT-6, TAT-7, TAT-8, TAT-9
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:51.435Z
+
+- **description**: updated

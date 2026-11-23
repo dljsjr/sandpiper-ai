@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T22:40:53.924Z
-updated_at: 2026-11-02T15:41:22.433Z
+updated_at: 2026-11-23T22:02:45.643Z
 ---
 
 # Preserve all six prompts in the external Sandpiper archive
@@ -24,13 +24,13 @@ Exact six-file original prompt tree copied and verified before source removal. P
 
 Verification: baseline87 files/642 tests passed. Individual expected RED→minimum GREEN→refactor assessment cycles covered zero defaults with a configured custom prompt, missing source prompt staging, missing prompts/skills bootstrap, and omitted absent owned prompt paths. Packed absence RED confirmed stale built templates, then normal builds fixed it. Final bun check clean; full87 files/645 tests pass without unhandled errors; bun run pack:cli passes. Actual tarball has no builtin prompt/skill definitions, archive paths or fixture-prompt. Theme scaffold remains unchanged.
 
-Exact before/after manifests and preservation checks: ~/.sandpiper/agent/backups/prompts-unbundle-20261028-I93Jj7/{before.json,archive-verified.json,preservation-after.json}. Independent read-only prompts-audit 0dff7f54fbaf PASS: original six filenames/bytes/SHA-256/modes, license/provenance, no active retired-template routes, corrected active docs, isolated custom prompt support, and final tarball. Five prior skill archives, global settings, WIP jj replacement skills and independent Claude copy are unchanged.
+Independent read-only prompts-audit 0dff7f54fbaf PASS: original six filenames/bytes/SHA-256/modes, license/provenance, no active retired-template routes, corrected active docs, isolated custom prompt support, and final tarball. Five prior skill archives, global settings, WIP jj replacement skills and independent Claude copy are unchanged.
 
 Local revisions: Sandpiper qswrsxnm/bcd004aa; external sandpiper-archive tpmzonpn/cb8fe70c. Both are committed locally; no remote, install, archive registration or project-index change. Archive README and original license are outside the six preserved prompt files.
 
 ## Original scope
 
-Archive exact original filenames/bytes/modes under ~/git/sandpiper-archive/prompts before deleting bundled sources. Use a separate jj-managed cold archive repository, with provenance outside the unchanged prompt files. No archive autoload/registration and no unrelated state changes.
+Archive exact original filenames/bytes/modes in the separate sandpiper-archive repository before deleting bundled sources. Use a separate jj-managed cold archive repository, with provenance outside the unchanged prompt files. No archive autoload/registration and no unrelated state changes.
 
 ---
 
@@ -57,3 +57,7 @@ Archive exact original filenames/bytes/modes under ~/git/sandpiper-archive/promp
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:45.643Z
+
+- **description**: updated

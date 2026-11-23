@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-11T15:54:45.887Z
-updated_at: 2026-11-11T21:49:42.442Z
+updated_at: 2026-11-23T22:05:39.264Z
 related:
   - TOOLS-92
 ---
@@ -16,11 +16,11 @@ related:
 
 ## Full gate passed (2026-11-11)
 
-wvpsuuxu / 7fba4a71: 65 files, 535 tests passed in 83s after TOOLS-126 removed the smoke file that had stopped this gate. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards. Logs: /tmp/sandpiper-tools126.aXQgrZ/gates (summary.tsv).
+wvpsuuxu / 7fba4a71: 65 files, 535 tests passed in 83s after TOOLS-126 removed the smoke file that had stopped this gate. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards.
 
 ## Final corrected queue checkpoint (2026-11-11)
 
-Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. Full logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik; summary.json contains exact results. All agents/processes are stopped and checkouts removed.
+Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. All agents/processes are stopped and checkouts removed.
 
 ## Verification stopped at TOOLS-116 (2026-11-11)
 
@@ -88,3 +88,7 @@ Doug decided on 2026-11-10 (TOOLS-92 review, inventory row B-5): remove ast-grep
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:39.264Z
+
+- **description**: updated

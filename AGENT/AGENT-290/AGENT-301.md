@@ -9,7 +9,7 @@ reporter: AGENT
 created_at: 2026-10-06T02:57:59.778Z
 related:
   - TOOLS-30
-updated_at: 2026-10-06T20:31:00.086Z
+updated_at: 2026-11-23T22:02:52.130Z
 depends_on:
   - AGENT-293
 ---
@@ -29,7 +29,7 @@ Steps:
 
 Done when: the agreed topology is implemented, and rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution is green.
 
-Status (2026-10-06): proposal written at .sandpiper/docs/specs/agent-301-build-topology-proposal.md. D (copy only the three Pi asset dirs, 8.6 MB to 1.2 MB) and E (clean.ts: .turbo, no depth limit, lstat) are done in the pi1 workspace. A (CLI-only dist/), B ("*" peers for the Pi-package manifests), and C (document the patch's reach) moved to TOOLS-30: Doug ties them to the post-migration build simplification (2026-10-06).
+Status (2026-10-06): proposal written at .sandpiper/archive/agent-301-build-topology-proposal.md. D (copy only the three Pi asset dirs, 8.6 MB to 1.2 MB) and E (clean.ts: .turbo, no depth limit, lstat) are done in the pi1 workspace. A (CLI-only dist/), B ("*" peers for the Pi-package manifests), and C (document the patch's reach) moved to TOOLS-30: Doug ties them to the post-migration build simplification (2026-10-06).
 
 ---
 
@@ -64,3 +64,7 @@ Status (2026-10-06): proposal written at .sandpiper/docs/specs/agent-301-build-t
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:52.130Z
+
+- **description**: updated

@@ -7,7 +7,7 @@ priority: HIGH
 assignee: "Doug"
 reporter: USER
 created_at: 2026-08-12T02:10:06.504Z
-updated_at: 2026-08-12T21:47:55.761Z
+updated_at: 2026-11-23T22:02:51.734Z
 ---
 
 # Finish the YAAMS wire codec and recover its tests
@@ -26,7 +26,7 @@ Verification: codec tests cover valid CLI fixtures and malformed roots/fields; `
 
 ---
 
-**MOVED — not abandoned.** Rewritten by hand as **PIEXT-37** in `~/git/yaams` (2026-08-12). pi-yaams work belongs to the PIEXT project, whose charter is exactly this; AGENT covers capabilities not specific to a single tool or extension. pi-yaams is developed out-of-tree today but moves in-tree with yaams, which is why the board lives there. Trail has no cross-repo move, so this closes WONTFIX rather than leaving a tombstone. All content and work state carried over verbatim.
+**MOVED — not abandoned.** Rewritten by hand as **PIEXT-37** in the separate yaams repository (2026-08-12). pi-yaams work belongs to the PIEXT project, whose charter is exactly this; AGENT covers capabilities not specific to a single tool or extension. pi-yaams is developed out-of-tree today but moves in-tree with yaams, which is why the board lives there. Trail has no cross-repo move, so this closes WONTFIX rather than leaving a tombstone. All content and work state carried over verbatim.
 
 ---
 
@@ -44,3 +44,7 @@ Verification: codec tests cover valid CLI fixtures and malformed roots/fields; `
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:51.734Z
+
+- **description**: updated

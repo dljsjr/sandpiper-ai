@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T16:53:38.969Z
-updated_at: 2026-10-28T17:32:56.508Z
+updated_at: 2026-11-23T22:02:55.598Z
 ---
 
 # Route affected project guidance directly to the Markdown project index
@@ -16,7 +16,7 @@ Inventory active project guidance referring to the projects skill or projects.to
 
 ## Implementation and verification — 2026-10-28
 
-Implemented and independently swept. Dotfiles source lnltrmkv/717ff7a3 updates the Claude project-index row and deletes the retired symlink_projects.tmpl provisioner. Deployed ~/.claude/CLAUDE.md changes by exactly that row; ~/.claude/skills/projects is removed. The existing source/deployed Journal paragraph difference is byte-preserved. Roux's active MEMORY.md differs only by the one projects.toon-to-projects.md filename substitution, with mode/other bytes preserved. Roux had no live peer; a scoped async notice was written before editing and updated with verification. Backups are under /Users/dstephen/.sandpiper/agent/backups/projects-index-20261028-9qr7FI/guidance/. No remaining active old-index/skill consumers found. Residual dated notes, retired memory-analysis output, review records, closed task history, captured prompts and backups remain intentionally unchanged. No unrelated project guidance required edits.
+Implemented and independently swept. Dotfiles source lnltrmkv/717ff7a3 updates the Claude project-index row and deletes the retired symlink_projects.tmpl provisioner. The deployed Claude Code global guidance changes by exactly that row; the user's Claude Code projects skill is removed. The existing source/deployed Journal paragraph difference is byte-preserved. Roux's active MEMORY.md differs only by the one projects.toon-to-projects.md filename substitution, with mode/other bytes preserved. Roux had no live peer; a scoped async notice was written before editing and updated with verification. No remaining active old-index/skill consumers found. Residual dated notes, retired memory-analysis output, review records, closed task history, captured prompts and backups remain intentionally unchanged. No unrelated project guidance required edits.
 
 ---
 
@@ -39,3 +39,7 @@ Implemented and independently swept. Dotfiles source lnltrmkv/717ff7a3 updates t
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:55.598Z
+
+- **description**: updated

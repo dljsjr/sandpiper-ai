@@ -1,12 +1,13 @@
 ---
 title: "Update Pi to 1.6.0"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-20T16:18:10.842Z
-updated_at: 2026-11-20T16:21:25.026Z
+updated_at: 2026-11-23T21:47:17.470Z
 ---
 
 # Update Pi to 1.6.0
@@ -30,3 +31,8 @@ Four pins at 1.6.0; patch reapplied and regenerated (only the interactive-mode h
 
 - **status**: IN PROGRESS → NEEDS REVIEW
 - **description**: 1 line → updated (5 lines)
+
+## 2026-11-23T21:47:17.470Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE

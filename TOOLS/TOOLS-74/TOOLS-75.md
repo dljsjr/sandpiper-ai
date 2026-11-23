@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T18:57:43.493Z
-updated_at: 2026-10-28T20:32:14.982Z
+updated_at: 2026-11-23T22:02:39.292Z
 ---
 
 # Archive and remove the bundled test-driven-development skill
@@ -16,13 +16,13 @@ updated_at: 2026-10-28T20:32:14.982Z
 
 Complete: original SKILL.md (22,731 bytes, SHA256 95ef9a6ffd9e6dacac2cc802c565239675fc3ad0dcd87116d59995116844ddba) and 0644 mode preserved; root directory mode 0755 preserved. Source/staged/packed TDD copy is absent. No archive auto-load registration was added; prior archives and global settings are unchanged.
 
-Verification: bun check clean; 87 Vitest files / 640 tests passed; bun run pack:cli passed, including isolated packed-install checks. Actual tarball contains only jj and mutation-testing skill directories. Independent preservation/routing review passed. Evidence: ~/.sandpiper/agent/backups/tdd-unbundle-20261028-7E44Cs/ (including preservation-after.json and identity-routing/preservation.json).
+Verification: bun check clean; 87 Vitest files / 640 tests passed; bun run pack:cli passed, including isolated packed-install checks. Actual tarball contains only jj and mutation-testing skill directories. Independent preservation/routing review passed.
 
 Local revisions: Sandpiper poqzxkxz / 5a0d94c7; canonical global guidance zzuwsomr / 65a3a2ef; Dotfiles vzsmtonk / a721a4f0. All edits are scoped; no remote push or release.
 
 ## Earlier scope record
 
-Preserve the entire current skill at ~/git/skills-incubator/skills/test-driven-development with exact bytes/modes and no destination overwrite or autoload. Remove its Sandpiper-owned bundled copy. The intended source-catalogue RED is already demonstrated: expected jj + mutation-testing; actual additionally includes test-driven-development. Proceed autonomously to the minimal production resource change, GREEN, and a refactor check. Then update existing diagnostic/packed contracts deliberately for that same approved behavior. The previous requirement to wait for user confirmation was an assistant mistake, not user policy.
+Preserve the entire current skill in the separate skills-incubator repository with exact bytes/modes and no destination overwrite or autoload. Remove its Sandpiper-owned bundled copy. The intended source-catalogue RED is already demonstrated: expected jj + mutation-testing; actual additionally includes test-driven-development. Proceed autonomously to the minimal production resource change, GREEN, and a refactor check. Then update existing diagnostic/packed contracts deliberately for that same approved behavior. The previous requirement to wait for user confirmation was an assistant mistake, not user policy.
 
 ---
 
@@ -53,3 +53,7 @@ Preserve the entire current skill at ~/git/skills-incubator/skills/test-driven-d
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:39.292Z
+
+- **description**: updated

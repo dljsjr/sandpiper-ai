@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-27T18:20:53.330Z
-updated_at: 2026-05-04T20:51:22.715Z
+updated_at: 2026-11-23T22:02:36.846Z
 depends_on:
   - AGENT-88
   - AGENT-89
@@ -19,7 +19,7 @@ related:
 
 Research and build the Claude Code plugin distribution for neutral Sandpiper capabilities/resources.
 
-See .sandpiper/docs/specs/package-first-multi-distribution.md.
+See .sandpiper/archive/package-first-multi-distribution-2026-04.md.
 
 Claude plugin reference findings to account for:
 - plugins are self-contained directories with optional `.claude-plugin/plugin.json`
@@ -62,3 +62,7 @@ Completion signal:
 ## 2026-05-04T20:51:22.716Z
 
 - **status**: IN PROGRESS → COMPLETE
+
+## 2026-11-23T22:02:36.846Z
+
+- **description**: updated

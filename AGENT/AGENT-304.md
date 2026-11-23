@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-07T14:03:51.864Z
-updated_at: 2026-10-07T15:09:48.492Z
+updated_at: 2026-11-23T22:02:41.237Z
 related:
   - AGENT-290
   - AGENT-266
@@ -16,7 +16,7 @@ related:
 
 # Align Birdup and its prompt editor with the Pi 1.0 migration
 
-Doug deferred these during AGENT-290 (2026-10-06); picked up 2026-10-07. Repos: ~/git/birdup (default workspace has uncommitted WIP that is not ours: pi-ext/*.ts, cli.py, content.py, prompt resources, mise.toml) and the jj workspace ~/git/birdup-markdown-editor. Coordinated with birdup-agent over Tattler.
+Doug deferred these during AGENT-290 (2026-10-06); picked up 2026-10-07. Repos: the separate birdup repository (default workspace has uncommitted WIP that is not ours: pi-ext/*.ts, cli.py, content.py, prompt resources, mise.toml) and the jj workspace in the separate birdup-markdown-editor repository. Coordinated with birdup-agent over Tattler.
 
 What changed in Sandpiper that Birdup sees:
 - sandpiper-system-prompt --json: 'prompt' is now the prompt the provider receives. That is Sandpiper's <system_prompt>…</system_prompt> followed by Pi-rendered <tools>, <rules>, <cwd> and any extension sections. Sandpiper's own <tools>/<available_tools>/Guidelines block is gone, and <environment> no longer has <cwd>.
@@ -41,3 +41,7 @@ Done when: birdup's tests and prompt editor work against the Pi 1.0 output (live
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:41.237Z
+
+- **description**: updated

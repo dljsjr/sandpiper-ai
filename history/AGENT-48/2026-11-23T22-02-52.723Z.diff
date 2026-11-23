@@ -1,0 +1,36 @@
+===================================================================
+--- a/AGENT-48.md
++++ b/AGENT-48.md
+@@ -6,9 +6,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-01T18:09:03.845Z
+-updated_at: 2026-04-01T18:10:40.514Z
++updated_at: 2026-11-23T22:02:52.723Z
+ ---
+ 
+ # Persist self-reflection learnings in skills/docs after task-storage design session
+ 
+@@ -27,10 +27,10 @@
+ - No unfiled follow-up work remains from the self-reflection pass
+ 
+ ## References
+ 
+-- `.sandpiper/docs/task-storage-strategy.md`
+-- `.sandpiper/docs/task-storage-implementation-plan.md`
++- `.sandpiper/archive/task-storage-strategy-2026-04.md`
++- `.sandpiper/archive/task-storage-implementation-plan-2026-04.md`
+ 
+ ---
+ 
+ # Activity Log
+@@ -47,4 +47,8 @@
+ ## 2026-04-01T18:10:40.514Z
+ 
+ - **status**: IN PROGRESS → COMPLETE
+ - **resolution**: DONE
++
++## 2026-11-23T22:02:52.723Z
++
++- **description**: updated

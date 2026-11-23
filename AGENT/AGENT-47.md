@@ -7,7 +7,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:52.812Z
-updated_at: 2026-11-10T16:08:54.439Z
+updated_at: 2026-11-23T22:02:46.984Z
 ---
 
 # ProcessManager: design multi-consumer output broadcast pattern
@@ -33,7 +33,7 @@ The shell relay extension might want to consume a process's stdout stream for it
 ## References
 
 - `packages/core/src/process-manager.ts` — ManagedProcess.readStdout / readStderr
-- `.sandpiper/docs/background-process-framework-design.md` — Open Questions section, item 3
+- `.sandpiper/archive/background-process-framework-design-2026-04.md` — Open Questions section, item 3
 - AGENT-28 — related: buffer size limits
 
 ---
@@ -62,3 +62,7 @@ The shell relay extension might want to consume a process's stdout stream for it
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:46.984Z
+
+- **description**: updated

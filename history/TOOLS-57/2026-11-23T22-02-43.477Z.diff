@@ -1,0 +1,71 @@
+===================================================================
+--- a/TOOLS-57.md
++++ b/TOOLS-57.md
+@@ -10,26 +10,26 @@
+ 
+ depends_on:
+   - TOOLS-60
+   - TOOLS-64
+-updated_at: 2026-10-28T22:08:09.135Z
++updated_at: 2026-11-23T22:02:43.477Z
+ ---
+ 
+ # Review and resolve the remaining bundled skills
+ 
+ ## Six-skill review accepted and complete — 2026-10-28
+ 
+ User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
+ 
+-All six outcomes are implemented and accepted. Sandpiper now bundles zero skills; five complete skills are preserved unchanged in the incubator, while projects was retired in favor of the preserved Markdown routing index. Custom/project/optional-package skill support remains. Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
++All six outcomes are implemented and accepted. Sandpiper now bundles zero skills; five complete skills are preserved unchanged in the incubator, while projects was retired in favor of the preserved Markdown routing index. Custom/project/optional-package skill support remains. Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed.
+ 
+ TOOLS-79–86 are COMPLETE/DONE. TOOLS-58 (six prompts) and TOOLS-59 (README-only themes scaffold) remain NOT STARTED, so TOOLS-30 stays IN PROGRESS and TOOLS-33 remains NEEDS REVIEW. No prompt/theme inclusion decisions were assumed.
+ 
+ ## Earlier decision and progress history
+ 
+ ## Current jj decision — 2026-10-28
+ 
+-User explicitly chose jj extraction and asked to check the believed incubator copy. No incubator jj exists; preserve the bundled 16-file/188,007-byte version there before removal under TOOLS-83–86. The separate replacement at ~/git/jujutsu-vcs-skill remains WIP (AGENT-67); do not install, edit or adopt it. All six inclusion decisions are now made, but jj implementation is in progress and mutation TOOLS-79–82 still awaits acceptance. Prompts/themes remain unreviewed; TOOLS-57/30 stay open.
++User explicitly chose jj extraction and asked to check the believed incubator copy. No incubator jj exists; preserve the bundled 16-file/188,007-byte version there before removal under TOOLS-83–86. The separate replacement in the jujutsu-vcs-skill repository (https://github.com/dljsjr/jujutsu-vcs-skill) remains WIP (AGENT-67); do not install, edit or adopt it. All six inclusion decisions are now made, but jj implementation is in progress and mutation TOOLS-79–82 still awaits acceptance. Prompts/themes remain unreviewed; TOOLS-57/30 stay open.
+ 
+ ## Previous status records
+ 
+ ## Current implementation status — 2026-10-28
+@@ -67,9 +67,9 @@
+ ## Ownership and shipping review — 2026-10-28
+ 
+ Confirmed six skill directories and 47 files: Markdown instructions/references plus the jj trigger-evaluation JSON. No skill supplies executable helpers, dependency installs, or a separate build. Each source SKILL.md matches its staged built copy.
+ 
+-projects is Sandpiper-specific: it owns instructions for ~/.sandpiper/agent/projects.toon and refers to optional external Journal. code-review, refactoring, test-driven-development and mutation-testing are generic coding-workflow guidance that can function as opinionated Sandpiper defaults. jj is generic VCS guidance with an existing separately owned rewrite under AGENT-67/AGENT-317 in ~/git/jujutsu-vcs-skill; do not duplicate that work here.
++projects is Sandpiper-specific: it owns instructions for the global project index and refers to optional external Journal. code-review, refactoring, test-driven-development and mutation-testing are generic coding-workflow guidance that can function as opinionated Sandpiper defaults. jj is generic VCS guidance with an existing separately owned rewrite under AGENT-67/AGENT-317 in the jujutsu-vcs-skill repository; do not duplicate that work here.
+ 
+ Recommendation, NOT yet approved: retain all six as current bundled defaults; handle any jj replacement through the existing rewrite. Extracting Markdown alone does not remove Trail/standup-style executable build complexity. This review concerns inclusion and ownership, not a rewrite or full technical validation of every skill reference. No skill contents, discovery behavior, or package wiring changed. Await the user's shipping/ownership decision before marking this subtask complete.
+ 
+ User response: declined the keep-all-six confirmation and chose to discuss changes. No keep/remove/extract decisions are approved yet. This task remains IN PROGRESS; do not treat the recommendation above as acceptance.
+@@ -81,15 +81,15 @@
+ User accepted projects implementation; TOOLS-60 and its three children are COMPLETE/DONE. Continuing the requested one-by-one discussion with code-review (second of the original six skills). No keep/remove/extract or content-rewrite decision is approved for code-review or the other four remaining skills.
+ 
+ Code-review discussion: the user identifies it as an early custom skill with likely extraneous material, wants a drastic rework, values codified review SOPs, and questions both the current SOP quality and harness bundling. No keep/remove/extract decision or rewrite scope is approved yet. Do not treat moving the existing text unchanged as satisfying the requested rethink.
+ 
+-Approved code-review decision: unbundle it, preserve its complete current contents under ~/git/skills-incubator/skills/code-review, and handle a drastic SOP redesign separately. Unbundling is TOOLS-64; deferred SOP design is TOOLS-68. No auto-loading of the archive or decisions about the other four remaining skills are approved.
++Approved code-review decision: unbundle it, preserve its complete current contents in the separate skills-incubator repository, and handle a drastic SOP redesign separately. Unbundling is TOOLS-64; deferred SOP design is TOOLS-68. No auto-loading of the archive or decisions about the other four remaining skills are approved.
+ 
+ Code-review unbundling/archival is implemented and awaits user review in TOOLS-64. Two original shipping decisions are made (projects and code-review); the other four skills remain undecided. Independent SOP redesign is deferred under TOOLS-68 and does not gate packaging cleanup.
+ 
+ User accepted code-review unbundling/archival; TOOLS-64 and its children are COMPLETE/DONE. Continue one-by-one with refactoring (3 of the original 6). No shipping, extraction or rewrite decision is approved for refactoring or the other three remaining skills.
+ 
+-Approved refactoring decision: preserve unchanged under ~/git/skills-incubator/skills/refactoring, remove the bundled copy, and rethink its SOP separately. Unbundling is TOOLS-69; deferred rethink is TOOLS-73. Only dependency-routing maintenance in retained guidance is approved. No decision about the other three remaining skills is made.
++Approved refactoring decision: preserve unchanged in the separate skills-incubator repository, remove the bundled copy, and rethink its SOP separately. Unbundling is TOOLS-69; deferred rethink is TOOLS-73. Only dependency-routing maintenance in retained guidance is approved. No decision about the other three remaining skills is made.
+ 
+ Refactoring unbundling/archival is implemented and awaits user review in TOOLS-69; its SOP rethink is deferred as TOOLS-73. Three original shipping decisions are made (projects, code-review, refactoring). Remaining undecided skills are jj, mutation-testing and test-driven-development. TDD received only an optional-dependency sentence, not a shipping/content-review decision.
+ 
+ User accepted refactoring implementation; TOOLS-69 and children are COMPLETE/DONE. Continue one-by-one with test-driven-development (4 of the original 6), followed by the still-undecided mutation-testing and jj. No TDD shipping or rewrite decision is approved yet.
+@@ -198,4 +198,8 @@
+ 
+ ## 2026-10-28T22:08:09.136Z
+ 
+ - **description**: updated
++
++## 2026-11-23T22:02:43.477Z
++
++- **description**: updated

@@ -1,0 +1,44 @@
+===================================================================
+--- a/TOOLS-109.md
++++ b/TOOLS-109.md
+@@ -6,9 +6,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-10T23:39:42.625Z
+-updated_at: 2026-11-11T21:49:42.161Z
++updated_at: 2026-11-23T22:05:38.401Z
+ related:
+   - TOOLS-92
+   - TOOLS-108
+ ---
+@@ -16,17 +16,17 @@
+ # Remove the DuckDuckGo search adapter
+ 
+ ## Corrected hermetic full gate passed (2026-11-11)
+ 
+-With the approved mwqvznwo smoke guard inherited, independent frozen install, zero-warning check and unfiltered full suite passed: 71 files/562 tests. Actual offline/read-only packed CLI checks included. Exact command: bun run test --maxWorkers 1 --no-file-parallelism. No timeout changes or retries. Status NEEDS REVIEW, not accepted. Logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik/05-uwwxxmml/.
++With the approved mwqvznwo smoke guard inherited, independent frozen install, zero-warning check and unfiltered full suite passed: 71 files/562 tests. Actual offline/read-only packed CLI checks included. Exact command: bun run test --maxWorkers 1 --no-file-parallelism. No timeout changes or retries. Status NEEDS REVIEW, not accepted.
+ 
+ ## Full verification passed (2026-11-11)
+ 
+-uwwxxmml: independent frozen install, zero-warning bun check, and full `bun run test --maxWorkers 1 --no-file-parallelism` passed: 71 files / 562 tests. No filters, exclusions or timeout changes; real offline/read-only packed CLI checks included. Fresh start load was below8. Independent code review found no outstanding actionable findings. Status is NEEDS REVIEW, not user-accepted COMPLETE. Logs: /tmp/sandpiper-gate-last-seven-full.ARdI8S/uwwxxmml/. Earlier implementation checkpoints below preceded this full gate.
++uwwxxmml: independent frozen install, zero-warning bun check, and full `bun run test --maxWorkers 1 --no-file-parallelism` passed: 71 files / 562 tests. No filters, exclusions or timeout changes; real offline/read-only packed CLI checks included. Fresh start load was below8. Independent code review found no outstanding actionable findings. Status is NEEDS REVIEW, not user-accepted COMPLETE. Earlier implementation checkpoints below preceded this full gate.
+ 
+ ## Per-commit regression correction (2026-11-11)
+ 
+-Parent reproduced rootProductMetadata failure in the intermediate109 commit: web-search no longer declares jsdom but its exact expectation still did. Removed only that stale extension expectation, retaining root runtime-jsdom coverage. Focused regression changed from1fail to1pass/8skipped and bun check passed. Folded into uwwxxmml (c37cc725). Rebased descendants; final sntvwxtp implementation tree is byte-identical to the previously reviewed bfcd98c4 tree. Logs: /tmp/sandpiper-sol-review.GL7plD/109-{red,green,fix-check}.log.
++Parent reproduced rootProductMetadata failure in the intermediate109 commit: web-search no longer declares jsdom but its exact expectation still did. Removed only that stale extension expectation, retaining root runtime-jsdom coverage. Focused regression changed from1fail to1pass/8skipped and bun check passed. Folded into uwwxxmml (c37cc725). Rebased descendants; final sntvwxtp implementation tree is byte-identical to the previously reviewed bfcd98c4 tree.
+ 
+ ## Independent check checkpoint (2026-11-11)
+ 
+ Parent/gate independently passed frozen install and the revision-specific bun check with zero errors/warnings. All ten tasks are implemented and independently reviewed with no outstanding actionable findings. Full/per-commit full-test gates remain pending quiet load; no completion or acceptance is claimed.
+@@ -90,4 +90,8 @@
+ ## 2026-11-11T21:49:42.162Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-11-23T22:05:38.401Z
++
++- **description**: updated

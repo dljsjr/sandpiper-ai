@@ -7,14 +7,14 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-26T14:43:53.558Z
-updated_at: 2026-10-28T01:17:05.773Z
+updated_at: 2026-11-23T22:02:49.347Z
 related:
   - TOOLS-38
 ---
 
 # Temporarily load the archived Trail skill when trail is on PATH
 
-Rename ~/git/skills-incubator/skills/tasks to trail and change its skill name to trail. Verify no skill-root path dependencies need migration; change bundled CLI instructions/examples to use trail from PATH so the temporary integration really uses the selected external tool. In Sandpiper resource discovery, add the hard-coded archived skill directory only when an executable named trail is available on PATH. No new flags, downloads, release management, or Trail skill discovery commands. Keep built-in skills available when trail is absent. Add hermetic tests and rebuild so the harness can reload while standalone Trail is in flight. Do not contact the Trail agent.
+Rename the tasks skill in the separate skills-incubator repository to trail and change its skill name to trail. Verify no skill-root path dependencies need migration; change bundled CLI instructions/examples to use trail from PATH so the temporary integration really uses the selected external tool. In Sandpiper resource discovery, add the hard-coded archived skill directory only when an executable named trail is available on PATH. No new flags, downloads, release management, or Trail skill discovery commands. Keep built-in skills available when trail is absent. Add hermetic tests and rebuild so the harness can reload while standalone Trail is in flight. Do not contact the Trail agent.
 
 ## Bookkeeping acceptance — 2026-10-27
 
@@ -43,3 +43,7 @@ Current verification: bun check passed with zero errors/warnings; bun run test r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:49.347Z
+
+- **description**: updated

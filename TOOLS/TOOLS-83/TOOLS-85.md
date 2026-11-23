@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T21:15:55.470Z
-updated_at: 2026-10-28T22:07:27.697Z
+updated_at: 2026-11-23T22:02:50.812Z
 ---
 
 # Verify skill-free built-ins and self-contained skill RPC coverage
@@ -16,7 +16,7 @@ updated_at: 2026-10-28T22:07:27.697Z
 
 Zero-built-in source/packed discovery verified. Individual RED→GREEN regressions cover missing optional skills category and absent owned discovery path; present/custom/Trail skill support remains. RPC filesystem coverage now uses its own fixture and the unchanged isolated mock provider. Resource-only discovery uses neutral factories with a mutable array copy; no unhandled error is suppressed and production updater code is unchanged.
 
-Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed; final artifact/preservation checks are recorded in ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/preservation-after.json.
+Final closeout verification: mutable fixture-array copy resolves TS4104; bun check is clean, full Vitest gate passes 87 files/642 tests with no unhandled errors, and bun run pack:cli passes. Actual tarball has zero built-in skills and no archive/replacement/test-fixture entries. Independent preservation/routing review passed.
 
 User explicitly requested closing all skill-resource review/extraction tickets. This closes the six-skill inclusion/extraction review only: projects, code-review, refactoring, TDD, mutation-testing and jj. It does not close prompt/theme reviews, deferred SOP redesigns, standalone Trail integration, WIP jj replacement AGENT-67, or updater lifecycle bug TOOLS-87.
 
@@ -28,11 +28,11 @@ Implementation changes: Sandpiper qmkzynrn, canonical guidance klxvrytv, Dotfile
 
 Third final gate stopped at TypeScript TS4104, packages/cli/standalone_resource_discovery.test.ts:50. Invalid assumption: createNeutralCapabilityExtensionFactories returns a mutable extension array; actual return type is readonly InlineExtension[], while DefaultResourceLoader expects InlineExtension[]. The fixture needs a mutable copy before assignment. No fourth patch/retry was made after the failure limit.
 
-Archive is complete: 16 original files/188,007 bytes with exact paths/modes at ~/git/skills-incubator/skills/jj. No previous incubator copy existed. Replacement skills and global settings still match captured fingerprints; WIP replacement was not edited/installed/adopted. Source/deployment removal, optional-routing docs and zero-built-in runtime changes are implemented but UNCOMMITTED across Sandpiper/global-guidance/Dotfiles; not ready for acceptance.
+Archive is complete: 16 original files/188,007 bytes with exact paths/modes in the separate skills-incubator repository. No previous incubator copy existed. Replacement skills and global settings still match captured fingerprints; WIP replacement was not edited/installed/adopted. Source/deployment removal, optional-routing docs and zero-built-in runtime changes are implemented but UNCOMMITTED across Sandpiper/global-guidance/Dotfiles; not ready for acceptance.
 
 Last runtime gate passed all 642 assertions, including offline packed install, but had an unrelated unhandled stale update callback. That production issue is separately TOOLS-87 NOT STARTED; fixture now uses neutral resource factories to avoid unrelated identity/updater work. Focused discovery tests pass; the final gate must be rerun only after resolving the readonly fixture type. Baseline was 87 files/640 tests; two new optional-directory regressions bring total642.
 
-Evidence: ~/.sandpiper/agent/backups/jj-unbundle-20261028-3NFgBZ/ contains before.json, snapshot.mjs, archive-verified.json, guide/deployment backups and diagnostic-red.log. Do not mark83–86 complete or infer acceptance of79–82. Broader resource review remains open.
+Do not mark83–86 complete or infer acceptance of79–82. Broader resource review remains open.
 
 ## Verification fixture isolation — 2026-10-28
 
@@ -83,3 +83,7 @@ Use autonomous one-behavior/test RED→GREEN→REFACTOR. Adapt source discovery,
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:50.812Z
+
+- **description**: updated

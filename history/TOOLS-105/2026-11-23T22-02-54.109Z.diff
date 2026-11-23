@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-105.md
++++ b/TOOLS-105.md
+@@ -6,9 +6,9 @@
+ priority: MEDIUM
+ assignee: "prompt-trim"
+ reporter: USER
+ created_at: 2026-11-09T22:57:46.443Z
+-updated_at: 2026-11-10T15:48:33.231Z
++updated_at: 2026-11-23T22:02:54.109Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -39,9 +39,9 @@
+ Left as is: the Testing section of docs/dev/env-vars.md still shows a direct PI_OFFLINE read as its example of a test that depends on the real environment.
+ 
+ ## Decision
+ 
+-Doug approved on 2026-11-09, during the TOOLS-92 review: remove resolveEnvVar, and have the update check read PI_OFFLINE directly. Inventory row K-14d in .sandpiper/docs/specs/retained-surface-inventory.md.
++Doug approved on 2026-11-09, during the TOOLS-92 review: remove resolveEnvVar, and have the update check read PI_OFFLINE directly. Inventory row K-14d in .sandpiper/archive/retained-surface-inventory.md.
+ 
+ ## Why
+ 
+ Both entrypoints mirror PI_* and SANDPIPER_* before any extension loads, so the helper's two-name lookup is redundant in a running Sandpiper. The one later change is made by Pi: with --offline, or with PI_OFFLINE=true or yes, Pi's main sets PI_OFFLINE=1 after mirroring. The helper reads SANDPIPER_OFFLINE first, so it can return a stale value and let the update check call npm while Pi is offline. PI_OFFLINE is the name Pi sets and honors.
+@@ -85,4 +85,8 @@
+ ## 2026-11-10T15:48:33.232Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-11-23T22:02:54.109Z
++
++- **description**: updated

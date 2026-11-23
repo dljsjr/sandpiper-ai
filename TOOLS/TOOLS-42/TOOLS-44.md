@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-26T14:44:09.474Z
-updated_at: 2026-10-28T01:17:05.397Z
+updated_at: 2026-11-23T22:02:55.001Z
 ---
 
 # Rename the archived skill and align its commands with PATH
 
-Renamed the external archived skill folder from ~/git/skills-incubator/skills/tasks to ~/git/skills-incubator/skills/trail. Updated frontmatter name to trail and the heading. No metadata or links depended on the old skill-root directory; .sandpiper/tasks data paths remain unchanged. The legacy skill did prescribe bundled scripts/trail, so its CLI instructions and examples in SKILL.md plus two references now use trail from PATH. Archived helper binaries remain intact but are explicitly not prescribed. SDK parsing reports exactly one trail skill with no diagnostics; stale skill-name/root/bundled-command searches are clean. These edits live outside the Sandpiper jj repository.
+Renamed the external archived skill folder from skills/tasks to skills/trail in the separate skills-incubator repository. Updated frontmatter name to trail and the heading. No metadata or links depended on the old skill-root directory; .sandpiper/tasks data paths remain unchanged. The legacy skill did prescribe bundled scripts/trail, so its CLI instructions and examples in SKILL.md plus two references now use trail from PATH. Archived helper binaries remain intact but are explicitly not prescribed. SDK parsing reports exactly one trail skill with no diagnostics; stale skill-name/root/bundled-command searches are clean. These edits live outside the Sandpiper jj repository.
 
 ## Bookkeeping acceptance — 2026-10-27
 
@@ -45,3 +45,7 @@ Current verification: bun check passed with zero errors/warnings; bun run test r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:55.001Z
+
+- **description**: updated

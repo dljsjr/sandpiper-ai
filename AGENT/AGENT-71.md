@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-04-21T19:37:12.561Z
-updated_at: 2026-05-04T19:27:45.284Z
+updated_at: 2026-11-23T22:02:53.118Z
 ---
 
 # Add extraction cache to rg-matrix for extractor A/B and Stage 2 rule grading
@@ -20,7 +20,7 @@ This task is to add an extraction cache that:
 3. Enables Stage 2 real-source rule grading by producing inspectable artifacts
 4. Eventually enables extractor A/B testing (compare rulesets from different extractor prompts)
 
-Cache location: ~/git/rg-matrix/extracted_rulesets/
+Cache location: extracted_rulesets/ in the separate rg-matrix repository
 Cache format: JSON with rules array, scope breakdown, rule count, extraction metadata.
 
 ---
@@ -44,3 +44,7 @@ Cache format: JSON with rules array, scope breakdown, rule count, extraction met
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:53.118Z
+
+- **description**: updated

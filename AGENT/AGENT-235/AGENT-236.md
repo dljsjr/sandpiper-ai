@@ -9,12 +9,12 @@ reporter: AGENT
 created_at: 2026-08-06T20:41:41.362Z
 depends_on:
   - AGENT-246
-updated_at: 2026-08-06T22:31:02.064Z
+updated_at: 2026-11-23T22:02:34.919Z
 ---
 
 # Bump pi pins to 0.84.0 across the monorepo
 
-Pins: root package.json:81-82 (pi-coding-agent, pi-tui), packages/cli/package.json:13, extensions/{autotoon,shell-relay,system,web-fetch,web-search}/package.json, plugins/pi/extensions/package.json (pi-coding-agent, pi-ai, pi-tui). Depends on AGENT-246 (typebox -> pi-ai re-export migration) landing first: once it does, there is NO typebox pin left to manage. Contingency: if AGENT-246 is deferred for any reason, the direct typebox pin must be bumped 1.3.6 -> 1.3.7 in the same change as the pi pins (the alias Pi bundles as of 0.83.0; we use no removed APIs; 1.3.7 fixes compiled validation of nullable array tool args).
+Pins: root package.json:81-82 (pi-coding-agent, pi-tui), extensions/{autotoon,shell-relay,system,web-fetch,web-search}/package.json, plugins/pi/extensions/package.json (pi-coding-agent, pi-ai, pi-tui). Depends on AGENT-246 (typebox -> pi-ai re-export migration) landing first: once it does, there is NO typebox pin left to manage. Contingency: if AGENT-246 is deferred for any reason, the direct typebox pin must be bumped 1.3.6 -> 1.3.7 in the same change as the pi pins (the alias Pi bundles as of 0.83.0; we use no removed APIs; 1.3.7 fixes compiled validation of nullable array tool args).
 
 Gate: bun check clean, bun run test, then rm -rf dist && env -u PI_PACKAGE_DIR bun run test:distribution.
 
@@ -53,3 +53,7 @@ PRECONDITION SATISFIED (2026-08-06): full suite reviewer-verified green after st
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:34.919Z
+
+- **description**: updated

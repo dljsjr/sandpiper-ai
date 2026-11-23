@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-06-23T20:28:30.773Z
-updated_at: 2026-10-19T19:39:15.843Z
+updated_at: 2026-11-23T22:02:53.716Z
 ---
 
 # Evaluate ctx.getSystemPromptOptions() (and ctx.mode) for YAAMS
@@ -18,7 +18,7 @@ Doug flagged getSystemPromptOptions() as a candidate for YAAMS (and possibly els
 
 FIRST STEP (grounding): identify what YAAMS currently does that would benefit from inspecting base system-prompt inputs (e.g. memory-injection sizing/placement decisions). Spike whether getSystemPromptOptions()/ctx.mode change or simplify that logic.
 
-Refiled 2026-10-19 to ~/.sandpiper/agent/inbox/yaams-system-prompt-options-and-mode.md at Doug's request; closed here when the MEM project was archived.
+Refiled 2026-10-19 at Doug's request; closed here when the MEM project was archived.
 
 ---
 
@@ -32,3 +32,7 @@ Refiled 2026-10-19 to ~/.sandpiper/agent/inbox/yaams-system-prompt-options-and-m
 ## 2026-10-19T19:39:15.844Z
 
 - **description**: 5 lines → updated (7 lines)
+
+## 2026-11-23T22:02:53.716Z
+
+- **description**: updated

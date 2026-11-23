@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "prompt-trim"
 reporter: USER
 created_at: 2026-11-09T23:33:26.863Z
-updated_at: 2026-11-10T15:48:33.414Z
+updated_at: 2026-11-23T22:02:43.189Z
 related:
   - TOOLS-92
   - TOOLS-43
@@ -37,7 +37,7 @@ Tests: eight tests whose subject is gone were removed and one handler test was a
 
 ## Decision
 
-Doug decided on 2026-11-09, during the TOOLS-92 review: remove the product-owned resources slot, because Sandpiper no longer bundles skills, prompt templates or themes. Not started. Inventory rows K-12 and B-4 in .sandpiper/docs/specs/retained-surface-inventory.md.
+Doug decided on 2026-11-09, during the TOOLS-92 review: remove the product-owned resources slot, because Sandpiper no longer bundles skills, prompt templates or themes. Not started. Inventory rows K-12 and B-4 in .sandpiper/archive/retained-surface-inventory.md.
 
 ## What the slot is
 
@@ -84,3 +84,7 @@ This reverses the TOOLS-57 to TOOLS-59 choice to keep the location as an optiona
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:43.189Z
+
+- **description**: updated

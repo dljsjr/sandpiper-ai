@@ -7,7 +7,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-04-28T18:37:46.152Z
-updated_at: 2026-11-19T18:58:29.576Z
+updated_at: 2026-11-23T22:02:46.035Z
 ---
 
 # Normalize remaining dependency declarations
@@ -70,7 +70,7 @@ This may violate the repo's exact-pin convention. Decide whether to pin it exact
 
 ## Original inbox note
 
-# Small dep-normalization cleanup for `~/git/sandpiper-ai`
+# Small dep-normalization cleanup for this repository
 
 ## Summary
 The workspace is **already 99% compliant** with the "exact pins + catalog references" convention. This is not a full dep audit — it is a two-line fixup plus two notes about the existing catalog.
@@ -176,3 +176,7 @@ The package and catalogs it names are gone; the single root package.json is exac
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: UNRESOLVED → WONTFIX
+
+## 2026-11-23T22:02:46.035Z
+
+- **description**: updated

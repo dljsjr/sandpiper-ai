@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T14:17:40.381Z
-updated_at: 2026-11-02T15:41:23.154Z
+updated_at: 2026-11-23T22:02:48.949Z
 ---
 
 # Review and resolve bundled prompt templates
@@ -20,7 +20,7 @@ User accepted the five-ticket prompt-removal package ("Okay cool we can mark tho
 
 ## Prompt review resolved; implementation ready for acceptance — 2026-10-28
 
-User chose removal/archive for all six unused templates, with the external location ~/git/sandpiper-archive/prompts. TOOLS-88–91 implements that decision, preserving originals unchanged and retaining custom prompt capability. Verification: baseline87 files/642 tests passed. Individual expected RED→minimum GREEN→refactor assessment cycles covered zero defaults with a configured custom prompt, missing source prompt staging, missing prompts/skills bootstrap, and omitted absent owned prompt paths. Packed absence RED confirmed stale built templates, then normal builds fixed it. Final bun check clean; full87 files/645 tests pass without unhandled errors; bun run pack:cli passes. Actual tarball has no builtin prompt/skill definitions, archive paths or fixture-prompt. Theme scaffold remains unchanged.
+User chose removal/archive for all six unused templates, with the separate sandpiper-archive repository as the external location. TOOLS-88–91 implements that decision, preserving originals unchanged and retaining custom prompt capability. Verification: baseline87 files/642 tests passed. Individual expected RED→minimum GREEN→refactor assessment cycles covered zero defaults with a configured custom prompt, missing source prompt staging, missing prompts/skills bootstrap, and omitted absent owned prompt paths. Packed absence RED confirmed stale built templates, then normal builds fixed it. Final bun check clean; full87 files/645 tests pass without unhandled errors; bun run pack:cli passes. Actual tarball has no builtin prompt/skill definitions, archive paths or fixture-prompt. Theme scaffold remains unchanged.
 
 Local revisions: Sandpiper qswrsxnm/bcd004aa; external sandpiper-archive tpmzonpn/cb8fe70c. Both are committed locally; no remote, install, archive registration or project-index change. Archive README and original license are outside the six preserved prompt files.
 
@@ -30,7 +30,7 @@ This task is ready for user review, not COMPLETE. TOOLS-59 themes remains NOT ST
 
 ## Approved six-prompt retirement — 2026-10-28
 
-User does not use any retained prompt and approved archiving/removing all six, choosing ~/git/sandpiper-archive/prompts. Implementation TOOLS-88–91 preserves exact originals in a separate jj-managed cold archive and removes bundled copies without registration/autoload. No content/SOP rewrite is requested. Preserve custom prompt support; handle missing optional prompt directories across staging/bootstrap/discovery. Themes TOOLS-59 and overall review remain separate. Original prompt-specific review notes below are historical context, not a requirement to keep those workflows bundled.
+User does not use any retained prompt and approved archiving/removing all six, choosing the separate sandpiper-archive repository. Implementation TOOLS-88–91 preserves exact originals in a separate jj-managed cold archive and removes bundled copies without registration/autoload. No content/SOP rewrite is requested. Preserve custom prompt support; handle missing optional prompt directories across staging/bootstrap/discovery. Themes TOOLS-59 and overall review remain separate. Original prompt-specific review notes below are historical context, not a requirement to keep those workflows bundled.
 
 ## Earlier review context
 
@@ -83,3 +83,7 @@ TOOLS-74 additionally replaces self-reflect's retired TDD-skill mapping with pro
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:48.949Z
+
+- **description**: updated

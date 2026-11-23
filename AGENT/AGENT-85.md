@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-27T18:20:53.043Z
-updated_at: 2026-04-29T04:34:17.544Z
+updated_at: 2026-11-23T22:02:42.214Z
 depends_on:
   - AGENT-84
 related:
@@ -16,7 +16,7 @@ related:
 
 # Spike standalone Sandpiper CLI using Pi main extension factories
 
-Spike a minimal standalone Sandpiper CLI entrypoint using Pi 0.70.x main(args, { extensionFactories }) support before broad file movement.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- minimal Sandpiper entrypoint runs against temp config state\n- at least one bundled/inline extension factory loads without root pi.extensions\n- at least one bundled skill/resource path loads without root pi.skills\n- bun compile/app-bundle asset constraints are documented
+Spike a minimal standalone Sandpiper CLI entrypoint using Pi 0.70.x main(args, { extensionFactories }) support before broad file movement.\n\nSee .sandpiper/archive/package-first-multi-distribution-2026-04.md.\n\nCompletion signal:\n- minimal Sandpiper entrypoint runs against temp config state\n- at least one bundled/inline extension factory loads without root pi.extensions\n- at least one bundled skill/resource path loads without root pi.skills\n- bun compile/app-bundle asset constraints are documented
 
 ---
 
@@ -39,3 +39,7 @@ Spike a minimal standalone Sandpiper CLI entrypoint using Pi 0.70.x main(args, {
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:42.214Z
+
+- **description**: updated

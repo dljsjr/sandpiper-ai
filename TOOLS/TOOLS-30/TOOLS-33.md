@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-20T15:20:03.012Z
-updated_at: 2026-11-09T19:42:58.745Z
+updated_at: 2026-11-23T22:02:37.713Z
 ---
 
 # Implement and verify the approved build simplification
@@ -28,7 +28,7 @@ Both earlier findings are addressed: payload assertions run before installation 
 
 ## Work breakdown complete; implementation not started
 
-TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/docs/specs/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
+TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/archive/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
 
 Doug paused sub-agents because he is fixing a fling bug. No worker was launched or queued, no implementation was substituted, and no product code changed. No launch retries during the hold. This parent remains open; planning completion is not implementation acceptance.
 
@@ -107,7 +107,7 @@ Returned to NEEDS REVIEW after premature lead final-completion during bookkeepin
 
 ## Earlier implementation and verification history
 
-Implemented and verified the workspace-only topology and the approved resource cleanup. Removed every third-party skill. Moved age, ast-grep, skill-review, and toon byte-for-byte to ~/git/skills-incubator/skills/. Flattened the eight retained first-party skills directly under packages/resources/skills/. Updated resource discovery, helper synchronization, prompts, tests, playbooks, and public documentation.
+Implemented and verified the workspace-only topology and the approved resource cleanup. Removed every third-party skill. Moved age, ast-grep, skill-review, and toon byte-for-byte to the separate skills-incubator repository. Flattened the eight retained first-party skills directly under packages/resources/skills/. Updated resource discovery, helper synchronization, prompts, tests, playbooks, and public documentation.
 
 Verification: bun check; bun run test (124 files, 1,220 tests); focused resource and integration tests; direct Sandpiper, Trail, and standup command smokes; archived-file byte comparison; stale-path and third-party sweeps.
 
@@ -222,3 +222,7 @@ Current verification: bun check passed with zero errors/warnings; bun run test r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:37.713Z
+
+- **description**: updated

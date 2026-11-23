@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-01T18:09:03.845Z
-updated_at: 2026-04-01T18:10:40.514Z
+updated_at: 2026-11-23T22:02:52.723Z
 ---
 
 # Persist self-reflection learnings in skills/docs after task-storage design session
@@ -28,8 +28,8 @@ Capture durable guidance updates that emerged during the task-storage design / s
 
 ## References
 
-- `.sandpiper/docs/task-storage-strategy.md`
-- `.sandpiper/docs/task-storage-implementation-plan.md`
+- `.sandpiper/archive/task-storage-strategy-2026-04.md`
+- `.sandpiper/archive/task-storage-implementation-plan-2026-04.md`
 
 ---
 
@@ -48,3 +48,7 @@ Capture durable guidance updates that emerged during the task-storage design / s
 
 - **status**: IN PROGRESS → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:52.723Z
+
+- **description**: updated

@@ -19,8 +19,6 @@ Options:
 - Use a small drain loop that checks for pending data
 - Accept the heuristic and document the trade-off
 
-Reference: code-review-shr-v1.md Finding 3
-
 ---
 
 # Activity Log

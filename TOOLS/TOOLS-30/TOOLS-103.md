@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "prompt-trim"
 reporter: USER
 created_at: 2026-11-09T21:51:36.370Z
-updated_at: 2026-11-10T15:48:33.020Z
+updated_at: 2026-11-23T22:02:42.993Z
 related:
   - TOOLS-92
   - TAT-70
@@ -46,7 +46,7 @@ For review:
 
 ## Decision
 
-Doug decided on 2026-11-09, during the TOOLS-92 review, to replace better-sqlite3 with the built-in node:sqlite module if Bun supports it. Bun 1.4.4 does. Not started. Inventory row: K-6b in .sandpiper/docs/specs/retained-surface-inventory.md.
+Doug decided on 2026-11-09, during the TOOLS-92 review, to replace better-sqlite3 with the built-in node:sqlite module if Bun supports it. Bun 1.4.4 does. Not started. Inventory row: K-6b in .sandpiper/archive/retained-surface-inventory.md.
 
 ## Why
 
@@ -106,3 +106,7 @@ Existing skill_metrics.sqlite3 files are plain SQLite files and need no migratio
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:42.993Z
+
+- **description**: updated

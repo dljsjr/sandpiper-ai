@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "docs-fix"
 reporter: USER
 created_at: 2026-11-11T16:00:15.159Z
-updated_at: 2026-11-11T16:18:41.386Z
+updated_at: 2026-11-23T22:02:48.751Z
 related:
   - TOOLS-92
 ---
@@ -24,7 +24,7 @@ Left for other work: a comment in extensions/chorus/chorus-ui.ts line 89 says to
 
 ## Decision
 
-Doug, 2026-11-11: wrong documentation needs no approval; fix it. This task carries out Section 6 (Batch C) of .sandpiper/docs/specs/retained-surface-inventory.md: rows C-1 to C-15.
+Doug, 2026-11-11: wrong documentation needs no approval; fix it. This task carries out Section 6 (Batch C) of .sandpiper/archive/retained-surface-inventory.md: rows C-1 to C-15.
 
 ## Scope
 
@@ -57,3 +57,7 @@ Doug, 2026-11-11: wrong documentation needs no approval; fix it. This task carri
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:48.751Z
+
+- **description**: updated

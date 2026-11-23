@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "batch-a-code, batch-a-config"
 reporter: USER
 created_at: 2026-11-10T22:55:16.255Z
-updated_at: 2026-11-11T16:18:41.008Z
+updated_at: 2026-11-23T22:02:48.554Z
 related:
   - TOOLS-92
 ---
@@ -35,12 +35,12 @@ Not complete:
 - A-11: the two root .gitignore lines still wait for inventory row L-2.
 
 For review:
-- The code agent corrected four specs that named removed things: background-process-framework-design.md, mailbox-coordination-architecture-notes.md, web-fetch-prd.md and pi-1-5-update-audit.md.
+- The code agent corrected four specs that named removed things: `.sandpiper/archive/background-process-framework-design-2026-04.md`, mailbox-coordination-architecture-notes.md, web-fetch-prd.md and pi-1-5-update-audit.md.
 - devtools/rootProductMetadata.test.ts now reads metadata.scripts?.build, because two manifests no longer have a scripts block.
 
 ## Decision
 
-Doug approved Batch A of .sandpiper/docs/specs/retained-surface-inventory.md as one unit on 2026-11-10: rows A-1, A-2 and A-4 to A-21. Each row removes or trims something that nothing uses.
+Doug approved Batch A of .sandpiper/archive/retained-surface-inventory.md as one unit on 2026-11-10: rows A-1, A-2 and A-4 to A-21. Each row removes or trims something that nothing uses.
 
 ## Execution
 
@@ -80,3 +80,7 @@ Eight commits in total, one per coherent unit. The coordinator verifies each del
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:48.554Z
+
+- **description**: updated

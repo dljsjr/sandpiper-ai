@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T18:57:43.569Z
-updated_at: 2026-10-28T20:32:15.069Z
+updated_at: 2026-11-23T22:02:45.051Z
 ---
 
 # Preserve autonomous one-test red-green-refactor in developer guidance
@@ -16,7 +16,7 @@ updated_at: 2026-10-28T20:32:15.069Z
 
 Complete in canonical global-guidance revision zzuwsomr / 65a3a2ef: developer ROLE.md and testing.md explicitly preserve autonomous one-test RED → GREEN → REFACTOR, expected-failure verification, minimum GREEN, refactor assessment before the next test, and no batching. Removed retired TDD skill prerequisites. Existing requirement to ask before changing testing infrastructure is unchanged; it is not a routine per-test approval gate. Markdown formatting and independent review pass.
 
-Verification: bun check clean; 87 Vitest files / 640 tests passed; bun run pack:cli passed, including isolated packed-install checks. Actual tarball contains only jj and mutation-testing skill directories. Independent preservation/routing review passed. Evidence: ~/.sandpiper/agent/backups/tdd-unbundle-20261028-7E44Cs/ (including preservation-after.json and identity-routing/preservation.json).
+Verification: bun check clean; 87 Vitest files / 640 tests passed; bun run pack:cli passed, including isolated packed-install checks. Actual tarball contains only jj and mutation-testing skill directories. Independent preservation/routing review passed.
 
 Local revisions: Sandpiper poqzxkxz / 5a0d94c7; canonical global guidance zzuwsomr / 65a3a2ef; Dotfiles vzsmtonk / a721a4f0. All edits are scoped; no remote push or release.
 
@@ -53,3 +53,7 @@ Keep the developer-role rule explicit and autonomous: one behavior -> one test -
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:45.051Z
+
+- **description**: updated

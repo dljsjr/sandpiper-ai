@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "relay-removal"
 reporter: AGENT
 created_at: 2026-11-02T18:19:44.026Z
-updated_at: 2026-11-10T16:57:02.074Z
+updated_at: 2026-11-23T22:05:41.363Z
 related:
   - TOOLS-30
   - TOOLS-92
@@ -66,7 +66,7 @@ Reproduced during TOOLS-92: extracted the actual Bun-packed current CLI into an 
 
 Decision required: if this public flag remains supported, include its owned assets and add an isolated installed-behavior regression. If Shell Relay support is intentionally retired, remove the public surface through an explicit approved change instead. The recommended root-package prototype can ship these source assets through the package file list without a staging helper, but does not include them yet. Do not silently drop the capability or add automatic installation.
 
-Evidence: .sandpiper/docs/specs/build-simplification-exploration.md and /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-build-explore-NadbqC/shell-asset-probe.json. No bug fix implemented.
+Evidence: .sandpiper/archive/build-simplification-exploration.md. No bug fix implemented.
 
 ---
 
@@ -105,3 +105,11 @@ Evidence: .sandpiper/docs/specs/build-simplification-exploration.md and /var/fol
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:40.077Z
+
+- **description**: updated
+
+## 2026-11-23T22:05:41.363Z
+
+- **description**: updated

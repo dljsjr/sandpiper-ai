@@ -1,0 +1,42 @@
+===================================================================
+--- a/AGENT-109.md
++++ b/AGENT-109.md
+@@ -6,26 +6,26 @@
+ priority: MEDIUM
+ assignee: UNASSIGNED
+ reporter: USER
+ created_at: 2026-04-28T18:37:46.057Z
+-updated_at: 2026-11-19T18:58:29.576Z
++updated_at: 2026-11-23T22:02:40.362Z
+ ---
+ 
+ # Add mutation testing quality gate
+ 
+ # Add mutation testing to sandpiper-ai
+ 
+ ## What
+ 
+-Set up StrykerJS (or equivalent) as a periodic test-quality gate for `~/git/sandpiper-ai/`.
++Set up StrykerJS (or equivalent) as a periodic test-quality gate for this repository.
+ 
+ ## Why now
+ 
+ The 2026-04-06 code review of the `standup-concurrency-fix` bookmark uncovered a textbook fixture-coupling failure: the parser had 6/6 passing tests against a hand-constructed "legacy format" that didn't match any real legacy standup file in the wild. The code, the fixture, and the regex all agreed with each other and disagreed with reality. Running the binary against a real standup file caught it in one command. (The standup helper has since been removed from the repository; the class of bug remains.)
+ 
+ Mutation testing would catch this whole class of bug when it runs instead of at code-review time. The project still has no mutation tooling installed, so the gap stays a gap until someone does a deliberate setup pass. This task *is* that deliberate setup pass.
+ 
+-The task was filed from `~/.sandpiper/agent/inbox/standup-concurrency-fix-review.md` (the discussion of B-1 and the parser test). That file is no longer in the inbox.
++The task was filed from the discussion of B-1 and the parser test.
+ 
+ ## Scope
+ 
+ - Pick a tool — StrykerJS is the obvious default for TypeScript. Verify it works under Bun and with Vitest as the test runner before committing.
+@@ -80,4 +80,8 @@
+ ## 2026-11-19T18:58:29.576Z
+ 
+ - **status**: NOT STARTED → COMPLETE
+ - **resolution**: UNRESOLVED → WONTFIX
++
++## 2026-11-23T22:02:40.362Z
++
++- **description**: updated

@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T16:53:38.823Z
-updated_at: 2026-10-28T17:32:56.385Z
+updated_at: 2026-11-23T22:02:44.461Z
 ---
 
 # Convert the project index and route global guidance directly to it
@@ -16,7 +16,7 @@ Preserve the complete current project directory in a backed-up Markdown routing 
 
 ## Implementation and verification — 2026-10-28
 
-Implemented. ~/.sandpiper/agent/projects.md is a regular, Prettier-formatted Markdown routing table. All 14 original names, exact descriptions/Unicode, checkout paths, active flags, row order and 0644 permissions are preserved. The old TOON file was removed only after byte-identical backup and no-active-consumer review. Canonical global AGENTS/workflow/skill-loading guidance routes directly to the index without a projects skill or registration prompt. Source: pnyrnurl/dff81b69. Preservation evidence and original: /Users/dstephen/.sandpiper/agent/backups/projects-index-20261028-9qr7FI/conversion.json, verification.json and projects.toon. Independent projects-inventory review PASS.
+Implemented. The global project index is a regular, Prettier-formatted Markdown routing table. All 14 original names, exact descriptions/Unicode, checkout paths, active flags, row order and 0644 permissions are preserved. The old TOON file was removed only after byte-identical backup and no-active-consumer review. Canonical global AGENTS/workflow/skill-loading guidance routes directly to the index without a projects skill or registration prompt. Source: pnyrnurl/dff81b69. Independent projects-inventory review PASS.
 
 ---
 
@@ -39,3 +39,7 @@ Implemented. ~/.sandpiper/agent/projects.md is a regular, Prettier-formatted Mar
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:44.461Z
+
+- **description**: updated

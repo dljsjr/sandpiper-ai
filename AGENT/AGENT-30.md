@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-03-30T02:56:05.619Z
-updated_at: 2026-03-30T03:03:51.354Z
+updated_at: 2026-11-23T22:02:35.493Z
 ---
 
 # Restructure AGENTS.md with progressive disclosure — split into focused docs
@@ -21,7 +21,7 @@ The project AGENTS.md is ~6800 tokens and growing. It needs progressive disclosu
 Candidates for extraction:
 - Build System & Distribution → docs/build-system.md
 - How Extensions Are Loaded → docs/extension-loading.md
-- TUI Development → already has .sandpiper/docs/tui-extension-patterns.md
+- TUI Development → already has .sandpiper/archive/tui-extension-patterns-2026-03.md
 - Environment Variables → docs/env-vars.md
 - Pi Extension API Pitfalls → docs/pi-api-pitfalls.md
 - CLI Development patterns → docs/cli-development.md
@@ -47,3 +47,7 @@ Also consider: should extracted docs live in docs/ (visible, part of the repo) o
 
 - **status**: IN PROGRESS → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:35.493Z
+
+- **description**: updated

@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-10-16T17:17:57.678Z
-updated_at: 2026-10-19T17:27:18.228Z
+updated_at: 2026-11-23T22:05:36.332Z
 ---
 
 # Remove the notify package from Doug's settings (confirm first)
 
-Doug confirmed 2026-10-16. Removed the git:github.com/mitsuhiko/agent-stuff package entry (extensions/notify.ts) from ~/.sandpiper/agent/settings.json; Pi 1.3.0's built-in OSC 7501 program status replaces it. Backup of the prior file: /tmp/settings.json.pre-AGENT-314. Takes effect on the next Sandpiper start.
+Doug confirmed 2026-10-16. Removed the git:github.com/mitsuhiko/agent-stuff package entry (extensions/notify.ts) from ~/.sandpiper/agent/settings.json; Pi 1.3.0's built-in OSC 7501 program status replaces it. Takes effect on the next Sandpiper start.
 
 ---
 
@@ -30,3 +30,7 @@ Doug confirmed 2026-10-16. Removed the git:github.com/mitsuhiko/agent-stuff pack
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:36.332Z
+
+- **description**: updated

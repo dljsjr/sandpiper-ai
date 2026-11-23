@@ -7,16 +7,16 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T17:55:43.647Z
-updated_at: 2026-10-28T18:22:55.258Z
+updated_at: 2026-11-23T22:02:44.658Z
 ---
 
 # Preserve the complete code-review skill in skills-incubator
 
-Copy the whole code-review directory to ~/git/skills-incubator/skills/code-review after checking ownership and destination absence. Verify every file, byte, relative path and mode against the pre-removal source. Preserve it as reference only; do not rewrite its instructions or install/register it.
+Copy the whole code-review directory to the separate skills-incubator repository after checking ownership and destination absence. Verify every file, byte, relative path and mode against the pre-removal source. Preserve it as reference only; do not rewrite its instructions or install/register it.
 
 ## Implementation and verification — 2026-10-28
 
-Complete archive at /Users/dstephen/git/skills-incubator/skills/code-review. All 11 original files (SKILL.md and ten language references), full relative entry set, contents/SHA-256/byte counts, file modes and both directory modes match the unchanged pre-removal source. Independent review PASS against /Users/dstephen/.sandpiper/agent/backups/code-review-unbundle-20261028-Jyz225/before.json; archive-verified.json and preservation-after.json retain checks. No rewrite, package metadata, install, autoload registration, or new repository was added. The independent ~/.claude/skills/code-review installation and global Sandpiper settings are unchanged.
+Complete archive in the separate skills-incubator repository. All 11 original files (SKILL.md and ten language references), full relative entry set, contents/SHA-256/byte counts, file modes and both directory modes match the unchanged pre-removal source. Independent review PASS. No rewrite, package metadata, install, autoload registration, or new repository was added. The independent Claude Code code-review skill installation and global Sandpiper settings are unchanged.
 
 ---
 
@@ -39,3 +39,7 @@ Complete archive at /Users/dstephen/git/skills-incubator/skills/code-review. All
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:44.658Z
+
+- **description**: updated

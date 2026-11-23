@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T18:57:43.352Z
-updated_at: 2026-10-28T20:32:15.254Z
+updated_at: 2026-11-23T22:02:55.993Z
 related:
   - TOOLS-57
   - TOOLS-30
@@ -17,13 +17,13 @@ related:
 
 ## Implementation verified — ready for review
 
-- Archived the complete original TDD skill unchanged in ~/git/skills-incubator/skills/test-driven-development and removed the bundled source/staged/packed copy.
+- Archived the complete original TDD skill unchanged in the separate skills-incubator repository and removed the bundled source/staged/packed copy.
 - Developer ROLE.md/testing.md now require autonomous one-behavior, one-test RED → GREEN → REFACTOR before the next test. Verify expected-reason RED; implement minimum GREEN; assess refactoring. No human approval gate per test and no batched tests/implementation.
 - Updated catalogue docs, diagnostic/discovery/packed assertions, self-reflect routing, and retired the Claude link/provisioner. BUG TOOLS-78 additionally repairs four identity lenses' retired dependency routes without changing lens content.
 - Demonstrated the single source-catalogue case: baseline GREEN → expected extra-skill RED → minimal resource removal GREEN. Assessed refactoring: no new code structure needed simplification. Then updated stale diagnostic contracts and rebuilt the stale packed artifact; final gates passed.
 - Implementation is complete and awaits user acceptance. TOOLS-57/30 remain open; no decision about mutation-testing or jj is implied.
 
-Verification: bun check clean; 87 Vitest files / 640 tests passed; bun run pack:cli passed, including isolated packed-install checks. Actual tarball contains only jj and mutation-testing skill directories. Independent preservation/routing review passed. Evidence: ~/.sandpiper/agent/backups/tdd-unbundle-20261028-7E44Cs/ (including preservation-after.json and identity-routing/preservation.json).
+Verification: bun check clean; 87 Vitest files / 640 tests passed; bun run pack:cli passed, including isolated packed-install checks. Actual tarball contains only jj and mutation-testing skill directories. Independent preservation/routing review passed.
 
 Local revisions: Sandpiper poqzxkxz / 5a0d94c7; canonical global guidance zzuwsomr / 65a3a2ef; Dotfiles vzsmtonk / a721a4f0. All edits are scoped; no remote push or release.
 
@@ -33,7 +33,7 @@ Local revisions: Sandpiper poqzxkxz / 5a0d94c7; canonical global guidance zzuwso
 
 The assistant incorrectly imported the archived skill's literal human-confirmation clause. The user clarified that routine TDD is AUTONOMOUS: write one test for one behavior, run it and verify RED for the expected reason, implement minimum GREEN, refactor, then write the next test. Do not batch tests and then batch implementation. No human approval gate is required per cycle. Genuine scope/requirements/destructive-action rules remain unchanged.
 
-Move the complete test-driven-development skill unchanged to ~/git/skills-incubator/skills/test-driven-development and remove the Sandpiper bundled copy. Rely on developer-role guidance for the essential autonomous TDD loop, preserving the refactor phase. Update active dependencies/catalogue/deployment without adding archive auto-loading, a new framework, a new TDD rewrite project, or decisions about mutation-testing/jj.
+Move the complete test-driven-development skill unchanged to the separate skills-incubator repository and remove the Sandpiper bundled copy. Rely on developer-role guidance for the essential autonomous TDD loop, preserving the refactor phase. Update active dependencies/catalogue/deployment without adding archive auto-loading, a new framework, a new TDD rewrite project, or decisions about mutation-testing/jj.
 
 Earlier RED checkpoint (before implementation): one source catalogue case passed before the assertion change, then failed for the expected extra test-driven-development entry. Only its expected list and continuation records changed; no source skill/archive/global-role/deployment edits occurred yet. Continue directly to the minimal resource change and GREEN; do not ask for routine test confirmation. Earlier mistaken human-gate wording is retained only in task history.
 
@@ -70,3 +70,7 @@ Earlier RED checkpoint (before implementation): one source catalogue case passed
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:55.993Z
+
+- **description**: updated

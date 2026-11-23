@@ -7,12 +7,12 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-13T17:21:13.593Z
-updated_at: 2026-05-04T19:27:45.226Z
+updated_at: 2026-11-23T22:02:36.070Z
 ---
 
 # Prototype reinforced-guidance extraction/retrieval prompts and evals
 
-Prototype reinforced-guidance extraction/retrieval prompts and evals.\n\nStatus update 2026-04-27: the prototype and experiment workbench were extracted to the standalone repository /Users/dstephen/git/reinforced-guidance. The mutable Sandpiper RG/aux-guidance stack qxpptpxm::xlwnnkxv was abandoned, and feat/reinforced-guidance was deleted. Continue Axis 3 work in the standalone repo rather than in sandpiper-ai.
+Prototype reinforced-guidance extraction/retrieval prompts and evals.\n\nStatus update 2026-04-27: the prototype and experiment workbench were extracted to the separate reinforced-guidance repository. The mutable Sandpiper RG/aux-guidance stack qxpptpxm::xlwnnkxv was abandoned, and feat/reinforced-guidance was deleted. Continue Axis 3 work in the standalone repo rather than in sandpiper-ai.
 
 ---
 
@@ -48,3 +48,7 @@ Prototype reinforced-guidance extraction/retrieval prompts and evals.\n\nStatus 
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:36.070Z
+
+- **description**: updated

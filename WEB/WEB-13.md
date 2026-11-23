@@ -7,7 +7,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:33:28.199Z
-updated_at: 2026-11-12T19:39:41.137Z
+updated_at: 2026-11-23T22:02:56.983Z
 related:
   - WEB-10
 ---
@@ -45,7 +45,7 @@ Re-evaluate when:
 
 ## References
 
-- `.sandpiper/docs/web-fetch-prd.md` — Deferred capabilities, Scope 4 (Browser automation)
+- `.sandpiper/archive/web-fetch-prd.md` — Deferred capabilities, Scope 4 (Browser automation)
 - WEB-10 — JS rendering adapter (related, lighter-weight alternative)
 
 ---
@@ -60,3 +60,7 @@ Re-evaluate when:
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:56.983Z
+
+- **description**: updated

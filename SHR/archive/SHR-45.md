@@ -19,8 +19,6 @@ Options:
 - Reduce it since it's non-fatal anyway (e.g., 2s)
 - Use an adaptive timeout based on observed prompt_ready latency
 
-Reference: code-review-shr-v1.md Finding 2
-
 ---
 
 # Activity Log

@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-21T15:53:05.818Z
-updated_at: 2026-11-19T18:58:29.576Z
+updated_at: 2026-11-23T22:02:52.922Z
 ---
 
 # Rewrite jj skill: research spike + restructure into SKILL.md + per-workflow reference docs
@@ -23,7 +23,7 @@ Discovery (2026-10-17):
 
 ## Closed in backlog triage (2026-11-19)
 
-The jj skill is no longer bundled with Sandpiper; the jj 0.46 rewrite continues in ~/git/jujutsu-vcs-skill. Its two research notes moved to .sandpiper/archive/.
+The jj skill is no longer bundled with Sandpiper; the jj 0.46 rewrite continues in the jujutsu-vcs-skill repository (https://github.com/dljsjr/jujutsu-vcs-skill). Its two research notes moved to .sandpiper/archive/.
 
 ---
 
@@ -46,3 +46,7 @@ The jj skill is no longer bundled with Sandpiper; the jj 0.46 rewrite continues 
 
 - **status**: IN PROGRESS → COMPLETE
 - **resolution**: UNRESOLVED → WONTFIX
+
+## 2026-11-23T22:02:52.922Z
+
+- **description**: updated

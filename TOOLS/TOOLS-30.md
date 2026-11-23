@@ -21,18 +21,18 @@ related:
 
 blocked_by:
   - TOOLS-122
-updated_at: 2026-11-11T21:59:08.588Z
+updated_at: 2026-11-23T22:02:37.234Z
 ---
 
 # Simplify the build and distribution system after the Pi 1.0 migration
 
 ## Session wrap (2026-11-11)
 
-Paused at Doug's request because of high context. All agents/processes are stopped and temporary workspaces removed. All ten original implementations are committed/reviewed; seven are NEEDS REVIEW and three remain full-gate-blocked.122 investigation did not reproduce the historical timing tails. Doug noted sustained high laptop load; plausible context, not measured cause. The three source cases use inherited5s defaults versus15s for sibling CLI cases; no documented5s startup SLA. No timeout change or permanent source-helper no-install guard was approved/applied. Do not resume without new scope/go. Continuation: .sandpiper/notes/simplification-handoff.md.
+Paused at Doug's request because of high context. All agents/processes are stopped and temporary workspaces removed. All ten original implementations are committed/reviewed; seven are NEEDS REVIEW and three remain full-gate-blocked.122 investigation did not reproduce the historical timing tails. Doug noted sustained high laptop load; plausible context, not measured cause. The three source cases use inherited5s defaults versus15s for sibling CLI cases; no documented5s startup SLA. No timeout change or permanent source-helper no-install guard was approved/applied. Do not resume without new scope/go.
 
 ## Current delivery and verification checkpoint (2026-11-11)
 
-All ten approved implementations and the separate one-line hermetic smoke correction are committed and independently reviewed. Corrected reference69/532 and seven original task full gates passed. Seven original tasks are NEEDS REVIEW. TOOLS-113 then stopped the serial queue with three existing5-second source-CLI timeouts, root cause unassigned. Consolidation and both Markdown full gates were not attempted. TOOLS-113/111/114 remain IN PROGRESS. TOOLS-116 correction is NEEDS REVIEW; broader verification121 now belongs under this parent and is blocked by new NOT STARTED bug122. No timeout/source workaround or blind retry. All agents/checkouts/processes closed. Handoff: .sandpiper/notes/simplification-handoff.md. Main bookmark/live installation unchanged.
+All ten approved implementations and the separate one-line hermetic smoke correction are committed and independently reviewed. Corrected reference69/532 and seven original task full gates passed. Seven original tasks are NEEDS REVIEW. TOOLS-113 then stopped the serial queue with three existing5-second source-CLI timeouts, root cause unassigned. Consolidation and both Markdown full gates were not attempted. TOOLS-113/111/114 remain IN PROGRESS. TOOLS-116 correction is NEEDS REVIEW; broader verification121 now belongs under this parent and is blocked by new NOT STARTED bug122. No timeout/source workaround or blind retry. All agents/checkouts/processes closed. Main bookmark/live installation unchanged.
 
 ## Verification stopped at TOOLS-116 (2026-11-11)
 
@@ -40,7 +40,7 @@ All ten approved implementations are committed and independently reviewed. Six t
 
 ## Native MCP adoption implemented in current simplification
 
-Session continuation entrypoint: .sandpiper/notes/simplification-handoff.md. Native implementation is committed as a60efe94; no coding action or worker remains queued. This is a documentation-only handoff, not acceptance or new scope.
+Native implementation is committed as a60efe94; no coding action or worker remains queued. This is a documentation-only handoff, not acceptance or new scope.
 
 User explicitly required adoption, and100–102 are now NEEDS REVIEW after completed implementation, main/fresh86files671tests, zero-warning checks/pack, actual offline read-only OWN web_search MCP proof and independent review with no outstanding findings.29obsolete lock records removed with no retained pin changes; application bundle184modules vs453. Own tool boundary remains, server tools unregistered, developer mise mcporter CLI intact. This is not another postponed investigation.99research remains accepted DONE. Parent stays IN PROGRESS and other implementation acceptance/deferrals remain separate. No pushes/releases or main move.
 
@@ -60,7 +60,7 @@ TOOLS-94–98 and TOOLS-33 are NEEDS REVIEW, not DONE. Root product/one Bun buil
 
 ## Work breakdown complete; implementation not started
 
-TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/docs/specs/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
+TOOLS-94 package/build,95 runtime,96 tests/helper removal,97 docs and98 integrated verification/review are all NOT STARTED. Detailed contracts, ownership and dependencies: .sandpiper/archive/build-simplification-work-plan.md. Preserve existing consumer name and packages/cli/bin launcher paths. Initial parallel lanes are94/95/97, then96 after94/95, then98 after all four.
 
 Doug paused sub-agents because he is fixing a fling bug. No worker was launched or queued, no implementation was substituted, and no product code changed. No launch retries during the hold. This parent remains open; planning completion is not implementation acceptance.
 
@@ -80,7 +80,7 @@ Doug clarified that Shell Relay is deliberately disabled for poor behavior and i
 
 ## Current exploration checkpoint
 
-User requested a fresh build-minimization exploration. TOOLS-92 is ready for review, with an evidence-backed root-product-package proposal in .sandpiper/docs/specs/build-simplification-exploration.md. One direct Bun build plus standard packing can eliminate custom production devtools helpers, Turbo, core emission and staging. A no-build TypeScript package also works in smoke probes but increases the tarball from about39.8MB to52.9MB. These are proposals, not approved implementation.
+User requested a fresh build-minimization exploration. TOOLS-92 is ready for review, with an evidence-backed root-product-package proposal in .sandpiper/archive/build-simplification-exploration.md. One direct Bun build plus standard packing can eliminate custom production devtools helpers, Turbo, core emission and staging. A no-build TypeScript package also works in smoke probes but increases the tarball from about39.8MB to52.9MB. These are proposals, not approved implementation.
 
 A real retained-asset gap is tracked by TOOLS-93: the advertised shell-integration installer cannot find scripts in the current tarball. Existing review findings33 remain open. Keep this parent IN PROGRESS. Accepted resource decisions57–59 remain DONE. No closed records or application source changed.
 
@@ -253,3 +253,7 @@ Local tracker limitation encountered during this repair: changing status retaine
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:37.234Z
+
+- **description**: updated

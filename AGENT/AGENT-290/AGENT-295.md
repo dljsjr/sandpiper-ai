@@ -7,17 +7,17 @@ priority: HIGH
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-06T02:57:59.333Z
-updated_at: 2026-10-06T20:30:59.711Z
+updated_at: 2026-11-23T22:05:41.565Z
 depends_on:
   - AGENT-293
 ---
 
 # Implement prompt ownership and the Shape B Pi patch
 
-Implement the System prompt section of .sandpiper/docs/specs/agent-290-pi-1-0-migration-spec.md (Ownership, and the synthetic-runs part of Local Pi patch) in extensions/system/startup-hooks.ts and packages/core.
+Implement the System prompt section of .sandpiper/archive/agent-290-pi-1-0-migration-spec.md (Ownership, and the synthetic-runs part of Local Pi patch) in extensions/system/startup-hooks.ts and packages/core.
 
 Steps:
-1. Test harness. Build an in-process harness: createAgentSession with the real createSandpiperIdentityExtension(), a temp agent dir, an in-memory or temp SessionManager, and a recording provider that captures each request's TranscriptContext. Start from the scratch probes /tmp/sp-pi1/probe-hybrid.ts and /tmp/sp-pi1/probe-sections.ts. They are scratch and may be gone after a reboot; the pattern is createAgentSession plus a provider registered in-process. AGENT-296 and AGENT-297 reuse this harness, so put it where both can import it.
+1. Test harness. Build an in-process harness: createAgentSession with the real createSandpiperIdentityExtension(), a temp agent dir, an in-memory or temp SessionManager, and a recording provider that captures each request's TranscriptContext. The pattern is createAgentSession plus a provider registered in-process. AGENT-296 and AGENT-297 reuse this harness, so put it where both can import it.
 2. Tests, red on stock 1.0.4. Assert the spec's Invariants except the tool-section rows, which belong to AGENT-296. Cover user-prompted runs, idle synthetic runs including a second turn, the first-turn gap as the documented exception, a resumed session, session.state.systemPrompt as /export renders it, byte-for-byte request prefix stability across idle synthetic turns, and an extension-added section such as mcp_servers. Confirm each fails for the reason the invariant names.
 3. Ownership in extensions/system/startup-hooks.ts:
    - In before_agent_start, set systemPromptOptions.customPrompt to the rendered prompt.
@@ -68,3 +68,11 @@ History (2026-10-06): absorbed AGENT-294, because tests are part of the implemen
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:41.039Z
+
+- **description**: updated
+
+## 2026-11-23T22:05:41.565Z
+
+- **description**: updated

@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.144Z
-updated_at: 2026-11-12T19:03:24.620Z
+updated_at: 2026-11-23T22:02:45.838Z
 ---
 
 # Add JS rendering adapter (lightpanda/Playwright) for SPA and JS-heavy pages
@@ -94,7 +94,7 @@ Most sites an agent reads are SSR (docs, GitHub, npm, MDN). But some pages — S
 ## References
 
 - `extensions/web-fetch/src/types.ts` — FetchAdapter interface
-- `.sandpiper/docs/web-fetch-prd.md` — deferred capabilities table, lightpanda design decision reasoning
+- `.sandpiper/archive/web-fetch-prd.md` — deferred capabilities table, lightpanda design decision reasoning
 
 ---
 
@@ -165,3 +165,7 @@ Most sites an agent reads are SSR (docs, GitHub, npm, MDN). But some pages — S
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:45.838Z
+
+- **description**: updated

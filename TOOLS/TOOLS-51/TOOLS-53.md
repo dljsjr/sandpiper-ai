@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: "cutover-dev"
 reporter: AGENT
 created_at: 2026-10-27T22:15:03.927Z
-updated_at: 2026-10-27T23:52:36.456Z
+updated_at: 2026-11-23T22:05:40.564Z
 ---
 
 # Remove bundled standup runtime and wire stable Journal directory defaults
 
-Removed packages/sandpiper-standup-cli, bundled standup skill/helper, helper sync and build/test/lock/knip wiring. Kept generic session lifecycle/PID infrastructure. Shared configurePiEnvironment now defaults AGENT_JOURNAL_DIR to absolute launch cwd/.sandpiper only when undefined, before imports in both entrypoints. Empty/relative/absolute values preserved exactly. Test-first: recorded failing default, then 14 bootstrap tests and staging test passed. Staging rejects orphan skill directories left by upgrades, retaining valid nested assets. Both actual built entrypoints + changed-cwd child passed 8 absent/override cases with fake HOME/agent dirs. Runtime slice independently reviewed. Final bun check clean; full gate 87files/640tests passes in developer and reviewer workspaces. Evidence: launch-env-after.json, runtime-red.txt, cache-hermetic-check.txt, hermetic-final-test.txt under /private/tmp/journal-cutover-jt1zotyw.
+Removed packages/sandpiper-standup-cli, bundled standup skill/helper, helper sync and build/test/lock/knip wiring. Kept generic session lifecycle/PID infrastructure. Shared configurePiEnvironment now defaults AGENT_JOURNAL_DIR to absolute launch cwd/.sandpiper only when undefined, before imports in both entrypoints. Empty/relative/absolute values preserved exactly. Test-first: recorded failing default, then 14 bootstrap tests and staging test passed. Staging rejects orphan skill directories left by upgrades, retaining valid nested assets. Both actual built entrypoints + changed-cwd child passed 8 absent/override cases with fake HOME/agent dirs. Runtime slice independently reviewed. Final bun check clean; full gate 87files/640tests passes in developer and reviewer workspaces.
 
 ---
 
@@ -39,3 +39,7 @@ Removed packages/sandpiper-standup-cli, bundled standup skill/helper, helper syn
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:40.564Z
+
+- **description**: updated

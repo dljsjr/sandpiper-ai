@@ -1,0 +1,34 @@
+===================================================================
+--- a/AGENT-92.md
++++ b/AGENT-92.md
+@@ -6,9 +6,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-04-27T18:20:53.330Z
+-updated_at: 2026-05-04T20:51:22.715Z
++updated_at: 2026-11-23T22:02:36.846Z
+ depends_on:
+   - AGENT-88
+   - AGENT-89
+ related:
+@@ -18,9 +18,9 @@
+ # Research and build Claude Code plugin distribution
+ 
+ Research and build the Claude Code plugin distribution for neutral Sandpiper capabilities/resources.
+ 
+-See .sandpiper/docs/specs/package-first-multi-distribution.md.
++See .sandpiper/archive/package-first-multi-distribution-2026-04.md.
+ 
+ Claude plugin reference findings to account for:
+ - plugins are self-contained directories with optional `.claude-plugin/plugin.json`
+ - skills map to `skills/`; selected prompt templates may map to `commands/` or skills after review
+@@ -61,4 +61,8 @@
+ 
+ ## 2026-05-04T20:51:22.716Z
+ 
+ - **status**: IN PROGRESS → COMPLETE
++
++## 2026-11-23T22:02:36.846Z
++
++- **description**: updated

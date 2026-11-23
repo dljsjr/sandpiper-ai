@@ -40,7 +40,7 @@ Historical record to read first:
 - .sandpiper/tasks/SHR/archive/SHR-70.md
 - .sandpiper/archive/openclaw-process-supervisor-investigation.md
 - .sandpiper/tasks/SHR/archive/SHR-79.md
-- .sandpiper/docs/specs/zellij-044-relay-design.md
+- .sandpiper/archive/shell-relay/zellij-044-relay-design.md
 - SHR-98
 
 Current note:

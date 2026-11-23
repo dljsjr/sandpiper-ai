@@ -7,7 +7,7 @@ priority: HIGH
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-04-28T18:37:45.963Z
-updated_at: 2026-11-12T19:39:41.215Z
+updated_at: 2026-11-23T22:02:34.538Z
 ---
 
 # Make standup CLI command tests cwd-independent
@@ -24,8 +24,8 @@ All of `packages/sandpiper-standup-cli/src/commands/*.test.ts` invoke the built 
 Reproduced on `main` (no involvement from the autotoon or aux-guidance branches):
 
 ```bash
-cd ~/git/sandpiper-ai/packages/sandpiper-standup-cli && bun x vitest run src/commands/read-cmd.test.ts   # PASSES
-cd ~/git/sandpiper-ai && bun x vitest run packages/sandpiper-standup-cli/src/commands/read-cmd.test.ts   # FAILS
+cd packages/sandpiper-standup-cli && bun x vitest run src/commands/read-cmd.test.ts   # PASSES
+cd <repo root> && bun x vitest run packages/sandpiper-standup-cli/src/commands/read-cmd.test.ts   # FAILS
 ```
 
 The per-package `bun run --filter sandpiper-standup-cli test` path shields this by implicitly cd-ing into the package dir, which is why the bug has not been noticed in per-package CI loops.
@@ -76,9 +76,9 @@ const CLI_BIN = resolve(dirname(fileURLToPath(import.meta.url)), '../../dist/san
 The `bun x` form is recommended as the default because it is cwd-independent, layout-independent, and matches the real invocation contract.
 
 ## Acceptance
-- `cd ~/git/sandpiper-ai && bun x vitest run packages/sandpiper-standup-cli/` is clean.
-- `cd ~/git/sandpiper-ai && bun x vitest run` no longer shows the 37 MODULE_NOT_FOUND failures caused by this path.
-- `cd ~/git/sandpiper-ai/packages/sandpiper-standup-cli && bun run test` still passes unchanged.
+- `cd <repo root> && bun x vitest run packages/sandpiper-standup-cli/` is clean.
+- `cd <repo root> && bun x vitest run` no longer shows the 37 MODULE_NOT_FOUND failures caused by this path.
+- `cd packages/sandpiper-standup-cli && bun run test` still passes unchanged.
 - `rg -n 'node dist/sandpiper-standup' packages/sandpiper-standup-cli` returns zero matches after the fix.
 
 ## Out of scope
@@ -109,3 +109,7 @@ The `bun x` form is recommended as the default because it is cwd-independent, la
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:34.538Z
+
+- **description**: updated

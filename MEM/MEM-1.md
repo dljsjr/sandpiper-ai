@@ -7,17 +7,14 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-03-25T03:14:28.312Z
-updated_at: 2026-10-19T19:39:07.831Z
+updated_at: 2026-11-23T22:02:47.968Z
 ---
 
 # Design memory/brain system for cross-session knowledge retrieval
 
 Design the sandpiper memory/brain system for cross-session knowledge retrieval.
 
-Current direction: core memory engine design has been spun out into the standalone Rust repo at ~/git/yaams (Yet Another Agent Memory System). YAAMS now owns the storage/retrieval engine, schema, search pipeline, and CLI dogfooding path. Relevant design docs live in:
-- ~/git/yaams/docs/architecture.md
-- ~/git/yaams/.sandpiper/docs/mvp-work-plan.md
-- ~/git/yaams/.sandpiper/docs/future-phases.md
+Current direction: core memory engine design has been spun out into the separate yaams repository, a standalone Rust repo (Yet Another Agent Memory System). YAAMS now owns the storage/retrieval engine, schema, search pipeline, and CLI dogfooding path.
 
 This MEM task should now be interpreted as sandpiper-side integration and productization work around YAAMS rather than re-designing the storage engine in-repo. Future follow-up likely includes extension integration, memory prompt injection, extraction orchestration, and session-boundary flushing.
 
@@ -37,3 +34,7 @@ This MEM task should now be interpreted as sandpiper-side integration and produc
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:47.968Z
+
+- **description**: 8 lines → updated (5 lines)

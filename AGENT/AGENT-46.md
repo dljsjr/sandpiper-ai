@@ -7,7 +7,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:52.779Z
-updated_at: 2026-11-19T18:58:29.576Z
+updated_at: 2026-11-23T22:02:41.628Z
 ---
 
 # ProcessManager: add process restart / auto-restart support
@@ -26,7 +26,7 @@ The current ProcessManager has no restart API. Restart semantics are currently l
 ## References
 
 - `packages/core/src/process-manager.ts` — ProcessManager implementation
-- `.sandpiper/docs/background-process-framework-design.md` — Open Questions section, item 2
+- `.sandpiper/archive/background-process-framework-design-2026-04.md` — Open Questions section, item 2
 - AGENT-28 — related: buffer size limits
 
 ## Closed in backlog triage (2026-11-19)
@@ -49,3 +49,7 @@ No need has come up; a caller can start the same id again after an exit.
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: UNRESOLVED → WONTFIX
+
+## 2026-11-23T22:02:41.628Z
+
+- **description**: updated

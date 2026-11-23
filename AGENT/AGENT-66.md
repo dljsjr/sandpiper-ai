@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-21T03:48:06.716Z
-updated_at: 2026-11-19T18:58:29.576Z
+updated_at: 2026-11-23T22:02:47.183Z
 related:
   - AGENT-51
 ---
@@ -28,7 +28,7 @@ To revisit: design a general capability-guidance reintegration alongside the bro
 
 ## Folded review context
 
-The following review notes were folded from inbox files before deleting them from `~/.sandpiper/agent/inbox/`.
+The following review notes were folded from inbox files before deleting them from the user's global agent inbox.
 
 ### Round 1 summary
 
@@ -52,8 +52,8 @@ Remaining non-blocking notes from round 2:
 
 **Date:** 2026-04-07  
 **Reviewer:** Sandpiper agent  
-**Scope reviewed:** committed AutoTOON stack from `8c40aab9` (`Merge standup-concurrency-fix to main`) through `42cf9aa5` (`Lean all the way in: just 'autotoon' everywhere 🎤`) in `~/git/sandpiper-ai`  
-**Important scope note:** I intentionally ignored the unrelated dirty working-copy state currently sitting on top of the bookmark (`.sandpiper/docs/mutation-testing.md`, deletion of `.sandpiper/docs/toon-extension.md`, `bun.lock`), and reviewed the committed stack only.
+**Scope reviewed:** committed AutoTOON stack from `8c40aab9` (`Merge standup-concurrency-fix to main`) through `42cf9aa5` (`Lean all the way in: just 'autotoon' everywhere 🎤`) in this repository  
+**Important scope note:** I intentionally ignored the unrelated dirty working-copy state currently sitting on top of the bookmark (`.sandpiper/docs/specs/mutation-testing.md`, deletion of `.sandpiper/docs/toon-extension.md`, `bun.lock`), and reviewed the committed stack only.
 
 ## Verdict
 
@@ -66,23 +66,23 @@ The JSON→TOON conversion path itself is small, clear, and well-tested. The pro
 ### Commands run
 
 ```bash
-cd ~/git/sandpiper-ai && bun run check:tsc
-cd ~/git/sandpiper-ai && bun run check:biome-check
-cd ~/git/sandpiper-ai && bun x vitest run \
+bun run check:tsc
+bun run check:biome-check
+bun x vitest run \
   extensions/autotoon/autotoon.test.ts \
   extensions/autotoon/autotoon-integration.test.ts \
   extensions/system/capability-guidance-registry.test.ts \
   extensions/system/startup-hooks.test.ts \
   packages/core/src/system-startup.test.ts
-cd ~/git/sandpiper-ai && uvx lizard -l typescript \
+uvx lizard -l typescript \
   extensions/autotoon/autotoon.ts \
   extensions/system/capability-guidance-registry.ts \
   packages/core/src/system-startup.ts
-cd ~/git/sandpiper-ai && scc --format json --by-file \
+scc --format json --by-file \
   extensions/autotoon/autotoon.ts \
   extensions/system/capability-guidance-registry.ts \
   packages/core/src/system-startup.ts
-cd ~/git/sandpiper-ai && bunx jscpd extensions/autotoon extensions/system packages/core/src/system-startup.ts \
+bunx jscpd extensions/autotoon extensions/system packages/core/src/system-startup.ts \
   --reporters json --output /tmp/autotoon-jscpd
 ```
 
@@ -126,8 +126,8 @@ cd ~/git/sandpiper-ai && bunx jscpd extensions/autotoon extensions/system packag
 - `extensions/system/capability-guidance-registry.ts`
 - `extensions/autotoon/autotoon.ts`
 - `extensions/system/startup-hooks.ts`
-- `.sandpiper/docs/extension-loading.md`
-- `.sandpiper/docs/pi-api-pitfalls.md`
+- `.sandpiper/archive/extension-loading-2026-04.md`
+- `.sandpiper/archive/pi-api-pitfalls-2026-03.md`
 
 The design assumes this flow works:
 
@@ -138,10 +138,10 @@ The design assumes this flow works:
 
 That assumption directly conflicts with the repo's own extension-loading guidance:
 
-- `.sandpiper/docs/extension-loading.md:12` — "Each extension gets its own jiti module scope. Do not rely on module-level state being shared across extensions."
-- `.sandpiper/docs/extension-loading.md:32` — "Each jiti load creates a separate module scope — module-level state is not shared between extensions. Use `pi.events` for cross-extension communication."
-- `.sandpiper/docs/pi-api-pitfalls.md:10` — "Treat module-level state as extension-local. Separate jiti loads do not share module instances."
-- `.sandpiper/docs/pi-api-pitfalls.md:50` — "A module-level array in `packages/core` will be a different instance in each extension. Use `pi.events` for cross-extension communication instead."
+- `.sandpiper/archive/extension-loading-2026-04.md:12` — "Each extension gets its own jiti module scope. Do not rely on module-level state being shared across extensions."
+- `.sandpiper/archive/extension-loading-2026-04.md:32` — "Each jiti load creates a separate module scope — module-level state is not shared between extensions. Use `pi.events` for cross-extension communication."
+- `.sandpiper/archive/pi-api-pitfalls-2026-03.md:10` — "Treat module-level state as extension-local. Separate jiti loads do not share module instances."
+- `.sandpiper/archive/pi-api-pitfalls-2026-03.md:50` — "A module-level array in `packages/core` will be a different instance in each extension. Use `pi.events` for cross-extension communication instead."
 
 The current tests do **not** resolve this contradiction, because they never exercise the real cross-extension load path:
 
@@ -285,9 +285,9 @@ If those items land, this should move from "good-but-not-clean" to a likely appr
 
 **Date:** 2026-04-07
 **Reviewer:** Sandpiper agent
-**Scope:** `feat/autotoon` bookmark in `~/git/sandpiper-ai` (rebased on top of updated `main` as of 2026-04-07)
+**Scope:** `feat/autotoon` bookmark in this repository (rebased on top of updated `main` as of 2026-04-07)
 **Current tip:** `cc34b448` (Fix test code type errors — round 1 continued)
-**Baseline:** previous round-1 review in `~/.sandpiper/agent/inbox/autotoon-extension-review.md`
+**Baseline:** previous round-1 review
 **Note:** The stack was rebased after the original review. Commit IDs from the original scope (`8c40aab9..d00ebc74`) are no longer valid. Use `jj log -r 'main..feat/autotoon'` to see the current stack.
 
 ## Verdict
@@ -305,7 +305,7 @@ This is the right direction, and it's meaningfully cleaner than the round-1 stac
 
 Commands run:
 ```bash
-cd ~/git/sandpiper-ai
+cd <repository root>
 bun run check:tsc
 bun run check:biome-check
 bun x vitest run \
@@ -401,7 +401,7 @@ pi.events.emit('capability_guidance:register_static', {
 
 `rg` confirms this is the only place in the repo still showing the old import. This is the single remaining stale-rebrand artifact.
 
-**Recommendation:** replace that code block with the `pi.events.emit` form and add a one-line pointer that this pattern is the cross-extension-safe one per `.sandpiper/docs/extension-loading.md` / `pi-api-pitfalls.md`.
+**Recommendation:** replace that code block with the `pi.events.emit` form and add a one-line pointer that this pattern is the cross-extension-safe one per `.sandpiper/archive/extension-loading-2026-04.md` / `.sandpiper/archive/pi-api-pitfalls-2026-03.md`.
 
 ### Minor 2 — Dead `dynamicCapabilityGuidance` infrastructure is partially wired up with no producers
 
@@ -495,3 +495,7 @@ AutoTOON has converted output without prompt guidance since April, with no recor
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: UNRESOLVED → WONTFIX
+
+## 2026-11-23T22:02:47.183Z
+
+- **description**: updated

@@ -23,7 +23,7 @@ Replace the current Tcl/Expect `unbuffer-relay` script with a TypeScript-side PT
 Investigation in SHR-70 evaluated multiple approaches and concluded:
 - `@lydell/node-pty` is the right PTY backend (prebuilts, full lifecycle control, stdin support)
 - Write our own lean adapter rather than vendoring OpenClaw's process/supervisor
-- Full analysis: `.sandpiper/docs/openclaw-process-supervisor-investigation.md`
+- Full analysis: `.sandpiper/archive/openclaw-process-supervisor-investigation.md`
 
 ## Scope
 
@@ -41,8 +41,7 @@ This is the **PTY MVP only** — replace unbuffer-relay, nothing more. Backgroun
 
 - `extensions/shell-relay/unbuffer-relay` — current Tcl/Expect implementation to replace
 - `extensions/shell-relay/shell-integration/relay.{fish,bash,zsh}` — `use_unbuffer` detection logic
-- `extensions/shell-relay/AGENTS.md` — "Enhanced Mode" section
-- `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — PTY approach comparison and `@lydell/node-pty` evaluation
+- `.sandpiper/archive/openclaw-process-supervisor-investigation.md` — PTY approach comparison and `@lydell/node-pty` evaluation
 - SHR-70 — completed investigation spike
 
 ---

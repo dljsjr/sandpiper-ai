@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "Piper"
 reporter: USER
 created_at: 2026-05-25T21:52:33.225Z
-updated_at: 2026-05-27T03:20:28.849Z
+updated_at: 2026-11-23T22:02:37.040Z
 related:
   - TAT-33
   - TAT-38
@@ -16,7 +16,7 @@ related:
 
 # Author multi-agent room coordination & decision-ownership playbook
 
-Delivered: the multi-agent room coordination playbook at ~/.sandpiper/agent/playbooks/workflow/multi-agent-rooms.md (wired into workflow/index.md). It defines how multiple agents coordinate in a Chorus room: start from the work graph not roles; map lanes/shared-state/isolation/artifacts before assigning agents; prefer jj-workspace isolation for coding lanes and artifact isolation for non-code; assign Owner/Lens/Scribe per phase; heartbeats over courtesy ACKs; chat-phase discipline (batch-read, classify, claim, act); and honest harness-limit mitigations (pre-assignment over reactive claiming, shared-state-as-lock, human as serialization point). Dogfooded live 2026-05-26 in room 'the gang writes some code' during the durable-rooms sizing pass: the pre-assignment and one-owner/no-parallel-synthesis sections validated in real time. SCOPE SPLIT: this ticket originally also implied a code-level protocol in the sandpiper-chorus integration; that implementation is split to a new follow-on ticket and deferred until the durable-rooms v1 rebuild lands, so it targets the new room substrate. This ticket covers the delivered playbook/guidelines only.
+Delivered: the multi-agent room coordination playbook in the user's global agent guidance (wired into workflow/index.md). It defines how multiple agents coordinate in a Chorus room: start from the work graph not roles; map lanes/shared-state/isolation/artifacts before assigning agents; prefer jj-workspace isolation for coding lanes and artifact isolation for non-code; assign Owner/Lens/Scribe per phase; heartbeats over courtesy ACKs; chat-phase discipline (batch-read, classify, claim, act); and honest harness-limit mitigations (pre-assignment over reactive claiming, shared-state-as-lock, human as serialization point). Dogfooded live 2026-05-26 in room 'the gang writes some code' during the durable-rooms sizing pass: the pre-assignment and one-owner/no-parallel-synthesis sections validated in real time. SCOPE SPLIT: this ticket originally also implied a code-level protocol in the sandpiper-chorus integration; that implementation is split to a new follow-on ticket and deferred until the durable-rooms v1 rebuild lands, so it targets the new room substrate. This ticket covers the delivered playbook/guidelines only.
 
 ---
 
@@ -56,3 +56,7 @@ Delivered: the multi-agent room coordination playbook at ~/.sandpiper/agent/play
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:37.040Z
+
+- **description**: updated

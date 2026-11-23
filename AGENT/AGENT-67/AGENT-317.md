@@ -1,5 +1,5 @@
 ---
-title: "Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill"
+title: "Draft new jj 0.46 technical references in the jujutsu-vcs-skill repository"
 status: COMPLETE
 resolution: DONE
 kind: SUBTASK
@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-17T22:35:03.474Z
-updated_at: 2026-10-19T17:30:03.049Z
+updated_at: 2026-11-23T22:06:12.346Z
 ---
 
-# Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill
+# Draft new jj 0.46 technical references in the jujutsu-vcs-skill repository
 
-Draft in ~/git/jujutsu-vcs-skill (jj repo, change lywzksxl): README.md plus 12 references (concepts, cli, revsets, filesets, templates, config, conflicts, operation-log, workspaces, bookmarks-and-remotes, git-interop, automation), about 1,750 lines. Reference mode only; agent guidance and SKILL.md deliberately left for the next discussion. Sources: the AGENT-315 CLI notes, the AGENT-316 docs notes, the 0.39-0.46 changelog. Verified in scratch repos on jj 0.46.0 / git 2.56 before writing: glob default for revset string patterns; split FILESETS -m without editor; JJ_EDITOR=true and unchanged-buffer semantics; JJ: lines and ignore-rest; non-zero editor exit; scripted --tool diff editor for split and squash -i (JJ-INSTRUCTIONS present in $right); revsets.run default reachable(@, mutable()) and jj usable inside jj run; workspace forget/remove on colocated worktrees; cross-workspace undo refusal text; stale error after a content rewrite from another workspace (metadata-only rewrite did not cause staleness); max-new-file-size warning; every templates.md example; 28 revset and 3 fileset examples parse. Internal links checked: 0 broken. Registered in ~/.sandpiper/agent/projects.toon.
+Draft in the jujutsu-vcs-skill repository (https://github.com/dljsjr/jujutsu-vcs-skill; jj repo, change lywzksxl): README.md plus 12 references (concepts, cli, revsets, filesets, templates, config, conflicts, operation-log, workspaces, bookmarks-and-remotes, git-interop, automation), about 1,750 lines. Reference mode only; agent guidance and SKILL.md deliberately left for the next discussion. Sources: the AGENT-315 CLI notes, the AGENT-316 docs notes, the 0.39-0.46 changelog. Verified in scratch repos on jj 0.46.0 / git 2.56 before writing: glob default for revset string patterns; split FILESETS -m without editor; JJ_EDITOR=true and unchanged-buffer semantics; JJ: lines and ignore-rest; non-zero editor exit; scripted --tool diff editor for split and squash -i (JJ-INSTRUCTIONS present in $right); revsets.run default reachable(@, mutable()) and jj usable inside jj run; workspace forget/remove on colocated worktrees; cross-workspace undo refusal text; stale error after a content rewrite from another workspace (metadata-only rewrite did not cause staleness); max-new-file-size warning; every templates.md example; 28 revset and 3 fileset examples parse. Internal links checked: 0 broken. Registered in the global project index.
 
 ---
 
@@ -35,3 +35,11 @@ Draft in ~/git/jujutsu-vcs-skill (jj repo, change lywzksxl): README.md plus 12 r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:47.380Z
+
+- **description**: updated
+
+## 2026-11-23T22:06:12.346Z
+
+- **title**: Draft new jj 0.46 technical references in ~/git/jujutsu-vcs-skill → Draft new jj 0.46 technical references in the jujutsu-vcs-skill repository

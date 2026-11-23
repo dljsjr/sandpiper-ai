@@ -37,7 +37,7 @@ Neither background processes nor subagents are built into Pi today. This framewo
 
 ## Design Direction
 
-Informed by the OpenClaw investigation (`.sandpiper/docs/openclaw-process-supervisor-investigation.md`):
+Informed by the OpenClaw investigation (`.sandpiper/archive/openclaw-process-supervisor-investigation.md`):
 - Adapter pattern: `SpawnProcessAdapter` interface with `child` and `pty` implementations
 - In-memory state machine: `starting → running → exiting → exited`
 - Timeout enforcement (overall + no-output)
@@ -55,7 +55,7 @@ Informed by the OpenClaw investigation (`.sandpiper/docs/openclaw-process-superv
 
 - SHR-71 — PTY MVP (prerequisite)
 - SHR-70 — completed investigation spike
-- `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — full analysis
+- `.sandpiper/archive/openclaw-process-supervisor-investigation.md` — full analysis
 - OpenClaw `src/process/supervisor/` — reference implementation (adapt concepts, don't vendor)
 
 

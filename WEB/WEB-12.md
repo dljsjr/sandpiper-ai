@@ -7,7 +7,7 @@ priority: LOW
 assignee: UNASSIGNED
 reporter: AGENT
 created_at: 2026-04-01T15:29:49.206Z
-updated_at: 2026-11-12T19:39:41.028Z
+updated_at: 2026-11-23T22:02:51.203Z
 ---
 
 # Spike: site crawling with robots.txt respect and conservative rate limiting
@@ -28,7 +28,7 @@ Return: a list of fetched+extracted pages, or stream them as discovered.
 
 ## References
 
-- `.sandpiper/docs/web-fetch-prd.md` — Deferred capabilities, Scope 2
+- `.sandpiper/archive/web-fetch-prd.md` — Deferred capabilities, Scope 2
 - WEB-11 — search tool (would be a natural companion to crawling for research workflows)
 
 ---
@@ -43,3 +43,7 @@ Return: a list of fetched+extracted pages, or stream them as discovered.
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:51.203Z
+
+- **description**: updated

@@ -1,0 +1,53 @@
+===================================================================
+--- a/TOOLS-92.md
++++ b/TOOLS-92.md
+@@ -8,16 +8,16 @@
+ reporter: USER
+ created_at: 2026-11-02T17:42:31.696Z
+ related:
+   - TOOLS-93
+-updated_at: 2026-11-11T16:41:28.979Z
++updated_at: 2026-11-23T22:02:54.597Z
+ ---
+ 
+ # Audit retained build, runtime and toolchain complexity against simplification scope
+ 
+ ## Audit complete, awaiting review (2026-11-11)
+ 
+-Every row of .sandpiper/docs/specs/retained-surface-inventory.md has a decision from Doug. The Decision column names the task that carries out each approved change.
++Every row of .sandpiper/archive/retained-surface-inventory.md has a decision from Doug. The Decision column names the task that carries out each approved change.
+ 
+ Done and signed off: TOOLS-93 (Shell Relay), TOOLS-103 to TOOLS-108, TOOLS-115 (documents), AGENT-319 and AGENT-320 (Pi 1.5.2), and the local cleanup in Batch L.
+ 
+ Approved and not started: TOOLS-109 (DuckDuckGo adapter), TOOLS-110 (.pi migration), TOOLS-111 (one manifest, Knip in the gate, one Vitest config), TOOLS-112 (logo files, Commander guidance, standup log, test:standalone), TOOLS-113 (ast-grep), TOOLS-114 (Markdown gate). TOOLS-30 stays open until these are done.
+@@ -25,9 +25,9 @@
+ Defects found during the review, each with its own task: AGENT-321 (prompt changes mid-session; approach not chosen), AGENT-322 (escaped tags in context notes), AGENT-323 (AutoTOON rewrites read results), WEB-22 (project settings trust). Backlog: WEB-23 (llms.txt probe).
+ 
+ ## Inventory ready for decisions (2026-11-09)
+ 
+-The deliverable now exists: .sandpiper/docs/specs/retained-surface-inventory.md (Reference). It replaces the pre-implementation classifications in build-simplification-exploration.md.
++The deliverable now exists: .sandpiper/archive/retained-surface-inventory.md (Reference). It replaces the pre-implementation classifications in build-simplification-exploration.md.
+ 
+ Doug asked for a second repo-wide pass for missed removal and simplification candidates. Six read-only audit runs covered root toolchain/config, extensions, packages plus devtools, and documentation. The coordinator repeated the searches behind the main findings. Nothing was built, packed, installed or tested, and no product file changed.
+ 
+ The inventory holds 15 keep rows, 6 rows tracked by TOOLS-93/43/87, 18 no-consumer leftovers (Batch A), 15 decisions with a tradeoff (B), 12 documentation corrections (C) and 4 local-only cleanups (L). Every proposal is unapproved. Decisions are recorded in the inventory's Decision column. Approved rows become implementation work under TOOLS-30 or a new task; this ticket closes when every row has a decision.
+@@ -49,9 +49,9 @@
+ ## Earlier scope and exploration history
+ 
+ ## Exploration ready for review
+ 
+-User requested a fresh search for the simplest possible build, especially whether devtools is needed. Results and tradeoffs are in .sandpiper/docs/specs/build-simplification-exploration.md (Explanation). No application source/manifests/build scripts changed; no implementation authorized.
++User requested a fresh search for the simplest possible build, especially whether devtools is needed. Results and tradeoffs are in .sandpiper/archive/build-simplification-exploration.md (Explanation). No application source/manifests/build scripts changed; no implementation authorized.
+ 
+ Recommendation: one root product package, one direct Bun build for both entrypoints, ordinary Bun packing. This can remove Turbo, separate core emission, resources/docs staging and all three production devtools helpers (151 lines), while retaining test infrastructure and module boundaries. Root-owned docs/license/assets eliminate cross-package staging instead of moving it to new scripts. Preserve current consumer package/bin identity unless explicitly renamed.
+ 
+ Evidence: Bun1.4.4 direct workspace pack includes patched runtime deps even under a separate hoisted-workspace fixture; it omits a parent LICENSE and a symlinked LICENSE. npm workspace packing still omits deps. Source typecheck succeeds without core dist. Two owned prototypes pass offline --ignore-scripts installs, readonly version/help, capture-provider diagnostics without external model calls, and user-extension runtime SDK imports. Bundled root prototype: one Bun invocation, no Turbo/core emit/staging/pack wrapper,16931 entries/39788927 bytes. Direct TS source prototype: no app build,24775 entries/52872269 bytes, no first-party tests,190 dependency tests. This is feasibility evidence, not a full-regression or clean-install certification.
+@@ -132,4 +132,8 @@
+ ## 2026-11-11T16:41:28.980Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-11-23T22:02:54.597Z
++
++- **description**: updated

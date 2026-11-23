@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: UNASSIGNED
 reporter: USER
 created_at: 2026-04-28T18:37:46.057Z
-updated_at: 2026-11-19T18:58:29.576Z
+updated_at: 2026-11-23T22:02:40.362Z
 ---
 
 # Add mutation testing quality gate
@@ -16,7 +16,7 @@ updated_at: 2026-11-19T18:58:29.576Z
 
 ## What
 
-Set up StrykerJS (or equivalent) as a periodic test-quality gate for `~/git/sandpiper-ai/`.
+Set up StrykerJS (or equivalent) as a periodic test-quality gate for this repository.
 
 ## Why now
 
@@ -24,7 +24,7 @@ The 2026-04-06 code review of the `standup-concurrency-fix` bookmark uncovered a
 
 Mutation testing would catch this whole class of bug when it runs instead of at code-review time. The project still has no mutation tooling installed, so the gap stays a gap until someone does a deliberate setup pass. This task *is* that deliberate setup pass.
 
-The task was filed from `~/.sandpiper/agent/inbox/standup-concurrency-fix-review.md` (the discussion of B-1 and the parser test). That file is no longer in the inbox.
+The task was filed from the discussion of B-1 and the parser test.
 
 ## Scope
 
@@ -81,3 +81,7 @@ Its motivating bug (a fixture that did not match real files) is not what mutatio
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: UNRESOLVED → WONTFIX
+
+## 2026-11-23T22:02:40.362Z
+
+- **description**: updated

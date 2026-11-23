@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-03T01:50:55.947Z
-updated_at: 2026-11-09T19:42:59.303Z
+updated_at: 2026-11-23T22:05:38.003Z
 related:
   - TOOLS-99
   - TOOLS-92
@@ -17,7 +17,7 @@ related:
 
 ## Declaration handoff and parent verification
 
-Exact pi-mcp1.3.0 directly declared in web-search and root runtime/bundled deps; only application mcporter removed. Root product/build/bin/file/patch/mise contracts unchanged. Existing runtime-closure case proved expected RED then GREEN; all9metadata tests pass, parent reran9 and check:deps successfully. Scoped Biome clean. One authorized offline lockfile-only regeneration removed29 obsolete package records (373to344), added0 and changed0 retained records/versions/integrities. Agent snapshot shows shared node_modules unchanged by lock update. Evidence /tmp/sp-tools-101-deps-before/lock-analysis.json and command logs. Worker closed. Parent shared install/build and actual package verification remain under102; no DONE inference.
+Exact pi-mcp1.3.0 directly declared in web-search and root runtime/bundled deps; only application mcporter removed. Root product/build/bin/file/patch/mise contracts unchanged. Existing runtime-closure case proved expected RED then GREEN; all9metadata tests pass, parent reran9 and check:deps successfully. Scoped Biome clean. One authorized offline lockfile-only regeneration removed29 obsolete package records (373to344), added0 and changed0 retained records/versions/integrities. Agent snapshot shows shared node_modules unchanged by lock update. Worker closed. Parent shared install/build and actual package verification remain under102; no DONE inference.
 
 ## Approved scope
 
@@ -44,3 +44,7 @@ Adoption is approved in current simplification scope. Declare exact pi-mcp1.3.0 
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:38.003Z
+
+- **description**: updated

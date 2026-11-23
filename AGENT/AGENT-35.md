@@ -7,7 +7,7 @@ priority: HIGH
 assignee: "Piper"
 reporter: USER
 created_at: 2026-03-30T20:00:27.396Z
-updated_at: 2026-07-11T16:53:29.535Z
+updated_at: 2026-11-23T22:02:52.529Z
 ---
 
 # Design deferred deterministic guidance/enforcement hooks for tool use
@@ -16,9 +16,9 @@ Design the first deterministic tool-use enforcement slice for Sandpiper.
 
 Canonical design docs:
 
-- `.sandpiper/docs/specs/agent-35-deterministic-tool-use-enforcement-prd.md`
-- `.sandpiper/docs/specs/agent-35-deterministic-tool-use-enforcement-spec.md`
-- `.sandpiper/docs/specs/agent-35-deterministic-tool-use-enforcement-work-plan.md`
+- `.sandpiper/archive/agent-35-deterministic-tool-use-enforcement-prd-2026-06.md`
+- `.sandpiper/archive/agent-35-deterministic-tool-use-enforcement-spec-2026-06.md`
+- `.sandpiper/archive/agent-35-deterministic-tool-use-enforcement-work-plan-2026-06.md`
 
 Current scope:
 
@@ -68,3 +68,7 @@ Next implementation move: Phase 0 hook-surface spike from the work plan.
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:52.529Z
+
+- **description**: updated

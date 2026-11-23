@@ -18,8 +18,6 @@ Fix: generate the export command based on detected shell:
 - Fish: `set -gx VAR 'value'`
 - Bash/Zsh: `export VAR='value'`
 
-Reference: code-review-shr-v1.md Finding 4
-
 ---
 
 # Activity Log

@@ -9,7 +9,7 @@ reporter: USER
 created_at: 2026-11-11T18:45:09.987Z
 blocked_by:
   - TOOLS-122
-updated_at: 2026-11-11T21:49:51.343Z
+updated_at: 2026-11-23T22:05:39.736Z
 ---
 
 # Independently rerun the corrected reference and implementation gates
@@ -20,7 +20,7 @@ After TOOLS-126 removed the smoke file, the four unattempted or failed unit gate
 
 ## Final corrected queue checkpoint (2026-11-11)
 
-Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. Full logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik; summary.json contains exact results. All agents/processes are stopped and checkouts removed.
+Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. All agents/processes are stopped and checkouts removed.
 
 ## Updated verification policy (2026-11-11)
 
@@ -65,3 +65,7 @@ After test-only fix, verify corrected reference plus every implementation unit w
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:39.736Z
+
+- **description**: updated

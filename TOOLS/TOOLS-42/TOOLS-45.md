@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-26T14:44:09.562Z
-updated_at: 2026-10-28T01:17:05.524Z
+updated_at: 2026-11-23T22:02:38.301Z
 ---
 
 # Add PATH-gated resource discovery with hermetic tests
 
-Added a small Node-compatible filesystem executable probe and resource-discovery hook. If trail is executable on PATH, registers ~/git/skills-incubator/skills/trail; otherwise leaves the built-in catalogue unchanged. Rechecks PATH during resource reload. Does not execute trail or query any flags, and adds no downloads or new flags. Test-first focused coverage verifies absence, later PATH entries, no CLI invocation, non-executable files, directories, reload checks, and actual SDK discovery from hermetic HOME/PATH fixtures. Headless test HOME is now sandboxed so real archived user skills cannot leak into tests.
+Added a small Node-compatible filesystem executable probe and resource-discovery hook. If trail is executable on PATH, registers the archived trail skill from the separate skills-incubator repository; otherwise leaves the built-in catalogue unchanged. Rechecks PATH during resource reload. Does not execute trail or query any flags, and adds no downloads or new flags. Test-first focused coverage verifies absence, later PATH entries, no CLI invocation, non-executable files, directories, reload checks, and actual SDK discovery from hermetic HOME/PATH fixtures. Headless test HOME is now sandboxed so real archived user skills cannot leak into tests.
 
 ## Bookkeeping acceptance — 2026-10-27
 
@@ -45,3 +45,7 @@ Current verification: bun check passed with zero errors/warnings; bun run test r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:38.301Z
+
+- **description**: updated

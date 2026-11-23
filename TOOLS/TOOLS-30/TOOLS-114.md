@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-11T15:54:46.048Z
-updated_at: 2026-11-11T21:49:42.512Z
+updated_at: 2026-11-23T22:05:39.527Z
 related:
   - TOOLS-92
   - TOOLS-112
@@ -17,11 +17,11 @@ related:
 
 ## Full gates passed (2026-11-11)
 
-zuylmqmn / d89f88e6 (formatting): 65 files, 535 tests passed in 114s. sntvwxtp / b28ec60f (Prettier check in the gate): 65 files, 535 tests passed in 98s. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards. Logs: /tmp/sandpiper-tools126.aXQgrZ/gates (summary.tsv).
+zuylmqmn / d89f88e6 (formatting): 65 files, 535 tests passed in 114s. sntvwxtp / b28ec60f (Prettier check in the gate): 65 files, 535 tests passed in 98s. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards.
 
 ## Final corrected queue checkpoint (2026-11-11)
 
-Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. Full logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik; summary.json contains exact results. All agents/processes are stopped and checkouts removed.
+Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. All agents/processes are stopped and checkouts removed.
 
 ## Verification stopped at TOOLS-116 (2026-11-11)
 
@@ -29,7 +29,7 @@ All ten approved implementations are committed and independently reviewed. Six t
 
 ## Implementation and independent check checkpoint (2026-11-11)
 
-Changes zuylmqmn (format-only) and sntvwxtp (Prettier dependency/gate) implement the full recorded scope. Exact Prettier3.10.0 pin; lock adds only3lines. Independent revision-byte review proves all18 Markdown changes equal formatter(original), all54 selected files are clean, and all75 excluded tracked files are unchanged. Worker fixtures prove hidden guidance is checked and18 ignored areas stay unchanged. Parent independently passed frozen installs, bun check (zero errors/warnings) and the focused metadata regression for both units. Logs: /tmp/sandpiper-markdown-independent.zzPSEN. Full/heavy and per-unit full-test gates remain pending; status stays IN PROGRESS, not accepted.
+Changes zuylmqmn (format-only) and sntvwxtp (Prettier dependency/gate) implement the full recorded scope. Exact Prettier3.10.0 pin; lock adds only3lines. Independent revision-byte review proves all18 Markdown changes equal formatter(original), all54 selected files are clean, and all75 excluded tracked files are unchanged. Worker fixtures prove hidden guidance is checked and18 ignored areas stay unchanged. Parent independently passed frozen installs, bun check (zero errors/warnings) and the focused metadata regression for both units. Full/heavy and per-unit full-test gates remain pending; status stays IN PROGRESS, not accepted.
 
 ## Decision
 
@@ -81,3 +81,7 @@ Doug decided on 2026-11-10 (TOOLS-92 review, inventory row B-16): format the tra
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:39.527Z
+
+- **description**: updated

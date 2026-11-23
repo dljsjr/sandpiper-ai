@@ -16,7 +16,7 @@ Fetch a URL and return clean, token-efficient markdown content for the agent.
 
 Pipeline: fetch() → jsdom → @mozilla/readability → turndown → TOON envelope
 Architecture: Pi extension with framework-independent core + adapter interface
-Full design: .sandpiper/docs/web-fetch-prd.md
+Full design: .sandpiper/archive/web-fetch-prd.md
 
 ---
 

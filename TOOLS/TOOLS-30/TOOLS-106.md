@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "session-vars"
 reporter: USER
 created_at: 2026-11-09T23:33:26.773Z
-updated_at: 2026-11-10T15:48:33.321Z
+updated_at: 2026-11-23T22:02:37.430Z
 related:
   - TOOLS-92
 ---
@@ -43,7 +43,7 @@ For review:
 
 ## Decision
 
-Doug decided on 2026-11-09, during the TOOLS-92 review: remove the session PID files, and keep SANDPIPER_SESSION_ID and SANDPIPER_SESSION_FILE set for the whole process. Not started. Inventory row K-10 in .sandpiper/docs/specs/retained-surface-inventory.md.
+Doug decided on 2026-11-09, during the TOOLS-92 review: remove the session PID files, and keep SANDPIPER_SESSION_ID and SANDPIPER_SESSION_FILE set for the whole process. Not started. Inventory row K-10 in .sandpiper/archive/retained-surface-inventory.md.
 
 ## Why
 
@@ -89,3 +89,7 @@ Observed while reading: when a new session has no session file, the previous SAN
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:37.430Z
+
+- **description**: updated

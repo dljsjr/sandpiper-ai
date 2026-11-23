@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-26T16:34:35.175Z
-updated_at: 2026-10-28T01:17:06.153Z
+updated_at: 2026-11-23T22:02:49.543Z
 ---
 
 # Review standup CLI, skill, and documentation for safety and complexity
 
-Reviewed the standup CLI, its skill, public docs, internal design/playbooks, and runtime/build connections. Findings are in .sandpiper/docs/specs/standup-review-2026-10-26.md (indexed in .sandpiper/docs/README.md). Reproduced successful concurrent lost updates, silent loss from unrecognized or mixed Markdown and accepted whitespace IDs, non-round-trippable read output, blanket cleanup with unknown liveness, and empty-input replacement. Confirmed the historical destructive-read behavior is fixed. All mutations used temporary HOME/XDG/project fixtures. Focused suite: 7 files / 52 tests pass; source/test Biome check clean. No runtime/skill fixes, redesign, real-data cleanup, or removal authorized or performed. No future implementation work is implied by this review.
+Reviewed the standup CLI, its skill, public docs, internal design/playbooks, and runtime/build connections. Reproduced successful concurrent lost updates, silent loss from unrecognized or mixed Markdown and accepted whitespace IDs, non-round-trippable read output, blanket cleanup with unknown liveness, and empty-input replacement. Confirmed the historical destructive-read behavior is fixed. All mutations used temporary HOME/XDG/project fixtures. Focused suite: 7 files / 52 tests pass; source/test Biome check clean. No runtime/skill fixes, redesign, real-data cleanup, or removal authorized or performed. No future implementation work is implied by this review.
 
 ## Bookkeeping acceptance — 2026-10-27
 
@@ -45,3 +45,7 @@ Current verification: bun check passed with zero errors/warnings; bun run test r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:49.543Z
+
+- **description**: updated

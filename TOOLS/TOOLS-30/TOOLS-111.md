@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-11T05:36:37.419Z
-updated_at: 2026-11-11T21:49:42.300Z
+updated_at: 2026-11-23T22:05:38.818Z
 related:
   - TOOLS-92
   - TOOLS-109
@@ -18,17 +18,17 @@ related:
 
 ## bunfig.toml removed (2026-11-11)
 
-Doug chose to delete it after the probe below. Change tmozzwzk / 42eaf738 follows sntvwxtp and removes bunfig.toml, its description in docs/dev/build-system.md and its trigger in the build playbook. Reason: for a lockfile with configVersion 1, Bun defaults to the isolated linker with workspaces and the hoisted linker without them; the root manifest has no workspaces. Gate in an isolated checkout: frozen install (166 top-level node_modules entries, no .bun store), clean bun check, full serial suite 65 files, 535 tests passed in 43s. Logs: /tmp/sandpiper-tools126.aXQgrZ/bunfig-rm.
+Doug chose to delete it after the probe below. Change tmozzwzk / 42eaf738 follows sntvwxtp and removes bunfig.toml, its description in docs/dev/build-system.md and its trigger in the build playbook. Reason: for a lockfile with configVersion 1, Bun defaults to the isolated linker with workspaces and the hoisted linker without them; the root manifest has no workspaces. Gate in an isolated checkout: frozen install (166 top-level node_modules entries, no .bun store), clean bun check, full serial suite 65 files, 535 tests passed in 43s.
 
 ## Full gate passed; bunfig question answered (2026-11-11)
 
-oykttyqt / 1b33b8ff: 65 files, 535 tests passed in 77s, including the real offline packed CLI test. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards. Logs: /tmp/sandpiper-tools126.aXQgrZ/gates (summary.tsv).
+oykttyqt / 1b33b8ff: 65 files, 535 tests passed in 77s, including the real offline packed CLI test. Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards.
 
-Without-bunfig probe at the tip sntvwxtp / b28ec60f: with bunfig.toml deleted, a frozen install produced the same hoisted layout (166 top-level node_modules entries, no .bun store) and the full suite passed 65 files, 535 tests in 48s, packing included. With one manifest the hoisted-linker setting changes nothing. bunfig.toml is still in the tree; removing it and its mention in docs/dev/build-system.md awaits Doug. Logs: /tmp/sandpiper-tools126.aXQgrZ/bunfig-probe.
+Without-bunfig probe at the tip sntvwxtp / b28ec60f: with bunfig.toml deleted, a frozen install produced the same hoisted layout (166 top-level node_modules entries, no .bun store) and the full suite passed 65 files, 535 tests in 48s, packing included. With one manifest the hoisted-linker setting changes nothing. bunfig.toml is still in the tree; removing it and its mention in docs/dev/build-system.md awaits Doug.
 
 ## Final corrected queue checkpoint (2026-11-11)
 
-Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. Full logs: /var/folders/zj/49vt4cds6l15fs_1frdvz89r0000gn/T/sandpiper-tools121-independent.7rb1rlik; summary.json contains exact results. All agents/processes are stopped and checkouts removed.
+Corrected reference and seven implementation units passed full gates; the ninth run stopped at TOOLS-113 with three different existing5-second source-entrypoint smoke timeouts. The guarded runtime-import case did not fail. No retry, new source change or cause attribution followed. TOOLS-122 records the new blocker. Consolidation and two Markdown unit full gates and without-bunfig probe remain unattempted. All agents/processes are stopped and checkouts removed.
 
 ## Verification stopped at TOOLS-116 (2026-11-11)
 
@@ -38,7 +38,7 @@ All ten approved implementations are committed and independently reviewed. Six t
 
 Parent/gate independently passed frozen install and the revision-specific bun check with zero errors/warnings. All ten tasks are implemented and independently reviewed with no outstanding actionable findings. Full/per-commit full-test gates remain pending quiet load; no completion or acceptance is claimed.
 
-Fresh dependency install also passed with no workspace links. The504-module build and both built CLI help commands passed under isolated HOME/agent/XDG/offline configuration. Logs: /tmp/sandpiper-gate-tools111.KePNdL. Real packing/bunfig proof still awaits quiet load.
+Fresh dependency install also passed with no workspace links. The504-module build and both built CLI help commands passed under isolated HOME/agent/XDG/offline configuration. Real packing/bunfig proof still awaits quiet load.
 
 ## Implementation checkpoint (2026-11-11)
 
@@ -122,3 +122,7 @@ Doug approved on 2026-11-10 (TOOLS-92 review, inventory rows B-27, B-3 and B-8):
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:38.818Z
+
+- **description**: updated

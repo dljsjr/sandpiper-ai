@@ -10,14 +10,14 @@ created_at: 2026-04-27T18:20:52.924Z
 related:
   - AGENT-16
   - AGENT-82
-updated_at: 2026-10-20T21:40:53.289Z
+updated_at: 2026-11-23T22:02:36.458Z
 ---
 
 # Plan package-first multi-distribution refactor
 
 Plan the repository refactor from a Pi-package-oriented Sandpiper repo to a package-first monorepo with multiple distributions.
 
-Work plan: `.sandpiper/docs/specs/package-first-multi-distribution.md`
+Work plan: `.sandpiper/archive/package-first-multi-distribution-2026-04.md`
 
 Summary:
 - Treat `packages/` as the long-term source of truth; root `extensions/`, `skills/`, `prompts`, and `themes` become generated/bridged distribution layout rather than canonical authored source.
@@ -74,3 +74,7 @@ Guardrails:
 ## 2026-10-20T21:40:53.295Z
 
 - **content**: updated via editor
+
+## 2026-11-23T22:02:36.458Z
+
+- **description**: updated

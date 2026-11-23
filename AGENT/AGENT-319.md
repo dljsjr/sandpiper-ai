@@ -7,7 +7,7 @@ priority: HIGH
 assignee: "pi-audit"
 reporter: USER
 created_at: 2026-11-10T16:09:43.550Z
-updated_at: 2026-11-10T22:20:41.112Z
+updated_at: 2026-11-23T22:02:52.331Z
 ---
 
 # Update the Pi dependency from 1.3.0 to 1.5.2
@@ -49,7 +49,7 @@ Coordinator findings that shape the work:
 - Type imports: Pi 1.5.2 still types registerTool against TypeBox (dist/core/extensions/types.d.ts imports Static and TSchema from typebox), its own built-in tools import Type from typebox, and its extension guide says to do the same. pi-schema is the validator. So the fix is to import Type from typebox.
 - The default-preamble assertion in extensions/system/prompt-ownership.test.ts is redundant: the line before it already asserts that the prompt starts with Sandpiper's block. Delete it instead of pinning Pi's new wording.
 
-Audit: .sandpiper/docs/specs/pi-1-5-update-audit.md (AGENT-320).
+Audit: .sandpiper/archive/pi-1-5-update-audit.md (AGENT-320).
 
 Doug wants the Pi dependency updated from 1.3.0 to 1.5.0 so the latest Codex models are available. On 2026-11-10 npm lists 1.3.0, 1.4.0, 1.5.0, 1.5.1 and 1.5.2 for all four @earendil-works packages that Sandpiper pins (pi-coding-agent, pi-ai, pi-tui, pi-mcp).
 
@@ -95,3 +95,7 @@ Sequence: audit first (subtask), then the update itself after Doug reviews the a
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:52.331Z
+
+- **description**: updated

@@ -7,7 +7,7 @@ priority: LOW
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-05-20T07:07:55.099Z
-updated_at: 2026-11-19T20:14:37.153Z
+updated_at: 2026-11-23T22:02:34.728Z
 ---
 
 # Extract Navigator dogfood observations from Tattler notes
@@ -16,7 +16,7 @@ Tattler v0 dogfood notes captured several valuable Navigator pair-programming ob
 
 ## Outcome (2026-11-19 triage)
 
-The extraction already existed: on 2026-05-19 the Navigator repository captured these observations in `~/git/navigator/.sandpiper/docs/specs/navigator-dogfood-feedback.md`, with NAV-51 to NAV-55 tracking them. Every observation in the Tattler notes is covered there. This change removes the duplicate "Navigator Dogfood Observations" and "Possible Navigator Guidance / Skill Work" sections and the three Navigator open questions from `.sandpiper/docs/specs/tattler-v0-dogfood-notes.md`, leaving a pointer. Navigator was also added to `~/.sandpiper/agent/projects.md` (Active false: not currently loaded).
+The extraction already existed: on 2026-05-19 the Navigator repository captured these observations, with NAV-51 to NAV-55 tracking them. Every observation in the Tattler notes is covered there. This change removes the duplicate "Navigator Dogfood Observations" and "Possible Navigator Guidance / Skill Work" sections and the three Navigator open questions from `.sandpiper/docs/specs/tattler-v0-dogfood-notes.md`, leaving a pointer. Navigator was also added to the global project index (Active false: not currently loaded).
 
 ---
 
@@ -36,3 +36,7 @@ The extraction already existed: on 2026-05-19 the Navigator repository captured 
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: UNRESOLVED → DONE
+
+## 2026-11-23T22:02:34.728Z
+
+- **description**: updated

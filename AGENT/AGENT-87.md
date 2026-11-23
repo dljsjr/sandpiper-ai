@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-27T18:20:53.126Z
-updated_at: 2026-05-01T18:47:29.502Z
+updated_at: 2026-11-23T22:02:53.319Z
 depends_on:
   - AGENT-86
 related:
@@ -16,7 +16,7 @@ related:
 
 # Split Sandpiper identity from neutral capabilities
 
-Split current Sandpiper identity behavior from neutral capability extensions.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- Sandpiper-only behavior (identity/system prompt/startup/update/migration/env mirroring) lives in a Sandpiper identity adapter/package\n- neutral capability extension set can load in vanilla Pi without Sandpiper identity/system prompt changes\n- tests cover both identity-present and neutral modes
+Split current Sandpiper identity behavior from neutral capability extensions.\n\nSee .sandpiper/archive/package-first-multi-distribution-2026-04.md.\n\nCompletion signal:\n- Sandpiper-only behavior (identity/system prompt/startup/update/migration/env mirroring) lives in a Sandpiper identity adapter/package\n- neutral capability extension set can load in vanilla Pi without Sandpiper identity/system prompt changes\n- tests cover both identity-present and neutral modes
 
 ---
 
@@ -39,3 +39,7 @@ Split current Sandpiper identity behavior from neutral capability extensions.\n\
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:53.319Z
+
+- **description**: updated

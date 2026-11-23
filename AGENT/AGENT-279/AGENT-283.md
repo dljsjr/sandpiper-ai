@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "Doug"
 reporter: USER
 created_at: 2026-08-12T02:10:06.703Z
-updated_at: 2026-08-12T21:47:56.126Z
+updated_at: 2026-11-23T22:02:46.518Z
 ---
 
 # Make the split pi-yaams package publishable
@@ -19,7 +19,7 @@ Add a distribution-level check using the package manager pack output (and a mini
 
 ---
 
-**MOVED — not abandoned.** Rewritten by hand as **PIEXT-40** in `~/git/yaams` (2026-08-12). pi-yaams work belongs to the PIEXT project, whose charter is exactly this; AGENT covers capabilities not specific to a single tool or extension. pi-yaams is developed out-of-tree today but moves in-tree with yaams, which is why the board lives there. Trail has no cross-repo move, so this closes WONTFIX rather than leaving a tombstone. All content and work state carried over verbatim.
+**MOVED — not abandoned.** Rewritten by hand as **PIEXT-40** in the separate yaams repository (2026-08-12). pi-yaams work belongs to the PIEXT project, whose charter is exactly this; AGENT covers capabilities not specific to a single tool or extension. pi-yaams is developed out-of-tree today but moves in-tree with yaams, which is why the board lives there. Trail has no cross-repo move, so this closes WONTFIX rather than leaving a tombstone. All content and work state carried over verbatim.
 
 ---
 
@@ -37,3 +37,7 @@ Add a distribution-level check using the package manager pack output (and a mini
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: WONTFIX
+
+## 2026-11-23T22:02:46.518Z
+
+- **description**: updated

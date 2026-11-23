@@ -7,12 +7,12 @@ priority: MEDIUM
 assignee: AGENT
 reporter: AGENT
 created_at: 2026-10-26T16:34:45.558Z
-updated_at: 2026-10-28T01:17:06.027Z
+updated_at: 2026-11-23T22:02:55.201Z
 ---
 
 # Audit standup skill and public/internal documentation contracts
 
-Audited the source standup skill, public feature and build docs, active concurrent-sessions design, local continuity playbook, user-global orientation/standup playbooks, projects skill, lifecycle prompts, and relevant runtime/README claims. F5 in .sandpiper/docs/specs/standup-review-2026-10-26.md records contradictory read/write pruning contracts, stale flags/startup claims, missing public operational guidance, and a dead task-doc link. Only the review report and its index entry changed; no behavioral docs or skill rewrites were made.
+Audited the source standup skill, public feature and build docs, active concurrent-sessions design, local continuity playbook, user-global orientation/standup playbooks, projects skill, lifecycle prompts, and relevant runtime/README claims. F5 in the review report records contradictory read/write pruning contracts, stale flags/startup claims, missing public operational guidance, and a dead task-doc link. Only the review report and its index entry changed; no behavioral docs or skill rewrites were made.
 
 ## Bookkeeping acceptance — 2026-10-27
 
@@ -45,3 +45,7 @@ Current verification: bun check passed with zero errors/warnings; bun run test r
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:55.201Z
+
+- **description**: updated

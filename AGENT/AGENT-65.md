@@ -11,7 +11,7 @@ related:
   - AGENT-28
   - AGENT-46
   - AGENT-47
-updated_at: 2026-11-19T18:58:29.576Z
+updated_at: 2026-11-23T22:02:41.823Z
 ---
 
 # ProcessManager: add PTY spawn mode via @lydell/node-pty
@@ -37,7 +37,7 @@ AGENT-15 implemented the background process framework MVP using `child_process.s
 
 ## References
 
-- `.sandpiper/docs/openclaw-process-supervisor-investigation.md` — PTY adapter design research
+- `.sandpiper/archive/openclaw-process-supervisor-investigation.md` — PTY adapter design research
 - `packages/core/src/process-manager.ts` — current implementation (child mode only)
 - AGENT-15 — original background framework (completed without PTY)
 - SHR-71 — PTY adapter for shell_relay (WONTFIX — not needed for shell_relay)
@@ -66,3 +66,7 @@ Needs a native dependency (node-pty) for an edge case; no need has come up.
 
 - **status**: NOT STARTED → COMPLETE
 - **resolution**: UNRESOLVED → WONTFIX
+
+## 2026-11-23T22:02:41.823Z
+
+- **description**: updated

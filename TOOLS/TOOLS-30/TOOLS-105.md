@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "prompt-trim"
 reporter: USER
 created_at: 2026-11-09T22:57:46.443Z
-updated_at: 2026-11-10T15:48:33.231Z
+updated_at: 2026-11-23T22:02:54.109Z
 related:
   - TOOLS-92
 ---
@@ -40,7 +40,7 @@ Left as is: the Testing section of docs/dev/env-vars.md still shows a direct PI_
 
 ## Decision
 
-Doug approved on 2026-11-09, during the TOOLS-92 review: remove resolveEnvVar, and have the update check read PI_OFFLINE directly. Inventory row K-14d in .sandpiper/docs/specs/retained-surface-inventory.md.
+Doug approved on 2026-11-09, during the TOOLS-92 review: remove resolveEnvVar, and have the update check read PI_OFFLINE directly. Inventory row K-14d in .sandpiper/archive/retained-surface-inventory.md.
 
 ## Why
 
@@ -86,3 +86,7 @@ Environment mirroring in packages/cli/standalone_bootstrap.ts (K-13, kept). The 
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:54.109Z
+
+- **description**: updated

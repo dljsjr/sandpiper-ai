@@ -1,0 +1,34 @@
+===================================================================
+--- a/TOOLS-99.md
++++ b/TOOLS-99.md
+@@ -6,9 +6,9 @@
+ priority: MEDIUM
+ assignee: AGENT
+ reporter: USER
+ created_at: 2026-11-02T23:03:48.440Z
+-updated_at: 2026-11-03T01:50:56.436Z
++updated_at: 2026-11-23T22:02:43.871Z
+ related:
+   - TOOLS-92
+ ---
+ 
+@@ -27,9 +27,9 @@
+ ## Research result: feasible internal-client candidate, no adoption approval
+ 
+ Pi's standalone @earendil-works/pi-mcp1.3.0 can replace the mcporter client layer behind the existing web_search facade. Source correction: only Parallel's anonymous web_search fallback uses mcporter; web_fetch uses ordinary HTTP. No REST rewrite, tools/list, host MCP manager/configuration, automatic upstream tool registration or new public tool is needed. Existing parser/provider/output boundary stays. Native package is already shipped transitively, but adoption still needs explicit exact direct declarations and normal packaging verification. Developer mise mcporter CLI is separate and unchanged.
+ 
+-Explanation: .sandpiper/docs/specs/web-search-mcp-transport-investigation.md. Lead reviewed full temporary proof and repeated15 injected-fetch cases plus strict public-API signature typecheck on Bun1.4.4. Existing parser/selection baseline2files14tests also passes. Temp evidence /tmp/tools99-native-mcp.f3C1Rv/{probe.ts,api-check.ts,result.json}; fake .invalid addresses, guarded uninjected fetch, isolated HOME/XDG. No real upstream/provider calls, production/dependency/build-output edits, install, workspace build or pack.
++Explanation: .sandpiper/archive/web-search-mcp-transport-investigation.md. Lead reviewed full temporary proof and repeated15 injected-fetch cases plus strict public-API signature typecheck on Bun1.4.4. Existing parser/selection baseline2files14tests also passes. Temp evidence /tmp/tools99-native-mcp.f3C1Rv/{probe.ts,api-check.ts,result.json}; fake .invalid addresses, guarded uninjected fetch, isolated HOME/XDG. No real upstream/provider calls, production/dependency/build-output edits, install, workspace build or pack.
+ 
+ Compatibility gates remain: actual Parallel Streamable HTTP/protocol support, loss of mcporter legacy HTTP+SSE fallback, exact15s tool-call bound versus connection setup, initialized-notification stall outside native request timeout, transport close after cancellation, best-effort1s session DELETE, malformed/error-result policy and current anonymous-auth behavior. Native is not a full-library drop-in replacement. Existing facade signal is not forwarded today; new user cancellation remains separate scope. Researcher native-mcp093cd11d85ba is closed. No replacement implementation ticket or code was created by assumption.
+ 
+ ## Original approved investigation
+@@ -64,4 +64,8 @@
+ ## 2026-11-03T01:50:56.437Z
+ 
+ - **status**: NEEDS REVIEW → COMPLETE
+ - **resolution**: DONE
++
++## 2026-11-23T22:02:43.871Z
++
++- **description**: updated

@@ -7,14 +7,14 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-11T20:54:39.469Z
-updated_at: 2026-11-11T21:49:42.026Z
+updated_at: 2026-11-23T22:05:37.608Z
 ---
 
 # Delete the redundant standalone CLI smoke tests
 
 ## Full gates passed (2026-11-11)
 
-Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards. Logs: /tmp/sandpiper-tools126.aXQgrZ/gates (summary.tsv).
+Each ran in a fresh isolated checkout: frozen install, clean bun check, then bun run test --maxWorkers 1 --no-file-parallelism with no filters, retries or timeout changes; source tree clean afterwards.
 
 - twvrvxws / 1d74e04b: 68 files, 526 tests, 65s
 - wvpsuuxu / 7fba4a71 (TOOLS-113): 65 files, 535 tests, 83s
@@ -32,7 +32,7 @@ Change twvrvxws / 1d74e04b, inserted directly after mwqvznwo so every simplifica
 
 Rebase effects: one conflict, in wtvvzmpy (it renamed the asserted flag to --identity in both files); resolved to the deleted file and the exactly-once form with --identity. Each rebased unit differs from its former commit by these two files only (checked zstuyrmu through zuylmqmn and the tip). New implementation tip sntvwxtp / b28ec60f; former 6924a9da.
 
-Verified at twvrvxws in an isolated checkout: frozen install, bun check clean, build, focused packedCli.test.ts 2/2 passed in 30.16s. Full per-commit gates are recorded under /tmp/sandpiper-tools126.aXQgrZ/gates.
+Verified at twvrvxws in an isolated checkout: frozen install, bun check clean, build, focused packedCli.test.ts 2/2 passed in 30.16s.
 
 ---
 
@@ -59,3 +59,7 @@ Verified at twvrvxws in an isolated checkout: frozen install, bun check clean, b
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:05:37.608Z
+
+- **description**: updated

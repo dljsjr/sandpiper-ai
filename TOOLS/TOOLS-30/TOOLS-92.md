@@ -9,14 +9,14 @@ reporter: USER
 created_at: 2026-11-02T17:42:31.696Z
 related:
   - TOOLS-93
-updated_at: 2026-11-11T16:41:28.979Z
+updated_at: 2026-11-23T22:02:54.597Z
 ---
 
 # Audit retained build, runtime and toolchain complexity against simplification scope
 
 ## Audit complete, awaiting review (2026-11-11)
 
-Every row of .sandpiper/docs/specs/retained-surface-inventory.md has a decision from Doug. The Decision column names the task that carries out each approved change.
+Every row of .sandpiper/archive/retained-surface-inventory.md has a decision from Doug. The Decision column names the task that carries out each approved change.
 
 Done and signed off: TOOLS-93 (Shell Relay), TOOLS-103 to TOOLS-108, TOOLS-115 (documents), AGENT-319 and AGENT-320 (Pi 1.5.2), and the local cleanup in Batch L.
 
@@ -26,7 +26,7 @@ Defects found during the review, each with its own task: AGENT-321 (prompt chang
 
 ## Inventory ready for decisions (2026-11-09)
 
-The deliverable now exists: .sandpiper/docs/specs/retained-surface-inventory.md (Reference). It replaces the pre-implementation classifications in build-simplification-exploration.md.
+The deliverable now exists: .sandpiper/archive/retained-surface-inventory.md (Reference). It replaces the pre-implementation classifications in build-simplification-exploration.md.
 
 Doug asked for a second repo-wide pass for missed removal and simplification candidates. Six read-only audit runs covered root toolchain/config, extensions, packages plus devtools, and documentation. The coordinator repeated the searches behind the main findings. Nothing was built, packed, installed or tested, and no product file changed.
 
@@ -50,7 +50,7 @@ Doug clarified that Shell Relay is deliberately disabled for poor behavior and i
 
 ## Exploration ready for review
 
-User requested a fresh search for the simplest possible build, especially whether devtools is needed. Results and tradeoffs are in .sandpiper/docs/specs/build-simplification-exploration.md (Explanation). No application source/manifests/build scripts changed; no implementation authorized.
+User requested a fresh search for the simplest possible build, especially whether devtools is needed. Results and tradeoffs are in .sandpiper/archive/build-simplification-exploration.md (Explanation). No application source/manifests/build scripts changed; no implementation authorized.
 
 Recommendation: one root product package, one direct Bun build for both entrypoints, ordinary Bun packing. This can remove Turbo, separate core emission, resources/docs staging and all three production devtools helpers (151 lines), while retaining test infrastructure and module boundaries. Root-owned docs/license/assets eliminate cross-package staging instead of moving it to new scripts. Preserve current consumer package/bin identity unless explicitly renamed.
 
@@ -133,3 +133,7 @@ Initial reconciliation is recorded; exhaustive retained-surface audit and user d
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:54.597Z
+
+- **description**: updated

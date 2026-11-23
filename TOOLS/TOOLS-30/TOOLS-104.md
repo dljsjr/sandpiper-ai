@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: "prompt-trim"
 reporter: USER
 created_at: 2026-11-09T22:37:52.756Z
-updated_at: 2026-11-10T15:48:33.133Z
+updated_at: 2026-11-23T22:02:48.359Z
 related:
   - TOOLS-92
 ---
@@ -45,7 +45,7 @@ Open: none for this task. Noted for later: the dumpSystemPrompt path writes to t
 
 ## Decision
 
-Doug approved three changes to the core system-prompt modules on 2026-11-09, during the TOOLS-92 review. Inventory rows K-14c, K-14e and K-14f in .sandpiper/docs/specs/retained-surface-inventory.md.
+Doug approved three changes to the core system-prompt modules on 2026-11-09, during the TOOLS-92 review. Inventory rows K-14c, K-14e and K-14f in .sandpiper/archive/retained-surface-inventory.md.
 
 ## Scope
 
@@ -90,3 +90,7 @@ One implementation agent in an isolated jj workspace, so its install, build and 
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:48.359Z
+
+- **description**: updated

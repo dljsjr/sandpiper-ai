@@ -7,7 +7,7 @@ priority: HIGH
 assignee: AGENT
 reporter: USER
 created_at: 2026-04-27T18:20:53.084Z
-updated_at: 2026-04-30T20:23:17.943Z
+updated_at: 2026-11-23T22:02:47.577Z
 depends_on:
   - AGENT-84
 related:
@@ -16,7 +16,7 @@ related:
 
 # Introduce host-context path and config abstraction
 
-Introduce typed host-context/path/config abstractions so neutral capability code receives app/cwd/agent/project/session paths explicitly instead of reading Sandpiper/Pi globals.\n\nSee .sandpiper/docs/specs/package-first-multi-distribution.md.\n\nCompletion signal:\n- neutral code paths receive typed host context or specific typed path values\n- path/config tests use temp dirs only\n- direct .sandpiper/~/.sandpiper/SANDPIPER_* references are isolated to Sandpiper identity/adapters/tests
+Introduce typed host-context/path/config abstractions so neutral capability code receives app/cwd/agent/project/session paths explicitly instead of reading Sandpiper/Pi globals.\n\nSee .sandpiper/archive/package-first-multi-distribution-2026-04.md.\n\nCompletion signal:\n- neutral code paths receive typed host context or specific typed path values\n- path/config tests use temp dirs only\n- direct .sandpiper/~/.sandpiper/SANDPIPER_* references are isolated to Sandpiper identity/adapters/tests
 
 ---
 
@@ -39,3 +39,7 @@ Introduce typed host-context/path/config abstractions so neutral capability code
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:47.577Z
+
+- **description**: updated

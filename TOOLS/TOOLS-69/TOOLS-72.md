@@ -7,7 +7,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-10-28T18:29:07.647Z
-updated_at: 2026-10-28T18:49:23.805Z
+updated_at: 2026-11-23T22:02:44.853Z
 ---
 
 # Remove mandatory routing and retired deployment of bundled refactoring
@@ -16,7 +16,7 @@ Inventory active global/project guidance, retained skills/prompts and deployment
 
 ## Implementation and verification — 2026-10-28
 
-Active routing updated minimally: global roles/developer/code-health.md makes installed refactoring guidance optional (zttqxmyr/1d075a7b); self-reflect mapping is optional; retained TDD changes only its first refactoring-skill dependency sentence. No TDD or prompt SOP rewrite was performed. The standalone refactor prompt has no hard skill prerequisite and is unchanged. Dotfiles uywuuwsy/694e5324 removes only symlink_refactoring.tmpl; deployed ~/.claude/skills/refactoring was verified as the obsolete Sandpiper link, backed up and removed, not retargeted. Backups: /Users/dstephen/.sandpiper/agent/backups/refactoring-unbundle-20261028-nUd8Rl/deployed-refactoring-skill-link and symlink_refactoring.tmpl. Independent inventory/no-autoload review PASS, no remaining hard routing blocker. Generic prose, historical records, other archives and independent installations remain untouched.
+Active routing updated minimally: global roles/developer/code-health.md makes installed refactoring guidance optional (zttqxmyr/1d075a7b); self-reflect mapping is optional; retained TDD changes only its first refactoring-skill dependency sentence. No TDD or prompt SOP rewrite was performed. The standalone refactor prompt has no hard skill prerequisite and is unchanged. Dotfiles uywuuwsy/694e5324 removes only symlink_refactoring.tmpl; the deployed Claude Code refactoring skill was verified as the obsolete Sandpiper link, backed up and removed, not retargeted. Independent inventory/no-autoload review PASS, no remaining hard routing blocker. Generic prose, historical records, other archives and independent installations remain untouched.
 
 ---
 
@@ -39,3 +39,7 @@ Active routing updated minimally: global roles/developer/code-health.md makes in
 
 - **status**: NEEDS REVIEW → COMPLETE
 - **resolution**: DONE
+
+## 2026-11-23T22:02:44.853Z
+
+- **description**: updated
