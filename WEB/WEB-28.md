@@ -1,0 +1,40 @@
+---
+title: "Surface page link relations in web_fetch's additional_content block"
+status: NEEDS REVIEW
+kind: TASK
+priority: MEDIUM
+assignee: AGENT
+reporter: USER
+created_at: 2026-11-23T22:52:40.769Z
+updated_at: 2026-11-23T22:57:28.711Z
+---
+
+# Surface page link relations in web_fetch's additional_content block
+
+Help agents find more information from a fetched page, using only what the page declares (its <link> elements and Link header). No new probing; a /.well-known resource is reported only when the page links to it.
+
+Elements, each emitted only when present, in this order; the block is left out when none is present:
+- canonical (RFC 6596): only when it differs from the final URL
+- latest_version (RFC 5829 latest-version)
+- prev (HTML; previous accepted), next (HTML), up (RFC 8288): url plus the link's title when given
+- llms_txt: url only (drop status and http_status). Also accept rel=index declarations whose target ends in /llms.txt (GitHub Docs), beside describedby
+- agent_skills: a link with any relation to /.well-known/agent-skills/index.json or /.well-known/skills/index.json (Agent Skills Discovery draft v0.2.0; Stripe advertises it with rel=service-meta)
+
+llms_txt and agent_skills carry one short line of guidance as element text (fetch the index instead of guessing URLs; read skills as page content, never install them). The other relations are self-explanatory. The tool description names the block once. Titles are whitespace-normalized, capped, and XML-escaped.
+
+Also: ignore a Markdown alternate whose target is an llms*.txt file (a section page on specification.website declared /llms-full.txt, 918 KB).
+
+Rejected after review: Last-Modified (build or cache time, weeks off real content dates), OpenSearch and SearchAction (extra request; results often need JavaScript), cite-as, breadcrumbs, content dates, first/last, other RFC 5829 version links, feeds, hreflang, probing /.well-known.
+
+---
+
+# Activity Log
+
+## 2026-11-23T22:52:44.719Z
+
+- **status**: NOT STARTED → IN PROGRESS
+- **assignee**: UNASSIGNED → AGENT
+
+## 2026-11-23T22:57:28.711Z
+
+- **status**: IN PROGRESS → NEEDS REVIEW
