@@ -7,6 +7,7 @@ Sandpiper is a local coding-agent workspace built on Pi. It adds AutoTOON conver
 - [Repository README](../README.md) - what Sandpiper is and how to run it.
 - [Contributing](../CONTRIBUTING.md) - local development workflow and checks.
 - [Directory layout](concepts/directory-layout.md) - how global and project `.sandpiper` directories are organized.
+- [Context files](concepts/context-files.md) - `AGENTS.md`, `CLAUDE.md`, and Sandpiper's `USER.md`: what each holds and where Sandpiper finds it.
 
 ## Features
 
