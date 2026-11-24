@@ -1,12 +1,13 @@
 ---
 title: "Surface page link relations in web_fetch's additional_content block"
-status: NEEDS REVIEW
+status: COMPLETE
+resolution: DONE
 kind: TASK
 priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-23T22:52:40.769Z
-updated_at: 2026-11-24T02:30:49.093Z
+updated_at: 2026-11-24T02:32:27.867Z
 ---
 
 # Surface page link relations in web_fetch's additional_content block
@@ -42,3 +43,8 @@ Rejected after review: Last-Modified (build or cache time, weeks off real conten
 ## 2026-11-24T02:30:49.093Z
 
 - **description**: updated
+
+## 2026-11-24T02:32:27.867Z
+
+- **status**: NEEDS REVIEW → COMPLETE
+- **resolution**: UNRESOLVED → DONE
