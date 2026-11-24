@@ -6,7 +6,7 @@ priority: MEDIUM
 assignee: AGENT
 reporter: USER
 created_at: 2026-11-23T22:52:40.769Z
-updated_at: 2026-11-23T22:57:28.711Z
+updated_at: 2026-11-24T02:30:49.093Z
 ---
 
 # Surface page link relations in web_fetch's additional_content block
@@ -20,7 +20,7 @@ Elements, each emitted only when present, in this order; the block is left out w
 - llms_txt: url only (drop status and http_status). Also accept rel=index declarations whose target ends in /llms.txt (GitHub Docs), beside describedby
 - agent_skills: a link with any relation to /.well-known/agent-skills/index.json or /.well-known/skills/index.json (Agent Skills Discovery draft v0.2.0; Stripe advertises it with rel=service-meta)
 
-llms_txt and agent_skills carry one short line of guidance as element text (fetch the index instead of guessing URLs; read skills as page content, never install them). The other relations are self-explanatory. The tool description names the block once. Titles are whitespace-normalized, capped, and XML-escaped.
+llms_txt and agent_skills carry one short line of guidance as element text (the file is an index and site map of the site for AI agents; skills are read as page content, never installed). The other relations are self-explanatory. The tool description names the block once. Titles are whitespace-normalized, capped, and XML-escaped.
 
 Also: ignore a Markdown alternate whose target is an llms*.txt file (a section page on specification.website declared /llms-full.txt, 918 KB).
 
@@ -38,3 +38,7 @@ Rejected after review: Last-Modified (build or cache time, weeks off real conten
 ## 2026-11-23T22:57:28.711Z
 
 - **status**: IN PROGRESS → NEEDS REVIEW
+
+## 2026-11-24T02:30:49.093Z
+
+- **description**: updated
